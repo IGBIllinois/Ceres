@@ -1,0 +1,26 @@
+{
+  "header": {
+    "title": "This is a test."
+  },
+  "orientation": {
+    "pan (deg)": 0.0,
+    "tilt (deg)": 0.0
+  },
+  "data acquisition": [ "os0-128" ],
+  "movement": [
+    {
+      "x (mm)": 6000,
+      "y (mm)": 6000,
+      "z (mm)": 6000,
+      "speed (mm/s)": 1000,
+      "collected data": false
+    },
+    {
+      "x (mm)": 7000,
+      "y (mm)": 7000,
+      "z (mm)": 6000,
+      "speed (mm/s)": 500,
+      "collected data": true
+    }
+  ]
+}
