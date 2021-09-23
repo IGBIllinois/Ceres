@@ -6,6 +6,8 @@
 
 cmake_minimum_required(VERSION 3.18)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 #
 # Setting this policy to NEW allows us to use the MSVC_RUNTIME_LIBRARY 
 # target property.  The generator expression would look like:
@@ -99,6 +101,7 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Find and include VTK
 
 find_package(VTK COMPONENTS GUISupportQt IOImage InteractionImage RenderingOpenGL2 TestingCore REQUIRED)
+find_package(PCL REQUIRED)
 
 # Find and include Qt
 set(Qt Qt5)
@@ -110,6 +113,7 @@ find_package(Ouster REQUIRED)
 find_package(ssnx2net REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
+#find_package(PkgConfig REQUIRED)
 
 #******************************************************************************
 # BUILD TYPE AND CODE
