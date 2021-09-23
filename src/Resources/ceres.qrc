@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/dcGui" >
-        <file>Icons/ripe.icns</file>
-        <file>Icons/ripe.ico</file>
-        <file>Images/About.png</file>
-        <file>Images/bottom_logo.png</file>
-        <file>UI/AboutDialog.ui</file>
-    </qresource>
-</RCC>
