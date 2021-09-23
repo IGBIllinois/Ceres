@@ -7,6 +7,16 @@
 
 class cDataBufferView;
 
+
+/******************************************************************************
+ *
+ * cDataBuffer: A read/write data buffer.
+ *
+ * The data buffer will auto
+ *
+ ******************************************************************************/
+
+
 class cDataBuffer
 {
 public:
@@ -225,6 +235,7 @@ public:
     cDataBuffer& operator>>(uint64_t& out);
     cDataBuffer& operator>>(float& out);
     cDataBuffer& operator>>(double& out);
+    cDataBuffer& operator>>(std::string& out);
 
     void read(std::string& out, unsigned char len);
     void read(std::byte*& out, unsigned char len);
@@ -258,6 +269,7 @@ public:
     cDataBuffer& operator<<(const uint64_t in);
     cDataBuffer& operator<<(const float in);
     cDataBuffer& operator<<(const double in);
+    cDataBuffer& operator<<(const std::string& in);
 
     void write(const std::string& in);
     void write(const std::byte* in, unsigned char len);

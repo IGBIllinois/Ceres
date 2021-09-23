@@ -8,15 +8,21 @@
 #include <functional>
 
 
-class cGpsStreamSsnx : public QObject
+class cGpsStreamSsnx //: public QObject
 {
-	Q_OBJECT
+//	Q_OBJECT
 
 public:
-	explicit cGpsStreamSsnx(QObject* parent = nullptr);
+//	explicit cGpsStreamSsnx(QObject* parent = nullptr);
+	cGpsStreamSsnx();
 	~cGpsStreamSsnx();
 
 	void registerDataProcessingCallback(std::function<void(const void* pBuffer, std::size_t buf_length)> fp);
+
+	/**
+	 * Try to setup the socket to listen for GPS data
+	 */
+	bool isConnected() const;
 
 	/**
 	 * Try to setup the socket to listen for GPS data
@@ -29,14 +35,19 @@ public:
 	void clear();
 
 	/**
-	 * receive_data will retrieve and process  datagrams from the UDP socket.
+	 * receive_data will retrieve and process datagrams from the UDP socket.
 	 * Note: call this method in a non-threaded non-GUI console application
 	 */
 	void receive_data();
 
-private:
-	void processDatagram();
+	/**
+	 * processOneDatagram will retrieve and process a single datagram from the UDP socket.
+	 * Note: this method will return immediately if no datagram is waiting
+	 */
+	void processOneDatagram();
+	void processDatagrams();
 
+	virtual void processDatagram(const void* pBuffer, std::size_t buf_length) = 0;
 
 private:
 	static const size_t MAX_DATA_LENGTH = 128;

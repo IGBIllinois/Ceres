@@ -11,7 +11,7 @@
 
 #include <QObject>
 
-class cLidarModelOuster : public cLidarModel
+class cLidarModelOuster : public cLidarModel, private cOusterImuStream_Qt, private cOusterLidarStream_Qt
 {
     Q_OBJECT
 
@@ -19,18 +19,29 @@ public:
     cLidarModelOuster(QObject* parent = nullptr);
     virtual ~cLidarModelOuster() = default;
 
+    /*
+     * Returns the preferred window title for the corresponding view.
+     */
+    QString getViewTitle() const override;
+
     void configure(nlohmann::json& jsonCfg) override;
     void writeDataHeader(cDataFile& file) override;
 
-private slots:
-    void processImuData(ouster::imu_data_t data);
-    void processLidarData(uint16_t frameID, ouster::lidar_data_t data);
+    double lidar_origin_to_beam_origin_mm() const;
+    const std::vector<double>& beam_azimuth_angles_rad() const;
+    const std::vector<double>& beam_altitude_angles_rad() const;
 
 protected:
+    void onNewData(const ouster::imu_data_t& new_data) override;
+    void onNewData(uint16_t frameID, ouster::lidar_data_t& data) override;
+
+protected:
+    void run() override;
+
+private:
+    bool mConnected;
 
     cOusterCmdStream_Qt   mCmdStream;
-    cOusterLidarStream_Qt mDataStream;
-    cOusterImuStream_Qt   mImuStream;
 
     ouster::sensor_network_info_t mActiveSensor;
 
@@ -49,5 +60,9 @@ protected:
 
     uint16_t              mLastFrameID;
     ouster::lidar_data_t  mLastLidarData;
+
+    double mLidarOriginToBeamOrigin_mm;
+    std::vector<double> mBeamAzimuthAngles_rad;
+    std::vector<double> mBeamAltitudeAngles_rad;
 };
 

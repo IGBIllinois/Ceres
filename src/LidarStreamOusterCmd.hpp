@@ -7,12 +7,10 @@
 #include <QtNetwork/QTcpSocket>
 
 
-class cOusterCmdStream_Qt : public QObject, public cOusterCommandStream
+class cOusterCmdStream_Qt : public cOusterCommandStream
 {
-	Q_OBJECT
-
 public:
-	explicit cOusterCmdStream_Qt(QObject* parent = nullptr);
+	cOusterCmdStream_Qt();
 	~cOusterCmdStream_Qt();
 
 private:

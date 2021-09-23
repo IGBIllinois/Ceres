@@ -5,12 +5,13 @@
 
 cDataModel::cDataModel()
 :
-    QObject()
+    QThread()
 {
 }
 
 cDataModel::~cDataModel()
 {
+    stopDataCollection();
 }
 
 void cDataModel::addSensor(cSensorModel* pSensor)
@@ -21,7 +22,34 @@ void cDataModel::addSensor(cSensorModel* pSensor)
 
 void cDataModel::startDataCollection()
 {
-    mFile.open("test.data");
+    if (!isRunning()) 
+    {
+        start(TimeCriticalPriority);
+    }
+}
+
+void cDataModel::stopDataCollection()
+{
+    mMutex.lock();
+    mAbort = true;
+    mMutex.unlock();
+
+    wait();
+
+    if (mFile.isOpen())
+    {
+        for (auto& sensor : mActiveSensors)
+        {
+            sensor->stopDataRecording();
+        }
+
+        mFile.close();
+    }
+}
+
+void cDataModel::startDataRecording(const std::string& filename)
+{
+    mFile.open(filename);
 
     for (auto& sensor : mActiveSensors)
     {
@@ -34,7 +62,7 @@ void cDataModel::startDataCollection()
     }
 }
 
-void cDataModel::stopDataCollection()
+void cDataModel::stopDataRecording()
 {
     for (auto& sensor : mActiveSensors)
     {
@@ -42,4 +70,20 @@ void cDataModel::stopDataCollection()
     }
 
     mFile.close();
+
+}
+
+void cDataModel::run()
+{
+    forever
+    {
+        if (mAbort)
+            return;
+
+        for (auto& sensor : mActiveSensors)
+        {
+            sensor->run();
+        }
+
+    }
 }

@@ -8,6 +8,8 @@
 //#include "OusterWidget.hpp"
 
 #include <QtWidgets>
+#include <QMessageBox>
+
 
 #include <cassert>
 #include <iostream>
@@ -33,11 +35,15 @@ cMainWindow::cMainWindow(QWidget* parent) :
     setWindowTitle(tr("Ceres"));
 
     setUnifiedTitleAndToolBarOnMac(true);
+
+    mMainModel.startDataCollection();
 }
 
 //-----------------------------------------------------------------------------
 cMainWindow::~cMainWindow()
 {
+    mMainModel.stopDataCollection();
+
     delete mpUI;
     mpUI = nullptr;
 }
@@ -191,6 +197,10 @@ void cMainWindow::createSensorModelsAndViews()
         msg += cfgFileName;
         msg += ": ";
         msg += e.what();
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+        mb.exec();
+
         throw std::runtime_error(msg);
     }
 

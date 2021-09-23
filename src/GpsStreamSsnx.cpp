@@ -5,10 +5,12 @@
 #include <iostream>
 
 
-cGpsStreamSsnx::cGpsStreamSsnx(QObject* parent)
-:
-    QObject(parent),
-    mSocket(this),
+//cGpsStreamSsnx::cGpsStreamSsnx(QObject* parent)
+cGpsStreamSsnx::cGpsStreamSsnx()
+    :
+//    QObject(parent),
+//    mSocket(this),
+    mSocket(),
     mDataBuffer()
 {
 }
@@ -26,6 +28,12 @@ cGpsStreamSsnx::~cGpsStreamSsnx()
 void cGpsStreamSsnx::registerDataProcessingCallback(std::function<void(const void* pBuffer, std::size_t buf_length)> fp)
 {
     mProcessingCallback = fp;
+}
+
+bool cGpsStreamSsnx::isConnected() const
+{
+    auto state = mSocket.state();
+    return  (state == QAbstractSocket::ConnectedState) || (state == QAbstractSocket::BoundState) || (state == QAbstractSocket::ListeningState);
 }
 
 bool cGpsStreamSsnx::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
@@ -77,11 +85,28 @@ void cGpsStreamSsnx::clear()
 void cGpsStreamSsnx::receive_data()
 {
     if (mSocket.waitForReadyRead(0))
-        processDatagram();
+        processDatagrams();
 }
 
-void cGpsStreamSsnx::processDatagram()
+void cGpsStreamSsnx::processOneDatagram()
 {
+    if (!mSocket.hasPendingDatagrams())
+        return;
+
+    mDatagram = mSocket.receiveDatagram();
+    mSender = mDatagram.senderAddress();
+    mDataBuffer = mDatagram.data();
+    processDatagram(mDataBuffer.data(), mDataBuffer.size());
+//    emit dataUpdated(mDataBuffer.data(), mDataBuffer.size());
+//    if (mProcessingCallback)
+//        mProcessingCallback(mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cGpsStreamSsnx::processDatagrams()
+{
+    if (!mSocket.isReadable())
+        return;
+
     while (mSocket.hasPendingDatagrams())
     {
         mDatagram = mSocket.receiveDatagram();

@@ -5,13 +5,12 @@
 #include <iostream>
 
 
-cOusterLidarStream_Qt::cOusterLidarStream_Qt(QObject* parent)
+cOusterLidarStream_Qt::cOusterLidarStream_Qt()
     :
-    QObject(parent),
     cOusterLidarStream(),
-    mSocket(this)
+    mSocket()
 {
-    QObject::connect(&mSocket, &QUdpSocket::readyRead, this, &cOusterLidarStream_Qt::processDatagram);
+//    QObject::connect(&mSocket, &QUdpSocket::readyRead, this, &cOusterLidarStream_Qt::processDatagrams);
 }
 
 cOusterLidarStream_Qt::~cOusterLidarStream_Qt()
@@ -72,11 +71,25 @@ void cOusterLidarStream_Qt::clear()
 void cOusterLidarStream_Qt::receive_data()
 {
     if (mSocket.waitForReadyRead(0))
-        processDatagram();
+        processDatagrams();
 }
 
-void cOusterLidarStream_Qt::processDatagram()
+void cOusterLidarStream_Qt::processOneDatagram()
 {
+    if (!mSocket.hasPendingDatagrams())
+        return;
+
+    mDatagram = mSocket.receiveDatagram();
+    mSender = mDatagram.senderAddress();
+    mDataBuffer = mDatagram.data();
+    process_packet(mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterLidarStream_Qt::processDatagrams()
+{
+    if (!mSocket.isReadable())
+        return;
+
     while (mSocket.hasPendingDatagrams())
     {
         mDatagram = mSocket.receiveDatagram();
@@ -86,7 +99,3 @@ void cOusterLidarStream_Qt::processDatagram()
     }
 }
 
-void cOusterLidarStream_Qt::onNewData(uint16_t frameID, ouster::lidar_data_t& data)
-{
-    emit dataUpdated(frameID, data);
-}

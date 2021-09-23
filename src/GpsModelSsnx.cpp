@@ -1,23 +1,63 @@
 
 #include "GpsModelSsnx.hpp"
+#include <functional>
+
+#include <QMessageBox>
 
 
 cGpsModelSsnx::cGpsModelSsnx(QObject* parent)
 :
     cGpsModel(parent)
 {
+    mConnected = false;
+//    connect(&mGpsDataStream, &cGpsStreamSsnx::dataUpdated, this, &cGpsModelSsnx::processData);
+//    mGpsDataStream.registerDataProcessingCallback(std::bind(&cGpsModelSsnx::processData, this));
 }
 
 cGpsModelSsnx::~cGpsModelSsnx()
 {
 }
 
+QString cGpsModelSsnx::getViewTitle() const
+{
+    return "SSNX GPS";
+}
 
 void cGpsModelSsnx::configure(nlohmann::json& jsonCfg)
 {
-    std::string ip = static_cast<std::string>(jsonCfg["host"]);
-    uint16_t port = jsonCfg["port"];
-    mGpsDataStream.try_to_connect(ip, port, false);
+    std::string ip;
+    uint16_t port = 0;
+
+    try
+    {
+        cGpsModel::configure(jsonCfg);
+
+        ip = static_cast<std::string>(jsonCfg["host"]);
+        port = jsonCfg["port"];
+    }
+    catch (const std::exception& e)
+    {
+        QString str = "Error in the \"ssnx\" configuration: ";
+        str.append(e.what());
+        QMessageBox msg(QMessageBox::Critical, "Configuration Error", str);
+        msg.exec();
+        return;
+    }
+
+    if (!try_to_connect(ip, port, false))
+    {
+        QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
+        msg.exec();
+        return;
+    }
+    
+    mConnected = isConnected();
+}
+
+void cGpsModelSsnx::run()
+{
+    if (!mConnected) return;
+    processOneDatagram();
 }
 
 void cGpsModelSsnx::writeDataHeader(cDataFile& file)
@@ -45,15 +85,15 @@ void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_0_t pvt)
 
     if (isRecording())
     {
-        mDataBuffer.reset();
-        mDataBuffer << mPvtTimestamp_s;
-        mDataBuffer << mLatitude_rad << mLongitude_rad << mHeight_m;
-        mDataBuffer << mVn_mps << mVe_mps << mVu_mps;
-        mDataBuffer << mGroundTrack_deg;
+        cSensorModel::mDataBuffer.reset();
+        cSensorModel::mDataBuffer << mPvtTimestamp_s;
+        cSensorModel::mDataBuffer << mLatitude_rad << mLongitude_rad << mHeight_m;
+        cSensorModel::mDataBuffer << mVn_mps << mVe_mps << mVu_mps;
+        cSensorModel::mDataBuffer << mGroundTrack_deg;
 
         std::lock_guard<std::mutex> guard(mFileMutex);
         if (mpFile)
-            mpFile->writeBlock(BlockIDs::GPS_PVT_1, mDataBuffer.data(), mDataBuffer.size());
+            mpFile->writeBlock(BlockIDs::GPS_PVT_1, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
     }
 
     if (mRecordTrack)
@@ -69,7 +109,7 @@ void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_0_t pvt)
     emit updatePVT(mPvtTimestamp_s,
         mLatitude_rad, mLongitude_rad, mHeight_m,
         mVn_mps, mVe_mps, mVu_mps,
-        mGroundTrack_deg);
+        mGroundTrack_deg, mDatum);
 }
 
 void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_1_t pvt)
@@ -99,20 +139,20 @@ void cGpsModelSsnx::receiverTime(const gps::ReceiverTime_t pvt)
 
     if (isRecording())
     {
-        mDataBuffer.reset();
-        mDataBuffer << mPvtTimestamp_s;
-        mDataBuffer << mUtcHour << mUtcMinute << mUtcSecond;
-        mDataBuffer << mUtcYear << mUtcMonth << mUtcDay;
+        cSensorModel::mDataBuffer.reset();
+        cSensorModel::mDataBuffer << mPvtTimestamp_s;
+        cSensorModel::mDataBuffer << mUtcHour << mUtcMinute << mUtcSecond;
+        cSensorModel::mDataBuffer << mUtcYear << mUtcMonth << mUtcDay;
 
         std::lock_guard<std::mutex> guard(mFileMutex);
         if (mpFile)
-            mpFile->writeBlock(BlockIDs::GPS_UTC_1, mDataBuffer.data(), mDataBuffer.size());
+            mpFile->writeBlock(BlockIDs::GPS_UTC_1, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
     }
 
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
 }
 
-void cGpsModelSsnx::processData(const void* pBuffer, std::size_t buf_length)
+void cGpsModelSsnx::processDatagram(const void* pBuffer, std::size_t buf_length)
 {
     decode(pBuffer, buf_length);
 }

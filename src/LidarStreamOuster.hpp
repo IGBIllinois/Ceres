@@ -8,12 +8,11 @@
 #include <QtNetwork/QNetworkDatagram>
 
 
-class cOusterLidarStream_Qt : public QObject, public cOusterLidarStream
+class cOusterLidarStream_Qt : public cOusterLidarStream
 {
-	Q_OBJECT
 
 public:
-	explicit cOusterLidarStream_Qt(QObject* parent = nullptr);
+	cOusterLidarStream_Qt();
 	~cOusterLidarStream_Qt();
 	
 
@@ -27,16 +26,11 @@ public:
 	 * Note: call this method in a non-threaded non-GUI console application
 	 */
 	void receive_data();
-
-signals:
-
-	void dataUpdated(uint16_t frameID, ouster::lidar_data_t data);
+	void processOneDatagram();
+	void processDatagrams();
 
 private:
 	bool try_to_connect(std::string_view host, uint16_t port, bool use_ipv6) override;
-	void processDatagram();
-
-	void onNewData(uint16_t frameID, ouster::lidar_data_t& data) override;
 
 
 	/**

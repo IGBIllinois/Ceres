@@ -8,12 +8,10 @@
 #include <QtNetwork/QNetworkDatagram>
 
 
-class cOusterImuStream_Qt : public QObject, public cOusterImuStream
+class cOusterImuStream_Qt : public cOusterImuStream
 {
-	Q_OBJECT
-
 public:
-	explicit cOusterImuStream_Qt(QObject* parent = nullptr);
+	cOusterImuStream_Qt();
 	~cOusterImuStream_Qt();
 
 	/**
@@ -26,16 +24,11 @@ public:
 	 * Note: call this method in a non-threaded non-GUI console application
 	 */
 	void receive_data();
+	void processOneDatagram();
+	void processDatagrams();
 
 private:
 	bool try_to_connect(std::string_view host, uint16_t port, bool use_ipv6) override;
-	void processDatagram();
-
-signals:
-	void dataUpdated(ouster::imu_data_t new_data);
-
-private:
-	void onNewData(const ouster::imu_data_t& new_data) override;
 
 private:
 	static const size_t MAX_DATA_LENGTH = 128;

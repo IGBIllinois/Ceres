@@ -3,6 +3,13 @@
 
 namespace
 {
+	template <typename T>
+	T byte_swap(T b)
+	{
+		if (sizeof(T) == 1)
+			return b;
+	}
+
 	/**
 	 * \brief read
 	 * \par Description
@@ -69,13 +76,21 @@ namespace
 
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Data Buffer
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
 cDataBuffer::cDataBuffer()
 : mpBuffer(nullptr), mReadIndex(0), mWriteIndex(0), mCapacity(0), 
 	mUnderrun(false), mOverrun(false)
 {
 }
 
-cDataBuffer::cDataBuffer(std::size_t capacity)
+cDataBuffer::cDataBuffer(size_type capacity)
 : mpBuffer(nullptr), mReadIndex(0), mWriteIndex(0), mCapacity(0),
 	mUnderrun(true), mOverrun(false)
 {

@@ -5,14 +5,11 @@
 #include <iostream>
 
 
-cOusterImuStream_Qt::cOusterImuStream_Qt(QObject* parent)
+cOusterImuStream_Qt::cOusterImuStream_Qt()
 :
-    QObject(parent),
-    mSocket(this),
+    mSocket(),
     mDataBuffer()
-{
-    QObject::connect(&mSocket, &QUdpSocket::readyRead, this, &cOusterImuStream_Qt::processDatagram);
-}
+{}
 
 cOusterImuStream_Qt::~cOusterImuStream_Qt()
 {
@@ -73,10 +70,21 @@ void cOusterImuStream_Qt::clear()
 void cOusterImuStream_Qt::receive_data()
 {
     if (mSocket.waitForReadyRead(0))
-        processDatagram();
+        processDatagrams();
 }
 
-void cOusterImuStream_Qt::processDatagram()
+void cOusterImuStream_Qt::processOneDatagram()
+{
+    if (!mSocket.hasPendingDatagrams())
+        return;
+
+    mDatagram = mSocket.receiveDatagram();
+    mSender = mDatagram.senderAddress();
+    mDataBuffer = mDatagram.data();
+    process_packet(mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterImuStream_Qt::processDatagrams()
 {
     while (mSocket.hasPendingDatagrams())
     {
@@ -87,9 +95,4 @@ void cOusterImuStream_Qt::processDatagram()
     }
 }
 
-
-void cOusterImuStream_Qt::onNewData(const ouster::imu_data_t& data)
-{
-    emit dataUpdated(data);
-}
 

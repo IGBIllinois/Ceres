@@ -33,7 +33,7 @@ source_group("Resources" FILES
   ${platform_resource_files}
 )
 
-qt5_add_resources(UI_RESOURCES ceres.qrc)
+qt5_add_resources(UI_RESOURCES ceres.qrc OPTIONS "--verbose")
 
 add_executable(Ceres WIN32 MACOSX_BUNDLE)
 
@@ -106,6 +106,8 @@ PRIVATE
 #
     Constants.hpp
     DataFileBlockIdentifiers.hpp
+    RawDataBuffer.hpp
+    RawDataBuffer.cpp
     DataBuffer.hpp
     DataBuffer.cpp
     DataFile.hpp
@@ -141,6 +143,7 @@ target_link_libraries(Ceres PUBLIC ${Qt}::Network)
 target_link_libraries(Ceres PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(Ceres PRIVATE ouster::ouster_static)
 target_link_libraries(Ceres PRIVATE ssnx2net::ssnx2net_static)
+target_link_libraries(Ceres PRIVATE ${PCL_VISUALIZATION_LIBRARIES})
 
 vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
 

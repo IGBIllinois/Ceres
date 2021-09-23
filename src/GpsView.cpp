@@ -9,6 +9,28 @@
 
 #include <string>
 
+namespace
+{
+	QString to_qstring(cGpsModel::eDatum datum)
+	{
+		switch (datum)
+		{
+		case cGpsModel::eDatum::WGS84: return QString("WGS84");
+		case cGpsModel::eDatum::DGNSS: return QString("DGNSS");
+		case cGpsModel::eDatum::ETRS89: return QString("ETRS89");
+		case cGpsModel::eDatum::NAD83: return QString("NAD83");
+		case cGpsModel::eDatum::NAD83_PA11: return QString("NAD83 PA11");
+		case cGpsModel::eDatum::NAD83_MA11: return QString("NAD83 (MA11)");
+		case cGpsModel::eDatum::GDA94: return QString("GDA94");
+		case cGpsModel::eDatum::FIRST_USER_DATUM: return QString("First Uset Datum");
+		case cGpsModel::eDatum::SECOND_USER_DATUM: return QString("Second Uset Datum");
+		}
+
+		return QString("Unknown");
+	}
+}
+
+
 cGpsView::cGpsView(QWidget* parent)
 	:
 	QAbstractScrollArea(parent)
@@ -149,7 +171,7 @@ void cGpsView::setVariableSize()
 void cGpsView::updatePVT(double timestamp_s,
 	double lat_rad, double lng_rad, double height_m,
 	double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,
-	double groundTrack_deg)
+	double groundTrack_deg, cGpsModel::eDatum datum)
 {
 	mpLatitude_deg->setText(QString::number(lat_rad * nConstants::RAD_TO_DEG));
 	mpLongitude_deg->setText(QString::number(lng_rad * nConstants::RAD_TO_DEG));
@@ -158,7 +180,8 @@ void cGpsView::updatePVT(double timestamp_s,
 	mpEastVelocity_mps->setText(QString::number(eastSpeed_mps));
 	mpUpVelocity_mps->setText(QString::number(vertSpeed_mps));
 	mpGroundTrack_deg->setText(QString::number(groundTrack_deg));
-	mpTimestamp_s->setText(QString::number(timestamp_s));
+	mpTimestamp_s->setText(QString::number(timestamp_s, 'f', 6));
+	mpDatum->setText(to_qstring(datum));
 }
 
 

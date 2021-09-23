@@ -3,7 +3,7 @@
 
 #include "DataFile.hpp"
 #include "DataFileBlockIdentifiers.hpp"
-#include "DataBuffer.hpp"
+#include "RawDataBuffer.hpp"
 
 #include <QObject>
 #include <mutex>
@@ -25,10 +25,15 @@ public:
     virtual ~cSensorModel() = default;
 
     /*
+     * Returns the preferred window title for the corresponding view.
+     */
+    virtual QString getViewTitle() const = 0;
+
+    /*
      * Apply any configuration parameters to the sensor
      * model.
      */
-    virtual void configure(nlohmann::json& jsonCfg) = 0;
+    virtual void configure(nlohmann::json& jsonCfg);
 
     /*
      * Write any "header" data block into the data file.
@@ -54,6 +59,9 @@ public:
      */
     bool isRecording();
 
+public:
+    virtual void run() = 0;
+
 protected:
     cSensorModel(QObject* parent = nullptr);
 
@@ -67,6 +75,13 @@ protected:
      */
     std::mutex mFileMutex;
 
-    cDataBuffer mDataBuffer;
+    cRawDataBuffer mDataBuffer;
+
+    /**
+     * Basic Sensor Information
+     */
+    std::string mManufacturer;
+    std::string mModel;
+    std::string mSerialNumber;
 };
 
