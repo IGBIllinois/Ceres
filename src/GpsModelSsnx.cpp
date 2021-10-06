@@ -4,6 +4,7 @@
 
 #include <QMessageBox>
 
+using namespace ssnx;
 
 cGpsModelSsnx::cGpsModelSsnx(QObject* parent)
 :
@@ -44,14 +45,28 @@ void cGpsModelSsnx::configure(nlohmann::json& jsonCfg)
         return;
     }
 
+
+    QString msg("Trying to establishing connection to GPS receiver at ");
+    msg.append(ip.c_str());
+    msg.append("...");
+
+    emit statusMessage(msg);
+
     if (!try_to_connect(ip, port, false))
     {
         QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
         msg.exec();
         return;
     }
-    
+   
     mConnected = isConnected();
+
+    if (!mConnected)
+    {
+        QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
+        msg.exec();
+        return;
+    }
 }
 
 void cGpsModelSsnx::run()
@@ -65,7 +80,7 @@ void cGpsModelSsnx::writeDataHeader(cDataFile& file)
     // The GPS does not have any 
 }
 
-void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_0_t pvt)
+void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
 {
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
@@ -112,17 +127,16 @@ void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_0_t pvt)
         mGroundTrack_deg, mDatum);
 }
 
-void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_1_t pvt)
-{
-    pvtGeodetic(static_cast<const gps::PVT_Geodetic_2_0_t>(pvt));
-}
+void cGpsModelSsnx::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
+{}
 
-void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_2_t pvt)
-{
-    pvtGeodetic(static_cast<const gps::PVT_Geodetic_2_0_t>(pvt));
-}
+void cGpsModelSsnx::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
+{}
 
-void cGpsModelSsnx::receiverTime(const gps::ReceiverTime_t pvt)
+void cGpsModelSsnx::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
+{}
+
+void cGpsModelSsnx::receiverTime(const gps::ReceiverTime_1_t pvt)
 {
     mTimeValid = pvt.dataValid;
     mRxTimestamp_s = pvt.timestamp_s;
@@ -151,6 +165,9 @@ void cGpsModelSsnx::receiverTime(const gps::ReceiverTime_t pvt)
 
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
 }
+
+void cGpsModelSsnx::rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm)
+{}
 
 void cGpsModelSsnx::processDatagram(const void* pBuffer, std::size_t buf_length)
 {

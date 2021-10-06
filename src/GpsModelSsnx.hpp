@@ -35,10 +35,12 @@ signals:
 protected:
     void run() override;
 
-    void pvtGeodetic(const gps::PVT_Geodetic_2_0_t pvt) override;
-    void pvtGeodetic(const gps::PVT_Geodetic_2_1_t pvt) override;
-    void pvtGeodetic(const gps::PVT_Geodetic_2_2_t pvt) override;
-    void receiverTime(const gps::ReceiverTime_t pvt) override;
+    void pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt) override;
+    void posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov) override;
+    void velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov) override;
+    void posProjected(const ssnx::gps::POS_Projected_1_t pvt) override;
+    void receiverTime(const ssnx::gps::ReceiverTime_1_t pvt) override;
+    void rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm) override;
 
 protected slots:
     void processDatagram(const void* pBuffer, std::size_t buf_length) override;
