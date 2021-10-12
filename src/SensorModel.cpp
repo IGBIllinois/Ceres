@@ -10,7 +10,7 @@ cSensorModel::cSensorModel(QObject* parent)
 {
 }
 
-void cSensorModel::configure(nlohmann::json& jsonCfg)
+void cSensorModel::configure(const nlohmann::json& jsonCfg)
 {
     if (!jsonCfg.contains("Manufacturer"))
         throw std::logic_error("Missing \"Manufacturer\" entry.");

@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ColorGradient.hpp"
+
 #include <QVtkOpenGlWidget.h>
 
 #include <vtkSmartPointer.h>
@@ -33,7 +35,7 @@ class cLidarModelOuster;
 class cOusterView : public QVTKOpenGLWidget
 {
 public:
-	cOusterView(QWidget* parent = nullptr);
+	cOusterView(cLidarModelOuster* pModel, QWidget* parent = nullptr);
 	virtual ~cOusterView();
 
 public slots:
@@ -42,6 +44,8 @@ public slots:
 private:
 	std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBA>> mData;
 	std::shared_ptr<pcl::visualization::PCLVisualizer> mpViewer;
+
+	cColorGradient mColorGradient;
 
 protected:
 	const cLidarModelOuster* mpModel;

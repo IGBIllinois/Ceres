@@ -7,7 +7,7 @@
 #include "LidarModelOuster.hpp"
 #include "OusterView.hpp"
 
-#include <QDockWidget>
+#include <QWidget>
 #include <QString>
 
 
@@ -33,14 +33,11 @@ std::pair<cSensorModel*, QDockWidget*> createOusterSensor(QWidget* parent)
     // Create the Ouster model and view...
     auto* lidarModel = new cLidarModelOuster(parent);
     auto* dockWidget = new QDockWidget(lidarModel->getViewTitle(), parent);
-    auto* lidarView = new cOusterView(dockWidget);
+    auto* lidarView = new cOusterView(lidarModel, dockWidget);
 
     dockWidget->setWidget(lidarView);
- //   dockWidget->connect(dockWidget, &QDockWidget::dockLocationChanged, gpsView, &cGpsView::dockLocationChanged);
- //   dockWidget->connect(dockWidget, &QDockWidget::topLevelChanged, gpsView, &cGpsView::topLevelChanged);
-
-//    gpsModel->connect(gpsModel, &cGpsModelSsnx::updatePVT, gpsView, &cGpsView::updatePVT);
-//    gpsModel->connect(gpsModel, &cGpsModelSsnx::updateUTC, gpsView, &cGpsView::updateUTC);
+ 
+    lidarModel->connect(lidarModel, &cLidarModelOuster::updateView, lidarView, &cOusterView::displayData);
 
     return std::make_pair(lidarModel, dockWidget);
 }

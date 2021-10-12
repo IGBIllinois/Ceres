@@ -20,7 +20,7 @@ public:
      */
     QString getViewTitle() const override;
 
-    void configure(nlohmann::json& jsonCfg) override;
+    void configure(const nlohmann::json& jsonCfg) override;
     void writeDataHeader(cDataFile& file) override;
 
 signals:

@@ -21,22 +21,18 @@
 //-----------------------------------------------------------------------------
 cMainWindow::cMainWindow(QWidget* parent) :
     QMainWindow(parent),
+    mpSplashScreen(nullptr),
+    mpExperiments(nullptr),
+    mpFileMenu(nullptr),
+    mpViewMenu(nullptr),
+    mpHelpMenu(nullptr),
     mpUI(new Ui::MainWindow)
 {
     mpUI->setupUi(this);
 
-    createMainMenu();
-    createSubMenusAndActions();
-    createActions();
-    createStatusBar();
-    createDockWindows();
-    createSensorModelsAndViews();
-
-    setWindowTitle(tr("Ceres"));
+     setWindowTitle(tr("Ceres"));
 
     setUnifiedTitleAndToolBarOnMac(true);
-
-    mMainModel.startDataCollection();
 }
 
 //-----------------------------------------------------------------------------
@@ -46,6 +42,30 @@ cMainWindow::~cMainWindow()
 
     delete mpUI;
     mpUI = nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::initialize(QSplashScreen* pSplashScreen)
+{
+    mpSplashScreen = pSplashScreen;
+
+    onStatusUpdate("Initializing menus...");
+    createMainMenu();
+    createSubMenusAndActions();
+    createActions();
+
+    onStatusUpdate("Initializing status bar...");
+    createStatusBar();
+
+    onStatusUpdate("Initializing dock windows...");
+    createDockWindows();
+
+    onStatusUpdate("Initializing sensors...");
+    createSensorModelsAndViews();
+
+    mMainModel.startDataCollection();
+
+    mpSplashScreen = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -69,6 +89,18 @@ void cMainWindow::fileAddExperiment()
 void cMainWindow::helpAbout()
 {
 
+}
+
+void cMainWindow::onStatusUpdate(QString msg)
+{
+    if (mpSplashScreen)
+    {
+        mpSplashScreen->showMessage(msg, Qt::AlignHCenter | Qt::AlignBottom);
+        return;
+    }
+
+    if (statusBar())
+        statusBar()->showMessage(msg);
 }
 
 //-----------------------------------------------------------------------------
@@ -179,6 +211,8 @@ void cMainWindow::createSensorModelsAndViews()
 
             if ((pModel == nullptr) || (pView == nullptr))
                 continue;
+
+            QObject::connect(pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
 
             mMainModel.addSensor(pModel);
 

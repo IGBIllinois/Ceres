@@ -18,7 +18,7 @@ class cDataModel : public QThread
     Q_OBJECT
 
 public:
-    explicit cDataModel();
+    explicit cDataModel(QObject* parent = nullptr);
     ~cDataModel();
 
     void addSensor(cSensorModel* pSensor);
@@ -28,6 +28,12 @@ public:
 
     void startDataRecording(const std::string& filename);
     void stopDataRecording();
+
+signals:
+    void statusMessage(QString msg);
+
+private slots:
+    void onStatusUpdate(QString msg);
 
 protected:
     void run() override;

@@ -11,6 +11,8 @@
 
 #include <QObject>
 
+const static uint32_t MIN_RANGE_MM = 300;
+
 class cLidarModelOuster : public cLidarModel, private cOusterImuStream_Qt, private cOusterLidarStream_Qt
 {
     Q_OBJECT
@@ -24,12 +26,28 @@ public:
      */
     QString getViewTitle() const override;
 
-    void configure(nlohmann::json& jsonCfg) override;
+    void configure(const nlohmann::json& jsonCfg) override;
     void writeDataHeader(cDataFile& file) override;
 
+    uint16_t columnsPerFrame() const;
+ //   std::vector<int> pixel_shift_by_row;
+    uint16_t pixelsPerColumn() const;
+    uint16_t columnWindowMin() const;
+    uint16_t columnWindowMax() const;
+
+    uint32_t minEncoderCount() const;
+    uint32_t maxEncoderCount() const;
+
     double lidar_origin_to_beam_origin_mm() const;
-    const std::vector<double>& beam_azimuth_angles_rad() const;
-    const std::vector<double>& beam_altitude_angles_rad() const;
+    const std::vector<double>& beamAzimuthAngles_rad() const;
+    const std::vector<double>& beamAltitudeAngles_rad() const;
+
+    uint16_t              frameID() const;
+    ouster::lidar_data_t  lidarData() const;
+    ouster::imu_data_t    imuData() const;
+
+signals:
+    void updateView();
 
 protected:
     void onNewData(const ouster::imu_data_t& new_data) override;
@@ -40,6 +58,7 @@ protected:
 
 private:
     bool mConnected;
+    int mFrameCounter;
 
     cOusterCmdStream_Qt   mCmdStream;
 

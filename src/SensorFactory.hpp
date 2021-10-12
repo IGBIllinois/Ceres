@@ -4,11 +4,7 @@
 #include <string>
 #include <utility>
 #include <QWidget>
-
-// Qt Forward Declaration
-QT_BEGIN_NAMESPACE
-class QDockWidget;
-QT_END_NAMESPACE
+#include <QDockWidget>
 
 class cSensorModel;
 

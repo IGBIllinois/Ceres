@@ -3,9 +3,9 @@
 #include "SensorModel.hpp"
 
 
-cDataModel::cDataModel()
+cDataModel::cDataModel(QObject* parent)
 :
-    QThread()
+    QThread(parent)
 {
 }
 
@@ -13,6 +13,12 @@ cDataModel::~cDataModel()
 {
     stopDataCollection();
 }
+
+void cDataModel::onStatusUpdate(QString msg)
+{
+    emit statusMessage(msg);
+}
+
 
 void cDataModel::addSensor(cSensorModel* pSensor)
 {

@@ -4,6 +4,7 @@
 #include "DataModel.hpp"
 
 #include <QMainWindow>
+#include <QString>
 
 
 // Qt Forward Declaration
@@ -13,6 +14,7 @@ class QListWidget;
 class QMenu;
 class QTextEdit;
 class QTreeWidget;
+class QSplashScreen;
 QT_END_NAMESPACE
 
 
@@ -33,11 +35,15 @@ public:
     explicit cMainWindow(QWidget* parent = nullptr);
     ~cMainWindow();
 
+    void initialize(QSplashScreen* pSplashScreen = nullptr);
+
+public slots:
+    void onStatusUpdate(QString msg);
+
 private slots:
     void fileNew();
     void fileAddExperiment();
     void helpAbout();
-
 
 private:
     void createMainMenu();
@@ -46,6 +52,8 @@ private:
     void createStatusBar();
     void createDockWindows();
     void createSensorModelsAndViews();
+
+    QSplashScreen* mpSplashScreen;
 
     QTreeWidget* mpExperiments;
 

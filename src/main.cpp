@@ -12,9 +12,9 @@ int main(int argc, char** argv)
     QPixmap* pPixmap = new QPixmap(":/ripe.illinois.edu/splash.png");
     QSplashScreen* pSplash = new QSplashScreen(*pPixmap);
     pSplash->show();
-    pSplash->showMessage("Initializing sensors...", Qt::AlignHCenter | Qt::AlignBottom);
 
     cMainWindow mainWin;
+    mainWin.initialize(pSplash);
     mainWin.show();
 
     pSplash->finish(&mainWin);

@@ -63,6 +63,8 @@ PRIVATE
     LidarStreamOuster.cpp
     LidarModelOuster.hpp
     LidarModelOuster.cpp
+    ColorGradient.hpp
+    ColorGradient.cpp
 
 #
 # General LiDAR View-Model-Controller files
@@ -143,6 +145,7 @@ target_link_libraries(Ceres PUBLIC ${Qt}::Network)
 target_link_libraries(Ceres PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(Ceres PRIVATE ouster::ouster_static)
 target_link_libraries(Ceres PRIVATE ssnx2net::ssnx2net_static)
+target_link_libraries(Ceres PRIVATE spidercam::scConnect_static)
 target_link_libraries(Ceres PRIVATE ${PCL_VISUALIZATION_LIBRARIES})
 
 vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})

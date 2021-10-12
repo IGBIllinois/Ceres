@@ -33,7 +33,7 @@ public:
      * Apply any configuration parameters to the sensor
      * model.
      */
-    virtual void configure(nlohmann::json& jsonCfg);
+    virtual void configure(const nlohmann::json& jsonCfg);
 
     /*
      * Write any "header" data block into the data file.
@@ -58,6 +58,9 @@ public:
      * Returns true if sensor data is being recorded
      */
     bool isRecording();
+
+signals:
+    void statusMessage(QString msg);
 
 public:
     virtual void run() = 0;

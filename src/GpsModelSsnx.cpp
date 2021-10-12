@@ -24,7 +24,7 @@ QString cGpsModelSsnx::getViewTitle() const
     return "SSNX GPS";
 }
 
-void cGpsModelSsnx::configure(nlohmann::json& jsonCfg)
+void cGpsModelSsnx::configure(const nlohmann::json& jsonCfg)
 {
     std::string ip;
     uint16_t port = 0;

@@ -98,6 +98,8 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Find all the packages needed by this code
 
+find_package(Eigen3 REQUIRED)
+
 # Find and include VTK
 
 find_package(VTK COMPONENTS GUISupportQt IOImage InteractionImage RenderingOpenGL2 TestingCore REQUIRED)
@@ -111,6 +113,7 @@ find_package(${Qt} COMPONENTS Widgets Core Network REQUIRED)
 # Find and include my libraries for data collection
 find_package(Ouster REQUIRED)
 find_package(ssnx2net REQUIRED)
+find_package(spidercam REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 #find_package(PkgConfig REQUIRED)
