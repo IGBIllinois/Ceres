@@ -1,0 +1,22 @@
+{
+	"sensors" :[
+		"ssnx",
+		"ouster"
+	],
+	"ssnx" :
+	{
+		"Manufacturer": "Septentrio",
+		"Model": "Altus-NR3",
+		"Serial Number": "123456",
+		"host": "172.16.1.3",
+		"port":10000
+	},
+	"ouster" :
+	{
+		"Manufacturer": "OUSTER",
+		"Model": "OS0-128",
+		"Serial Number": "123456",
+		"azimuth window": [135.0, 225.0],
+		"mode": "2048x10"
+	}
+}
