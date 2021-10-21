@@ -1,11 +1,13 @@
 
 #include "DataModel.hpp"
-#include "SensorModel.hpp"
+#include "Sensors/SensorModel.hpp"
+#include "ExperimentControllers/ExperimentCtrlModel.hpp"
 
 
 cDataModel::cDataModel(QObject* parent)
 :
-    QThread(parent)
+    QThread(parent),
+    mpController(nullptr)
 {
 }
 
@@ -17,6 +19,12 @@ cDataModel::~cDataModel()
 void cDataModel::onStatusUpdate(QString msg)
 {
     emit statusMessage(msg);
+}
+
+void cDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)
+{
+    if (pControlModel)
+        mpController = pControlModel;
 }
 
 

@@ -51,6 +51,7 @@ private:
     void createActions();
     void createStatusBar();
     void createDockWindows();
+    bool createExperimentController();
     void createSensorModelsAndViews();
 
     QSplashScreen* mpSplashScreen;

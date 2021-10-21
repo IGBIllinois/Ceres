@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "DataFile.hpp"
+#include "BlockDataFile/BlockDataFile.hpp"
 
 #include <QObject>
 #include <QThread>
@@ -10,7 +10,7 @@
 #include <vector>
 
 // Forward Declarations
-
+class cExperimentControlModel;
 class cSensorModel;
 
 class cDataModel : public QThread
@@ -21,6 +21,7 @@ public:
     explicit cDataModel(QObject* parent = nullptr);
     ~cDataModel();
 
+    void addExperimentControlModel(cExperimentControlModel* pSensor);
     void addSensor(cSensorModel* pSensor);
 
     void startDataCollection();
@@ -39,9 +40,10 @@ protected:
     void run() override;
 
 private:
+    cExperimentControlModel* mpController;
     std::vector<cSensorModel*> mActiveSensors;
 
-    cDataFile   mFile;
+    cBlockDataFile   mFile;
 
     QMutex mMutex;
     bool mAbort = false;

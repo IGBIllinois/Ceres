@@ -2,10 +2,12 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "ExperimentCtrlFactory.hpp"
+#include "ExperimentControllers/ExperimentCtrlView.hpp"
+#include "ExperimentControllers/ExperimentCtrlModel.hpp"
+
 #include "SensorFactory.hpp"
-#include "GpsModelSsnx.hpp"
-#include "GpsWidget.hpp"
-//#include "OusterWidget.hpp"
+#include "Sensors/SensorModel.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>
@@ -30,7 +32,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
 {
     mpUI->setupUi(this);
 
-     setWindowTitle(tr("Ceres"));
+    setWindowTitle(tr("Ceres"));
 
     setUnifiedTitleAndToolBarOnMac(true);
 }
@@ -60,10 +62,16 @@ void cMainWindow::initialize(QSplashScreen* pSplashScreen)
     onStatusUpdate("Initializing dock windows...");
     createDockWindows();
 
+    onStatusUpdate("Initializing experiment controller...");
+    if (!createExperimentController())
+    {
+        exit(EXIT_FAILURE);
+    }
+
     onStatusUpdate("Initializing sensors...");
     createSensorModelsAndViews();
 
-    mMainModel.startDataCollection();
+//    mMainModel.startDataCollection();
 
     mpSplashScreen = nullptr;
 }
@@ -175,6 +183,86 @@ void cMainWindow::createDockWindows()
 }
 
 //-----------------------------------------------------------------------------
+bool cMainWindow::createExperimentController()
+{
+    std::string cfgFileName = "C:/igb/Ceres/build/bin/Debug/ceres.json";
+    //    QApplication::arguments();
+    QString s = QApplication::applicationDirPath();
+    QDockWidget* dockWidget = nullptr;
+
+    std::ifstream in;
+    in.open(cfgFileName);
+
+    if (!in.is_open())
+    {
+        // Note: we can't reuse the wxThreadEvent object
+        std::string msg = "Could not open ";
+        msg += cfgFileName;
+        msg += " for reading!";
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+        mb.exec();
+
+        return false;
+    }
+
+    try
+    {
+        nlohmann::json jsonDoc;
+        in >> jsonDoc;
+
+        if (!jsonDoc.contains("controller"))
+        {
+            std::string msg = "Fatal error in ";
+            msg += cfgFileName;
+            msg += ": Undefined experiment controller";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+            mb.exec();
+
+            return false;
+        }
+
+        std::string name = jsonDoc["controller"];
+
+        auto controller = create_experiment_controller(name);
+
+        cExperimentControlModel* pModel = controller.first;
+        cExperimentControlView* pView = controller.second;
+
+        if ((pModel == nullptr) || (pView == nullptr))
+        {
+            //continue;
+        }
+
+        QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+
+        mMainModel.addExperimentControlModel(pModel);
+
+        if (jsonDoc.contains(name))
+        {
+            pModel->configure(jsonDoc[name]);
+        }
+
+        setCentralWidget(pView);
+    }
+    catch (const std::exception& e)
+    {
+        std::string msg = "Error in ";
+        msg += cfgFileName;
+        msg += ": ";
+        msg += e.what();
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+        mb.exec();
+
+        return false;
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
 void cMainWindow::createSensorModelsAndViews()
 {
     std::string cfgFileName = "C:/igb/Ceres/build/bin/Debug/ceres.json";
@@ -237,24 +325,4 @@ void cMainWindow::createSensorModelsAndViews()
 
         throw std::runtime_error(msg);
     }
-
-
-    // Create the SSNX model and view...
-/*
-    auto* gpsModel = new cGpsModelSsnx(this);
-//    gpsModel->setParent(this);
-    mMainModel.addSensor(gpsModel);
-
-    dockWidget = new QDockWidget(tr("GPS"), this);
-    auto* gpsView = new GpsWidget(dockWidget);
-    dockWidget->setWidget(gpsView);
-    connect(dockWidget, &QDockWidget::dockLocationChanged, gpsView, &cGpsView::dockLocationChanged);
-    connect(dockWidget, &QDockWidget::topLevelChanged, gpsView, &cGpsView::topLevelChanged);
-
-    addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-    mpViewMenu->addAction(dockWidget->toggleViewAction());
-
-    connect(gpsModel, &cGpsModelSsnx::updatePVT, gpsView, &cGpsView::updatePVT);
-    connect(gpsModel, &cGpsModelSsnx::updateUTC, gpsView, &cGpsView::updateUTC);
-*/
 }

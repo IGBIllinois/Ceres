@@ -8,6 +8,15 @@ cmake_minimum_required(VERSION 3.18)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+macro(print_all_variables)
+    message(STATUS "print_all_variables------------------------------------------{")
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
+    message(STATUS "print_all_variables------------------------------------------}")
+endmacro()
+
 #
 # Setting this policy to NEW allows us to use the MSVC_RUNTIME_LIBRARY 
 # target property.  The generator expression would look like:
@@ -117,6 +126,8 @@ find_package(spidercam REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 #find_package(PkgConfig REQUIRED)
+
+print_all_variables()
 
 #******************************************************************************
 # BUILD TYPE AND CODE
