@@ -18,13 +18,6 @@ public:
 	virtual ~cGpsView();
 
 public slots:
-    void updatePVT(double timestamp_s,
-        double lat_rad, double lng_rad, double height_m, 
-        double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps, 
-        double groundTrack_deg, cGpsModel::eDatum datum);
-
-    void updateUTC(int hour, int min, int sec, int day, int month, int year);
-
     void dockLocationChanged(Qt::DockWidgetArea area);
     void topLevelChanged(bool topLevel);
 

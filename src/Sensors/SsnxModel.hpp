@@ -2,26 +2,22 @@
 #pragma once
 
 #include "GpsModel.hpp"
-#include "GpsStreamSsnx.hpp"
+#include "SsnxGpsStream.hpp"
 
 #include <QObject>
 #include <ssnx/ssn_net_decoder.hpp>
 
-class cGpsModelSsnx : public cGpsModel, public SsnNetDecoder, private cGpsStreamSsnx
+class cSsnxModel : public cGpsModel, public SsnNetDecoder, private cSsnxGpsStream
 {
     Q_OBJECT
 
 public:
-    explicit cGpsModelSsnx(QObject* parent = nullptr);
-    ~cGpsModelSsnx();
+    explicit cSsnxModel(QObject* parent = nullptr);
+    ~cSsnxModel();
 
-    /*
-     * Returns the preferred window title for the corresponding view.
-     */
-    QString getViewTitle() const override;
-
+ 
     void configure(const nlohmann::json& jsonCfg) override;
-    void writeDataHeader(cDataFile& file) override;
+    void writeDataHeader(cBlockDataFile& file) override;
 
 signals:
     void updatePVT(double timestamp_s,

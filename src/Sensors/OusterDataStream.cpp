@@ -1,5 +1,5 @@
 
-#include "LidarStreamOuster.hpp"
+#include "OusterDataStream.hpp"
 
 #include <QtNetwork/QHostInfo>
 #include <iostream>

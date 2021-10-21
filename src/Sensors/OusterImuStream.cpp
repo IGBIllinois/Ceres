@@ -1,5 +1,5 @@
 
-#include "LidarStreamOusterImu.hpp"
+#include "OusterImuStream.hpp"
 
 #include <QtNetwork/QHostInfo>
 #include <iostream>

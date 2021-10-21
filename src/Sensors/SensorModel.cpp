@@ -25,7 +25,7 @@ void cSensorModel::configure(const nlohmann::json& jsonCfg)
     mSerialNumber = jsonCfg["Serial Number"];
 }
 
-void cSensorModel::startDataRecording(cDataFile& file)
+void cSensorModel::startDataRecording(cBlockDataFile& file)
 {
     std::lock_guard<std::mutex> guard(mFileMutex);
     mpFile = &file;

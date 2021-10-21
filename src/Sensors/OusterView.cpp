@@ -1,7 +1,7 @@
 
 #include "OusterView.hpp"
-#include "Constants.hpp"
-#include "LidarModelOuster.hpp"
+#include "../Utilities/Constants.hpp"
+#include "OusterModel.hpp"
 
 #include <string>
 #include <vtkGenericOpenGLRenderWindow.h>
@@ -27,11 +27,13 @@ namespace
     }
 }
 
-cOusterView::cOusterView(cLidarModelOuster* pModel, QWidget* parent)
+cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
 	:
     QVTKOpenGLWidget(parent, Qt::WindowMinMaxButtonsHint),
     mpModel(pModel)
 {
+    setWindowTitle("OUSTER LiDAR");
+
     mData = std::make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();;
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

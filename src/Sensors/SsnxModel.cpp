@@ -1,30 +1,23 @@
 
-#include "GpsModelSsnx.hpp"
+#include "SsnxModel.hpp"
 #include <functional>
 
 #include <QMessageBox>
 
 using namespace ssnx;
 
-cGpsModelSsnx::cGpsModelSsnx(QObject* parent)
+cSsnxModel::cSsnxModel(QObject* parent)
 :
     cGpsModel(parent)
 {
     mConnected = false;
-//    connect(&mGpsDataStream, &cGpsStreamSsnx::dataUpdated, this, &cGpsModelSsnx::processData);
-//    mGpsDataStream.registerDataProcessingCallback(std::bind(&cGpsModelSsnx::processData, this));
 }
 
-cGpsModelSsnx::~cGpsModelSsnx()
+cSsnxModel::~cSsnxModel()
 {
 }
 
-QString cGpsModelSsnx::getViewTitle() const
-{
-    return "SSNX GPS";
-}
-
-void cGpsModelSsnx::configure(const nlohmann::json& jsonCfg)
+void cSsnxModel::configure(const nlohmann::json& jsonCfg)
 {
     std::string ip;
     uint16_t port = 0;
@@ -69,18 +62,18 @@ void cGpsModelSsnx::configure(const nlohmann::json& jsonCfg)
     }
 }
 
-void cGpsModelSsnx::run()
+void cSsnxModel::run()
 {
     if (!mConnected) return;
     processOneDatagram();
 }
 
-void cGpsModelSsnx::writeDataHeader(cDataFile& file)
+void cSsnxModel::writeDataHeader(cBlockDataFile& file)
 {
     // The GPS does not have any 
 }
 
-void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
+void cSsnxModel::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
 {
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
@@ -108,7 +101,7 @@ void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
 
         std::lock_guard<std::mutex> guard(mFileMutex);
         if (mpFile)
-            mpFile->writeBlock(BlockIDs::GPS_PVT_1, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
+            mpFile->writeBlock(BlockID_t(200) /*GPS_PVT_1*/, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
     }
 
     if (mRecordTrack)
@@ -127,16 +120,16 @@ void cGpsModelSsnx::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
         mGroundTrack_deg, mDatum);
 }
 
-void cGpsModelSsnx::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
+void cSsnxModel::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 {}
 
-void cGpsModelSsnx::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
+void cSsnxModel::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 {}
 
-void cGpsModelSsnx::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
+void cSsnxModel::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
 {}
 
-void cGpsModelSsnx::receiverTime(const gps::ReceiverTime_1_t pvt)
+void cSsnxModel::receiverTime(const gps::ReceiverTime_1_t pvt)
 {
     mTimeValid = pvt.dataValid;
     mRxTimestamp_s = pvt.timestamp_s;
@@ -159,17 +152,17 @@ void cGpsModelSsnx::receiverTime(const gps::ReceiverTime_1_t pvt)
         cSensorModel::mDataBuffer << mUtcYear << mUtcMonth << mUtcDay;
 
         std::lock_guard<std::mutex> guard(mFileMutex);
-        if (mpFile)
-            mpFile->writeBlock(BlockIDs::GPS_UTC_1, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
+//        if (mpFile)
+//            mpFile->writeBlock(BlockIDs::GPS_UTC_1, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
     }
 
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
 }
 
-void cGpsModelSsnx::rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm)
+void cSsnxModel::rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm)
 {}
 
-void cGpsModelSsnx::processDatagram(const void* pBuffer, std::size_t buf_length)
+void cSsnxModel::processDatagram(const void* pBuffer, std::size_t buf_length)
 {
     decode(pBuffer, buf_length);
 }

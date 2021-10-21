@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "DataFile.hpp"
-#include "DataFileBlockIdentifiers.hpp"
-#include "RawDataBuffer.hpp"
+#include "../BlockDataFile/BlockDataFile.hpp"
+#include "../BlockDataFile/RawDataBuffer.hpp"
+#include "SensorIdentifiers.hpp"
 
 #include <QObject>
 #include <mutex>
@@ -25,11 +25,6 @@ public:
     virtual ~cSensorModel() = default;
 
     /*
-     * Returns the preferred window title for the corresponding view.
-     */
-    virtual QString getViewTitle() const = 0;
-
-    /*
      * Apply any configuration parameters to the sensor
      * model.
      */
@@ -40,13 +35,13 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    virtual void writeDataHeader(cDataFile& file) = 0;
+    virtual void writeDataHeader(cBlockDataFile& file) = 0;
 
     /*
      * Sets the non-owning data file pointer to
      * start the writing of sensor data.
      */
-    void startDataRecording(cDataFile& file);
+    void startDataRecording(cBlockDataFile& file);
 
     /*
      * Sets the non-owning data file pointer to null to
@@ -71,7 +66,7 @@ protected:
     /**
      * A non-owning pointer to the data file
      */
-    cDataFile* mpFile;
+    cBlockDataFile* mpFile;
 
     /**
      * The mutex for guarding the data file pointer

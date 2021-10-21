@@ -3,31 +3,27 @@
 
 #include "LidarModel.hpp"
 
-#include "LidarStreamOuster.hpp"
-#include "LidarStreamOusterCmd.hpp"
-#include "LidarStreamOusterImu.hpp"
-#include "ouster/ouster_defs.h"
-#include "ouster/OusterSensorDiscovery.h"
+#include "OusterDataStream.hpp"
+#include "OusterCmdStream.hpp"
+#include "OusterImuStream.hpp"
+
+#include <ouster/ouster_defs.h>
+#include <ouster/OusterSensorDiscovery.h>
 
 #include <QObject>
 
 const static uint32_t MIN_RANGE_MM = 300;
 
-class cLidarModelOuster : public cLidarModel, private cOusterImuStream_Qt, private cOusterLidarStream_Qt
+class cOusterModel : public cLidarModel, private cOusterImuStream_Qt, private cOusterLidarStream_Qt
 {
     Q_OBJECT
 
 public:
-    cLidarModelOuster(QObject* parent = nullptr);
-    virtual ~cLidarModelOuster() = default;
-
-    /*
-     * Returns the preferred window title for the corresponding view.
-     */
-    QString getViewTitle() const override;
+    cOusterModel(QObject* parent = nullptr);
+    virtual ~cOusterModel() = default;
 
     void configure(const nlohmann::json& jsonCfg) override;
-    void writeDataHeader(cDataFile& file) override;
+    void writeDataHeader(cBlockDataFile& file) override;
 
     uint16_t columnsPerFrame() const;
  //   std::vector<int> pixel_shift_by_row;

@@ -1,11 +1,11 @@
 
-#include "LidarModelOuster.hpp"
-#include "Constants.hpp"
+#include "OusterModel.hpp"
+#include "../Utilities/Constants.hpp"
 
 #include <QMessageBox>
 #include <optional>
 
-cLidarModelOuster::cLidarModelOuster(QObject* parent)
+cOusterModel::cOusterModel(QObject* parent)
 :
     cLidarModel(parent),
     mCmdStream(),
@@ -15,12 +15,7 @@ cLidarModelOuster::cLidarModelOuster(QObject* parent)
     mFrameCounter = 0;
 }
 
-QString cLidarModelOuster::getViewTitle() const
-{
-    return "OUSTER LiDAR";
-}
-
-void cLidarModelOuster::configure(const nlohmann::json& jsonCfg)
+void cOusterModel::configure(const nlohmann::json& jsonCfg)
 {
     std::optional<double> azimuth_min_deg;
     std::optional<double> azimuth_max_deg;
@@ -215,7 +210,7 @@ void cLidarModelOuster::configure(const nlohmann::json& jsonCfg)
     mConnected = true;
 }
 
-void cLidarModelOuster::run()
+void cOusterModel::run()
 {
     if (!mConnected) return;
 
@@ -223,17 +218,17 @@ void cLidarModelOuster::run()
     cOusterLidarStream_Qt::processOneDatagram();
 }
 
-void cLidarModelOuster::writeDataHeader(cDataFile& file)
+void cOusterModel::writeDataHeader(cBlockDataFile& file)
 {
 
 }
 
-void cLidarModelOuster::onNewData(const ouster::imu_data_t& data)
+void cOusterModel::onNewData(const ouster::imu_data_t& data)
 {
     mLastImuData = data;
 }
 
-void cLidarModelOuster::onNewData(uint16_t frameID, ouster::lidar_data_t& data)
+void cOusterModel::onNewData(uint16_t frameID, ouster::lidar_data_t& data)
 {
     mLastFrameID = frameID;
     mLastLidarData = data;
@@ -245,66 +240,66 @@ void cLidarModelOuster::onNewData(uint16_t frameID, ouster::lidar_data_t& data)
     }
 }
 
-uint16_t cLidarModelOuster::columnsPerFrame() const
+uint16_t cOusterModel::columnsPerFrame() const
 {
     return mDataFormat.columns_per_frame;
 }
 
 //   std::vector<int> cLidarModelOuster::pixelShiftByRow() const;
 
-uint16_t cLidarModelOuster::pixelsPerColumn() const
+uint16_t cOusterModel::pixelsPerColumn() const
 {
     return mDataFormat.pixels_per_column;
 }
 
-uint16_t cLidarModelOuster::columnWindowMin() const
+uint16_t cOusterModel::columnWindowMin() const
 {
     return mDataFormat.column_window_min;
 }
 
-uint16_t cLidarModelOuster::columnWindowMax() const
+uint16_t cOusterModel::columnWindowMax() const
 {
     return mDataFormat.column_window_max;
 }
 
 
-uint32_t cLidarModelOuster::minEncoderCount() const
+uint32_t cOusterModel::minEncoderCount() const
 {
     return 22528;
 }
 
-uint32_t cLidarModelOuster::maxEncoderCount() const
+uint32_t cOusterModel::maxEncoderCount() const
 {
     return 67584;
 }
 
 
-double cLidarModelOuster::lidar_origin_to_beam_origin_mm() const
+double cOusterModel::lidar_origin_to_beam_origin_mm() const
 {
     return mLidarOriginToBeamOrigin_mm;
 }
 
-const std::vector<double>& cLidarModelOuster::beamAzimuthAngles_rad() const
+const std::vector<double>& cOusterModel::beamAzimuthAngles_rad() const
 {
     return mBeamAzimuthAngles_rad;
 }
 
-const std::vector<double>& cLidarModelOuster::beamAltitudeAngles_rad() const
+const std::vector<double>& cOusterModel::beamAltitudeAngles_rad() const
 {
     return mBeamAltitudeAngles_rad;
 }
 
-uint16_t cLidarModelOuster::frameID() const
+uint16_t cOusterModel::frameID() const
 {
     return mLastFrameID;
 }
 
-ouster::lidar_data_t cLidarModelOuster::lidarData() const
+ouster::lidar_data_t cOusterModel::lidarData() const
 {
     return mLastLidarData;
 }
 
-ouster::imu_data_t cLidarModelOuster::imuData() const
+ouster::imu_data_t cOusterModel::imuData() const
 {
     return mLastImuData;
 }

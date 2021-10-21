@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ColorGradient.hpp"
+#include "../Utilities/ColorGradient.hpp"
 
 #include <QVtkOpenGlWidget.h>
 
@@ -30,12 +30,12 @@
 QT_BEGIN_NAMESPACE
 QT_END_NAMESPACE
 
-class cLidarModelOuster;
+class cOusterModel;
 
 class cOusterView : public QVTKOpenGLWidget
 {
 public:
-	cOusterView(cLidarModelOuster* pModel, QWidget* parent = nullptr);
+	cOusterView(cOusterModel* pModel, QWidget* parent = nullptr);
 	virtual ~cOusterView();
 
 public slots:
@@ -48,5 +48,5 @@ private:
 	cColorGradient mColorGradient;
 
 protected:
-	const cLidarModelOuster* mpModel;
+	const cOusterModel* mpModel;
 };

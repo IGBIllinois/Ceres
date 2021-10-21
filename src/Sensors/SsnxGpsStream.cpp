@@ -1,21 +1,18 @@
 
-#include "GpsStreamSsnx.hpp"
+#include "SsnxGpsStream.hpp"
 
 #include <QtNetwork/QHostInfo>
 #include <iostream>
 
 
-//cGpsStreamSsnx::cGpsStreamSsnx(QObject* parent)
-cGpsStreamSsnx::cGpsStreamSsnx()
+cSsnxGpsStream::cSsnxGpsStream()
     :
-//    QObject(parent),
-//    mSocket(this),
     mSocket(),
     mDataBuffer()
 {
 }
 
-cGpsStreamSsnx::~cGpsStreamSsnx()
+cSsnxGpsStream::~cSsnxGpsStream()
 {
     if (mSocket.isOpen())
     {
@@ -25,18 +22,18 @@ cGpsStreamSsnx::~cGpsStreamSsnx()
 }
 
 
-void cGpsStreamSsnx::registerDataProcessingCallback(std::function<void(const void* pBuffer, std::size_t buf_length)> fp)
+void cSsnxGpsStream::registerDataProcessingCallback(std::function<void(const void* pBuffer, std::size_t buf_length)> fp)
 {
     mProcessingCallback = fp;
 }
 
-bool cGpsStreamSsnx::isConnected() const
+bool cSsnxGpsStream::isConnected() const
 {
     auto state = mSocket.state();
     return  (state == QAbstractSocket::ConnectedState) || (state == QAbstractSocket::BoundState) || (state == QAbstractSocket::ListeningState);
 }
 
-bool cGpsStreamSsnx::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
+bool cSsnxGpsStream::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
 {
     QHostInfo info = QHostInfo::fromName(QString(host.data()));
     if (info.error() != QHostInfo::NoError)
@@ -74,7 +71,7 @@ bool cGpsStreamSsnx::try_to_connect(std::string_view host, uint16_t port, bool u
     return true;
 }
 
-void cGpsStreamSsnx::clear()
+void cSsnxGpsStream::clear()
 {
     while (mSocket.hasPendingDatagrams())
     {
@@ -82,13 +79,13 @@ void cGpsStreamSsnx::clear()
     }
 }
 
-void cGpsStreamSsnx::receive_data()
+void cSsnxGpsStream::receive_data()
 {
     if (mSocket.waitForReadyRead(0))
         processDatagrams();
 }
 
-void cGpsStreamSsnx::processOneDatagram()
+void cSsnxGpsStream::processOneDatagram()
 {
     if (!mSocket.hasPendingDatagrams())
         return;
@@ -97,12 +94,9 @@ void cGpsStreamSsnx::processOneDatagram()
     mSender = mDatagram.senderAddress();
     mDataBuffer = mDatagram.data();
     processDatagram(mDataBuffer.data(), mDataBuffer.size());
-//    emit dataUpdated(mDataBuffer.data(), mDataBuffer.size());
-//    if (mProcessingCallback)
-//        mProcessingCallback(mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cGpsStreamSsnx::processDatagrams()
+void cSsnxGpsStream::processDatagrams()
 {
     if (!mSocket.isReadable())
         return;

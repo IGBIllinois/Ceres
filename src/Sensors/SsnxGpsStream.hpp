@@ -8,14 +8,12 @@
 #include <functional>
 
 
-class cGpsStreamSsnx //: public QObject
+class cSsnxGpsStream
 {
-//	Q_OBJECT
-
 public:
 //	explicit cGpsStreamSsnx(QObject* parent = nullptr);
-	cGpsStreamSsnx();
-	~cGpsStreamSsnx();
+	cSsnxGpsStream();
+	~cSsnxGpsStream();
 
 	void registerDataProcessingCallback(std::function<void(const void* pBuffer, std::size_t buf_length)> fp);
 
