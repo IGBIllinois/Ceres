@@ -24,8 +24,8 @@ public:
     void addExperimentControlModel(cExperimentControlModel* pSensor);
     void addSensor(cSensorModel* pSensor);
 
-    void startDataCollection();
-    void stopDataCollection();
+    void startDataThread();
+    void stopDataThread();
 
     void startDataRecording(const std::string& filename);
     void stopDataRecording();

@@ -13,7 +13,7 @@ cDataModel::cDataModel(QObject* parent)
 
 cDataModel::~cDataModel()
 {
-    stopDataCollection();
+    stopDataThread();
 }
 
 void cDataModel::onStatusUpdate(QString msg)
@@ -34,7 +34,7 @@ void cDataModel::addSensor(cSensorModel* pSensor)
         mActiveSensors.push_back(pSensor);
 }
 
-void cDataModel::startDataCollection()
+void cDataModel::startDataThread()
 {
     if (!isRunning()) 
     {
@@ -42,7 +42,7 @@ void cDataModel::startDataCollection()
     }
 }
 
-void cDataModel::stopDataCollection()
+void cDataModel::stopDataThread()
 {
     mMutex.lock();
     mAbort = true;
@@ -93,6 +93,8 @@ void cDataModel::run()
     {
         if (mAbort)
             return;
+
+        mpController->run();
 
         for (auto& sensor : mActiveSensors)
         {

@@ -13,6 +13,8 @@ public:
 	cSpidercamController();
 	~cSpidercamController();
 
+	bool isConnected() const;
+
 	bool try_to_connect(std::string_view hostname, uint16_t port, bool use_ipv6 = false);
 
 	void clearIncomingBuffer() override;

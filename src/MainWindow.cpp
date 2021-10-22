@@ -11,6 +11,7 @@
 
 #include <QtWidgets>
 #include <QMessageBox>
+#include <QToolBar>
 
 
 #include <cassert>
@@ -28,7 +29,9 @@ cMainWindow::cMainWindow(QWidget* parent) :
     mpFileMenu(nullptr),
     mpViewMenu(nullptr),
     mpHelpMenu(nullptr),
-    mpUI(new Ui::MainWindow)
+    mpFileBar(nullptr),
+    mpUI(new Ui::MainWindow),
+    mpController(nullptr)
 {
     mpUI->setupUi(this);
 
@@ -40,7 +43,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
 //-----------------------------------------------------------------------------
 cMainWindow::~cMainWindow()
 {
-    mMainModel.stopDataCollection();
+    mMainModel.stopDataThread();
 
     delete mpUI;
     mpUI = nullptr;
@@ -55,6 +58,9 @@ void cMainWindow::initialize(QSplashScreen* pSplashScreen)
     createMainMenu();
     createSubMenusAndActions();
     createActions();
+
+    onStatusUpdate("Initializing toolbars...");
+    createToolBars();
 
     onStatusUpdate("Initializing status bar...");
     createStatusBar();
@@ -71,7 +77,7 @@ void cMainWindow::initialize(QSplashScreen* pSplashScreen)
     onStatusUpdate("Initializing sensors...");
     createSensorModelsAndViews();
 
-//    mMainModel.startDataCollection();
+    mMainModel.startDataThread();
 
     mpSplashScreen = nullptr;
 }
@@ -162,6 +168,12 @@ void cMainWindow::createActions()
 }
 
 //-----------------------------------------------------------------------------
+void cMainWindow::createToolBars()
+{
+    mpFileBar = addToolBar("File");
+}
+
+//-----------------------------------------------------------------------------
 void cMainWindow::createStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
@@ -228,9 +240,9 @@ bool cMainWindow::createExperimentController()
         auto controller = create_experiment_controller(name);
 
         cExperimentControlModel* pModel = controller.first;
-        cExperimentControlView* pView = controller.second;
+        mpController = controller.second;
 
-        if ((pModel == nullptr) || (pView == nullptr))
+        if ((pModel == nullptr) || (mpController == nullptr))
         {
             //continue;
         }
@@ -242,9 +254,10 @@ bool cMainWindow::createExperimentController()
         if (jsonDoc.contains(name))
         {
             pModel->configure(jsonDoc[name]);
+            mpController->configure(jsonDoc[name]);
         }
 
-        setCentralWidget(pView);
+        setCentralWidget(mpController);
     }
     catch (const std::exception& e)
     {

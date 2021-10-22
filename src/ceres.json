@@ -15,7 +15,9 @@
 		"max Y position (m)": 190.0,
 		"min height (m)": 1.0,
 		"max height (m)": 9.0,
-		"max speed (m/s)": 2.0
+		"max speed (m/s)": 2.0,
+		"update interval (ms)": 250,
+		"position tolerance (cm)": 1.0
 	},
 	"ssnx" :
 	{

@@ -4,6 +4,9 @@
 #include "ExperimentCtrlModel.hpp"
 
 #include "SpidercamCtrl.hpp"
+#include "SpidercamUtils.hpp"
+#include "../Utilities/Timers.hpp"
+#include "../Utilities/Utilities.hpp"
 
 class cSpidercamModel : public cExperimentControlModel
 {
@@ -29,9 +32,66 @@ public:
 
 
 signals:
-    void updatePosition();
+    void limitsChanged(spidercam::sWorkingDimensions limits);
+    void positionChanged(spidercam::sPosition pos);
+	void movingChanged(bool moving);
+	void batteryLevelChanged(float level_pct);
+
+/*
+	bool mDollyConnected;
+	bool mConsoleConnected;
+	bool mIpCameraConnected;
+	bool mSafetyCircuitRestarted;
+	bool mActivated;
+	bool mDollyPositionKnown;
+	bool mPlaceKnown;
+	bool mBordersKnown;
+	bool mFieldKnown;
+	bool mSetPointEnabled;
+	bool mConsoleEnabled;
+	bool mObstacleLessThan2000mm;
+	bool mObstacleLessThan1500mm;
+	bool mObstacleLessThan1000mm;
+	bool mObstacleLessThan500mm;
+	bool mBusy;
+	bool mDone;
+	bool mMoving;
+	bool mCalibrated;
+	bool mCableLengthAdjustmentRequired;
+	bool mNearBorder;
+	bool mInPosition;
+	bool mAtCalibrationPosition;
+	bool mAtCorrectionPosition;
+	bool mInScriptMode;
+	bool mInInteractiveMode;
+	bool mInError;
+
+	float mBatteryLevel_pct;
+*/
 
 protected:
+	void run() override;
+
+protected:
+
+	spidercam::sPosition mCurrentPosition;
+
+
+	comparator<int, spidercam::window_compare<int, 2>> mBatteryLevel_pct;
+
+	edge_detect<bool>	mBusy;
+	edge_detect<bool>	mInError;
+	edge_detect<bool>	mDone;
+	edge_detect<bool>	mMoving;
+	edge_detect<bool>	mObstacleLessThan2000mm;
+	edge_detect<bool>	mObstacleLessThan1500mm;
+	edge_detect<bool>	mObstacleLessThan1000mm;
+	edge_detect<bool>	mObstacleLessThan500mm;
+
+	cIntervalTimer	mTimer;
+
+	double mPositionTolerance_mm;
+
 
 private:
     cSpidercamController mController;

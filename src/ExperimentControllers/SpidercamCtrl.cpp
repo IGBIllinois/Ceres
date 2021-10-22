@@ -21,6 +21,12 @@ cSpidercamController::~cSpidercamController()
 }
 
 
+bool cSpidercamController::isConnected() const
+{
+    return mSocket.isValid() && (mSocket.state() == QAbstractSocket::ConnectedState);
+}
+
+
 bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t port, bool use_ipv6)
 {
     QHostInfo info = QHostInfo::fromName(QString(hostname.data()));
@@ -55,9 +61,8 @@ bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t po
         return false;
 
     mSocket.connectToHost(local_endpoint, port);
-    mSocket.waitForConnected();
 
-    return true;
+    return mSocket.waitForConnected();
 }
 
 void cSpidercamController::clearIncomingBuffer()
@@ -89,7 +94,7 @@ int cSpidercamController::send_cmd(const std::string_view msg)
 
 std::string cSpidercamController::recv_reply()
 {
-    if (!mSocket.waitForReadyRead())
+    if (!mSocket.waitForReadyRead(1))
     {
         return std::string();
     }

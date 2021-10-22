@@ -1,12 +1,14 @@
 
 #pragma once
 
-//#include "../DataFile.hpp"
+#include "../BlockDataFile/BlockDataFile.hpp"
+#include "../BlockDataFile/RawDataBuffer.hpp"
+#include "ExperimentCtrlIdentifiers.hpp"
 
 #include <QObject>
 #include <nlohmann/json.hpp>
+#include <mutex>
 
-class cBlockDataFile;
 
 class cExperimentControlModel : public QObject
 {
@@ -28,11 +30,43 @@ public:
      */
     virtual void writeDataHeader(cBlockDataFile& file) = 0;
 
+    /*
+     * Sets the non-owning data file pointer to
+     * start the writing of sensor data.
+     */
+    void startDataRecording(cBlockDataFile& file);
+
+    /*
+     * Sets the non-owning data file pointer to null to
+     * stop the writing of sensor data.
+     */
+    void stopDataRecording();
+
+    /*
+     * Returns true if sensor data is being recorded
+     */
+    bool isRecording();
+
 signals:
     void statusMessage(QString msg);
 
+public:
+    virtual void run() = 0;
+
 protected:
-    cExperimentControlModel() = default;
+    cExperimentControlModel();
+
+    /**
+     * A non-owning pointer to the data file
+     */
+    cBlockDataFile* mpFile;
+
+    /**
+     * The mutex for guarding the data file pointer
+     */
+    std::mutex mFileMutex;
+
+    cRawDataBuffer mDataBuffer;
 
 
 };

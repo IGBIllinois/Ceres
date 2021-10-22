@@ -27,6 +27,8 @@ PRIVATE
     SpidercamModel.cpp
     SpidercamCtrl.hpp
     SpidercamCtrl.cpp
+    SpidercamUtils.hpp
+    SpidercamUtils.cpp
 
     SpidercamCtrlFactory.hpp
     SpidercamCtrlFactory.cpp

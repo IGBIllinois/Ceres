@@ -1,10 +1,12 @@
 
 #pragma once
 
-#include <QWidget>
+//#include <QWidget>
+#include <QAbstractScrollArea>
+#include <nlohmann/json.hpp>
 
 
-class cExperimentControlView : public QWidget
+class cExperimentControlView : public QAbstractScrollArea
 {
     Q_OBJECT
 
@@ -12,9 +14,10 @@ public:
 	virtual ~cExperimentControlView() = default;
 
     /*
-     * Returns the preferred window title for the corresponding view.
+     * Apply any configuration parameters to the experiment
+     * controller view.
      */
-    virtual QString getViewTitle() const = 0;
+    virtual void configure(const nlohmann::json& jsonCfg);
 
 protected:
 	cExperimentControlView() = default;

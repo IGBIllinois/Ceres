@@ -15,11 +15,12 @@ class QMenu;
 class QTextEdit;
 class QTreeWidget;
 class QSplashScreen;
+class QToolBar;
 QT_END_NAMESPACE
 
 
-// Forward Declaration
-class GpsWidget;
+// Forward Declarations
+class cExperimentControlView;
 
 
 namespace Ui 
@@ -49,6 +50,7 @@ private:
     void createMainMenu();
     void createSubMenusAndActions();
     void createActions();
+    void createToolBars();
     void createStatusBar();
     void createDockWindows();
     bool createExperimentController();
@@ -62,9 +64,13 @@ private:
     QMenu* mpViewMenu;
     QMenu* mpHelpMenu;
 
+    QToolBar* mpFileBar;
+
     Ui::MainWindow* mpUI;
     QString mCurrentFile;
 
     cDataModel mMainModel;
+
+    cExperimentControlView* mpController;
 };
 

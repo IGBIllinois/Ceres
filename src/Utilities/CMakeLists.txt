@@ -10,11 +10,14 @@ target_sources(Utilities
 PUBLIC
 
 	Constants.hpp
+	Utilities.hpp
 	ColorGradient.hpp
+	Timers.hpp
 
 PRIVATE
 
 	ColorGradient.cpp
+	Timers.cpp
 )
 
 #
