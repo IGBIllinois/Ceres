@@ -8,6 +8,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 // Forward Declarations
 class cExperimentControlModel;
@@ -26,6 +27,8 @@ public:
 
     void startDataThread();
     void stopDataThread();
+
+    void loadExperiment(const nlohmann::json& expDoc);
 
     void startDataRecording(const std::string& filename);
     void stopDataRecording();

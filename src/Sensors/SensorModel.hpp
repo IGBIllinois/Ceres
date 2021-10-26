@@ -25,6 +25,17 @@ public:
     virtual ~cSensorModel() = default;
 
     /*
+     * Returns a string used as a class descriptor of the 
+     * type sensor.
+     */
+    virtual char* sensorClass() const = 0;
+
+    /*
+     * Returns a string used as a descriptor of the sensor.
+     */
+    virtual char* descriptor() const = 0;
+
+    /*
      * Apply any configuration parameters to the sensor
      * model.
      */

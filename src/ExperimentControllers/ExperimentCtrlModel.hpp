@@ -18,10 +18,18 @@ public:
 	virtual ~cExperimentControlModel() = default;
 
     /*
-     * Apply any configuration parameters to the sensor
-     * model.
+     * Returns a string used as a descriptor of the experiment
+     * controller.
+     */
+    virtual char* descriptor() const = 0;
+
+    /*
+     * Apply any configuration parameters to the experiment
+     * controller model.
      */
     virtual void configure(const nlohmann::json& jsonCfg) = 0;
+
+    virtual void loadExperiment(const nlohmann::json& expDoc) = 0;
 
     /*
      * Write any "header" data block into the data file.

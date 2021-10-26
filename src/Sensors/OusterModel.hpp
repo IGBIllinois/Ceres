@@ -22,6 +22,11 @@ public:
     cOusterModel(QObject* parent = nullptr);
     virtual ~cOusterModel() = default;
 
+    /*
+     * Returns a string used as a descriptor of the sensor.
+     */
+    char* descriptor() const override { return "ouster"; };
+
     void configure(const nlohmann::json& jsonCfg) override;
     void writeDataHeader(cBlockDataFile& file) override;
 

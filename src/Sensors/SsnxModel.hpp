@@ -15,6 +15,11 @@ public:
     explicit cSsnxModel(QObject* parent = nullptr);
     ~cSsnxModel();
 
+    /*
+     * Returns a string used as a descriptor of the sensor.
+     */
+    char* descriptor() const override { return "ssnx"; };
+
  
     void configure(const nlohmann::json& jsonCfg) override;
     void writeDataHeader(cBlockDataFile& file) override;

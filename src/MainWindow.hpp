@@ -13,7 +13,6 @@ class QAction;
 class QListWidget;
 class QMenu;
 class QTextEdit;
-class QTreeWidget;
 class QSplashScreen;
 class QToolBar;
 QT_END_NAMESPACE
@@ -21,6 +20,7 @@ QT_END_NAMESPACE
 
 // Forward Declarations
 class cExperimentControlView;
+class cExperimentManager;
 
 
 namespace Ui 
@@ -58,7 +58,7 @@ private:
 
     QSplashScreen* mpSplashScreen;
 
-    QTreeWidget* mpExperiments;
+    cExperimentManager* mpExperiments;
 
     QMenu* mpFileMenu;
     QMenu* mpViewMenu;

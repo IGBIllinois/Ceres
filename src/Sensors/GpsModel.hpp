@@ -67,6 +67,11 @@ public:
         int  utcSecond;
     };
 
+    /*
+     * Returns a string used as a class descriptor of the
+     * type sensor.
+     */
+    char* sensorClass() const override { return "gps"; };
 
     bool isPositionValid() const;
     bool isTimeValid() const;

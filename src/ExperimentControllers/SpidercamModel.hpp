@@ -16,12 +16,20 @@ public:
 	cSpidercamModel();
 	~cSpidercamModel();
 
+	/*
+	 * Returns a string used as a descriptor of the experiment
+	 * controller.
+	 */
+	char* descriptor() const override { return "spidercam"; };
+
 
     /*
      * Apply any configuration parameters to the sensor
      * model.
      */
     void configure(const nlohmann::json& jsonCfg) override;
+
+	void loadExperiment(const nlohmann::json& expDoc) override;
 
     /*
      * Write any "header" data block into the data file.

@@ -52,12 +52,23 @@ void cDataModel::stopDataThread()
 
     if (mFile.isOpen())
     {
+        mpController->stopDataRecording();
+
         for (auto& sensor : mActiveSensors)
         {
             sensor->stopDataRecording();
         }
 
         mFile.close();
+    }
+}
+
+void cDataModel::loadExperiment(const nlohmann::json& expDoc)
+{
+    std::string ctrl = expDoc["controller"];
+    if (ctrl.compare(mpController->descriptor()) != 0)
+    {
+
     }
 }
 

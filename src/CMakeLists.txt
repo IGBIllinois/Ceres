@@ -73,6 +73,10 @@ PRIVATE
     SensorFactory.hpp
     SensorFactory.cpp
 
+    ExperimentManager.hpp
+    ExperimentManager.cpp
+    ExperimentTreeItem.hpp
+    ExperimentTreeItem.cpp
     DataModel.hpp
     DataModel.cpp
     MainWindow.hpp

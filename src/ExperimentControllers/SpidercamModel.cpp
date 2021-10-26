@@ -101,6 +101,11 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
     mCurrentPosition = mController.getLastKnownPosition();
 }
 
+void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
+{
+
+}
+
 void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
 {
 

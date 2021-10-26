@@ -2,6 +2,8 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "ExperimentManager.hpp"
+
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentControllers/ExperimentCtrlView.hpp"
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
@@ -184,10 +186,7 @@ void cMainWindow::createDockWindows()
 {
     QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    mpExperiments = new QTreeWidget(dock);
-    mpExperiments->clear();
-    mpExperiments->setColumnCount(1);
-    mpExperiments->setHeaderLabel("Loaded Experiments");
+    mpExperiments = new cExperimentManager(dock);
 
     dock->setWidget(mpExperiments);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
