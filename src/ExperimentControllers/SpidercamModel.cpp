@@ -79,6 +79,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage(msg);
 
+/*
     if (!mController.try_to_connect(c2_ip, port))
     {
         QMessageBox msg(QMessageBox::Critical, "Spidercam Error", "Could not establish required command connection to Spidercam C2 computer!");
@@ -88,6 +89,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
         exit(EXIT_FAILURE);
 #endif // NDEBUG
     }
+*/
 
     mController.clearIncomingBuffer();
 

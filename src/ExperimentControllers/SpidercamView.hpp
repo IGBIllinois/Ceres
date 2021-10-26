@@ -2,11 +2,16 @@
 #pragma once
 
 #include "ExperimentCtrlView.hpp"
+#include "SpidercamScanArea.hpp"
 
 #include <spidercam/spidercam_types.hpp>
 
-#include <QPainter>
-#include <QPen>
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QLabel;
+class QLineEdit;
+QT_END_NAMESPACE
+
 
 class cSpidercamView : public cExperimentControlView
 {
@@ -25,9 +30,6 @@ public slots:
 	void updateLimits(spidercam::sWorkingDimensions limits);
 	void updatedPosition(spidercam::sPosition pos);
 
-protected:
-	void paintEvent(QPaintEvent* event) override;
-
 private:
     double mMinX_mm = 0;
     double mMaxX_mm = 0;
@@ -36,7 +38,11 @@ private:
     double mMinHeight_mm = 0;
     double mMaxHeight_mm = 0;
 
-    QPainter*	mpDrawingArea;
-	QPen* mpBorderPen;
+    cSpidercamScanArea* mpScanArea;
+
+    QLineEdit* mpX_m;
+    QLineEdit* mpY_m;
+    QLineEdit* mpZ_m;
+
 };
 

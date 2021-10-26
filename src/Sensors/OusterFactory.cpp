@@ -8,8 +8,8 @@
 #include <QString>
 #include <QDockWidget>
 
-
-std::pair<cSensorModel*, QDockWidget*> create_ouster_sensor(QWidget* parent)
+sSensorWidgets
+create_ouster_sensor(QWidget* parent)
 {
     // Create the Ouster model and view...
     auto* pModel = new cOusterModel(parent);
@@ -21,6 +21,6 @@ std::pair<cSensorModel*, QDockWidget*> create_ouster_sensor(QWidget* parent)
 
     QObject::connect(pModel, &cOusterModel::updateView, pView, &cOusterView::displayData);
 
-    return std::make_pair(pModel, dockWidget);
+    return sSensorWidgets(pModel, dockWidget);
 }
 

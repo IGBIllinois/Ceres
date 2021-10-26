@@ -2,10 +2,33 @@
 #pragma once
 
 #include <string>
-#include <utility>
-#include <memory>
 
 class cExperimentControlView;
 class cExperimentControlModel;
 
-std::pair<cExperimentControlModel*, cExperimentControlView*> create_experiment_controller(const std::string& name);
+// Qt Forward Declaration
+//QT_BEGIN_NAMESPACE
+class QDockWidget;
+//QT_END_NAMESPACE
+
+
+struct sExperimentControllerWidgets
+{
+	cExperimentControlModel* pModel;
+	cExperimentControlView* pView;
+	QDockWidget* pDockableView;
+	// Future: property page
+
+	sExperimentControllerWidgets() : pModel(nullptr), pView(nullptr), pDockableView(nullptr)
+	{}
+
+	sExperimentControllerWidgets(cExperimentControlModel* model, cExperimentControlView* view)
+		: pModel(model), pView(view), pDockableView(nullptr)
+	{}
+
+	sExperimentControllerWidgets(cExperimentControlModel* model, cExperimentControlView* view, QDockWidget* dock)
+		: pModel(model), pView(view), pDockableView(dock)
+	{}
+};
+
+sExperimentControllerWidgets create_experiment_controller(const std::string& name);

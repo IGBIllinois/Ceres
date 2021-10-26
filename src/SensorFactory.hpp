@@ -2,10 +2,24 @@
 #pragma once
 
 #include <string>
-#include <utility>
 #include <QWidget>
 #include <QDockWidget>
 
 class cSensorModel;
 
-std::pair<cSensorModel*, QDockWidget*> create_sensor(const std::string& name, QWidget* parent);
+
+struct sSensorWidgets
+{
+	cSensorModel* pModel;
+	QDockWidget* pView;
+	// Future: property page
+
+	sSensorWidgets() : pModel(nullptr), pView(nullptr)
+	{}
+
+	sSensorWidgets(cSensorModel* model, QDockWidget* view)
+		: pModel(model), pView(view)
+	{}
+};
+
+sSensorWidgets create_sensor(const std::string& name, QWidget* parent);

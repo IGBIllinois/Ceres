@@ -8,7 +8,7 @@
 #include <QString>
 
 
-std::pair<cExperimentControlModel*, cExperimentControlView*> create_spidercam_controller()
+sExperimentControllerWidgets create_spidercam_controller()
 {
     // Create the Spidercam Controller...
     auto* model = new cSpidercamModel();
@@ -18,5 +18,5 @@ std::pair<cExperimentControlModel*, cExperimentControlView*> create_spidercam_co
 
     QObject::connect(model, &cSpidercamModel::positionChanged, view, &cSpidercamView::updatedPosition);
 
-    return std::make_pair(model, view);
+    return sExperimentControllerWidgets(model, view);
 }

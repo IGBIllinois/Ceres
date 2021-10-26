@@ -5,7 +5,7 @@
 #include "Sensors/SsnxFactory.hpp"
 
 
-std::pair<cSensorModel*, QDockWidget*> create_sensor(const std::string& name, QWidget* parent)
+sSensorWidgets create_sensor(const std::string& name, QWidget* parent)
 {
     if (name.compare(ssnx_id) == 0)
     {
@@ -17,5 +17,5 @@ std::pair<cSensorModel*, QDockWidget*> create_sensor(const std::string& name, QW
         return create_ouster_sensor(parent);
     }
 
-    return std::make_pair(nullptr, nullptr);
+    return sSensorWidgets();
 }

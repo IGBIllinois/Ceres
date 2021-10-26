@@ -21,6 +21,10 @@ PRIVATE
 #
 # Spidercam files
 #
+    SpidercamDollyStatus.hpp
+    SpidercamDollyStatus.cpp
+    SpidercamScanArea.hpp
+    SpidercamScanArea.cpp
     SpidercamView.hpp
     SpidercamView.cpp
     SpidercamModel.hpp

@@ -237,10 +237,10 @@ bool cMainWindow::createExperimentController()
 
         std::string name = jsonDoc["controller"];
 
-        auto controller = create_experiment_controller(name);
+        auto widgets = create_experiment_controller(name);
 
-        cExperimentControlModel* pModel = controller.first;
-        mpController = controller.second;
+        cExperimentControlModel* pModel = widgets.pModel;
+        mpController = widgets.pView;
 
         if ((pModel == nullptr) || (mpController == nullptr))
         {
@@ -258,6 +258,13 @@ bool cMainWindow::createExperimentController()
         }
 
         setCentralWidget(mpController);
+
+        if (widgets.pDockableView)
+        {
+            addDockWidget(Qt::NoDockWidgetArea, widgets.pDockableView);
+            mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
+
+        }
     }
     catch (const std::exception& e)
     {
@@ -305,25 +312,22 @@ void cMainWindow::createSensorModelsAndViews()
 
         for (std::string name : sensors)
         {
-            auto sensor_view = create_sensor(name, this);
-            
-            cSensorModel* pModel = sensor_view.first;
-            QDockWidget* pView = sensor_view.second;
+            auto widgets = create_sensor(name, this);
 
-            if ((pModel == nullptr) || (pView == nullptr))
+            if ((widgets.pModel == nullptr) || (widgets.pView == nullptr))
                 continue;
 
-            QObject::connect(pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+            QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
 
-            mMainModel.addSensor(pModel);
+            mMainModel.addSensor(widgets.pModel);
 
             if (jsonDoc.contains(name))
             {
-                pModel->configure(jsonDoc[name]);
+                widgets.pModel->configure(jsonDoc[name]);
             }
 
-            addDockWidget(Qt::RightDockWidgetArea, pView);
-            mpViewMenu->addAction(pView->toggleViewAction());
+            addDockWidget(Qt::RightDockWidgetArea, widgets.pView);
+            mpViewMenu->addAction(widgets.pView->toggleViewAction());
         }
     }
     catch (const std::exception& e)

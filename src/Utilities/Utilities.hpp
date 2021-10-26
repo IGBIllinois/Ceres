@@ -118,6 +118,10 @@ public:
      bool IsFalling() const  { return Tr::lt(current_value, previous_value); }
      bool HasChanged() const { return !Tr::eq(current_value,previous_value); }
 
+     // The reset method will keep the current value, but clear the 
+     // IsRising, IsFalling and HasChanged methods to return false.
+     void reset() { previous_value = current_value; }
+
      // The data method will bypass the edge-detection capabilities of this class.
      // Use it with caution!
      T& data() { return current_value; }

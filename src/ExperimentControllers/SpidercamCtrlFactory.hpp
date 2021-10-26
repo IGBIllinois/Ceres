@@ -1,14 +1,8 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
-#include <memory>
-
-class cExperimentControlView;
-class cExperimentControlModel;
-
+#include "../ExperimentCtrlFactory.hpp"
 
 static char* spidercam_id = "spidercam";
 
-std::pair<cExperimentControlModel*, cExperimentControlView*> create_spidercam_controller();
+sExperimentControllerWidgets create_spidercam_controller();

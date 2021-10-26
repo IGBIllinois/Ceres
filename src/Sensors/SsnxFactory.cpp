@@ -10,7 +10,7 @@
 #include <QDockWidget>
 
 
-std::pair<cSensorModel*, QDockWidget*> create_ssnx_sensor(QWidget* parent)
+sSensorWidgets create_ssnx_sensor(QWidget* parent)
 {
     // Create the SSNX model and view...
     auto* pModel = new cSsnxModel(parent);
@@ -25,6 +25,6 @@ std::pair<cSensorModel*, QDockWidget*> create_ssnx_sensor(QWidget* parent)
     QObject::connect(pModel, &cSsnxModel::updatePVT, pView, &cSsnxView::updatePVT);
     QObject::connect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxView::updateUTC);
 
-    return std::make_pair(pModel, dockWidget);
+    return sSensorWidgets(pModel, dockWidget);
 }
 
