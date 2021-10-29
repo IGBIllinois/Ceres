@@ -62,7 +62,7 @@ void cSsnxModel::configure(const nlohmann::json& jsonCfg)
     }
 }
 
-void cSsnxModel::run()
+void cSsnxModel::update()
 {
     if (!mConnected) return;
     processOneDatagram();

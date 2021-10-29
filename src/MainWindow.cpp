@@ -2,6 +2,8 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "CeresSplashScreen.hpp"
+
 #include "ExperimentManager.hpp"
 
 #include "ExperimentCtrlFactory.hpp"
@@ -52,7 +54,7 @@ cMainWindow::~cMainWindow()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::initialize(QSplashScreen* pSplashScreen)
+void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 {
     mpSplashScreen = pSplashScreen;
 
@@ -87,7 +89,7 @@ void cMainWindow::initialize(QSplashScreen* pSplashScreen)
 //-----------------------------------------------------------------------------
 void cMainWindow::fileNew()
 {
-
+    mMainModel.test();
 }
 
 //-----------------------------------------------------------------------------
@@ -111,7 +113,7 @@ void cMainWindow::onStatusUpdate(QString msg)
 {
     if (mpSplashScreen)
     {
-        mpSplashScreen->showMessage(msg, Qt::AlignHCenter | Qt::AlignBottom);
+        mpSplashScreen->showMessage(msg);
         return;
     }
 

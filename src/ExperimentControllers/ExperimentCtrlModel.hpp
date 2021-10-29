@@ -55,11 +55,16 @@ public:
      */
     bool isRecording();
 
+    void test();
+
 signals:
     void statusMessage(QString msg);
 
+    void recordingStarted();
+    void recordingStopped();
+
 public:
-    virtual void run() = 0;
+    virtual void update() = 0;
 
 protected:
     cExperimentControlModel();

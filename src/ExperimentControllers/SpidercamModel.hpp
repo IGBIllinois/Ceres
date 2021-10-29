@@ -78,7 +78,7 @@ signals:
 */
 
 protected:
-	void run() override;
+	void update() override;
 
 protected:
 

@@ -68,8 +68,12 @@ public:
 signals:
     void statusMessage(QString msg);
 
+public slots:
+    void startRecording();
+    void stopRecording();
+
 public:
-    virtual void run() = 0;
+    virtual void update() = 0;
 
 protected:
     cSensorModel(QObject* parent = nullptr);
@@ -83,6 +87,8 @@ protected:
      * The mutex for guarding the data file pointer
      */
     std::mutex mFileMutex;
+
+    bool mIsRecording;
 
     cRawDataBuffer mDataBuffer;
 

@@ -97,20 +97,36 @@ void cDataModel::stopDataRecording()
     mFile.close();
 
 }
+void cDataModel::test()
+{
+    mpController->test();
+}
 
 void cDataModel::run()
 {
+    for (auto& sensor : mActiveSensors)
+    {
+        QObject::connect(mpController, &cExperimentControlModel::recordingStarted, sensor, &cSensorModel::startRecording);
+        QObject::connect(mpController, &cExperimentControlModel::recordingStopped, sensor, &cSensorModel::stopRecording);
+    }
+
     forever
     {
         if (mAbort)
             return;
 
-        mpController->run();
+        mpController->update();
 
         for (auto& sensor : mActiveSensors)
         {
-            sensor->run();
+            sensor->update();
         }
 
+    }
+
+    for (auto& sensor : mActiveSensors)
+    {
+        QObject::disconnect(mpController, &cExperimentControlModel::recordingStarted, sensor, &cSensorModel::startRecording);
+        QObject::disconnect(mpController, &cExperimentControlModel::recordingStopped, sensor, &cSensorModel::stopRecording);
     }
 }

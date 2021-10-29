@@ -33,6 +33,8 @@ public:
     void startDataRecording(const std::string& filename);
     void stopDataRecording();
 
+    void test();
+
 signals:
     void statusMessage(QString msg);
 

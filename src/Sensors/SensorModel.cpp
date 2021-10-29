@@ -8,6 +8,7 @@ cSensorModel::cSensorModel(QObject* parent)
     mpFile(nullptr),
     mDataBuffer(1024)
 {
+    mIsRecording = false;
 }
 
 void cSensorModel::configure(const nlohmann::json& jsonCfg)
@@ -39,5 +40,18 @@ void cSensorModel::stopDataRecording()
 
 bool cSensorModel::isRecording()
 {
-    return mpFile;
+    return mIsRecording && mpFile;
+}
+
+void cSensorModel::startRecording()
+{
+    if (mpFile && mpFile->isOpen())
+    {
+        mIsRecording = true;
+    }
+}
+
+void cSensorModel::stopRecording()
+{
+    mIsRecording = false;
 }

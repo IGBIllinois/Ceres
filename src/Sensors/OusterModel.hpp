@@ -55,7 +55,7 @@ protected:
     void onNewData(uint16_t frameID, ouster::lidar_data_t& data) override;
 
 protected:
-    void run() override;
+    void update() override;
 
 private:
     bool mConnected;

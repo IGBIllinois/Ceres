@@ -82,6 +82,8 @@ PRIVATE
     MainWindow.hpp
     MainWindow.cpp
 
+    CeresSplashScreen.hpp
+    CeresSplashScreen.cpp
     main.cpp
 )
 

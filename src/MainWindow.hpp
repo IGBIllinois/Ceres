@@ -13,12 +13,12 @@ class QAction;
 class QListWidget;
 class QMenu;
 class QTextEdit;
-class QSplashScreen;
 class QToolBar;
 QT_END_NAMESPACE
 
 
 // Forward Declarations
+class cCeresSplashScreen;
 class cExperimentControlView;
 class cExperimentManager;
 
@@ -36,7 +36,7 @@ public:
     explicit cMainWindow(QWidget* parent = nullptr);
     ~cMainWindow();
 
-    void initialize(QSplashScreen* pSplashScreen = nullptr);
+    void initialize(cCeresSplashScreen* pSplashScreen = nullptr);
 
 public slots:
     void onStatusUpdate(QString msg);
@@ -56,7 +56,7 @@ private:
     bool createExperimentController();
     void createSensorModelsAndViews();
 
-    QSplashScreen* mpSplashScreen;
+    cCeresSplashScreen* mpSplashScreen;
 
     cExperimentManager* mpExperiments;
 

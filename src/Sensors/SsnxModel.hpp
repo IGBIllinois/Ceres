@@ -34,7 +34,7 @@ signals:
 
 
 protected:
-    void run() override;
+    void update() override;
 
     void pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt) override;
     void posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov) override;

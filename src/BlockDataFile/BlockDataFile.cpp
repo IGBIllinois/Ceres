@@ -61,7 +61,7 @@ namespace
     }
 }
 
-cBlockDataFile::cBlockDataFile() : mpFile(nullptr)
+cBlockDataFile::cBlockDataFile() //: mpFile(nullptr)
 {
     if (!crc_table_computed)
         make_crc_table();

@@ -29,3 +29,8 @@ bool cExperimentControlModel::isRecording()
 {
     return mpFile;
 }
+
+void cExperimentControlModel::test()
+{
+    emit recordingStarted();
+}

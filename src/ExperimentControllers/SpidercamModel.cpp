@@ -111,7 +111,7 @@ void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
 
 }
 
-void cSpidercamModel::run()
+void cSpidercamModel::update()
 {
     if (mController.checkForReply())
     {

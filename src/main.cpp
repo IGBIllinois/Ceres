@@ -1,16 +1,15 @@
 
 
 #include <QApplication>
-#include <QSplashScreen>
 
+#include "CeresSplashScreen.hpp"
 #include "MainWindow.hpp"
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    QPixmap* pPixmap = new QPixmap(":/ripe.illinois.edu/splash.png");
-    QSplashScreen* pSplash = new QSplashScreen(*pPixmap);
+    cCeresSplashScreen* pSplash = new cCeresSplashScreen();
     pSplash->show();
 
     cMainWindow mainWin;
@@ -21,9 +20,6 @@ int main(int argc, char** argv)
 
     delete pSplash; 
     pSplash = nullptr;
-    
-    delete pPixmap;
-    pPixmap = nullptr;
 
 	return app.exec();
 }

@@ -210,7 +210,7 @@ void cOusterModel::configure(const nlohmann::json& jsonCfg)
     mConnected = true;
 }
 
-void cOusterModel::run()
+void cOusterModel::update()
 {
     if (!mConnected) return;
 

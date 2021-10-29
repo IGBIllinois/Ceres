@@ -79,7 +79,7 @@ public:
 	void writeBlock(BlockID_t id, const std::byte* buf, std::size_t len);
 
 private:
-    FILE* mpFile;
+//    FILE* mpFile;
     std::ofstream mFile;
 
 	const uint8_t mHeader[8] = {137, 83, 80, 68, 82, 67, 77, 03};
