@@ -4,10 +4,20 @@
 
 #include <QMessageBox>
 
+namespace
+{
+    uint32_t TOLERANCE_MM = 10;
+
+    template <typename T>
+    T abs_difference(T v1, T v2)
+    {
+        return (v2 > v1) ? v2 - v1 : v1 - v2;
+    }
+}
 
 cSpidercamModel::cSpidercamModel()
 {
-    mPositionTolerance_mm = 0.0;
+    mPositionTolerance_mm = TOLERANCE_MM;
 }
 
 cSpidercamModel::~cSpidercamModel()
@@ -103,7 +113,39 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
 void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
 {
+    if (mRunning)
+        return;
 
+    for (std::size_t i = 0; i < mExperiment.size(); ++i)
+    {
+        delete mExperiment[i];
+        mExperiment[i] = nullptr;
+    }
+
+    mExperiment.clear();
+    mExperiment.push_back(new cExperimentState_Dummy());
+
+    for (auto entry : expDoc)
+    {
+        std::string type = entry["type"];
+
+        cExperimentState* pState = nullptr;
+
+        if (type == "delay")
+        {
+            pState = new cExperimentState_Delay();
+        }
+        else if (type == "movement")
+        {
+            pState = new cSpidercamExperimentState_Movement(mCurrentPosition, mController, TOLERANCE_MM);
+        }
+
+        if (pState)
+        {
+            pState->configure(entry);
+            mExperiment.push_back(pState);
+        }
+    }
 }
 
 void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
@@ -126,13 +168,65 @@ void cSpidercamModel::update()
         emit positionChanged(mCurrentPosition);
     }
 
+    mDollyConnected = mController.isDollyConnected();
+    mConsoleConnected = mController.isConsoleConnected();
+    mActivated = mController.isActivated();
+    mDollyPositionKnown = mController.isDollyPositionKnown();
+    mConsoleEnabled = mController.isConsoleEnabled();
+
     mInError = mController.isInError();
     mBusy = mController.isBusy();
+    mMoving = mController.isMoving();
+    mInPosition = mController.isInPosition();
+    mDone = mController.isDone();
+    mBatteryLevel_pct = mController.getBatteryLevel_pct();
+    mObstacleLessThan2000mm = mController.isObstacleLessThan2000mm();
+    mObstacleLessThan1500mm = mController.isObstacleLessThan1500mm();
+    mObstacleLessThan1000mm = mController.isObstacleLessThan1000mm();
+    mObstacleLessThan500mm = mController.isObstacleLessThan500mm();
 
-//    bool readyForMotion = mController.isDollyConnected() && mController.isConsoleConnected() && mController.isSetPointEnabled() && !mController.isBusy() && !mController.isInError();
+    if (mBusy.HasChanged())
+        emit busyChanged(mBusy);
+
+    if (mMoving.HasChanged())
+        emit movingChanged(mMoving);
+
+    if (mInPosition.HasChanged())
+        emit inPositionStateChanged(mInPosition);
+
+    if (mBatteryLevel_pct.HasChanged())
+        emit batteryLevelChanged(mBatteryLevel_pct);
+
+    if (mObstacleLessThan2000mm)
+    {
+        if (mObstacleLessThan1500mm)
+        {
+            if (mObstacleLessThan1000mm)
+            {
+                if (mObstacleLessThan500mm)
+                {
+                    if (mObstacleLessThan500mm.IsRising())
+                        emit obstacleDistanceChanged(0.0);
+                }
+                else if (mObstacleLessThan1000mm.IsRising() || mObstacleLessThan500mm.IsFalling())
+                    emit obstacleDistanceChanged(500.0);
+            }
+            else if (mObstacleLessThan1500mm.IsRising() || mObstacleLessThan1000mm.IsFalling())
+                emit obstacleDistanceChanged(1000.0);
+        }
+        else if (mObstacleLessThan2000mm.IsRising() || mObstacleLessThan1500mm.IsFalling())
+            emit obstacleDistanceChanged(1500.0);
+    }
+    else if (mObstacleLessThan2000mm.IsFalling())
+        emit obstacleDistanceChanged(-1.0);
+
+
+    bool readyForMotion = mDollyConnected && mConsoleConnected && mController.isSetPointEnabled() && !mBusy && !mInError;
     if (mTimer.elapsed())
     {
         mController.sendRequestForCurrentPosition();
     }
+
+    updateExperimentStateMachine();
 }
 

@@ -65,11 +65,44 @@ void cDataModel::stopDataThread()
 
 void cDataModel::loadExperiment(const nlohmann::json& expDoc)
 {
+    if (!expDoc.contains("experiment"))
+    {
+        return;
+    }
+
     std::string ctrl = expDoc["controller"];
     if (ctrl.compare(mpController->descriptor()) != 0)
     {
-
+        return;
     }
+
+    auto required_sensors = expDoc["sensors"];
+
+    for (auto required_sensor : required_sensors)
+    {
+        bool found = false;
+
+        for (auto& sensor : mActiveSensors)
+        {
+            if (required_sensor == sensor->descriptor())
+            {
+                found = true;
+                break;
+            }
+        }
+    }
+
+    mpController->loadExperiment(expDoc["experiment"]);
+}
+
+void cDataModel::startExperiment()
+{
+    mpController->startExperiment();
+}
+
+void cDataModel::terminateExperiment()
+{
+    mpController->terminateExperiment();
 }
 
 void cDataModel::startDataRecording(const std::string& filename)
@@ -97,17 +130,12 @@ void cDataModel::stopDataRecording()
     mFile.close();
 
 }
-void cDataModel::test()
-{
-    mpController->test();
-}
 
 void cDataModel::run()
 {
     for (auto& sensor : mActiveSensors)
     {
-        QObject::connect(mpController, &cExperimentControlModel::recordingStarted, sensor, &cSensorModel::startRecording);
-        QObject::connect(mpController, &cExperimentControlModel::recordingStopped, sensor, &cSensorModel::stopRecording);
+        QObject::connect(mpController, &cExperimentControlModel::updateRecordingState, sensor, &cSensorModel::recordingStateUpdated);
     }
 
     forever
@@ -121,12 +149,10 @@ void cDataModel::run()
         {
             sensor->update();
         }
-
     }
 
     for (auto& sensor : mActiveSensors)
     {
-        QObject::disconnect(mpController, &cExperimentControlModel::recordingStarted, sensor, &cSensorModel::startRecording);
-        QObject::disconnect(mpController, &cExperimentControlModel::recordingStopped, sensor, &cSensorModel::stopRecording);
+        QObject::disconnect(mpController, &cExperimentControlModel::updateRecordingState, sensor, &cSensorModel::recordingStateUpdated);
     }
 }

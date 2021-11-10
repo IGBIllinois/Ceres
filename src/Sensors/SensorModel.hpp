@@ -69,8 +69,7 @@ signals:
     void statusMessage(QString msg);
 
 public slots:
-    void startRecording();
-    void stopRecording();
+    void recordingStateUpdated(bool recording);
 
 public:
     virtual void update() = 0;

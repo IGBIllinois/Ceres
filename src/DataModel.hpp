@@ -30,10 +30,11 @@ public:
 
     void loadExperiment(const nlohmann::json& expDoc);
 
+    void startExperiment();
+    void terminateExperiment();
+
     void startDataRecording(const std::string& filename);
     void stopDataRecording();
-
-    void test();
 
 signals:
     void statusMessage(QString msg);

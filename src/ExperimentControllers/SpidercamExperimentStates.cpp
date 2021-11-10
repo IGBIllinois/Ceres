@@ -3,7 +3,7 @@
 #include "SpidercamCtrl.hpp"
 #include "../Utilities/Constants.hpp"
 
-
+#include <thread>
 
 namespace
 {
@@ -14,47 +14,6 @@ namespace
 	}
 }
 
-
-
-cSpidercamExperimentState_Delay::cSpidercamExperimentState_Delay()
-	: mElapsedTime_sec(0), mWaitTime_sec(0)
-{
-}
-
-
-void cSpidercamExperimentState_Delay::configure(const nlohmann::json& stateDoc)
-{
-	mWaitTime_sec = stateDoc["wait (sec)"];
-}
-
-QString cSpidercamExperimentState_Delay::getStatusStr()
-{
-	QString msg = "Delaying for ";
-	msg.append(std::to_string(mWaitTime_sec).c_str());
-	msg += " sec.";
-	return msg;
-}
-
-bool cSpidercamExperimentState_Delay::recording()
-{
-	return false;
-}
-
-void cSpidercamExperimentState_Delay::initialize()
-{
-	mStart = std::chrono::steady_clock::now();
-}
-
-void cSpidercamExperimentState_Delay::run()
-{
-	auto diff = std::chrono::steady_clock::now() - mStart;
-	mElapsedTime_sec = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
-}
-
-bool cSpidercamExperimentState_Delay::finished()
-{
-	return mElapsedTime_sec >= mWaitTime_sec;
-}
 
 
 cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spidercam::sPosition& pos, 
@@ -110,6 +69,8 @@ void cSpidercamExperimentState_Movement::run()
 
 bool cSpidercamExperimentState_Movement::finished()
 {
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	return true;
 	return ((abs_difference(mDollyPos.X_mm, mX_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Y_mm, mY_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Z_mm, mZ_mm) < mTolerance_mm));

@@ -52,6 +52,19 @@ bool cSpidercamScanArea::isRecording() const
 void cSpidercamScanArea::setRecording(bool recording)
 {
 	mIsRecording = recording;
+
+	if (mIsRecording)
+	{
+		mDollyPen.setColor(mMeasurementColor);
+		mDollyBrush.setColor(mMeasurementColor);
+	}
+	else
+	{
+		mDollyPen.setColor(mDollyColor);
+		mDollyBrush.setColor(mDollyColor);
+	}
+
+	repaint();
 }
 
 void cSpidercamScanArea::clearRecordedPath()
@@ -129,17 +142,6 @@ void cSpidercamScanArea::drawDollyMarker(QPainter& painter)
 	int x = mX_Scale * (mDollyPosition.x() - mMinX) + mX_Offset;
 	int y = mY_Scale * (mDollyPosition.y() - mMinY) + mY_Offset;
 	QPoint center(x, y);
-
-	if (mIsRecording)
-	{
-		mDollyPen.setColor(mMeasurementColor);
-		mDollyBrush.setColor(mMeasurementColor);
-	}
-	else
-	{
-		mDollyPen.setColor(mDollyColor);
-		mDollyBrush.setColor(mDollyColor);
-	}
 
 	painter.setPen(mDollyPen);
 	painter.drawEllipse(center, 2*mDollyMarkerRadius, 2*mDollyMarkerRadius);

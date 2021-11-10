@@ -13,6 +13,9 @@ public:
 	cExperimentTreeItem(QTreeWidget* parent, const QString& text);
 	cExperimentTreeItem(QTreeWidgetItem* parent, const std::filesystem::path& file);
 
+	QString getFilename() const;
+
+	bool hasExperimentDocument() const;
 	nlohmann::json getExperimentDocument() const;
 
 private:

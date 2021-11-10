@@ -43,15 +43,18 @@ bool cSensorModel::isRecording()
     return mIsRecording && mpFile;
 }
 
-void cSensorModel::startRecording()
+void cSensorModel::recordingStateUpdated(bool recording)
 {
-    if (mpFile && mpFile->isOpen())
+    if (recording)
     {
-        mIsRecording = true;
+        if (mpFile && mpFile->isOpen())
+        {
+            mIsRecording = true;
+        }
+    }
+    else
+    {
+        mIsRecording = false;
     }
 }
 
-void cSensorModel::stopRecording()
-{
-    mIsRecording = false;
-}

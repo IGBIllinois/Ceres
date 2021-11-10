@@ -29,6 +29,7 @@ public:
 public slots:
 	void updateLimits(spidercam::sWorkingDimensions limits);
 	void updatedPosition(spidercam::sPosition pos);
+    void recordingStateUpdated(bool recording);
 
 private:
     double mMinX_mm = 0;

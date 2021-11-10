@@ -29,7 +29,8 @@ public:
     void updateDollyPosition(uint32_t x, uint32_t y);
 
 public slots:
-//    void setBorderPenWidth(int width);
+
+    //    void setBorderPenWidth(int width);
 //    void setBorderPenColor(const QColor& color);
 
  //   void setMeasurementPenWidth(int width);

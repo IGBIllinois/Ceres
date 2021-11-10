@@ -4,10 +4,14 @@
 #include "../BlockDataFile/BlockDataFile.hpp"
 #include "../BlockDataFile/RawDataBuffer.hpp"
 #include "ExperimentCtrlIdentifiers.hpp"
+#include "../Utilities/Utilities.hpp"
 
 #include <QObject>
 #include <nlohmann/json.hpp>
 #include <mutex>
+#include <vector>
+
+class cExperimentState;
 
 
 class cExperimentControlModel : public QObject
@@ -30,6 +34,23 @@ public:
     virtual void configure(const nlohmann::json& jsonCfg) = 0;
 
     virtual void loadExperiment(const nlohmann::json& expDoc) = 0;
+
+    bool hasExperiment() const;
+
+    void clearExperiment();
+
+    /**
+     * Started the loaded experiment.
+     * 
+     * Returns true if the experiment was started, false otherwise.
+     */
+
+    virtual bool startExperiment();
+
+    /**
+     * Terminate a running experiment, otherwise just returns.
+     */
+    virtual void terminateExperiment();
 
     /*
      * Write any "header" data block into the data file.
@@ -55,19 +76,18 @@ public:
      */
     bool isRecording();
 
-    void test();
-
 signals:
     void statusMessage(QString msg);
 
-    void recordingStarted();
-    void recordingStopped();
+    void updateRecordingState(bool recording);
 
 public:
     virtual void update() = 0;
 
 protected:
     cExperimentControlModel();
+
+    void updateExperimentStateMachine();
 
     /**
      * A non-owning pointer to the data file
@@ -81,5 +101,13 @@ protected:
 
     cRawDataBuffer mDataBuffer;
 
+    bool mRunning;
+
+
+    edge_detect<bool>	mRecording;
+
+    std::vector<cExperimentState*> mExperiment;
+    std::size_t mActiveStateNumber;
+    cExperimentState* mpActiveState;
 
 };

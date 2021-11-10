@@ -1,82 +1,15 @@
 
 #pragma once
 
+#include "ExperimentStates.hpp"
+
 #include <spidercam/spidercam_types.hpp>
-#include <nlohmann/json.hpp>
-#include <chrono>
-#include <QString>
 
 // Forward Declarations
 class cSpidercamController;
 
 
-class cSpidercamExperimentState
-{
-public:
-	cSpidercamExperimentState() = default;
-	virtual ~cSpidercamExperimentState() = default;
-
-	virtual QString getStatusStr() = 0;
-
-	virtual void configure(const nlohmann::json& stateDoc) = 0;
-
-	virtual bool recording() = 0;
-
-	virtual void initialize() = 0;
-	virtual void run() = 0;
-	virtual bool finished() = 0;
-};
-
-
-class cSpidercamExperimentState_Dummy : public cSpidercamExperimentState
-{
-public:
-	cSpidercamExperimentState_Dummy() = default;
-
-	QString getStatusStr() override
-	{
-		return QString();
-	}
-
-	void configure(const nlohmann::json& stateDoc) override {};
-
-	bool recording() override 
-	{
-		return false;
-	};
-
-	void initialize() override {};
-	void run() override {};
-	bool finished() override
-	{
-		return true;
-	}
-};
-
-
-class cSpidercamExperimentState_Delay : public cSpidercamExperimentState
-{
-public:
-	cSpidercamExperimentState_Delay();
-
-	QString getStatusStr() override;
-
-	void configure(const nlohmann::json& stateDoc) override;
-
-	bool recording() override;
-
-	void initialize() override;
-	void run() override;
-	bool finished() override;
-
-private:
-	std::chrono::time_point<std::chrono::steady_clock>	mStart;
-	double mElapsedTime_sec;
-	double mWaitTime_sec;
-};
-
-
-class cSpidercamExperimentState_Movement : public cSpidercamExperimentState
+class cSpidercamExperimentState_Movement : public cExperimentState
 {
 public:
 	cSpidercamExperimentState_Movement(const spidercam::sPosition& pos,

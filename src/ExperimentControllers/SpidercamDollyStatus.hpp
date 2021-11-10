@@ -5,19 +5,72 @@
 
 #include <QAbstractScrollArea>
 
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QLabel;
+class QLineEdit;
+QT_END_NAMESPACE
+
 
 class cSpidercamDollyStatus : public QAbstractScrollArea
 {
 public:
-    cSpidercamDollyStatus();
+    explicit cSpidercamDollyStatus(QWidget* parent = nullptr);
 	~cSpidercamDollyStatus();
 
 public slots:
 	void updateLimits(spidercam::sWorkingDimensions limits);
-	void updatedPosition(spidercam::sPosition pos);
+	void updatePosition(spidercam::sPosition pos);
+    void updateBatteryLevel(float level_pct);
 
-protected:
-	void paintEvent(QPaintEvent* event) override;
+public slots:
+    void dockLocationChanged(Qt::DockWidgetArea area);
+    void topLevelChanged(bool topLevel);
+
+
+private:
+    void createWidgets();
+    void horizontalLayout();
+    void verticalLayout();
+
+    void setFixedSize();
+    void setVariableSize();
+
+private:
+    QLabel* mpX_Label;
+    QLineEdit* mpX_m;
+
+    QLabel* mpY_Label;
+    QLineEdit* mpY_m;
+
+    QLabel* mpZ_Label;
+    QLineEdit* mpZ_m;
+
+    QLabel* mpHeightLabel;
+    QLineEdit* mpHeight_m;
+
+    QLabel* mpPanLabel;
+    QLineEdit* mpPan_deg;
+
+    QLabel* mpTiltLabel;
+    QLineEdit* mpTilt_deg;
+
+    QLabel* mpSpeedLabel;
+    QLineEdit* mpSpeed_mps;
+
+    QLabel* mpBatteryLabel;
+    QLineEdit* mpBatteryLevel_pct;
+
+/*
+    QLabel* mpTimestampLabel;
+    QLineEdit* mpTimestamp_s;
+
+    QLabel* mpDateLabel;
+    QLineEdit* mpDate;
+
+    QLabel* mpTimeLabel;
+    QLineEdit* mpTime;
+*/
 
 private:
     double mMinX_mm = 0;

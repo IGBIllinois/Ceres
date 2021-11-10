@@ -93,3 +93,7 @@ void cSpidercamView::updatedPosition(spidercam::sPosition pos)
 	mpZ_m->setText(QString::number(pos.height_mm * nConstants::MM_TO_M, 'f', 3));
 }
 
+void cSpidercamView::recordingStateUpdated(bool recording)
+{
+	mpScanArea->setRecording(recording);
+}

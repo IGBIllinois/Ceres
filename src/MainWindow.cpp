@@ -5,6 +5,7 @@
 #include "CeresSplashScreen.hpp"
 
 #include "ExperimentManager.hpp"
+#include "ExperimentTreeItem.hpp"
 
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentControllers/ExperimentCtrlView.hpp"
@@ -89,7 +90,26 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 //-----------------------------------------------------------------------------
 void cMainWindow::fileNew()
 {
-    mMainModel.test();
+    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+    if ((pExperiment == nullptr) || ( ! pExperiment->hasExperimentDocument()))
+    {
+        return;
+    }
+
+    QString msg = "Loading experiment \"";
+    msg += pExperiment->text(0);
+    msg += "\" from file ";
+    msg += pExperiment->getFilename();
+
+    onStatusUpdate(msg);
+    auto expDoc = pExperiment->getExperimentDocument();
+    mMainModel.loadExperiment(expDoc);
+
+    msg = "Running experiment: ";
+    msg += pExperiment->text(0);
+
+    onStatusUpdate(msg);
+    mMainModel.startExperiment();
 }
 
 //-----------------------------------------------------------------------------
@@ -262,9 +282,12 @@ bool cMainWindow::createExperimentController()
 
         if (widgets.pDockableView)
         {
-            addDockWidget(Qt::NoDockWidgetArea, widgets.pDockableView);
-            mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
+            widgets.pDockableView->setParent(this);
+            widgets.pDockableView->setAllowedAreas(Qt::AllDockWidgetAreas);
+            widgets.pDockableView->hide();
 
+            addDockWidget(Qt::BottomDockWidgetArea, widgets.pDockableView);
+            mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
         }
     }
     catch (const std::exception& e)

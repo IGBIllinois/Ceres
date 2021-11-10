@@ -30,6 +30,18 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const std::fil
     mExperimentFile = experiment_file;
 }
 
+
+QString cExperimentTreeItem::getFilename() const
+{
+    QString filename = mExperimentFile.string().c_str();
+    return filename;
+}
+
+bool cExperimentTreeItem::hasExperimentDocument() const
+{
+    return !mExperimentFile.empty();
+}
+
 nlohmann::json cExperimentTreeItem::getExperimentDocument() const
 {
     std::ifstream in;

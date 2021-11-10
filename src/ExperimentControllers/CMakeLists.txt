@@ -23,6 +23,8 @@ PRIVATE
 #
     SpidercamDollyStatus.hpp
     SpidercamDollyStatus.cpp
+    SpidercamExperimentStates.hpp
+    SpidercamExperimentStates.cpp
     SpidercamScanArea.hpp
     SpidercamScanArea.cpp
     SpidercamView.hpp
@@ -44,6 +46,12 @@ PRIVATE
 
     ExperimentCtrlView.cpp
     ExperimentCtrlModel.cpp
+
+#
+# Base Classes for the experiment state machine
+#
+    ExperimentStates.hpp
+    ExperimentStates.cpp
 )
 
 #
