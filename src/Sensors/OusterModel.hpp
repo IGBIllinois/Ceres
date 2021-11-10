@@ -19,7 +19,7 @@ class cOusterModel : public cLidarModel, private cOusterImuStream_Qt, private cO
     Q_OBJECT
 
 public:
-    cOusterModel(QObject* parent = nullptr);
+    cOusterModel();
     virtual ~cOusterModel() = default;
 
     /*

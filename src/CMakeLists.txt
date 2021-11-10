@@ -77,6 +77,8 @@ PRIVATE
     ExperimentManager.cpp
     ExperimentTreeItem.hpp
     ExperimentTreeItem.cpp
+    DataThread.hpp
+    DataThread.cpp
     DataModel.hpp
     DataModel.cpp
     MainWindow.hpp

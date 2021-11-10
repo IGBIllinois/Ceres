@@ -6,8 +6,7 @@
 
 cDataModel::cDataModel(QObject* parent)
 :
-    QThread(parent),
-    mpController(nullptr)
+    QObject(parent)
 {
 }
 
@@ -24,37 +23,36 @@ void cDataModel::onStatusUpdate(QString msg)
 void cDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)
 {
     if (pControlModel)
-        mpController = pControlModel;
+    {
+        mThread.mpController = pControlModel;
+        mThread.mpController->moveToThread(&mThread);
+    }
 }
 
 
 void cDataModel::addSensor(cSensorModel* pSensor)
 {
     if (pSensor)
-        mActiveSensors.push_back(pSensor);
+    {
+        pSensor->moveToThread(&mThread);
+        mThread.mActiveSensors.push_back(pSensor);
+    }
 }
 
 void cDataModel::startDataThread()
 {
-    if (!isRunning()) 
-    {
-        start(TimeCriticalPriority);
-    }
+    mThread.start();
 }
 
 void cDataModel::stopDataThread()
 {
-    mMutex.lock();
-    mAbort = true;
-    mMutex.unlock();
-
-    wait();
+    mThread.stop();
 
     if (mFile.isOpen())
     {
-        mpController->stopDataRecording();
+        mThread.mpController->stopDataRecording();
 
-        for (auto& sensor : mActiveSensors)
+        for (auto& sensor : mThread.mActiveSensors)
         {
             sensor->stopDataRecording();
         }
@@ -71,7 +69,7 @@ void cDataModel::loadExperiment(const nlohmann::json& expDoc)
     }
 
     std::string ctrl = expDoc["controller"];
-    if (ctrl.compare(mpController->descriptor()) != 0)
+    if (ctrl.compare(mThread.mpController->descriptor()) != 0)
     {
         return;
     }
@@ -82,7 +80,7 @@ void cDataModel::loadExperiment(const nlohmann::json& expDoc)
     {
         bool found = false;
 
-        for (auto& sensor : mActiveSensors)
+        for (auto& sensor : mThread.mActiveSensors)
         {
             if (required_sensor == sensor->descriptor())
             {
@@ -92,29 +90,29 @@ void cDataModel::loadExperiment(const nlohmann::json& expDoc)
         }
     }
 
-    mpController->loadExperiment(expDoc["experiment"]);
+    mThread.mpController->loadExperiment(expDoc["experiment"]);
 }
 
 void cDataModel::startExperiment()
 {
-    mpController->startExperiment();
+    mThread.mpController->startExperiment();
 }
 
 void cDataModel::terminateExperiment()
 {
-    mpController->terminateExperiment();
+    mThread.mpController->terminateExperiment();
 }
 
 void cDataModel::startDataRecording(const std::string& filename)
 {
     mFile.open(filename);
 
-    for (auto& sensor : mActiveSensors)
+    for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->writeDataHeader(mFile);
     }
 
-    for (auto& sensor : mActiveSensors)
+    for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->startDataRecording(mFile);
     }
@@ -122,7 +120,7 @@ void cDataModel::startDataRecording(const std::string& filename)
 
 void cDataModel::stopDataRecording()
 {
-    for (auto& sensor : mActiveSensors)
+    for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->stopDataRecording();
     }
@@ -131,28 +129,3 @@ void cDataModel::stopDataRecording()
 
 }
 
-void cDataModel::run()
-{
-    for (auto& sensor : mActiveSensors)
-    {
-        QObject::connect(mpController, &cExperimentControlModel::updateRecordingState, sensor, &cSensorModel::recordingStateUpdated);
-    }
-
-    forever
-    {
-        if (mAbort)
-            return;
-
-        mpController->update();
-
-        for (auto& sensor : mActiveSensors)
-        {
-            sensor->update();
-        }
-    }
-
-    for (auto& sensor : mActiveSensors)
-    {
-        QObject::disconnect(mpController, &cExperimentControlModel::updateRecordingState, sensor, &cSensorModel::recordingStateUpdated);
-    }
-}

@@ -134,7 +134,7 @@ void cSpidercamDollyStatus::horizontalLayout()
 	mainlayout->addWidget(mpTimeLabel, 3, 2);
 	mainlayout->addWidget(mpTime, 3, 3);
 */
-
+	mainlayout->setSpacing(5);
 	setLayout(mainlayout);
 }
 

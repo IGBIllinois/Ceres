@@ -2,9 +2,8 @@
 #include "SensorModel.hpp"
 
 
-cSensorModel::cSensorModel(QObject* parent)
+cSensorModel::cSensorModel()
 :
-    QObject(parent),
     mpFile(nullptr),
     mDataBuffer(1024)
 {

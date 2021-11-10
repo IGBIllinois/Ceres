@@ -91,6 +91,8 @@ void cSpidercamView::updatedPosition(spidercam::sPosition pos)
 	mpX_m->setText(QString::number(pos.X_mm * nConstants::MM_TO_M, 'f', 3));
 	mpY_m->setText(QString::number(pos.Y_mm * nConstants::MM_TO_M, 'f', 3));
 	mpZ_m->setText(QString::number(pos.height_mm * nConstants::MM_TO_M, 'f', 3));
+
+	repaint();
 }
 
 void cSpidercamView::recordingStateUpdated(bool recording)

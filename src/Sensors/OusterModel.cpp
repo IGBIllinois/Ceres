@@ -5,9 +5,8 @@
 #include <QMessageBox>
 #include <optional>
 
-cOusterModel::cOusterModel(QObject* parent)
+cOusterModel::cOusterModel()
 :
-    cLidarModel(parent),
     mCmdStream(),
     mLastFrameID(0)
 {

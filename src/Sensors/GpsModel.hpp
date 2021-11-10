@@ -83,7 +83,7 @@ public:
     sUtcTime  getTime() const;
 
 protected:
-    cGpsModel(QObject* parent = nullptr);
+    cGpsModel();
     virtual ~cGpsModel() = default;
 
     eDatum mDatum;

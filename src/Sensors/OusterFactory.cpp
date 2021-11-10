@@ -12,7 +12,7 @@ sSensorWidgets
 create_ouster_sensor(QWidget* parent)
 {
     // Create the Ouster model and view...
-    auto* pModel = new cOusterModel(parent);
+    auto* pModel = new cOusterModel();
     auto* dockWidget = new QDockWidget(parent);
     auto* pView = new cOusterView(pModel, dockWidget);
     

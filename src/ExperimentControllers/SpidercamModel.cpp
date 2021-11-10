@@ -7,15 +7,12 @@
 namespace
 {
     uint32_t TOLERANCE_MM = 10;
-
-    template <typename T>
-    T abs_difference(T v1, T v2)
-    {
-        return (v2 > v1) ? v2 - v1 : v1 - v2;
-    }
 }
 
 cSpidercamModel::cSpidercamModel()
+    : mDollyConnected(false), mConsoleConnected(false), mActivated(false),
+      mDollyPositionKnown(false), mConsoleEnabled(false)
+
 {
     mPositionTolerance_mm = TOLERANCE_MM;
 }
@@ -109,6 +106,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
     }
 
     mCurrentPosition = mController.getLastKnownPosition();
+    emit positionChanged(mCurrentPosition);
 }
 
 void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
@@ -155,6 +153,8 @@ void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
 
 void cSpidercamModel::update()
 {
+    return;
+
     if (mController.checkForReply())
     {
         mController.readReply();
@@ -180,10 +180,11 @@ void cSpidercamModel::update()
     mInPosition = mController.isInPosition();
     mDone = mController.isDone();
     mBatteryLevel_pct = mController.getBatteryLevel_pct();
-    mObstacleLessThan2000mm = mController.isObstacleLessThan2000mm();
-    mObstacleLessThan1500mm = mController.isObstacleLessThan1500mm();
-    mObstacleLessThan1000mm = mController.isObstacleLessThan1000mm();
+
     mObstacleLessThan500mm = mController.isObstacleLessThan500mm();
+    mObstacleLessThan1000mm = mController.isObstacleLessThan1000mm() || mObstacleLessThan500mm;
+    mObstacleLessThan1500mm = mController.isObstacleLessThan1500mm() || mObstacleLessThan1000mm;
+    mObstacleLessThan2000mm = mController.isObstacleLessThan2000mm() || mObstacleLessThan1500mm;
 
     if (mBusy.HasChanged())
         emit busyChanged(mBusy);

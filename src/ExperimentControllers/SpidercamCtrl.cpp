@@ -105,7 +105,9 @@ std::string cSpidercamController::recv_reply()
     auto pos = reply.find("</root>");
 
     if (pos != std::string::npos)
+    {
         reply.erase(pos);
+    }
     
     return reply;
 }

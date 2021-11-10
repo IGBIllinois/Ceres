@@ -13,7 +13,7 @@
 sSensorWidgets create_ssnx_sensor(QWidget* parent)
 {
     // Create the SSNX model and view...
-    auto* pModel = new cSsnxModel(parent);
+    auto* pModel = new cSsnxModel();
     auto* dockWidget = new QDockWidget(parent);
     auto* pView = new cSsnxView(dockWidget);
 

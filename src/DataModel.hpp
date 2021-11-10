@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockDataFile/BlockDataFile.hpp"
+#include "DataThread.hpp"
 
 #include <QObject>
 #include <QThread>
@@ -14,7 +15,7 @@
 class cExperimentControlModel;
 class cSensorModel;
 
-class cDataModel : public QThread
+class cDataModel : public QObject
 {
     Q_OBJECT
 
@@ -42,17 +43,11 @@ signals:
 private slots:
     void onStatusUpdate(QString msg);
 
-protected:
-    void run() override;
-
 private:
-    cExperimentControlModel* mpController;
-    std::vector<cSensorModel*> mActiveSensors;
+    cDataThread mThread;
 
     cBlockDataFile   mFile;
 
     QMutex mMutex;
-    bool mAbort = false;
-
 };
 

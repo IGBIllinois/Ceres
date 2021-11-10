@@ -11,7 +11,7 @@ class cPvtModel : public cSensorModel
 public:
 
 protected:
-    cPvtModel(QObject* parent = nullptr);
+    cPvtModel();
     ~cPvtModel() = default;
 
     bool mDataValid;

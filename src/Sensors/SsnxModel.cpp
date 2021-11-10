@@ -6,9 +6,7 @@
 
 using namespace ssnx;
 
-cSsnxModel::cSsnxModel(QObject* parent)
-:
-    cGpsModel(parent)
+cSsnxModel::cSsnxModel()
 {
     mConnected = false;
 }
@@ -45,6 +43,7 @@ void cSsnxModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage(msg);
 
+    ip = "127.0.0.1";
     if (!try_to_connect(ip, port, false))
     {
         QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");

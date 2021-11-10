@@ -75,7 +75,7 @@ public:
     virtual void update() = 0;
 
 protected:
-    cSensorModel(QObject* parent = nullptr);
+    cSensorModel();
 
     /**
      * A non-owning pointer to the data file

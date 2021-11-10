@@ -69,8 +69,6 @@ void cSpidercamExperimentState_Movement::run()
 
 bool cSpidercamExperimentState_Movement::finished()
 {
-	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-	return true;
 	return ((abs_difference(mDollyPos.X_mm, mX_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Y_mm, mY_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Z_mm, mZ_mm) < mTolerance_mm));

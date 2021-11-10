@@ -41,22 +41,22 @@ cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
     setMaximumSize(16777215, 16777215);
 
 	// needed to ensure appropriate OpenGL context is created for VTK rendering.
-	QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
+//	QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
 
 
-    auto renderer = vtkSmartPointer<vtkRenderer>::New();
-    auto renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-    renderWindow->AddRenderer(renderer);
+//    auto renderer = vtkSmartPointer<vtkRenderer>::New();
+//    auto renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+//    renderWindow->AddRenderer(renderer);
 
-    mpViewer.reset(new PCLVisualizer(renderer, renderWindow, "lidar", false));
+//    mpViewer.reset(new PCLVisualizer(renderer, renderWindow, "lidar", false));
 
-    setRenderWindow(renderWindow);
+//    setRenderWindow(renderWindow);
 
-    displayData();
+ //   displayData();
 
-    update();
+//    update();
 
-    mpViewer->addCoordinateSystem();
+//    mpViewer->addCoordinateSystem();
 }
 
 cOusterView::~cOusterView()
@@ -67,6 +67,8 @@ cOusterView::~cOusterView()
 void cOusterView::displayData()
 {
     if (!isVisible()) return;
+
+/*
 
     pcl::PointXYZRGBA pt;
 
@@ -125,4 +127,6 @@ void cOusterView::displayData()
     }
 
     renderWindow()->Render();
+
+*/
 }

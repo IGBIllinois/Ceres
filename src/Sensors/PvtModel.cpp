@@ -2,9 +2,7 @@
 #include "PvtModel.hpp"
 
 
-cPvtModel::cPvtModel(QObject* parent)
-:
-    cSensorModel(parent)
+cPvtModel::cPvtModel()
 {
     mDataValid = false;
 
