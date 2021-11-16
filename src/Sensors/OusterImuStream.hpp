@@ -8,11 +8,19 @@
 #include <QtNetwork/QNetworkDatagram>
 
 
-class cOusterImuStream_Qt : public cOusterImuStream
+class cOusterImuStream_Qt : private cOusterImuStream
 {
 public:
 	cOusterImuStream_Qt();
 	~cOusterImuStream_Qt();
+
+	/*
+	 * Starts/Stops communication with the endpoint.
+	 * These methods are called inside the QThread so that
+	 * all of the communication happens within the same thread!
+	 */
+	bool startCommunications(std::string_view sensor, uint16_t port, bool use_ipv6);
+	void stopCommunications();
 
 	/**
 	 * Clear will remove all input datagrams from the UDP socket
@@ -33,7 +41,7 @@ private:
 private:
 	static const size_t MAX_DATA_LENGTH = 128;
 
-	QUdpSocket mSocket;
+	QUdpSocket* mpSocket;
 	QHostAddress mSender;
 	QNetworkDatagram mDatagram;
 	QByteArray mDataBuffer;

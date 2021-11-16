@@ -10,7 +10,7 @@ cSensorModel::cSensorModel()
     mIsRecording = false;
 }
 
-void cSensorModel::configure(const nlohmann::json& jsonCfg)
+bool cSensorModel::configure(const nlohmann::json& jsonCfg)
 {
     if (!jsonCfg.contains("Manufacturer"))
         throw std::logic_error("Missing \"Manufacturer\" entry.");
@@ -23,6 +23,8 @@ void cSensorModel::configure(const nlohmann::json& jsonCfg)
     if (!jsonCfg.contains("Serial Number"))
         throw std::logic_error("Missing \"Serial Number\" entry.");
     mSerialNumber = jsonCfg["Serial Number"];
+
+    return true;
 }
 
 void cSensorModel::startDataRecording(cBlockDataFile& file)

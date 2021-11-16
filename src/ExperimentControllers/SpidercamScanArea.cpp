@@ -89,6 +89,8 @@ void cSpidercamScanArea::updateDollyPosition(uint32_t x, uint32_t y)
 
 		mpActivePath->push_back({x,y});
 	}
+
+	repaint();
 }
 
 void cSpidercamScanArea::updateBounds(double minX, double maxX, double minY, double maxY)
@@ -141,6 +143,9 @@ void cSpidercamScanArea::drawDollyMarker(QPainter& painter)
 {
 	int x = mX_Scale * (mDollyPosition.x() - mMinX) + mX_Offset;
 	int y = mY_Scale * (mDollyPosition.y() - mMinY) + mY_Offset;
+
+	y = height() - y;
+
 	QPoint center(x, y);
 
 	painter.setPen(mDollyPen);
@@ -168,6 +173,7 @@ void cSpidercamScanArea::drawPath(QPainter& painter)
 		auto point = measurementPath[0];
 		int x = mX_Scale * (point.x_mm - mMinX) + mX_Offset;
 		int y = mY_Scale * (point.y_mm - mMinY) + mY_Offset;
+		y = height() - y;
 		path.moveTo(x, y);
 
 		for (int i = 0; i < measurementPath.size(); ++i)
@@ -175,6 +181,7 @@ void cSpidercamScanArea::drawPath(QPainter& painter)
 			auto point = measurementPath[i];
 			int x = mX_Scale * (point.x_mm - mMinX) + mX_Offset;
 			int y = mY_Scale * (point.y_mm - mMinY) + mY_Offset;
+			y = height() - y;
 			path.lineTo(x, y);
 		}
 

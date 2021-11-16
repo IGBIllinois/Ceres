@@ -24,6 +24,11 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 	mSpeed_mmps(0), mPan_deg(0), mTilt_deg(0)
 
 {
+	mMoveCommandSent = false;
+	mBusy = false;
+	mIsMoving = false;
+	mIsSetPointEnabled = false;
+	mInError = false;
 }
 
 void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
@@ -44,11 +49,11 @@ QString cSpidercamExperimentState_Movement::getStatusStr()
 {
 	QString msg = "Moving to: ";
 	msg.append(std::to_string(mX_mm).c_str());
-	msg += ", ";
+	msg += "mm, ";
 	msg.append(std::to_string(mY_mm).c_str());
-	msg += ", ";
+	msg += "mm, ";
 	msg.append(std::to_string(mZ_mm).c_str());
-	msg += ".";
+	msg += "mm.";
 	return msg;
 }
 
@@ -59,16 +64,47 @@ bool cSpidercamExperimentState_Movement::recording()
 
 void cSpidercamExperimentState_Movement::initialize()
 {
-	mController.sendRequestNewPosition(mX_mm, mY_mm, mZ_mm, mSpeed_mmps, mPan_deg, mTilt_deg);
+	mMoveCommandSent = false;
+	mBusy = false;
+	mIsMoving = false;
+	mIsSetPointEnabled = false;
+	mInError = false;
 }
 
 void cSpidercamExperimentState_Movement::run()
 {
-	mDollyPos.speed_mmps;
+	mBusy = mController.isBusy();
+	mIsMoving = mController.isMoving();
+	mIsSetPointEnabled = mController.isSetPointEnabled();
+	mInError = mController.isInError();
+
+	bool readyForMotion = mIsSetPointEnabled && !mBusy && !mInError;
+
+	if (mMoveCommandSent) return;
+
+	if (!readyForMotion) return;
+
+	mMoveCommandSent = mController.sendRequestNewPosition(mX_mm, mY_mm, mZ_mm, mSpeed_mmps, mPan_deg, mTilt_deg, 0.0f);
 }
 
 bool cSpidercamExperimentState_Movement::finished()
 {
+	if (mIsMoving)
+		return false;
+
+/*
+	if (!mRecordData)
+	{
+		std::chrono::seconds delay(2);
+		std::this_thread::sleep_for(delay);
+	}
+	else
+	{
+		std::chrono::seconds delay(4);
+		std::this_thread::sleep_for(delay);
+	}
+	return true;
+*/
 	return ((abs_difference(mDollyPos.X_mm, mX_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Y_mm, mY_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Z_mm, mZ_mm) < mTolerance_mm));

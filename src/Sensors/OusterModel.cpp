@@ -1,5 +1,6 @@
 
 #include "OusterModel.hpp"
+#include "OusterFactory.hpp"
 #include "../Utilities/Constants.hpp"
 
 #include <QMessageBox>
@@ -8,13 +9,22 @@
 cOusterModel::cOusterModel()
 :
     mCmdStream(),
-    mLastFrameID(0)
+    mLastFrameID(0),
+    mLidarOriginToBeamOrigin_mm(0)
 {
     mConnected = false;
     mFrameCounter = 0;
+    mImuPort = 0;
+    mLidarPort = 0;
+    mUseIpv6 = false;
 }
 
-void cOusterModel::configure(const nlohmann::json& jsonCfg)
+char* cOusterModel::descriptor() const
+{
+    return ouster_id;
+}
+
+bool cOusterModel::configure(const nlohmann::json& jsonCfg)
 {
     std::optional<double> azimuth_min_deg;
     std::optional<double> azimuth_max_deg;
@@ -97,7 +107,7 @@ void cOusterModel::configure(const nlohmann::json& jsonCfg)
         str.append(e.what());
         QMessageBox msg(QMessageBox::Critical, "Configuration Error", str);
         msg.exec();
-        return;
+        return false;
     }
 
     emit statusMessage("Searching for OUSTER LiDARs...");
@@ -108,7 +118,7 @@ void cOusterModel::configure(const nlohmann::json& jsonCfg)
     {
         QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "No Ouster sensors were detected on the network!");
         msg.exec();
-        return;
+        return false;
     }
     
     mActiveSensor = sensors[0];
@@ -123,7 +133,7 @@ void cOusterModel::configure(const nlohmann::json& jsonCfg)
         std::cout << std::endl;
         std::cout << "Please use the \"lidar_hostname\" command line option to select sensor." << std::endl;
 */
-        return;
+        return false;
     }
 
     auto sensor_ip = mActiveSensor.sensor_ip_address;
@@ -142,8 +152,13 @@ void cOusterModel::configure(const nlohmann::json& jsonCfg)
     {
         QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "Could not establish command connection to OUSTER lidar!");
         msg.exec();
-        return;
+        return false;
     }
+
+    // We have a valid connection, save our parameters for later reconnection.
+    mSensorIpAddress = sensor_ip;
+    mDstIpAddress = dst_ip;
+    mUseIpv6 = use_ipv6;
 
 
     if (azimuth_min_deg.has_value() && azimuth_max_deg.has_value())
@@ -180,33 +195,47 @@ void cOusterModel::configure(const nlohmann::json& jsonCfg)
     mDataFormat = mCmdStream.retrieveLidarDataFormat();
     mAzimuthWindow = mCmdStream.retrieveAzimuthWindow(true);
 
-    auto imu_port = mCmdStream.retrieveImuUdpPort(true);
-    auto lidar_port = mCmdStream.retrieveLidarUdpPort(true);
+    mImuPort = mCmdStream.retrieveImuUdpPort(true);
+    mLidarPort = mCmdStream.retrieveLidarUdpPort(true);
+
+    return true;
+}
+
+bool cOusterModel::startCommunications()
+{
 
     emit statusMessage("Trying to establishing IMU connection...");
 
-    if (!cOusterImuStream_Qt::connect_to_sensor(dst_ip, imu_port, use_ipv6))
+    if (!cOusterImuStream_Qt::startCommunications(mDstIpAddress, mImuPort, mUseIpv6))
     {
         QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "Could not establish IMU data connection to OUSTER lidar!");
         msg.exec();
-        return;
+        return false;
     }
-
-    cOusterLidarStream_Qt::setDataFormat(mDataFormat);
 
     emit statusMessage("Trying to establishing LiDAR data connection...");
 
-    if (!cOusterLidarStream_Qt::connect_to_sensor(dst_ip, lidar_port, use_ipv6))
+    if (!cOusterLidarStream_Qt::startCommunications(mDstIpAddress, mLidarPort, mUseIpv6))
     {
         QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "Could not establish data connection to OUSTER lidar!");
         msg.exec();
-        return;
+        return false;
     }
+
+    cOusterLidarStream_Qt::setDataFormat(mDataFormat);
 
     cOusterImuStream_Qt::clear();
     cOusterLidarStream_Qt::clear();
 
     mConnected = true;
+
+    return true;
+}
+
+void cOusterModel::stopCommunications()
+{
+    cOusterImuStream_Qt::stopCommunications();
+    cOusterLidarStream_Qt::stopCommunications();
 }
 
 void cOusterModel::update()

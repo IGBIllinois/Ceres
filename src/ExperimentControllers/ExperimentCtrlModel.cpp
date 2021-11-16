@@ -67,7 +67,7 @@ void cExperimentControlModel::terminateExperiment()
     if (!mRunning) return;
 
     mRunning = false;
-    emit updateRecordingState(false);
+    emit recordingStateChanged(false);
     emit statusMessage("Experiment stopped!");
 }
 
@@ -79,7 +79,7 @@ void cExperimentControlModel::updateExperimentStateMachine()
     mRecording = mpActiveState->recording();
 
     if (mRecording.HasChanged())
-        emit updateRecordingState(mRecording);
+        emit recordingStateChanged(mRecording);
 
     mpActiveState->run();
 
@@ -98,7 +98,7 @@ void cExperimentControlModel::updateExperimentStateMachine()
         }
         else
         {
-            emit updateRecordingState(false);
+            emit recordingStateChanged(false);
             mRunning = false;
             emit statusMessage("Experiment completed!");
         }

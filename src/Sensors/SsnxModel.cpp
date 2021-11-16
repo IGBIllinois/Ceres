@@ -1,5 +1,6 @@
 
 #include "SsnxModel.hpp"
+#include "SsnxFactory.hpp"
 #include <functional>
 
 #include <QMessageBox>
@@ -15,7 +16,12 @@ cSsnxModel::~cSsnxModel()
 {
 }
 
-void cSsnxModel::configure(const nlohmann::json& jsonCfg)
+char* cSsnxModel::descriptor() const 
+{
+    return ssnx_id;
+};
+
+bool cSsnxModel::configure(const nlohmann::json& jsonCfg)
 {
     std::string ip;
     uint16_t port = 0;
@@ -33,9 +39,8 @@ void cSsnxModel::configure(const nlohmann::json& jsonCfg)
         str.append(e.what());
         QMessageBox msg(QMessageBox::Critical, "Configuration Error", str);
         msg.exec();
-        return;
+        return false;
     }
-
 
     QString msg("Trying to establishing connection to GPS receiver at ");
     msg.append(ip.c_str());
@@ -43,22 +48,40 @@ void cSsnxModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage(msg);
 
-    ip = "127.0.0.1";
     if (!try_to_connect(ip, port, false))
     {
         QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
         msg.exec();
-        return;
+        return false;
     }
-   
+
+    return true;
+}
+
+bool cSsnxModel::startCommunications()
+{
+    if (!cSsnxGpsStream::startCommunications())
+    {
+        QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
+        msg.exec();
+        return false;
+    }
+
     mConnected = isConnected();
 
     if (!mConnected)
     {
         QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
         msg.exec();
-        return;
+        return false;
     }
+
+    return true;
+}
+
+void cSsnxModel::stopCommunications()
+{
+    cSsnxGpsStream::stopCommunications();
 }
 
 void cSsnxModel::update()

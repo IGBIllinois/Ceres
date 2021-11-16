@@ -39,7 +39,7 @@ public:
      * Apply any configuration parameters to the sensor
      * model.
      */
-    virtual void configure(const nlohmann::json& jsonCfg);
+    virtual bool configure(const nlohmann::json& jsonCfg);
 
     /*
      * Write any "header" data block into the data file.
@@ -64,6 +64,14 @@ public:
      * Returns true if sensor data is being recorded
      */
     bool isRecording();
+
+    /*
+     * Starts/Stops communication with the endpoint.
+     * These methods are called inside the QThread so that
+     * all of the communication happens within the same thread!
+     */
+    virtual bool startCommunications() = 0;
+    virtual void stopCommunications() = 0;
 
 signals:
     void statusMessage(QString msg);

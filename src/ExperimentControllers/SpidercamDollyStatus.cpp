@@ -1,5 +1,6 @@
 
 #include "SpidercamDollyStatus.hpp"
+#include "../Utilities/Constants.hpp"
 
 #include <QLineEdit>
 #include <QLabel>
@@ -34,12 +35,21 @@ void cSpidercamDollyStatus::updateLimits(spidercam::sWorkingDimensions limits)
 
 void cSpidercamDollyStatus::updatePosition(spidercam::sPosition pos)
 {
-	repaint();
+
+	mpX_m->setText(QString::number(pos.X_mm * nConstants::MM_TO_M, 'f', 3));
+	mpY_m->setText(QString::number(pos.Y_mm * nConstants::MM_TO_M, 'f', 3));
+	mpZ_m->setText(QString::number(pos.Z_mm * nConstants::MM_TO_M, 'f', 3));
+	mpHeight_m->setText(QString::number(pos.height_mm * nConstants::MM_TO_M, 'f', 3));
+
+	mpPan_deg->setText(QString::number(pos.pan_deg, 'f', 2));
+	mpTilt_deg->setText(QString::number(pos.tilt_deg, 'f', 2));
+
+	mpSpeed_mps->setText(QString::number(pos.speed_mmps * nConstants::MM_TO_M, 'f', 3));
 }
 
 void cSpidercamDollyStatus::updateBatteryLevel(float level_pct)
 {
-	repaint();
+	mpBatteryLevel_pct->setText(QString::number(level_pct, 'f', 2));
 }
 
 

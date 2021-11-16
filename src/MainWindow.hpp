@@ -13,6 +13,7 @@ class QAction;
 class QListWidget;
 class QMenu;
 class QTextEdit;
+class QLineEdit;
 class QToolBar;
 QT_END_NAMESPACE
 
@@ -65,6 +66,8 @@ private:
     QMenu* mpHelpMenu;
 
     QToolBar* mpFileBar;
+    QLineEdit* mpWindSpeed_kts;
+    QLineEdit* myWindDirection_deg;
 
     Ui::MainWindow* mpUI;
     QString mCurrentFile;

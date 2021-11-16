@@ -29,6 +29,12 @@ private:
 	const spidercam::sPosition& mDollyPos;
 	cSpidercamController& mController;
 
+	bool mMoveCommandSent;
+	bool mBusy;
+	bool mIsMoving;
+	bool mIsSetPointEnabled;
+	bool mInError;
+
 	bool mRecordData;
 
 	uint32_t mX_mm;

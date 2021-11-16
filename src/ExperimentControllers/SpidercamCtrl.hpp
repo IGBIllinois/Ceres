@@ -5,17 +5,24 @@
 
 #include <QByteArray>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QHostInfo>
 
 
 class cSpidercamController : public cSpiderCamCom
 {
 public:
-	cSpidercamController();
+	cSpidercamController(QObject* parent = nullptr);
 	~cSpidercamController();
+
+	QString remoteEndpoint() const;
+	uint16_t remotePort() const;
 
 	bool isConnected() const;
 
 	bool try_to_connect(std::string_view hostname, uint16_t port, bool use_ipv6 = false);
+
+	bool startCommunications();
+	void stopCommunications();
 
 	void clearIncomingBuffer() override;
 	bool checkForReply() override;
@@ -28,6 +35,10 @@ private:
 
 	const size_t MAX_REPLY_LENGTH = 16 * 1024;
 
-	QTcpSocket mSocket;
+	QHostAddress mRemoteEndpoint;
+	uint16_t mPort;
+
+	QTcpSocket* mpSocket;
+//	QTcpSocket mSocket;
 	QByteArray mReplyBuffer;
 };

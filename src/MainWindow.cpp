@@ -85,6 +85,8 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     mMainModel.startDataThread();
 
     mpSplashScreen = nullptr;
+    onStatusUpdate(tr("Ready"));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -200,7 +202,23 @@ void cMainWindow::createToolBars()
 //-----------------------------------------------------------------------------
 void cMainWindow::createStatusBar()
 {
-    statusBar()->showMessage(tr("Ready"));
+    QStatusBar* pStatus = statusBar();
+    
+    QFontMetrics fm(pStatus->font());
+    int pixelsWide = fm.horizontalAdvance(" XXX.X ");
+
+    mpWindSpeed_kts = new QLineEdit();
+    mpWindSpeed_kts->setReadOnly(true);
+    mpWindSpeed_kts->setFixedWidth(pixelsWide);
+    mpWindSpeed_kts->setToolTip(tr("Wind Speed in knots"));
+
+    myWindDirection_deg = new QLineEdit();
+    myWindDirection_deg->setReadOnly(true);
+    myWindDirection_deg->setFixedWidth(pixelsWide);
+    myWindDirection_deg->setToolTip(tr("Wind Direction"));
+
+    pStatus->addPermanentWidget(mpWindSpeed_kts);
+    pStatus->addPermanentWidget(myWindDirection_deg);
 }
 
 //-----------------------------------------------------------------------------
@@ -336,19 +354,35 @@ void cMainWindow::createSensorModelsAndViews()
 
         for (std::string name : sensors)
         {
-            auto widgets = create_sensor(name, this);
+            auto widgets = create_sensor(name);
 
             if ((widgets.pModel == nullptr) || (widgets.pView == nullptr))
                 continue;
 
+            if (jsonDoc.contains(name))
+            {
+                bool validSensor = false;
+                try
+                {
+                    validSensor = widgets.pModel->configure(jsonDoc[name]);
+                }
+                catch (const std::exception& e)
+                {
+                    validSensor = false;
+                }
+
+                if (!validSensor)
+                {
+                    remove_sensor(name, widgets);
+                    continue;
+                }
+            }
+
+            widgets.pView->setParent(this);
+
             QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
 
             mMainModel.addSensor(widgets.pModel);
-
-            if (jsonDoc.contains(name))
-            {
-                widgets.pModel->configure(jsonDoc[name]);
-            }
 
             addDockWidget(Qt::RightDockWidgetArea, widgets.pView);
             mpViewMenu->addAction(widgets.pView->toggleViewAction());

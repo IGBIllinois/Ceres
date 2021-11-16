@@ -33,10 +33,21 @@ public:
      */
     virtual void configure(const nlohmann::json& jsonCfg) = 0;
 
+    /*
+     * Load an experiment from JSON file.
+     */
     virtual void loadExperiment(const nlohmann::json& expDoc) = 0;
 
+    /*
+     * Is there an experiment (state machine) loaded in the experiment
+     * controller.
+     */
     bool hasExperiment() const;
 
+    /*
+     * Clear the experiment (state machine) from the experiment
+     * controller.
+     */
     void clearExperiment();
 
     /**
@@ -44,7 +55,6 @@ public:
      * 
      * Returns true if the experiment was started, false otherwise.
      */
-
     virtual bool startExperiment();
 
     /**
@@ -76,10 +86,18 @@ public:
      */
     bool isRecording();
 
+    /*
+     * Starts/Stops communication with the endpoint.
+     * These methods are called inside the QThread so that
+     * all of the communication happens within the same thread!
+     */
+    virtual bool startCommunications() = 0;
+    virtual void stopCommunications() = 0;
+
 signals:
     void statusMessage(QString msg);
 
-    void updateRecordingState(bool recording);
+    void recordingStateChanged(bool recording);
 
 public:
     virtual void update() = 0;

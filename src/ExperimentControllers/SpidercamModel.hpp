@@ -32,6 +32,13 @@ public:
 
 	void loadExperiment(const nlohmann::json& expDoc) override;
 
+	/**
+	 * Started the loaded experiment.
+	 *
+	 * Returns true if the experiment was started, false otherwise.
+	 */
+	bool startExperiment() override;
+
     /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
@@ -39,6 +46,8 @@ public:
      */
     void writeDataHeader(cBlockDataFile& file) override;
 
+	bool startCommunications() override;
+	void stopCommunications() override;
 
 signals:
     void limitsChanged(spidercam::sWorkingDimensions limits);
@@ -61,8 +70,6 @@ signals:
 	bool mNearBorder;
 	bool mAtCalibrationPosition;
 	bool mAtCorrectionPosition;
-	bool mInScriptMode;
-	bool mInInteractiveMode;
 */
 
 protected:
@@ -80,6 +87,8 @@ protected:
 	bool mActivated;
 	bool mDollyPositionKnown;
 	bool mConsoleEnabled;
+	bool mInInteractiveMode;
+	bool mInScriptMode;
 
 	edge_detect<bool>	mBusy;
 	edge_detect<bool>	mInError;

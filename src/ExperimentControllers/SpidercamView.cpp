@@ -84,18 +84,16 @@ void cSpidercamView::updateLimits(spidercam::sWorkingDimensions limits)
 	mpScanArea->updateBounds(mMinX_mm, mMaxX_mm, mMinY_mm, mMaxY_mm);
 }
 
-void cSpidercamView::updatedPosition(spidercam::sPosition pos)
+void cSpidercamView::updatePosition(spidercam::sPosition pos)
 {
 	mpScanArea->updateDollyPosition(pos.X_mm, pos.Y_mm);
 
 	mpX_m->setText(QString::number(pos.X_mm * nConstants::MM_TO_M, 'f', 3));
 	mpY_m->setText(QString::number(pos.Y_mm * nConstants::MM_TO_M, 'f', 3));
 	mpZ_m->setText(QString::number(pos.height_mm * nConstants::MM_TO_M, 'f', 3));
-
-	repaint();
 }
 
-void cSpidercamView::recordingStateUpdated(bool recording)
+void cSpidercamView::updateRecordingState(bool recording)
 {
 	mpScanArea->setRecording(recording);
 }

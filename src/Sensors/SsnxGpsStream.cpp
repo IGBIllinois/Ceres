@@ -7,18 +7,15 @@
 
 cSsnxGpsStream::cSsnxGpsStream()
     :
-    mSocket(),
+    mpSocket(nullptr),
     mDataBuffer()
 {
+    mPort = 0;
 }
 
 cSsnxGpsStream::~cSsnxGpsStream()
 {
-    if (mSocket.isOpen())
-    {
-        mSocket.disconnectFromHost();
-        mSocket.close();
-    }
+    stopCommunications();
 }
 
 
@@ -29,7 +26,9 @@ void cSsnxGpsStream::registerDataProcessingCallback(std::function<void(const voi
 
 bool cSsnxGpsStream::isConnected() const
 {
-    auto state = mSocket.state();
+    if (!mpSocket) return false;
+
+    auto state = mpSocket->state();
     return  (state == QAbstractSocket::ConnectedState) || (state == QAbstractSocket::BoundState) || (state == QAbstractSocket::ListeningState);
 }
 
@@ -66,31 +65,58 @@ bool cSsnxGpsStream::try_to_connect(std::string_view host, uint16_t port, bool u
     if (local_endpoint.isNull())
         return false;
 
-    mSocket.bind(local_endpoint, port);
+    QUdpSocket  socket;
+
+    if (socket.bind(local_endpoint, port))
+    {
+        mLocalEndpoint = local_endpoint;
+        mPort = port;
+    }
 
     return true;
 }
 
+bool cSsnxGpsStream::startCommunications()
+{
+    if (mpSocket) return true;
+
+    mpSocket = new QUdpSocket();
+    return mpSocket->bind(mLocalEndpoint, mPort);
+}
+
+void cSsnxGpsStream::stopCommunications()
+{
+    if (mpSocket && mpSocket->isOpen())
+    {
+        mpSocket->disconnectFromHost();
+        mpSocket->close();
+    }
+
+    delete mpSocket; mpSocket = nullptr;
+}
+
 void cSsnxGpsStream::clear()
 {
-    while (mSocket.hasPendingDatagrams())
+    if (!mpSocket) return;
+
+    while (mpSocket->hasPendingDatagrams())
     {
-        mDatagram = mSocket.receiveDatagram();
+        mDatagram = mpSocket->receiveDatagram();
     }
 }
 
 void cSsnxGpsStream::receive_data()
 {
-    if (mSocket.waitForReadyRead(0))
+    if (mpSocket->waitForReadyRead(0))
         processDatagrams();
 }
 
 void cSsnxGpsStream::processOneDatagram()
 {
-    if (!mSocket.hasPendingDatagrams())
+    if (!mpSocket->hasPendingDatagrams())
         return;
 
-    mDatagram = mSocket.receiveDatagram();
+    mDatagram = mpSocket->receiveDatagram();
     mSender = mDatagram.senderAddress();
     mDataBuffer = mDatagram.data();
     processDatagram(mDataBuffer.data(), mDataBuffer.size());
@@ -98,12 +124,12 @@ void cSsnxGpsStream::processOneDatagram()
 
 void cSsnxGpsStream::processDatagrams()
 {
-    if (!mSocket.isReadable())
+    if (!mpSocket->isReadable())
         return;
 
-    while (mSocket.hasPendingDatagrams())
+    while (mpSocket->hasPendingDatagrams())
     {
-        mDatagram = mSocket.receiveDatagram();
+        mDatagram = mpSocket->receiveDatagram();
         mSender = mDatagram.senderAddress();
         mDataBuffer = mDatagram.data();
         if (mProcessingCallback)

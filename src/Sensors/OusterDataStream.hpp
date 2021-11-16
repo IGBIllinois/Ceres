@@ -8,13 +8,20 @@
 #include <QtNetwork/QNetworkDatagram>
 
 
-class cOusterLidarStream_Qt : public cOusterLidarStream
+class cOusterLidarStream_Qt : private cOusterLidarStream
 {
 
 public:
 	cOusterLidarStream_Qt();
 	~cOusterLidarStream_Qt();
 	
+	/*
+	 * Starts/Stops communication with the endpoint.
+	 * These methods are called inside the QThread so that
+	 * all of the communication happens within the same thread!
+	 */
+	bool startCommunications(std::string_view sensor, uint16_t port, bool use_ipv6);
+	void stopCommunications();
 
 	/**
 	 * Clear will remove all input datagrams from the UDP socket
@@ -29,6 +36,8 @@ public:
 	void processOneDatagram();
 	void processDatagrams();
 
+	using cOusterLidarStream::setDataFormat;
+
 private:
 	bool try_to_connect(std::string_view host, uint16_t port, bool use_ipv6) override;
 
@@ -42,7 +51,7 @@ private:
 	 */
 	static const size_t MAX_DATA_LENGTH = 24896;
 
-	QUdpSocket mSocket;
+	QUdpSocket* mpSocket;
 	QHostAddress mSender;
 	QNetworkDatagram mDatagram;
 	QByteArray mDataBuffer;

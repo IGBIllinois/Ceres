@@ -6,4 +6,5 @@
 
 static char* ssnx_id = "ssnx";
 
-sSensorWidgets create_ssnx_sensor(QWidget* parent);
+sSensorWidgets create_ssnx_sensor();
+void remove_ssnx_sensor(sSensorWidgets widgets);

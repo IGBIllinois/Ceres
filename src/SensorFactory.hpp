@@ -2,10 +2,13 @@
 #pragma once
 
 #include <string>
-#include <QWidget>
-#include <QDockWidget>
 
 class cSensorModel;
+
+// Qt Forward Declaration
+//QT_BEGIN_NAMESPACE
+class QDockWidget;
+//QT_END_NAMESPACE
 
 
 struct sSensorWidgets
@@ -22,4 +25,5 @@ struct sSensorWidgets
 	{}
 };
 
-sSensorWidgets create_sensor(const std::string& name, QWidget* parent);
+sSensorWidgets create_sensor(const std::string& name);
+void remove_sensor(const std::string& name, sSensorWidgets widgets);

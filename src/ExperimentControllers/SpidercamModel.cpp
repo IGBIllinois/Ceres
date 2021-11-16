@@ -11,7 +11,9 @@ namespace
 
 cSpidercamModel::cSpidercamModel()
     : mDollyConnected(false), mConsoleConnected(false), mActivated(false),
-      mDollyPositionKnown(false), mConsoleEnabled(false)
+      mDollyPositionKnown(false), mConsoleEnabled(false), mInInteractiveMode(false),
+    mInScriptMode(false),
+    mController(this)
 
 {
     mPositionTolerance_mm = TOLERANCE_MM;
@@ -20,6 +22,32 @@ cSpidercamModel::cSpidercamModel()
 cSpidercamModel::~cSpidercamModel()
 {
 
+}
+
+bool cSpidercamModel::startCommunications()
+{
+    QString msg("Establishing connection to Spidercam at ");
+    msg += mController.remoteEndpoint();
+    msg.append("...");
+
+    emit statusMessage(msg);
+
+    return mController.startCommunications();
+
+    /*BAF
+        mController.clearIncomingBuffer();
+
+        if (mController.isConnected())
+        {
+            mController.requestCurrentPosition();
+            mCurrentPosition = mController.getLastKnownPosition();
+        }
+    */
+}
+
+void cSpidercamModel::stopCommunications()
+{
+    mController.stopCommunications();
 }
 
 void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
@@ -80,13 +108,13 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
     mController.setSafetyLimits(limits, maxSpeed_mmps);
 
-    QString msg("Trying to establishing connection to Spidercam at ");
+    QString msg("Testing connection to Spidercam at ");
     msg.append(c2_ip.c_str());
     msg.append("...");
 
     emit statusMessage(msg);
 
-/*
+
     if (!mController.try_to_connect(c2_ip, port))
     {
         QMessageBox msg(QMessageBox::Critical, "Spidercam Error", "Could not establish required command connection to Spidercam C2 computer!");
@@ -96,17 +124,6 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
         exit(EXIT_FAILURE);
 #endif // NDEBUG
     }
-*/
-
-    mController.clearIncomingBuffer();
-
-    if (mController.isConnected())
-    {
-        mController.requestCurrentPosition();
-    }
-
-    mCurrentPosition = mController.getLastKnownPosition();
-    emit positionChanged(mCurrentPosition);
 }
 
 void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
@@ -146,6 +163,20 @@ void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
     }
 }
 
+bool cSpidercamModel::startExperiment()
+{
+    if (!mInScriptMode)
+    {
+        QString str = "Make sure the C2 computer is in remote mode.\n";
+        str += "Please enter remote mode and then start your experiment.";
+        QMessageBox msg(QMessageBox::Warning, "Message", str);
+        msg.exec();
+    }
+
+    return cExperimentControlModel::startExperiment();
+}
+
+
 void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
 {
 
@@ -153,9 +184,7 @@ void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
 
 void cSpidercamModel::update()
 {
-    return;
-
-    if (mController.checkForReply())
+    if (mController.checkForReply() || true)
     {
         mController.readReply();
     }
@@ -173,6 +202,8 @@ void cSpidercamModel::update()
     mActivated = mController.isActivated();
     mDollyPositionKnown = mController.isDollyPositionKnown();
     mConsoleEnabled = mController.isConsoleEnabled();
+    mInInteractiveMode = mController.isInInteractiveMode();
+    mInScriptMode = mController.isInScriptMode();
 
     mInError = mController.isInError();
     mBusy = mController.isBusy();

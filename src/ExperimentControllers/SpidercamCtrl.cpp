@@ -1,29 +1,35 @@
 
 #include "SpidercamCtrl.hpp"
 
-#include <QtNetwork/QHostInfo>
 #include <iostream>
 
 
-cSpidercamController::cSpidercamController()
+cSpidercamController::cSpidercamController(QObject* parent)
     :
-        mSocket()
+        mpSocket(nullptr)
+//    mSocket()
 {
+    mPort = 0;
 }
 
 cSpidercamController::~cSpidercamController()
 {
-    if (mSocket.isOpen())
-    {
-        mSocket.disconnectFromHost();
-        mSocket.close();
-    }
+    stopCommunications();
 }
 
+QString cSpidercamController::remoteEndpoint() const
+{
+    return mRemoteEndpoint.toString();
+}
+
+uint16_t cSpidercamController::remotePort() const
+{
+    return mPort;
+}
 
 bool cSpidercamController::isConnected() const
 {
-    return mSocket.isValid() && (mSocket.state() == QAbstractSocket::ConnectedState);
+    return mpSocket->isValid() && (mpSocket->state() == QAbstractSocket::ConnectedState);
 }
 
 
@@ -36,7 +42,7 @@ bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t po
         return false;
     }
 
-    QHostAddress local_endpoint;
+    QHostAddress remote_endpoint;
 
     auto endpoints = info.addresses();
     for (auto& endpoint : endpoints)
@@ -45,35 +51,68 @@ bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t po
         {
             if (QAbstractSocket::IPv6Protocol != endpoint.protocol())
                 continue;
-            local_endpoint = endpoint;
+            remote_endpoint = endpoint;
             break;
         }
         else
         {
             if (QAbstractSocket::IPv4Protocol != endpoint.protocol())
                 continue;
-            local_endpoint = endpoint;
+            remote_endpoint = endpoint;
             break;
         }
     }
 
-    if (local_endpoint.isNull())
+    if (remote_endpoint.isNull())
         return false;
 
-    mSocket.connectToHost(local_endpoint, port);
+    // Test connection parameters
+    QTcpSocket socket;
+ 
+    socket.connectToHost(remote_endpoint, port);
 
-    return mSocket.waitForConnected();
+    bool result = socket.waitForConnected();
+
+    if (result)
+    {
+        mPort = port;
+        mRemoteEndpoint = remote_endpoint;
+    }
+
+    return result;
+}
+
+bool cSpidercamController::startCommunications()
+{
+    if (mpSocket) return true;
+
+    mpSocket = new QTcpSocket();
+
+    mpSocket->connectToHost(mRemoteEndpoint, mPort);
+
+    return mpSocket->waitForConnected();
+}
+
+void cSpidercamController::stopCommunications()
+{
+    if (mpSocket && mpSocket->isOpen())
+    {
+        mpSocket->disconnectFromHost();
+        mpSocket->close();
+    }
+
+    delete mpSocket; mpSocket = nullptr;
 }
 
 void cSpidercamController::clearIncomingBuffer()
 {
     QByteArray response_buffer;
-    auto len = mSocket.bytesAvailable();
+    auto len = mpSocket->bytesAvailable();
     while (len > 0)
     {
-        response_buffer = mSocket.readAll();
+        response_buffer = mpSocket->readAll();
         response_buffer.clear();
-        len = mSocket.bytesAvailable();
+        len = mpSocket->bytesAvailable();
     }
 
     mReplyBuffer.clear();
@@ -81,25 +120,25 @@ void cSpidercamController::clearIncomingBuffer()
 
 bool cSpidercamController::checkForReply()
 {
-    return mSocket.bytesAvailable() > 0;
+    return mpSocket->bytesAvailable() > 0;
 }
 
 int cSpidercamController::send_cmd(const std::string_view msg)
 {
-    auto len = mSocket.write(msg.data(), msg.size());
-    mSocket.flush();
-    mSocket.waitForBytesWritten();
+    auto len = mpSocket->write(msg.data(), msg.size());
+    mpSocket->flush();
+    mpSocket->waitForBytesWritten();
     return len;
 }
 
 std::string cSpidercamController::recv_reply()
 {
-    if (!mSocket.waitForReadyRead(1))
+    if (!mpSocket->waitForReadyRead(1))
     {
         return std::string();
     }
 
-    mReplyBuffer = mSocket.readAll();
+    mReplyBuffer = mpSocket->readAll();
 
     std::string reply(mReplyBuffer.constData(), mReplyBuffer.size());
     auto pos = reply.find("</root>");
@@ -129,7 +168,7 @@ void cSpidercamController::errorHandler(QAbstractSocket::SocketError socketError
         std::cerr << "settings are correct." << std::endl;
         break;
     default:
-        std::cerr << "The following error occurred: " << mSocket.errorString().toStdString() << std::endl;
+        std::cerr << "The following error occurred: " << mpSocket->errorString().toStdString() << std::endl;
     }
 
 }

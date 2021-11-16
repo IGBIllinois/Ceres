@@ -47,13 +47,19 @@ public:
 
 	virtual void processDatagram(const void* pBuffer, std::size_t buf_length) = 0;
 
+	bool startCommunications();
+	void stopCommunications();
+
 private:
 	static const size_t MAX_DATA_LENGTH = 128;
 
-	QUdpSocket mSocket;
+	uint16_t	 mPort;
+	QHostAddress mLocalEndpoint;
 	QHostAddress mSender;
+
+	QUdpSocket*		 mpSocket;
 	QNetworkDatagram mDatagram;
-	QByteArray mDataBuffer;
+	QByteArray		 mDataBuffer;
 
 	std::function<void(const void* pBuffer, std::size_t buf_length)> mProcessingCallback;
 };

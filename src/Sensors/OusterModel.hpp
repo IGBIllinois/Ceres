@@ -25,9 +25,9 @@ public:
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    char* descriptor() const override { return "ouster"; };
+    char* descriptor() const override;
 
-    void configure(const nlohmann::json& jsonCfg) override;
+    bool configure(const nlohmann::json& jsonCfg) override;
     void writeDataHeader(cBlockDataFile& file) override;
 
     uint16_t columnsPerFrame() const;
@@ -47,6 +47,14 @@ public:
     ouster::lidar_data_t  lidarData() const;
     ouster::imu_data_t    imuData() const;
 
+    /*
+     * Starts/Stops communication with the endpoint.
+     * These methods are called inside the QThread so that
+     * all of the communication happens within the same thread!
+     */
+    bool startCommunications() override;
+    void stopCommunications() override;
+
 signals:
     void updateView();
 
@@ -60,6 +68,12 @@ protected:
 private:
     bool mConnected;
     int mFrameCounter;
+
+    uint16_t mImuPort;
+    uint16_t mLidarPort;
+    std::string mSensorIpAddress;
+    std::string mDstIpAddress;
+    bool mUseIpv6;
 
     cOusterCmdStream_Qt   mCmdStream;
 

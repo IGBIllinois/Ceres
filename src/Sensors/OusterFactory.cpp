@@ -8,12 +8,11 @@
 #include <QString>
 #include <QDockWidget>
 
-sSensorWidgets
-create_ouster_sensor(QWidget* parent)
+sSensorWidgets create_ouster_sensor()
 {
     // Create the Ouster model and view...
     auto* pModel = new cOusterModel();
-    auto* dockWidget = new QDockWidget(parent);
+    auto* dockWidget = new QDockWidget();
     auto* pView = new cOusterView(pModel, dockWidget);
     
     dockWidget->setWindowTitle(pView->windowTitle());
@@ -24,3 +23,15 @@ create_ouster_sensor(QWidget* parent)
     return sSensorWidgets(pModel, dockWidget);
 }
 
+void remove_ouster_sensor(sSensorWidgets widgets)
+{
+    // SSNX model and view...
+    auto* pModel = static_cast<cOusterModel*>(widgets.pModel);
+    auto* dockWidget = widgets.pView;
+    auto* pView = static_cast<cOusterView*>(dockWidget->widget());
+
+    QObject::disconnect(pModel, &cOusterModel::updateView, pView, &cOusterView::displayData);
+
+    delete pModel;
+    delete dockWidget;
+}

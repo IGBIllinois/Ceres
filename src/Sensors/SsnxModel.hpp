@@ -18,11 +18,19 @@ public:
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    char* descriptor() const override { return "ssnx"; };
+    char* descriptor() const override;
 
  
-    void configure(const nlohmann::json& jsonCfg) override;
+    bool configure(const nlohmann::json& jsonCfg) override;
     void writeDataHeader(cBlockDataFile& file) override;
+
+    /*
+     * Starts/Stops communication with the endpoint.
+     * These methods are called inside the QThread so that
+     * all of the communication happens within the same thread!
+     */
+    bool startCommunications() override;
+    void stopCommunications() override;
 
 signals:
     void updatePVT(double timestamp_s,
@@ -48,7 +56,5 @@ protected slots:
 
 private:
     bool mConnected;
-
-//    cGpsStreamSsnx mGpsDataStream;
 };
 

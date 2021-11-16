@@ -8,18 +8,33 @@
 cOusterLidarStream_Qt::cOusterLidarStream_Qt()
     :
     cOusterLidarStream(),
-    mSocket()
+    mpSocket(nullptr)
 {
-//    QObject::connect(&mSocket, &QUdpSocket::readyRead, this, &cOusterLidarStream_Qt::processDatagrams);
 }
 
 cOusterLidarStream_Qt::~cOusterLidarStream_Qt()
 {
-    if (mSocket.isOpen())
+    stopCommunications();
+}
+
+bool cOusterLidarStream_Qt::startCommunications(std::string_view sensor, uint16_t port, bool use_ipv6)
+{
+    if (mpSocket) return true;
+
+    mpSocket = new QUdpSocket();
+
+    return cOusterLidarStream::connect_to_sensor(sensor, port, use_ipv6);
+}
+
+void cOusterLidarStream_Qt::stopCommunications()
+{
+    if (mpSocket && mpSocket->isOpen())
     {
-        mSocket.disconnectFromHost();
-        mSocket.close();
+        mpSocket->disconnectFromHost();
+        mpSocket->close();
     }
+
+    delete mpSocket; mpSocket = nullptr;
 }
 
 bool cOusterLidarStream_Qt::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
@@ -55,31 +70,31 @@ bool cOusterLidarStream_Qt::try_to_connect(std::string_view host, uint16_t port,
     if (local_endpoint.isNull())
         return false;
 
-    mSocket.bind(local_endpoint, port);
+    mpSocket->bind(local_endpoint, port);
 
     return true;
 }
 
 void cOusterLidarStream_Qt::clear()
 {
-    while (mSocket.hasPendingDatagrams())
+    while (mpSocket->hasPendingDatagrams())
     {
-        mDatagram = mSocket.receiveDatagram();
+        mDatagram = mpSocket->receiveDatagram();
     }
 }
 
 void cOusterLidarStream_Qt::receive_data()
 {
-    if (mSocket.waitForReadyRead(0))
+    if (mpSocket->waitForReadyRead(0))
         processDatagrams();
 }
 
 void cOusterLidarStream_Qt::processOneDatagram()
 {
-    if (!mSocket.hasPendingDatagrams())
+    if (!mpSocket->hasPendingDatagrams())
         return;
 
-    mDatagram = mSocket.receiveDatagram();
+    mDatagram = mpSocket->receiveDatagram();
     mSender = mDatagram.senderAddress();
     mDataBuffer = mDatagram.data();
     process_packet(mDataBuffer.data(), mDataBuffer.size());
@@ -87,12 +102,12 @@ void cOusterLidarStream_Qt::processOneDatagram()
 
 void cOusterLidarStream_Qt::processDatagrams()
 {
-    if (!mSocket.isReadable())
+    if (!mpSocket->isReadable())
         return;
 
-    while (mSocket.hasPendingDatagrams())
+    while (mpSocket->hasPendingDatagrams())
     {
-        mDatagram = mSocket.receiveDatagram();
+        mDatagram = mpSocket->receiveDatagram();
         mSender = mDatagram.senderAddress();
         mDataBuffer = mDatagram.data();
         process_packet(mDataBuffer.data(), mDataBuffer.size());
