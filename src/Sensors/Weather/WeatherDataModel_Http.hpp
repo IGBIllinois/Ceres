@@ -24,6 +24,10 @@ public:
      */
     static char* protocol() { return "http"; };
 
+    QUrl url() const { return mUrl; }
+
+    bool configure(const nlohmann::json& jsonCfg) override;
+
     /*
      * Starts/Stops communication with the endpoint.
      * These methods are called inside the QThread so that
@@ -42,6 +46,8 @@ protected:
     virtual ~cWeatherDataModel_Http();
 
     void getRequest();
+
+    virtual void processReply(const std::string& reply) = 0;
 
 private:
     QNetworkAccessManager* mpHttpManager;

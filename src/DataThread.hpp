@@ -33,6 +33,7 @@ protected:
 
 public:
     cExperimentControlModel* mpController;
+    std::vector<cSensorModel*> mSensors;
     std::vector<cSensorModel*> mActiveSensors;
 
 private:

@@ -36,7 +36,7 @@ void cDataModel::addSensor(cSensorModel* pSensor)
     if (pSensor)
     {
         pSensor->moveToThread(&mThread);
-        mThread.mActiveSensors.push_back(pSensor);
+        mThread.mSensors.push_back(pSensor);
     }
 }
 

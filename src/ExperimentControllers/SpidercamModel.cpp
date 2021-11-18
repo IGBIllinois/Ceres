@@ -205,6 +205,8 @@ void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
 
 void cSpidercamModel::update()
 {
+    if (!mController.isConnected()) return;
+
     if (mController.checkForReply() || true)
     {
         mController.readReply();

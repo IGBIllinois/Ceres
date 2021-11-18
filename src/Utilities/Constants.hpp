@@ -18,4 +18,7 @@ namespace nConstants
 	const static double CM_TO_M = 1.0 / M_TO_CM;
 	const static double CM_TO_MM = 10.0;
 	const static double MM_TO_CM = 1.0 / CM_TO_MM;
+
+	const static double MPS_TO_MPH = 2.23693629;
+	const static double MPH_TO_MPS = 1.0 / MPS_TO_MPH;
 }

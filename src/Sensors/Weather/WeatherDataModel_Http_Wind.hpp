@@ -7,6 +7,8 @@
 
 class cWeatherDataModel_Http_Wind : public cWeatherDataModel_Http
 {
+    Q_OBJECT
+
 public:
     /*
      * Returns a string used as a class descriptor of the
@@ -24,7 +26,21 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFile& file) override {};
 
+signals:
+    void windDataChanged(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
+
+protected:
+    void processReply(const std::string& reply) override;
+
+private:
+    nlohmann::json mReply;
+    std::array<double, 3> mData;
+    double mMaxWindSpeed_mps;
+
+    double mWindSpeed_mps;
+    double mWindDirection_deg;
+    bool mDataValid;
 };
 

@@ -34,7 +34,7 @@ uint16_t cSpidercamController::remotePort() const
 
 bool cSpidercamController::isConnected() const
 {
-    return mpSocket->isValid() && (mpSocket->state() == QAbstractSocket::ConnectedState);
+    return mpSocket && mpSocket->isValid() && (mpSocket->state() == QAbstractSocket::ConnectedState);
 }
 
 

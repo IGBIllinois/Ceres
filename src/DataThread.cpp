@@ -3,6 +3,7 @@
 #include "Sensors/SensorModel.hpp"
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
 
+#include <QAbstractEventDispatcher>
 
 cDataThread::cDataThread()
 :
@@ -33,17 +34,22 @@ void cDataThread::stop()
 
 void cDataThread::run()
 {
+    mActiveSensors.clear();
+
     // Start the network communications so that communication are tied to this thread
     if (!mpController->startCommunications())
     {
-        goto cleanup;
+        //goto cleanup;
     }
-    for (auto& sensor : mActiveSensors)
+    for (auto& sensor : mSensors)
     {
         if (!sensor->startCommunications())
         {
-            goto cleanup;
+            continue;
+            //goto cleanup;
         }
+
+        mActiveSensors.push_back(sensor);
     }
 
     for (auto& sensor : mActiveSensors)
@@ -51,8 +57,15 @@ void cDataThread::run()
         QObject::connect(mpController, &cExperimentControlModel::recordingStateChanged, sensor, &cSensorModel::recordingStateUpdated);
     }
 
+    auto* pDispatcher = eventDispatcher();
+
     forever
     {
+        if (pDispatcher->hasPendingEvents())
+        {
+            pDispatcher->processEvents(QEventLoop::ExcludeUserInputEvents);
+        }
+
         if (mAbort)
             return;
 
@@ -71,7 +84,7 @@ void cDataThread::run()
 
 cleanup:
     // Shutdown the network communications that are tied to this thread
-    for (auto& sensor : mActiveSensors)
+    for (auto& sensor : mSensors)
     {
         sensor->stopCommunications();
     }

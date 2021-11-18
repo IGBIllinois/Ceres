@@ -14,8 +14,13 @@ sSensorWidgets create_http_based_sensor(const std::string& data_type)
     sSensorWidgets widgets;
     if (data_type == cWeatherDataModel_Http_Wind::data_type())
     {
-        widgets.pModel = new cWeatherDataModel_Http_Wind();
-        widgets.pStatusBar = new cWindSpeedAndDirection();
+        auto* pModel = new cWeatherDataModel_Http_Wind();
+        auto* pStatusBar = new cWindSpeedAndDirection();
+
+        QObject::connect(pModel, &cWeatherDataModel_Http_Wind::windDataChanged, pStatusBar, &cWindSpeedAndDirection::updateWindData);
+
+        widgets.pModel = pModel;
+        widgets.pStatusBar = pStatusBar;
     }
 
     return widgets;
