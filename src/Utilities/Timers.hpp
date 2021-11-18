@@ -10,6 +10,9 @@ public:
 	cIntervalTimer(uint32_t interval_ms);
 	~cIntervalTimer() = default;
 
+	uint32_t interval_sec() const;
+	void interval_sec(uint32_t interval_sec);
+
 	uint32_t interval_ms() const;
 	void interval_ms(uint32_t interval_ms);
 

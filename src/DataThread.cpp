@@ -31,75 +31,6 @@ void cDataThread::stop()
     wait();
 }
 
-/*
-void cDataModel::loadExperiment(const nlohmann::json& expDoc)
-{
-    if (!expDoc.contains("experiment"))
-    {
-        return;
-    }
-
-    std::string ctrl = expDoc["controller"];
-    if (ctrl.compare(mpController->descriptor()) != 0)
-    {
-        return;
-    }
-
-    auto required_sensors = expDoc["sensors"];
-
-    for (auto required_sensor : required_sensors)
-    {
-        bool found = false;
-
-        for (auto& sensor : mActiveSensors)
-        {
-            if (required_sensor == sensor->descriptor())
-            {
-                found = true;
-                break;
-            }
-        }
-    }
-
-    mpController->loadExperiment(expDoc["experiment"]);
-}
-
-void cDataModel::startExperiment()
-{
-    mpController->startExperiment();
-}
-
-void cDataModel::terminateExperiment()
-{
-    mpController->terminateExperiment();
-}
-
-void cDataModel::startDataRecording(const std::string& filename)
-{
-    mFile.open(filename);
-
-    for (auto& sensor : mActiveSensors)
-    {
-        sensor->writeDataHeader(mFile);
-    }
-
-    for (auto& sensor : mActiveSensors)
-    {
-        sensor->startDataRecording(mFile);
-    }
-}
-
-void cDataModel::stopDataRecording()
-{
-    for (auto& sensor : mActiveSensors)
-    {
-        sensor->stopDataRecording();
-    }
-
-    mFile.close();
-}
-*/
-
 void cDataThread::run()
 {
     // Start the network communications so that communication are tied to this thread
@@ -146,4 +77,8 @@ cleanup:
     }
 
     mpController->stopCommunications();
+
+    QString msg("Data collection thread terminated.");
+
+    emit statusMessage(msg);
 }

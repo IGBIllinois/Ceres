@@ -26,23 +26,43 @@ cSpidercamModel::~cSpidercamModel()
 
 bool cSpidercamModel::startCommunications()
 {
+    if (!mController.hasRemoteEndpoint())
+    {
+        QString msg("Cannot establishing connection to Spidercam.");
+
+        emit statusMessage(msg);
+
+        return false;
+    }
+
     QString msg("Establishing connection to Spidercam at ");
     msg += mController.remoteEndpoint();
     msg.append("...");
 
     emit statusMessage(msg);
 
-    return mController.startCommunications();
+    bool result = mController.startCommunications();
 
-    /*BAF
-        mController.clearIncomingBuffer();
+    if (!result)
+    {
+        QString msg("Failed to connect to Spidercam at ");
+        msg += mController.remoteEndpoint();
+        msg.append(".");
 
-        if (mController.isConnected())
-        {
-            mController.requestCurrentPosition();
-            mCurrentPosition = mController.getLastKnownPosition();
-        }
-    */
+        emit statusMessage(msg);
+
+        return false;
+    }
+
+    mController.clearIncomingBuffer();
+
+    if (mController.isConnected())
+    {
+        mController.requestCurrentPosition();
+        mCurrentPosition = mController.getLastKnownPosition();
+    }
+
+    return result;
 }
 
 void cSpidercamModel::stopCommunications()
@@ -114,7 +134,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage(msg);
 
-
+/*
     if (!mController.try_to_connect(c2_ip, port))
     {
         QMessageBox msg(QMessageBox::Critical, "Spidercam Error", "Could not establish required command connection to Spidercam C2 computer!");
@@ -124,6 +144,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
         exit(EXIT_FAILURE);
 #endif // NDEBUG
     }
+*/
 }
 
 void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)

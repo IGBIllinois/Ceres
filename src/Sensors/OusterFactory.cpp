@@ -25,9 +25,9 @@ sSensorWidgets create_ouster_sensor()
 
 void remove_ouster_sensor(sSensorWidgets widgets)
 {
-    // SSNX model and view...
+    // Ouster model and view...
     auto* pModel = static_cast<cOusterModel*>(widgets.pModel);
-    auto* dockWidget = widgets.pView;
+    auto* dockWidget = widgets.pDockableView;
     auto* pView = static_cast<cOusterView*>(dockWidget->widget());
 
     QObject::disconnect(pModel, &cOusterModel::updateView, pView, &cOusterView::displayData);

@@ -8,6 +8,7 @@ cDataModel::cDataModel(QObject* parent)
 :
     QObject(parent)
 {
+    QObject::connect(&mThread, &cDataThread::statusMessage, this, &cDataModel::onStatusUpdate);
 }
 
 cDataModel::~cDataModel()

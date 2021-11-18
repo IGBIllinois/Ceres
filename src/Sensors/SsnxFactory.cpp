@@ -33,7 +33,7 @@ void remove_ssnx_sensor(sSensorWidgets widgets)
 {
     // SSNX model and view...
     auto* pModel = static_cast<cSsnxModel*>(widgets.pModel);
-    auto* dockWidget = widgets.pView;
+    auto* dockWidget = widgets.pDockableView;
     auto* pView = static_cast<cSsnxView*>(dockWidget->widget());
 
     QObject::disconnect(pModel, &cSsnxModel::updatePVT, pView, &cSsnxView::updatePVT);

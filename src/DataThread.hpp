@@ -22,19 +22,11 @@ public:
     explicit cDataThread();
     ~cDataThread();
 
-//    void addExperimentControlModel(cExperimentControlModel* pSensor);
-//    void addSensor(cSensorModel* pSensor);
-
     void start();
     void stop();
 
-//    void loadExperiment(const nlohmann::json& expDoc);
-
-//    void startExperiment();
-//    void terminateExperiment();
-
-//    void startDataRecording(const std::string& filename);
-//    void stopDataRecording();
+signals:
+    void statusMessage(QString msg);
 
 protected:
     void run() override;

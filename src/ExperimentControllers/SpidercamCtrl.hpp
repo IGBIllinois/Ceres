@@ -14,6 +14,7 @@ public:
 	cSpidercamController(QObject* parent = nullptr);
 	~cSpidercamController();
 
+	bool hasRemoteEndpoint() const;
 	QString remoteEndpoint() const;
 	uint16_t remotePort() const;
 

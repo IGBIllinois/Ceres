@@ -66,8 +66,6 @@ private:
     QMenu* mpHelpMenu;
 
     QToolBar* mpFileBar;
-    QLineEdit* mpWindSpeed_kts;
-    QLineEdit* myWindDirection_deg;
 
     Ui::MainWindow* mpUI;
     QString mCurrentFile;

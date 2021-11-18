@@ -18,6 +18,26 @@ PUBLIC
  
 PRIVATE
 #
+# Weather Station at the Energy Farm
+#
+    Weather/WindSpeedAndDirection.hpp
+    Weather/WindSpeedAndDirection.cpp
+
+    Weather/WeatherDataModel_Http_Wind.hpp
+    Weather/WeatherDataModel_Http_Wind.cpp
+
+#
+# Weather Station
+#
+    Weather/WeatherDataModel_Http.hpp
+    Weather/WeatherDataModel_Http.cpp
+    Weather/WeatherDataModel.hpp
+    Weather/WeatherDataModel.cpp
+
+    Weather/WeatherDataFactory.hpp
+    Weather/WeatherDataFactory.cpp
+
+#
 # OUSTER LiDAR files
 #
     OusterView.hpp

@@ -17,6 +17,11 @@ cSpidercamController::~cSpidercamController()
     stopCommunications();
 }
 
+bool cSpidercamController::hasRemoteEndpoint() const
+{
+    return !mRemoteEndpoint.isNull();
+}
+
 QString cSpidercamController::remoteEndpoint() const
 {
     return mRemoteEndpoint.toString();

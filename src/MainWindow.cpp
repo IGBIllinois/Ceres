@@ -25,6 +25,61 @@
 
 #include <nlohmann/json.hpp>
 
+namespace
+{
+    std::string getCfgFilePath()
+    {
+ //       std::string cfgFilePath = "C:/igb/Ceres/build/bin/Debug/ceres.json";
+        QString cfgPath;
+
+        auto args = QApplication::arguments();
+        if (args.size() > 1)
+        {
+            auto n = args.size() - 1;
+            for (std::size_t i = 1; i < n; ++i)
+            {
+                QString arg = args[i];
+                if (arg.compare("-c") || arg.compare("--config") || arg.compare("/c"))
+                {
+                    cfgPath = args[i + 1];
+                    break;
+                }
+            }
+        }
+
+        if (!cfgPath.isEmpty())
+        {
+            if (QFile::exists(cfgPath))
+            {
+                return cfgPath.toStdString();
+            }
+
+            QString msg = "Configuration file \"";
+            msg += cfgPath;
+            msg += "\" does not exist!  Make sure the \"-c\" option specifies the full path to the configuration file and that the file exists.";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            return std::string();
+        }
+
+        cfgPath = QApplication::applicationDirPath();
+//        cfgPath = QDir::currentPath();
+        cfgPath += "/ceres.json";
+        if (QFile::exists(cfgPath))
+            return cfgPath.toStdString();
+
+        QString msg = "The default configuration file \"";
+        msg += cfgPath;
+        msg += "\" does not exist!";
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+        mb.exec();
+
+        return std::string();
+    }
+}
 
 //-----------------------------------------------------------------------------
 cMainWindow::cMainWindow(QWidget* parent) :
@@ -43,6 +98,9 @@ cMainWindow::cMainWindow(QWidget* parent) :
     setWindowTitle(tr("Ceres"));
 
     setUnifiedTitleAndToolBarOnMac(true);
+
+    QObject::connect(&mMainModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -82,9 +140,10 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     onStatusUpdate("Initializing sensors...");
     createSensorModelsAndViews();
 
+    mpSplashScreen = nullptr;
+
     mMainModel.startDataThread();
 
-    mpSplashScreen = nullptr;
     onStatusUpdate(tr("Ready"));
 
 }
@@ -202,23 +261,7 @@ void cMainWindow::createToolBars()
 //-----------------------------------------------------------------------------
 void cMainWindow::createStatusBar()
 {
-    QStatusBar* pStatus = statusBar();
-    
-    QFontMetrics fm(pStatus->font());
-    int pixelsWide = fm.horizontalAdvance(" XXX.X ");
-
-    mpWindSpeed_kts = new QLineEdit();
-    mpWindSpeed_kts->setReadOnly(true);
-    mpWindSpeed_kts->setFixedWidth(pixelsWide);
-    mpWindSpeed_kts->setToolTip(tr("Wind Speed in knots"));
-
-    myWindDirection_deg = new QLineEdit();
-    myWindDirection_deg->setReadOnly(true);
-    myWindDirection_deg->setFixedWidth(pixelsWide);
-    myWindDirection_deg->setToolTip(tr("Wind Direction"));
-
-    pStatus->addPermanentWidget(mpWindSpeed_kts);
-    pStatus->addPermanentWidget(myWindDirection_deg);
+    statusBar();
 }
 
 //-----------------------------------------------------------------------------
@@ -236,9 +279,12 @@ void cMainWindow::createDockWindows()
 //-----------------------------------------------------------------------------
 bool cMainWindow::createExperimentController()
 {
-    std::string cfgFileName = "C:/igb/Ceres/build/bin/Debug/ceres.json";
-    //    QApplication::arguments();
-    QString s = QApplication::applicationDirPath();
+    std::string cfgFileName = getCfgFilePath();
+    if (cfgFileName.empty())
+    {
+        return false;
+    }
+
     QDockWidget* dockWidget = nullptr;
 
     std::ifstream in;
@@ -246,12 +292,11 @@ bool cMainWindow::createExperimentController()
 
     if (!in.is_open())
     {
-        // Note: we can't reuse the wxThreadEvent object
-        std::string msg = "Could not open ";
-        msg += cfgFileName;
+        QString msg = "Could not open ";
+        msg += cfgFileName.c_str();
         msg += " for reading!";
 
-        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
         mb.exec();
 
         return false;
@@ -327,17 +372,17 @@ bool cMainWindow::createExperimentController()
 //-----------------------------------------------------------------------------
 void cMainWindow::createSensorModelsAndViews()
 {
-    std::string cfgFileName = "C:/igb/Ceres/build/bin/Debug/ceres.json";
-//    QApplication::arguments();
-    QString s = QApplication::applicationDirPath();
-    QDockWidget* dockWidget = nullptr;
+    std::string cfgFileName = getCfgFilePath();
+    if (cfgFileName.empty())
+    {
+        return;
+    }
 
     std::ifstream in;
     in.open(cfgFileName);
 
     if (!in.is_open())
     {
-        // Note: we can't reuse the wxThreadEvent object
         std::string msg = "Could not open ";
         msg += cfgFileName;
         msg += " for reading!";
@@ -352,19 +397,32 @@ void cMainWindow::createSensorModelsAndViews()
 
         auto sensors = jsonDoc["sensors"];
 
-        for (std::string name : sensors)
+        for (auto sensor : sensors)
         {
-            auto widgets = create_sensor(name);
+            std::string type = sensor["type"];
+            auto widgets = create_sensor(type, sensor);
 
-            if ((widgets.pModel == nullptr) || (widgets.pView == nullptr))
+            if (widgets.pModel == nullptr)
+            {
+                std::string msg = "Error in ";
+                msg += cfgFileName;
+                msg += ": Unknown sensor type \"";
+                msg += type;
+                msg += "\".";
+
+                QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+                mb.exec();
                 continue;
+            }
 
-            if (jsonDoc.contains(name))
+            QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+
+            if (jsonDoc.contains(type))
             {
                 bool validSensor = false;
                 try
                 {
-                    validSensor = widgets.pModel->configure(jsonDoc[name]);
+                    validSensor = widgets.pModel->configure(jsonDoc[type]);
                 }
                 catch (const std::exception& e)
                 {
@@ -373,19 +431,27 @@ void cMainWindow::createSensorModelsAndViews()
 
                 if (!validSensor)
                 {
-                    remove_sensor(name, widgets);
+                    remove_sensor(type, widgets);
                     continue;
                 }
             }
 
-            widgets.pView->setParent(this);
-
-            QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
 
             mMainModel.addSensor(widgets.pModel);
 
-            addDockWidget(Qt::RightDockWidgetArea, widgets.pView);
-            mpViewMenu->addAction(widgets.pView->toggleViewAction());
+            if (widgets.pDockableView)
+            {
+                widgets.pDockableView->setParent(this);
+
+                addDockWidget(Qt::RightDockWidgetArea, widgets.pDockableView);
+                mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
+            }
+
+
+            if (widgets.pStatusBar)
+            {
+                statusBar()->addPermanentWidget(widgets.pStatusBar);
+            }
         }
     }
     catch (const std::exception& e)

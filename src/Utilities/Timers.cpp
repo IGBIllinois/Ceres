@@ -14,6 +14,17 @@ cIntervalTimer::cIntervalTimer(uint32_t interval_ms)
 	mInterval = std::chrono::milliseconds(interval_ms);
 }
 
+uint32_t cIntervalTimer::interval_sec() const
+{
+	seconds ms = duration_cast<seconds>(mInterval);
+	return ms.count();
+}
+
+void cIntervalTimer::interval_sec(uint32_t interval_sec)
+{
+	mInterval = std::chrono::seconds(interval_sec);
+}
+
 uint32_t cIntervalTimer::interval_ms() const
 {
 	milliseconds ms = duration_cast<milliseconds>(mInterval);
