@@ -60,6 +60,17 @@ bool cSpidercamModel::startCommunications()
     {
         mController.requestCurrentPosition();
         mCurrentPosition = mController.getLastKnownPosition();
+        updateState();
+
+        emit positionChanged(mCurrentPosition);
+        emit busyChanged(mBusy);
+        emit movingChanged(mMoving);
+        emit batteryLevelChanged(mBatteryLevel_pct);
+        emit inPositionStateChanged(mInPosition);
+
+        updateObstacleDistance();
+
+        emit statusMessage("Ready");
     }
 
     return result;
@@ -134,7 +145,6 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage(msg);
 
-/*
     if (!mController.try_to_connect(c2_ip, port))
     {
         QMessageBox msg(QMessageBox::Critical, "Spidercam Error", "Could not establish required command connection to Spidercam C2 computer!");
@@ -144,7 +154,12 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
         exit(EXIT_FAILURE);
 #endif // NDEBUG
     }
-*/
+
+    {
+        QString msg("Connection to Spidercam established.");
+
+        emit statusMessage(msg);
+    }
 }
 
 void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
@@ -220,6 +235,34 @@ void cSpidercamModel::update()
         emit positionChanged(mCurrentPosition);
     }
 
+    updateState();
+
+    if (mBusy.HasChanged())
+        emit busyChanged(mBusy);
+
+    if (mMoving.HasChanged())
+        emit movingChanged(mMoving);
+
+    if (mInPosition.HasChanged())
+        emit inPositionStateChanged(mInPosition);
+
+    if (mBatteryLevel_pct.HasChanged())
+        emit batteryLevelChanged(mBatteryLevel_pct);
+
+    updateObstacleDistance();
+
+    bool readyForMotion = mDollyConnected && mConsoleConnected && mController.isSetPointEnabled() && !mBusy && !mInError;
+    if (mTimer.elapsed())
+    {
+        mController.sendRequestForCurrentPosition();
+    }
+
+    updateExperimentStateMachine();
+}
+
+
+void cSpidercamModel::updateState()
+{
     mDollyConnected = mController.isDollyConnected();
     mConsoleConnected = mController.isConsoleConnected();
     mActivated = mController.isActivated();
@@ -239,19 +282,10 @@ void cSpidercamModel::update()
     mObstacleLessThan1000mm = mController.isObstacleLessThan1000mm() || mObstacleLessThan500mm;
     mObstacleLessThan1500mm = mController.isObstacleLessThan1500mm() || mObstacleLessThan1000mm;
     mObstacleLessThan2000mm = mController.isObstacleLessThan2000mm() || mObstacleLessThan1500mm;
+}
 
-    if (mBusy.HasChanged())
-        emit busyChanged(mBusy);
-
-    if (mMoving.HasChanged())
-        emit movingChanged(mMoving);
-
-    if (mInPosition.HasChanged())
-        emit inPositionStateChanged(mInPosition);
-
-    if (mBatteryLevel_pct.HasChanged())
-        emit batteryLevelChanged(mBatteryLevel_pct);
-
+void cSpidercamModel::updateObstacleDistance()
+{
     if (mObstacleLessThan2000mm)
     {
         if (mObstacleLessThan1500mm)
@@ -274,14 +308,4 @@ void cSpidercamModel::update()
     }
     else if (mObstacleLessThan2000mm.IsFalling())
         emit obstacleDistanceChanged(-1.0);
-
-
-    bool readyForMotion = mDollyConnected && mConsoleConnected && mController.isSetPointEnabled() && !mBusy && !mInError;
-    if (mTimer.elapsed())
-    {
-        mController.sendRequestForCurrentPosition();
-    }
-
-    updateExperimentStateMachine();
 }
-

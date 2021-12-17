@@ -75,6 +75,9 @@ signals:
 protected:
 	void update() override;
 
+	void updateState();
+	void updateObstacleDistance();
+
 protected:
 
 	spidercam::sPosition mCurrentPosition;
