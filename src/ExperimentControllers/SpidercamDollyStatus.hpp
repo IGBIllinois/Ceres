@@ -4,6 +4,7 @@
 #include <spidercam/spidercam_types.hpp>
 
 #include <QAbstractScrollArea>
+#include <QStatusBar>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -14,6 +15,8 @@ QT_END_NAMESPACE
 
 class cSpidercamDollyStatus : public QAbstractScrollArea
 {
+    Q_OBJECT
+
 public:
     explicit cSpidercamDollyStatus(QWidget* parent = nullptr);
 	~cSpidercamDollyStatus();
@@ -61,17 +64,6 @@ private:
     QLabel* mpBatteryLabel;
     QLineEdit* mpBatteryLevel_pct;
 
-/*
-    QLabel* mpTimestampLabel;
-    QLineEdit* mpTimestamp_s;
-
-    QLabel* mpDateLabel;
-    QLineEdit* mpDate;
-
-    QLabel* mpTimeLabel;
-    QLineEdit* mpTime;
-*/
-
 private:
     double mMinX_mm = 0;
     double mMaxX_mm = 0;
@@ -79,5 +71,20 @@ private:
     double mMaxY_mm = 0;
     double mMinHeight_mm = 0;
     double mMaxHeight_mm = 0;
+};
+
+class cBatteryStatus : public QStatusBar
+{
+    Q_OBJECT
+
+public:
+    cBatteryStatus(QWidget* parent = nullptr);
+    virtual ~cBatteryStatus() = default;
+
+public slots:
+    void updateBatteryLevel(float level_pct);
+
+private:
+    QLineEdit* mpBatteryLevel_pct;
 };
 

@@ -38,5 +38,9 @@ sExperimentControllerWidgets create_spidercam_controller()
     QObject::connect(pModel, &cSpidercamModel::positionChanged, pStatus, &cSpidercamDollyStatus::updatePosition);
     QObject::connect(pModel, &cSpidercamModel::batteryLevelChanged, pStatus, &cSpidercamDollyStatus::updateBatteryLevel);
 
-    return sExperimentControllerWidgets(pModel, pView, pDockWidget);
+    auto* pStatusBar = new cBatteryStatus();
+
+    QObject::connect(pModel, &cSpidercamModel::batteryLevelChanged, pStatusBar, &cBatteryStatus::updateBatteryLevel);
+
+    return sExperimentControllerWidgets(pModel, pView, pDockWidget, pStatusBar);
 }

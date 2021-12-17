@@ -94,23 +94,6 @@ void cSpidercamDollyStatus::createWidgets()
 	mpBatteryLabel->setText("Battery (pct)");
 	mpBatteryLevel_pct = new QLineEdit();
 	mpBatteryLevel_pct->setReadOnly(true);
-
-/*
-	mpTimestampLabel = new QLabel();
-	mpTimestampLabel->setText("Timestamp (s):");
-	mpTimestamp_s = new QLineEdit();
-	mpTimestamp_s->setReadOnly(true);
-
-	mpDateLabel = new QLabel();
-	mpDateLabel->setText("Date:");
-	mpDate = new QLineEdit();
-	mpDate->setReadOnly(true);
-
-	mpTimeLabel = new QLabel();
-	mpTimeLabel->setText("Time:");
-	mpTime = new QLineEdit();
-	mpTime->setReadOnly(true);
-*/
 }
 
 void cSpidercamDollyStatus::horizontalLayout()
@@ -136,14 +119,7 @@ void cSpidercamDollyStatus::horizontalLayout()
 	mainlayout->addWidget(mpSpeed_mps, 1, 5);
 	mainlayout->addWidget(mpBatteryLabel, 1, 6);
 	mainlayout->addWidget(mpBatteryLevel_pct, 1, 7);
-/*
-	mainlayout->addWidget(mpTimestampLabel, 2, 4);
-	mainlayout->addWidget(mpTimestamp_s, 2, 5);
-	mainlayout->addWidget(mpDateLabel, 3, 0);
-	mainlayout->addWidget(mpDate, 3, 1);
-	mainlayout->addWidget(mpTimeLabel, 3, 2);
-	mainlayout->addWidget(mpTime, 3, 3);
-*/
+
 	mainlayout->setSpacing(5);
 	setLayout(mainlayout);
 }
@@ -163,12 +139,6 @@ void cSpidercamDollyStatus::verticalLayout()
 	mainlayout->addRow(mpSpeedLabel, mpSpeed_mps);
 	mainlayout->addRow(mpBatteryLabel, mpBatteryLevel_pct);
 	
-/*
-	mainlayout->addRow(mpTimestampLabel, mpTimestamp_s);
-	mainlayout->addRow(mpDateLabel, mpDate);
-	mainlayout->addRow(mpTimeLabel, mpTime);
-*/
-
 	setLayout(mainlayout);
 }
 
@@ -211,4 +181,35 @@ void cSpidercamDollyStatus::topLevelChanged(bool topLevel)
 		verticalLayout();
 		setFixedSize();
 	}
+}
+
+
+cBatteryStatus::cBatteryStatus(QWidget* parent)
+	:
+	QStatusBar(parent), mpBatteryLevel_pct(nullptr)
+{
+	setSizeGripEnabled(false);
+
+	QFontMetrics fm(font());
+	int pixelsWide = fm.horizontalAdvance("Bat: XXX ");
+
+	mpBatteryLevel_pct = new QLineEdit(this);
+	mpBatteryLevel_pct->setReadOnly(true);
+	mpBatteryLevel_pct->setFixedWidth(pixelsWide);
+	mpBatteryLevel_pct->setAlignment(Qt::AlignCenter);
+	mpBatteryLevel_pct->setToolTip(tr("Battery Level"));
+
+	addPermanentWidget(mpBatteryLevel_pct);
+
+	setWindowTitle("Battery Status");
+
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+}
+
+void cBatteryStatus::updateBatteryLevel(float level_pct)
+{
+	QString s = "Bat: ";
+	s += QString::number(static_cast<uint8_t>(level_pct));
+
+	mpBatteryLevel_pct->setText(s);
 }
