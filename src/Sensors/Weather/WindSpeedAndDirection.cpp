@@ -12,7 +12,7 @@ cWindSpeedAndDirection::cWindSpeedAndDirection(QWidget* parent)
 	setSizeGripEnabled(false);
 
 	QFontMetrics fm(font());
-	int pixelsWide = fm.horizontalAdvance(" XXX.X ");
+	int pixelsWide = fm.horizontalAdvance("Speed: XXX.X ");
 
 	mpWindSpeed_mph = new QLineEdit(this);
 	mpWindSpeed_mph->setReadOnly(true);
@@ -20,28 +20,35 @@ cWindSpeedAndDirection::cWindSpeedAndDirection(QWidget* parent)
 	mpWindSpeed_mph->setAlignment(Qt::AlignCenter);
 	mpWindSpeed_mph->setToolTip(tr("Wind Speed in mph"));
 
+	pixelsWide = fm.horizontalAdvance("Dir: XXX.X ");
 	myWindDirection_deg = new QLineEdit(this);
 	myWindDirection_deg->setReadOnly(true);
 	myWindDirection_deg->setFixedWidth(pixelsWide);
 	myWindDirection_deg->setAlignment(Qt::AlignCenter);
-	myWindDirection_deg->setToolTip(tr("Wind Direction"));
+	myWindDirection_deg->setToolTip(tr("Wind Direction in degrees"));
 
 	addPermanentWidget(mpWindSpeed_mph);
 	addPermanentWidget(myWindDirection_deg);
 
 	setWindowTitle("Wind Speed and Direction");
+
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 void cWindSpeedAndDirection::updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg)
 {
 	if (valid_wind_speed)
 	{
-		mpWindSpeed_mph->setText(QString::number(wind_speed_mps * nConstants::MPS_TO_MPH, 'f', 1));
+		QString s = "Speed: ";
+		s += QString::number(wind_speed_mps * nConstants::MPS_TO_MPH, 'f', 1);
+		mpWindSpeed_mph->setText(s);
 	}
 	else
 	{
 		mpWindSpeed_mph->setText("Calm");
 	}
 
-	myWindDirection_deg->setText(QString::number(static_cast<int>(wind_dir_deg)));
+	QString s = "Dir: ";
+	s += QString::number(static_cast<int>(wind_dir_deg));
+	myWindDirection_deg->setText(s);
 }
