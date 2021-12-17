@@ -25,11 +25,7 @@ struct sSensorWidgets
 	sSensorWidgets() : pModel(nullptr), pDockableView(nullptr), pStatusBar(nullptr)
 	{}
 
-	sSensorWidgets(cSensorModel* model, QDockWidget* view)
-		: pModel(model), pDockableView(view), pStatusBar(nullptr)
-	{}
-
-	sSensorWidgets(cSensorModel* model, QDockWidget* view, QStatusBar* status)
+	sSensorWidgets(cSensorModel* model, QDockWidget* view, QStatusBar* status = nullptr)
 		: pModel(model), pDockableView(view), pStatusBar(status)
 	{}
 };

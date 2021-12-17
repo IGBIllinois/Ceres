@@ -37,10 +37,6 @@ void cDataThread::run()
     mActiveSensors.clear();
 
     // Start the network communications so that communication are tied to this thread
-    if (!mpController->startCommunications())
-    {
-        //goto cleanup;
-    }
     for (auto& sensor : mSensors)
     {
         if (!sensor->startCommunications())
@@ -55,6 +51,11 @@ void cDataThread::run()
     for (auto& sensor : mActiveSensors)
     {
         QObject::connect(mpController, &cExperimentControlModel::recordingStateChanged, sensor, &cSensorModel::recordingStateUpdated);
+    }
+
+    if (!mpController->startCommunications())
+    {
+        goto cleanup;
     }
 
     auto* pDispatcher = eventDispatcher();

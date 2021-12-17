@@ -143,9 +143,6 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     mpSplashScreen = nullptr;
 
     mMainModel.startDataThread();
-
-    onStatusUpdate(tr("Ready"));
-
 }
 
 //-----------------------------------------------------------------------------
@@ -352,6 +349,11 @@ bool cMainWindow::createExperimentController()
             addDockWidget(Qt::BottomDockWidgetArea, widgets.pDockableView);
             mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
         }
+
+        if (widgets.pStatusBar)
+        {
+            statusBar()->addPermanentWidget(widgets.pStatusBar);
+        }
     }
     catch (const std::exception& e)
     {
@@ -446,7 +448,6 @@ void cMainWindow::createSensorModelsAndViews()
                 addDockWidget(Qt::RightDockWidgetArea, widgets.pDockableView);
                 mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
             }
-
 
             if (widgets.pStatusBar)
             {
