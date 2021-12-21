@@ -96,6 +96,9 @@ public:
 
 signals:
     void statusMessage(QString msg);
+    void infoMessage(QString title, QString msg);
+    void warningMessage(QString title, QString msg);
+    void errorMessage(QString title, QString msg);
 
     void recordingStateChanged(bool recording);
 

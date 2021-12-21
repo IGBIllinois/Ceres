@@ -2,8 +2,6 @@
 #include "SpidercamModel.hpp"
 #include "../Utilities/Constants.hpp"
 
-#include <QMessageBox>
-
 namespace
 {
     uint32_t TOLERANCE_MM = 10;
@@ -114,8 +112,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
         {
             QString str = "Invalid \"update interval (ms)\" in the \"spidercam\" configuration.\n";
             str.append("The interval must be in the range >0 to <60,000.  The value will be ignored.");
-            QMessageBox msg(QMessageBox::Critical, "Configuration Error", str);
-            msg.exec();
+            emit errorMessage("Configuration Error", str);
         }
         else
         {
@@ -128,8 +125,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
     {
         QString str = "Error in the \"spidercam\" configuration: ";
         str.append(e.what());
-        QMessageBox msg(QMessageBox::Critical, "Configuration Error", str);
-        msg.exec();
+        emit errorMessage("Configuration Error", str);
         return;
     }
 
@@ -147,8 +143,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
     if (!mController.try_to_connect(c2_ip, port))
     {
-        QMessageBox msg(QMessageBox::Critical, "Spidercam Error", "Could not establish required command connection to Spidercam C2 computer!");
-        msg.exec();
+        emit errorMessage("Spidercam Error", "Could not establish required command connection to Spidercam C2 computer!");
 
 #ifdef NDEBUG
         exit(EXIT_FAILURE);
@@ -205,8 +200,7 @@ bool cSpidercamModel::startExperiment()
     {
         QString str = "Make sure the C2 computer is in remote mode.\n";
         str += "Please enter remote mode and then start your experiment.";
-        QMessageBox msg(QMessageBox::Warning, "Message", str);
-        msg.exec();
+        emit warningMessage("Message", str);
     }
 
     return cExperimentControlModel::startExperiment();
