@@ -36,8 +36,9 @@ private:
     void horizontalLayout();
     void verticalLayout();
 
-    void setFixedSize();
-    void setVariableSize();
+    void setFloatingSize();
+    void setHorzDockSize();
+    void setVertDockSize();
 
 private:
     QLabel* mpX_Label;

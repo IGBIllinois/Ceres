@@ -18,9 +18,6 @@ public:
     explicit cSpidercamScanArea(QWidget* parent = nullptr);
 	~cSpidercamScanArea();
 
-    QSize minimumSizeHint() const override;
-    QSize sizeHint() const override;
-
     bool isRecording() const;
     void setRecording(bool recording);
     void clearRecordedPath();
@@ -40,8 +37,8 @@ protected:
 	void paintEvent(QPaintEvent* event) override;
 
 private:
-    void drawDollyMarker(QPainter& painter);
-    void drawPath(QPainter& painter);
+    void drawDollyMarker(QPainter& painter, double height);
+    void drawPath(QPainter& painter, double height);
 
 private:
     double mMinX = 0;

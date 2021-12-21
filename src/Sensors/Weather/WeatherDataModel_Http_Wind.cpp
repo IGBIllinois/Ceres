@@ -3,7 +3,6 @@
 #include "../../Utilities/Constants.hpp"
 
 #include <QEventLoop>
-#include <QMessageBox>
 
 
 cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind()
@@ -61,8 +60,7 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 	else
 	{
 		// Error
-		QMessageBox msg(QMessageBox::Critical, "Wind Data Communication Error", reply->errorString());
-		msg.exec();
+		emit errorMessage("Wind Data Communication Error", reply->errorString());
 
 		return false;
 	}
@@ -136,8 +134,7 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox msg(QMessageBox::Critical, "Wind Data Communication Error", e.what());
-		msg.exec();
+		emit errorMessage("Wind Data Communication Error", e.what());
 
 		return false;
 	}

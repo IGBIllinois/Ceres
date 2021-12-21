@@ -16,7 +16,7 @@ cSpidercamDollyStatus::cSpidercamDollyStatus(QWidget* parent)
 	createWidgets();
 
 	verticalLayout();
-	setFixedSize();
+	setVertDockSize();
 }
 
 cSpidercamDollyStatus::~cSpidercamDollyStatus()
@@ -101,24 +101,23 @@ void cSpidercamDollyStatus::horizontalLayout()
 	// We need to remove the old layout before we can add a new one!
 	delete layout();
 
-	auto* mainlayout = new QGridLayout(this);
-	mainlayout->addWidget(mpX_Label, 0, 0);
-	mainlayout->addWidget(mpX_m, 0, 1);
-	mainlayout->addWidget(mpY_Label, 0, 2);
-	mainlayout->addWidget(mpY_m, 0, 3);
-	mainlayout->addWidget(mpZ_Label, 0, 4);
-	mainlayout->addWidget(mpZ_m, 0, 5);
-	mainlayout->addWidget(mpHeightLabel, 0, 6);
-	mainlayout->addWidget(mpHeight_m, 0, 7);
-
-	mainlayout->addWidget(mpPanLabel, 1, 0);
-	mainlayout->addWidget(mpPan_deg, 1, 1);
-	mainlayout->addWidget(mpTiltLabel, 1, 2);
-	mainlayout->addWidget(mpTilt_deg, 1, 3);
-	mainlayout->addWidget(mpSpeedLabel, 1, 4);
-	mainlayout->addWidget(mpSpeed_mps, 1, 5);
-	mainlayout->addWidget(mpBatteryLabel, 1, 6);
-	mainlayout->addWidget(mpBatteryLevel_pct, 1, 7);
+	auto* mainlayout = new QHBoxLayout(this);
+	mainlayout->addWidget(mpX_Label);
+	mainlayout->addWidget(mpX_m);
+	mainlayout->addWidget(mpY_Label);
+	mainlayout->addWidget(mpY_m);
+	mainlayout->addWidget(mpZ_Label);
+	mainlayout->addWidget(mpZ_m);
+	mainlayout->addWidget(mpHeightLabel);
+	mainlayout->addWidget(mpHeight_m);
+	mainlayout->addWidget(mpPanLabel);
+	mainlayout->addWidget(mpPan_deg);
+	mainlayout->addWidget(mpTiltLabel);
+	mainlayout->addWidget(mpTilt_deg);
+	mainlayout->addWidget(mpSpeedLabel);
+	mainlayout->addWidget(mpSpeed_mps);
+	mainlayout->addWidget(mpBatteryLabel);
+	mainlayout->addWidget(mpBatteryLevel_pct);
 
 	mainlayout->setSpacing(5);
 	setLayout(mainlayout);
@@ -142,44 +141,51 @@ void cSpidercamDollyStatus::verticalLayout()
 	setLayout(mainlayout);
 }
 
-void cSpidercamDollyStatus::setFixedSize()
+void cSpidercamDollyStatus::setFloatingSize()
 {
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//	setMinimumSize(687, 139);
-//	setMaximumSize(687, 139);
+	setMinimumSize(300, 275);
+	setMaximumSize(300, 275);
 }
 
-void cSpidercamDollyStatus::setVariableSize()
+void cSpidercamDollyStatus::setHorzDockSize()
 {
-	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-//	setMinimumSize(0, 0);
-//	setMaximumSize(16777215, 16777215);
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+	setMinimumSize(1000, 50);
+	setMaximumSize(16777215, 50);
+}
+
+void cSpidercamDollyStatus::setVertDockSize()
+{
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	setMinimumSize(300, 275);
+	setMaximumSize(16777215, 16777215);
 }
 
 void cSpidercamDollyStatus::dockLocationChanged(Qt::DockWidgetArea area)
 {
-	setVariableSize();
-
 	if ((area == Qt::LeftDockWidgetArea) || (area == Qt::RightDockWidgetArea))
 	{
 		verticalLayout();
+		setVertDockSize();
 		return;
 	}
 
 	if ((area == Qt::TopDockWidgetArea) || (area == Qt::BottomDockWidgetArea))
 	{
 		horizontalLayout();
+		setHorzDockSize();
 		return;
 	}
 }
 
 void cSpidercamDollyStatus::topLevelChanged(bool topLevel)
 {
-	// topLevel is true when our GPS view is floating. 
+	// topLevel is true when our status view is floating. 
 	if (topLevel)
 	{
 		verticalLayout();
-		setFixedSize();
+		setFloatingSize();
 	}
 }
 

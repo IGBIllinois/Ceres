@@ -29,26 +29,22 @@ namespace
 
 cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
 	:
-    QVTKOpenGLWidget(parent, Qt::WindowMinMaxButtonsHint),
+    QVTKOpenGLStereoWidget(parent, Qt::WindowMinMaxButtonsHint),
     mpModel(pModel)
 {
     setWindowTitle("OUSTER LiDAR");
 
     mData = std::make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();;
 
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumSize(200, 200);
-    setMaximumSize(16777215, 16777215);
 
 	// needed to ensure appropriate OpenGL context is created for VTK rendering.
-//	QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
+	QSurfaceFormat::setDefaultFormat(QVTKOpenGLStereoWidget::defaultFormat());
 
+    auto renderer = vtkSmartPointer<vtkRenderer>::New();
+    auto renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+    renderWindow->AddRenderer(renderer);
 
-//    auto renderer = vtkSmartPointer<vtkRenderer>::New();
-//    auto renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-//    renderWindow->AddRenderer(renderer);
-
-//    mpViewer.reset(new PCLVisualizer(renderer, renderWindow, "lidar", false));
+    mpViewer.reset(new PCLVisualizer(renderer, renderWindow, "lidar", false));
 
 //    setRenderWindow(renderWindow);
 
@@ -56,13 +52,52 @@ cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
 
 //    update();
 
-//    mpViewer->addCoordinateSystem();
+    mpViewer->addCoordinateSystem(0.5);
 }
 
 cOusterView::~cOusterView()
 {
-
 }
+
+
+void cOusterView::setFloatingSize()
+{
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setMinimumSize(200, 200);
+    setMaximumSize(16777215, 16777215);
+}
+
+void cOusterView::setDockedSize()
+{
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setMinimumSize(200, 200);
+    setMaximumSize(16777215, 16777215);
+}
+
+void cOusterView::dockLocationChanged(Qt::DockWidgetArea area)
+{
+    if ((area == Qt::LeftDockWidgetArea) || (area == Qt::RightDockWidgetArea))
+    {
+        setDockedSize();
+        return;
+    }
+
+    if ((area == Qt::TopDockWidgetArea) || (area == Qt::BottomDockWidgetArea))
+    {
+        setDockedSize();
+        return;
+    }
+}
+
+void cOusterView::topLevelChanged(bool topLevel)
+{
+    // topLevel is true when our GPS view is floating. 
+    if (topLevel)
+    {
+        setFloatingSize();
+    }
+}
+
 
 void cOusterView::displayData()
 {
@@ -130,3 +165,5 @@ void cOusterView::displayData()
 
 */
 }
+
+

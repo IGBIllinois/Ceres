@@ -47,6 +47,9 @@ cSpidercamView::cSpidercamView()
 
 	setLayout(mainlayout);
 
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	setMinimumSize(500, 500);
+	setMaximumSize(16777215, 16777215);
 }
 
 cSpidercamView::~cSpidercamView()

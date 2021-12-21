@@ -133,33 +133,40 @@ void cGpsView::verticalLayout()
 	setLayout(mainlayout);
 }
 
-void cGpsView::setFixedSize()
+void cGpsView::setFloatingSize()
 {
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setMinimumSize(687, 139);
 	setMaximumSize(687, 139);
 }
 
-void cGpsView::setVariableSize()
+void cGpsView::setHorzDockSize()
 {
-	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	setMinimumSize(0, 0);
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+	setMinimumSize(687, 139);
+	setMaximumSize(16777215, 139);
+}
+
+void cGpsView::setVertDockSize()
+{
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	setMinimumSize(250, 350);
 	setMaximumSize(16777215, 16777215);
 }
 
 void cGpsView::dockLocationChanged(Qt::DockWidgetArea area)
 {
-	setVariableSize();
-
 	if ((area == Qt::LeftDockWidgetArea) || (area == Qt::RightDockWidgetArea))
 	{
 		verticalLayout();
+		setVertDockSize();
 		return;
 	}
 
 	if ((area == Qt::TopDockWidgetArea) || (area == Qt::BottomDockWidgetArea))
 	{
 		horizontalLayout();
+		setHorzDockSize();
 		return;
 	}
 }
@@ -170,6 +177,6 @@ void cGpsView::topLevelChanged(bool topLevel)
 	if (topLevel)
 	{
 		horizontalLayout();
-		setFixedSize();
+		setFloatingSize();
 	}
 }

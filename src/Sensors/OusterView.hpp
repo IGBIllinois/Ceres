@@ -3,7 +3,7 @@
 
 #include "../Utilities/ColorGradient.hpp"
 
-#include <QVtkOpenGlWidget.h>
+#include <QVTKOpenGLStereoWidget.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
@@ -32,14 +32,24 @@ QT_END_NAMESPACE
 
 class cOusterModel;
 
-class cOusterView : public QVTKOpenGLWidget
+class cOusterView : public QVTKOpenGLStereoWidget
 {
+	Q_OBJECT
+
 public:
 	cOusterView(cOusterModel* pModel, QWidget* parent = nullptr);
 	virtual ~cOusterView();
 
 public slots:
 	void displayData();
+
+public slots:
+	void dockLocationChanged(Qt::DockWidgetArea area);
+	void topLevelChanged(bool topLevel);
+
+private:
+	void setFloatingSize();
+	void setDockedSize();
 
 private:
 	std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBA>> mData;

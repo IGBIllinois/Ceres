@@ -34,16 +34,6 @@ cSpidercamScanArea::~cSpidercamScanArea()
 {
 }
 
-QSize cSpidercamScanArea::minimumSizeHint() const
-{
-	return QSize(50, 50);
-}
-
-QSize cSpidercamScanArea::sizeHint() const
-{
-	return QSize(100, 100);
-}
-
 bool cSpidercamScanArea::isRecording() const
 {
 	return mIsRecording;
@@ -133,18 +123,20 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		mY_Scale = ideal_height / (mMaxY - mMinY);
 
 		painter.drawRect(0, 0, w, w);
+
+		h = w;
 	}
 
-	drawDollyMarker(painter);
-	drawPath(painter);
+	drawDollyMarker(painter, h);
+	drawPath(painter, h);
 }
 
-void cSpidercamScanArea::drawDollyMarker(QPainter& painter)
+void cSpidercamScanArea::drawDollyMarker(QPainter& painter, double height)
 {
 	int x = mX_Scale * (mDollyPosition.x() - mMinX) + mX_Offset;
 	int y = mY_Scale * (mDollyPosition.y() - mMinY) + mY_Offset;
 
-	y = height() - y;
+	y = height - y;
 
 	QPoint center(x, y);
 
@@ -156,7 +148,7 @@ void cSpidercamScanArea::drawDollyMarker(QPainter& painter)
 
 }
 
-void cSpidercamScanArea::drawPath(QPainter& painter)
+void cSpidercamScanArea::drawPath(QPainter& painter, double height)
 {
 	if (mMeasurementPaths.empty()) return;
 
@@ -173,7 +165,7 @@ void cSpidercamScanArea::drawPath(QPainter& painter)
 		auto point = measurementPath[0];
 		int x = mX_Scale * (point.x_mm - mMinX) + mX_Offset;
 		int y = mY_Scale * (point.y_mm - mMinY) + mY_Offset;
-		y = height() - y;
+		y = height - y;
 		path.moveTo(x, y);
 
 		for (int i = 0; i < measurementPath.size(); ++i)
@@ -181,7 +173,7 @@ void cSpidercamScanArea::drawPath(QPainter& painter)
 			auto point = measurementPath[i];
 			int x = mX_Scale * (point.x_mm - mMinX) + mX_Offset;
 			int y = mY_Scale * (point.y_mm - mMinY) + mY_Offset;
-			y = height() - y;
+			y = height - y;
 			path.lineTo(x, y);
 		}
 
