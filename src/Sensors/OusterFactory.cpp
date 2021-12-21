@@ -17,6 +17,8 @@ sSensorWidgets create_ouster_sensor()
     
     dockWidget->setWindowTitle(pView->windowTitle());
     dockWidget->setWidget(pView);
+    QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cOusterView::dockLocationChanged);
+    QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cOusterView::topLevelChanged);
 
     QObject::connect(pModel, &cOusterModel::updateView, pView, &cOusterView::displayData);
 

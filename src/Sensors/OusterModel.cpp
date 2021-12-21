@@ -3,7 +3,6 @@
 #include "OusterFactory.hpp"
 #include "../Utilities/Constants.hpp"
 
-#include <QMessageBox>
 #include <optional>
 
 cOusterModel::cOusterModel()
@@ -45,8 +44,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
                 QString str = "Error in the \"ouster\" configuration:\n";
                 str.append("    The \"azimuth window\" min/max values must be in the range 0.0 to 360.0 degrees.\n");
                 str.append("\nThe \"azimuth window\" parameters will be ignored.");
-                QMessageBox msg(QMessageBox::Warning, "Configuration Warning", str);
-                msg.exec();
+                emit warningMessage("Configuration Warning", str);
                 azimuth_min_deg.reset();
                 azimuth_max_deg.reset();
             }
@@ -55,8 +53,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
                 QString str = "Error in the \"ouster\" configuration:\n";
                 str.append("    The minimum angle for the \"azimuth window\" must be less than the maximum angle.\n");
                 str.append("\nThe \"azimuth window\" parameters will be ignored.");
-                QMessageBox msg(QMessageBox::Warning, "Configuration Warning", str);
-                msg.exec();
+                emit warningMessage("Configuration Warning", str);
                 azimuth_min_deg.reset();
                 azimuth_max_deg.reset();
             }
@@ -96,8 +93,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
                 str.append("        512x10, 1024x10, 2048x10\n");
                 str.append("        512x20, 1024x20\n");
                 str.append("\nThe \"mode\" parameter will be ignored.");
-                QMessageBox msg(QMessageBox::Warning, "Configuration Warning", str);
-                msg.exec();
+                emit warningMessage("Configuration Warning", str);
             }
         }
     }
@@ -105,8 +101,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
     {
         QString str = "Error in the \"ouster\" configuration: ";
         str.append(e.what());
-        QMessageBox msg(QMessageBox::Critical, "Configuration Error", str);
-        msg.exec();
+        emit errorMessage("Configuration Error", str);
         return false;
     }
 
@@ -116,8 +111,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
 
     if (sensors.empty())
     {
-        QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "No Ouster sensors were detected on the network!");
-        msg.exec();
+        emit errorMessage("LiDAR Error", "No Ouster sensors were detected on the network!");
         return false;
     }
     
@@ -150,8 +144,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
 
     if (!mCmdStream.connect_to_sensor(sensor_ip, use_ipv6))
     {
-        QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "Could not establish command connection to OUSTER lidar!");
-        msg.exec();
+        emit errorMessage("LiDAR Error", "Could not establish command connection to OUSTER lidar!");
         return false;
     }
 
@@ -208,8 +201,7 @@ bool cOusterModel::startCommunications()
 
     if (!cOusterImuStream_Qt::startCommunications(mDstIpAddress, mImuPort, mUseIpv6))
     {
-        QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "Could not establish IMU data connection to OUSTER lidar!");
-        msg.exec();
+        emit errorMessage("LiDAR Error", "Could not establish IMU data connection to OUSTER lidar!");
         return false;
     }
 
@@ -217,8 +209,7 @@ bool cOusterModel::startCommunications()
 
     if (!cOusterLidarStream_Qt::startCommunications(mDstIpAddress, mLidarPort, mUseIpv6))
     {
-        QMessageBox msg(QMessageBox::Critical, "LiDAR Error", "Could not establish data connection to OUSTER lidar!");
-        msg.exec();
+        emit errorMessage("LiDAR Error", "Could not establish data connection to OUSTER lidar!");
         return false;
     }
 

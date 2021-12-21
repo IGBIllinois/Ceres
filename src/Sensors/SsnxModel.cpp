@@ -3,8 +3,6 @@
 #include "SsnxFactory.hpp"
 #include <functional>
 
-#include <QMessageBox>
-
 using namespace ssnx;
 
 cSsnxModel::cSsnxModel()
@@ -37,8 +35,7 @@ bool cSsnxModel::configure(const nlohmann::json& jsonCfg)
     {
         QString str = "Error in the \"ssnx\" configuration: ";
         str.append(e.what());
-        QMessageBox msg(QMessageBox::Critical, "Configuration Error", str);
-        msg.exec();
+        emit errorMessage("Configuration Error", str);
         return false;
     }
 
@@ -50,8 +47,7 @@ bool cSsnxModel::configure(const nlohmann::json& jsonCfg)
 
     if (!try_to_connect(ip, port, false))
     {
-        QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
-        msg.exec();
+        emit errorMessage("GPS Error", "Could not establish connection to GPS receiver!");
         return false;
     }
 
@@ -62,8 +58,7 @@ bool cSsnxModel::startCommunications()
 {
     if (!cSsnxGpsStream::startCommunications())
     {
-        QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
-        msg.exec();
+        emit errorMessage("GPS Error", "Could not establish connection to GPS receiver!");
         return false;
     }
 
@@ -71,8 +66,7 @@ bool cSsnxModel::startCommunications()
 
     if (!mConnected)
     {
-        QMessageBox msg(QMessageBox::Critical, "GPS Error", "Could not establish connection to GPS receiver!");
-        msg.exec();
+        emit errorMessage("GPS Error", "Could not establish connection to GPS receiver!");
         return false;
     }
 
