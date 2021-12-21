@@ -41,6 +41,9 @@ public:
 
 public slots:
     void onStatusUpdate(QString msg);
+    void onInfoMessage(QString title, QString msg);
+    void onWarningMessage(QString title, QString msg);
+    void onErrorMessage(QString title, QString msg);
 
 private slots:
     void fileNew();

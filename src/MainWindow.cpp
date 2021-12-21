@@ -100,7 +100,9 @@ cMainWindow::cMainWindow(QWidget* parent) :
     setUnifiedTitleAndToolBarOnMac(true);
 
     QObject::connect(&mMainModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-
+    QObject::connect(&mMainModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(&mMainModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
 }
 
 //-----------------------------------------------------------------------------
@@ -197,6 +199,24 @@ void cMainWindow::onStatusUpdate(QString msg)
 
     if (statusBar())
         statusBar()->showMessage(msg);
+}
+
+void cMainWindow::onInfoMessage(QString title, QString msg)
+{
+    QMessageBox msg_box(QMessageBox::Information, title, msg);
+    msg_box.exec();
+}
+
+void cMainWindow::onWarningMessage(QString title, QString msg)
+{
+    QMessageBox msg_box(QMessageBox::Warning, title, msg);
+    msg_box.exec();
+}
+
+void cMainWindow::onErrorMessage(QString title, QString msg)
+{
+    QMessageBox msg_box(QMessageBox::Critical, title, msg);
+    msg_box.exec();
 }
 
 //-----------------------------------------------------------------------------
@@ -329,6 +349,9 @@ bool cMainWindow::createExperimentController()
         }
 
         QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+        QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
+        QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
+        QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
         mMainModel.addExperimentControlModel(pModel);
 
@@ -418,6 +441,9 @@ void cMainWindow::createSensorModelsAndViews()
             }
 
             QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+            QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
+            QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
+            QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
             if (jsonDoc.contains(type))
             {
@@ -431,11 +457,13 @@ void cMainWindow::createSensorModelsAndViews()
                     validSensor = false;
                 }
 
+/*BAF
                 if (!validSensor)
                 {
                     remove_sensor(type, widgets);
                     continue;
                 }
+*/
             }
 
 

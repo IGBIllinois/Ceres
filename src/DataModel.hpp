@@ -39,9 +39,13 @@ public:
 
 signals:
     void statusMessage(QString msg);
+    void infoMessage(QString title, QString msg);
+    void warningMessage(QString title, QString msg);
+    void errorMessage(QString title, QString msg);
 
 private slots:
     void onStatusUpdate(QString msg);
+    void onErrorUpdate(QString title, QString msg);
 
 private:
     cDataThread mThread;

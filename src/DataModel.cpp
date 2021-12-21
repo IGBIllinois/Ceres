@@ -21,6 +21,11 @@ void cDataModel::onStatusUpdate(QString msg)
     emit statusMessage(msg);
 }
 
+void cDataModel::onErrorUpdate(QString title, QString msg)
+{
+    emit errorMessage(title, msg);
+}
+
 void cDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)
 {
     if (pControlModel)
