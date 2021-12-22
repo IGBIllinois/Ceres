@@ -23,8 +23,6 @@
 #include <vtkBoxWidget.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
-#include <memory>
-
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -52,8 +50,8 @@ private:
 	void setDockedSize();
 
 private:
-	std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBA>> mData;
-	std::shared_ptr<pcl::visualization::PCLVisualizer> mpViewer;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr mData;
+	pcl::visualization::PCLVisualizer::Ptr mpViewer;
 
 	cColorGradient mColorGradient;
 

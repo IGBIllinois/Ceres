@@ -6,6 +6,13 @@
 #include <string>
 #include <vtkGenericOpenGLRenderWindow.h>
 
+
+#include <pcl/common/common_headers.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/visualization/pcl_visualizer.h>
+
+
 using namespace pcl::visualization;
 
 namespace
@@ -34,7 +41,51 @@ cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
 {
     setWindowTitle("OUSTER LiDAR");
 
-    mData = std::make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();;
+    mData = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();;
+
+    // ------------------------------------
+    // -----Create example point cloud-----
+    // ------------------------------------
+    // We're going to make an ellipse extruded along the z-axis. The colour for
+    // the XYZRGB cloud will gradually go from red to green to blue.
+    std::uint8_t r(255), g(15), b(15);
+    for (float z(-1.0); z <= 1.0; z += 0.05)
+    {
+        for (float angle(0.0); angle <= 360.0; angle += 5.0)
+        {
+            pcl::PointXYZRGB point;
+            point.x = 0.5 * std::cos(pcl::deg2rad(angle));
+            point.y = sinf(pcl::deg2rad(angle));
+            point.z = z;
+            std::uint32_t rgb = (static_cast<std::uint32_t>(r) << 16 |
+                static_cast<std::uint32_t>(g) << 8 | static_cast<std::uint32_t>(b));
+            point.rgb = *reinterpret_cast<float*>(&rgb);
+            mData->points.push_back(point);
+        }
+        if (z < 0.0)
+        {
+            r -= 12;
+            g += 12;
+        }
+        else
+        {
+            g -= 12;
+            b += 12;
+        }
+    }
+    mData->width = mData->size();
+    mData->height = 1;
+    // ------------------------------------
+    // -----Create example point cloud-----
+    // ------------------------------------
+
+/*
+    pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
+    viewer->setBackgroundColor(0, 0, 0);
+    pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
+    viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb, "sample cloud");
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
+*/
 
 
 	// needed to ensure appropriate OpenGL context is created for VTK rendering.
@@ -44,15 +95,19 @@ cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
     auto renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
     renderWindow->AddRenderer(renderer);
 
-    mpViewer.reset(new PCLVisualizer(renderer, renderWindow, "lidar", false));
+    auto* visualizer = new PCLVisualizer(renderer, renderWindow, "lidar", false);
+    mpViewer.reset(visualizer);
 
-//    setRenderWindow(renderWindow);
+    mpViewer->setBackgroundColor(0, 0, 0);
+    mpViewer->addCoordinateSystem(1.0);
+    mpViewer->initCameraParameters();
+
+    setRenderWindow(mpViewer->getRenderWindow());
+
 
  //   displayData();
 
-//    update();
-
-    mpViewer->addCoordinateSystem(0.5);
+    update();
 }
 
 cOusterView::~cOusterView()
