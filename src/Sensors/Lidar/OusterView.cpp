@@ -1,6 +1,6 @@
 
 #include "OusterView.hpp"
-#include "../Utilities/Constants.hpp"
+#include "../../Utilities/Constants.hpp"
 #include "OusterModel.hpp"
 
 #include <string>
@@ -104,8 +104,7 @@ cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
 
     setRenderWindow(mpViewer->getRenderWindow());
 
-
- //   displayData();
+    displayData();
 
     update();
 }
@@ -153,21 +152,61 @@ void cOusterView::topLevelChanged(bool topLevel)
     }
 }
 
+void cOusterView::beamIntrinsicsChanged(ouster::beam_intrinsics_t beam_intrinsics)
+{
+    mLidarOriginToBeamOrigin_mm = beam_intrinsics.lidar_to_beam_origins_mm;
+    for (auto azimuth_deg : beam_intrinsics.azimuth_angles_deg)
+    {
+        mBeamAzimuthAngles_rad.push_back(-1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
+    }
+    for (auto altitude_deg : beam_intrinsics.altitude_angles_deg)
+    {
+        mBeamAltitudeAngles_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
+    }
+}
+
+void cOusterView::imuIntrinsicsChanged(ouster::imu_intrinsics_t imu_intrinsics)
+{
+
+}
+
+void cOusterView::lidarIntrinsicsChanged(ouster::lidar_intrinsics_t lidar_intrinsics)
+{
+
+}
+
+void cOusterView::dataFormatChanged(ouster::lidar_data_format_t lidar_data_format)
+{
+    mColumnsPerFrame = lidar_data_format.columns_per_frame;
+    mPixelsPerColumn = lidar_data_format.pixels_per_column;
+    mColumnWindowMin = lidar_data_format.column_window_min;
+    mColumnWindowMax = lidar_data_format.column_window_max;
+}
+
+void cOusterView::azimuthWindowChanged(ouster::azimuth_range_t azimuth_range)
+{
+
+}
+
+void cOusterView::encoderCountChanged(uint32_t min, uint32_t max)
+{
+    mEncoderCountMin = min;
+    mEncoderCountMax = max;
+}
+
+void cOusterView::imuDataChanged(ouster::imu_data_t data)
+{
+    data.acceleration_Xaxis_g;
+    data.acceleration_Yaxis_g;
+    data.acceleration_Zaxis_g;
+}
 
 void cOusterView::displayData()
 {
     if (!isVisible()) return;
 
-/*
+    pcl::PointXYZRGB pt;
 
-    pcl::PointXYZRGBA pt;
-
-    auto minEncoderCount = mpModel->minEncoderCount();
-    auto maxEncoderCount = mpModel->maxEncoderCount();
-    auto colPerFrame = mpModel->columnsPerFrame();
-    auto pixPerColumn = mpModel->pixelsPerColumn();
-
-    auto n = mpModel->lidar_origin_to_beam_origin_mm();
 
     auto& phi = mpModel->beamAltitudeAngles_rad();
     if (phi.empty()) return;
@@ -181,14 +220,14 @@ void cOusterView::displayData()
     mData->reserve(lidar_returns.size());
     mData->clear();
 
-    for (std::size_t c = 0; c < colPerFrame; ++c)
+    for (std::size_t c = 0; c < mColumnsPerFrame; ++c)
     {
-        for (std::size_t p = 0; p < pixPerColumn; ++p)
+        for (std::size_t p = 0; p < mPixelsPerColumn; ++p)
         {
-            auto pixelId = (c * pixPerColumn) + p;
+            auto pixelId = (c * mPixelsPerColumn) + p;
             auto& lidar_return = lidar_returns[pixelId];
-            if (lidar_return.encoder_count < minEncoderCount) continue;
-            if (lidar_return.encoder_count > maxEncoderCount) continue;
+            if (lidar_return.encoder_count < mEncoderCountMin) continue;
+            if (lidar_return.encoder_count > mEncoderCountMax) continue;
             if (lidar_return.range_mm < MIN_RANGE_MM) continue;
 
             auto color = mColorGradient.getColorAtValue( intensity2norm(lidar_return.intensity) );
@@ -197,19 +236,17 @@ void cOusterView::displayData()
             pt.g = static_cast<uint8_t>(color.g * 255);
             pt.b = static_cast<uint8_t>(color.b * 255);
 
-            auto range_mm = (lidar_return.range_mm - n);
+            auto range_mm = (lidar_return.range_mm - mLidarOriginToBeamOrigin_mm);
             auto theta_e = nConstants::TWO_PI * (1.0 - lidar_return.encoder_count / 90112.0);
             auto cos_alt = cos(phi[p]);
             auto cos_enc = cos(theta_e);
-            pt.x = range_mm * cos(theta_e + theta_a[p]) * cos_alt + n * cos_enc;
-            pt.y = range_mm * sin(theta_e + theta_a[p]) * cos_alt + n * cos_enc;
+            pt.x = range_mm * cos(theta_e + theta_a[p]) * cos_alt + mLidarOriginToBeamOrigin_mm * cos_enc;
+            pt.y = range_mm * sin(theta_e + theta_a[p]) * cos_alt + mLidarOriginToBeamOrigin_mm * cos_enc;
             pt.z = range_mm * sin(phi[p]);
 
             mData->push_back(pt);
         }
     }
-
-    mpViewer->addCoordinateSystem();
 
     if (!mpViewer->updatePointCloud(mData))
     {
@@ -218,7 +255,6 @@ void cOusterView::displayData()
 
     renderWindow()->Render();
 
-*/
 }
 
 

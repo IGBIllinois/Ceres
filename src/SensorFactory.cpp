@@ -1,8 +1,8 @@
 
 #include "SensorFactory.hpp"
 
-#include "Sensors/OusterFactory.hpp"
-#include "Sensors/SsnxFactory.hpp"
+#include "Sensors/Lidar/OusterFactory.hpp"
+#include "Sensors/GPS/SsnxFactory.hpp"
 #include "Sensors/Weather/WeatherDataFactory.hpp"
 
 

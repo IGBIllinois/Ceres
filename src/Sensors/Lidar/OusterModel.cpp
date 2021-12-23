@@ -1,7 +1,7 @@
 
 #include "OusterModel.hpp"
 #include "OusterFactory.hpp"
-#include "../Utilities/Constants.hpp"
+#include "../../Utilities/Constants.hpp"
 
 #include <optional>
 
@@ -169,24 +169,6 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
 
 
     mConfigParameters = mCmdStream.retrieveConfigParam(true);
-    mSensorInfo = mCmdStream.retrieveSensorInfo();
-    mTimeInfo = mCmdStream.retrieveTimeInfo();
-    mBeamIntrinsics = mCmdStream.retrieveBeamIntrinsics();
-
-    mLidarOriginToBeamOrigin_mm = mBeamIntrinsics.lidar_to_beam_origins_mm;
-    for (auto azimuth_deg : mBeamIntrinsics.azimuth_angles_deg)
-    {
-        mBeamAzimuthAngles_rad.push_back( -1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
-    }
-    for (auto altitude_deg : mBeamIntrinsics.altitude_angles_deg)
-    {
-        mBeamAltitudeAngles_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
-    }
-
-    mImuIntrinsics = mCmdStream.retrieveImuIntrinsics();
-    mLidarIntrinsics = mCmdStream.retrieveLidarIntrinsics();
-    mDataFormat = mCmdStream.retrieveLidarDataFormat();
-    mAzimuthWindow = mCmdStream.retrieveAzimuthWindow(true);
 
     mImuPort = mCmdStream.retrieveImuUdpPort(true);
     mLidarPort = mCmdStream.retrieveLidarUdpPort(true);
@@ -213,7 +195,44 @@ bool cOusterModel::startCommunications()
         return false;
     }
 
+    emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
+
     cOusterLidarStream_Qt::setDataFormat(mDataFormat);
+
+    mSensorInfo = mCmdStream.retrieveSensorInfo();
+    emit updateSensorInfo(mSensorInfo);
+
+    mTimeInfo = mCmdStream.retrieveTimeInfo();
+    emit updateTimeInfo(mTimeInfo);
+
+    mBeamIntrinsics = mCmdStream.retrieveBeamIntrinsics();
+    emit updateBeamIntrinsics(mBeamIntrinsics);
+
+    mLidarOriginToBeamOrigin_mm = mBeamIntrinsics.lidar_to_beam_origins_mm;
+    for (auto azimuth_deg : mBeamIntrinsics.azimuth_angles_deg)
+    {
+        mBeamAzimuthAngles_rad.push_back(-1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
+    }
+    for (auto altitude_deg : mBeamIntrinsics.altitude_angles_deg)
+    {
+        mBeamAltitudeAngles_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
+    }
+    emit updateBeamIntrinsics(mBeamIntrinsics);
+
+    mImuIntrinsics = mCmdStream.retrieveImuIntrinsics();
+    emit updateImuIntrinsics(mImuIntrinsics);
+
+    mLidarIntrinsics = mCmdStream.retrieveLidarIntrinsics();
+    emit updateLidarIntrinsics(mLidarIntrinsics);
+
+    mDataFormat = mCmdStream.retrieveLidarDataFormat();
+    emit updateDataFormat(mDataFormat);
+
+    mAzimuthWindow = mCmdStream.retrieveAzimuthWindow(true);
+    emit updateAzimuthWindow(mAzimuthWindow);
+
+    emit updateEncoderCount(minEncoderCount(), maxEncoderCount());
+
 
     cOusterImuStream_Qt::clear();
     cOusterLidarStream_Qt::clear();
@@ -245,6 +264,7 @@ void cOusterModel::writeDataHeader(cBlockDataFile& file)
 void cOusterModel::onNewData(const ouster::imu_data_t& data)
 {
     mLastImuData = data;
+    emit updateImuData(data);
 }
 
 void cOusterModel::onNewData(uint16_t frameID, ouster::lidar_data_t& data)
@@ -255,7 +275,7 @@ void cOusterModel::onNewData(uint16_t frameID, ouster::lidar_data_t& data)
     if (--mFrameCounter < 1)
     {
         mFrameCounter = 3;
-        emit updateView();
+        emit updateLidarData();
     }
 }
 
@@ -263,8 +283,6 @@ uint16_t cOusterModel::columnsPerFrame() const
 {
     return mDataFormat.columns_per_frame;
 }
-
-//   std::vector<int> cLidarModelOuster::pixelShiftByRow() const;
 
 uint16_t cOusterModel::pixelsPerColumn() const
 {
@@ -280,7 +298,6 @@ uint16_t cOusterModel::columnWindowMax() const
 {
     return mDataFormat.column_window_max;
 }
-
 
 uint32_t cOusterModel::minEncoderCount() const
 {

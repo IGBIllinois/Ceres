@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "SensorModel.hpp"
+#include "../SensorModel.hpp"
 
 
 class cLidarModel : public cSensorModel

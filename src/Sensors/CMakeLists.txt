@@ -40,46 +40,46 @@ PRIVATE
 #
 # OUSTER LiDAR files
 #
-    OusterView.hpp
-    OusterView.cpp
-    OusterCmdStream.hpp
-    OusterCmdStream.cpp
-    OusterImuStream.hpp
-    OusterImuStream.cpp
-    OusterDataStream.hpp
-    OusterDataStream.cpp
-    OusterModel.hpp
-    OusterModel.cpp
+    Lidar/OusterView.hpp
+    Lidar/OusterView.cpp
+    Lidar/OusterCmdStream.hpp
+    Lidar/OusterCmdStream.cpp
+    Lidar/OusterImuStream.hpp
+    Lidar/OusterImuStream.cpp
+    Lidar/OusterDataStream.hpp
+    Lidar/OusterDataStream.cpp
+    Lidar/OusterModel.hpp
+    Lidar/OusterModel.cpp
 
-    OusterFactory.hpp
-    OusterFactory.cpp
+    Lidar/OusterFactory.hpp
+    Lidar/OusterFactory.cpp
 
 #
 # General LiDAR View-Model-Controller files
 #
-    LidarModel.hpp
-    LidarModel.cpp
+    Lidar/LidarModel.hpp
+    Lidar/LidarModel.cpp
 
 #
 # Septertino GPS receiver files
 #
-    SsnxGpsStream.hpp
-    SsnxGpsStream.cpp
-    SsnxModel.hpp
-    SsnxModel.cpp
-    SsnxView.hpp
-    SsnxView.cpp
+    GPS/SsnxGpsStream.hpp
+    GPS/SsnxGpsStream.cpp
+    GPS/SsnxModel.hpp
+    GPS/SsnxModel.cpp
+    GPS/SsnxView.hpp
+    GPS/SsnxView.cpp
 
-    SsnxFactory.hpp
-    SsnxFactory.cpp
+    GPS/SsnxFactory.hpp
+    GPS/SsnxFactory.cpp
 
 #
 # General GPS View-Model-Controller files
 #
-    GpsView.hpp
-    GpsView.cpp
-    GpsModel.hpp
-    GpsModel.cpp
+    GPS/GpsView.hpp
+    GPS/GpsView.cpp
+    GPS/GpsModel.hpp
+    GPS/GpsModel.cpp
 
 
 #

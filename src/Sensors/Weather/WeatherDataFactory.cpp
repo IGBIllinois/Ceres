@@ -34,13 +34,6 @@ sSensorWidgets create_weather_data_sensor(const nlohmann::json& sensorInfo)
     if (protocol == "http")
         return create_http_based_sensor(data_type);
 
-/*
-    dockWidget->setWindowTitle(pView->windowTitle());
-    dockWidget->setWidget(pView);
-
-    QObject::connect(pModel, &cOusterModel::updateView, pView, &cOusterView::displayData);
-*/
-
     return sSensorWidgets();
 }
 

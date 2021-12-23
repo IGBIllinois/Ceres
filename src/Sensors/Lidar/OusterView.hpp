@@ -1,7 +1,9 @@
 
 #pragma once
 
-#include "../Utilities/ColorGradient.hpp"
+#include "../../Utilities/ColorGradient.hpp"
+
+#include <ouster/ouster_defs.h>
 
 #include <QVTKOpenGLStereoWidget.h>
 
@@ -39,6 +41,14 @@ public:
 	virtual ~cOusterView();
 
 public slots:
+	void beamIntrinsicsChanged(ouster::beam_intrinsics_t beam_intrinsics);
+	void imuIntrinsicsChanged(ouster::imu_intrinsics_t imu_intrinsics);
+	void lidarIntrinsicsChanged(ouster::lidar_intrinsics_t lidar_intrinsics);
+	void dataFormatChanged(ouster::lidar_data_format_t lidar_data_format);
+	void azimuthWindowChanged(ouster::azimuth_range_t azimuth_range);
+	void encoderCountChanged(uint32_t min, uint32_t max);
+	void imuDataChanged(ouster::imu_data_t data);
+
 	void displayData();
 
 public slots:
@@ -50,6 +60,18 @@ private:
 	void setDockedSize();
 
 private:
+
+	uint16_t mColumnsPerFrame;
+	uint16_t mPixelsPerColumn;
+	uint16_t mColumnWindowMin;
+	uint16_t mColumnWindowMax;
+	uint32_t mEncoderCountMin;
+	uint32_t mEncoderCountMax;
+
+	double mLidarOriginToBeamOrigin_mm;
+	std::vector<double> mBeamAzimuthAngles_rad;
+	std::vector<double> mBeamAltitudeAngles_rad;
+
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr mData;
 	pcl::visualization::PCLVisualizer::Ptr mpViewer;
 

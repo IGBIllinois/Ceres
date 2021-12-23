@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../SensorFactory.hpp"
+#include "../../SensorFactory.hpp"
 
 
 static char* ssnx_id = "ssnx";

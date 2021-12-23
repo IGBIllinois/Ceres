@@ -56,7 +56,16 @@ public:
     void stopCommunications() override;
 
 signals:
-    void updateView();
+    void updateSensorInfo(ouster::sensor_info_t info);
+    void updateTimeInfo(ouster::time_info_t info);
+    void updateBeamIntrinsics(ouster::beam_intrinsics_t beam_intrinsics);
+    void updateImuIntrinsics(ouster::imu_intrinsics_t imu_intrinsics);
+    void updateLidarIntrinsics(ouster::lidar_intrinsics_t lidar_intrinsics);
+    void updateDataFormat(ouster::lidar_data_format_t lidar_data_format);
+    void updateAzimuthWindow(ouster::azimuth_range_t azimuth_range);
+    void updateEncoderCount(uint32_t min, uint32_t max);
+    void updateImuData(ouster::imu_data_t data);
+    void updateLidarData();
 
 protected:
     void onNewData(const ouster::imu_data_t& new_data) override;
