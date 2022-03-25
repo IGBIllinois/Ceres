@@ -115,7 +115,7 @@ void cDataModel::startDataRecording(const std::string& filename)
 
     for (auto& sensor : mThread.mActiveSensors)
     {
-        sensor->writeDataHeader(mFile);
+        sensor->writeDataHeader(&mFile);
     }
 
     for (auto& sensor : mThread.mActiveSensors)

@@ -6,6 +6,7 @@
 #include "OusterDataStream.hpp"
 #include "OusterCmdStream.hpp"
 #include "OusterImuStream.hpp"
+#include "OusterSerializer.hpp"
 
 #include <ouster/ouster_defs.h>
 #include <ouster/OusterSensorDiscovery.h>
@@ -28,7 +29,9 @@ public:
     char* descriptor() const override;
 
     bool configure(const nlohmann::json& jsonCfg) override;
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFile* pFile) override;
+    void startDataRecording(cBlockDataFile& file) override;
+    void stopDataRecording() override;
 
     uint16_t columnsPerFrame() const;
  //   std::vector<int> pixel_shift_by_row;
@@ -39,12 +42,19 @@ public:
     uint32_t minEncoderCount() const;
     uint32_t maxEncoderCount() const;
 
+    ouster::sensor_info_t getSensorInfo() const;
+    ouster::time_info_t getTimeInfo() const;
+    ouster::beam_intrinsics_t getBeamIntrinsics() const;
+    ouster::imu_intrinsics_t getImuIntrinsics() const;
+    ouster::lidar_intrinsics_t getLidarIntrinsics() const;
+    ouster::lidar_data_format_t getLidarDataFormat() const;
+
     double lidar_origin_to_beam_origin_mm() const;
     const std::vector<double>& beamAzimuthAngles_rad() const;
     const std::vector<double>& beamAltitudeAngles_rad() const;
 
     uint16_t              frameID() const;
-    ouster::lidar_data_t  lidarData() const;
+    cOusterLidarData      lidarData() const;
     ouster::imu_data_t    imuData() const;
 
     /*
@@ -56,20 +66,33 @@ public:
     void stopCommunications() override;
 
 signals:
+    void updateSensorInfo();
+    void updateTimeInfo();
+    void updateBeamIntrinsics();
+    void updateImuIntrinsics();
+    void updateLidarIntrinsics();
+    void updateDataFormat();
+
+/*
     void updateSensorInfo(ouster::sensor_info_t info);
     void updateTimeInfo(ouster::time_info_t info);
-    void updateBeamIntrinsics(ouster::beam_intrinsics_t beam_intrinsics);
+*/
+//    void updateBeamIntrinsics(ouster::beam_intrinsics_t beam_intrinsics);
+/*
     void updateImuIntrinsics(ouster::imu_intrinsics_t imu_intrinsics);
     void updateLidarIntrinsics(ouster::lidar_intrinsics_t lidar_intrinsics);
     void updateDataFormat(ouster::lidar_data_format_t lidar_data_format);
+*/
+
     void updateAzimuthWindow(ouster::azimuth_range_t azimuth_range);
-    void updateEncoderCount(uint32_t min, uint32_t max);
-    void updateImuData(ouster::imu_data_t data);
+    void updateEncoderCount(int min, int max);
+//    void updateImuData(ouster::imu_data_t data);
+    void updateImuData();
     void updateLidarData();
 
 protected:
     void onNewData(const ouster::imu_data_t& new_data) override;
-    void onNewData(uint16_t frameID, ouster::lidar_data_t& data) override;
+    void onNewData(uint16_t frameID, const cOusterLidarData& data) override;
 
 protected:
     void update() override;
@@ -99,13 +122,15 @@ private:
 
 //    ouster::alerts_t			mAlerts;
 
-    ouster::imu_data_t    mLastImuData;
+    ouster::imu_data_t  mLastImuData;
 
-    uint16_t              mLastFrameID;
-    ouster::lidar_data_t  mLastLidarData;
+    uint16_t            mLastFrameID;
+    cOusterLidarData    mLastLidarData;
 
     double mLidarOriginToBeamOrigin_mm;
     std::vector<double> mBeamAzimuthAngles_rad;
     std::vector<double> mBeamAltitudeAngles_rad;
+
+    cOusterSerializer mSerializer;
 };
 

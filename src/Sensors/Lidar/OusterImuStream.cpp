@@ -9,7 +9,9 @@ cOusterImuStream_Qt::cOusterImuStream_Qt()
 :
     mpSocket(nullptr),
     mDataBuffer()
-{}
+{
+    mDataBuffer.reserve(MAX_DATA_LENGTH);
+}
 
 cOusterImuStream_Qt::~cOusterImuStream_Qt()
 {

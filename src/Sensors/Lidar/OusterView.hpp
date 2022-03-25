@@ -41,13 +41,22 @@ public:
 	virtual ~cOusterView();
 
 public slots:
-	void beamIntrinsicsChanged(ouster::beam_intrinsics_t beam_intrinsics);
+	void beamIntrinsicsChanged();
+	void imuIntrinsicsChanged();
+	void lidarIntrinsicsChanged();
+	void dataFormatChanged();
+
+//	void beamIntrinsicsChanged(ouster::beam_intrinsics_t beam_intrinsics);
+	
+/*
 	void imuIntrinsicsChanged(ouster::imu_intrinsics_t imu_intrinsics);
 	void lidarIntrinsicsChanged(ouster::lidar_intrinsics_t lidar_intrinsics);
-	void dataFormatChanged(ouster::lidar_data_format_t lidar_data_format);
+*/
+
 	void azimuthWindowChanged(ouster::azimuth_range_t azimuth_range);
-	void encoderCountChanged(uint32_t min, uint32_t max);
-	void imuDataChanged(ouster::imu_data_t data);
+	void encoderCountChanged(int min, int max);
+//	void imuDataChanged(ouster::imu_data_t data);
+	void imuDataChanged();
 
 	void displayData();
 
@@ -68,9 +77,23 @@ private:
 	uint32_t mEncoderCountMin;
 	uint32_t mEncoderCountMax;
 
+	std::vector<int> mPixelShiftByRow;
+
+	std::array<double, 4> mX_sensor;
+	std::array<double, 4> mY_sensor;
+	std::array<double, 4> mZ_sensor;
+
+	std::array<double, 4> mX_imu;
+	std::array<double, 4> mY_imu;
+	std::array<double, 4> mZ_imu;
+
+	double mGx;
+	double mGy;
+	double mGz;
+
 	double mLidarOriginToBeamOrigin_mm;
-	std::vector<double> mBeamAzimuthAngles_rad;
-	std::vector<double> mBeamAltitudeAngles_rad;
+	std::vector<double> mTheta_rad;
+	std::vector<double> mPhi_rad;
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr mData;
 	pcl::visualization::PCLVisualizer::Ptr mpViewer;

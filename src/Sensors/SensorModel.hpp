@@ -46,19 +46,19 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    virtual void writeDataHeader(cBlockDataFile& file) = 0;
+    virtual void writeDataHeader(cBlockDataFile* pFile) = 0;
 
     /*
      * Sets the non-owning data file pointer to
      * start the writing of sensor data.
      */
-    void startDataRecording(cBlockDataFile& file);
+    virtual void startDataRecording(cBlockDataFile& file) = 0;
 
     /*
      * Sets the non-owning data file pointer to null to
      * stop the writing of sensor data.
      */
-    void stopDataRecording();
+    virtual void stopDataRecording() = 0;
 
     /*
      * Returns true if sensor data is being recorded
@@ -88,19 +88,15 @@ public:
 protected:
     cSensorModel();
 
-    /**
-     * A non-owning pointer to the data file
-     */
-    cBlockDataFile* mpFile;
-
+protected:
     /**
      * The mutex for guarding the data file pointer
      */
-    std::mutex mFileMutex;
+    //std::mutex mFileMutex;
 
     bool mIsRecording;
 
-    cRawDataBuffer mDataBuffer;
+    //cRawDataBuffer mDataBuffer;
 
     /**
      * Basic Sensor Information

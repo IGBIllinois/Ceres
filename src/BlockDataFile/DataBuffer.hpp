@@ -237,8 +237,8 @@ public:
     cDataBuffer& operator>>(double& out);
     cDataBuffer& operator>>(std::string& out);
 
-    void read(std::string& out, unsigned char len);
-    void read(std::byte*& out, unsigned char len);
+    void read(std::string& out, uint16_t len);
+    void read(std::byte*& out, uint16_t len);
 //@}
 
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -272,7 +272,7 @@ public:
     cDataBuffer& operator<<(const std::string& in);
 
     void write(const std::string& in);
-    void write(const std::byte* in, unsigned char len);
+    void write(const std::byte* in, uint16_t len);
 //@}
 
 protected:

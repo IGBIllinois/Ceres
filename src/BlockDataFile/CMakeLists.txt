@@ -10,15 +10,18 @@ target_sources(BlockDataFile
 PUBLIC
 
 	BlockDataFile.hpp
-	BlockIdentifiers.hpp
+	BlockId.hpp
+	ClassIdentifiers.hpp
     DataBuffer.hpp
 	RawDataBuffer.hpp
+	BlockSerializer.hpp
 
 PRIVATE
 
 	BlockDataFile.cpp
     DataBuffer.cpp
     RawDataBuffer.cpp
+	BlockSerializer.cpp
 )
 
 #

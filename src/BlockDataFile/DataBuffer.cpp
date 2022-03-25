@@ -437,7 +437,15 @@ cDataBuffer& cDataBuffer::operator>>(double& out)
 	return *this;
 }
 
-void cDataBuffer::read(std::string& out, unsigned char len)
+cDataBuffer& cDataBuffer::operator>>(std::string& out)
+{
+	uint16_t len = 0;
+	operator>>(len);
+	read(out, len);
+	return *this;
+}
+
+void cDataBuffer::read(std::string& out, uint16_t len)
 {
 	// Check to make sure we have enough buffer space to put this variable into
 	// our internal storage.
@@ -455,7 +463,7 @@ void cDataBuffer::read(std::string& out, unsigned char len)
 	mReadIndex += len;
 }
 
-void cDataBuffer::read(std::byte*& out, unsigned char len)
+void cDataBuffer::read(std::byte*& out, uint16_t len)
 {
 	// Check to make sure we have enough buffer space to put this variable into
 	// our internal storage.
@@ -579,6 +587,12 @@ cDataBuffer& cDataBuffer::operator<<(const double in)
 	return *this;
 }
 
+cDataBuffer& cDataBuffer::operator<<(const std::string& in)
+{
+	write(in);
+	return *this;
+}
+
 void cDataBuffer::write(const std::string& in)
 {
 	if (in.empty())
@@ -586,7 +600,7 @@ void cDataBuffer::write(const std::string& in)
 		return;
 	}
 
-	auto len = in.length();
+	uint16_t len = in.length();
 
 	// Check to make sure we have enough buffer space to put this variable into
 	// our internal storage.
@@ -602,7 +616,7 @@ void cDataBuffer::write(const std::string& in)
 	mWriteIndex += len;
 }
 
-void cDataBuffer::write(const std::byte* in, unsigned char len)
+void cDataBuffer::write(const std::byte* in, uint16_t len)
 {
 	// Check to make sure we have enough buffer space to put this variable into
 	// our internal storage.

@@ -3,9 +3,12 @@
 
 #include "GpsModel.hpp"
 #include "SsnxGpsStream.hpp"
+#include "SsnxSerializer.hpp"
 
 #include <QObject>
+
 #include <ssnx/ssn_net_decoder.hpp>
+
 
 class cSsnxModel : public cGpsModel, public SsnNetDecoder, private cSsnxGpsStream
 {
@@ -22,7 +25,10 @@ public:
 
  
     bool configure(const nlohmann::json& jsonCfg) override;
-    void writeDataHeader(cBlockDataFile& file) override;
+
+    void writeDataHeader(cBlockDataFile* pFile) override;
+    void startDataRecording(cBlockDataFile& file) override;
+    void stopDataRecording() override;
 
     /*
      * Starts/Stops communication with the endpoint.
@@ -55,6 +61,7 @@ protected slots:
     void processDatagram(const void* pBuffer, std::size_t buf_length) override;
 
 private:
+    cSsnxSerializer mSerializer;
     bool mConnected;
 };
 

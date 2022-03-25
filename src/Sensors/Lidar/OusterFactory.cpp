@@ -1,3 +1,5 @@
+/**
+ */
 
 #include "OusterFactory.hpp"
 
@@ -8,6 +10,7 @@
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
+#include <QMetaType>
 
 Q_DECLARE_METATYPE(ouster::sensor_info_t);
 Q_DECLARE_METATYPE(ouster::time_info_t);

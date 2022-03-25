@@ -78,6 +78,9 @@ std::string cOusterCmdStream_Qt::recv_reply()
 
     std::string reply(mReplyBuffer.constData(), mReplyBuffer.size());
     reply.erase(reply.find_last_not_of(" \r\n\t") + 1);
+
+    mReplyBuffer.clear();
+
     return reply;
 }
 

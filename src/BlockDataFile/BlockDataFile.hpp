@@ -1,12 +1,13 @@
 
 #pragma once
 
-#include "BlockIdentifiers.hpp"
-
 #include <cstddef>
 #include <string>
 #include <cstdio>
 #include <fstream>
+
+// Forward Declares
+class cBlockID;
 
 /**
 	Storage of the data from the Spidercam system is based on a block file format.
@@ -22,8 +23,8 @@
 	Big Endian: 55AA	or	Little Endian: AA55
 
 
-	This signature indicates that the remainder of the datastream contains a single PNG image,
-	consisting of a series of chunks beginning with an IHDR chunkand ending with an IEND chunk.
+	This signature indicates that the remainder of the datastream consisting of a series
+	of data blocks.
 
 	Block Layout
 	Each block consists of three or four fields:
@@ -75,8 +76,8 @@ public:
     bool isOpen();
     void close();
 
-	void writeBlock(BlockID_t id);
-	void writeBlock(BlockID_t id, const std::byte* buf, std::size_t len);
+	void writeBlock(const cBlockID& id);
+	void writeBlock(const cBlockID& id, const std::byte* buf, std::size_t len);
 
 private:
 //    FILE* mpFile;

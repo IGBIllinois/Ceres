@@ -1,11 +1,23 @@
 
 #include "BlockDataFile.hpp"
+#include "BlockId.hpp"
 
 #include <cstddef>
 #include <cstdint>
 
+
 namespace
 {
+
+    uint32_t to_uint32(const cBlockID& blockID)
+    {
+        uint32_t id = static_cast<uint32_t>(blockID.classID()) << 16;
+        id |= static_cast<uint16_t>(blockID.majorVersion()) << 8;
+        id |= blockID.minorVersion();
+
+        return id;
+    }
+
     /* Table of CRCs of all 8-bit messages. */
     uint32_t crc_table[256];
 
@@ -48,17 +60,34 @@ namespace
     }
 
     /* Return the CRC of the block id and block bytes buf[0..len-1]. */
-    uint32_t crc(uint32_t id, const std::byte* buf, std::size_t len)
+    uint32_t crc(const cBlockID& blockID, const std::byte* buf, std::size_t len)
     {
+        uint32_t id = to_uint32(blockID);
         auto c = update_crc(0xffffffffUL, reinterpret_cast<const std::byte*>(&id), sizeof(id));
+        auto dataID = blockID.dataID();
+        c = update_crc(c, reinterpret_cast<const std::byte*>(&dataID), sizeof(dataID)); // ^ 0xffffffffUL;
         return update_crc(c, buf, len) ^ 0xffffffffUL;
     }
 
     /* Return the CRC of the block id.  Used in zero length data blocks */
-    uint32_t crc(uint32_t id)
+    uint32_t crc(const cBlockID& blockID)
     {
-        return update_crc(0xffffffffUL, reinterpret_cast<const std::byte*>(&id), sizeof(id)) ^ 0xffffffffUL;
+        uint32_t id = to_uint32(blockID);
+        auto c = update_crc(0xffffffffUL, reinterpret_cast<const std::byte*>(&id), sizeof(id));
+        auto dataID = blockID.dataID();
+        return update_crc(c, reinterpret_cast<const std::byte*>(&dataID), sizeof(dataID)) ^ 0xffffffffUL;
     }
+
+    std::ostream& operator<<(std::ostream& out, const cBlockID& blockID)
+    {
+        out << blockID.classID();
+        out << blockID.majorVersion();
+        out << blockID.minorVersion();
+        out << blockID.dataID();
+
+        return out;
+    }
+
 }
 
 cBlockDataFile::cBlockDataFile() //: mpFile(nullptr)
@@ -99,14 +128,14 @@ void cBlockDataFile::close()
     mFile.close();
 }
 
-void cBlockDataFile::writeBlock(BlockID_t id)
+void cBlockDataFile::writeBlock(const cBlockID& id)
 {
     mFile << static_cast<std::uint32_t>(0);
-    mFile << static_cast<std::uint32_t>(id);
-    mFile << crc(static_cast<std::uint32_t>(id));
+    mFile << id;
+    mFile << crc(id);
 }
 
-void cBlockDataFile::writeBlock(BlockID_t id, const std::byte* buf, std::size_t len)
+void cBlockDataFile::writeBlock(const cBlockID& id, const std::byte* buf, std::size_t len)
 {
     if (len == 0)
     {
@@ -115,8 +144,8 @@ void cBlockDataFile::writeBlock(BlockID_t id, const std::byte* buf, std::size_t 
     }
 
     mFile << static_cast<std::uint32_t>(len);
-    mFile << static_cast<std::uint32_t>(id);
+    mFile << id;
     mFile.write(reinterpret_cast<const char*>(buf), len);
-    mFile << crc(static_cast<std::uint32_t>(id), buf, len);
+    mFile << crc(id, buf, len);
 }
 

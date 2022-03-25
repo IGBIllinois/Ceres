@@ -35,6 +35,11 @@ PRIVATE
     SpidercamCtrl.cpp
     SpidercamUtils.hpp
     SpidercamUtils.cpp
+    SpidercamBlockId.hpp
+    SpidercamBlockId.cpp
+    SpidercamDataIdentifiers.hpp
+    SpidercamSerializer.hpp
+    SpidercamSerializer.cpp
 
     SpidercamCtrlFactory.hpp
     SpidercamCtrlFactory.cpp

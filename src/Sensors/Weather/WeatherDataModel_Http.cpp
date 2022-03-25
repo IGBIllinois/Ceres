@@ -96,7 +96,6 @@ void cWeatherDataModel_Http::requestReceived(QNetworkReply* pReply)
     }
 }
 
-
 void cWeatherDataModel_Http::update()
 {
     if (mTimer.elapsed())

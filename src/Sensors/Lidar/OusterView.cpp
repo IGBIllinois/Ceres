@@ -3,6 +3,7 @@
 #include "../../Utilities/Constants.hpp"
 #include "OusterModel.hpp"
 
+#include <ouster/ouster_utils.h>
 #include <string>
 #include <vtkGenericOpenGLRenderWindow.h>
 
@@ -17,6 +18,8 @@ using namespace pcl::visualization;
 
 namespace
 {
+    const double ENCODER_TICS_TO_RAD = nConstants::TWO_PI / ouster::MAX_ENCODER_COUNT;
+
     float intensity2norm(uint16_t intensity)
     {
         const static float SCALE = 0.01f;
@@ -37,9 +40,42 @@ namespace
 cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
 	:
     QVTKOpenGLStereoWidget(parent, Qt::WindowMinMaxButtonsHint),
-    mpModel(pModel)
+    mpModel(pModel),
+    mEncoderCountMin(0),
+    mEncoderCountMax(0)
 {
     setWindowTitle("OUSTER LiDAR");
+
+    mX_sensor[0] = 1.0;
+    mX_sensor[1] = 0.0;
+    mX_sensor[2] = 0.0;
+    mX_sensor[3] = 0.0;
+
+    mY_sensor[0] = 0.0;
+    mY_sensor[1] = 1.0;
+    mY_sensor[2] = 0.0;
+    mY_sensor[3] = 0.0;
+
+    mZ_sensor[0] = 0.0;
+    mZ_sensor[1] = 0.0;
+    mZ_sensor[2] = 1.0;
+    mZ_sensor[3] = 0.0;
+
+
+    mX_imu[0] = 1.0;
+    mX_imu[1] = 0.0;
+    mX_imu[2] = 0.0;
+    mX_imu[3] = 0.0;
+
+    mY_imu[0] = 0.0;
+    mY_imu[1] = 1.0;
+    mY_imu[2] = 0.0;
+    mY_imu[3] = 0.0;
+
+    mZ_imu[0] = 0.0;
+    mZ_imu[1] = 0.0;
+    mZ_imu[2] = 1.0;
+    mZ_imu[3] = 0.0;
 
     mData = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();;
 
@@ -103,10 +139,6 @@ cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
     mpViewer->initCameraParameters();
 
     setRenderWindow(mpViewer->getRenderWindow());
-
-    displayData();
-
-    update();
 }
 
 cOusterView::~cOusterView()
@@ -152,19 +184,22 @@ void cOusterView::topLevelChanged(bool topLevel)
     }
 }
 
+/*
 void cOusterView::beamIntrinsicsChanged(ouster::beam_intrinsics_t beam_intrinsics)
 {
     mLidarOriginToBeamOrigin_mm = beam_intrinsics.lidar_to_beam_origins_mm;
     for (auto azimuth_deg : beam_intrinsics.azimuth_angles_deg)
     {
-        mBeamAzimuthAngles_rad.push_back(-1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
+        mTheta_rad.push_back(-1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
     }
     for (auto altitude_deg : beam_intrinsics.altitude_angles_deg)
     {
-        mBeamAltitudeAngles_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
+        mPhi_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
     }
 }
+*/
 
+/*
 void cOusterView::imuIntrinsicsChanged(ouster::imu_intrinsics_t imu_intrinsics)
 {
 
@@ -182,53 +217,129 @@ void cOusterView::dataFormatChanged(ouster::lidar_data_format_t lidar_data_forma
     mColumnWindowMin = lidar_data_format.column_window_min;
     mColumnWindowMax = lidar_data_format.column_window_max;
 }
+*/
+
+void cOusterView::beamIntrinsicsChanged()
+{
+    ouster::beam_intrinsics_t beam_intrinsics = mpModel->getBeamIntrinsics();
+
+    mLidarOriginToBeamOrigin_mm = beam_intrinsics.lidar_to_beam_origins_mm;
+    for (auto azimuth_deg : beam_intrinsics.azimuth_angles_deg)
+    {
+        mTheta_rad.push_back(-1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
+    }
+    for (auto altitude_deg : beam_intrinsics.altitude_angles_deg)
+    {
+        mPhi_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
+    }
+}
+
+void cOusterView::imuIntrinsicsChanged()
+{
+    ouster::imu_intrinsics_t imu_intrinsics = mpModel->getImuIntrinsics();
+
+    mX_imu[0] = imu_intrinsics.imu_to_sensor_transform[0];
+    mX_imu[1] = imu_intrinsics.imu_to_sensor_transform[1];
+    mX_imu[2] = imu_intrinsics.imu_to_sensor_transform[2];
+    mX_imu[3] = imu_intrinsics.imu_to_sensor_transform[3];
+
+    mY_imu[0] = imu_intrinsics.imu_to_sensor_transform[4];
+    mY_imu[1] = imu_intrinsics.imu_to_sensor_transform[5];
+    mY_imu[2] = imu_intrinsics.imu_to_sensor_transform[6];
+    mY_imu[3] = imu_intrinsics.imu_to_sensor_transform[7];
+
+    mZ_imu[0] = imu_intrinsics.imu_to_sensor_transform[8];
+    mZ_imu[1] = imu_intrinsics.imu_to_sensor_transform[9];
+    mZ_imu[2] = imu_intrinsics.imu_to_sensor_transform[10];
+    mZ_imu[3] = imu_intrinsics.imu_to_sensor_transform[11];
+}
+
+void cOusterView::lidarIntrinsicsChanged()
+{
+    ouster::lidar_intrinsics_t lidar_intrinsics = mpModel->getLidarIntrinsics();
+
+    mX_sensor[0] = lidar_intrinsics.lidar_to_sensor_transform[0];
+    mX_sensor[1] = lidar_intrinsics.lidar_to_sensor_transform[1];
+    mX_sensor[2] = lidar_intrinsics.lidar_to_sensor_transform[2];
+    mX_sensor[3] = lidar_intrinsics.lidar_to_sensor_transform[3];
+
+    mY_sensor[0] = lidar_intrinsics.lidar_to_sensor_transform[4];
+    mY_sensor[1] = lidar_intrinsics.lidar_to_sensor_transform[5];
+    mY_sensor[2] = lidar_intrinsics.lidar_to_sensor_transform[6];
+    mY_sensor[3] = lidar_intrinsics.lidar_to_sensor_transform[7];
+
+    mZ_sensor[0] = lidar_intrinsics.lidar_to_sensor_transform[8];
+    mZ_sensor[1] = lidar_intrinsics.lidar_to_sensor_transform[9];
+    mZ_sensor[2] = lidar_intrinsics.lidar_to_sensor_transform[10];
+    mZ_sensor[3] = lidar_intrinsics.lidar_to_sensor_transform[11];
+}
+
+void cOusterView::dataFormatChanged()
+{
+    ouster::lidar_data_format_t lidar_data_format = mpModel->getLidarDataFormat();
+
+    mColumnsPerFrame = lidar_data_format.columns_per_frame;
+    mPixelsPerColumn = lidar_data_format.pixels_per_column;
+    mColumnWindowMin = lidar_data_format.column_window_min;
+    mColumnWindowMax = lidar_data_format.column_window_max;
+    mPixelShiftByRow = lidar_data_format.pixel_shift_by_row;
+}
 
 void cOusterView::azimuthWindowChanged(ouster::azimuth_range_t azimuth_range)
 {
 
 }
 
-void cOusterView::encoderCountChanged(uint32_t min, uint32_t max)
+void cOusterView::encoderCountChanged(int min, int max)
 {
     mEncoderCountMin = min;
     mEncoderCountMax = max;
 }
 
-void cOusterView::imuDataChanged(ouster::imu_data_t data)
+//void cOusterView::imuDataChanged(ouster::imu_data_t data)
+void cOusterView::imuDataChanged()
 {
-    data.acceleration_Xaxis_g;
-    data.acceleration_Yaxis_g;
-    data.acceleration_Zaxis_g;
+    ouster::imu_data_t data = mpModel->imuData();
+
+    mGx = mX_imu[0] * data.acceleration_Xaxis_g + mX_imu[1] * data.acceleration_Yaxis_g + mX_imu[2] * data.acceleration_Zaxis_g + mX_imu[3];
+    mGy = mY_imu[0] * data.acceleration_Xaxis_g + mY_imu[1] * data.acceleration_Yaxis_g + mY_imu[2] * data.acceleration_Zaxis_g + mY_imu[3];
+    mGz = mZ_imu[0] * data.acceleration_Xaxis_g + mZ_imu[1] * data.acceleration_Yaxis_g + mZ_imu[2] * data.acceleration_Zaxis_g + mZ_imu[3];
 }
 
 void cOusterView::displayData()
 {
     if (!isVisible()) return;
 
-    pcl::PointXYZRGB pt;
+    if (mPhi_rad.empty()) return;
+    if (mTheta_rad.empty()) return;
 
+    auto lidar_data = mpModel->lidarData();
+    if (lidar_data.empty()) return;
 
-    auto& phi = mpModel->beamAltitudeAngles_rad();
-    if (phi.empty()) return;
+    auto lidar_returns = destagger(lidar_data, mPixelShiftByRow);
 
-    auto& theta_a = mpModel->beamAzimuthAngles_rad();
-    if (theta_a.empty()) return;
-
-    auto lidar_returns = mpModel->lidarData();
-    if (lidar_returns.empty()) return;
-
-    mData->reserve(lidar_returns.size());
+    mData->reserve(lidar_returns.num_rows() * lidar_returns.num_columns());
     mData->clear();
+
+    pcl::PointXYZRGB pt;
 
     for (std::size_t c = 0; c < mColumnsPerFrame; ++c)
     {
+        auto encoder_count = lidar_data.encoderPosition(c);
+        if (encoder_count < mEncoderCountMin) continue;
+        if (encoder_count > mEncoderCountMax) continue;
+        auto theta_e = nConstants::TWO_PI - (encoder_count * ENCODER_TICS_TO_RAD);
+        auto cos_enc = cos(theta_e);
+        auto offset_enc = mLidarOriginToBeamOrigin_mm * cos(theta_e);
+
         for (std::size_t p = 0; p < mPixelsPerColumn; ++p)
         {
             auto pixelId = (c * mPixelsPerColumn) + p;
-            auto& lidar_return = lidar_returns[pixelId];
-            if (lidar_return.encoder_count < mEncoderCountMin) continue;
-            if (lidar_return.encoder_count > mEncoderCountMax) continue;
-            if (lidar_return.range_mm < MIN_RANGE_MM) continue;
+            const auto& lidar_return = lidar_returns.get(p, c);
+            if (lidar_return.range_mm < MIN_RANGE_MM)
+            {
+ //               continue;
+            }
 
             auto color = mColorGradient.getColorAtValue( intensity2norm(lidar_return.intensity) );
 
@@ -237,12 +348,14 @@ void cOusterView::displayData()
             pt.b = static_cast<uint8_t>(color.b * 255);
 
             auto range_mm = (lidar_return.range_mm - mLidarOriginToBeamOrigin_mm);
-            auto theta_e = nConstants::TWO_PI * (1.0 - lidar_return.encoder_count / 90112.0);
-            auto cos_alt = cos(phi[p]);
-            auto cos_enc = cos(theta_e);
-            pt.x = range_mm * cos(theta_e + theta_a[p]) * cos_alt + mLidarOriginToBeamOrigin_mm * cos_enc;
-            pt.y = range_mm * sin(theta_e + theta_a[p]) * cos_alt + mLidarOriginToBeamOrigin_mm * cos_enc;
-            pt.z = range_mm * sin(phi[p]);
+            auto cos_alt = cos(mPhi_rad[p]);
+            double x = range_mm * cos(theta_e + mTheta_rad[p]) * cos_alt + offset_enc;
+            double y = range_mm * sin(theta_e + mTheta_rad[p]) * cos_alt + offset_enc;
+            double z = range_mm * sin(mPhi_rad[p]);
+
+            pt.x = mX_sensor[0] * x + mX_sensor[1] * y + mX_sensor[2] * z + mX_sensor[3];
+            pt.y = mY_sensor[0] * x + mY_sensor[1] * y + mY_sensor[2] * z + mY_sensor[3];
+            pt.z = mZ_sensor[0] * x + mZ_sensor[1] * y + mZ_sensor[2] * z + mZ_sensor[3];
 
             mData->push_back(pt);
         }
@@ -255,6 +368,7 @@ void cOusterView::displayData()
 
     renderWindow()->Render();
 
+    update();
 }
 
 

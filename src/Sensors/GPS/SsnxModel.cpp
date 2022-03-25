@@ -6,6 +6,8 @@
 using namespace ssnx;
 
 cSsnxModel::cSsnxModel()
+:
+    mSerializer(4096)
 {
     mConnected = false;
 }
@@ -84,10 +86,23 @@ void cSsnxModel::update()
     processOneDatagram();
 }
 
-void cSsnxModel::writeDataHeader(cBlockDataFile& file)
+void cSsnxModel::writeDataHeader(cBlockDataFile* pFile)
 {
-    // The GPS does not have any 
+    mSerializer.attach(pFile);
+    mSerializer.detach();
 }
+
+void cSsnxModel::startDataRecording(cBlockDataFile& file)
+{
+    mSerializer.attach(&file);
+}
+
+void cSsnxModel::stopDataRecording()
+{
+    recordingStateUpdated(false);
+    mSerializer.detach();
+}
+
 
 void cSsnxModel::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
 {
@@ -107,8 +122,11 @@ void cSsnxModel::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
     mVu_mps = pvt.Vu_mps;
     mGroundTrack_deg = pvt.GroundTrack_deg;
 
-    if (isRecording())
+    if (mIsRecording && static_cast<bool>(mSerializer))
     {
+        mSerializer.write(pvt);
+
+#if 0
         cSensorModel::mDataBuffer.reset();
         cSensorModel::mDataBuffer << mPvtTimestamp_s;
         cSensorModel::mDataBuffer << mLatitude_rad << mLongitude_rad << mHeight_m;
@@ -116,8 +134,9 @@ void cSsnxModel::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
         cSensorModel::mDataBuffer << mGroundTrack_deg;
 
         std::lock_guard<std::mutex> guard(mFileMutex);
-        if (mpFile)
+        if (mSerializer)
             mpFile->writeBlock(BlockID_t(200) /*GPS_PVT_1*/, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
+#endif
     }
 
     if (mRecordTrack)
@@ -160,16 +179,19 @@ void cSsnxModel::receiverTime(const gps::ReceiverTime_1_t pvt)
     mUtcYear = pvt.utcYear;
     mRxTimeLocked = pvt.TimeOfWeekWithin20ms || pvt.TimeOfWeekWithinThreshold;
 
-    if (isRecording())
+    if (mIsRecording && static_cast<bool>(mSerializer))
     {
+        mSerializer.write(pvt);
+/*
         cSensorModel::mDataBuffer.reset();
         cSensorModel::mDataBuffer << mPvtTimestamp_s;
         cSensorModel::mDataBuffer << mUtcHour << mUtcMinute << mUtcSecond;
         cSensorModel::mDataBuffer << mUtcYear << mUtcMonth << mUtcDay;
 
         std::lock_guard<std::mutex> guard(mFileMutex);
-//        if (mpFile)
-//            mpFile->writeBlock(BlockIDs::GPS_UTC_1, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
+        if (mpFile)
+            mpFile->writeBlock(BlockIDs::GPS_UTC_1, cSensorModel::mDataBuffer.data(), cSensorModel::mDataBuffer.size());
+*/
     }
 
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);

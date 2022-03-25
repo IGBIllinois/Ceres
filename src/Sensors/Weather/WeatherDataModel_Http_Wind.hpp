@@ -26,7 +26,9 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFile& file) override {};
+    void writeDataHeader(cBlockDataFile* pFile) override;
+    void startDataRecording(cBlockDataFile& file) override;
+    void stopDataRecording() override;
 
 signals:
     void windDataChanged(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
