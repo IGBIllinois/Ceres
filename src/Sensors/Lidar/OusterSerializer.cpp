@@ -1,0 +1,316 @@
+
+#include "OusterSerializer.hpp"
+#include "OusterDataIdentifiers.hpp"
+#include "../../BlockDataFile/BlockDataFile.hpp"
+
+#include <ouster/ouster_defs.h>
+#include <ouster/ouster_utils.h>
+#include <ouster/OusterLidarData.h>
+
+#include <cassert>
+
+using namespace ouster;
+
+cOusterSerializer::cOusterSerializer()
+:
+    cBlockSerializer()
+{}
+
+cOusterSerializer::cOusterSerializer(std::size_t n, cBlockDataFile* pDataFile)
+:
+    cBlockSerializer(n, pDataFile)
+{
+}
+
+void cOusterSerializer::setVersion(uint8_t major, uint8_t minor)
+{
+	mBlockID.setVersion(major, minor);
+}
+
+void cOusterSerializer::write(const ouster::config_param_t& in)
+{
+    assert(mpDataFile);
+
+	mBlockID.dataID(DataID::CONFIGURATION_INFO);
+
+    mDataBuffer.clear();
+    mDataBuffer <<in.udp_ip;
+    mDataBuffer << in.udp_dest;
+    mDataBuffer << in.lidar_port;
+    mDataBuffer << in.imu_port;
+    mDataBuffer << to_int(in.timestamp_mode);
+    mDataBuffer << to_int(in.sync_pulse_in_polarity);
+    mDataBuffer << to_int(in.nmea_in_polarity);
+    mDataBuffer << in.nmea_ignore_valid_char;
+    mDataBuffer << to_int(in.nmea_baud_rate);
+    mDataBuffer << in.nmea_leap_seconds;
+    mDataBuffer << to_int(in.multipurpose_io_mode);
+    mDataBuffer << to_int(in.sync_pulse_out_polarity);
+    mDataBuffer << in.sync_pulse_out_frequency_hz;
+    mDataBuffer << in.sync_pulse_out_angle;
+    mDataBuffer << in.sync_pulse_out_pulse_width;
+    mDataBuffer << in.auto_start_flag;
+    mDataBuffer << to_int(in.operating_mode);
+    mDataBuffer << to_int(in.lidar_mode);
+    mDataBuffer << in.azimuth_window.min_deg;
+    mDataBuffer << in.azimuth_window.max_deg;
+    mDataBuffer << in.phase_lock_enable;
+    mDataBuffer << in.phase_lock_offset_deg;
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::sensor_info_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::SENSOR_INFO);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.product_line;
+    mDataBuffer << in.product_part_number;
+    mDataBuffer << in.product_serial_number;
+    mDataBuffer << in.base_part_number;
+    mDataBuffer << in.base_serial_number;
+    mDataBuffer << in.image_rev;
+    mDataBuffer << to_string(in.build_revision);
+    mDataBuffer << to_string(in.proto_revision);
+    mDataBuffer << in.build_date;
+    mDataBuffer << to_int(in.status);
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::timestamp_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::TIMESTAMP);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.time;
+    mDataBuffer << to_int(in.mode);
+    mDataBuffer << in.sync_pulse_in;
+    mDataBuffer << in.internal_osc;
+    mDataBuffer << in.ptp_1588;
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::sync_pulse_in_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::SYNC_PULSE_IN);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.locked;
+    mDataBuffer << in.last_period_nsec;
+    mDataBuffer << in.count_unfiltered;
+    mDataBuffer << in.count;
+    mDataBuffer << to_int(in.polarity);
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::sync_pulse_out_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::SYNC_PULSE_OUT);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.pulse_width_ms;
+    mDataBuffer << in.angle_deg;
+    mDataBuffer << in.frequency_hz;
+    mDataBuffer << to_int(in.polarity);
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::multipurpose_io_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::MULTIPURPOSE_IO);
+
+    mDataBuffer.clear();
+    mDataBuffer << to_int(in.mode);
+    mDataBuffer << in.pulse_width_ms;
+    mDataBuffer << in.angle_deg;
+    mDataBuffer << in.frequency_hz;
+    mDataBuffer << to_int(in.polarity);
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::nmea_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::NMEA);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.locked;
+    mDataBuffer << to_int(in.baud_rate);
+    mDataBuffer << in.bit_count;
+    mDataBuffer << in.bit_count_unfiltered;
+    mDataBuffer << in.start_char_count;
+    mDataBuffer << in.char_count;
+    mDataBuffer << in.last_read_message;
+    mDataBuffer << in.date_decoded_count;
+    mDataBuffer << in.not_valid_count;
+    mDataBuffer << in.utc_decoded_count;
+    mDataBuffer << in.leap_seconds;
+    mDataBuffer << in.ignore_valid_char;
+    mDataBuffer << to_int(in.polarity);
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::time_info_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::TIME_INFO);
+
+    mDataBuffer.clear();
+/*
+    mDataBuffer << in.timestamp_info;
+    mDataBuffer << in.sync_pulse_info;
+    mDataBuffer << in.multipurpose_io_info;
+    mDataBuffer << in.nmea_info;
+*/
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::beam_intrinsics_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::BEAM_INTRINSICS);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.lidar_to_beam_origins_mm;
+
+    uint32_t n = in.azimuth_angles_deg.size();
+    mDataBuffer << n;
+    for (std::size_t i = 0; i < n; ++i)
+        mDataBuffer << in.azimuth_angles_deg[i];
+
+    n = in.altitude_angles_deg.size();
+    mDataBuffer << n;
+    for (std::size_t i = 0; i < n; ++i)
+        mDataBuffer << in.altitude_angles_deg[i];
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::imu_intrinsics_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::IMU_INTRINSICS);
+
+    mDataBuffer.clear();
+
+    uint32_t n = in.imu_to_sensor_transform.size();
+    mDataBuffer << n;
+    for (std::size_t i = 0; i < n; ++i)
+        mDataBuffer << in.imu_to_sensor_transform[i];
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::lidar_intrinsics_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::LIDAR_INTRINSICS);
+
+    mDataBuffer.clear();
+
+    uint32_t n = in.lidar_to_sensor_transform.size();
+    mDataBuffer << n;
+    for (std::size_t i = 0; i < n; ++i)
+        mDataBuffer << in.lidar_to_sensor_transform[i];
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::lidar_data_format_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::LIDAR_DATA_FORMAT);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.columns_per_frame;
+    mDataBuffer << in.columns_per_packet;
+
+    uint32_t n = in.pixel_shift_by_row.size();
+    mDataBuffer << n;
+    for (std::size_t i = 0; i < n; ++i)
+        mDataBuffer << in.pixel_shift_by_row[i];
+
+    mDataBuffer << in.pixels_per_column;
+    mDataBuffer << in.column_window_min;
+    mDataBuffer << in.column_window_max;
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(const ouster::imu_data_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::IMU_DATA);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.diagnostic_time_ns;
+    mDataBuffer << in.accelerometer_read_time_ns;
+    mDataBuffer << in.gyroscope_read_time_ns;
+
+    mDataBuffer << in.acceleration_Xaxis_g;
+    mDataBuffer << in.acceleration_Yaxis_g;
+    mDataBuffer << in.acceleration_Zaxis_g;
+
+    mDataBuffer << in.angular_velocity_Xaxis_deg_per_sec;
+    mDataBuffer << in.angular_velocity_Yaxis_deg_per_sec;
+    mDataBuffer << in.angular_velocity_Zaxis_deg_per_sec;
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cOusterSerializer::write(uint16_t frameID, const cOusterLidarData& lidar_data)
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::LIDAR_DATA);
+
+    mDataBuffer.clear();
+
+    auto& data = lidar_data.data();
+    uint16_t rows = data.num_rows();
+    uint16_t cols = data.num_columns();
+
+    mDataBuffer << rows;
+    mDataBuffer << cols;
+
+    for (uint16_t c = 0; c < cols; ++c)
+    {
+        auto& col = data.column(c);
+        for (uint16_t r = 0; r < rows; ++r)
+        {
+            auto& pixel = col[r];
+            mDataBuffer << pixel.range_mm;
+            mDataBuffer << pixel.intensity;
+            mDataBuffer << pixel.reflectivity;
+            mDataBuffer << pixel.ambient_noise;
+        }
+    }
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+
