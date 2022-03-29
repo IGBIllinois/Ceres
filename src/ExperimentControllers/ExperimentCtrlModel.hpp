@@ -88,6 +88,8 @@ public:
      */
     bool isRecording();
 
+    void recordingStateChanged(bool recording);
+
     /*
      * Starts/Stops communication with the endpoint.
      * These methods are called inside the QThread so that
@@ -102,7 +104,8 @@ signals:
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
 
-    void recordingStateChanged(bool recording);
+    void requestDataRecording();
+    void requestPauseRecording();
     void experimentTerminated();
 
 public:

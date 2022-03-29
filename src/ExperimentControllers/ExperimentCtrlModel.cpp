@@ -34,6 +34,18 @@ bool cExperimentControlModel::isRecording()
     return mRecording;
 }
 
+void cExperimentControlModel::recordingStateChanged(bool recording)
+{
+    if (recording)
+    {
+        emit requestDataRecording;
+    }
+    else
+    {
+        emit requestPauseRecording;
+    }
+}
+
 bool cExperimentControlModel::hasExperiment() const
 {
     return !mExperiment.empty();
@@ -67,8 +79,10 @@ void cExperimentControlModel::terminateExperiment()
 {
     if (!mRunning) return;
 
+    recordingStateChanged(false);
+
     mRunning = false;
-    emit recordingStateChanged(false);
+    emit experimentTerminated();
     emit statusMessage("Experiment stopped!");
 }
 
@@ -80,7 +94,7 @@ void cExperimentControlModel::updateExperimentStateMachine()
     mRecording = mpActiveState->recording();
 
     if (mRecording.HasChanged())
-        emit recordingStateChanged(mRecording);
+        recordingStateChanged(mRecording);
 
     mpActiveState->run();
 
@@ -99,8 +113,9 @@ void cExperimentControlModel::updateExperimentStateMachine()
         }
         else
         {
-            emit recordingStateChanged(false);
+            recordingStateChanged(false);
             mRunning = false;
+            emit experimentTerminated();
             emit statusMessage("Experiment completed!");
         }
     }

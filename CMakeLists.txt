@@ -107,12 +107,12 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Find all the packages needed by this code
 
-find_package(Eigen3 REQUIRED)
+#find_package(Eigen3 REQUIRED)
 
 # Find and include VTK
 
-find_package(VTK COMPONENTS GUISupportQt IOImage InteractionImage RenderingOpenGL2 TestingCore REQUIRED)
-find_package(PCL REQUIRED)
+#find_package(VTK COMPONENTS GUISupportQt IOImage InteractionImage RenderingOpenGL2 TestingCore REQUIRED)
+#find_package(PCL REQUIRED)
 
 # Find and include Qt
 set(Qt Qt5)
@@ -127,7 +127,7 @@ find_package(nlohmann_json REQUIRED)
 
 #find_package(PkgConfig REQUIRED)
 
-print_all_variables()
+#print_all_variables()
 
 #******************************************************************************
 # BUILD TYPE AND CODE

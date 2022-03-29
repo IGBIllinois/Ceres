@@ -115,7 +115,7 @@ target_link_libraries(Ceres PRIVATE ExperimentControllers)
 target_link_libraries(Ceres PRIVATE Sensors)
 target_link_libraries(Ceres PRIVATE Utilities)
 
-vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
+#vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
 
 
 #install(TARGETS asio_client RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}/asio")

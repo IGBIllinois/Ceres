@@ -70,8 +70,8 @@ public slots:
     /*
      * Toggles the recording state of the sensor.
      */
-    void startDataRecording();
-    void pauseDataRecording();
+    void dataRecordingRequested();
+    void pauseRecordingRequested();
 
 signals:
     void statusMessage(QString msg);

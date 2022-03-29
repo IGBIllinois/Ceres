@@ -50,7 +50,8 @@ void cDataThread::run()
 
     for (auto& sensor : mActiveSensors)
     {
-//        QObject::connect(mpController, &cExperimentControlModel::recordingStateChanged, sensor, &cSensorModel::recordingStateUpdated);
+        QObject::connect(mpController, &cExperimentControlModel::requestDataRecording, sensor, &cSensorModel::dataRecordingRequested);
+        QObject::connect(mpController, &cExperimentControlModel::requestPauseRecording, sensor, &cSensorModel::pauseRecordingRequested);
     }
 
     if (!mpController->startCommunications())
@@ -80,7 +81,8 @@ void cDataThread::run()
 
     for (auto& sensor : mActiveSensors)
     {
-//        QObject::disconnect(mpController, &cExperimentControlModel::recordingStateChanged, sensor, &cSensorModel::recordingStateUpdated);
+        QObject::disconnect(mpController, &cExperimentControlModel::requestDataRecording, sensor, &cSensorModel::dataRecordingRequested);
+        QObject::disconnect(mpController, &cExperimentControlModel::requestPauseRecording, sensor, &cSensorModel::pauseRecordingRequested);
     }
 
 cleanup:
