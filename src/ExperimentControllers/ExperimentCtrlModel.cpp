@@ -7,8 +7,7 @@
 cExperimentControlModel::cExperimentControlModel()
     :
     QObject(),
-    mpFile(nullptr),
-    mDataBuffer(1024),
+//    mpFile(nullptr),
     mRunning(false),
     mActiveStateNumber(0),
     mpActiveState(nullptr)
@@ -16,6 +15,7 @@ cExperimentControlModel::cExperimentControlModel()
 }
 
 
+/*
 void cExperimentControlModel::startDataRecording(cBlockDataFile& file)
 {
     std::lock_guard<std::mutex> guard(mFileMutex);
@@ -27,10 +27,11 @@ void cExperimentControlModel::stopDataRecording()
     std::lock_guard<std::mutex> guard(mFileMutex);
     mpFile = nullptr;
 }
+*/
 
 bool cExperimentControlModel::isRecording()
 {
-    return mpFile && mRecording;
+    return mRecording;
 }
 
 bool cExperimentControlModel::hasExperiment() const

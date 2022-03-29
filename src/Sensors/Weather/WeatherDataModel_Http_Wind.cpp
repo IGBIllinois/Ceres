@@ -142,19 +142,15 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 	return true;
 }
 
-void cWeatherDataModel_Http_Wind::writeDataHeader(cBlockDataFile* pFile)
+void cWeatherDataModel_Http_Wind::writeDataHeader(cBlockDataFile& file)
 {
-
-}
-
-void cWeatherDataModel_Http_Wind::startDataRecording(cBlockDataFile& file)
-{
-
+	//mSerializer.attach(&file);
 }
 
 void cWeatherDataModel_Http_Wind::stopDataRecording()
 {
-	recordingStateUpdated(false);
+	cWeatherDataModel_Http::stopDataRecording();
+	//mSerializer.detach();
 }
 
 void cWeatherDataModel_Http_Wind::processReply(const std::string& reply)

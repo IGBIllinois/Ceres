@@ -73,13 +73,15 @@ public:
      * Sets the non-owning data file pointer to
      * start the writing of sensor data.
      */
-    void startDataRecording(cBlockDataFile& file);
+//    virtual void startDataRecording();
+
+//    virtual void pauseDataRecording() = 0;
 
     /*
      * Sets the non-owning data file pointer to null to
      * stop the writing of sensor data.
      */
-    void stopDataRecording();
+    virtual void stopDataRecording() = 0;
 
     /*
      * Returns true if sensor data is being recorded
@@ -101,6 +103,7 @@ signals:
     void errorMessage(QString title, QString msg);
 
     void recordingStateChanged(bool recording);
+    void experimentTerminated();
 
 public:
     virtual void update() = 0;
@@ -111,19 +114,11 @@ protected:
     void updateExperimentStateMachine();
 
     /**
-     * A non-owning pointer to the data file
+     * A flag to signal that recording is active
      */
-    cBlockDataFile* mpFile;
-
-    /**
-     * The mutex for guarding the data file pointer
-     */
-    std::mutex mFileMutex;
-
-    cRawDataBuffer mDataBuffer;
+    bool mIsRecording;
 
     bool mRunning;
-
 
     edge_detect<bool>	mRecording;
 

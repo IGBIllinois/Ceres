@@ -31,6 +31,7 @@ void cDataModel::addExperimentControlModel(cExperimentControlModel* pControlMode
     if (pControlModel)
     {
         mThread.mpController = pControlModel;
+        QObject::connect(mThread.mpController, &cExperimentControlModel::experimentTerminated, this, &cDataModel::onExperimentTerminated);
         mThread.mpController->moveToThread(&mThread);
     }
 }
@@ -99,8 +100,17 @@ void cDataModel::loadExperiment(const nlohmann::json& expDoc)
     mThread.mpController->loadExperiment(expDoc["experiment"]);
 }
 
-void cDataModel::startExperiment()
+void cDataModel::startExperiment(const std::string& filename)
 {
+    mFile.open(filename);
+
+    mThread.mpController->writeDataHeader(mFile);
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->writeDataHeader(mFile);
+    }
+
     mThread.mpController->startExperiment();
 }
 
@@ -109,15 +119,9 @@ void cDataModel::terminateExperiment()
     mThread.mpController->terminateExperiment();
 }
 
-void cDataModel::startDataRecording(const std::string& filename)
+/*
+void cDataModel::startDataRecording()
 {
-    mFile.open(filename);
-
-    for (auto& sensor : mThread.mActiveSensors)
-    {
-        sensor->writeDataHeader(&mFile);
-    }
-
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->startDataRecording(mFile);
@@ -132,6 +136,19 @@ void cDataModel::stopDataRecording()
     }
 
     mFile.close();
+}
+*/
 
+
+void cDataModel::onExperimentTerminated()
+{
+    mThread.mpController->stopDataRecording();
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->stopDataRecording();
+    }
+
+    mFile.close();
 }
 

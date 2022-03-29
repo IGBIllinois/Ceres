@@ -209,8 +209,14 @@ bool cSpidercamModel::startExperiment()
 
 void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
 {
-
+    mSerializer.attach(&file);
 }
+
+void cSpidercamModel::stopDataRecording()
+{
+    mSerializer.detach();
+}
+
 
 void cSpidercamModel::update()
 {

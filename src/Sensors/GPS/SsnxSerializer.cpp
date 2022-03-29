@@ -286,20 +286,17 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Residuals_1_t& in)
     mDataBuffer << in.timestamp_s;
     mDataBuffer << in.N;
     mDataBuffer << in.SBSize;
-/*
- 	struct PVT_Residual_t
-	{
-		int16_t        CACodeRes;
-		int16_t        P1CodeRes;
-		int16_t        P2CodeRes;
-		int16_t        DopplerL1Res;
-		int16_t        DopplerL2Res;
-		uint8_t        PRN;
+
+    for (auto& satResidual: in.SatResidual)
+    {
+        mDataBuffer << satResidual.PRN;
+        mDataBuffer << satResidual.CACodeRes;
+        mDataBuffer << satResidual.P1CodeRes;
+        mDataBuffer << satResidual.P2CodeRes;
+        mDataBuffer << satResidual.DopplerL1Res;
+        mDataBuffer << satResidual.DopplerL2Res;
     }
-
-    PVT_Residual_t SatResidual[72];
-*/
-
+        
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -322,20 +319,17 @@ void cSsnxSerializer::write(const ssnx::gps::RAIMStatistics_1_t& in)
     mDataBuffer << in.UnityOverallModelV;
     mDataBuffer << in.N;
     mDataBuffer << in.SBSize;
-/*
-    struct RAIMSatData_t
-    {
-        uint8_t        PRN;
-        uint8_t        AntennaID;
-        uint8_t        TestResults;
-        uint16_t       UnityRangeW;
-        uint16_t       UnityRrateW;
-        uint16_t       RangeMDB;
-        uint16_t       RrateMDB;
-    };
 
-    RAIMSatData_t  RAIMChannel[72];
-*/
+    for (auto& satData: in.RAIMChannel)
+    {
+        mDataBuffer << satData.PRN;
+        mDataBuffer << satData.AntennaID;
+        mDataBuffer << satData.TestResults;
+        mDataBuffer << satData.UnityRangeW;
+        mDataBuffer << satData.UnityRrateW;
+        mDataBuffer << satData.RangeMDB;
+        mDataBuffer << satData.RrateMDB;
+    }
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }

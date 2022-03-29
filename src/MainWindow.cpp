@@ -169,7 +169,9 @@ void cMainWindow::fileNew()
     msg += pExperiment->text(0);
 
     onStatusUpdate(msg);
-    mMainModel.startExperiment();
+
+    std::string filename = "c:\tmp\test.data";
+    mMainModel.startExperiment(filename);
 }
 
 //-----------------------------------------------------------------------------

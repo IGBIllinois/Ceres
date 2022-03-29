@@ -31,6 +31,8 @@ signals:
 protected:
     void run() override;
 
+private:
+
 public:
     cExperimentControlModel* mpController;
     std::vector<cSensorModel*> mSensors;

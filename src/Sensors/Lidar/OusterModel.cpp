@@ -342,26 +342,20 @@ void cOusterModel::update()
     cOusterLidarStream_Qt::processOneDatagram();
 }
 
-void cOusterModel::writeDataHeader(cBlockDataFile* pFile)
+void cOusterModel::writeDataHeader(cBlockDataFile& file)
 {
-    mSerializer.attach(pFile);
+    mSerializer.attach(&file);
     mSerializer.write(mConfigParameters);
     mSerializer.write(mSensorInfo);
     mSerializer.write(mBeamIntrinsics);
     mSerializer.write(mImuIntrinsics);
     mSerializer.write(mLidarIntrinsics);
     mSerializer.write(mDataFormat);
-    mSerializer.detach();
-}
-
-void cOusterModel::startDataRecording(cBlockDataFile& file)
-{
-    mSerializer.attach(&file);
 }
 
 void cOusterModel::stopDataRecording()
 {
-    recordingStateUpdated(false);
+    cLidarModel::stopDataRecording();
     mSerializer.detach();
 }
 

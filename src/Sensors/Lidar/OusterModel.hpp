@@ -29,12 +29,13 @@ public:
     char* descriptor() const override;
 
     bool configure(const nlohmann::json& jsonCfg) override;
-    void writeDataHeader(cBlockDataFile* pFile) override;
-    void startDataRecording(cBlockDataFile& file) override;
+
+    void writeDataHeader(cBlockDataFile& file) override;
+//    void startDataRecording() override;
+//    void pauseDataRecording() override;
     void stopDataRecording() override;
 
     uint16_t columnsPerFrame() const;
- //   std::vector<int> pixel_shift_by_row;
     uint16_t pixelsPerColumn() const;
     uint16_t columnWindowMin() const;
     uint16_t columnWindowMax() const;

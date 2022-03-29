@@ -86,23 +86,16 @@ void cSsnxModel::update()
     processOneDatagram();
 }
 
-void cSsnxModel::writeDataHeader(cBlockDataFile* pFile)
-{
-    mSerializer.attach(pFile);
-    mSerializer.detach();
-}
-
-void cSsnxModel::startDataRecording(cBlockDataFile& file)
+void cSsnxModel::writeDataHeader(cBlockDataFile& file)
 {
     mSerializer.attach(&file);
 }
 
 void cSsnxModel::stopDataRecording()
 {
-    recordingStateUpdated(false);
+    cGpsModel::stopDataRecording();
     mSerializer.detach();
 }
-
 
 void cSsnxModel::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
 {

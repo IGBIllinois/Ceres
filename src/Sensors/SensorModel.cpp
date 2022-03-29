@@ -29,44 +29,30 @@ bool cSensorModel::configure(const nlohmann::json& jsonCfg)
     return true;
 }
 
-/*
-void cSensorModel::startDataRecording(cBlockDataFile& file)
+void cSensorModel::writeDataHeader(cBlockDataFile& file)
 {
-    std::lock_guard<std::mutex> guard(mFileMutex);
-    mpFile = &file;
+    mIsRecording = false;
 }
-*/
 
-/*
+void cSensorModel::startDataRecording()
+{
+    mIsRecording = true;
+}
+
+void cSensorModel::pauseDataRecording()
+{
+    mIsRecording = false;
+}
+
 void cSensorModel::stopDataRecording()
 {
-    std::lock_guard<std::mutex> guard(mFileMutex);
-    mpFile = nullptr;
+    mIsRecording = false;
 }
-*/
+
 
 bool cSensorModel::isRecording()
 {
-//    return mIsRecording && mpFile;
     return mIsRecording;
 }
 
-void cSensorModel::recordingStateUpdated(bool recording)
-{
-    mIsRecording = recording;
-
-/*
-    if (recording)
-    {
-        if (canSaveData())
-        {
-            mIsRecording = true;
-        }
-    }
-    else
-    {
-        mIsRecording = false;
-    }
-*/
-}
 

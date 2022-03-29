@@ -31,11 +31,13 @@ public:
 
     void loadExperiment(const nlohmann::json& expDoc);
 
-    void startExperiment();
+    void startExperiment(const std::string& filename);
     void terminateExperiment();
 
-    void startDataRecording(const std::string& filename);
+/*
+    void startDataRecording();
     void stopDataRecording();
+*/
 
 signals:
     void statusMessage(QString msg);
@@ -46,6 +48,8 @@ signals:
 private slots:
     void onStatusUpdate(QString msg);
     void onErrorUpdate(QString title, QString msg);
+
+    void onExperimentTerminated();
 
 private:
     cDataThread mThread;

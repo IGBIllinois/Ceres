@@ -5,6 +5,7 @@
 
 #include "SpidercamCtrl.hpp"
 #include "SpidercamUtils.hpp"
+#include "SpidercamSerializer.hpp"
 #include "SpidercamExperimentStates.hpp"
 #include "../Utilities/Timers.hpp"
 #include "../Utilities/Utilities.hpp"
@@ -45,6 +46,7 @@ public:
      * constant over the span of the experiment.
      */
     void writeDataHeader(cBlockDataFile& file) override;
+	void stopDataRecording() override;
 
 	bool startCommunications() override;
 	void stopCommunications() override;
@@ -109,5 +111,6 @@ protected:
 
 private:
     cSpidercamController mController;
+	cSpidercamSerializer mSerializer;
 };
 
