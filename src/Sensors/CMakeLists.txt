@@ -29,6 +29,12 @@ PRIVATE
 #
 # Weather Station
 #
+    Weather/WeatherBlockId.hpp
+    Weather/WeatherBlockId.cpp
+    Weather/WeatherDataIdentifiers.hpp
+    Weather/WeatherSerializer.hpp
+    Weather/WeatherSerializer.cpp
+
     Weather/WeatherDataModel_Http.hpp
     Weather/WeatherDataModel_Http.cpp
     Weather/WeatherDataModel.hpp

@@ -157,10 +157,10 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
     }
 }
 
-void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
+bool cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
 {
     if (mRunning)
-        return;
+        return false;
 
     for (std::size_t i = 0; i < mExperiment.size(); ++i)
     {
@@ -192,6 +192,8 @@ void cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
             mExperiment.push_back(pState);
         }
     }
+
+    return true;
 }
 
 bool cSpidercamModel::startExperiment()

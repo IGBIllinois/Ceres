@@ -31,7 +31,7 @@ public:
      */
     void configure(const nlohmann::json& jsonCfg) override;
 
-	void loadExperiment(const nlohmann::json& expDoc) override;
+	bool loadExperiment(const nlohmann::json& expDoc) override;
 
 	/**
 	 * Started the loaded experiment.

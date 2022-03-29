@@ -6,7 +6,8 @@
 
 cDataModel::cDataModel(QObject* parent)
 :
-    QObject(parent)
+    QObject(parent),
+    mSerializer(4096)
 {
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cDataModel::onStatusUpdate);
 }
@@ -61,24 +62,51 @@ void cDataModel::stopDataThread()
 
         for (auto& sensor : mThread.mActiveSensors)
         {
-            sensor->stopDataRecording();
+            sensor->endDataRecording();
         }
 
         mFile.close();
     }
 }
 
-void cDataModel::loadExperiment(const nlohmann::json& expDoc)
+bool cDataModel::openDataFile(const std::string& filename)
+{
+    if (mFile.isOpen())
+        return false;
+
+    mFile.open(filename);
+
+    mSerializer.attach(&mFile);
+
+    return mFile.isOpen();
+}
+
+void cDataModel::closeDataFile()
+{
+    mSerializer.detach();
+    mFile.close();
+}
+
+bool cDataModel::isExperimentRunning()
+{
+    if (!mThread.mpController)
+        return false;
+
+    return mThread.mpController->isExperimentRunning();
+}
+
+
+bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
 {
     if (!expDoc.contains("experiment"))
     {
-        return;
+        return false;
     }
-
+    
     std::string ctrl = expDoc["controller"];
     if (ctrl.compare(mThread.mpController->descriptor()) != 0)
     {
-        return;
+        return false;
     }
 
     auto required_sensors = expDoc["sensors"];
@@ -97,13 +125,11 @@ void cDataModel::loadExperiment(const nlohmann::json& expDoc)
         }
     }
 
-    mThread.mpController->loadExperiment(expDoc["experiment"]);
+    return mThread.mpController->loadExperiment(expDoc["experiment"]);
 }
 
-void cDataModel::startExperiment(const std::string& filename)
+void cDataModel::startExperiment(const nlohmann::json& expDoc)
 {
-    mFile.open(filename);
-
     mThread.mpController->writeDataHeader(mFile);
 
     for (auto& sensor : mThread.mActiveSensors)
@@ -111,6 +137,7 @@ void cDataModel::startExperiment(const std::string& filename)
         sensor->writeDataHeader(mFile);
     }
 
+    mSerializer.startTime(time(0));
     mThread.mpController->startExperiment();
 }
 
@@ -119,26 +146,6 @@ void cDataModel::terminateExperiment()
     mThread.mpController->terminateExperiment();
 }
 
-/*
-void cDataModel::startDataRecording()
-{
-    for (auto& sensor : mThread.mActiveSensors)
-    {
-        sensor->startDataRecording(mFile);
-    }
-}
-
-void cDataModel::stopDataRecording()
-{
-    for (auto& sensor : mThread.mActiveSensors)
-    {
-        sensor->stopDataRecording();
-    }
-
-    mFile.close();
-}
-*/
-
 
 void cDataModel::onExperimentTerminated()
 {
@@ -146,9 +153,10 @@ void cDataModel::onExperimentTerminated()
 
     for (auto& sensor : mThread.mActiveSensors)
     {
-        sensor->stopDataRecording();
+        sensor->endDataRecording();
     }
 
-    mFile.close();
+    mSerializer.endTime(time(0));
+    closeDataFile();
 }
 

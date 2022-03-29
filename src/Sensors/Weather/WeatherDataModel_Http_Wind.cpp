@@ -7,7 +7,8 @@
 
 cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind()
 	:
-		mData()
+		mData(),
+		mSerializer(4096)
 {
 	mMaxWindSpeed_mps = 100;
 	mWindSpeed_mps = 0.0;
@@ -98,6 +99,7 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 		 *	]
 		 */
 		auto& jsonFields = jsonHead["fields"];
+		mConfigInfo = to_string(jsonFields);
 		auto& wind_speed = jsonFields[0];
 		if ((wind_speed["name"] != "WS_ms") || (wind_speed["type"] != "xsd:float") || (wind_speed["units"] != "m/s"))
 			throw std::invalid_argument("Invalid JSON wind speed data format.");
@@ -144,13 +146,14 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 
 void cWeatherDataModel_Http_Wind::writeDataHeader(cBlockDataFile& file)
 {
-	//mSerializer.attach(&file);
+	mSerializer.attach(&file);
+	mSerializer.writeConfigInfo(mConfigInfo);
 }
 
-void cWeatherDataModel_Http_Wind::stopDataRecording()
+void cWeatherDataModel_Http_Wind::endDataRecording()
 {
-	cWeatherDataModel_Http::stopDataRecording();
-	//mSerializer.detach();
+	cWeatherDataModel_Http::endDataRecording();
+	mSerializer.detach();
 }
 
 void cWeatherDataModel_Http_Wind::processReply(const std::string& reply)
@@ -164,6 +167,11 @@ void cWeatherDataModel_Http_Wind::processReply(const std::string& reply)
 	mWindSpeed_mps = mData[0];
 	mWindDirection_deg = mData[1];
 	mDataValid = mData[2] == 0;
+
+	if (mIsRecording && static_cast<bool>(mSerializer))
+	{
+
+	}
 
 	if (mWindSpeed_mps > mMaxWindSpeed_mps)
 	{

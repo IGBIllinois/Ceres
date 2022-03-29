@@ -24,7 +24,7 @@ sExperimentControllerWidgets create_spidercam_controller()
 
     QObject::connect(pModel, &cSpidercamModel::limitsChanged, pView, &cSpidercamView::updateLimits);
     QObject::connect(pModel, &cSpidercamModel::positionChanged, pView, &cSpidercamView::updatePosition);
-    QObject::connect(pModel, &cSpidercamModel::recordingStateChanged, pView, &cSpidercamView::updateRecordingState);
+    QObject::connect(pModel, &cSpidercamModel::requestDataRecordingState, pView, &cSpidercamView::updateRecordingState);
 
     auto* pDockWidget = new QDockWidget();
     auto* pStatus = new cSpidercamDollyStatus(pDockWidget);

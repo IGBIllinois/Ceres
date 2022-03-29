@@ -36,7 +36,7 @@ public:
     /*
      * Load an experiment from JSON file.
      */
-    virtual void loadExperiment(const nlohmann::json& expDoc) = 0;
+    virtual bool loadExperiment(const nlohmann::json& expDoc) = 0;
 
     /*
      * Is there an experiment (state machine) loaded in the experiment
@@ -49,6 +49,12 @@ public:
      * controller.
      */
     void clearExperiment();
+
+    /*
+     * Clear the experiment (state machine) from the experiment
+    * controller.
+    */
+    bool isExperimentRunning();
 
     /**
      * Started the loaded experiment.
@@ -88,8 +94,6 @@ public:
      */
     bool isRecording();
 
-    void recordingStateChanged(bool recording);
-
     /*
      * Starts/Stops communication with the endpoint.
      * These methods are called inside the QThread so that
@@ -104,8 +108,7 @@ signals:
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
 
-    void requestDataRecording();
-    void requestPauseRecording();
+    void requestDataRecordingState(bool record);
     void experimentTerminated();
 
 public:
@@ -114,13 +117,13 @@ public:
 protected:
     cExperimentControlModel();
 
+    void recordingStateChanged(bool recording);
+
     void updateExperimentStateMachine();
 
     /**
-     * A flag to signal that recording is active
+     * A flag to signal that an experiment is active
      */
-    bool mIsRecording;
-
     bool mRunning;
 
     edge_detect<bool>	mRecording;

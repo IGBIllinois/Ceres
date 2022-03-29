@@ -58,7 +58,7 @@ enum class ClassIDs: uint16_t
     /*
      * 1 - 1, 024  : Range for Main program / Experiment Header data
      */
-    HEADER = SYSTEM_BASE_ID,
+    EXPERIMENT_INFO = SYSTEM_BASE_ID,
 
     /*
      * 1,025 -  2,048  : Range for Experiment Controller data
@@ -72,6 +72,11 @@ enum class ClassIDs: uint16_t
      */
     OUSTER  = SENSOR_BASE_ID,
 
-    SSNX    = SENSOR_BASE_ID + 0x0080,
+    SSNX    = OUSTER + 0x0080,
+
+    HYSPEX = SSNX + 0x0080,
+
+    // We will put the weather data at the end of our range
+    WEATHER = SENSOR_MAX_ID - 0x0080,
 };
 

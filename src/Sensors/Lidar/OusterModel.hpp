@@ -31,9 +31,7 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
 
     void writeDataHeader(cBlockDataFile& file) override;
-//    void startDataRecording() override;
-//    void pauseDataRecording() override;
-    void stopDataRecording() override;
+    void endDataRecording() override;
 
     uint16_t columnsPerFrame() const;
     uint16_t pixelsPerColumn() const;

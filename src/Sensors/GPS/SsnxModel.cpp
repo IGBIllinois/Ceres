@@ -91,9 +91,9 @@ void cSsnxModel::writeDataHeader(cBlockDataFile& file)
     mSerializer.attach(&file);
 }
 
-void cSsnxModel::stopDataRecording()
+void cSsnxModel::endDataRecording()
 {
-    cGpsModel::stopDataRecording();
+    cGpsModel::endDataRecording();
     mSerializer.detach();
 }
 

@@ -51,7 +51,7 @@ public:
     /*
      * Detach the serializer.
      */
-    virtual void stopDataRecording() = 0;
+    virtual void endDataRecording() = 0;
 
     /*
      * Returns true if sensor data is being recorded
@@ -70,8 +70,7 @@ public slots:
     /*
      * Toggles the recording state of the sensor.
      */
-    void dataRecordingRequested();
-    void pauseRecordingRequested();
+    void dataRecordingStateChange(bool record);
 
 signals:
     void statusMessage(QString msg);

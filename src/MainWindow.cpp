@@ -150,6 +150,11 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 //-----------------------------------------------------------------------------
 void cMainWindow::fileNew()
 {
+    if (mMainModel.isExperimentRunning())
+    {
+        //TODO: Something here!
+    }
+
     auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
     if ((pExperiment == nullptr) || ( ! pExperiment->hasExperimentDocument()))
     {
@@ -163,15 +168,19 @@ void cMainWindow::fileNew()
 
     onStatusUpdate(msg);
     auto expDoc = pExperiment->getExperimentDocument();
-    mMainModel.loadExperiment(expDoc);
+    if (!mMainModel.loadExperiment(expDoc))
+    {
+    }
+
+    std::string filename = "c:\\tmp\\test.data";
+    mMainModel.openDataFile(filename);
 
     msg = "Running experiment: ";
     msg += pExperiment->text(0);
 
     onStatusUpdate(msg);
 
-    std::string filename = "c:\tmp\test.data";
-    mMainModel.startExperiment(filename);
+    mMainModel.startExperiment(expDoc);
 }
 
 //-----------------------------------------------------------------------------

@@ -34,17 +34,12 @@ void cSensorModel::writeDataHeader(cBlockDataFile& file)
     mIsRecording = false;
 }
 
-void cSensorModel::dataRecordingRequested()
+void cSensorModel::dataRecordingStateChange(bool record)
 {
-    mIsRecording = true;
+    mIsRecording = record;
 }
 
-void cSensorModel::pauseRecordingRequested()
-{
-    mIsRecording = false;
-}
-
-void cSensorModel::stopDataRecording()
+void cSensorModel::endDataRecording()
 {
     mIsRecording = false;
 }

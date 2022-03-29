@@ -353,9 +353,9 @@ void cOusterModel::writeDataHeader(cBlockDataFile& file)
     mSerializer.write(mDataFormat);
 }
 
-void cOusterModel::stopDataRecording()
+void cOusterModel::endDataRecording()
 {
-    cLidarModel::stopDataRecording();
+    cLidarModel::endDataRecording();
     mSerializer.detach();
 }
 

@@ -2,8 +2,9 @@
 #pragma once
 
 #include "WeatherDataModel_Http.hpp"
+#include "WeatherSerializer.hpp"
 
-
+#include <string>
 
 class cWeatherDataModel_Http_Wind : public cWeatherDataModel_Http
 {
@@ -27,7 +28,7 @@ public:
      * constant over the span of the experiment.
      */
     void writeDataHeader(cBlockDataFile& pFile) override;
-    void stopDataRecording() override;
+    void endDataRecording() override;
 
 signals:
     void windDataChanged(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
@@ -43,5 +44,8 @@ private:
     double mWindSpeed_mps;
     double mWindDirection_deg;
     bool mDataValid;
+
+    std::string mConfigInfo;
+    cWeatherSerializer mSerializer;
 };
 

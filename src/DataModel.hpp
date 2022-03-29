@@ -3,6 +3,7 @@
 
 #include "BlockDataFile/BlockDataFile.hpp"
 #include "DataThread.hpp"
+#include "ExperimentSerializer.hpp"
 
 #include <QObject>
 #include <QThread>
@@ -29,15 +30,14 @@ public:
     void startDataThread();
     void stopDataThread();
 
-    void loadExperiment(const nlohmann::json& expDoc);
+    bool openDataFile(const std::string& filename);
+    void closeDataFile();
 
-    void startExperiment(const std::string& filename);
+    bool isExperimentRunning();
+
+    bool loadExperiment(const nlohmann::json& expDoc);
+    void startExperiment(const nlohmann::json& expDoc);
     void terminateExperiment();
-
-/*
-    void startDataRecording();
-    void stopDataRecording();
-*/
 
 signals:
     void statusMessage(QString msg);
@@ -54,7 +54,8 @@ private slots:
 private:
     cDataThread mThread;
 
-    cBlockDataFile   mFile;
+    cBlockDataFile          mFile;
+    cExperimentSerializer   mSerializer;
 
     QMutex mMutex;
 };
