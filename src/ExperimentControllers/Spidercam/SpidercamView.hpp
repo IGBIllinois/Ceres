@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ExperimentCtrlView.hpp"
+#include "../ExperimentCtrlView.hpp"
 #include "SpidercamScanArea.hpp"
 
 #include <spidercam/spidercam_types.hpp>

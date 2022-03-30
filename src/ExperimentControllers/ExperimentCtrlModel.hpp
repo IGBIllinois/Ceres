@@ -1,17 +1,19 @@
 
 #pragma once
 
-#include "../BlockDataFile/BlockDataFile.hpp"
-#include "../BlockDataFile/RawDataBuffer.hpp"
-#include "ExperimentCtrlIdentifiers.hpp"
+//#include "../BlockDataFile/BlockDataFile.hpp"
+//#include "../BlockDataFile/RawDataBuffer.hpp"
+//#include "ExperimentCtrlIdentifiers.hpp"
 #include "../Utilities/Utilities.hpp"
 
 #include <QObject>
 #include <nlohmann/json.hpp>
-#include <mutex>
+//#include <mutex>
 #include <vector>
 
+// Forward Declarations
 class cExperimentState;
+class cBlockDataFile;
 
 
 class cExperimentControlModel : public QObject

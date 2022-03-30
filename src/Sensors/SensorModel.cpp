@@ -3,11 +3,6 @@
 
 
 cSensorModel::cSensorModel()
-/*
-:
-    mpFile(nullptr),
-    mDataBuffer(1024)
-*/
 {
     mIsRecording = false;
 }

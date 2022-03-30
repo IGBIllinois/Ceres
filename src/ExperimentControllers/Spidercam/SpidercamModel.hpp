@@ -1,14 +1,14 @@
 
 #pragma once
 
-#include "ExperimentCtrlModel.hpp"
+#include "../ExperimentCtrlModel.hpp"
 
 #include "SpidercamCtrl.hpp"
 #include "SpidercamUtils.hpp"
 #include "SpidercamSerializer.hpp"
 #include "SpidercamExperimentStates.hpp"
-#include "../Utilities/Timers.hpp"
-#include "../Utilities/Utilities.hpp"
+#include "../../Utilities/Timers.hpp"
+#include "../../Utilities/Utilities.hpp"
 
 class cSpidercamModel : public cExperimentControlModel
 {

@@ -170,7 +170,7 @@ void cWeatherDataModel_Http_Wind::processReply(const std::string& reply)
 
 	if (mIsRecording && static_cast<bool>(mSerializer))
 	{
-
+		mSerializer.writeWindData_mps(mDataValid, mWindSpeed_mps, mWindDirection_deg);
 	}
 
 	if (mWindSpeed_mps > mMaxWindSpeed_mps)

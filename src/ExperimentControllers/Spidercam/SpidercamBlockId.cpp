@@ -1,7 +1,7 @@
 
 #include "SpidercamBlockId.hpp"
 
-#include "../BlockDataFile/ClassIdentifiers.hpp"
+#include "../../BlockDataFile/ClassIdentifiers.hpp"
 
 
 cSpidercamID::cSpidercamID(uint8_t majorVer, uint8_t minorVer)

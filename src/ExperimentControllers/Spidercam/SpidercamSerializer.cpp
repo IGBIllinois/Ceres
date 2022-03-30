@@ -1,7 +1,7 @@
 
 #include "SpidercamSerializer.hpp"
 #include "SpidercamDataIdentifiers.hpp"
-#include "../BlockDataFile/BlockDataFile.hpp"
+#include "../../BlockDataFile/BlockDataFile.hpp"
 
 
 #include <cassert>

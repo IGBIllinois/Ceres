@@ -1,7 +1,7 @@
 
 #include "ExperimentCtrlFactory.hpp"
 
-#include "ExperimentControllers/SpidercamCtrlFactory.hpp"
+#include "ExperimentControllers/Spidercam/SpidercamCtrlFactory.hpp"
 
 
 sExperimentControllerWidgets create_experiment_controller(const std::string& name)

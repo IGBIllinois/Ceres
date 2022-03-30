@@ -1,14 +1,11 @@
 
 #pragma once
 
-#include "../BlockDataFile/BlockDataFile.hpp"
-#include "../BlockDataFile/RawDataBuffer.hpp"
-#include "SensorIdentifiers.hpp"
-
 #include <QObject>
-#include <mutex>
 #include <nlohmann/json.hpp>
 
+// Forward Declarations
+class cBlockDataFile;
 
 
 /**

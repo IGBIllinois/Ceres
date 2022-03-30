@@ -4,13 +4,12 @@ set(CMAKE_AUTOMOC ON)
 
 add_library(ExperimentControllers STATIC)
 
-#set_target_properties(ExperimentControllers PROPERTIES LANGUAGE C CXX)
+set_target_properties(ExperimentControllers PROPERTIES LANGUAGE CXX)
 
 target_compile_features(ExperimentControllers PRIVATE cxx_std_17)
 
 target_sources(ExperimentControllers
 PUBLIC
-
 #
 # Base Headers for all Experiment Controller classes
 #
@@ -19,36 +18,8 @@ PUBLIC
  
 PRIVATE
 #
-# Spidercam files
-#
-    SpidercamDollyStatus.hpp
-    SpidercamDollyStatus.cpp
-    SpidercamExperimentStates.hpp
-    SpidercamExperimentStates.cpp
-    SpidercamScanArea.hpp
-    SpidercamScanArea.cpp
-    SpidercamView.hpp
-    SpidercamView.cpp
-    SpidercamModel.hpp
-    SpidercamModel.cpp
-    SpidercamCtrl.hpp
-    SpidercamCtrl.cpp
-    SpidercamUtils.hpp
-    SpidercamUtils.cpp
-    SpidercamBlockId.hpp
-    SpidercamBlockId.cpp
-    SpidercamDataIdentifiers.hpp
-    SpidercamSerializer.hpp
-    SpidercamSerializer.cpp
-
-    SpidercamCtrlFactory.hpp
-    SpidercamCtrlFactory.cpp
-
-#
 # Abstract Base Class for all Experiment Controllers
 #
-    ExperimentCtrlIdentifiers.hpp
-
     ExperimentCtrlView.cpp
     ExperimentCtrlModel.cpp
 
@@ -71,8 +42,13 @@ set_property(SOURCE ExperimentCtrlModel.hpp PROPERTY SKIP_AUTOMOC ON)
 set_property(TARGET ExperimentControllers PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 target_link_libraries(ExperimentControllers PRIVATE ${Qt}::Widgets)
-target_link_libraries(ExperimentControllers PUBLIC ${Qt}::Network)
 target_link_libraries(ExperimentControllers PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(ExperimentControllers PRIVATE spidercam::scConnect_static)
 target_link_libraries(ExperimentControllers PRIVATE BlockDataFile)
+target_link_libraries(ExperimentControllers PRIVATE SpidercamCtrl_static)
+
+set_target_properties(ExperimentControllers PROPERTIES FOLDER "ExperimentControllers")
+
+
+# Add the Spidercam Control library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Spidercam)
 

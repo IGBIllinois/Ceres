@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "../BlockDataFile/DataBuffer.hpp"
+#include "../../BlockDataFile/DataBuffer.hpp"
 #include "SpidercamBlockId.hpp"
 
 // Forward Declarations

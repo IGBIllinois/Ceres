@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../ExperimentCtrlFactory.hpp"
+#include "../../ExperimentCtrlFactory.hpp"
 
 static char* spidercam_id = "spidercam";
 

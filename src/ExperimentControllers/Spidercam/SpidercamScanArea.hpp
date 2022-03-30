@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../Utilities/Utilities.hpp"
+#include "../../Utilities/Utilities.hpp"
 
 #include <QWidget>
 #include <QPen>
