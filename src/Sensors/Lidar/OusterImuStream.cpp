@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-cOusterImuStream_Qt::cOusterImuStream_Qt()
+cOusterImuStream_Qt::cOusterImuStream_Qt(QObject* parent)
 :
     mpSocket(nullptr),
     mDataBuffer()

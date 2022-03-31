@@ -5,8 +5,9 @@
 
 using namespace ssnx;
 
-cSsnxModel::cSsnxModel()
+cSsnxModel::cSsnxModel(QObject* parent)
 :
+    cGpsModel(parent),
     mSerializer(4096)
 {
     mConnected = false;

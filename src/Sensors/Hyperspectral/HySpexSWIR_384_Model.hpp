@@ -11,7 +11,7 @@ class cHySpexSWIR_384_Model : public cHyperspectralModel
     Q_OBJECT
 
 public:
-    cHySpexSWIR_384_Model();
+    cHySpexSWIR_384_Model(QObject* parent = nullptr);
     virtual ~cHySpexSWIR_384_Model() = default;
 
     /*

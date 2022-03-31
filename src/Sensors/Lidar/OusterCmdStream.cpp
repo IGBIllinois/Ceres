@@ -5,9 +5,9 @@
 #include <iostream>
 
 
-cOusterCmdStream_Qt::cOusterCmdStream_Qt()
+cOusterCmdStream_Qt::cOusterCmdStream_Qt(QObject* parent)
     :
-        mSocket()
+        mSocket(parent)
 {
 }
 

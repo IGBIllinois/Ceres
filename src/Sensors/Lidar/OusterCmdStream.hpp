@@ -10,7 +10,7 @@
 class cOusterCmdStream_Qt : public cOusterCommandStream
 {
 public:
-	cOusterCmdStream_Qt();
+	cOusterCmdStream_Qt(QObject* parent = nullptr);
 	~cOusterCmdStream_Qt();
 
 private:

@@ -20,7 +20,7 @@ public:
     char* descriptor() const override;
 
 protected:
-    cWeatherDataModel();
+    cWeatherDataModel(QObject* parent = nullptr);
     virtual ~cWeatherDataModel() = default;
 };
 

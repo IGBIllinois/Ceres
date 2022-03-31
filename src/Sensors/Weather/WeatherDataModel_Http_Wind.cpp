@@ -5,10 +5,11 @@
 #include <QEventLoop>
 
 
-cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind()
-	:
-		mData(),
-		mSerializer(4096)
+cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind(QObject* parent)
+:
+	cWeatherDataModel_Http(parent),
+	mData(),
+	mSerializer(4096)
 {
 	mMaxWindSpeed_mps = 100;
 	mWindSpeed_mps = 0.0;

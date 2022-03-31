@@ -2,7 +2,9 @@
 #include "SensorModel.hpp"
 
 
-cSensorModel::cSensorModel()
+cSensorModel::cSensorModel(QObject* parent)
+:
+    QObject(parent)
 {
     mIsRecording = false;
 }

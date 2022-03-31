@@ -5,7 +5,9 @@
 
 #include <optional>
 
-cHySpexSWIR_384_Model::cHySpexSWIR_384_Model()
+cHySpexSWIR_384_Model::cHySpexSWIR_384_Model(QObject* parent)
+:
+    cHyperspectralModel(parent)
 {
     mConnected = false;
 }

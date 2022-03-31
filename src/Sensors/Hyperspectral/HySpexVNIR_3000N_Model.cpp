@@ -5,7 +5,9 @@
 
 #include <optional>
 
-cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model()
+cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
+:
+    cHyperspectralModel(parent)
 {
     mConnected = false;
 }

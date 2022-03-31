@@ -17,7 +17,7 @@ public:
      */
     static char* data_type() { return "wind"; };
 
-    cWeatherDataModel_Http_Wind();
+    cWeatherDataModel_Http_Wind(QObject* parent = nullptr);
     virtual ~cWeatherDataModel_Http_Wind() = default;
 
     bool configure(const nlohmann::json& jsonCfg) override;

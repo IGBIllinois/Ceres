@@ -2,7 +2,9 @@
 #include "GpsModel.hpp"
 
 
-cGpsModel::cGpsModel()
+cGpsModel::cGpsModel(QObject* parent)
+:
+    cSensorModel(parent)
 {
     mDatum = eDatum::WGS84;
 

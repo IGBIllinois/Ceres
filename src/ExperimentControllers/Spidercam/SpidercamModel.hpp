@@ -15,7 +15,7 @@ class cSpidercamModel : public cExperimentControlModel
     Q_OBJECT
 
 public:
-	cSpidercamModel();
+	cSpidercamModel(QObject* parent = nullptr);
 	~cSpidercamModel();
 
 	/*

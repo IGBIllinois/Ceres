@@ -117,7 +117,7 @@ public:
     virtual void update() = 0;
 
 protected:
-    cExperimentControlModel();
+    cExperimentControlModel(QObject* parent = nullptr);
 
     void recordingStateChanged(bool recording);
 

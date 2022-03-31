@@ -12,7 +12,7 @@ class cOusterLidarStream_Qt : private cOusterLidarStream
 {
 
 public:
-	cOusterLidarStream_Qt();
+	cOusterLidarStream_Qt(QObject* parent = nullptr);
 	~cOusterLidarStream_Qt();
 	
 	/*

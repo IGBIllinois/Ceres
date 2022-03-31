@@ -7,9 +7,11 @@ namespace
     uint32_t TOLERANCE_MM = 10;
 }
 
-cSpidercamModel::cSpidercamModel()
-    : mDollyConnected(false), mConsoleConnected(false), mActivated(false),
-      mDollyPositionKnown(false), mConsoleEnabled(false), mInInteractiveMode(false),
+cSpidercamModel::cSpidercamModel(QObject* parent)
+:
+    cExperimentControlModel(parent),
+    mDollyConnected(false), mConsoleConnected(false), mActivated(false),
+    mDollyPositionKnown(false), mConsoleEnabled(false), mInInteractiveMode(false),
     mInScriptMode(false),
     mController(this)
 

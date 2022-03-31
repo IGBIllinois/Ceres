@@ -5,9 +5,12 @@
 
 #include <optional>
 
-cOusterModel::cOusterModel()
+cOusterModel::cOusterModel(QObject* parent)
 :
-    mCmdStream(),
+    cLidarModel(parent),
+    cOusterImuStream_Qt(this),
+    cOusterLidarStream_Qt(this),
+    mCmdStream(this),
     mLastFrameID(0),
     mLidarOriginToBeamOrigin_mm(0)
 {
@@ -319,7 +322,6 @@ bool cOusterModel::startCommunications()
     uint32_t max = maxEncoderCount();
 
     emit updateEncoderCount(min, max);
-
 
     cOusterImuStream_Qt::clear();
     cOusterLidarStream_Qt::clear();

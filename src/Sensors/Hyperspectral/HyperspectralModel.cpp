@@ -2,7 +2,9 @@
 #include "HyperspectralModel.hpp"
 
 
-cHyperspectralModel::cHyperspectralModel()
+cHyperspectralModel::cHyperspectralModel(QObject* parent)
+:
+	cSensorModel(parent)
 {
 }
 

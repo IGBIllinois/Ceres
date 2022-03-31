@@ -31,10 +31,10 @@ cSpidercamView::cSpidercamView()
 	mpZ_m = new QLineEdit();
 	mpZ_m->setReadOnly(true);
 
-	auto* mainlayout = new QVBoxLayout(this);
+	auto* mainlayout = new QVBoxLayout();
 	mainlayout->addWidget(mpScanArea);
 
-	auto* statuslayout = new QHBoxLayout(this);
+	auto* statuslayout = new QHBoxLayout();
 
 	statuslayout->addWidget(pX_Label);
 	statuslayout->addWidget(mpX_m);

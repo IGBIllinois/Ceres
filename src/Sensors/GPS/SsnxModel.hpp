@@ -15,7 +15,7 @@ class cSsnxModel : public cGpsModel, public SsnNetDecoder, private cSsnxGpsStrea
     Q_OBJECT
 
 public:
-    explicit cSsnxModel();
+    explicit cSsnxModel(QObject* parent = nullptr);
     ~cSsnxModel();
 
     /*

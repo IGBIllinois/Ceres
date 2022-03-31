@@ -11,7 +11,7 @@
 class cOusterImuStream_Qt : private cOusterImuStream
 {
 public:
-	cOusterImuStream_Qt();
+	cOusterImuStream_Qt(QObject* parent = nullptr);
 	~cOusterImuStream_Qt();
 
 	/*

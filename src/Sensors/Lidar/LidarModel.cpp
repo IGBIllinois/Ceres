@@ -2,7 +2,9 @@
 #include "LidarModel.hpp"
 
 
-cLidarModel::cLidarModel()
+cLidarModel::cLidarModel(QObject* parent)
+:
+	cSensorModel(parent)
 {
 }
 

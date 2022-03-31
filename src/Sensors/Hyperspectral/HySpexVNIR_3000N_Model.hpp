@@ -11,7 +11,7 @@ class cHySpexVNIR_3000N_Model : public cHyperspectralModel
     Q_OBJECT
 
 public:
-    cHySpexVNIR_3000N_Model();
+    cHySpexVNIR_3000N_Model(QObject* parent = nullptr);
     virtual ~cHySpexVNIR_3000N_Model() = default;
 
     /*

@@ -5,8 +5,10 @@
 #include <QMessageBox>
 
 
-cWeatherDataModel_Http::cWeatherDataModel_Http()
-	: mpHttpManager(nullptr)
+cWeatherDataModel_Http::cWeatherDataModel_Http(QObject* parent)
+:
+    cWeatherDataModel(parent),
+    mpHttpManager(nullptr)
 {
     mTimer.interval_sec(static_cast<uint32_t>(10));
 }

@@ -15,7 +15,7 @@ public:
     char* sensorClass() const override { return "hyperspectral"; };
 
 protected:
-    cHyperspectralModel();
+    cHyperspectralModel(QObject* parent = nullptr);
     virtual ~cHyperspectralModel() = default;
 };
 

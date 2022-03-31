@@ -42,7 +42,7 @@ protected slots:
     void requestReceived(QNetworkReply* pReply);
 
 protected:
-    cWeatherDataModel_Http();
+    cWeatherDataModel_Http(QObject* parent = nullptr);
     virtual ~cWeatherDataModel_Http();
 
     void getRequest();

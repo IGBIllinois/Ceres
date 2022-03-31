@@ -17,7 +17,6 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mBorderPen.setColor(mBorderColor);
 	mBorderPen.setStyle(Qt::SolidLine);
 	mBorderPen.setWidth(5);
-	mBorder.setPen(mBorderPen);
 
 	mDollyMarkerRadius = 3;
 	mDollyColor.setRgb(0,0,255);

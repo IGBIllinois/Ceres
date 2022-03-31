@@ -68,7 +68,6 @@ private:
     QPen   mMeasurementPen;
     QColor mMeasurementColor;
 
-    QPainter mBorder;
     QPen   mBorderPen;
     QColor mBorderColor;
 

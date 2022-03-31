@@ -5,8 +5,8 @@
 #include <iostream>
 
 
-cOusterLidarStream_Qt::cOusterLidarStream_Qt()
-    :
+cOusterLidarStream_Qt::cOusterLidarStream_Qt(QObject* parent)
+:
     cOusterLidarStream(),
     mpSocket(nullptr)
 {

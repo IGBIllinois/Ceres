@@ -3,7 +3,9 @@
 #include "WeatherDataFactory.hpp"
 
 
-cWeatherDataModel::cWeatherDataModel()
+cWeatherDataModel::cWeatherDataModel(QObject* parent)
+:
+	cSensorModel(parent)
 {
 }
 

@@ -4,9 +4,9 @@
 
 
 
-cExperimentControlModel::cExperimentControlModel()
-    :
-    QObject(),
+cExperimentControlModel::cExperimentControlModel(QObject* parent)
+:
+    QObject(parent),
     mRunning(false),
     mActiveStateNumber(0),
     mpActiveState(nullptr)

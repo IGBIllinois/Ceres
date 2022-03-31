@@ -79,7 +79,7 @@ public:
     virtual void update() = 0;
 
 protected:
-    cSensorModel();
+    cSensorModel(QObject* parent = nullptr);
 
 protected:
     /**
