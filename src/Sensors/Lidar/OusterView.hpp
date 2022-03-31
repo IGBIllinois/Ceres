@@ -27,11 +27,12 @@ public slots:
 	void lidarIntrinsicsChanged();
 	void dataFormatChanged();
 
+	void azimuthWindowChanged();
 
-	void azimuthWindowChanged(ouster::azimuth_range_t azimuth_range);
+//	void azimuthWindowChanged(ouster::azimuth_range_t azimuth_range);
 //	void encoderCountChanged(int min, int max);
-	void imuDataChanged();
 
+	void imuDataChanged();
 	void displayData();
 
 public slots:

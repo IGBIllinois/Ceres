@@ -312,7 +312,8 @@ bool cOusterModel::startCommunications()
         azimuthWindow = mCmdStream.retrieveAzimuthWindow(true);
     } while (!azimuthWindow.has_value());
     mAzimuthWindow = azimuthWindow.value();
-    emit updateAzimuthWindow(mAzimuthWindow);
+//    emit updateAzimuthWindow(mAzimuthWindow);
+    emit updateAzimuthWindow();
 
     uint32_t min = minEncoderCount();
     uint32_t max = maxEncoderCount();

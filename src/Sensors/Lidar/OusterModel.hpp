@@ -75,17 +75,16 @@ signals:
 /*
     void updateSensorInfo(ouster::sensor_info_t info);
     void updateTimeInfo(ouster::time_info_t info);
-*/
-//    void updateBeamIntrinsics(ouster::beam_intrinsics_t beam_intrinsics);
-/*
+    void updateBeamIntrinsics(ouster::beam_intrinsics_t beam_intrinsics);
     void updateImuIntrinsics(ouster::imu_intrinsics_t imu_intrinsics);
     void updateLidarIntrinsics(ouster::lidar_intrinsics_t lidar_intrinsics);
     void updateDataFormat(ouster::lidar_data_format_t lidar_data_format);
+    void updateImuData(ouster::imu_data_t data);
+    void updateAzimuthWindow(ouster::azimuth_range_t azimuth_range);
 */
 
-    void updateAzimuthWindow(ouster::azimuth_range_t azimuth_range);
+    void updateAzimuthWindow();
     void updateEncoderCount(int min, int max);
-//    void updateImuData(ouster::imu_data_t data);
     void updateImuData();
     void updateLidarData();
 

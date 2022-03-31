@@ -52,6 +52,6 @@ public:
 	void write(uint16_t frameID, const cOusterLidarData& data);
 
 private:
-    cOusterID       mBlockID;
+	cOusterLidarID    mBlockID;
 };
 

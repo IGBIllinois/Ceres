@@ -30,7 +30,7 @@ namespace
 
 cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
 	:
-    cOusterVizWidget(parent),
+    cOusterVizWidget(),
     mpModel(pModel)
 {
     setWindowTitle("OUSTER LiDAR");
@@ -103,7 +103,8 @@ void cOusterView::dataFormatChanged()
     cOusterVizWidget::dataFormatChanged(lidar_data_format);
 }
 
-void cOusterView::azimuthWindowChanged(ouster::azimuth_range_t azimuth_range)
+//void cOusterView::azimuthWindowChanged(ouster::azimuth_range_t azimuth_range)
+void cOusterView::azimuthWindowChanged()
 {
 }
 
