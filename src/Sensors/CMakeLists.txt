@@ -44,6 +44,7 @@ target_link_libraries(Sensors PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(Sensors PRIVATE gps_static)
 target_link_libraries(Sensors PRIVATE lidar_static)
 target_link_libraries(Sensors PRIVATE weather_static)
+target_link_libraries(Sensors PRIVATE hyperspectral_static)
 
 
 set_target_properties(Sensors PROPERTIES FOLDER "Sensors")
@@ -51,6 +52,9 @@ set_target_properties(Sensors PROPERTIES FOLDER "Sensors")
 
 # Add the GPS library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/GPS)
+
+# Add the Hyperspectral library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Hyperspectral)
 
 # Add the LiDAR library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Lidar)

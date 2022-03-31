@@ -55,28 +55,49 @@ static const uint16_t SENSOR_MAX_ID = 0xFFFE;
 
 enum class ClassIDs: uint16_t
 {
-    /*
+    /***********************************************************
      * 1 - 1, 024  : Range for Main program / Experiment Header data
-     */
+     ***********************************************************/
     EXPERIMENT_INFO = SYSTEM_BASE_ID,
 
-    /*
+    /***********************************************************
      * 1,025 -  2,048  : Range for Experiment Controller data
+     ***********************************************************/
+
+    /*
+     * Experiment Controller based on position/velocity
      */
     PVT		    = EXP_CONTROL_BASE_ID,
 
+    /*
+     * Experiment Controller from Spidercam
+     */
     SPIDERCAM   = EXP_CONTROL_BASE_ID + 0x0010,
 
-    /*
+    /***********************************************************
      * 2,049 - 65,534  : Range for Sensor data
+     ***********************************************************/
+
+    /*
+     * Sensors from OUSTER
      */
-    OUSTER  = SENSOR_BASE_ID,
+    OUSTER        = SENSOR_BASE_ID,
+    OUSTER_LIDAR,
 
-    SSNX    = OUSTER + 0x0080,
+    /*
+     * Sensors from Septentrio
+     */
+    SEPTENTRIO    = OUSTER + 0x0080,
+    SSNX,
 
-    HYSPEX = SSNX + 0x0080,
+    /*
+     * Sensors from Hyspex
+     */
+    HYSPEX              = SSNX + 0x0080,
+    HYSPEX_SWIR_384,
+    HYSPEX_VNIR_3000N,
 
     // We will put the weather data at the end of our range
-    WEATHER = SENSOR_MAX_ID - 0x0080,
+    WEATHER             = SENSOR_MAX_ID - 0x0080,
 };
 
