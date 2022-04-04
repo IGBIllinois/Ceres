@@ -2,6 +2,7 @@
 #include "DataModel.hpp"
 #include "Sensors/SensorModel.hpp"
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
+#include "ExperimentTypes.hpp"
 
 
 cDataModel::cDataModel(QObject* parent)
@@ -32,7 +33,7 @@ void cDataModel::addExperimentControlModel(cExperimentControlModel* pControlMode
     if (pControlModel)
     {
         mThread.mpController = pControlModel;
-        QObject::connect(mThread.mpController, &cExperimentControlModel::experimentTerminated, this, &cDataModel::onExperimentTerminated);
+        QObject::connect(mThread.mpController, &cExperimentControlModel::experimentStateChanged, this, &cDataModel::onExperimentStateChange);
         mThread.mpController->moveToThread(&mThread);
     }
 }
@@ -147,16 +148,26 @@ void cDataModel::terminateExperiment()
 }
 
 
-void cDataModel::onExperimentTerminated()
+void cDataModel::onExperimentStateChange(experiment::State state)
 {
-    mThread.mpController->stopDataRecording();
+    using namespace experiment;
 
-    for (auto& sensor : mThread.mActiveSensors)
+    switch (state)
     {
-        sensor->endDataRecording();
-    }
+    case State::COMPLETED:
+    case State::TERMINATED:
+    {
+        mThread.mpController->stopDataRecording();
 
-    mSerializer.endTime(time(0));
-    closeDataFile();
+        for (auto& sensor : mThread.mActiveSensors)
+        {
+            sensor->endDataRecording();
+        }
+
+        mSerializer.endTime(time(0));
+        closeDataFile();
+        break;
+    }
+    }
 }
 

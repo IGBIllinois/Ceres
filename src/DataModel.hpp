@@ -16,6 +16,12 @@
 class cExperimentControlModel;
 class cSensorModel;
 
+namespace experiment
+{
+    enum class State;
+}
+
+
 class cDataModel : public QObject
 {
     Q_OBJECT
@@ -49,7 +55,7 @@ private slots:
     void onStatusUpdate(QString msg);
     void onErrorUpdate(QString title, QString msg);
 
-    void onExperimentTerminated();
+    void onExperimentStateChange(experiment::State state);
 
 private:
     cDataThread mThread;

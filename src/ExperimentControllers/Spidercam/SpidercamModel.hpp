@@ -38,7 +38,7 @@ public:
 	 *
 	 * Returns true if the experiment was started, false otherwise.
 	 */
-	bool startExperiment() override;
+	void startExperiment() override;
 
     /*
      * Write any "header" data block into the data file.

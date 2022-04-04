@@ -1,6 +1,7 @@
 
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentStates.hpp"
+#include "../ExperimentTypes.hpp"
 
 
 
@@ -8,6 +9,7 @@ cExperimentControlModel::cExperimentControlModel(QObject* parent)
 :
     QObject(parent),
     mRunning(false),
+    mPaused(false),
     mActiveStateNumber(0),
     mpActiveState(nullptr)
 {
@@ -43,30 +45,52 @@ void cExperimentControlModel::clearExperiment()
     mExperiment.clear();
 }
 
-bool cExperimentControlModel::startExperiment()
+void cExperimentControlModel::startExperiment()
 {
     if (mExperiment.empty())
-        return false;
+        return;
 
     if (mRunning)
-        return false;
+        return;
+
+    if (mPaused)
+    {
+        mPaused = false;
+        return;
+    }
 
     mRunning = true;
     mActiveStateNumber = 0;
     mpActiveState = mExperiment[mActiveStateNumber];
 
-    return true;
+    emit experimentStateChanged(experiment::State::RUNNING);
 }
 
 void cExperimentControlModel::terminateExperiment()
 {
-    if (!mRunning) return;
+    if (!mRunning)
+    {
+        mPaused = false;
+        return;
+    }
 
     recordingStateChanged(false);
 
     mRunning = false;
-    emit experimentTerminated();
+    mPaused = false;
+    emit experimentStateChanged(experiment::State::TERMINATED);
     emit statusMessage("Experiment stopped!");
+}
+
+void cExperimentControlModel::pauseExperiment()
+{
+    if (!mRunning || (mpActiveState == nullptr))
+    {
+        mPaused = false;
+        return;
+    }
+
+    mPaused = true;
 }
 
 
@@ -78,6 +102,8 @@ void cExperimentControlModel::updateExperimentStateMachine()
 
     if (mRecording.HasChanged())
         recordingStateChanged(mRecording);
+
+    if (mPaused) return;
 
     mpActiveState->run();
 
@@ -98,7 +124,7 @@ void cExperimentControlModel::updateExperimentStateMachine()
         {
             recordingStateChanged(false);
             mRunning = false;
-            emit experimentTerminated();
+            emit experimentStateChanged(experiment::State::COMPLETED);
             emit statusMessage("Experiment completed!");
         }
     }

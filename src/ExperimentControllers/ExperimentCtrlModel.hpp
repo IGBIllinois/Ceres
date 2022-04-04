@@ -1,19 +1,20 @@
 
 #pragma once
 
-//#include "../BlockDataFile/BlockDataFile.hpp"
-//#include "../BlockDataFile/RawDataBuffer.hpp"
-//#include "ExperimentCtrlIdentifiers.hpp"
 #include "../Utilities/Utilities.hpp"
 
 #include <QObject>
 #include <nlohmann/json.hpp>
-//#include <mutex>
 #include <vector>
 
 // Forward Declarations
 class cExperimentState;
 class cBlockDataFile;
+
+namespace experiment
+{
+    enum class State;
+}
 
 
 class cExperimentControlModel : public QObject
@@ -63,12 +64,12 @@ public:
      * 
      * Returns true if the experiment was started, false otherwise.
      */
-    virtual bool startExperiment();
+//    virtual bool startExperiment();
 
     /**
      * Terminate a running experiment, otherwise just returns.
      */
-    virtual void terminateExperiment();
+//    virtual void terminateExperiment();
 
     /*
      * Write any "header" data block into the data file.
@@ -110,8 +111,18 @@ signals:
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
 
+signals:
+    void experimentStateChanged(experiment::State state);
     void requestDataRecordingState(bool record);
-    void experimentTerminated();
+
+ /**
+  * Slots for controlling experiment state machine.
+  */
+public slots:
+    virtual void startExperiment();
+    virtual void terminateExperiment();
+    virtual void pauseExperiment();
+
 
 public:
     virtual void update() = 0;
@@ -127,6 +138,7 @@ protected:
      * A flag to signal that an experiment is active
      */
     bool mRunning;
+    bool mPaused;
 
     edge_detect<bool>	mRecording;
 

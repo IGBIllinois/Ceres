@@ -56,6 +56,9 @@ add_executable(Ceres WIN32 MACOSX_BUNDLE)
 target_compile_features(Ceres PRIVATE cxx_std_17)
 
 target_sources(Ceres
+PUBLIC
+    ExperimentTypes.hpp
+
 PRIVATE
 #    ${Cmake_hdr_moc}
 #    ${Cmake_form_hdr}

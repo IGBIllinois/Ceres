@@ -1,6 +1,7 @@
 
 #include "SpidercamModel.hpp"
 #include "../../Utilities/Constants.hpp"
+#include "../../ExperimentTypes.hpp"
 
 namespace
 {
@@ -195,10 +196,12 @@ bool cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
         }
     }
 
+    emit experimentStateChanged(experiment::State::LOADED);
+
     return true;
 }
 
-bool cSpidercamModel::startExperiment()
+void cSpidercamModel::startExperiment()
 {
     if (!mInScriptMode)
     {
@@ -207,7 +210,7 @@ bool cSpidercamModel::startExperiment()
         emit warningMessage("Message", str);
     }
 
-    return cExperimentControlModel::startExperiment();
+    cExperimentControlModel::startExperiment();
 }
 
 
