@@ -88,6 +88,11 @@ void cDataModel::closeDataFile()
     mFile.close();
 }
 
+std::string cDataModel::experimentTitle() const
+{
+    return mExperimentTitle;
+}
+
 bool cDataModel::isExperimentRunning()
 {
     if (!mThread.mpController)
@@ -96,6 +101,13 @@ bool cDataModel::isExperimentRunning()
     return mThread.mpController->isExperimentRunning();
 }
 
+bool cDataModel::isExperimentLoaded() const
+{
+    if (!mThread.mpController)
+        return false;
+
+    return mThread.mpController->hasExperiment();
+}
 
 bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
 {
@@ -126,10 +138,16 @@ bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
         }
     }
 
-    return mThread.mpController->loadExperiment(expDoc["experiment"]);
+    if (mThread.mpController->loadExperiment(expDoc["experiment"]))
+    {
+        mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
+        mExperimentDoc = to_string(expDoc);
+    }
+
+    return false;
 }
 
-void cDataModel::startExperiment(const nlohmann::json& expDoc)
+void cDataModel::startExperiment()
 {
     mThread.mpController->writeDataHeader(mFile);
 
@@ -166,6 +184,10 @@ void cDataModel::onExperimentStateChange(experiment::State state)
 
         mSerializer.endTime(time(0));
         closeDataFile();
+
+        mExperimentTitle.clear();
+        mExperimentDoc.clear();
+
         break;
     }
     }

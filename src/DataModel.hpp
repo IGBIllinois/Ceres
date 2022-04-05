@@ -41,8 +41,10 @@ public:
 
     bool isExperimentRunning();
 
+    std::string experimentTitle() const;
+    bool isExperimentLoaded() const;
     bool loadExperiment(const nlohmann::json& expDoc);
-    void startExperiment(const nlohmann::json& expDoc);
+    void startExperiment();
     void terminateExperiment();
 
 signals:
@@ -62,6 +64,9 @@ private:
 
     cBlockDataFile          mFile;
     cExperimentSerializer   mSerializer;
+
+    std::string  mExperimentTitle;
+    std::string  mExperimentDoc;
 
     QMutex mMutex;
 };

@@ -48,6 +48,10 @@ public slots:
 private slots:
     void fileNew();
     void fileAddExperiment();
+    void experimentLoad();
+    void experimentRun();
+    void experimentPause();
+    void experimentStop();
     void helpAbout();
 
 private:
@@ -65,6 +69,13 @@ private:
     cExperimentManager* mpExperiments;
 
     QMenu* mpFileMenu;
+    QMenu* mpExperimentMenu;
+
+    QAction* mpExpLoad;
+    QAction* mpExpRun;
+    QAction* mpExpPause;
+    QAction* mpExpStop;
+
     QMenu* mpViewMenu;
     QMenu* mpHelpMenu;
 

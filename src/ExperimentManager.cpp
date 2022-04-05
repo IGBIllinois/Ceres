@@ -60,3 +60,14 @@ void cExperimentManager::loadArchivedExperiments()
     cExperimentTreeItem* pTopItem = new cExperimentTreeItem(this, "Archive");
     addTopLevelItem(pTopItem);
 }
+
+/*
+ *  Selections Dialog
+ */
+cExperimentSelectDlg::cExperimentSelectDlg(QWidget* parent)
+:
+    QDialog(parent)
+{}
+
+
+

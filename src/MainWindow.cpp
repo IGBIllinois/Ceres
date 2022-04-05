@@ -86,7 +86,12 @@ cMainWindow::cMainWindow(QWidget* parent) :
     QMainWindow(parent),
     mpSplashScreen(nullptr),
     mpExperiments(nullptr),
+    mpExpLoad(nullptr),
+    mpExpRun(nullptr),
+    mpExpPause(nullptr),
+    mpExpStop(nullptr),
     mpFileMenu(nullptr),
+    mpExperimentMenu(nullptr),
     mpViewMenu(nullptr),
     mpHelpMenu(nullptr),
     mpFileBar(nullptr),
@@ -172,15 +177,6 @@ void cMainWindow::fileNew()
     {
     }
 
-    std::string filename = "c:\\tmp\\test.data";
-    mMainModel.openDataFile(filename);
-
-    msg = "Running experiment: ";
-    msg += pExperiment->text(0);
-
-    onStatusUpdate(msg);
-
-    mMainModel.startExperiment(expDoc);
 }
 
 //-----------------------------------------------------------------------------
@@ -192,6 +188,87 @@ void cMainWindow::fileAddExperiment()
     title->setText(0, "Title");
     experiment->addChild(title);
     mpExperiments->addTopLevelItem(experiment);
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::experimentLoad()
+{
+    if (mMainModel.isExperimentRunning())
+    {
+        //TODO: Something here!
+    }
+
+    cExperimentSelectDlg* dlg = new cExperimentSelectDlg(this);
+    dlg->exec();
+
+    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+    if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
+    {
+        return;
+    }
+
+    QString msg = "Loading experiment \"";
+    msg += pExperiment->text(0);
+    msg += "\" from file ";
+    msg += pExperiment->getFilename();
+
+    onStatusUpdate(msg);
+    auto expDoc = pExperiment->getExperimentDocument();
+    if (!mMainModel.loadExperiment(expDoc))
+    {
+    }
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::experimentRun()
+{
+    if (!mMainModel.isExperimentLoaded())
+    {
+        experimentLoad();
+
+        if (!mMainModel.isExperimentLoaded())
+        {
+            return;
+        }
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("New File"), QString(), tr("Ceres data (*.ceres);;All Files (*.*)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!mMainModel.openDataFile(fileName.toStdString()))
+        return;
+
+    QString msg = "Running experiment: ";
+    msg += mMainModel.experimentTitle().c_str();
+
+    onStatusUpdate(msg);
+
+    mMainModel.startExperiment();
+
+    mpExpLoad->setEnabled(false);
+    mpExpRun->setEnabled(false);
+    mpExpPause->setEnabled(true);
+    mpExpStop->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::experimentPause()
+{
+    mpExpLoad->setEnabled(false);
+    mpExpRun->setEnabled(true);
+    mpExpPause->setEnabled(false);
+    mpExpStop->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::experimentStop()
+{
+    mpExpLoad->setEnabled(true);
+    mpExpRun->setEnabled(true);
+    mpExpPause->setEnabled(false);
+    mpExpStop->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -234,6 +311,7 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
 void cMainWindow::createMainMenu()
 {
     mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
+    mpExperimentMenu = mpUI->menuBar->addMenu(tr("&Experiment"));
     mpViewMenu = mpUI->menuBar->addMenu(tr("&View"));
     mpHelpMenu = mpUI->menuBar->addMenu(tr("&Help"));
 }
@@ -266,7 +344,33 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, &QApplication::closeAllWindows);
     mpFileMenu->addAction(pMenuItem);
 
+    // Build the Experiment Menu
+    mpExpLoad = new QAction(tr("&Load"), this);
+    mpExpLoad->setStatusTip(tr("Load experiment..."));
+    connect(mpExpLoad, &QAction::triggered, this, &cMainWindow::experimentLoad);
+    mpExperimentMenu->addAction(mpExpLoad);
+
+    mpExperimentMenu->addSeparator();
+
+    mpExpRun = new QAction(tr("&Run"), this);
+    mpExpRun->setStatusTip(tr("Run experiment..."));
+    connect(mpExpRun, &QAction::triggered, this, &cMainWindow::experimentRun);
+    mpExperimentMenu->addAction(mpExpRun);
+
+    mpExpPause = new QAction(tr("&Pause"), this);
+    mpExpPause->setStatusTip(tr("Pause the currently running experiment"));
+    connect(mpExpPause, &QAction::triggered, this, &cMainWindow::experimentPause);
+    mpExperimentMenu->addAction(mpExpPause);
+    mpExpPause->setEnabled(false);
+
+    mpExpStop = new QAction(tr("&Stop"), this);
+    mpExpStop->setStatusTip(tr("Stop the currently running experiment"));
+    connect(mpExpStop, &QAction::triggered, this, &cMainWindow::experimentStop);
+    mpExperimentMenu->addAction(mpExpStop);
+    mpExpStop->setEnabled(false);
+
     // Build the View Menu
+    /* The view menu is built dock window system */
 
     // Build the Help Menu
     pMenuItem = new QAction(tr("&About"), this);
