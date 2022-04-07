@@ -45,6 +45,8 @@ public slots:
     void onWarningMessage(QString title, QString msg);
     void onErrorMessage(QString title, QString msg);
 
+    void onExperimentCompleted();
+
 private slots:
     void fileNew();
     void fileAddExperiment();

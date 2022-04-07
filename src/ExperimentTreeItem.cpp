@@ -10,6 +10,13 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const QString& tex
 	setText(0, text);
 }
 
+cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const QString& text, const std::filesystem::path& experiment_file)
+    : QTreeWidgetItem(parent)
+{
+    setText(0, text);
+    mExperimentFile = experiment_file;
+}
+
 cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const std::filesystem::path& experiment_file)
 	: QTreeWidgetItem(parent)
 {
@@ -30,11 +37,29 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const std::fil
     mExperimentFile = experiment_file;
 }
 
+cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const QString& name, const std::filesystem::path& experiment_file)
+    : QTreeWidgetItem(parent)
+{
+    setText(0, name);
+    mExperimentFile = experiment_file;
+}
+
+cExperimentTreeItem::cExperimentTreeItem(const cExperimentTreeItem& other)
+    : QTreeWidgetItem(other)
+{
+    mExperimentFile = other.mExperimentFile;
+}
+
 
 QString cExperimentTreeItem::getFilename() const
 {
     QString filename = mExperimentFile.string().c_str();
     return filename;
+}
+
+const std::filesystem::path& cExperimentTreeItem::getExperimentFile() const
+{
+    return mExperimentFile;
 }
 
 bool cExperimentTreeItem::hasExperimentDocument() const

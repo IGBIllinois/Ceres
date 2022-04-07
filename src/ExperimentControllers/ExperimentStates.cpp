@@ -38,6 +38,10 @@ void cExperimentState_Delay::run()
 	mElapsedTime_sec = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
 }
 
+void cExperimentState_Delay::pause()
+{
+}
+
 bool cExperimentState_Delay::finished()
 {
 	return mElapsedTime_sec >= mWaitTime_sec;

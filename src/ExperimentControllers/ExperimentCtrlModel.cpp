@@ -31,9 +31,14 @@ bool cExperimentControlModel::hasExperiment() const
     return !mExperiment.empty();
 }
 
-bool cExperimentControlModel::isExperimentRunning()
+bool cExperimentControlModel::isExperimentRunning() const
 {
     return mRunning;
+}
+
+bool cExperimentControlModel::isExperimentPaused() const
+{
+    return mPaused;
 }
 
 void cExperimentControlModel::clearExperiment()
@@ -47,10 +52,9 @@ void cExperimentControlModel::clearExperiment()
 
 void cExperimentControlModel::startExperiment()
 {
-    if (mExperiment.empty())
-        return;
+    using namespace experiment;
 
-    if (mRunning)
+    if (mExperiment.empty())
         return;
 
     if (mPaused)
@@ -59,15 +63,20 @@ void cExperimentControlModel::startExperiment()
         return;
     }
 
+    if (mRunning)
+        return;
+
     mRunning = true;
     mActiveStateNumber = 0;
     mpActiveState = mExperiment[mActiveStateNumber];
 
-    emit experimentStateChanged(experiment::State::RUNNING);
+    emit experimentStateChanged(to_int(State::RUNNING));
 }
 
 void cExperimentControlModel::terminateExperiment()
 {
+    using namespace experiment;
+
     if (!mRunning)
     {
         mPaused = false;
@@ -78,12 +87,14 @@ void cExperimentControlModel::terminateExperiment()
 
     mRunning = false;
     mPaused = false;
-    emit experimentStateChanged(experiment::State::TERMINATED);
+    emit experimentStateChanged(to_int(State::TERMINATED));
     emit statusMessage("Experiment stopped!");
 }
 
 void cExperimentControlModel::pauseExperiment()
 {
+    using namespace experiment;
+
     if (!mRunning || (mpActiveState == nullptr))
     {
         mPaused = false;
@@ -91,11 +102,15 @@ void cExperimentControlModel::pauseExperiment()
     }
 
     mPaused = true;
+    emit experimentStateChanged(to_int(State::PAUSED));
+    emit statusMessage("Experiment paused...");
 }
 
 
 void cExperimentControlModel::updateExperimentStateMachine()
 {
+    using namespace experiment;
+
     if (!mRunning || (mpActiveState == nullptr)) return;
 
     mRecording = mpActiveState->recording();
@@ -103,7 +118,11 @@ void cExperimentControlModel::updateExperimentStateMachine()
     if (mRecording.HasChanged())
         recordingStateChanged(mRecording);
 
-    if (mPaused) return;
+    if (mPaused)
+    {
+        mpActiveState->pause();
+        return;
+    }
 
     mpActiveState->run();
 
@@ -124,7 +143,7 @@ void cExperimentControlModel::updateExperimentStateMachine()
         {
             recordingStateChanged(false);
             mRunning = false;
-            emit experimentStateChanged(experiment::State::COMPLETED);
+            emit experimentStateChanged(to_int(State::COMPLETED));
             emit statusMessage("Experiment completed!");
         }
     }

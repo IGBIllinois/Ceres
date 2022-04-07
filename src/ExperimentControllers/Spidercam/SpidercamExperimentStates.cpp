@@ -25,6 +25,7 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 
 {
 	mMoveCommandSent = false;
+	mStopCommandSent = false;
 	mBusy = false;
 	mIsMoving = false;
 	mIsSetPointEnabled = false;
@@ -65,6 +66,7 @@ bool cSpidercamExperimentState_Movement::recording()
 void cSpidercamExperimentState_Movement::initialize()
 {
 	mMoveCommandSent = false;
+	mStopCommandSent = false;
 	mBusy = false;
 	mIsMoving = false;
 	mIsSetPointEnabled = false;
@@ -85,6 +87,20 @@ void cSpidercamExperimentState_Movement::run()
 	if (!readyForMotion) return;
 
 	mMoveCommandSent = mController.sendRequestNewPosition(mX_mm, mY_mm, mZ_mm, mSpeed_mmps, mPan_deg, mTilt_deg, 0.0f);
+	mStopCommandSent = false;
+
+}
+
+void cSpidercamExperimentState_Movement::pause()
+{
+	if (!mStopCommandSent)
+		mStopCommandSent = mController.requestStop();
+
+	mMoveCommandSent = false;
+	mBusy = false;
+	mIsMoving = false;
+	mIsSetPointEnabled = false;
+	mInError = false;
 }
 
 bool cSpidercamExperimentState_Movement::finished()
@@ -92,19 +108,6 @@ bool cSpidercamExperimentState_Movement::finished()
 	if (mIsMoving)
 		return false;
 
-/*
-	if (!mRecordData)
-	{
-		std::chrono::seconds delay(2);
-		std::this_thread::sleep_for(delay);
-	}
-	else
-	{
-		std::chrono::seconds delay(4);
-		std::this_thread::sleep_for(delay);
-	}
-	return true;
-*/
 	return ((abs_difference(mDollyPos.X_mm, mX_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Y_mm, mY_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Z_mm, mZ_mm) < mTolerance_mm));

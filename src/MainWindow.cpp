@@ -6,6 +6,7 @@
 
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
+#include "ExperimentToolbar.hpp"
 
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentControllers/ExperimentCtrlView.hpp"
@@ -108,6 +109,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
     QObject::connect(&mMainModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
     QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::connect(&mMainModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+    QObject::connect(&mMainModel, &cDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
 }
 
 //-----------------------------------------------------------------------------
@@ -198,13 +200,21 @@ void cMainWindow::experimentLoad()
         //TODO: Something here!
     }
 
-    cExperimentSelectDlg* dlg = new cExperimentSelectDlg(this);
-    dlg->exec();
-
     auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
     if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
     {
-        return;
+        cExperimentSelectDlg* dlg = new cExperimentSelectDlg(this);
+        dlg->initialize(mpExperiments);
+        auto result = dlg->exec();
+        if (result == QDialog::Rejected)
+            return;
+        
+        pExperiment = dlg->currentItem();
+        if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
+        {
+            //TODO: Something here!
+            return;
+        }
     }
 
     QString msg = "Loading experiment \"";
@@ -222,6 +232,20 @@ void cMainWindow::experimentLoad()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentRun()
 {
+    if (mMainModel.isExperimentRunning())
+    {
+        if (mMainModel.isExperimentPaused())
+        {
+            mMainModel.startExperiment();
+
+            mpExpLoad->setEnabled(false);
+            mpExpRun->setEnabled(false);
+            mpExpPause->setEnabled(true);
+            mpExpStop->setEnabled(true);
+        }
+        return;
+    }
+
     if (!mMainModel.isExperimentLoaded())
     {
         experimentLoad();
@@ -256,6 +280,13 @@ void cMainWindow::experimentRun()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentPause()
 {
+    if (!mMainModel.isExperimentRunning())
+    {
+        return;
+    }
+
+    mMainModel.pauseExperiment();
+
     mpExpLoad->setEnabled(false);
     mpExpRun->setEnabled(true);
     mpExpPause->setEnabled(false);
@@ -265,10 +296,14 @@ void cMainWindow::experimentPause()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentStop()
 {
-    mpExpLoad->setEnabled(true);
-    mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(false);
-    mpExpStop->setEnabled(false);
+    if (!mMainModel.isExperimentRunning())
+    {
+        return;
+    }
+
+    mMainModel.terminateExperiment();
+
+    onExperimentCompleted();
 }
 
 //-----------------------------------------------------------------------------
@@ -306,6 +341,16 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
     QMessageBox msg_box(QMessageBox::Critical, title, msg);
     msg_box.exec();
 }
+
+
+void cMainWindow::onExperimentCompleted()
+{
+    mpExpLoad->setEnabled(true);
+    mpExpRun->setEnabled(true);
+    mpExpPause->setEnabled(false);
+    mpExpStop->setEnabled(false);
+}
+
 
 //-----------------------------------------------------------------------------
 void cMainWindow::createMainMenu()
@@ -387,7 +432,10 @@ void cMainWindow::createActions()
 //-----------------------------------------------------------------------------
 void cMainWindow::createToolBars()
 {
-    mpFileBar = addToolBar("File");
+//    mpFileBar = addToolBar("File");
+
+    auto* toolbar = new cExperimentToolbar(this);
+    addToolBar(toolbar);
 }
 
 //-----------------------------------------------------------------------------

@@ -162,6 +162,8 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
 bool cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
 {
+    using namespace experiment;
+
     if (mRunning)
         return false;
 
@@ -196,14 +198,14 @@ bool cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
         }
     }
 
-    emit experimentStateChanged(experiment::State::LOADED);
+    emit experimentStateChanged(to_int(State::LOADED));
 
     return true;
 }
 
 void cSpidercamModel::startExperiment()
 {
-    if (!mInScriptMode)
+    if (!mInScriptMode && !mRunning)
     {
         QString str = "Make sure the C2 computer is in remote mode.\n";
         str += "Please enter remote mode and then start your experiment.";

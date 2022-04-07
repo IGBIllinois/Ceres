@@ -23,6 +23,7 @@ public:
 
 	void initialize() override;
 	void run() override;
+	void pause() override;
 	bool finished() override;
 
 private:
@@ -30,6 +31,7 @@ private:
 	cSpidercamController& mController;
 
 	bool mMoveCommandSent;
+	bool mStopCommandSent;
 	bool mBusy;
 	bool mIsMoving;
 	bool mIsSetPointEnabled;

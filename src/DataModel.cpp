@@ -101,6 +101,14 @@ bool cDataModel::isExperimentRunning()
     return mThread.mpController->isExperimentRunning();
 }
 
+bool cDataModel::isExperimentPaused()
+{
+    if (!mThread.mpController)
+        return false;
+
+    return mThread.mpController->isExperimentPaused();
+}
+
 bool cDataModel::isExperimentLoaded() const
 {
     if (!mThread.mpController)
@@ -111,6 +119,11 @@ bool cDataModel::isExperimentLoaded() const
 
 bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
 {
+    if (isExperimentRunning())
+    {
+        return false;
+    }
+
     if (!expDoc.contains("experiment"))
     {
         return false;
@@ -149,6 +162,12 @@ bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
 
 void cDataModel::startExperiment()
 {
+    if (isExperimentRunning())
+    {
+        mThread.mpController->startExperiment();
+        return;
+    }
+
     mThread.mpController->writeDataHeader(mFile);
 
     for (auto& sensor : mThread.mActiveSensors)
@@ -160,15 +179,24 @@ void cDataModel::startExperiment()
     mThread.mpController->startExperiment();
 }
 
+void cDataModel::pauseExperiment()
+{
+    if (mThread.mpController)
+        mThread.mpController->pauseExperiment();
+}
+
 void cDataModel::terminateExperiment()
 {
-    mThread.mpController->terminateExperiment();
+    if (mThread.mpController)
+        mThread.mpController->terminateExperiment();
 }
 
 
-void cDataModel::onExperimentStateChange(experiment::State state)
+void cDataModel::onExperimentStateChange(int s)
 {
     using namespace experiment;
+
+    auto state = to_state(s);
 
     switch (state)
     {
@@ -187,6 +215,8 @@ void cDataModel::onExperimentStateChange(experiment::State state)
 
         mExperimentTitle.clear();
         mExperimentDoc.clear();
+
+        emit experimentCompleted();
 
         break;
     }

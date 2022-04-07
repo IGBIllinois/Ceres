@@ -19,6 +19,7 @@ public:
 
 	virtual void initialize() = 0;
 	virtual void run() = 0;
+	virtual void pause() = 0;
 	virtual bool finished() = 0;
 };
 
@@ -42,6 +43,7 @@ public:
 
 	void initialize() override {};
 	void run() override {};
+	void pause() override {};
 	bool finished() override
 	{
 		return true;
@@ -62,6 +64,7 @@ public:
 
 	void initialize() override;
 	void run() override;
+	void pause() override;
 	bool finished() override;
 
 private:

@@ -18,7 +18,7 @@ class cSensorModel;
 
 namespace experiment
 {
-    enum class State;
+    enum class State : uint8_t;
 }
 
 
@@ -40,11 +40,13 @@ public:
     void closeDataFile();
 
     bool isExperimentRunning();
+    bool isExperimentPaused();
 
     std::string experimentTitle() const;
     bool isExperimentLoaded() const;
     bool loadExperiment(const nlohmann::json& expDoc);
     void startExperiment();
+    void pauseExperiment();
     void terminateExperiment();
 
 signals:
@@ -53,11 +55,13 @@ signals:
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
 
+    void experimentCompleted();
+
 private slots:
     void onStatusUpdate(QString msg);
     void onErrorUpdate(QString title, QString msg);
 
-    void onExperimentStateChange(experiment::State state);
+    void onExperimentStateChange(int state);
 
 private:
     cDataThread mThread;

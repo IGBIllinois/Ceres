@@ -13,7 +13,7 @@ class cBlockDataFile;
 
 namespace experiment
 {
-    enum class State;
+    enum class State : uint8_t;
 }
 
 
@@ -54,10 +54,14 @@ public:
     void clearExperiment();
 
     /*
-     * Clear the experiment (state machine) from the experiment
-    * controller.
+     * Is the experiment (state machine) running?
     */
-    bool isExperimentRunning();
+    bool isExperimentRunning() const;
+
+    /*
+     * Is the experiment (state machine) paused?
+    */
+    bool isExperimentPaused() const;
 
     /**
      * Started the loaded experiment.
@@ -112,7 +116,7 @@ signals:
     void errorMessage(QString title, QString msg);
 
 signals:
-    void experimentStateChanged(experiment::State state);
+    void experimentStateChanged(int state);
     void requestDataRecordingState(bool record);
 
  /**

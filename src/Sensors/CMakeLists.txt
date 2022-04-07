@@ -56,10 +56,19 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/GPS)
 # Add the Hyperspectral library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Hyperspectral)
 
+# Add the Multispectral library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Multispectral)
+
 # Add the LiDAR library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Lidar)
 
 # Add the Weather library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Weather)
+
+# Add the RGB camera library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/RGB)
+
+# Add the IR camera library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/IR)
 
 

@@ -5,5 +5,9 @@
         <file alias="about.png">./Resources/Images/About.png</file>
         <file alias="splash.png">./Resources/Images/splash.png</file>
         <file alias="bottom_logo.png">./Resources/Images/bottom_logo.png</file>
+        <file alias="load_exp.png">./Resources/Images/load_exp.png</file>
+        <file alias="start_exp.png">./Resources/Images/start_exp.png</file>
+        <file alias="pause_exp.png">./Resources/Images/pause_exp.png</file>
+        <file alias="stop_exp.png">./Resources/Images/stop_exp.png</file>
     </qresource>
 </RCC>
