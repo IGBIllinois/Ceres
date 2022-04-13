@@ -24,7 +24,7 @@ public:
 	void initialize() override;
 	void run() override;
 	void pause() override;
-	bool finished() override;
+	eRESULT finished() override;
 
 private:
 	const spidercam::sPosition& mDollyPos;

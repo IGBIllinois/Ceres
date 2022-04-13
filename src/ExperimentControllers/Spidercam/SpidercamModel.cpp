@@ -160,47 +160,12 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
     }
 }
 
-bool cSpidercamModel::loadExperiment(const nlohmann::json& expDoc)
+cExperimentState* cSpidercamModel::createState(const std::string& type)
 {
-    using namespace experiment;
+    if (type == "movement")
+        return new cSpidercamExperimentState_Movement(mCurrentPosition, mController, TOLERANCE_MM);
 
-    if (mRunning)
-        return false;
-
-    for (std::size_t i = 0; i < mExperiment.size(); ++i)
-    {
-        delete mExperiment[i];
-        mExperiment[i] = nullptr;
-    }
-
-    mExperiment.clear();
-    mExperiment.push_back(new cExperimentState_Dummy());
-
-    for (auto entry : expDoc)
-    {
-        std::string type = entry["type"];
-
-        cExperimentState* pState = nullptr;
-
-        if (type == "delay")
-        {
-            pState = new cExperimentState_Delay();
-        }
-        else if (type == "movement")
-        {
-            pState = new cSpidercamExperimentState_Movement(mCurrentPosition, mController, TOLERANCE_MM);
-        }
-
-        if (pState)
-        {
-            pState->configure(entry);
-            mExperiment.push_back(pState);
-        }
-    }
-
-    emit experimentStateChanged(to_int(State::LOADED));
-
-    return true;
+    return cExperimentControlModel::createState(type);
 }
 
 void cSpidercamModel::startExperiment()

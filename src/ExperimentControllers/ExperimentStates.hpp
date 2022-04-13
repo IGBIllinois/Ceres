@@ -1,13 +1,22 @@
 
 #pragma once
 
+#include <QString>
+#include <QMessageBox>
+
 #include <nlohmann/json.hpp>
 #include <chrono>
-#include <QString>
 
 class cExperimentState
 {
 public:
+	enum class eRESULT 
+	{
+		WAITING,	// The state is not complete and the state machine should not advance
+		DONE,		// The state is complete and the state machine should advance
+		ABORT		// The state is requesting an abort of the experiment
+	};
+
 	cExperimentState() = default;
 	virtual ~cExperimentState() = default;
 
@@ -20,7 +29,7 @@ public:
 	virtual void initialize() = 0;
 	virtual void run() = 0;
 	virtual void pause() = 0;
-	virtual bool finished() = 0;
+	virtual eRESULT finished() = 0;
 };
 
 
@@ -44,9 +53,9 @@ public:
 	void initialize() override {};
 	void run() override {};
 	void pause() override {};
-	bool finished() override
+	eRESULT finished() override
 	{
-		return true;
+		return eRESULT::DONE;
 	}
 };
 
@@ -65,12 +74,41 @@ public:
 	void initialize() override;
 	void run() override;
 	void pause() override;
-	bool finished() override;
+	eRESULT finished() override;
 
 private:
 	std::chrono::time_point<std::chrono::steady_clock>	mStart;
 	double mElapsedTime_sec;
 	double mWaitTime_sec;
+};
+
+
+class cPauseExperimentStateDlg;
+
+class cExperimentState_Pause : public QObject, public cExperimentState
+{
+	Q_OBJECT
+
+public:
+	cExperimentState_Pause();
+	~cExperimentState_Pause();
+
+	QString getStatusStr() override;
+
+	void configure(const nlohmann::json& stateDoc) override;
+
+	bool recording() override;
+
+	void initialize() override;
+	void run() override;
+	void pause() override;
+	eRESULT finished() override;
+
+signals:
+	void showDlg();
+
+private:
+	cPauseExperimentStateDlg* mpDlg;
 };
 
 

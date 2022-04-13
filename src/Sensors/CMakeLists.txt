@@ -23,6 +23,16 @@ PRIVATE
     PvtModel.cpp
 
 #
+# Dummy sensor Model-View files for testing
+#
+    DummySensorView.hpp
+    DummySensorView.cpp
+    DummySensorModel.hpp
+    DummySensorModel.cpp
+    DummySensorFactory.hpp
+    DummySensorFactory.cpp
+
+#
 # Abstract Base Class for all Sensor Models
 #
     SensorModel.hpp
@@ -45,6 +55,9 @@ target_link_libraries(Sensors PRIVATE gps_static)
 target_link_libraries(Sensors PRIVATE lidar_static)
 target_link_libraries(Sensors PRIVATE weather_static)
 target_link_libraries(Sensors PRIVATE hyperspectral_static)
+target_link_libraries(Sensors PRIVATE rgb_camera_static)
+target_link_libraries(Sensors PRIVATE ir_camera_static)
+target_link_libraries(Sensors PRIVATE multispectral_static)
 
 
 set_target_properties(Sensors PROPERTIES FOLDER "Sensors")

@@ -117,7 +117,7 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Find and include Qt
 set(Qt Qt5)
 
-find_package(${Qt} COMPONENTS Widgets Core Network REQUIRED)
+find_package(${Qt} COMPONENTS Widgets Core Network Multimedia REQUIRED)
 
 # Find and include my libraries for data collection
 find_package(Ouster REQUIRED)

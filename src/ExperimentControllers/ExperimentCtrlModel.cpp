@@ -47,8 +47,57 @@ void cExperimentControlModel::clearExperiment()
 
     mActiveStateNumber = 0;
     mpActiveState = nullptr;
+
+    for (std::size_t i = 0; i < mExperiment.size(); ++i)
+    {
+        delete mExperiment[i];
+        mExperiment[i] = nullptr;
+    }
+
     mExperiment.clear();
 }
+
+cExperimentState* cExperimentControlModel::createState(const std::string& type)
+{
+    if (type == "delay")
+        return new cExperimentState_Delay();
+
+    if (type == "pause")
+        return new cExperimentState_Pause();
+
+    return nullptr;
+}
+
+
+bool cExperimentControlModel::loadExperiment(const nlohmann::json& expDoc)
+{
+    using namespace experiment;
+
+    if (mRunning)
+        return false;
+
+    clearExperiment();
+
+    mExperiment.push_back(new cExperimentState_Dummy());
+
+    for (auto entry : expDoc)
+    {
+        std::string type = entry["type"];
+
+        cExperimentState* pState = createState(type);
+
+        if (pState)
+        {
+            pState->configure(entry);
+            mExperiment.push_back(pState);
+        }
+    }
+
+    emit experimentStateChanged(to_int(State::LOADED));
+
+    return true;
+}
+
 
 void cExperimentControlModel::startExperiment()
 {
@@ -126,7 +175,13 @@ void cExperimentControlModel::updateExperimentStateMachine()
 
     mpActiveState->run();
 
-    if (mpActiveState->finished())
+    auto result = mpActiveState->finished();
+    if (result == cExperimentState::eRESULT::ABORT)
+    {
+        terminateExperiment();
+    }
+
+    if (result == cExperimentState::eRESULT::DONE)
     {
         ++mActiveStateNumber;
 

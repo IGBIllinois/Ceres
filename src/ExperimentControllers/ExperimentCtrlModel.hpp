@@ -39,7 +39,7 @@ public:
     /*
      * Load an experiment from JSON file.
      */
-    virtual bool loadExperiment(const nlohmann::json& expDoc) = 0;
+    bool loadExperiment(const nlohmann::json& expDoc);
 
     /*
      * Is there an experiment (state machine) loaded in the experiment
@@ -133,6 +133,8 @@ public:
 
 protected:
     cExperimentControlModel(QObject* parent = nullptr);
+
+    virtual cExperimentState* createState(const std::string& type);
 
     void recordingStateChanged(bool recording);
 

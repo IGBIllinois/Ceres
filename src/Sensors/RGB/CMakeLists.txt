@@ -7,6 +7,18 @@ set(RGB_CAMERA_PUBLIC_HEADERS
 set(RGB_CAMERA_SOURCE_FILES
 
 #
+# Axis Communications Video Cameras
+#
+AxisCommunicationsModel_F44.hpp
+AxisCommunicationsModel_F44.cpp
+AxisCommunicationsView.hpp
+AxisCommunicationsView.cpp
+AxisCommunicationsModel.hpp
+AxisCommunicationsModel.cpp
+AxisCommunicationsFactory.hpp
+AxisCommunicationsFactory.cpp
+
+#
 # General RGB Camera View-Model-Controller files
 #
     RgbCameraView.hpp
@@ -42,6 +54,7 @@ PRIVATE
 
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Network)
+target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Multimedia)
 target_link_libraries(rgb_camera_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(rgb_camera_static PUBLIC BlockDataFile)
 

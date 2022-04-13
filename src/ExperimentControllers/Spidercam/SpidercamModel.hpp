@@ -31,7 +31,10 @@ public:
      */
     void configure(const nlohmann::json& jsonCfg) override;
 
-	bool loadExperiment(const nlohmann::json& expDoc) override;
+	/*
+	 * Create a experiment state for the state machine
+	 */
+	cExperimentState* createState(const std::string& type) override;
 
 	/**
 	 * Started the loaded experiment.

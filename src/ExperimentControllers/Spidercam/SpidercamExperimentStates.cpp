@@ -103,13 +103,13 @@ void cSpidercamExperimentState_Movement::pause()
 	mInError = false;
 }
 
-bool cSpidercamExperimentState_Movement::finished()
+cExperimentState::eRESULT cSpidercamExperimentState_Movement::finished()
 {
 	if (mIsMoving)
-		return false;
+		return eRESULT::WAITING;
 
 	return ((abs_difference(mDollyPos.X_mm, mX_mm) < mTolerance_mm) &&
 			(abs_difference(mDollyPos.Y_mm, mY_mm) < mTolerance_mm) &&
-			(abs_difference(mDollyPos.Z_mm, mZ_mm) < mTolerance_mm));
+			(abs_difference(mDollyPos.Z_mm, mZ_mm) < mTolerance_mm)) ? eRESULT::DONE : eRESULT::WAITING;
 }
 

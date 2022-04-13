@@ -18,6 +18,16 @@ PUBLIC
  
 PRIVATE
 #
+# A dummy Experiment Controller for sensor testing
+#
+    DummyCtrlView.hpp
+    DummyCtrlView.cpp
+    DummyCtrlModel.hpp
+    DummyCtrlModel.cpp
+    DummyCtrlFactory.hpp
+    DummyCtrlFactory.cpp
+
+#
 # Abstract Base Class for all Experiment Controllers
 #
     ExperimentCtrlView.cpp
@@ -26,6 +36,8 @@ PRIVATE
 #
 # Base Classes for the experiment state machine
 #
+    PauseExperimentStateDlg.hpp
+    PauseExperimentStateDlg.cpp
     ExperimentStates.hpp
     ExperimentStates.cpp
 )
