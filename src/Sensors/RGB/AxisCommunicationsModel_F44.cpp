@@ -47,7 +47,7 @@ bool cAxisCommunicationsModel_F44::startCommunications()
 	if (mpHttpManager) return true;
 
 	mpHttpManager  = new QNetworkAccessManager(this);
-//BAF	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cWeatherDataModel_Http::requestReceived);
+	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
 
 	return true;
 }
@@ -56,7 +56,7 @@ void cAxisCommunicationsModel_F44::stopCommunications()
 {
     if (!mpHttpManager) return;
 
-//BAF    disconnect(mpHttpManager, &QNetworkAccessManager::finished, this, &cWeatherDataModel_Http::requestReceived);
+    disconnect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
 
     delete mpHttpManager; mpHttpManager = nullptr;
 }

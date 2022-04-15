@@ -3,9 +3,13 @@
 
 #include "RgbCameraModel.hpp"
 #include "../../Utilities/Timers.hpp"
+#include "AxisCommunicationsUtils.hpp"
 
 #include <QNetworkReply>
 #include <QUrl>
+#include <QBitmap>
+
+#include <vector>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -36,6 +40,11 @@ public:
     static char* protocol() { return "http"; };
 
     QUrl url() const { return mUrl; }
+
+    int getVapixVersion() const;
+    const std::vector<axis::sImageSize_t>& getImageSizes() const;
+    const std::vector<axis::eIMAGE_FORMAT>& getImageFormats() const;
+
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
@@ -68,13 +77,25 @@ protected:
     cAxisCommunicationsModel(QObject* parent = nullptr);
     virtual ~cAxisCommunicationsModel();
 
+    void queryVapixSupport();
+    void querySupportedResolutions();
+    void querySupportedImageFormats();
+    axis::sImageSize_t queryImageResolution(uint8_t camera);
+    QBitmap getBitmap(uint8_t camera, axis::sImageSize_t resolution = axis::sImageSize_t());
+    QImage getJPEG(uint8_t camera, axis::sImageSize_t resolution = axis::sImageSize_t());
+
     void getRequest();
 
+    QString queryServer(const QNetworkRequest& request);
     virtual void processReply(const std::string& reply) {};
 
 protected:
     QNetworkAccessManager* mpHttpManager;
     QUrl mUrl;
+
+    int mVapixVersion;
+    std::vector<axis::sImageSize_t>  mSupportedImageSizes;
+    std::vector<axis::eIMAGE_FORMAT> mSupportedImageFormats;
 
     cIntervalTimer	mTimer;
 };

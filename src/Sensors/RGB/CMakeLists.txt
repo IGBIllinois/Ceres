@@ -15,6 +15,8 @@ AxisCommunicationsView.hpp
 AxisCommunicationsView.cpp
 AxisCommunicationsModel.hpp
 AxisCommunicationsModel.cpp
+AxisCommunicationsUtils.hpp
+AxisCommunicationsUtils.cpp
 AxisCommunicationsFactory.hpp
 AxisCommunicationsFactory.cpp
 
