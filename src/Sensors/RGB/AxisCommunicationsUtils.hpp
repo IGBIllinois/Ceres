@@ -23,4 +23,14 @@ namespace axis
     std::string to_string(sImageSize_t size);
     sImageSize_t to_image_size(const std::string& str);
 
+    inline bool operator==(const sImageSize_t& lhs, const sImageSize_t& rhs)
+    {
+        return (lhs.width == rhs.width) && (lhs.height == rhs.height);
+    }
+
+    inline bool operator!=(const sImageSize_t& lhs, const sImageSize_t& rhs)
+    {
+        return ! (lhs == rhs);
+    }
+
 } // end of axis namespace

@@ -3,13 +3,18 @@
 
 #include "AxisCommunicationsModel.hpp"
 #include "../../Utilities/Timers.hpp"
+#include "AxisCamera.hpp"
 
-#include <QNetworkReply>
-#include <QUrl>
+//#include <QNetworkReply>
+//#include <QUrl>
+#include <QImage>
+
+#include <vector>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QNetworkAccessManager;
+class QNetworkReply;
 QT_END_NAMESPACE
 
 
@@ -46,6 +51,10 @@ public:
     void update() override;
 
 protected slots:
+    void imageGrabbed(int id, QImage* img);
+    void errorHappend(int id, QString msg);
+    void stateChanged(int id, cAxisCamera::GrabbingState newState);
+
     void requestReceived(QNetworkReply* pReply);
 
     void getRequest();
@@ -53,5 +62,9 @@ protected slots:
     virtual void processReply(const std::string& reply) {};
 
 private:
+    int mCurrentCameraId;
+
+private:
+    std::vector<cAxisCamera*> mCameras;
 };
 

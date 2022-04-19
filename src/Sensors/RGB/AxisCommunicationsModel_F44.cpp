@@ -5,16 +5,25 @@
 #include <QNetworkAccessManager>
 #include <QMessageBox>
 
+const std::size_t MAX_CAMERAS = 4;
+
 
 cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
 :
     cAxisCommunicationsModel(parent)
 {
+    mCameras = {nullptr, nullptr, nullptr, nullptr};
 }
 
 cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
 {
 	stopCommunications();
+
+    for (auto* camera : mCameras)
+    {
+        delete camera;
+        camera = nullptr;
+    }
 }
 
 bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
@@ -22,7 +31,51 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     try
     {
         auto section = jsonCfg["F44"];
-        return cAxisCommunicationsModel::configure(section);
+
+
+        if (!cAxisCommunicationsModel::configure(section))
+        {
+            return false;
+        }
+
+        auto cameras = section["cameras"];
+
+        if (MAX_CAMERAS <= cameras.size())
+        {
+            QString str = "Error in the \"axis_communications\" configuration:\n";
+            str.append("The F44 controller only supports a maximum of four cameras.");
+            emit errorMessage("Configuration Error", str);
+
+            return false;
+        }
+
+        for (int i = 0; i < cameras.size(); ++i)
+        {
+            auto camera = cameras[i];
+            int id = camera["id"];
+            mCameras[i] = new cAxisCamera(id, this);
+
+            axis::sImageSize_t image_size = axis::to_image_size(camera["resolution"]);
+            auto it = std::find(mSupportedImageSizes.begin(), mSupportedImageSizes.end(), image_size);
+            if (it == mSupportedImageSizes.end())
+            {
+                QString str = "Error in the \"axis_communications\" configuration:\n";
+                str.append("The F44 controller only supports a maximum of four cameras.");
+                emit errorMessage("Configuration Error", str);
+
+                return false;
+            }
+            mCameras[i]->setImageSize(image_size);
+
+            int fps = camera["frames per second"];
+            mCameras[i]->setFramesPerSeconds(fps);
+
+            mCameras[i]->setSource(mUrl);
+
+            connect(mCameras[i], &cAxisCamera::imageGrabbed, this, &cAxisCommunicationsModel_F44::imageGrabbed);
+            connect(mCameras[i], &cAxisCamera::errorHappend, this, &cAxisCommunicationsModel_F44::errorHappend);
+            connect(mCameras[i], &cAxisCamera::stateChanged, this, &cAxisCommunicationsModel_F44::stateChanged);
+        }
     }
     catch (const std::exception& e)
     {
@@ -44,16 +97,20 @@ void cAxisCommunicationsModel_F44::endDataRecording()
 
 bool cAxisCommunicationsModel_F44::startCommunications()
 {
-	if (mpHttpManager) return true;
+//	if (mpHttpManager) return true;
 
-	mpHttpManager  = new QNetworkAccessManager(this);
-	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
+//	mpHttpManager  = new QNetworkAccessManager(this);
+//	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
+
+    mCameras[0]->startGrabbing();
 
 	return true;
 }
 
 void cAxisCommunicationsModel_F44::stopCommunications()
 {
+    mCameras[0]->stopGrabbing();
+
     if (!mpHttpManager) return;
 
     disconnect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
@@ -65,7 +122,8 @@ void cAxisCommunicationsModel_F44::requestReceived(QNetworkReply* pReply)
 {
 	pReply->deleteLater();
 
-    if (pReply->error() == QNetworkReply::NoError) {
+    if (pReply->error() == QNetworkReply::NoError) 
+    {
         // Get the http status code
         int v = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         if (v >= 200 && v < 300) // Success
@@ -96,6 +154,45 @@ void cAxisCommunicationsModel_F44::update()
     {
         getRequest();
     }
+}
+
+void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
+{
+    mCurrentImage = *img;
+}
+
+void cAxisCommunicationsModel_F44::errorHappend(int id, QString msg)
+{
+    QString title = "Camera ";
+    title += QString::number(id);
+    title += "Error";
+    emit errorMessage(title, msg);
+}
+
+void cAxisCommunicationsModel_F44::stateChanged(int id, cAxisCamera::GrabbingState newState)
+{
+    QString msg = "Camera ";
+    msg += QString::number(id);
+
+    switch (newState)
+    {
+    case cAxisCamera::GrabbingState::Off:
+        msg += " is now off.";
+        break;
+    case cAxisCamera::GrabbingState::TurnOff:
+        msg += " is turning off.";
+        break;
+    case cAxisCamera::GrabbingState::TurnOn:
+        msg += " is turning on.";
+        break;
+    case cAxisCamera::GrabbingState::On:
+        msg += " is now on.";
+        break;
+    case cAxisCamera::GrabbingState::Error:
+        msg += " has an error.";
+        break;
+    }
+    emit statusMessage(msg);
 }
 
 void cAxisCommunicationsModel_F44::getRequest()

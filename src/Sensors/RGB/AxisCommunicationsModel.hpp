@@ -97,6 +97,8 @@ protected:
     std::vector<axis::sImageSize_t>  mSupportedImageSizes;
     std::vector<axis::eIMAGE_FORMAT> mSupportedImageFormats;
 
+    QImage mCurrentImage;
+
     cIntervalTimer	mTimer;
 };
 

@@ -72,12 +72,6 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
     querySupportedResolutions();
     querySupportedImageFormats();
 
-    auto image_size = queryImageResolution(1);
-
-    auto pic = getJPEG(1, image_size);
-
-    pic.save("test.jpg");
-
 /*
 	try
 	{
