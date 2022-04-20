@@ -9,6 +9,8 @@ set(RGB_CAMERA_SOURCE_FILES
 #
 # Axis Communications Video Cameras
 #
+AxisCommunicationsView_F44.hpp
+AxisCommunicationsView_F44.cpp
 AxisCommunicationsModel_F44.hpp
 AxisCommunicationsModel_F44.cpp
 AxisCommunicationsView.hpp

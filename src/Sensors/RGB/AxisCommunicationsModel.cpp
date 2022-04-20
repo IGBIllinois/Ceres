@@ -23,7 +23,6 @@ cAxisCommunicationsModel::cAxisCommunicationsModel(QObject* parent)
     mVapixVersion(0)
 {
     mpHttpManager = new QNetworkAccessManager(this);
-    mTimer.interval_sec(static_cast<uint32_t>(10));
 }
 
 cAxisCommunicationsModel::~cAxisCommunicationsModel()
@@ -149,10 +148,6 @@ void cAxisCommunicationsModel::requestReceived(QNetworkReply* pReply)
 
 void cAxisCommunicationsModel::update()
 {
-    if (mTimer.elapsed())
-    {
-        getRequest();
-    }
 }
 
 void cAxisCommunicationsModel::queryVapixSupport()
@@ -278,93 +273,6 @@ axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera
 
     return axis::sImageSize_t();
 }
-
-QBitmap cAxisCommunicationsModel::getBitmap(uint8_t camera, axis::sImageSize_t resolution)
-{
-    auto supported = std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), axis::eIMAGE_FORMAT::BITMAP);
-    if (supported == std::end(mSupportedImageFormats))
-        return QBitmap();
-
-    QUrl url(mUrl);
-
-    url.setPath("/axis-cgi/bitmap/image.bmp");
-
-    QUrlQuery query;
-
-    if (camera > 0)
-        query.addQueryItem("camera", QString::number(camera));
-
-    if ((resolution.width != 0) && (resolution.height != 0))
-        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
-
-    if (!query.isEmpty())
-    {
-        url.setQuery(query);
-    }
-
-    QNetworkRequest request(url);
-
-    QNetworkReply* reply = mpHttpManager->get(request);
-
-    reply->waitForReadyRead(5000);
-
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-
-    reply->deleteLater();
-
-    QByteArray image_data = reply->readAll();
-    QImage image;
-    auto ok = image.loadFromData(image_data);
-
-    return QBitmap::fromImage(image);
-}
-
-QImage cAxisCommunicationsModel::getJPEG(uint8_t camera, axis::sImageSize_t resolution)
-{
-    auto supported = std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), axis::eIMAGE_FORMAT::JPEG);
-    if (supported == std::end(mSupportedImageFormats))
-        return QImage();
-
-    QUrl url(mUrl);
-
-    url.setPath("/axis-cgi/jpg/image.cgi");
-
-    QUrlQuery query;
-
-    if (camera > 0)
-        query.addQueryItem("camera", QString::number(camera));
-
-    if ((resolution.width != 0) && (resolution.height != 0))
-        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
-
-    if (!query.isEmpty())
-    {
-        url.setQuery(query);
-    }
-
-    QNetworkRequest request(url);
-
-    QNetworkReply* reply = mpHttpManager->get(request);
-
-    reply->waitForReadyRead(5000);
-
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-
-    reply->deleteLater();
-
-    QByteArray image_data = reply->readAll();
-    QImage image;
-    auto ok = image.loadFromData(image_data);
-
-    return image;
-}
-
 
 QString cAxisCommunicationsModel::queryServer(const QNetworkRequest& request)
 {

@@ -4,8 +4,7 @@
 #include "AxisCommunicationsFactory.hpp"
 
 #include "AxisCommunicationsModel_F44.hpp"
-#include "AxisCommunicationsView.hpp"
-//#include <ouster/ouster_defs.h>
+#include "AxisCommunicationsView_F44.hpp"
 
 #include <QWidget>
 #include <QString>
@@ -27,16 +26,19 @@ sSensorWidgets create_axis_communications_f44_sensor()
     // Create the Ouster model and view...
     auto* pModel = new cAxisCommunicationsModel_F44();
     auto* dockWidget = new QDockWidget();
-    auto* pView = new cAxisCommunicationsView(pModel, dockWidget);
+    auto* pView = new cAxisCommunicationsView_F44(pModel, dockWidget);
+    pView->initialize();
 
     dockWidget->setWindowTitle(pView->windowTitle());
     dockWidget->setWidget(pView);
     QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cAxisCommunicationsView::dockLocationChanged);
     QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cAxisCommunicationsView::topLevelChanged);
 
+    QObject::connect(pModel, &cAxisCommunicationsModel_F44::enableCamera, pView, &cAxisCommunicationsView_F44::enableCamera);
+
+    QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
+
 /*
-    QObject::connect(pModel, &cOusterModel::updateBeamIntrinsics, pView, &cOusterView::beamIntrinsicsChanged);
-    QObject::connect(pModel, &cOusterModel::updateImuIntrinsics, pView, &cOusterView::imuIntrinsicsChanged);
     QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterView::lidarIntrinsicsChanged);
     QObject::connect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterView::dataFormatChanged);
     QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterView::azimuthWindowChanged);

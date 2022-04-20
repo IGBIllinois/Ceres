@@ -50,6 +50,12 @@ public:
 
     void update() override;
 
+signals:
+    void enableCamera(int id);
+
+public slots:
+    void setActiveCamera(int id);
+
 protected slots:
     void imageGrabbed(int id, QImage* img);
     void errorHappend(int id, QString msg);
@@ -65,6 +71,8 @@ private:
     int mCurrentCameraId;
 
 private:
+    cAxisCamera* mpActiveCamera;
+
     std::vector<cAxisCamera*> mCameras;
 };
 

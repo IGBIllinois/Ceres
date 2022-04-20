@@ -2,7 +2,6 @@
 #pragma once
 
 #include "RgbCameraModel.hpp"
-#include "../../Utilities/Timers.hpp"
 #include "AxisCommunicationsUtils.hpp"
 
 #include <QNetworkReply>
@@ -38,6 +37,8 @@ public:
      * type sensor.
      */
     static char* protocol() { return "http"; };
+
+    const QImage& getCurrentImage() const;
 
     QUrl url() const { return mUrl; }
 
@@ -81,8 +82,6 @@ protected:
     void querySupportedResolutions();
     void querySupportedImageFormats();
     axis::sImageSize_t queryImageResolution(uint8_t camera);
-    QBitmap getBitmap(uint8_t camera, axis::sImageSize_t resolution = axis::sImageSize_t());
-    QImage getJPEG(uint8_t camera, axis::sImageSize_t resolution = axis::sImageSize_t());
 
     void getRequest();
 
@@ -98,7 +97,5 @@ protected:
     std::vector<axis::eIMAGE_FORMAT> mSupportedImageFormats;
 
     QImage mCurrentImage;
-
-    cIntervalTimer	mTimer;
 };
 

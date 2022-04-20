@@ -10,7 +10,8 @@ const std::size_t MAX_CAMERAS = 4;
 
 cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
 :
-    cAxisCommunicationsModel(parent)
+    cAxisCommunicationsModel(parent),
+    mpActiveCamera(nullptr)
 {
     mCameras = {nullptr, nullptr, nullptr, nullptr};
 }
@@ -28,6 +29,7 @@ cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
 
 bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 {
+
     try
     {
         auto section = jsonCfg["F44"];
@@ -75,13 +77,20 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
             connect(mCameras[i], &cAxisCamera::imageGrabbed, this, &cAxisCommunicationsModel_F44::imageGrabbed);
             connect(mCameras[i], &cAxisCamera::errorHappend, this, &cAxisCommunicationsModel_F44::errorHappend);
             connect(mCameras[i], &cAxisCamera::stateChanged, this, &cAxisCommunicationsModel_F44::stateChanged);
+
+            emit enableCamera(id);
         }
+
+        int default_id = section["default camera id"];
+        setActiveCamera(default_id);
+
     }
     catch (const std::exception& e)
     {
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 void cAxisCommunicationsModel_F44::writeDataHeader(cBlockDataFile& file)
@@ -102,14 +111,14 @@ bool cAxisCommunicationsModel_F44::startCommunications()
 //	mpHttpManager  = new QNetworkAccessManager(this);
 //	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
 
-    mCameras[0]->startGrabbing();
+    mpActiveCamera->startGrabbing();
 
 	return true;
 }
 
 void cAxisCommunicationsModel_F44::stopCommunications()
 {
-    mCameras[0]->stopGrabbing();
+    mpActiveCamera->stopGrabbing();
 
     if (!mpHttpManager) return;
 
@@ -150,10 +159,42 @@ void cAxisCommunicationsModel_F44::requestReceived(QNetworkReply* pReply)
 
 void cAxisCommunicationsModel_F44::update()
 {
-    if (mTimer.elapsed())
+}
+
+void cAxisCommunicationsModel_F44::setActiveCamera(int id)
+{
+    cAxisCamera* pCamera = nullptr;
+
+    if (mpActiveCamera && (id == mpActiveCamera->cameraID()))
     {
-        getRequest();
+        return;
     }
+
+    for (auto* camera : mCameras)
+    {
+        if (camera->cameraID() == id)
+        {
+            pCamera = camera;
+            break;
+        }
+    }
+
+    // Check to make sure the camera was found
+    if (!pCamera)
+        return;
+
+    bool isGrabbing = false;
+
+    if (mpActiveCamera)
+    {
+        isGrabbing = mpActiveCamera->isGrabbing();
+        mpActiveCamera->stopGrabbing();
+    }
+
+    if (isGrabbing)
+        pCamera->startGrabbing();
+
+    mpActiveCamera = pCamera;
 }
 
 void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
@@ -165,7 +206,7 @@ void cAxisCommunicationsModel_F44::errorHappend(int id, QString msg)
 {
     QString title = "Camera ";
     title += QString::number(id);
-    title += "Error";
+    title += " Error";
     emit errorMessage(title, msg);
 }
 

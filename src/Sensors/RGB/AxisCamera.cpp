@@ -124,7 +124,7 @@ bool cAxisCamera::sendRequest()
     mpRequest->setUrl(mCurrentUrl);
 
     mpReply = mpDownloadManager->get(*mpRequest);
-    connect(mpReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(downloadErrorSlot(QNetworkReply::NetworkError)));
+    connect(mpReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(downloadError(QNetworkReply::NetworkError)));
     connect(mpReply, SIGNAL(readyRead()), this, SLOT(replyDataAvailable()));
 
     mCurrentImageSize = 0;
@@ -267,5 +267,81 @@ void cAxisCamera::requestReceived(QNetworkReply* pReply)
         // Error
         pReply->errorString();
     }
+}
+
+QBitmap cAxisCamera::getBitmap(axis::sImageSize_t resolution)
+{
+    QUrl url(mCurrentUrl);
+
+    url.setPath("/axis-cgi/bitmap/image.bmp");
+
+    QUrlQuery query;
+
+    query.addQueryItem("camera", QString::number(mCameraID));
+
+    if ((resolution.width != 0) && (resolution.height != 0))
+        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
+
+    if (!query.isEmpty())
+    {
+        url.setQuery(query);
+    }
+
+    QNetworkRequest request(url);
+
+    QNetworkReply* reply = mpDownloadManager->get(request);
+
+    reply->waitForReadyRead(5000);
+
+    QEventLoop loop;
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+
+    reply->deleteLater();
+
+    QByteArray image_data = reply->readAll();
+    QImage image;
+    auto ok = image.loadFromData(image_data);
+
+    return QBitmap::fromImage(image);
+}
+
+QImage cAxisCamera::getJPEG(axis::sImageSize_t resolution)
+{
+    QUrl url(mCurrentUrl);
+
+    url.setPath("/axis-cgi/jpg/image.cgi");
+
+    QUrlQuery query;
+
+    query.addQueryItem("camera", QString::number(mCameraID));
+
+    if ((resolution.width != 0) && (resolution.height != 0))
+        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
+
+    if (!query.isEmpty())
+    {
+        url.setQuery(query);
+    }
+
+    QNetworkRequest request(url);
+
+    QNetworkReply* reply = mpDownloadManager->get(request);
+
+    reply->waitForReadyRead(5000);
+
+    QEventLoop loop;
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+
+    reply->deleteLater();
+
+    QByteArray image_data = reply->readAll();
+    QImage image;
+    auto ok = image.loadFromData(image_data);
+
+    return image;
 }
 
