@@ -22,6 +22,9 @@ public:
 	void startTime(time_t time);
 	void endTime(time_t time);
 
+protected:
+	cBlockID& blockID() override;
+
 private:
     cExperimentID         mBlockID;
 };

@@ -47,6 +47,9 @@ public:
 	void write(const ssnx::gps::ReceiverTime_1_t& in);
 	void write(const ssnx::gps::RtcmDatum_1_t& in);
 
+protected:
+	cBlockID& blockID() override;
+
 private:
     cSsnxID         mBlockID;
 };

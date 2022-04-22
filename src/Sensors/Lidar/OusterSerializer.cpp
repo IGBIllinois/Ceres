@@ -22,9 +22,9 @@ cOusterSerializer::cOusterSerializer(std::size_t n, cBlockDataFile* pDataFile)
 {
 }
 
-void cOusterSerializer::setVersion(uint8_t major, uint8_t minor)
+cBlockID& cOusterSerializer::blockID()
 {
-	mBlockID.setVersion(major, minor);
+    return mBlockID;
 }
 
 void cOusterSerializer::write(const ouster::config_param_t& in)

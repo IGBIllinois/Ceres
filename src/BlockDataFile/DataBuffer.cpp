@@ -640,6 +640,30 @@ void cDataBuffer::write(const std::byte* in, uint16_t len)
 	mWriteIndex += len;
 }
 
+void cDataBuffer::write(const char* in, std::size_t len)
+{
+	// Check to make sure we have enough buffer space to put this variable into
+	// our internal storage.
+	if (write_size() < len)
+	{
+		mOverrun = true;
+		return;
+	}
+
+	if (in == nullptr)
+	{
+		// null out the char array in the buffer
+		memset(&mpBuffer[mWriteIndex], 0, len);
+		mWriteIndex += len;
+		return;
+	}
+
+	// put the data into the buffer
+	memcpy(&mpBuffer[mWriteIndex], in, len);
+
+	mWriteIndex += len;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //

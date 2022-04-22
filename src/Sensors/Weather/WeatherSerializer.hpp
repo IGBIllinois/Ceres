@@ -19,11 +19,12 @@ public:
 	explicit cWeatherSerializer(std::size_t n, cBlockDataFile* pDataFile = nullptr);
 	~cWeatherSerializer() = default;
 
-	void setVersion(uint8_t major, uint8_t minor);
-
 	void writeConfigInfo(const std::string& info);
 	void writeWindData_mps(bool valid, double speed_mps, double dir_deg);
 	void writeWindData_knots(bool valid, double speed_knots, double dir_deg);
+
+protected:
+	cBlockID& blockID() override;
 
 private:
     cWeatherID       mBlockID;

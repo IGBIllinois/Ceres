@@ -1,6 +1,7 @@
 
 #include "BlockSerializer.hpp"
 #include "BlockDataFile.hpp"
+#include "BlockId.hpp"
 
 
 cBlockSerializer::cBlockSerializer()
@@ -31,6 +32,11 @@ cBlockDataFile* cBlockSerializer::detach()
 void cBlockSerializer::setBufferCapacity(std::size_t n)
 {
     mDataBuffer.capacity(n);
+}
+
+void cBlockSerializer::setVersion(uint8_t major, uint8_t minor)
+{
+    blockID().setVersion(major, minor);
 }
 
 

@@ -6,6 +6,7 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QCamera>
+#include <QLayout>
 
 #include <string>
 
@@ -30,32 +31,39 @@ void cAxisCommunicationsView_F44::initialize()
     toolbar->setMovable(false);
 
     mpCamera1 = new QToolButton(toolbar);
-    mpCamera1->setText("1");
+    mpCamera1->setIcon(QIcon(":/ripe.illinois.edu/one_button.jpg"));
     mpCamera1->setEnabled(false);
     connect(mpCamera1, &QToolButton::released, this, &cAxisCommunicationsView_F44::cameraSelected_1);
 
     toolbar->addWidget(mpCamera1);
 
     mpCamera2 = new QToolButton(toolbar);
-    mpCamera2->setText("2");
+    mpCamera2->setIcon(QIcon(":/ripe.illinois.edu/two_button.png"));
     mpCamera2->setEnabled(false);
     connect(mpCamera2, &QToolButton::released, this, &cAxisCommunicationsView_F44::cameraSelected_2);
 
     toolbar->addWidget(mpCamera2);
 
     mpCamera3 = new QToolButton(toolbar);
-    mpCamera3->setText("3");
+    mpCamera3->setIcon(QIcon(":/ripe.illinois.edu/three_button.png"));
     mpCamera3->setEnabled(false);
     connect(mpCamera3, &QToolButton::released, this, &cAxisCommunicationsView_F44::cameraSelected_3);
 
     toolbar->addWidget(mpCamera3);
 
     mpCamera4 = new QToolButton(toolbar);
-    mpCamera4->setText("4");
+    mpCamera4->setIcon(QIcon(":/ripe.illinois.edu/four_button.png"));
     mpCamera4->setEnabled(false);
     connect(mpCamera4, &QToolButton::released, this, &cAxisCommunicationsView_F44::cameraSelected_4);
 
     toolbar->addWidget(mpCamera4);
+
+    auto* mainLayout = new QVBoxLayout();
+
+    mainLayout->addWidget(toolbar);
+    mainLayout->addWidget(mpImage);
+
+    setLayout(mainLayout);
 }
 
 void cAxisCommunicationsView_F44::enableCamera(int id)

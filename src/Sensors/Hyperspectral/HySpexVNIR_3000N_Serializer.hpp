@@ -17,7 +17,8 @@ public:
 	explicit cHySpexVNIR_3000N_Serializer(std::size_t n, cBlockDataFile* pDataFile);
 	~cHySpexVNIR_3000N_Serializer() = default;
 
-	void setVersion(uint8_t major, uint8_t minor);
+protected:
+	cBlockID& blockID() override;
 
 private:
 	cHySpex_VNIR_3000N_ID       mBlockID;

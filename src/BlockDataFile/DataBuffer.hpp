@@ -273,6 +273,7 @@ public:
 
     void write(const std::string& in);
     void write(const std::byte* in, uint16_t len);
+    void write(const char* in, std::size_t len);
 //@}
 
 protected:

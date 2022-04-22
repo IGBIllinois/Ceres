@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "RgbImageWidget.hpp"
+
 #include <QAbstractScrollArea>
 
 // Qt Forward Declaration
@@ -25,5 +27,6 @@ private:
 	virtual void setFloatingSize();
 	virtual void setDockedSize();
 
-private:
+protected:
+	cRgbImageWidget* mpImage;
 };

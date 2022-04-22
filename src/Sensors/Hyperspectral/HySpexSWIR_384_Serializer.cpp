@@ -18,9 +18,9 @@ cHySpexSWIR_384_Serializer::cHySpexSWIR_384_Serializer(std::size_t n, cBlockData
 {
 }
 
-void cHySpexSWIR_384_Serializer::setVersion(uint8_t major, uint8_t minor)
+cBlockID& cHySpexSWIR_384_Serializer::blockID()
 {
-	mBlockID.setVersion(major, minor);
+    return mBlockID;
 }
 
 

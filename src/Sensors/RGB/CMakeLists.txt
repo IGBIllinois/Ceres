@@ -17,6 +17,11 @@ AxisCommunicationsView.hpp
 AxisCommunicationsView.cpp
 AxisCommunicationsModel.hpp
 AxisCommunicationsModel.cpp
+AxisCommunicationsBlockId.hpp
+AxisCommunicationsBlockId.cpp
+AxisDataIdentifiers.hpp
+AxisCommunicationsSerializer.hpp
+AxisCommunicationsSerializer.cpp
 AxisCamera.hpp
 AxisCamera.cpp
 AxisCommunicationsUtils.hpp
@@ -27,6 +32,8 @@ AxisCommunicationsFactory.cpp
 #
 # General RGB Camera View-Model-Controller files
 #
+    RgbImageWidget.hpp
+    RgbImageWidget.cpp
     RgbCameraView.hpp
     RgbCameraView.cpp
     RgbCameraModel.hpp

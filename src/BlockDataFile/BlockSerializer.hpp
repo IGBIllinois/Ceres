@@ -8,6 +8,7 @@
 
 // Forward Declarations
 class cBlockDataFile;
+class cBlockID;
 
 
 class cBlockSerializer
@@ -22,10 +23,15 @@ public:
 
 	void setBufferCapacity(std::size_t n);
 
+	void setVersion(uint8_t major, uint8_t minor);
+
 	explicit operator bool() const noexcept
 	{
 		return mpDataFile != nullptr;
 	}
+
+protected:
+	virtual cBlockID& blockID() = 0;
 
 protected:
     cDataBuffer     mDataBuffer;

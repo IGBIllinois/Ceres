@@ -34,8 +34,6 @@ public:
 	explicit cOusterSerializer(std::size_t n, cBlockDataFile* pDataFile);
 	~cOusterSerializer() = default;
 
-	void setVersion(uint8_t major, uint8_t minor);
-
 	void write(const ouster::config_param_t& in);
 	void write(const ouster::sensor_info_t& in);
 	void write(const ouster::timestamp_t& in);
@@ -50,6 +48,9 @@ public:
 	void write(const ouster::lidar_data_format_t& in);
 	void write(const ouster::imu_data_t& in);
 	void write(uint16_t frameID, const cOusterLidarData& data);
+
+protected:
+	cBlockID& blockID() override;
 
 private:
 	cOusterLidarID    mBlockID;

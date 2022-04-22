@@ -61,6 +61,11 @@ void cExperimentSerializer::endTime(time_t time)
 
 }
 
+cBlockID& cExperimentSerializer::blockID()
+{
+    return mBlockID;
+}
+
 
 
 

@@ -22,6 +22,11 @@ cSsnxSerializer::cSsnxSerializer(std::size_t n, cBlockDataFile* pDataFile)
 {
 }
 
+cBlockID& cSsnxSerializer::blockID()
+{
+    return mBlockID;
+}
+
 void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_1_t& in)
 {
     assert(mpDataFile);

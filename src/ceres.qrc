@@ -9,5 +9,9 @@
         <file alias="start_exp.png">./Resources/Images/start_exp.png</file>
         <file alias="pause_exp.png">./Resources/Images/pause_exp.png</file>
         <file alias="stop_exp.png">./Resources/Images/stop_exp.png</file>
+        <file alias="one_button.png">./Resources/Images/button_one.png</file>
+        <file alias="two_button.png">./Resources/Images/button_two.png</file>
+        <file alias="three_button.png">./Resources/Images/button_three.png</file>
+        <file alias="four_button.png">./Resources/Images/button_four.png</file>
     </qresource>
 </RCC>

@@ -103,13 +103,16 @@ bool cAxisCamera::startGrabbing()
 
     mCurrentUrl.setQuery(query);
 
+    mCurrentState = GrabbingState::TurnOn;
+    emit stateChanged(mCameraID, mCurrentState);
+
     return sendRequest();
 }
 
 void cAxisCamera::stopGrabbing()
 {
-    mCurrentState = GrabbingState::Off;
-    emit stateChanged(mCameraID, GrabbingState::Off);
+    mCurrentState = GrabbingState::TurnOff;
+    emit stateChanged(mCameraID, mCurrentState);
     if (mpReply)
     {
         mpReply->abort();
@@ -143,11 +146,14 @@ void cAxisCamera::downloadFinished(QNetworkReply* reply)
     mpImageReader->read(mpCurrentImage);
     qWarning() << "reading image done";
     emit imageGrabbed(mCameraID, mpCurrentImage);
+
+    mCurrentState = GrabbingState::Off;
+    emit stateChanged(mCameraID, mCurrentState);
 }
 
 void cAxisCamera::downloadError(QNetworkReply::NetworkError)
 {
-    if (mpReply)
+    if (mpReply && (mCurrentState == GrabbingState::On))
     {
         mErrorStr = mpReply->errorString();
         emit errorHappend(mCameraID, mErrorStr);
@@ -233,7 +239,7 @@ void cAxisCamera::bufferToImage()
     {
         mErrorStr = "Image read fail: ";
         mErrorStr += mpImageReader->errorString();
-        emit errorHappend(mCameraID, mErrorStr);
+        qWarning() << mErrorStr;
     }
 }
 
@@ -267,81 +273,5 @@ void cAxisCamera::requestReceived(QNetworkReply* pReply)
         // Error
         pReply->errorString();
     }
-}
-
-QBitmap cAxisCamera::getBitmap(axis::sImageSize_t resolution)
-{
-    QUrl url(mCurrentUrl);
-
-    url.setPath("/axis-cgi/bitmap/image.bmp");
-
-    QUrlQuery query;
-
-    query.addQueryItem("camera", QString::number(mCameraID));
-
-    if ((resolution.width != 0) && (resolution.height != 0))
-        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
-
-    if (!query.isEmpty())
-    {
-        url.setQuery(query);
-    }
-
-    QNetworkRequest request(url);
-
-    QNetworkReply* reply = mpDownloadManager->get(request);
-
-    reply->waitForReadyRead(5000);
-
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-
-    reply->deleteLater();
-
-    QByteArray image_data = reply->readAll();
-    QImage image;
-    auto ok = image.loadFromData(image_data);
-
-    return QBitmap::fromImage(image);
-}
-
-QImage cAxisCamera::getJPEG(axis::sImageSize_t resolution)
-{
-    QUrl url(mCurrentUrl);
-
-    url.setPath("/axis-cgi/jpg/image.cgi");
-
-    QUrlQuery query;
-
-    query.addQueryItem("camera", QString::number(mCameraID));
-
-    if ((resolution.width != 0) && (resolution.height != 0))
-        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
-
-    if (!query.isEmpty())
-    {
-        url.setQuery(query);
-    }
-
-    QNetworkRequest request(url);
-
-    QNetworkReply* reply = mpDownloadManager->get(request);
-
-    reply->waitForReadyRead(5000);
-
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-
-    reply->deleteLater();
-
-    QByteArray image_data = reply->readAll();
-    QImage image;
-    auto ok = image.loadFromData(image_data);
-
-    return image;
 }
 

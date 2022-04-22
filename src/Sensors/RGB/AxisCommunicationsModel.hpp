@@ -3,6 +3,7 @@
 
 #include "RgbCameraModel.hpp"
 #include "AxisCommunicationsUtils.hpp"
+#include "AxisCommunicationsSerializer.hpp"
 
 #include <QNetworkReply>
 #include <QUrl>
@@ -50,18 +51,6 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
 
     /*
-     * Write any "header" data block into the data file.
-     * A header data block is a metadata block that is
-     * constant over the span of the experiment.
-     */
-    void writeDataHeader(cBlockDataFile& file) override;
-
-    /*
-     * Detach the serializer.
-     */
-    void endDataRecording() override;
-
-    /*
      * Starts/Stops communication with the endpoint.
      * These methods are called inside the QThread so that
      * all of the communication happens within the same thread!
@@ -70,6 +59,9 @@ public:
     void stopCommunications() override;
 
     void update() override;
+
+signals:
+    void onNewImage(const QImage& image);
 
 protected slots:
     void requestReceived(QNetworkReply* pReply);
@@ -83,7 +75,10 @@ protected:
     void querySupportedImageFormats();
     axis::sImageSize_t queryImageResolution(uint8_t camera);
 
-    void getRequest();
+    QBitmap getBitmap(int cameraId, axis::sImageSize_t resolution = axis::sImageSize_t());
+    QImage getJPEG(int cameraId, axis::sImageSize_t resolution = axis::sImageSize_t());
+
+//    void getRequest();
 
     QString queryServer(const QNetworkRequest& request);
     virtual void processReply(const std::string& reply) {};
@@ -97,5 +92,7 @@ protected:
     std::vector<axis::eIMAGE_FORMAT> mSupportedImageFormats;
 
     QImage mCurrentImage;
+
+    cAxisCommunicationsSerializer mSerializer;
 };
 

@@ -48,8 +48,6 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
-    void update() override;
-
 signals:
     void enableCamera(int id);
 
@@ -63,14 +61,14 @@ protected slots:
 
     void requestReceived(QNetworkReply* pReply);
 
-    void getRequest();
+//    void getRequest();
 
     virtual void processReply(const std::string& reply) {};
 
 private:
-    int mCurrentCameraId;
+    QByteArray mImageData;
+    QBuffer mImageBuffer;
 
-private:
     cAxisCamera* mpActiveCamera;
 
     std::vector<cAxisCamera*> mCameras;

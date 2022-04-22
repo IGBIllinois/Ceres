@@ -35,6 +35,12 @@ char* cAxisCommunicationsModel::descriptor() const
     return axis_communications_id;
 }
 
+
+const QImage& cAxisCommunicationsModel::getCurrentImage() const
+{
+    return mCurrentImage;
+}
+
 int cAxisCommunicationsModel::getVapixVersion() const
 {
     return mVapixVersion;
@@ -87,23 +93,11 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
     return cRgbCameraModel::configure(jsonCfg);
 }
 
-void cAxisCommunicationsModel::writeDataHeader(cBlockDataFile& file)
-{
-
-}
-
-void cAxisCommunicationsModel::endDataRecording()
-{
-
-}
-
-
 bool cAxisCommunicationsModel::startCommunications()
 {
 	if (mpHttpManager) return true;
 
 	mpHttpManager  = new QNetworkAccessManager(this);
-//BAF	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cWeatherDataModel_Http::requestReceived);
 
 	return true;
 }
@@ -111,8 +105,6 @@ bool cAxisCommunicationsModel::startCommunications()
 void cAxisCommunicationsModel::stopCommunications()
 {
     if (!mpHttpManager) return;
-
-//BAF    disconnect(mpHttpManager, &QNetworkAccessManager::finished, this, &cWeatherDataModel_Http::requestReceived);
 
     delete mpHttpManager; mpHttpManager = nullptr;
 }
@@ -308,8 +300,107 @@ QString cAxisCommunicationsModel::queryServer(const QNetworkRequest& request)
     return replyText;
 }
 
-void cAxisCommunicationsModel::getRequest()
+QBitmap cAxisCommunicationsModel::getBitmap(int cameraId, axis::sImageSize_t resolution)
 {
-    mpHttpManager->get(QNetworkRequest(mUrl));
+    if (std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), axis::eIMAGE_FORMAT::BITMAP)
+        == mSupportedImageFormats.end())
+    {
+        return QBitmap();
+    }
+
+    if (resolution != axis::sImageSize_t())
+    {
+        auto it = std::find(mSupportedImageSizes.begin(), mSupportedImageSizes.end(), resolution);
+        if (it == mSupportedImageSizes.end())
+            return QBitmap();
+    }
+
+    QUrl url(mUrl);
+
+    url.setPath("/axis-cgi/bitmap/image.bmp");
+
+    QUrlQuery query;
+
+    if (cameraId > 0)
+        query.addQueryItem("camera", QString::number(cameraId));
+
+    if ((resolution.width != 0) && (resolution.height != 0))
+        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
+
+    if (!query.isEmpty())
+    {
+        url.setQuery(query);
+    }
+
+    QNetworkRequest request(url);
+
+    QNetworkReply* reply = mpHttpManager->get(request);
+
+    reply->waitForReadyRead(5000);
+
+    QEventLoop loop;
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+
+    reply->deleteLater();
+
+    QByteArray image_data = reply->readAll();
+    QImage image;
+    auto ok = image.loadFromData(image_data);
+
+    return QBitmap::fromImage(image);
+}
+
+QImage cAxisCommunicationsModel::getJPEG(int cameraId, axis::sImageSize_t resolution)
+{
+    if (std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), axis::eIMAGE_FORMAT::JPEG)
+        == mSupportedImageFormats.end())
+    {
+        return QImage();
+    }
+
+    if (resolution != axis::sImageSize_t())
+    {
+        auto it = std::find(mSupportedImageSizes.begin(), mSupportedImageSizes.end(), resolution);
+        if (it == mSupportedImageSizes.end())
+            return QImage();
+    }
+
+    QUrl url(mUrl);
+
+    url.setPath("/axis-cgi/jpg/image.cgi");
+
+    QUrlQuery query;
+
+    if (cameraId > 0)
+        query.addQueryItem("camera", QString::number(cameraId));
+
+    if ((resolution.width != 0) && (resolution.height != 0))
+        query.addQueryItem("resolution", QString(axis::to_string(resolution).c_str()));
+
+    if (!query.isEmpty())
+    {
+        url.setQuery(query);
+    }
+
+    QNetworkRequest request(url);
+
+    QNetworkReply* reply = mpHttpManager->get(request);
+
+    reply->waitForReadyRead(5000);
+
+    QEventLoop loop;
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+    disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+
+    reply->deleteLater();
+
+    QByteArray image_data = reply->readAll();
+    QImage image;
+    auto ok = image.loadFromData(image_data);
+
+    return image;
 }
 

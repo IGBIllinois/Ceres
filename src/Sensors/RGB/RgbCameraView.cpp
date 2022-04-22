@@ -8,6 +8,7 @@ cRgbCameraView::cRgbCameraView(QWidget* parent)
 :
     QAbstractScrollArea(parent)
 {
+    mpImage = new cRgbImageWidget(this);
 }
 
 cRgbCameraView::~cRgbCameraView()

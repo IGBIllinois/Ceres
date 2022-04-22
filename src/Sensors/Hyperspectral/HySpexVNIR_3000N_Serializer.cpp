@@ -19,9 +19,9 @@ cHySpexVNIR_3000N_Serializer::cHySpexVNIR_3000N_Serializer(std::size_t n, cBlock
 {
 }
 
-void cHySpexVNIR_3000N_Serializer::setVersion(uint8_t major, uint8_t minor)
+cBlockID& cHySpexVNIR_3000N_Serializer::blockID()
 {
-	mBlockID.setVersion(major, minor);
+    return mBlockID;
 }
 
 

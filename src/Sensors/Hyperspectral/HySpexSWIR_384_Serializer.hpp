@@ -17,8 +17,9 @@ public:
 	explicit cHySpexSWIR_384_Serializer(std::size_t n, cBlockDataFile* pDataFile);
 	~cHySpexSWIR_384_Serializer() = default;
 
-	void setVersion(uint8_t major, uint8_t minor);
 
+protected:
+	cBlockID& blockID() override;
 
 private:
 	cHySpex_SWIR_384_ID       mBlockID;

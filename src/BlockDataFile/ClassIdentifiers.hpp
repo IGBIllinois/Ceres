@@ -97,6 +97,12 @@ enum class ClassIDs: uint16_t
     HYSPEX_SWIR_384,
     HYSPEX_VNIR_3000N,
 
+    /*
+     * Sensors from Axis Communications
+     */
+     AXIS_COMMUNICATIONS = HYSPEX + 0x0080,
+     AXIS_COMMUNICATIONS_CAMERA,
+
     // We will put the weather data at the end of our range
     WEATHER             = SENSOR_MAX_ID - 0x0080,
 };

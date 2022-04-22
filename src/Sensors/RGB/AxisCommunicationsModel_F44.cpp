@@ -11,8 +11,12 @@ const std::size_t MAX_CAMERAS = 4;
 cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
 :
     cAxisCommunicationsModel(parent),
+    mImageData(),
+    mImageBuffer(&mImageData),
     mpActiveCamera(nullptr)
 {
+    mImageBuffer.open(QIODevice::ReadWrite);
+
     mCameras = {nullptr, nullptr, nullptr, nullptr};
 }
 
@@ -95,22 +99,24 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 
 void cAxisCommunicationsModel_F44::writeDataHeader(cBlockDataFile& file)
 {
-
+    mSerializer.attach(&file);
+//    mSerializer.write(mConfigParameters);
+//    mSerializer.write(mSensorInfo);
+//    mSerializer.write(mBeamIntrinsics);
+//    mSerializer.write(mImuIntrinsics);
+//    mSerializer.write(mLidarIntrinsics);
+//    mSerializer.write(mDataFormat);
 }
 
 void cAxisCommunicationsModel_F44::endDataRecording()
 {
-
+    cAxisCommunicationsModel::endDataRecording();
+    mSerializer.detach();
 }
 
 
 bool cAxisCommunicationsModel_F44::startCommunications()
 {
-//	if (mpHttpManager) return true;
-
-//	mpHttpManager  = new QNetworkAccessManager(this);
-//	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
-
     mpActiveCamera->startGrabbing();
 
 	return true;
@@ -119,12 +125,6 @@ bool cAxisCommunicationsModel_F44::startCommunications()
 void cAxisCommunicationsModel_F44::stopCommunications()
 {
     mpActiveCamera->stopGrabbing();
-
-    if (!mpHttpManager) return;
-
-    disconnect(mpHttpManager, &QNetworkAccessManager::finished, this, &cAxisCommunicationsModel_F44::requestReceived);
-
-    delete mpHttpManager; mpHttpManager = nullptr;
 }
 
 void cAxisCommunicationsModel_F44::requestReceived(QNetworkReply* pReply)
@@ -155,10 +155,6 @@ void cAxisCommunicationsModel_F44::requestReceived(QNetworkReply* pReply)
         // Error
         pReply->errorString();
     }
-}
-
-void cAxisCommunicationsModel_F44::update()
-{
 }
 
 void cAxisCommunicationsModel_F44::setActiveCamera(int id)
@@ -195,11 +191,23 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
         pCamera->startGrabbing();
 
     mpActiveCamera = pCamera;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
+        mSerializer.write(mpActiveCamera->getImageSize());
+    }
 }
 
 void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
 {
     mCurrentImage = *img;
+    emit onNewImage(mCurrentImage);
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.writeJPEG(mCurrentImage);
+    }
 }
 
 void cAxisCommunicationsModel_F44::errorHappend(int id, QString msg)
@@ -236,8 +244,4 @@ void cAxisCommunicationsModel_F44::stateChanged(int id, cAxisCamera::GrabbingSta
     emit statusMessage(msg);
 }
 
-void cAxisCommunicationsModel_F44::getRequest()
-{
-    mpHttpManager->get(QNetworkRequest(mUrl));
-}
 

@@ -19,9 +19,9 @@ cWeatherSerializer::cWeatherSerializer(std::size_t n, cBlockDataFile* pDataFile)
 {
 }
 
-void cWeatherSerializer::setVersion(uint8_t major, uint8_t minor)
+cBlockID& cWeatherSerializer::blockID()
 {
-	mBlockID.setVersion(major, minor);
+    return mBlockID;
 }
 
 void cWeatherSerializer::writeConfigInfo(const std::string& info)

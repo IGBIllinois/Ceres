@@ -3,10 +3,9 @@
 
 #include "RgbCameraView.hpp"
 
-
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
-class QCamera;
+class QPaintEvent;
 QT_END_NAMESPACE
 
 class cAxisCommunicationsModel;
@@ -20,10 +19,7 @@ public:
 	virtual ~cAxisCommunicationsView();
 
 public slots:
-
-
-private:
-	QCamera* mpCamera;
+	void imageUpdated(const QImage& image);
 
 protected:
 	const cAxisCommunicationsModel* mpModel;

@@ -54,9 +54,6 @@ public:
     void stopGrabbing();
     bool isGrabbing() const { return (mCurrentState == GrabbingState::On); }
 
-    QBitmap getBitmap(axis::sImageSize_t resolution = axis::sImageSize_t());
-    QImage getJPEG(axis::sImageSize_t resolution = axis::sImageSize_t());
-
 signals:
     void imageGrabbed(int id, QImage* img);
     void errorHappend(int id, QString msg);
@@ -86,7 +83,6 @@ private:
     QNetworkRequest* mpRequest;
     QNetworkReply* mpReply;
     QByteArray  mNetworkData;
-    int mLastState;
     QUrl mCurrentUrl;
     GrabbingState mCurrentState;
     QString mErrorStr;
