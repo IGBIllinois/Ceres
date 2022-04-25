@@ -1,6 +1,7 @@
 
 #include "RgbCameraView.hpp"
 
+#include <QResizeEvent>
 #include <string>
 
 
@@ -53,3 +54,8 @@ void cRgbCameraView::topLevelChanged(bool topLevel)
     }
 }
 
+void cRgbCameraView::resizeEvent(QResizeEvent* e)
+{
+    QAbstractScrollArea::resizeEvent(e);
+    mpImage->resizeImage(e->size().width(), e->size().height());
+}

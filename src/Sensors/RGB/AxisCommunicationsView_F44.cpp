@@ -29,9 +29,10 @@ void cAxisCommunicationsView_F44::initialize()
     auto* toolbar = new QToolBar(this);
     toolbar->setFloatable(false);
     toolbar->setMovable(false);
+    toolbar->setAutoFillBackground(true);
 
     mpCamera1 = new QToolButton(toolbar);
-    mpCamera1->setIcon(QIcon(":/ripe.illinois.edu/one_button.jpg"));
+    mpCamera1->setIcon(QIcon(":/ripe.illinois.edu/one_button.png"));
     mpCamera1->setEnabled(false);
     connect(mpCamera1, &QToolButton::released, this, &cAxisCommunicationsView_F44::cameraSelected_1);
 

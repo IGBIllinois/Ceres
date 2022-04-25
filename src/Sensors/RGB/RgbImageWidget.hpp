@@ -19,9 +19,14 @@ public:
 	const QImage& getImage() const;
 	void setImage(const QImage& image);
 
+	void resizeImage(int width, int height);
+
 protected:
 	void paintEvent(QPaintEvent* event) override;
 
 private:
 	QImage mCurrentImage;
+	int mWindowHeight = -1;
+	int mWindowWidth = -1;
+	double mAspectRatio = 1.0;
 };
