@@ -26,32 +26,32 @@ char* cOusterModel::descriptor() const
     return ouster_id;
 }
 
-ouster::sensor_info_t cOusterModel::getSensorInfo() const
+ouster::sensor_info_2_t cOusterModel::getSensorInfo() const
 {
     return mSensorInfo;
 }
 
-ouster::time_info_t cOusterModel::getTimeInfo() const
+ouster::time_info_2_t cOusterModel::getTimeInfo() const
 {
     return mTimeInfo;
 }
 
-ouster::beam_intrinsics_t cOusterModel::getBeamIntrinsics() const
+ouster::beam_intrinsics_2_t cOusterModel::getBeamIntrinsics() const
 {
     return mBeamIntrinsics;
 }
 
-ouster::imu_intrinsics_t cOusterModel::getImuIntrinsics() const
+ouster::imu_intrinsics_2_t cOusterModel::getImuIntrinsics() const
 {
     return mImuIntrinsics;
 }
 
-ouster::lidar_intrinsics_t cOusterModel::getLidarIntrinsics() const
+ouster::lidar_intrinsics_2_t cOusterModel::getLidarIntrinsics() const
 {
     return mLidarIntrinsics;
 }
 
-ouster::lidar_data_format_t cOusterModel::getLidarDataFormat() const
+ouster::lidar_data_format_2_t cOusterModel::getLidarDataFormat() const
 {
     return mDataFormat;
 }
@@ -202,7 +202,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
     mCmdStream.setUdpDestAuto();
     mCmdStream.reinitialize();
 
-    std::optional<ouster::config_param_t>		configParameters;
+    std::optional<ouster::config_param_2_t>		configParameters;
     do
     {
         configParameters = mCmdStream.retrieveConfigParam(true);
@@ -236,7 +236,7 @@ bool cOusterModel::startCommunications()
 
     emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
 
-    std::optional<ouster::sensor_info_t> sensorInfo;
+    std::optional<ouster::sensor_info_2_t> sensorInfo;
     do
     {
         sensorInfo = mCmdStream.retrieveSensorInfo();
@@ -249,7 +249,7 @@ bool cOusterModel::startCommunications()
         mSensorInfo.build_revision.minor);
 
 
-    std::optional<ouster::time_info_t> timeInfo;
+    std::optional<ouster::time_info_2_t> timeInfo;
     do
     {
         timeInfo = mCmdStream.retrieveTimeInfo();
@@ -258,7 +258,7 @@ bool cOusterModel::startCommunications()
 //    emit updateTimeInfo(mTimeInfo);
     emit updateTimeInfo();
 
-    std::optional<ouster::beam_intrinsics_t> beamIntrinsics;
+    std::optional<ouster::beam_intrinsics_2_t> beamIntrinsics;
     do
     {
         beamIntrinsics = mCmdStream.retrieveBeamIntrinsics();
@@ -277,7 +277,7 @@ bool cOusterModel::startCommunications()
 //    emit updateBeamIntrinsics(mBeamIntrinsics);
     emit updateBeamIntrinsics();
 
-    std::optional<ouster::imu_intrinsics_t>	imuIntrinsics;
+    std::optional<ouster::imu_intrinsics_2_t>	imuIntrinsics;
     do
     {
         imuIntrinsics = mCmdStream.retrieveImuIntrinsics();
@@ -286,7 +286,7 @@ bool cOusterModel::startCommunications()
 //    emit updateImuIntrinsics(mImuIntrinsics);
     emit updateImuIntrinsics();
 
-    std::optional<ouster::lidar_intrinsics_t> lidarIntrinsics;
+    std::optional<ouster::lidar_intrinsics_2_t> lidarIntrinsics;
     do
     {
         lidarIntrinsics = mCmdStream.retrieveLidarIntrinsics();
@@ -295,7 +295,7 @@ bool cOusterModel::startCommunications()
 //    emit updateLidarIntrinsics(mLidarIntrinsics);
     emit updateLidarIntrinsics();
 
-    std::optional<ouster::lidar_data_format_t> dataFormat;
+    std::optional<ouster::lidar_data_format_2_t> dataFormat;
     do
     {
         dataFormat = mCmdStream.retrieveLidarDataFormat();

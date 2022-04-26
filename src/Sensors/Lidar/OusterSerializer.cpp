@@ -27,7 +27,7 @@ cBlockID& cOusterSerializer::blockID()
     return mBlockID;
 }
 
-void cOusterSerializer::write(const ouster::config_param_t& in)
+void cOusterSerializer::write(const ouster::config_param_2_t& in)
 {
     assert(mpDataFile);
 
@@ -60,7 +60,7 @@ void cOusterSerializer::write(const ouster::config_param_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::sensor_info_t& in)
+void cOusterSerializer::write(const ouster::sensor_info_2_t& in)
 {
     assert(mpDataFile);
 
@@ -81,7 +81,7 @@ void cOusterSerializer::write(const ouster::sensor_info_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::timestamp_t& in)
+void cOusterSerializer::write(const ouster::timestamp_2_t& in)
 {
     assert(mpDataFile);
 
@@ -97,7 +97,7 @@ void cOusterSerializer::write(const ouster::timestamp_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::sync_pulse_in_t& in)
+void cOusterSerializer::write(const ouster::sync_pulse_in_2_t& in)
 {
     assert(mpDataFile);
 
@@ -113,7 +113,7 @@ void cOusterSerializer::write(const ouster::sync_pulse_in_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::sync_pulse_out_t& in)
+void cOusterSerializer::write(const ouster::sync_pulse_out_2_t& in)
 {
     assert(mpDataFile);
 
@@ -128,7 +128,7 @@ void cOusterSerializer::write(const ouster::sync_pulse_out_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::multipurpose_io_t& in)
+void cOusterSerializer::write(const ouster::multipurpose_io_2_t& in)
 {
     assert(mpDataFile);
 
@@ -144,7 +144,7 @@ void cOusterSerializer::write(const ouster::multipurpose_io_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::nmea_t& in)
+void cOusterSerializer::write(const ouster::nmea_2_t& in)
 {
     assert(mpDataFile);
 
@@ -168,7 +168,7 @@ void cOusterSerializer::write(const ouster::nmea_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::time_info_t& in)
+void cOusterSerializer::write(const ouster::time_info_2_t& in)
 {
     assert(mpDataFile);
 
@@ -184,7 +184,7 @@ void cOusterSerializer::write(const ouster::time_info_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::beam_intrinsics_t& in)
+void cOusterSerializer::write(const ouster::beam_intrinsics_2_t& in)
 {
     assert(mpDataFile);
 
@@ -206,7 +206,7 @@ void cOusterSerializer::write(const ouster::beam_intrinsics_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::imu_intrinsics_t& in)
+void cOusterSerializer::write(const ouster::imu_intrinsics_2_t& in)
 {
     assert(mpDataFile);
 
@@ -222,7 +222,7 @@ void cOusterSerializer::write(const ouster::imu_intrinsics_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::lidar_intrinsics_t& in)
+void cOusterSerializer::write(const ouster::lidar_intrinsics_2_t& in)
 {
     assert(mpDataFile);
 
@@ -238,7 +238,7 @@ void cOusterSerializer::write(const ouster::lidar_intrinsics_t& in)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cOusterSerializer::write(const ouster::lidar_data_format_t& in)
+void cOusterSerializer::write(const ouster::lidar_data_format_2_t& in)
 {
     assert(mpDataFile);
 

@@ -41,12 +41,12 @@ public:
     uint32_t minEncoderCount() const;
     uint32_t maxEncoderCount() const;
 
-    ouster::sensor_info_t getSensorInfo() const;
-    ouster::time_info_t getTimeInfo() const;
-    ouster::beam_intrinsics_t getBeamIntrinsics() const;
-    ouster::imu_intrinsics_t getImuIntrinsics() const;
-    ouster::lidar_intrinsics_t getLidarIntrinsics() const;
-    ouster::lidar_data_format_t getLidarDataFormat() const;
+    ouster::sensor_info_2_t getSensorInfo() const;
+    ouster::time_info_2_t getTimeInfo() const;
+    ouster::beam_intrinsics_2_t getBeamIntrinsics() const;
+    ouster::imu_intrinsics_2_t getImuIntrinsics() const;
+    ouster::lidar_intrinsics_2_t getLidarIntrinsics() const;
+    ouster::lidar_data_format_2_t getLidarDataFormat() const;
 
     double lidar_origin_to_beam_origin_mm() const;
     const std::vector<double>& beamAzimuthAngles_rad() const;
@@ -109,14 +109,14 @@ private:
 
     ouster::sensor_network_info_t mActiveSensor;
 
-    ouster::config_param_t		mConfigParameters;
-    ouster::sensor_info_t		mSensorInfo;
-    ouster::time_info_t			mTimeInfo;
-    ouster::beam_intrinsics_t	mBeamIntrinsics;
-    ouster::imu_intrinsics_t	mImuIntrinsics;
-    ouster::lidar_intrinsics_t	mLidarIntrinsics;
-    ouster::lidar_data_format_t mDataFormat;
-	ouster::azimuth_range_t		mAzimuthWindow;
+    ouster::config_param_2_t		mConfigParameters;
+    ouster::sensor_info_2_t		    mSensorInfo;
+    ouster::time_info_2_t			mTimeInfo;
+    ouster::beam_intrinsics_2_t	    mBeamIntrinsics;
+    ouster::imu_intrinsics_2_t	    mImuIntrinsics;
+    ouster::lidar_intrinsics_2_t	mLidarIntrinsics;
+    ouster::lidar_data_format_2_t   mDataFormat;
+	ouster::azimuth_range_t		    mAzimuthWindow;
 
 //    ouster::alerts_t			mAlerts;
 

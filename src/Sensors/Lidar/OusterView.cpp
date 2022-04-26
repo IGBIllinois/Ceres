@@ -81,25 +81,25 @@ void cOusterView::topLevelChanged(bool topLevel)
 
 void cOusterView::beamIntrinsicsChanged()
 {
-    ouster::beam_intrinsics_t beam_intrinsics = mpModel->getBeamIntrinsics();
+    ouster::beam_intrinsics_2_t beam_intrinsics = mpModel->getBeamIntrinsics();
     cOusterVizWidget::beamIntrinsicsChanged(beam_intrinsics);
 }
 
 void cOusterView::imuIntrinsicsChanged()
 {
-    ouster::imu_intrinsics_t imu_intrinsics = mpModel->getImuIntrinsics();
+    ouster::imu_intrinsics_2_t imu_intrinsics = mpModel->getImuIntrinsics();
     cOusterVizWidget::imuIntrinsicsChanged(imu_intrinsics);
 }
 
 void cOusterView::lidarIntrinsicsChanged()
 {
-    ouster::lidar_intrinsics_t lidar_intrinsics = mpModel->getLidarIntrinsics();
+    ouster::lidar_intrinsics_2_t lidar_intrinsics = mpModel->getLidarIntrinsics();
     cOusterVizWidget::lidarIntrinsicsChanged(lidar_intrinsics);
 }
 
 void cOusterView::dataFormatChanged()
 {
-    ouster::lidar_data_format_t lidar_data_format = mpModel->getLidarDataFormat();
+    ouster::lidar_data_format_2_t lidar_data_format = mpModel->getLidarDataFormat();
     cOusterVizWidget::dataFormatChanged(lidar_data_format);
 }
 

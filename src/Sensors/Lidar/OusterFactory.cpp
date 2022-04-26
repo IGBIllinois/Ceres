@@ -12,12 +12,12 @@
 #include <QDockWidget>
 #include <QMetaType>
 
-Q_DECLARE_METATYPE(ouster::sensor_info_t);
-Q_DECLARE_METATYPE(ouster::time_info_t);
-Q_DECLARE_METATYPE(ouster::beam_intrinsics_t);
-Q_DECLARE_METATYPE(ouster::imu_intrinsics_t);
-Q_DECLARE_METATYPE(ouster::lidar_intrinsics_t);
-Q_DECLARE_METATYPE(ouster::lidar_data_format_t);
+Q_DECLARE_METATYPE(ouster::sensor_info_2_t);
+Q_DECLARE_METATYPE(ouster::time_info_2_t);
+Q_DECLARE_METATYPE(ouster::beam_intrinsics_2_t);
+Q_DECLARE_METATYPE(ouster::imu_intrinsics_2_t);
+Q_DECLARE_METATYPE(ouster::lidar_intrinsics_2_t);
+Q_DECLARE_METATYPE(ouster::lidar_data_format_2_t);
 Q_DECLARE_METATYPE(ouster::azimuth_range_t);
 Q_DECLARE_METATYPE(ouster::imu_data_t);
 
@@ -39,7 +39,6 @@ sSensorWidgets create_ouster_sensor()
     QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterView::lidarIntrinsicsChanged);
     QObject::connect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterView::dataFormatChanged);
     QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterView::azimuthWindowChanged);
-//    QObject::connect(pModel, &cOusterModel::updateEncoderCount, pView, &cOusterView::encoderCountChanged);
     QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged);
     QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData);
 
@@ -58,7 +57,6 @@ void remove_ouster_sensor(sSensorWidgets widgets)
     QObject::disconnect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterView::lidarIntrinsicsChanged);
     QObject::disconnect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterView::dataFormatChanged);
     QObject::disconnect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterView::azimuthWindowChanged);
-//    QObject::disconnect(pModel, &cOusterModel::updateEncoderCount, pView, &cOusterView::encoderCountChanged);
     QObject::disconnect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged);
     QObject::disconnect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData);
 
