@@ -49,6 +49,9 @@ source_group("Resources" FILES
 
 qt5_add_resources(UI_RESOURCES ceres.qrc OPTIONS "--verbose")
 
+#
+# Main Ceres Application
+#
 add_executable(Ceres WIN32 MACOSX_BUNDLE)
 
 #set_target_properties(Ceres PROPERTIES LANGUAGE C CXX)
@@ -128,6 +131,72 @@ target_link_libraries(Ceres PRIVATE Utilities)
 
 #vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
 
+
+#
+# Ceres Remote Data Acquition Client
+#
+add_executable(CeresRemoteClient WIN32 MACOSX_BUNDLE)
+
+target_compile_features(CeresRemoteClient PRIVATE cxx_std_17)
+
+
+target_sources(CeresRemoteClient
+PUBLIC
+    ExperimentTypes.hpp
+
+PRIVATE
+#    ${Cmake_hdr_moc}
+#    ${Cmake_form_hdr}
+
+    ${ui_files}
+    ${UI_RESOURCES}
+    ${platform_resource_files}
+
+#
+# General Application files
+#
+    SensorFactory.hpp
+    SensorFactory.cpp
+
+    ExperimentBlockId.hpp
+    ExperimentBlockId.cpp
+    ExperimentDataIdentifiers.hpp
+    ExperimentSerializer.hpp
+    ExperimentSerializer.cpp
+
+    DataThread.hpp
+    DataThread.cpp
+    DataModel.hpp
+    DataModel.cpp
+    RemoteClientWindow.hpp
+    RemoteClientWindow.cpp
+
+    CeresSplashScreen.hpp
+    CeresSplashScreen.cpp
+    CeresRemoteClient.cpp
+)
+
+
+#
+# Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
+# Force use MultiThreadedDLL (-MD) and MultiThreadedDebugDLL (-MDd)
+set_property(TARGET CeresRemoteClient PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+
+if(APPLE)
+    set_target_properties(CeresRemoteClient PROPERTIES
+        RESOURCE "./Resources/Icons/ripe.icns"
+        MACOSX_BUNDLE_ICON_FILE ripe.icns
+        MACOSX_BUNDLE_COPYRIGHT "Copyright University of Illinois"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "edu.illinois.ripe"
+        )
+endif()
+
+target_link_libraries(CeresRemoteClient PRIVATE ${Qt}::Widgets)
+target_link_libraries(CeresRemoteClient PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(CeresRemoteClient PRIVATE BlockDataFile)
+target_link_libraries(CeresRemoteClient PRIVATE Sensors)
+target_link_libraries(CeresRemoteClient PRIVATE Utilities)
 
 #install(TARGETS asio_client RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}/asio")
 
