@@ -275,6 +275,8 @@ void cMainWindow::experimentRun()
     mpExpRun->setEnabled(false);
     mpExpPause->setEnabled(true);
     mpExpStop->setEnabled(true);
+
+    emit experimentRunning();
 }
 
 //-----------------------------------------------------------------------------
@@ -291,6 +293,8 @@ void cMainWindow::experimentPause()
     mpExpRun->setEnabled(true);
     mpExpPause->setEnabled(false);
     mpExpStop->setEnabled(true);
+
+    emit experimentPaused();
 }
 
 //-----------------------------------------------------------------------------
@@ -349,6 +353,8 @@ void cMainWindow::onExperimentCompleted()
     mpExpRun->setEnabled(true);
     mpExpPause->setEnabled(false);
     mpExpStop->setEnabled(false);
+
+    emit experimentStopped();
 }
 
 
@@ -435,6 +441,12 @@ void cMainWindow::createToolBars()
 //    mpFileBar = addToolBar("File");
 
     auto* toolbar = new cExperimentToolbar(this);
+    connect(this, &cMainWindow::experimentRunning, toolbar, &cExperimentToolbar::experimentRunning);
+    connect(this, &cMainWindow::experimentPaused, toolbar, &cExperimentToolbar::experimentPaused);
+    connect(this, &cMainWindow::experimentStopped, toolbar, &cExperimentToolbar::experimentStopped);
+
+    connect(toolbar, &cExperimentToolbar::loadSelected, this, &cMainWindow::experimentLoad);
+
     addToolBar(toolbar);
 }
 

@@ -35,9 +35,45 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
 {
 	auto pos = stateDoc["position"];
-	mX_mm = static_cast<uint32_t>(pos["x (m)"].get<double>() * nConstants::M_TO_MM);
-	mY_mm = static_cast<uint32_t>(pos["y (m)"].get<double>() * nConstants::M_TO_MM);
-	mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
+
+	if (pos.contains("x (mm)"))
+	{
+		mX_mm = static_cast<uint32_t>(pos["x (mm)"].get<double>());
+	}
+	else if (pos.contains("x (m)"))
+	{
+		mX_mm = static_cast<uint32_t>(pos["x (m)"].get<double>() * nConstants::M_TO_MM);
+	}
+	else
+	{
+		mX_mm = -1.0;
+	}
+
+	if (pos.contains("y (mm)"))
+	{
+		mY_mm = static_cast<uint32_t>(pos["y (mm)"].get<double>());
+	}
+	else if (pos.contains("y (m)"))
+	{
+		mY_mm = static_cast<uint32_t>(pos["y (m)"].get<double>() * nConstants::M_TO_MM);
+	}
+	else
+	{
+		mY_mm = -1.0;
+	}
+
+	if (pos.contains("z (mm)"))
+	{
+		mZ_mm = static_cast<uint32_t>(pos["z (mm)"].get<double>());
+	}
+	else if (pos.contains("z (m)"))
+	{
+		mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
+	}
+	else
+	{
+		mZ_mm = -1.0;
+	}
 
 	mSpeed_mmps = stateDoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM;
 	mPan_deg = stateDoc["pan"];
@@ -49,11 +85,11 @@ void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 QString cSpidercamExperimentState_Movement::getStatusStr()
 {
 	QString msg = "Moving to: ";
-	msg.append(std::to_string(mX_mm).c_str());
+	msg.append(std::to_string(static_cast<uint32_t>(mX_mm)).c_str());
 	msg += "mm, ";
-	msg.append(std::to_string(mY_mm).c_str());
+	msg.append(std::to_string(static_cast<uint32_t>(mY_mm)).c_str());
 	msg += "mm, ";
-	msg.append(std::to_string(mZ_mm).c_str());
+	msg.append(std::to_string(static_cast<uint32_t>(mZ_mm)).c_str());
 	msg += "mm.";
 	return msg;
 }
@@ -67,28 +103,45 @@ void cSpidercamExperimentState_Movement::initialize()
 {
 	mMoveCommandSent = false;
 	mStopCommandSent = false;
-	mBusy = false;
 	mIsMoving = false;
-	mIsSetPointEnabled = false;
-	mInError = false;
+	mBusy = mController.isBusy();
+	mIsSetPointEnabled = mController.isSetPointEnabled();
+	mInError = mController.isInError();
+	mIsConsoleConnected = mController.isConsoleConnected();
+
+	if (mX_mm < 0.0)
+	{
+		mX_mm = mController.getLastKnownPosition().X_mm;
+	}
+
+	if (mY_mm < 0.0)
+	{
+		mY_mm = mController.getLastKnownPosition().Y_mm;
+	}
+
+	if (mZ_mm < 0.0)
+	{
+		mZ_mm = mController.getLastKnownPosition().Z_mm;
+	}
 }
 
 void cSpidercamExperimentState_Movement::run()
 {
 	mBusy = mController.isBusy();
+	mIsConsoleConnected = mController.isConsoleConnected();
 	mIsMoving = mController.isMoving();
 	mIsSetPointEnabled = mController.isSetPointEnabled();
 	mInError = mController.isInError();
 
-	bool readyForMotion = mIsSetPointEnabled && !mBusy && !mInError;
+	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mBusy && !mInError;
 
 	if (mMoveCommandSent) return;
 
 	if (!readyForMotion) return;
 
-	mMoveCommandSent = mController.sendRequestNewPosition(mX_mm, mY_mm, mZ_mm, mSpeed_mmps, mPan_deg, mTilt_deg, 0.0f);
+	mMoveCommandSent = mController.sendRequestNewPosition(mX_mm, mY_mm, mZ_mm,
+		mZ_mm, mSpeed_mmps, mPan_deg, mTilt_deg, 0.0f);
 	mStopCommandSent = false;
-
 }
 
 void cSpidercamExperimentState_Movement::pause()
@@ -105,6 +158,13 @@ void cSpidercamExperimentState_Movement::pause()
 
 cExperimentState::eRESULT cSpidercamExperimentState_Movement::finished()
 {
+	mIsConsoleConnected = mController.isConsoleConnected();
+	mIsSetPointEnabled = mController.isSetPointEnabled();
+	mInError = mController.isInError();
+	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mInError;
+	if (!readyForMotion)
+		return eRESULT::ABORT;
+
 	if (mIsMoving)
 		return eRESULT::WAITING;
 

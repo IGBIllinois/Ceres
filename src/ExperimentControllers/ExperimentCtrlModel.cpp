@@ -118,6 +118,7 @@ void cExperimentControlModel::startExperiment()
     mRunning = true;
     mActiveStateNumber = 0;
     mpActiveState = mExperiment[mActiveStateNumber];
+    mpActiveState->initialize();
 
     emit experimentStateChanged(to_int(State::RUNNING));
 }

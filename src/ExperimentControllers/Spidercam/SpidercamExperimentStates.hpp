@@ -33,15 +33,16 @@ private:
 	bool mMoveCommandSent;
 	bool mStopCommandSent;
 	bool mBusy;
+	bool mIsConsoleConnected;
 	bool mIsMoving;
 	bool mIsSetPointEnabled;
 	bool mInError;
 
 	bool mRecordData;
 
-	uint32_t mX_mm;
-	uint32_t mY_mm;
-	uint32_t mZ_mm;
+	double mX_mm;
+	double mY_mm;
+	double mZ_mm;
 
 	uint32_t mTolerance_mm;
 

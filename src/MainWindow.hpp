@@ -39,6 +39,11 @@ public:
 
     void initialize(cCeresSplashScreen* pSplashScreen = nullptr);
 
+signals:
+    void experimentRunning();
+    void experimentPaused();
+    void experimentStopped();
+
 public slots:
     void onStatusUpdate(QString msg);
     void onInfoMessage(QString title, QString msg);

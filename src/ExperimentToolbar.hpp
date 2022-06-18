@@ -12,6 +12,8 @@ QT_END_NAMESPACE
 
 class cExperimentToolbar : public QToolBar
 {
+	Q_OBJECT
+
 public:
 	cExperimentToolbar(QWidget* parent = nullptr);
 
@@ -21,10 +23,21 @@ signals:
 	void pauseSelected();
 	void stopSelected();
 
+public slots:
+	void experimentRunning();
+	void experimentPaused();
+	void experimentStopped();
+
+private slots:
+	void loadButtonPressed();
+	void startButtonPressed();
+	void pauseButtonPressed();
+	void stopButtonPressed();
+
 private:
-	QToolButton* mpLoadButton;
-	QToolButton* mpStartButton;
-	QToolButton* mpPauseButton;
-	QToolButton* mpStopButton;
+	QAction* mpLoadAction;
+	QAction* mpStartAction;
+	QAction* mpPauseAction;
+	QAction* mpStopAction;
 };
 

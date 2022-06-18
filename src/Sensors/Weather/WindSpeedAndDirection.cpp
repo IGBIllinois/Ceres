@@ -49,6 +49,15 @@ void cWindSpeedAndDirection::updateWindData(bool valid_wind_speed, double wind_s
 	}
 
 	QString s = "Dir: ";
-	s += QString::number(static_cast<int>(wind_dir_deg));
+
+	QString dir = QString::number(static_cast<int>(wind_dir_deg));
+
+	if (wind_dir_deg < 10.0)
+		dir.insert(0, "00");
+	else if (wind_dir_deg < 100.0)
+		dir.insert(0, "0");
+
+	s += dir;
+
 	myWindDirection_deg->setText(s);
 }
