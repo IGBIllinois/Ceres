@@ -22,8 +22,11 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 	mDollyPos(pos), mController(controller), mRecordData(false), 
 	mX_mm(0), mY_mm(0), mZ_mm(0), mTolerance_mm(tolerance_mm),
 	mSpeed_mmps(0), mPan_deg(0), mTilt_deg(0)
-
 {
+	mX_NeedsInitialization = false;
+	mY_NeedsInitialization = false;
+	mZ_NeedsInitialization = false;
+
 	mMoveCommandSent = false;
 	mStopCommandSent = false;
 	mBusy = false;
@@ -46,6 +49,7 @@ void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 	}
 	else
 	{
+		mX_NeedsInitialization = true;
 		mX_mm = -1.0;
 	}
 
@@ -59,6 +63,7 @@ void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 	}
 	else
 	{
+		mY_NeedsInitialization = true;
 		mY_mm = -1.0;
 	}
 
@@ -72,6 +77,7 @@ void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 	}
 	else
 	{
+		mZ_NeedsInitialization = true;
 		mZ_mm = -1.0;
 	}
 
@@ -109,17 +115,17 @@ void cSpidercamExperimentState_Movement::initialize()
 	mInError = mController.isInError();
 	mIsConsoleConnected = mController.isConsoleConnected();
 
-	if (mX_mm < 0.0)
+	if (mX_NeedsInitialization)
 	{
 		mX_mm = mController.getLastKnownPosition().X_mm;
 	}
 
-	if (mY_mm < 0.0)
+	if (mY_NeedsInitialization)
 	{
 		mY_mm = mController.getLastKnownPosition().Y_mm;
 	}
 
-	if (mZ_mm < 0.0)
+	if (mZ_NeedsInitialization)
 	{
 		mZ_mm = mController.getLastKnownPosition().Z_mm;
 	}

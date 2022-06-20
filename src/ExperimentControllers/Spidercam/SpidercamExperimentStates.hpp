@@ -44,6 +44,10 @@ private:
 	double mY_mm;
 	double mZ_mm;
 
+	bool mX_NeedsInitialization;
+	bool mY_NeedsInitialization;
+	bool mZ_NeedsInitialization;
+
 	uint32_t mTolerance_mm;
 
 	double mSpeed_mmps;

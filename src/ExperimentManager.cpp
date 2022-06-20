@@ -15,8 +15,7 @@ namespace fs = std::filesystem;
 
 cExperimentManager::cExperimentManager(QWidget* parent)
 	: QTreeWidget(parent),
-    mpActiveItems(nullptr),
-    mpArchiveItems(nullptr)
+    mpExperimentItems(nullptr)
 {
     clear();
     setColumnCount(1);
@@ -27,57 +26,78 @@ cExperimentManager::cExperimentManager(QWidget* parent)
 
     auto cwd = std::filesystem::current_path();
 
-    mActivePath = cwd / "Active";
-    mArchivePath = cwd / "Archive";
+    mExperimentPath = cwd / "Experiments";
 
-    if (!fs::exists(mActivePath))
+    if (!fs::exists(mExperimentPath))
     {
-        fs::create_directory(mActivePath);
+        fs::create_directory(mExperimentPath);
     }
 
-    if (!fs::exists(mArchivePath))
+    loadExperiments();
+}
+
+void cExperimentManager::refresh()
+{
+    clear();
+    loadExperiments();
+}
+
+const cExperimentTreeItem* cExperimentManager::experiments() const
+{
+    return this->r;
+}
+
+void cExperimentManager::loadExperiments()
+{
+//    mpExperimentItems = new cExperimentTreeItem(this, "Experiments");
+
+//    loadExperiments(*mpExperimentItems, mExperimentPath);
+    for (auto entry : fs::directory_iterator(mExperimentPath))
     {
-        fs::create_directory(mArchivePath);
-    }
+        if (entry.is_directory())
+        {
+            QString name = entry.path().filename().string().c_str();
+            cExperimentTreeItem* level = new cExperimentTreeItem(this, name);
+            loadExperiments(*level, entry.path());
+        }
 
-    loadActiveExperiments();
-    loadArchivedExperiments();
-}
-
-const cExperimentTreeItem* cExperimentManager::activeItems() const
-{
-    return mpActiveItems;
-}
-
-const cExperimentTreeItem* cExperimentManager::archiveItems() const
-{
-    return mpArchiveItems;
-}
-
-void cExperimentManager::loadActiveExperiments()
-{
-    mpActiveItems = new cExperimentTreeItem(this, "Active");
-
-    for (auto entry : fs::directory_iterator(mActivePath))
-    {
         if (entry.is_regular_file())
         {
             try
             {
-                auto* pItem = new cExperimentTreeItem(mpActiveItems, entry.path());
+                auto* pItem = new cExperimentTreeItem(this, entry.path());
             }
-            catch(const std::exception& e)
-            { }
+            catch (const std::exception& e)
+            {
+            }
         }
     }
 
-    addTopLevelItem(mpActiveItems);
+//    addTopLevelItem(mpExperimentItems);
 }
 
-void cExperimentManager::loadArchivedExperiments()
+void cExperimentManager::loadExperiments(cExperimentTreeItem& root, const std::filesystem::path& path)
 {
-    mpArchiveItems = new cExperimentTreeItem(this, "Archive");
-    addTopLevelItem(mpArchiveItems);
+    for (auto entry : fs::directory_iterator(path))
+    {
+        if (entry.is_directory())
+        {
+            QString name = entry.path().filename().string().c_str();
+            cExperimentTreeItem* level = new cExperimentTreeItem(&root, name);
+            loadExperiments(*level, entry.path());
+        }
+
+        if (entry.is_regular_file())
+        {
+            try
+            {
+                auto* pItem = new cExperimentTreeItem(&root, entry.path());
+            }
+            catch (const std::exception& e)
+            {
+            }
+        }
+    }
 }
 
 /*
@@ -102,7 +122,7 @@ void cExperimentSelectDlg::initialize(const cExperimentManager& mgr)
     mpExperiments->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     mpExperiments->setSelectionBehavior(QAbstractItemView::SelectItems);
     mpExperiments->setSelectionMode(QAbstractItemView::SingleSelection);
-    auto* active = mgr.activeItems();
+    auto* active = mgr.experiments();
     auto n = active->childCount();
 
     QList<QTreeWidgetItem*> items;

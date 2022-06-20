@@ -34,6 +34,9 @@ cExperimentToolbar::cExperimentToolbar(QWidget* parent)
 	mpStopAction->setStatusTip(tr("Stop the currently running experiment"));
 	connect(mpStopAction, &QAction::triggered, this, &cExperimentToolbar::stopButtonPressed);
 	this->addAction(mpStopAction);
+
+	mpPauseAction->setEnabled(false);
+	mpStopAction->setEnabled(false);
 }
 
 void cExperimentToolbar::experimentRunning()

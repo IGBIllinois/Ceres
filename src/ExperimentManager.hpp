@@ -20,18 +20,18 @@ class cExperimentManager : public QTreeWidget
 public:
 	cExperimentManager(QWidget* parent = nullptr);
 
-	const cExperimentTreeItem* activeItems() const;
-	const cExperimentTreeItem* archiveItems() const;
+	const cExperimentTreeItem* experiments() const;
+
+public slots:
+	void refresh();
 
 private:
-	void loadActiveExperiments();
-	void loadArchivedExperiments();
+	void loadExperiments();
+	void loadExperiments(cExperimentTreeItem& parent, const std::filesystem::path& path);
 
 private:
-	cExperimentTreeItem*	mpActiveItems;
-	cExperimentTreeItem*	mpArchiveItems;
-	std::filesystem::path	mActivePath;
-	std::filesystem::path	mArchivePath;
+	cExperimentTreeItem*	mpExperimentItems;
+	std::filesystem::path	mExperimentPath;
 };
 
 class cExperimentSelectDlg : public QDialog

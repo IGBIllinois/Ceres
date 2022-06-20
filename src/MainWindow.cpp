@@ -446,6 +446,9 @@ void cMainWindow::createToolBars()
     connect(this, &cMainWindow::experimentStopped, toolbar, &cExperimentToolbar::experimentStopped);
 
     connect(toolbar, &cExperimentToolbar::loadSelected, this, &cMainWindow::experimentLoad);
+    connect(toolbar, &cExperimentToolbar::runSelected, this, &cMainWindow::experimentRun);
+    connect(toolbar, &cExperimentToolbar::pauseSelected, this, &cMainWindow::experimentPause);
+    connect(toolbar, &cExperimentToolbar::stopSelected, this, &cMainWindow::experimentStop);
 
     addToolBar(toolbar);
 }
