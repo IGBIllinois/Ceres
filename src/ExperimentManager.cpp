@@ -13,9 +13,10 @@
 
 namespace fs = std::filesystem;
 
-cExperimentManager::cExperimentManager(QWidget* parent)
+cExperimentManager::cExperimentManager(const QString& path, QWidget* parent)
 	: QTreeWidget(parent),
-    mpExperimentItems(nullptr)
+    mpExperimentItems(nullptr),
+    mExperimentPath(path.toStdString())
 {
     clear();
     setColumnCount(1);
@@ -23,10 +24,6 @@ cExperimentManager::cExperimentManager(QWidget* parent)
     setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     setSelectionBehavior(QAbstractItemView::SelectItems);
     setSelectionMode(QAbstractItemView::SingleSelection);
-
-    auto cwd = std::filesystem::current_path();
-
-    mExperimentPath = cwd / "Experiments";
 
     if (!fs::exists(mExperimentPath))
     {
@@ -44,7 +41,7 @@ void cExperimentManager::refresh()
 
 const cExperimentTreeItem* cExperimentManager::experiments() const
 {
-    return this->r;
+    return nullptr;
 }
 
 void cExperimentManager::loadExperiments()
@@ -95,6 +92,7 @@ void cExperimentManager::loadExperiments(cExperimentTreeItem& root, const std::f
             }
             catch (const std::exception& e)
             {
+                std::string msg = e.what();
             }
         }
     }

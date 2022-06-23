@@ -23,6 +23,12 @@ class cCeresSplashScreen;
 class cExperimentControlView;
 class cExperimentManager;
 
+/*
+namespace nlohmann
+{
+    class json;
+}
+*/
 
 namespace Ui 
 {
@@ -67,13 +73,16 @@ private:
     void createActions();
     void createToolBars();
     void createStatusBar();
-    void createDockWindows();
-    bool createExperimentController();
-    void createSensorModelsAndViews();
+    void createDockWindows(const nlohmann::json& configDoc);
+    void createExperimentController(const nlohmann::json& configDoc);
+    void createSensorModelsAndViews(const nlohmann::json& configDoc);
 
     cCeresSplashScreen* mpSplashScreen;
 
     cExperimentManager* mpExperiments;
+
+    QString mDefaultDataPath;
+    QString mExperimentFilesPath;
 
     QMenu* mpFileMenu;
     QMenu* mpExperimentMenu;

@@ -23,6 +23,7 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 
 #include <nlohmann/json.hpp>
 
@@ -30,7 +31,6 @@ namespace
 {
     std::string getCfgFilePath()
     {
- //       std::string cfgFilePath = "C:/igb/Ceres/build/bin/Debug/ceres.json";
         QString cfgPath;
 
         auto args = QApplication::arguments();
@@ -66,7 +66,6 @@ namespace
         }
 
         cfgPath = QApplication::applicationDirPath();
-//        cfgPath = QDir::currentPath();
         cfgPath += "/ceres.json";
         if (QFile::exists(cfgPath))
             return cfgPath.toStdString();
@@ -105,6 +104,12 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     setUnifiedTitleAndToolBarOnMac(true);
 
+    auto cwd = std::filesystem::current_path();
+    auto data_path = cwd / "Data";
+    auto exp_path = cwd / "Experiments";
+    mDefaultDataPath = QString::fromLatin1(data_path.string().c_str());
+    mExperimentFilesPath = QString::fromLatin1(exp_path.string().c_str());
+
     QObject::connect(&mMainModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
     QObject::connect(&mMainModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
     QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
@@ -126,6 +131,67 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 {
     mpSplashScreen = pSplashScreen;
 
+    std::string cfgFileName = getCfgFilePath();
+    nlohmann::json configDoc;
+
+    if (!cfgFileName.empty())
+    {
+        std::ifstream in;
+        in.open(cfgFileName);
+
+        if (!in.is_open())
+        {
+            QString msg = "Could not open ";
+            msg += cfgFileName.c_str();
+            msg += " for reading!";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+
+        try
+        {
+            in >> configDoc;
+        }
+        catch (const nlohmann::json::parse_error& e)
+        {
+            QString msg = "Parsing error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+        catch (const std::exception& e)
+        {
+            QString msg = "Unknown error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if (configDoc.contains("default data folder"))
+    {
+        auto folders = configDoc["default data folder"];
+#ifdef WIN32
+        if (folders.contains("windows"))
+        {
+            mDefaultDataPath = QString::fromLatin1(folders["windows"].get<std::string>().c_str());
+        }
+#endif
+    }
+
     onStatusUpdate("Initializing menus...");
     createMainMenu();
     createSubMenusAndActions();
@@ -137,17 +203,29 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     onStatusUpdate("Initializing status bar...");
     createStatusBar();
 
-    onStatusUpdate("Initializing dock windows...");
-    createDockWindows();
-
-    onStatusUpdate("Initializing experiment controller...");
-    if (!createExperimentController())
+    try
     {
+        onStatusUpdate("Initializing dock windows...");
+        createDockWindows(configDoc);
+
+        onStatusUpdate("Initializing experiment controller...");
+        createExperimentController(configDoc);
+
+        onStatusUpdate("Initializing sensors...");
+        createSensorModelsAndViews(configDoc);
+    }
+    catch (const std::exception& e)
+    {
+        std::string msg = "Error in ";
+        msg += cfgFileName;
+        msg += ": ";
+        msg += e.what();
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+        mb.exec();
+
         exit(EXIT_FAILURE);
     }
-
-    onStatusUpdate("Initializing sensors...");
-    createSensorModelsAndViews();
 
     mpSplashScreen = nullptr;
 
@@ -204,7 +282,7 @@ void cMainWindow::experimentLoad()
     if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
     {
         cExperimentSelectDlg* dlg = new cExperimentSelectDlg(this);
-        dlg->initialize(mpExperiments);
+        dlg->initialize(*mpExperiments);
         auto result = dlg->exec();
         if (result == QDialog::Rejected)
             return;
@@ -246,17 +324,15 @@ void cMainWindow::experimentRun()
         return;
     }
 
+    // Reload the experiment each time incase the experiment was tweaked
+    experimentLoad();
+
     if (!mMainModel.isExperimentLoaded())
     {
-        experimentLoad();
-
-        if (!mMainModel.isExperimentLoaded())
-        {
-            return;
-        }
+        return;
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("New File"), QString(), tr("Ceres data (*.ceres);;All Files (*.*)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("New File"), mDefaultDataPath, tr("Ceres data (*.ceres);;All Files (*.*)"));
 
     if (fileName.isEmpty())
         return;
@@ -460,11 +536,22 @@ void cMainWindow::createStatusBar()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::createDockWindows()
+void cMainWindow::createDockWindows(const nlohmann::json& configDoc)
 {
+    if (configDoc.contains("experiment file folder"))
+    {
+        auto folders = configDoc["experiment file folder"];
+#ifdef WIN32
+        if (folders.contains("windows"))
+        {
+            mExperimentFilesPath = QString::fromLatin1(folders["windows"].get<std::string>().c_str());
+        }
+#endif
+    }
+
     QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    mpExperiments = new cExperimentManager(dock);
+    mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
 
     dock->setWidget(mpExperiments);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
@@ -472,82 +559,105 @@ void cMainWindow::createDockWindows()
 }
 
 //-----------------------------------------------------------------------------
-bool cMainWindow::createExperimentController()
+void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
 {
-    std::string cfgFileName = getCfgFilePath();
-    if (cfgFileName.empty())
+    std::string name = configDoc["controller"];
+
+    auto widgets = create_experiment_controller(name);
+
+    cExperimentControlModel* pModel = widgets.pModel;
+    mpController = widgets.pView;
+
+    if ((pModel == nullptr) || (mpController == nullptr))
     {
-        return false;
+        //continue;
     }
 
-    QDockWidget* dockWidget = nullptr;
+    QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-    std::ifstream in;
-    in.open(cfgFileName);
+    mMainModel.addExperimentControlModel(pModel);
 
-    if (!in.is_open())
+    if (configDoc.contains(name))
     {
-        QString msg = "Could not open ";
-        msg += cfgFileName.c_str();
-        msg += " for reading!";
-
-        QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-        mb.exec();
-
-        return false;
+        pModel->configure(configDoc[name]);
+        mpController->configure(configDoc[name]);
     }
 
-    try
-    {
-        nlohmann::json jsonDoc;
-        in >> jsonDoc;
+    setCentralWidget(mpController);
 
-        if (!jsonDoc.contains("controller"))
+    if (widgets.pDockableView)
+    {
+        widgets.pDockableView->setParent(this);
+        widgets.pDockableView->setAllowedAreas(Qt::AllDockWidgetAreas);
+        widgets.pDockableView->hide();
+
+        addDockWidget(Qt::BottomDockWidgetArea, widgets.pDockableView);
+        mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
+    }
+
+    if (widgets.pStatusBar)
+    {
+        statusBar()->addPermanentWidget(widgets.pStatusBar);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
+{
+    auto sensors = configDoc["sensors"];
+
+    for (auto sensor : sensors)
+    {
+        std::string type = sensor["type"];
+        auto widgets = create_sensor(type, sensor);
+
+        if (widgets.pModel == nullptr)
         {
-            std::string msg = "Fatal error in ";
-            msg += cfgFileName;
-            msg += ": Undefined experiment controller";
+            std::string msg = "Unknown sensor type \"";
+            msg += type;
+            msg += "\".";
 
             QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
             mb.exec();
-
-            return false;
+            continue;
         }
 
-        std::string name = jsonDoc["controller"];
+        QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+        QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-        auto widgets = create_experiment_controller(name);
-
-        cExperimentControlModel* pModel = widgets.pModel;
-        mpController = widgets.pView;
-
-        if ((pModel == nullptr) || (mpController == nullptr))
+        if (configDoc.contains(type))
         {
-            //continue;
+            bool validSensor = false;
+            try
+            {
+                validSensor = widgets.pModel->configure(configDoc[type]);
+            }
+            catch (const std::exception& e)
+            {
+                validSensor = false;
+            }
+
+/*BAF
+            if (!validSensor)
+            {
+                remove_sensor(type, widgets);
+                continue;
+            }
+*/
         }
 
-        QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-        QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
-        QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
-        QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
-
-        mMainModel.addExperimentControlModel(pModel);
-
-        if (jsonDoc.contains(name))
-        {
-            pModel->configure(jsonDoc[name]);
-            mpController->configure(jsonDoc[name]);
-        }
-
-        setCentralWidget(mpController);
+        mMainModel.addSensor(widgets.pModel);
 
         if (widgets.pDockableView)
         {
             widgets.pDockableView->setParent(this);
-            widgets.pDockableView->setAllowedAreas(Qt::AllDockWidgetAreas);
-            widgets.pDockableView->hide();
 
-            addDockWidget(Qt::BottomDockWidgetArea, widgets.pDockableView);
+            addDockWidget(Qt::RightDockWidgetArea, widgets.pDockableView);
             mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
         }
 
@@ -555,122 +665,5 @@ bool cMainWindow::createExperimentController()
         {
             statusBar()->addPermanentWidget(widgets.pStatusBar);
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::string msg = "Error in ";
-        msg += cfgFileName;
-        msg += ": ";
-        msg += e.what();
-
-        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
-        mb.exec();
-
-        return false;
-    }
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::createSensorModelsAndViews()
-{
-    std::string cfgFileName = getCfgFilePath();
-    if (cfgFileName.empty())
-    {
-        return;
-    }
-
-    std::ifstream in;
-    in.open(cfgFileName);
-
-    if (!in.is_open())
-    {
-        std::string msg = "Could not open ";
-        msg += cfgFileName;
-        msg += " for reading!";
-
-        throw std::runtime_error(msg);
-    }
-
-    try
-    {
-        nlohmann::json jsonDoc;
-        in >> jsonDoc;
-
-        auto sensors = jsonDoc["sensors"];
-
-        for (auto sensor : sensors)
-        {
-            std::string type = sensor["type"];
-            auto widgets = create_sensor(type, sensor);
-
-            if (widgets.pModel == nullptr)
-            {
-                std::string msg = "Error in ";
-                msg += cfgFileName;
-                msg += ": Unknown sensor type \"";
-                msg += type;
-                msg += "\".";
-
-                QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
-                mb.exec();
-                continue;
-            }
-
-            QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-            QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
-            QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
-            QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
-
-            if (jsonDoc.contains(type))
-            {
-                bool validSensor = false;
-                try
-                {
-                    validSensor = widgets.pModel->configure(jsonDoc[type]);
-                }
-                catch (const std::exception& e)
-                {
-                    validSensor = false;
-                }
-
-/*BAF
-                if (!validSensor)
-                {
-                    remove_sensor(type, widgets);
-                    continue;
-                }
-*/
-            }
-
-
-            mMainModel.addSensor(widgets.pModel);
-
-            if (widgets.pDockableView)
-            {
-                widgets.pDockableView->setParent(this);
-
-                addDockWidget(Qt::RightDockWidgetArea, widgets.pDockableView);
-                mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
-            }
-
-            if (widgets.pStatusBar)
-            {
-                statusBar()->addPermanentWidget(widgets.pStatusBar);
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::string msg = "Error in ";
-        msg += cfgFileName;
-        msg += ": ";
-        msg += e.what();
-
-        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
-        mb.exec();
-
-        throw std::runtime_error(msg);
     }
 }

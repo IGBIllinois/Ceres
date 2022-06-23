@@ -18,7 +18,7 @@ class cExperimentManager : public QTreeWidget
 	Q_OBJECT
 
 public:
-	cExperimentManager(QWidget* parent = nullptr);
+	cExperimentManager(const QString& path, QWidget* parent = nullptr);
 
 	const cExperimentTreeItem* experiments() const;
 

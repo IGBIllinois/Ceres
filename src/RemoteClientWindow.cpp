@@ -78,18 +78,11 @@ namespace
 cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     QMainWindow(parent),
     mpSplashScreen(nullptr),
-    mpExperiments(nullptr),
-    mpExpLoad(nullptr),
-    mpExpRun(nullptr),
-    mpExpPause(nullptr),
-    mpExpStop(nullptr),
     mpFileMenu(nullptr),
-    mpExperimentMenu(nullptr),
     mpViewMenu(nullptr),
     mpHelpMenu(nullptr),
     mpFileBar(nullptr),
-    mpUI(new Ui::MainWindow),
-    mpController(nullptr)
+    mpUI(new Ui::MainWindow)
 {
     mpUI->setupUi(this);
 
@@ -97,11 +90,11 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
 
     setUnifiedTitleAndToolBarOnMac(true);
 
-    QObject::connect(&mMainModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::connect(&mMainModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::connect(&mMainModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
-    QObject::connect(&mMainModel, &cDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+    QObject::connect(&mMainModel, &cDataModel::statusMessage, this, &cRemoteClientWindow::onStatusUpdate);
+    QObject::connect(&mMainModel, &cDataModel::infoMessage, this, &cRemoteClientWindow::onInfoMessage);
+    QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
+    QObject::connect(&mMainModel, &cDataModel::errorMessage, this, &cRemoteClientWindow::onErrorMessage);
+    QObject::connect(&mMainModel, &cDataModel::experimentCompleted, this, &cRemoteClientWindow::onExperimentCompleted);
 }
 
 //-----------------------------------------------------------------------------
