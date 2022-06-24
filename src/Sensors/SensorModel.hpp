@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 
 // Forward Declarations
-class cBlockDataFile;
+class cBlockDataFileWriter;
 
 
 /**
@@ -43,7 +43,7 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    virtual void writeDataHeader(cBlockDataFile& file) = 0;
+    virtual void writeDataHeader(cBlockDataFileWriter& file) = 0;
 
     /*
      * Detach the serializer.

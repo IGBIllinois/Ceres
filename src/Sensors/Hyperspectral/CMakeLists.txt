@@ -9,17 +9,10 @@ set(HYPERSPECTRAL_SOURCE_FILES
 #
 # HySpex Cameras
 #
-    HySpexBlockId.hpp
-    HySpexBlockId.cpp
-    HySpexDataIdentifiers.hpp
-    HySpexVNIR_3000N_Serializer.hpp
-    HySpexVNIR_3000N_Serializer.cpp
     HySpexVNIR_3000N_Model.hpp
     HySpexVNIR_3000N_Model.cpp
     HySpexVNIR_3000N_View.hpp
     HySpexVNIR_3000N_View.cpp
-    HySpexSWIR_384_Serializer.hpp
-    HySpexSWIR_384_Serializer.cpp
     HySpexSWIR_384_Model.hpp
     HySpexSWIR_384_Model.cpp
     HySpexSWIR_384_View.hpp

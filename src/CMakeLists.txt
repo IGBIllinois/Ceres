@@ -79,12 +79,6 @@ PRIVATE
     SensorFactory.hpp
     SensorFactory.cpp
 
-    ExperimentBlockId.hpp
-    ExperimentBlockId.cpp
-    ExperimentDataIdentifiers.hpp
-    ExperimentSerializer.hpp
-    ExperimentSerializer.cpp
-
     ExperimentManager.hpp
     ExperimentManager.cpp
     ExperimentTreeItem.hpp
@@ -157,12 +151,6 @@ PRIVATE
 #
     SensorFactory.hpp
     SensorFactory.cpp
-
-    ExperimentBlockId.hpp
-    ExperimentBlockId.cpp
-    ExperimentDataIdentifiers.hpp
-    ExperimentSerializer.hpp
-    ExperimentSerializer.cpp
 
     DataThread.hpp
     DataThread.cpp

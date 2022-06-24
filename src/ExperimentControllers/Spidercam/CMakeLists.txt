@@ -24,11 +24,6 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
     SpidercamCtrl.cpp
     SpidercamUtils.hpp
     SpidercamUtils.cpp
-    SpidercamBlockId.hpp
-    SpidercamBlockId.cpp
-    SpidercamDataIdentifiers.hpp
-    SpidercamSerializer.hpp
-    SpidercamSerializer.cpp
 
     SpidercamCtrlFactory.cpp
 )

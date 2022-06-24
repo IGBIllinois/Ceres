@@ -3,7 +3,7 @@
 
 #include "RgbCameraModel.hpp"
 #include "AxisCommunicationsUtils.hpp"
-#include "AxisCommunicationsSerializer.hpp"
+#include "../../BlockDataFile/AxisCommunicationsSerializer.hpp"
 
 #include <QNetworkReply>
 #include <QUrl>

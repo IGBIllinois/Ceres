@@ -6,10 +6,10 @@
 
 cBlockSerializer::cBlockSerializer()
 :
-    cBlockSerializer(0)
+    cBlockSerializer(1024)
 {}
 
-cBlockSerializer::cBlockSerializer(std::size_t n, cBlockDataFile* pDataFile)
+cBlockSerializer::cBlockSerializer(std::size_t n, cBlockDataFileWriter* pDataFile)
 :
     mpDataFile(pDataFile)
 {
@@ -17,12 +17,12 @@ cBlockSerializer::cBlockSerializer(std::size_t n, cBlockDataFile* pDataFile)
 }
 
 
-void cBlockSerializer::attach(cBlockDataFile* pDataFile)
+void cBlockSerializer::attach(cBlockDataFileWriter* pDataFile)
 {
     mpDataFile = pDataFile;
 }
 
-cBlockDataFile* cBlockSerializer::detach()
+cBlockDataFileWriter* cBlockSerializer::detach()
 {
     auto pFile = mpDataFile;
     mpDataFile = nullptr;

@@ -345,7 +345,7 @@ void cOusterModel::update()
     cOusterLidarStream_Qt::processOneDatagram();
 }
 
-void cOusterModel::writeDataHeader(cBlockDataFile& file)
+void cOusterModel::writeDataHeader(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
     mSerializer.write(mConfigParameters);

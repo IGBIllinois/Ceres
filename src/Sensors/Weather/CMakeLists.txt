@@ -18,12 +18,6 @@ set(WEATHER_SOURCE_FILES
 #
 # Weather Station
 #
-    WeatherBlockId.hpp
-    WeatherBlockId.cpp
-    WeatherDataIdentifiers.hpp
-    WeatherSerializer.hpp
-    WeatherSerializer.cpp
-
     WeatherDataModel_Http.hpp
     WeatherDataModel_Http.cpp
     WeatherDataModel.hpp

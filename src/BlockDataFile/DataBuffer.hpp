@@ -153,7 +153,8 @@ public:
      * Note: data returns a const char* for use
      */
     const std::byte* data() const;
-//@}
+    std::byte* data(std::size_t len);
+    //@}
 
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

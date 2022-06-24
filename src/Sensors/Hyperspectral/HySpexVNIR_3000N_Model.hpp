@@ -2,7 +2,7 @@
 #pragma once
 
 #include "HyperspectralModel.hpp"
-#include "HySpexVNIR_3000N_Serializer.hpp"
+#include "../../BlockDataFile/HySpexVNIR_3000N_Serializer.hpp"
 
 #include <QObject>
 
@@ -21,7 +21,7 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFileWriter& file) override;
     void endDataRecording() override;
 
     /*

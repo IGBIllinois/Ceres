@@ -36,7 +36,7 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFileWriter& file) override;
 	void stopDataRecording() override;
 
 	bool startCommunications() override;

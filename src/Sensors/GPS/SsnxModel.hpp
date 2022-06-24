@@ -3,7 +3,7 @@
 
 #include "GpsModel.hpp"
 #include "SsnxGpsStream.hpp"
-#include "SsnxSerializer.hpp"
+#include "../../BlockDataFile/SsnxSerializer.hpp"
 
 #include <QObject>
 
@@ -26,7 +26,7 @@ public:
  
     bool configure(const nlohmann::json& jsonCfg) override;
 
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFileWriter& file) override;
     void endDataRecording() override;
 
     /*

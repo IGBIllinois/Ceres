@@ -3,7 +3,7 @@
 
 #include "BlockDataFile/BlockDataFile.hpp"
 #include "DataThread.hpp"
-#include "ExperimentSerializer.hpp"
+#include "BlockDataFile/ExperimentSerializer.hpp"
 
 #include <QObject>
 #include <QThread>
@@ -66,7 +66,7 @@ private slots:
 private:
     cDataThread mThread;
 
-    cBlockDataFile          mFile;
+    cBlockDataFileWriter    mFile;
     cExperimentSerializer   mSerializer;
 
     std::string  mExperimentTitle;

@@ -32,7 +32,7 @@ void cDummyControlModel::startExperiment()
 }
 
 
-void cDummyControlModel::writeDataHeader(cBlockDataFile& file)
+void cDummyControlModel::writeDataHeader(cBlockDataFileWriter& file)
 {
 }
 

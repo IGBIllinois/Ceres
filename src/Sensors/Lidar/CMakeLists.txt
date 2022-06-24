@@ -19,12 +19,6 @@ set(LIDAR_SOURCE_FILES
     OusterDataStream.cpp
     OusterModel.hpp
     OusterModel.cpp
-    OusterBlockId.hpp
-    OusterBlockId.cpp
-    OusterDataIdentifiers.hpp
-    OusterSerializer.hpp
-    OusterSerializer.cpp
-
     OusterFactory.cpp
 
 #

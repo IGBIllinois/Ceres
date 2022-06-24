@@ -145,7 +145,7 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 	return true;
 }
 
-void cWeatherDataModel_Http_Wind::writeDataHeader(cBlockDataFile& file)
+void cWeatherDataModel_Http_Wind::writeDataHeader(cBlockDataFileWriter& file)
 {
 	mSerializer.attach(&file);
 	mSerializer.writeConfigInfo(mConfigInfo);

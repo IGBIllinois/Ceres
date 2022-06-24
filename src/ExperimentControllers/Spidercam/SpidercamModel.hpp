@@ -5,8 +5,8 @@
 
 #include "SpidercamCtrl.hpp"
 #include "SpidercamUtils.hpp"
-#include "SpidercamSerializer.hpp"
 #include "SpidercamExperimentStates.hpp"
+#include "../../BlockDataFile/SpidercamSerializer.hpp"
 #include "../../Utilities/Timers.hpp"
 #include "../../Utilities/Utilities.hpp"
 
@@ -48,7 +48,7 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFileWriter& file) override;
 	void stopDataRecording() override;
 
 	bool startCommunications() override;

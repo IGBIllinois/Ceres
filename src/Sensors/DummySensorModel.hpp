@@ -24,7 +24,7 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFileWriter& file) override;
     void endDataRecording() override;
 
     /*

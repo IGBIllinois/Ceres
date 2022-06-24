@@ -254,6 +254,12 @@ const std::byte* cDataBuffer::data() const
 	return mpBuffer;
 }
 
+std::byte* cDataBuffer::data(std::size_t len)
+{
+	mWriteIndex += len;
+	return mpBuffer;
+}
+
 void cDataBuffer::attach(std::byte* buffer, std::size_t size)
 {
 	delete[] mpBuffer;

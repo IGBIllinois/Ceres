@@ -6,7 +6,7 @@
 #include "OusterDataStream.hpp"
 #include "OusterCmdStream.hpp"
 #include "OusterImuStream.hpp"
-#include "OusterSerializer.hpp"
+#include "../../BlockDataFile/OusterSerializer.hpp"
 
 #include <ouster/ouster_defs.h>
 #include <ouster/OusterSensorDiscovery.h>
@@ -30,7 +30,7 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
-    void writeDataHeader(cBlockDataFile& file) override;
+    void writeDataHeader(cBlockDataFileWriter& file) override;
     void endDataRecording() override;
 
     uint16_t columnsPerFrame() const;

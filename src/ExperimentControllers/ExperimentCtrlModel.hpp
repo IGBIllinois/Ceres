@@ -9,7 +9,7 @@
 
 // Forward Declarations
 class cExperimentState;
-class cBlockDataFile;
+class cBlockDataFileWriter;
 
 namespace experiment
 {
@@ -80,7 +80,7 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    virtual void writeDataHeader(cBlockDataFile& file) = 0;
+    virtual void writeDataHeader(cBlockDataFileWriter& file) = 0;
 
     /*
      * Sets the non-owning data file pointer to

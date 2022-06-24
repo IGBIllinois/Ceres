@@ -15,11 +15,6 @@ set(GPS_SOURCE_FILES
     SsnxModel.cpp
     SsnxView.hpp
     SsnxView.cpp
-    SsnxBlockId.hpp
-    SsnxBlockId.cpp
-    SsnxDataIdentifiers.hpp
-    SsnxSerializer.hpp
-    SsnxSerializer.cpp
 
     SsnxFactory.cpp
 
@@ -56,7 +51,7 @@ PRIVATE
     ${GPS_SOURCE_FILES}
 )
 
-target_include_directories(gps_static PRIVATE BlockDataFile)
+#target_include_directories(gps_static PRIVATE BlockDataFile)
 
 target_link_libraries(gps_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(gps_static PUBLIC ${Qt}::Network)

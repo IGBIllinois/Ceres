@@ -87,7 +87,7 @@ void cSsnxModel::update()
     processOneDatagram();
 }
 
-void cSsnxModel::writeDataHeader(cBlockDataFile& file)
+void cSsnxModel::writeDataHeader(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }

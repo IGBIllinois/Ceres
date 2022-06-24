@@ -53,7 +53,7 @@ void cHySpexSWIR_384_Model::update()
 
 }
 
-void cHySpexSWIR_384_Model::writeDataHeader(cBlockDataFile& file)
+void cHySpexSWIR_384_Model::writeDataHeader(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }

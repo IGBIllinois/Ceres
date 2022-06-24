@@ -1,13 +1,17 @@
 
 #pragma once
 
+#include "BlockId.hpp"
+#include "BlockParser.hpp"
+#include "DataBuffer.hpp"
+
 #include <cstddef>
 #include <string>
 #include <cstdio>
 #include <fstream>
+#include <map>
 
 // Forward Declares
-class cBlockID;
 
 /**
 	Storage of the data from the Spidercam system is based on a block file format.
@@ -58,19 +62,19 @@ class cBlockID;
 */
 
 
-class cBlockDataFile
+class cBlockDataFileWriter
 {
 public:
-	cBlockDataFile();
-	explicit cBlockDataFile(const std::string& filename);
+	cBlockDataFileWriter();
+	explicit cBlockDataFileWriter(const std::string& filename);
 
-	cBlockDataFile(const cBlockDataFile&) = delete;
-	cBlockDataFile(cBlockDataFile&&) = delete;
+	cBlockDataFileWriter(const cBlockDataFileWriter&) = delete;
+	cBlockDataFileWriter(cBlockDataFileWriter&&) = delete;
 
-	cBlockDataFile& operator=(const cBlockDataFile&) = delete;
-	cBlockDataFile& operator=(cBlockDataFile&&) = delete;
+	cBlockDataFileWriter& operator=(const cBlockDataFileWriter&) = delete;
+	cBlockDataFileWriter& operator=(cBlockDataFileWriter&&) = delete;
 
-	~cBlockDataFile();
+	~cBlockDataFileWriter();
 
     void open(const std::string& filename);
     bool isOpen();
@@ -80,10 +84,40 @@ public:
 	void writeBlock(const cBlockID& id, const std::byte* buf, std::size_t len);
 
 private:
-//    FILE* mpFile;
     std::ofstream mFile;
+};
 
-	const uint8_t mHeader[8] = {137, 83, 80, 68, 82, 67, 77, 03};
-	const uint16_t mBOM = 0x55AA;
+
+
+class cBlockDataFileReader
+{
+public:
+	cBlockDataFileReader();
+	explicit cBlockDataFileReader(const std::string& filename);
+
+	cBlockDataFileReader(const cBlockDataFileReader&) = delete;
+	cBlockDataFileReader(cBlockDataFileReader&&) = delete;
+
+	cBlockDataFileReader& operator=(const cBlockDataFileReader&) = delete;
+	cBlockDataFileReader& operator=(cBlockDataFileReader&&) = delete;
+
+	~cBlockDataFileReader();
+
+	void open(const std::string& filename);
+	bool isOpen();
+	void close();
+
+	void attach(cBlockParser* pParser);
+	cBlockParser* detach(cBlockID id);
+
+	bool processBlock();
+
+private:
+	//    FILE* mpFile;
+	std::ifstream mFile;
+	bool mByteSwapNeeded;
+
+	cDataBuffer mBuffer;
+	std::map<BLOCK_CLASS_ID_t, cBlockParser*> mParsers;
 };
 

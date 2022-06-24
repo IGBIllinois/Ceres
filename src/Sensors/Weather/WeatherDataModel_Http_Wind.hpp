@@ -2,7 +2,7 @@
 #pragma once
 
 #include "WeatherDataModel_Http.hpp"
-#include "WeatherSerializer.hpp"
+#include "../../BlockDataFile/WeatherSerializer.hpp"
 
 #include <string>
 
@@ -27,7 +27,7 @@ public:
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFile& pFile) override;
+    void writeDataHeader(cBlockDataFileWriter& pFile) override;
     void endDataRecording() override;
 
 signals:

@@ -97,7 +97,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     return true;
 }
 
-void cAxisCommunicationsModel_F44::writeDataHeader(cBlockDataFile& file)
+void cAxisCommunicationsModel_F44::writeDataHeader(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 //    mSerializer.write(mConfigParameters);

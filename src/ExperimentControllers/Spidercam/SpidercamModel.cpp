@@ -181,7 +181,7 @@ void cSpidercamModel::startExperiment()
 }
 
 
-void cSpidercamModel::writeDataHeader(cBlockDataFile& file)
+void cSpidercamModel::writeDataHeader(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }

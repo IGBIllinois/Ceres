@@ -45,15 +45,41 @@ enum class ClassIDs: uint16_t;
     65,535          : Reserved
 */
 
+typedef uint16_t BLOCK_CLASS_ID_t;
+typedef uint8_t  BLOCK_MAJOR_VERSION_t;
+typedef uint8_t  BLOCK_MINOR_VERSION_t;
+typedef uint16_t BLOCK_DATA_ID_t;
 
-class cBlockID
+struct sBlockHeader
+{
+    BLOCK_CLASS_ID_t       mClassID = 0;
+    BLOCK_MAJOR_VERSION_t  mMajorVersion = 0;
+    BLOCK_MINOR_VERSION_t  mMinorVersion = 0;
+
+    sBlockHeader() = default;
+    explicit sBlockHeader(const sBlockHeader& id)
+        :
+        mClassID(id.mClassID), mMajorVersion(id.mMajorVersion), mMinorVersion(id.mMinorVersion)
+    {}
+    explicit sBlockHeader(ClassIDs classId, uint8_t majorVer = 0, uint8_t minorVer = 0)
+        :
+            mClassID(static_cast<uint16_t>(classId)), mMajorVersion(majorVer), mMinorVersion(minorVer)
+    {}
+};
+
+class cBlockID : private sBlockHeader
 {
 public:
     cBlockID() {}
-        
+
+    explicit cBlockID(const sBlockHeader& id)
+        :
+        sBlockHeader(id)
+    {}
+
     explicit cBlockID(ClassIDs classId, uint8_t majorVer = 0, uint8_t minorVer = 0)
     : 
-        mClassID(static_cast<uint16_t>(classId)), mMajorVersion(majorVer), mMinorVersion(minorVer)
+        sBlockHeader(classId, majorVer, minorVer)
     {}
 
     void classID(ClassIDs id) noexcept
@@ -102,6 +128,11 @@ public:
         return mDataID;
     }
 
+    sBlockHeader blockHeader() const noexcept
+    {
+        return sBlockHeader(*this);
+    }
+
 /*
     friend void swap(BlockID_t& a, BlockID_t& b) noexcept
     {
@@ -109,12 +140,12 @@ public:
         swap(static_cast<uint32_t&>(a), static_cast<uint32_t&>(b));
     }
 */
-
 private:
-    uint16_t mClassID = 0;
-    uint8_t mMajorVersion = 0;
-    uint8_t mMinorVersion = 0;
-    uint16_t mDataID = 0;
+    BLOCK_DATA_ID_t mDataID = 0;
 };
 
-
+inline bool operator<(const sBlockHeader& lhs, const sBlockHeader& rhs)
+{
+    return (lhs.mClassID < rhs.mClassID) && (lhs.mMajorVersion < rhs.mMajorVersion)
+        && (lhs.mMinorVersion < rhs.mMinorVersion);
+}

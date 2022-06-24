@@ -52,7 +52,7 @@ void cHySpexVNIR_3000N_Model::update()
     if (!mConnected) return;
 }
 
-void cHySpexVNIR_3000N_Model::writeDataHeader(cBlockDataFile& file)
+void cHySpexVNIR_3000N_Model::writeDataHeader(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }

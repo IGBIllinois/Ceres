@@ -17,11 +17,6 @@ AxisCommunicationsView.hpp
 AxisCommunicationsView.cpp
 AxisCommunicationsModel.hpp
 AxisCommunicationsModel.cpp
-AxisCommunicationsBlockId.hpp
-AxisCommunicationsBlockId.cpp
-AxisDataIdentifiers.hpp
-AxisCommunicationsSerializer.hpp
-AxisCommunicationsSerializer.cpp
 AxisCamera.hpp
 AxisCamera.cpp
 AxisCommunicationsUtils.hpp

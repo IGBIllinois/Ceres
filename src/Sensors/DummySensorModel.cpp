@@ -34,7 +34,7 @@ void cDummyModel::update()
 {
 }
 
-void cDummyModel::writeDataHeader(cBlockDataFile& file)
+void cDummyModel::writeDataHeader(cBlockDataFileWriter& file)
 {
 }
 
