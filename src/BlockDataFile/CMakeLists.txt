@@ -73,7 +73,19 @@ PUBLIC
     WeatherDataIdentifiers.hpp
     WeatherSerializer.hpp
 
+#
+# Headers for serializing/parsing Position/Velocity/Time data
+#
+    PvtBlockId.hpp
+    PvtDataIdentifiers.hpp
+    PvtSerializer.hpp
+    PvtParser.hpp
+
 PRIVATE
+
+    PvtBlockId.cpp
+    PvtSerializer.cpp
+    PvtParser.cpp
 
     WeatherBlockId.cpp
     WeatherSerializer.cpp

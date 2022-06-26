@@ -6,7 +6,7 @@
 
 cPvtID::cPvtID(uint8_t majorVer, uint8_t minorVer)
 :
-    cBlockID(ClassIDs::OUSTER_LIDAR, majorVer, minorVer)
+    cBlockID(ClassIDs::PVT, majorVer, minorVer)
 {}
 
 void cPvtID::dataID(pvt::DataID id) noexcept
