@@ -85,10 +85,16 @@ PRIVATE
     ExperimentTreeItem.cpp
     ExperimentToolbar.hpp
     ExperimentToolbar.cpp
+	
     DataThread.hpp
     DataThread.cpp
+    DataModelRemote.hpp
+    DataModelRemote.cpp
+    DataModelLocal.hpp
+    DataModelLocal.cpp
     DataModel.hpp
     DataModel.cpp
+	
     MainWindow.hpp
     MainWindow.cpp
 

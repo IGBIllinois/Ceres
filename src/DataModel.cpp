@@ -4,18 +4,26 @@
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
+// Static Data
+std::chrono::time_point<std::chrono::high_resolution_clock> cDataModel::mStartTime;
+
+// Static Methods
+std::uint64_t cDataModel::timestamp_ns()
+{
+    const auto end = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(end - mStartTime).count();
+}
+
 
 cDataModel::cDataModel(QObject* parent)
 :
-    QObject(parent),
-    mSerializer(4096)
+    QObject(parent)
 {
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cDataModel::onStatusUpdate);
 }
 
 cDataModel::~cDataModel()
 {
-    stopDataThread();
 }
 
 void cDataModel::onStatusUpdate(QString msg)
@@ -56,36 +64,6 @@ void cDataModel::startDataThread()
 void cDataModel::stopDataThread()
 {
     mThread.stop();
-
-    if (mFile.isOpen())
-    {
-        mThread.mpController->stopDataRecording();
-
-        for (auto& sensor : mThread.mActiveSensors)
-        {
-            sensor->endDataRecording();
-        }
-
-        mFile.close();
-    }
-}
-
-bool cDataModel::openDataFile(const std::string& filename)
-{
-    if (mFile.isOpen())
-        return false;
-
-    mFile.open(filename);
-
-    mSerializer.attach(&mFile);
-
-    return mFile.isOpen();
-}
-
-void cDataModel::closeDataFile()
-{
-    mSerializer.detach();
-    mFile.close();
 }
 
 std::string cDataModel::experimentTitle() const
@@ -160,25 +138,6 @@ bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
     return false;
 }
 
-void cDataModel::startExperiment()
-{
-    if (isExperimentRunning())
-    {
-        mThread.mpController->startExperiment();
-        return;
-    }
-
-    mThread.mpController->writeDataHeader(mFile);
-
-    for (auto& sensor : mThread.mActiveSensors)
-    {
-        sensor->writeDataHeader(mFile);
-    }
-
-    mSerializer.startTime(time(0));
-    mThread.mpController->startExperiment();
-}
-
 void cDataModel::pauseExperiment()
 {
     if (mThread.mpController)
@@ -200,26 +159,25 @@ void cDataModel::onExperimentStateChange(int s)
 
     switch (state)
     {
-    case State::COMPLETED:
-    case State::TERMINATED:
-    {
-        mThread.mpController->stopDataRecording();
-
-        for (auto& sensor : mThread.mActiveSensors)
+        case State::COMPLETED:
+        case State::TERMINATED:
         {
-            sensor->endDataRecording();
+            mThread.mpController->stopDataRecording();
+
+            for (auto& sensor : mThread.mActiveSensors)
+            {
+                sensor->endDataRecording();
+            }
+
+            closeDataFile();
+
+            mExperimentTitle.clear();
+            mExperimentDoc.clear();
+
+            emit experimentCompleted();
+
+            break;
         }
-
-        mSerializer.endTime(time(0));
-        closeDataFile();
-
-        mExperimentTitle.clear();
-        mExperimentDoc.clear();
-
-        emit experimentCompleted();
-
-        break;
-    }
     }
 }
 

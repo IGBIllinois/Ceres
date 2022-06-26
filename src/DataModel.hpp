@@ -1,9 +1,7 @@
 
 #pragma once
 
-#include "BlockDataFile/BlockDataFile.hpp"
 #include "DataThread.hpp"
-#include "BlockDataFile/ExperimentSerializer.hpp"
 
 #include <QObject>
 #include <QThread>
@@ -11,6 +9,7 @@
 #include <QWaitCondition>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <chrono>
 
 // Forward Declarations
 class cExperimentControlModel;
@@ -30,22 +29,26 @@ public:
     explicit cDataModel(QObject* parent = nullptr);
     ~cDataModel();
 
-    void addExperimentControlModel(cExperimentControlModel* pSensor);
+    static std::uint64_t timestamp_ns();
+
+    void addExperimentControlModel(cExperimentControlModel* pModel);
     void addSensor(cSensorModel* pSensor);
 
-    void startDataThread();
-    void stopDataThread();
+    virtual void startDataThread();
+    virtual void stopDataThread();
 
-    bool openDataFile(const std::string& filename);
-    void closeDataFile();
+    virtual bool openDataFile(const QString& defaultPath) = 0;
+    virtual void closeDataFile() = 0;
 
     bool isExperimentRunning();
     bool isExperimentPaused();
 
     std::string experimentTitle() const;
+
     bool isExperimentLoaded() const;
     bool loadExperiment(const nlohmann::json& expDoc);
-    void startExperiment();
+
+    virtual void startExperiment() = 0;
     void pauseExperiment();
     void terminateExperiment();
 
@@ -63,15 +66,13 @@ private slots:
 
     void onExperimentStateChange(int state);
 
-private:
+protected:
     cDataThread mThread;
-
-    cBlockDataFileWriter    mFile;
-    cExperimentSerializer   mSerializer;
 
     std::string  mExperimentTitle;
     std::string  mExperimentDoc;
 
-    QMutex mMutex;
+private:
+    static std::chrono::time_point<std::chrono::high_resolution_clock> mStartTime;
 };
 

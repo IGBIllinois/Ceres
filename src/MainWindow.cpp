@@ -4,6 +4,10 @@
 
 #include "CeresSplashScreen.hpp"
 
+#include "DataModel.hpp"
+#include "DataModelLocal.hpp"
+#include "DataModelRemote.hpp"
+
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
 #include "ExperimentToolbar.hpp"
@@ -96,6 +100,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
     mpHelpMenu(nullptr),
     mpFileBar(nullptr),
     mpUI(new Ui::MainWindow),
+    mpDataModel(nullptr),
     mpController(nullptr)
 {
     mpUI->setupUi(this);
@@ -109,18 +114,12 @@ cMainWindow::cMainWindow(QWidget* parent) :
     auto exp_path = cwd / "Experiments";
     mDefaultDataPath = QString::fromLatin1(data_path.string().c_str());
     mExperimentFilesPath = QString::fromLatin1(exp_path.string().c_str());
-
-    QObject::connect(&mMainModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::connect(&mMainModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::connect(&mMainModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
-    QObject::connect(&mMainModel, &cDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
 }
 
 //-----------------------------------------------------------------------------
 cMainWindow::~cMainWindow()
 {
-    mMainModel.stopDataThread();
+    mpDataModel->stopDataThread();
 
     delete mpUI;
     mpUI = nullptr;
@@ -208,6 +207,9 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
         onStatusUpdate("Initializing dock windows...");
         createDockWindows(configDoc);
 
+        onStatusUpdate("Initializing data model...");
+        createDataModel(configDoc);
+
         onStatusUpdate("Initializing experiment controller...");
         createExperimentController(configDoc);
 
@@ -229,13 +231,13 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
     mpSplashScreen = nullptr;
 
-    mMainModel.startDataThread();
+    mpDataModel->startDataThread();
 }
 
 //-----------------------------------------------------------------------------
 void cMainWindow::fileNew()
 {
-    if (mMainModel.isExperimentRunning())
+    if (mpDataModel->isExperimentRunning())
     {
         //TODO: Something here!
     }
@@ -253,7 +255,7 @@ void cMainWindow::fileNew()
 
     onStatusUpdate(msg);
     auto expDoc = pExperiment->getExperimentDocument();
-    if (!mMainModel.loadExperiment(expDoc))
+    if (!mpDataModel->loadExperiment(expDoc))
     {
     }
 
@@ -273,7 +275,7 @@ void cMainWindow::fileAddExperiment()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentLoad()
 {
-    if (mMainModel.isExperimentRunning())
+    if (mpDataModel->isExperimentRunning())
     {
         //TODO: Something here!
     }
@@ -302,7 +304,7 @@ void cMainWindow::experimentLoad()
 
     onStatusUpdate(msg);
     auto expDoc = pExperiment->getExperimentDocument();
-    if (!mMainModel.loadExperiment(expDoc))
+    if (!mpDataModel->loadExperiment(expDoc))
     {
     }
 }
@@ -310,11 +312,11 @@ void cMainWindow::experimentLoad()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentRun()
 {
-    if (mMainModel.isExperimentRunning())
+    if (mpDataModel->isExperimentRunning())
     {
-        if (mMainModel.isExperimentPaused())
+        if (mpDataModel->isExperimentPaused())
         {
-            mMainModel.startExperiment();
+            mpDataModel->startExperiment();
 
             mpExpLoad->setEnabled(false);
             mpExpRun->setEnabled(false);
@@ -327,25 +329,20 @@ void cMainWindow::experimentRun()
     // Reload the experiment each time incase the experiment was tweaked
     experimentLoad();
 
-    if (!mMainModel.isExperimentLoaded())
+    if (!mpDataModel->isExperimentLoaded())
     {
         return;
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("New File"), mDefaultDataPath, tr("Ceres data (*.ceres);;All Files (*.*)"));
-
-    if (fileName.isEmpty())
-        return;
-
-    if (!mMainModel.openDataFile(fileName.toStdString()))
+    if (!mpDataModel->openDataFile(mDefaultDataPath))
         return;
 
     QString msg = "Running experiment: ";
-    msg += mMainModel.experimentTitle().c_str();
+    msg += mpDataModel->experimentTitle().c_str();
 
     onStatusUpdate(msg);
 
-    mMainModel.startExperiment();
+    mpDataModel->startExperiment();
 
     mpExpLoad->setEnabled(false);
     mpExpRun->setEnabled(false);
@@ -358,12 +355,12 @@ void cMainWindow::experimentRun()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentPause()
 {
-    if (!mMainModel.isExperimentRunning())
+    if (!mpDataModel->isExperimentRunning())
     {
         return;
     }
 
-    mMainModel.pauseExperiment();
+    mpDataModel->pauseExperiment();
 
     mpExpLoad->setEnabled(false);
     mpExpRun->setEnabled(true);
@@ -376,12 +373,12 @@ void cMainWindow::experimentPause()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentStop()
 {
-    if (!mMainModel.isExperimentRunning())
+    if (!mpDataModel->isExperimentRunning())
     {
         return;
     }
 
-    mMainModel.terminateExperiment();
+    mpDataModel->terminateExperiment();
 
     onExperimentCompleted();
 }
@@ -559,6 +556,30 @@ void cMainWindow::createDockWindows(const nlohmann::json& configDoc)
 }
 
 //-----------------------------------------------------------------------------
+void cMainWindow::createDataModel(const nlohmann::json& configDoc)
+{
+    auto data_model = configDoc["data model"];
+
+    if (data_model.is_string())
+    {
+        std::string type = data_model.get<std::string>();
+
+        if (type == "local")
+            mpDataModel = new cDataModelLocal(this);
+    }
+    else if (data_model.is_object())
+    {
+
+    }
+
+    QObject::connect(mpDataModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(mpDataModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(mpDataModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(mpDataModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+    QObject::connect(mpDataModel, &cDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+}
+
+//-----------------------------------------------------------------------------
 void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
 {
     std::string name = configDoc["controller"];
@@ -578,7 +599,7 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-    mMainModel.addExperimentControlModel(pModel);
+    mpDataModel->addExperimentControlModel(pModel);
 
     if (configDoc.contains(name))
     {
@@ -651,7 +672,7 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
 */
         }
 
-        mMainModel.addSensor(widgets.pModel);
+        mpDataModel->addSensor(widgets.pModel);
 
         if (widgets.pDockableView)
         {

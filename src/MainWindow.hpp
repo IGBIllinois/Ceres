@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "DataModel.hpp"
-
 #include <QMainWindow>
 #include <QString>
+
+#include <nlohmann/json.hpp>
 
 
 // Qt Forward Declaration
@@ -20,15 +20,9 @@ QT_END_NAMESPACE
 
 // Forward Declarations
 class cCeresSplashScreen;
+class cDataModel;
 class cExperimentControlView;
 class cExperimentManager;
-
-/*
-namespace nlohmann
-{
-    class json;
-}
-*/
 
 namespace Ui 
 {
@@ -74,6 +68,7 @@ private:
     void createToolBars();
     void createStatusBar();
     void createDockWindows(const nlohmann::json& configDoc);
+    void createDataModel(const nlohmann::json& configDoc);
     void createExperimentController(const nlohmann::json& configDoc);
     void createSensorModelsAndViews(const nlohmann::json& configDoc);
 
@@ -100,7 +95,7 @@ private:
     Ui::MainWindow* mpUI;
     QString mCurrentFile;
 
-    cDataModel mMainModel;
+    cDataModel* mpDataModel;
 
     cExperimentControlView* mpController;
 };

@@ -45,16 +45,7 @@ public slots:
     void onWarningMessage(QString title, QString msg);
     void onErrorMessage(QString title, QString msg);
 
-    void onExperimentCompleted();
-
 private slots:
-    void fileNew();
-    void fileAddExperiment();
-    void experimentLoad();
-    void experimentRun();
-    void experimentPause();
-    void experimentStop();
-    void helpAbout();
 
 private:
     void createMainMenu();
@@ -62,22 +53,17 @@ private:
     void createActions();
     void createToolBars();
     void createStatusBar();
-    void createDockWindows();
-    bool createExperimentController();
     void createSensorModelsAndViews();
 
     cCeresSplashScreen* mpSplashScreen;
 
     QMenu* mpFileMenu;
 
-    QMenu* mpViewMenu;
     QMenu* mpHelpMenu;
-
-    QToolBar* mpFileBar;
 
     Ui::MainWindow* mpUI;
     QString mCurrentFile;
 
-    cDataModel mMainModel;
+    cDataModel* mpMainModel;
 };
 
