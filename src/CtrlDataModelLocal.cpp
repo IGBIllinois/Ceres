@@ -1,26 +1,26 @@
 
-#include "DataModelLocal.hpp"
+#include "CtrlDataModelLocal.hpp"
 #include "Sensors/SensorModel.hpp"
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
 #include <QtWidgets>
 
-cDataModelLocal::cDataModelLocal(QObject* parent)
+cCtrlDataModelLocal::cCtrlDataModelLocal(QObject* parent)
 :
-    cDataModel(parent),
+    cCtrlDataModel(parent),
     mSerializer(4096)
 {
 }
 
-cDataModelLocal::~cDataModelLocal()
+cCtrlDataModelLocal::~cCtrlDataModelLocal()
 {
     stopDataThread();
 }
 
-void cDataModelLocal::stopDataThread()
+void cCtrlDataModelLocal::stopDataThread()
 {
-    cDataModel::stopDataThread();
+    cCtrlDataModel::stopDataThread();
 
     if (mFile.isOpen())
     {
@@ -35,7 +35,7 @@ void cDataModelLocal::stopDataThread()
     }
 }
 
-bool cDataModelLocal::openDataFile(const QString& defaultPath)
+bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath)
 {
     QString fileName = QFileDialog::getSaveFileName(nullptr, tr("New File"), defaultPath, tr("Ceres data (*.ceres);;All Files (*.*)"));
 
@@ -52,14 +52,14 @@ bool cDataModelLocal::openDataFile(const QString& defaultPath)
     return mFile.isOpen();
 }
 
-void cDataModelLocal::closeDataFile()
+void cCtrlDataModelLocal::closeDataFile()
 {
     mSerializer.endTime(time(nullptr));
     mSerializer.detach();
     mFile.close();
 }
 
-void cDataModelLocal::startExperiment()
+void cCtrlDataModelLocal::startExperiment()
 {
     if (isExperimentRunning())
     {

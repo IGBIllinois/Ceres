@@ -9,36 +9,37 @@
 #include "Sensors/RGB/AxisCommunicationsFactory.hpp"
 
 
-sSensorWidgets create_sensor(const std::string& name, const nlohmann::json& sensorInfo)
+sSensorWidgets create_sensor(const std::string& name, 
+    const nlohmann::json& sensorInfo, bool no_visualization)
 {
     if (name.compare(dummy_id) == 0)
     {
-        return create_dummy_sensor();
+        return create_dummy_sensor(no_visualization);
     }
 
     if (name.compare(ssnx_id) == 0)
     {
-        return create_ssnx_sensor();
+        return create_ssnx_sensor(no_visualization);
     }
 
     if (name.compare(ouster_id) == 0)
     {
-        return create_ouster_sensor();
+        return create_ouster_sensor(no_visualization);
     }
 
     if (name.compare(weather_data_id) == 0)
     {
-        return create_weather_data_sensor(sensorInfo);
+        return create_weather_data_sensor(sensorInfo, no_visualization);
     }
 
     if (name.compare(hyspex_id) == 0)
     {
-        return create_hyspex_sensor(sensorInfo);
+        return create_hyspex_sensor(sensorInfo, no_visualization);
     }
 
     if (name.compare(axis_communications_id) == 0)
     {
-        return create_axis_communications_sensor(sensorInfo);
+        return create_axis_communications_sensor(sensorInfo, no_visualization);
     }
 
     return sSensorWidgets();

@@ -62,6 +62,7 @@ signals:
 	void batteryLevelChanged(float level_pct);
 	void obstacleDistanceChanged(float distantance_mm);
 	void inPositionStateChanged(bool in_position);
+	void inScriptMode(bool in_script_mode);
 
 /*
 	bool mIpCameraConnected;
@@ -96,7 +97,6 @@ protected:
 	bool mDollyPositionKnown;
 	bool mConsoleEnabled;
 	bool mInInteractiveMode;
-	bool mInScriptMode;
 
 	edge_detect<bool>	mBusy;
 	edge_detect<bool>	mInError;
@@ -107,6 +107,7 @@ protected:
 	edge_detect<bool>	mObstacleLessThan1000mm;
 	edge_detect<bool>	mObstacleLessThan500mm;
 	edge_detect<bool>	mInPosition;
+	edge_detect<bool>   mInScriptMode;
 
 	cIntervalTimer	mTimer;
 

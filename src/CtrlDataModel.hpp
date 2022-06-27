@@ -20,14 +20,19 @@ namespace experiment
     enum class State : uint8_t;
 }
 
-
-class cDataModel : public QObject
+/*****************************************************************************
+ * 
+ * The cCtrlDataModel class is the base class for experiment control and
+ * data acquisition.
+ * 
+ *****************************************************************************/
+class cCtrlDataModel : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit cDataModel(QObject* parent = nullptr);
-    ~cDataModel();
+    explicit cCtrlDataModel(QObject* parent = nullptr);
+    ~cCtrlDataModel();
 
     static std::uint64_t timestamp_ns();
 

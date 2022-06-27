@@ -30,5 +30,7 @@ struct sSensorWidgets
 	{}
 };
 
-sSensorWidgets create_sensor(const std::string& name, const nlohmann::json& sensorInfo);
+sSensorWidgets create_sensor(const std::string& name, 
+	const nlohmann::json& sensorInfo, bool no_visualization = false);
+
 void remove_sensor(const std::string& name, sSensorWidgets widgets);

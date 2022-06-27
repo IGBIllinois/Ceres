@@ -163,7 +163,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 cExperimentState* cSpidercamModel::createState(const std::string& type)
 {
     if (type == "movement")
-        return new cSpidercamExperimentState_Movement(mCurrentPosition, mController, TOLERANCE_MM);
+        return new cSpidercamExperimentState_Movement(mCurrentPosition, mController, mPositionTolerance_mm);
 
     return cExperimentControlModel::createState(type);
 }
@@ -173,7 +173,7 @@ void cSpidercamModel::startExperiment()
     if (!mInScriptMode && !mRunning)
     {
         QString str = "Make sure the C2 computer is in remote mode.\n";
-        str += "Please enter remote mode and then start your experiment.";
+        str += "Please enter remote mode.";
         emit warningMessage("Message", str);
     }
 
@@ -203,7 +203,7 @@ void cSpidercamModel::update()
 
     const auto& pos = mController.getLastKnownPosition();
 
-    if (spidercam::hasPositionChanged(pos, mCurrentPosition, mPositionTolerance_mm))
+    if (spidercam::hasPosSpeedChanged(pos, mCurrentPosition, mPositionTolerance_mm))
     {
         mCurrentPosition = pos;
         emit positionChanged(mCurrentPosition);
@@ -222,6 +222,9 @@ void cSpidercamModel::update()
 
     if (mBatteryLevel_pct.HasChanged())
         emit batteryLevelChanged(mBatteryLevel_pct);
+
+    if (mInScriptMode.HasChanged())
+        emit inScriptMode(mInScriptMode);
 
     updateObstacleDistance();
 

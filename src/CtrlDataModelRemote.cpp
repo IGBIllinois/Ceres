@@ -1,31 +1,31 @@
 
-#include "DataModelRemote.hpp"
+#include "CtrlDataModelRemote.hpp"
 #include "Sensors/SensorModel.hpp"
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
 
-cDataModelRemote::cDataModelRemote(QObject* parent)
+cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
 :
-    cDataModel(parent)
+    cCtrlDataModel(parent)
 {
 }
 
-cDataModelRemote::~cDataModelRemote()
+cCtrlDataModelRemote::~cCtrlDataModelRemote()
 {
     stopDataThread();
 }
 
-bool cDataModelRemote::openDataFile(const QString& defaultPath)
+bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath)
 {
     return false;
 }
 
-void cDataModelRemote::closeDataFile()
+void cCtrlDataModelRemote::closeDataFile()
 {
 }
 
-void cDataModelRemote::startExperiment()
+void cCtrlDataModelRemote::startExperiment()
 {
 }
 

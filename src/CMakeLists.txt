@@ -88,12 +88,12 @@ PRIVATE
 	
     DataThread.hpp
     DataThread.cpp
-    DataModelRemote.hpp
-    DataModelRemote.cpp
-    DataModelLocal.hpp
-    DataModelLocal.cpp
-    DataModel.hpp
-    DataModel.cpp
+    CtrlDataModelRemote.hpp
+    CtrlDataModelRemote.cpp
+    CtrlDataModelLocal.hpp
+    CtrlDataModelLocal.cpp
+    CtrlDataModel.hpp
+    CtrlDataModel.cpp
 	
     MainWindow.hpp
     MainWindow.cpp

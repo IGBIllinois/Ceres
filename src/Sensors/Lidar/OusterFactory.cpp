@@ -22,10 +22,14 @@ Q_DECLARE_METATYPE(ouster::azimuth_range_t);
 Q_DECLARE_METATYPE(ouster::imu_data_t);
 
 
-sSensorWidgets create_ouster_sensor()
+sSensorWidgets create_ouster_sensor(bool no_visualization)
 {
     // Create the Ouster model and view...
     auto* pModel = new cOusterModel();
+
+    if (no_visualization)
+        return sSensorWidgets(pModel, nullptr);
+
     auto* dockWidget = new QDockWidget();
     auto* pView = new cOusterView(pModel, dockWidget);
     

@@ -20,7 +20,7 @@ QT_END_NAMESPACE
 
 // Forward Declarations
 class cCeresSplashScreen;
-class cDataModel;
+class cCtrlDataModel;
 class cExperimentControlView;
 class cExperimentManager;
 
@@ -95,7 +95,7 @@ private:
     Ui::MainWindow* mpUI;
     QString mCurrentFile;
 
-    cDataModel* mpDataModel;
+    cCtrlDataModel* mpModel;
 
     cExperimentControlView* mpController;
 };

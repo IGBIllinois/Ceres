@@ -33,6 +33,7 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 	mIsMoving = false;
 	mIsSetPointEnabled = false;
 	mInError = false;
+	mInScriptMode = false;
 }
 
 void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
@@ -96,7 +97,9 @@ QString cSpidercamExperimentState_Movement::getStatusStr()
 	msg.append(std::to_string(static_cast<uint32_t>(mY_mm)).c_str());
 	msg += "mm, ";
 	msg.append(std::to_string(static_cast<uint32_t>(mZ_mm)).c_str());
-	msg += "mm.";
+	msg += "mm at ";
+	msg.append(std::to_string(static_cast<uint32_t>(mSpeed_mmps)).c_str());
+	msg += "mm/sec.";
 	return msg;
 }
 
@@ -114,6 +117,7 @@ void cSpidercamExperimentState_Movement::initialize()
 	mIsSetPointEnabled = mController.isSetPointEnabled();
 	mInError = mController.isInError();
 	mIsConsoleConnected = mController.isConsoleConnected();
+	mInScriptMode = mController.isInScriptMode();
 
 	if (mX_NeedsInitialization)
 	{
@@ -138,6 +142,7 @@ void cSpidercamExperimentState_Movement::run()
 	mIsMoving = mController.isMoving();
 	mIsSetPointEnabled = mController.isSetPointEnabled();
 	mInError = mController.isInError();
+	mInScriptMode = mController.isInScriptMode();
 
 	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mBusy && !mInError;
 
@@ -167,6 +172,8 @@ cExperimentState::eRESULT cSpidercamExperimentState_Movement::finished()
 	mIsConsoleConnected = mController.isConsoleConnected();
 	mIsSetPointEnabled = mController.isSetPointEnabled();
 	mInError = mController.isInError();
+	mInScriptMode = mController.isInScriptMode();
+
 	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mInError;
 	if (!readyForMotion)
 		return eRESULT::ABORT;
@@ -174,8 +181,16 @@ cExperimentState::eRESULT cSpidercamExperimentState_Movement::finished()
 	if (mIsMoving)
 		return eRESULT::WAITING;
 
-	return ((abs_difference(mDollyPos.X_mm, mX_mm) < mTolerance_mm) &&
-			(abs_difference(mDollyPos.Y_mm, mY_mm) < mTolerance_mm) &&
-			(abs_difference(mDollyPos.Z_mm, mZ_mm) < mTolerance_mm)) ? eRESULT::DONE : eRESULT::WAITING;
+	auto dx = abs_difference(mDollyPos.X_mm, mX_mm);
+	auto dy = abs_difference(mDollyPos.Y_mm, mY_mm);
+	auto dz = abs_difference(mDollyPos.Z_mm, mZ_mm);
+
+	if ((dx < mTolerance_mm) && (dy < mTolerance_mm) && (dz < mTolerance_mm))
+	{
+		if (mDollyPos.speed_mmps == 0)
+			return eRESULT::DONE;
+	}
+		
+	return eRESULT::WAITING;
 }
 

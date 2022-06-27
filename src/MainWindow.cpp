@@ -4,9 +4,9 @@
 
 #include "CeresSplashScreen.hpp"
 
-#include "DataModel.hpp"
-#include "DataModelLocal.hpp"
-#include "DataModelRemote.hpp"
+#include "CtrlDataModel.hpp"
+#include "CtrlDataModelLocal.hpp"
+#include "CtrlDataModelRemote.hpp"
 
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
@@ -100,7 +100,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
     mpHelpMenu(nullptr),
     mpFileBar(nullptr),
     mpUI(new Ui::MainWindow),
-    mpDataModel(nullptr),
+    mpModel(nullptr),
     mpController(nullptr)
 {
     mpUI->setupUi(this);
@@ -119,7 +119,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
 //-----------------------------------------------------------------------------
 cMainWindow::~cMainWindow()
 {
-    mpDataModel->stopDataThread();
+    mpModel->stopDataThread();
 
     delete mpUI;
     mpUI = nullptr;
@@ -231,13 +231,13 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
     mpSplashScreen = nullptr;
 
-    mpDataModel->startDataThread();
+    mpModel->startDataThread();
 }
 
 //-----------------------------------------------------------------------------
 void cMainWindow::fileNew()
 {
-    if (mpDataModel->isExperimentRunning())
+    if (mpModel->isExperimentRunning())
     {
         //TODO: Something here!
     }
@@ -255,7 +255,7 @@ void cMainWindow::fileNew()
 
     onStatusUpdate(msg);
     auto expDoc = pExperiment->getExperimentDocument();
-    if (!mpDataModel->loadExperiment(expDoc))
+    if (!mpModel->loadExperiment(expDoc))
     {
     }
 
@@ -275,7 +275,7 @@ void cMainWindow::fileAddExperiment()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentLoad()
 {
-    if (mpDataModel->isExperimentRunning())
+    if (mpModel->isExperimentRunning())
     {
         //TODO: Something here!
     }
@@ -304,7 +304,7 @@ void cMainWindow::experimentLoad()
 
     onStatusUpdate(msg);
     auto expDoc = pExperiment->getExperimentDocument();
-    if (!mpDataModel->loadExperiment(expDoc))
+    if (!mpModel->loadExperiment(expDoc))
     {
     }
 }
@@ -312,11 +312,11 @@ void cMainWindow::experimentLoad()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentRun()
 {
-    if (mpDataModel->isExperimentRunning())
+    if (mpModel->isExperimentRunning())
     {
-        if (mpDataModel->isExperimentPaused())
+        if (mpModel->isExperimentPaused())
         {
-            mpDataModel->startExperiment();
+            mpModel->startExperiment();
 
             mpExpLoad->setEnabled(false);
             mpExpRun->setEnabled(false);
@@ -329,20 +329,20 @@ void cMainWindow::experimentRun()
     // Reload the experiment each time incase the experiment was tweaked
     experimentLoad();
 
-    if (!mpDataModel->isExperimentLoaded())
+    if (!mpModel->isExperimentLoaded())
     {
         return;
     }
 
-    if (!mpDataModel->openDataFile(mDefaultDataPath))
+    if (!mpModel->openDataFile(mDefaultDataPath))
         return;
 
     QString msg = "Running experiment: ";
-    msg += mpDataModel->experimentTitle().c_str();
+    msg += mpModel->experimentTitle().c_str();
 
     onStatusUpdate(msg);
 
-    mpDataModel->startExperiment();
+    mpModel->startExperiment();
 
     mpExpLoad->setEnabled(false);
     mpExpRun->setEnabled(false);
@@ -355,12 +355,12 @@ void cMainWindow::experimentRun()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentPause()
 {
-    if (!mpDataModel->isExperimentRunning())
+    if (!mpModel->isExperimentRunning())
     {
         return;
     }
 
-    mpDataModel->pauseExperiment();
+    mpModel->pauseExperiment();
 
     mpExpLoad->setEnabled(false);
     mpExpRun->setEnabled(true);
@@ -373,12 +373,12 @@ void cMainWindow::experimentPause()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentStop()
 {
-    if (!mpDataModel->isExperimentRunning())
+    if (!mpModel->isExperimentRunning())
     {
         return;
     }
 
-    mpDataModel->terminateExperiment();
+    mpModel->terminateExperiment();
 
     onExperimentCompleted();
 }
@@ -565,18 +565,18 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         std::string type = data_model.get<std::string>();
 
         if (type == "local")
-            mpDataModel = new cDataModelLocal(this);
+            mpModel = new cCtrlDataModelLocal(this);
     }
     else if (data_model.is_object())
     {
 
     }
 
-    QObject::connect(mpDataModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::connect(mpDataModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::connect(mpDataModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::connect(mpDataModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
-    QObject::connect(mpDataModel, &cDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+    QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(mpModel, &cCtrlDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(mpModel, &cCtrlDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+    QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
 }
 
 //-----------------------------------------------------------------------------
@@ -599,7 +599,7 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-    mpDataModel->addExperimentControlModel(pModel);
+    mpModel->addExperimentControlModel(pModel);
 
     if (configDoc.contains(name))
     {
@@ -672,7 +672,7 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
 */
         }
 
-        mpDataModel->addSensor(widgets.pModel);
+        mpModel->addSensor(widgets.pModel);
 
         if (widgets.pDockableView)
         {

@@ -12,10 +12,14 @@
 #include <QMetaType>
 
 
-sSensorWidgets create_dummy_sensor()
+sSensorWidgets create_dummy_sensor(bool no_visualization)
 {
     // Create the dummy model and view...
     auto* pModel = new cDummyModel();
+
+    if (no_visualization)
+        return sSensorWidgets(pModel, nullptr);
+
     auto* dockWidget = new QDockWidget();
     auto* pView = new cDummyView(dockWidget);
     

@@ -10,10 +10,14 @@
 #include <QDockWidget>
 
 
-sSensorWidgets create_ssnx_sensor()
+sSensorWidgets create_ssnx_sensor(bool no_visualization)
 {
     // Create the SSNX model and view...
     auto* pModel = new cSsnxModel();
+
+    if (no_visualization)
+        return sSensorWidgets(pModel, nullptr);
+
     auto* dockWidget = new QDockWidget();
     auto* pView = new cSsnxView(dockWidget);
 

@@ -37,6 +37,7 @@ private:
 	bool mIsMoving;
 	bool mIsSetPointEnabled;
 	bool mInError;
+	bool mInScriptMode;
 
 	bool mRecordData;
 

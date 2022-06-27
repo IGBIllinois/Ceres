@@ -16,5 +16,6 @@ namespace spidercam
 	};
 
 	bool hasPositionChanged(const sPosition& pos1, const sPosition& pos2, double tolerance_mm);
+	bool hasPosSpeedChanged(const sPosition& pos1, const sPosition& pos2, double tolerance_mm);
 
 }	// End of namespace: spidercam

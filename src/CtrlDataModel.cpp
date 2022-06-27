@@ -1,53 +1,53 @@
 
-#include "DataModel.hpp"
+#include "CtrlDataModel.hpp"
 #include "Sensors/SensorModel.hpp"
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
 // Static Data
-std::chrono::time_point<std::chrono::high_resolution_clock> cDataModel::mStartTime;
+std::chrono::time_point<std::chrono::high_resolution_clock> cCtrlDataModel::mStartTime;
 
 // Static Methods
-std::uint64_t cDataModel::timestamp_ns()
+std::uint64_t cCtrlDataModel::timestamp_ns()
 {
     const auto end = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end - mStartTime).count();
 }
 
 
-cDataModel::cDataModel(QObject* parent)
+cCtrlDataModel::cCtrlDataModel(QObject* parent)
 :
     QObject(parent)
 {
-    QObject::connect(&mThread, &cDataThread::statusMessage, this, &cDataModel::onStatusUpdate);
+    QObject::connect(&mThread, &cDataThread::statusMessage, this, &cCtrlDataModel::onStatusUpdate);
 }
 
-cDataModel::~cDataModel()
+cCtrlDataModel::~cCtrlDataModel()
 {
 }
 
-void cDataModel::onStatusUpdate(QString msg)
+void cCtrlDataModel::onStatusUpdate(QString msg)
 {
     emit statusMessage(msg);
 }
 
-void cDataModel::onErrorUpdate(QString title, QString msg)
+void cCtrlDataModel::onErrorUpdate(QString title, QString msg)
 {
     emit errorMessage(title, msg);
 }
 
-void cDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)
+void cCtrlDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)
 {
     if (pControlModel)
     {
         mThread.mpController = pControlModel;
-        QObject::connect(mThread.mpController, &cExperimentControlModel::experimentStateChanged, this, &cDataModel::onExperimentStateChange);
+        QObject::connect(mThread.mpController, &cExperimentControlModel::experimentStateChanged, this, &cCtrlDataModel::onExperimentStateChange);
         mThread.mpController->moveToThread(&mThread);
     }
 }
 
 
-void cDataModel::addSensor(cSensorModel* pSensor)
+void cCtrlDataModel::addSensor(cSensorModel* pSensor)
 {
     if (pSensor)
     {
@@ -56,22 +56,22 @@ void cDataModel::addSensor(cSensorModel* pSensor)
     }
 }
 
-void cDataModel::startDataThread()
+void cCtrlDataModel::startDataThread()
 {
     mThread.start();
 }
 
-void cDataModel::stopDataThread()
+void cCtrlDataModel::stopDataThread()
 {
     mThread.stop();
 }
 
-std::string cDataModel::experimentTitle() const
+std::string cCtrlDataModel::experimentTitle() const
 {
     return mExperimentTitle;
 }
 
-bool cDataModel::isExperimentRunning()
+bool cCtrlDataModel::isExperimentRunning()
 {
     if (!mThread.mpController)
         return false;
@@ -79,7 +79,7 @@ bool cDataModel::isExperimentRunning()
     return mThread.mpController->isExperimentRunning();
 }
 
-bool cDataModel::isExperimentPaused()
+bool cCtrlDataModel::isExperimentPaused()
 {
     if (!mThread.mpController)
         return false;
@@ -87,7 +87,7 @@ bool cDataModel::isExperimentPaused()
     return mThread.mpController->isExperimentPaused();
 }
 
-bool cDataModel::isExperimentLoaded() const
+bool cCtrlDataModel::isExperimentLoaded() const
 {
     if (!mThread.mpController)
         return false;
@@ -95,7 +95,7 @@ bool cDataModel::isExperimentLoaded() const
     return mThread.mpController->hasExperiment();
 }
 
-bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
+bool cCtrlDataModel::loadExperiment(const nlohmann::json& expDoc)
 {
     if (isExperimentRunning())
     {
@@ -138,20 +138,20 @@ bool cDataModel::loadExperiment(const nlohmann::json& expDoc)
     return false;
 }
 
-void cDataModel::pauseExperiment()
+void cCtrlDataModel::pauseExperiment()
 {
     if (mThread.mpController)
         mThread.mpController->pauseExperiment();
 }
 
-void cDataModel::terminateExperiment()
+void cCtrlDataModel::terminateExperiment()
 {
     if (mThread.mpController)
         mThread.mpController->terminateExperiment();
 }
 
 
-void cDataModel::onExperimentStateChange(int s)
+void cCtrlDataModel::onExperimentStateChange(int s)
 {
     using namespace experiment;
 

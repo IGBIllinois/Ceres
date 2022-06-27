@@ -1,18 +1,18 @@
 
 #pragma once
 
-#include "DataModel.hpp"
+#include "CtrlDataModel.hpp"
 #include "BlockDataFile/BlockDataFile.hpp"
 #include "BlockDataFile/ExperimentSerializer.hpp"
 
 
-class cDataModelRemote : public cDataModel
+class cCtrlDataModelRemote : public cCtrlDataModel
 {
     Q_OBJECT
 
 public:
-    explicit cDataModelRemote(QObject* parent = nullptr);
-    ~cDataModelRemote();
+    explicit cCtrlDataModelRemote(QObject* parent = nullptr);
+    ~cCtrlDataModelRemote();
 
     bool openDataFile(const QString& defaultPath) override;
     void closeDataFile();

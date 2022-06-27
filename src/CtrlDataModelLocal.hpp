@@ -1,17 +1,17 @@
 
 #pragma once
 
-#include "DataModel.hpp"
+#include "CtrlDataModel.hpp"
 #include "BlockDataFile/BlockDataFile.hpp"
 #include "BlockDataFile/ExperimentSerializer.hpp"
 
-class cDataModelLocal : public cDataModel
+class cCtrlDataModelLocal : public cCtrlDataModel
 {
     Q_OBJECT
 
 public:
-    explicit cDataModelLocal(QObject* parent = nullptr);
-    ~cDataModelLocal();
+    explicit cCtrlDataModelLocal(QObject* parent = nullptr);
+    ~cCtrlDataModelLocal();
 
     void stopDataThread() override;
 
