@@ -86,14 +86,17 @@ PRIVATE
     ExperimentToolbar.hpp
     ExperimentToolbar.cpp
 	
-    DataThread.hpp
-    DataThread.cpp
     CtrlDataModelRemote.hpp
     CtrlDataModelRemote.cpp
     CtrlDataModelLocal.hpp
     CtrlDataModelLocal.cpp
     CtrlDataModel.hpp
     CtrlDataModel.cpp
+	
+    DataModel.hpp
+    DataModel.cpp
+    DataThread.hpp
+    DataThread.cpp
 	
     MainWindow.hpp
     MainWindow.cpp

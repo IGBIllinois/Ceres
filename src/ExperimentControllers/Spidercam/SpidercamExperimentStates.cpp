@@ -133,6 +133,9 @@ void cSpidercamExperimentState_Movement::initialize()
 	{
 		mZ_mm = mController.getLastKnownPosition().Z_mm;
 	}
+
+	mPan_deg = mController.getLastKnownPosition().pan_deg;
+	mTilt_deg = mController.getLastKnownPosition().tilt_deg;
 }
 
 void cSpidercamExperimentState_Movement::run()
