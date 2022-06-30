@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "DataThread.hpp"
+#include "TimestampProvider.hpp"
+#include "CtrlDataThread.hpp"
 
 #include <QObject>
 #include <QThread>
@@ -9,7 +10,6 @@
 #include <QWaitCondition>
 #include <vector>
 #include <nlohmann/json.hpp>
-#include <chrono>
 
 // Forward Declarations
 class cExperimentControlModel;
@@ -26,15 +26,13 @@ namespace experiment
  * data acquisition.
  * 
  *****************************************************************************/
-class cCtrlDataModel : public QObject
+class cCtrlDataModel : public QObject, public cTimestampProvider
 {
     Q_OBJECT
 
 public:
     explicit cCtrlDataModel(QObject* parent = nullptr);
     ~cCtrlDataModel();
-
-    static std::uint64_t timestamp_ns();
 
     void addExperimentControlModel(cExperimentControlModel* pModel);
     void addSensor(cSensorModel* pSensor);
@@ -72,12 +70,9 @@ private slots:
     void onExperimentStateChange(int state);
 
 protected:
-    cDataThread mThread;
-
     std::string  mExperimentTitle;
     std::string  mExperimentDoc;
 
-private:
-    static std::chrono::time_point<std::chrono::high_resolution_clock> mStartTime;
+    cCtrlDataThread mThread;
 };
 

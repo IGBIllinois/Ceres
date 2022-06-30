@@ -4,16 +4,6 @@
 #include "ExperimentControllers/ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
-// Static Data
-std::chrono::time_point<std::chrono::high_resolution_clock> cCtrlDataModel::mStartTime;
-
-// Static Methods
-std::uint64_t cCtrlDataModel::timestamp_ns()
-{
-    const auto end = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration_cast<std::chrono::nanoseconds>(end - mStartTime).count();
-}
-
 
 cCtrlDataModel::cCtrlDataModel(QObject* parent)
 :
