@@ -1,38 +1,27 @@
 
 #pragma once
 
+#include "TimestampProvider.hpp"
 #include "DataThread.hpp"
 
 #include <QObject>
-#include <QThread>
-#include <QMutex>
-#include <QWaitCondition>
-#include <vector>
 #include <nlohmann/json.hpp>
-#include <chrono>
 
 // Forward Declarations
 class cSensorModel;
-
-namespace experiment
-{
-    enum class State : uint8_t;
-}
 
 /*****************************************************************************
  * 
  * The cDataModel class is the base class for data acquisition.
  * 
  *****************************************************************************/
-class cDataModel : public QObject
+class cDataModel : public QObject, public cTimestampProvider
 {
     Q_OBJECT
 
 public:
     explicit cDataModel(QObject* parent = nullptr);
     ~cDataModel();
-
-    static std::uint64_t timestamp_ns();
 
     void addSensor(cSensorModel* pSensor);
 
@@ -54,8 +43,5 @@ private slots:
 
 protected:
     cDataThread mThread;
-
-private:
-    static std::chrono::time_point<std::chrono::high_resolution_clock> mStartTime;
 };
 

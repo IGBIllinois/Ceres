@@ -7,7 +7,9 @@ set_target_properties(BlockDataFile PROPERTIES LANGUAGE CXX)
 target_compile_features(BlockDataFile PRIVATE cxx_std_17)
 
 target_sources(BlockDataFile
-PUBLIC
+#PUBLIC
+#INTERFACE
+PRIVATE
 
 #
 # Base Headers for the serializing/parsing block data files

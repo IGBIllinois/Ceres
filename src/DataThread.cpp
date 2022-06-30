@@ -1,13 +1,10 @@
 
 #include "DataThread.hpp"
 #include "Sensors/SensorModel.hpp"
-#include "ExperimentControllers/ExperimentCtrlModel.hpp"
 
 #include <QAbstractEventDispatcher>
 
 cDataThread::cDataThread()
-:
-    mpController(nullptr)
 {
 }
 
@@ -32,7 +29,7 @@ void cDataThread::stop()
     wait();
 }
 
-void cDataThread::run()
+bool cDataThread::startCommunications()
 {
     mActiveSensors.clear();
 
@@ -48,12 +45,31 @@ void cDataThread::run()
         mActiveSensors.push_back(sensor);
     }
 
-    for (auto& sensor : mActiveSensors)
+    return true;
+}
+
+bool cDataThread::stopCommunications()
+{
+    // Shutdown the network communications that are tied to this thread
+    for (auto& sensor : mSensors)
     {
-        QObject::connect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
+        sensor->stopCommunications();
     }
 
-    if (!mpController->startCommunications())
+    return true;
+}
+
+void cDataThread::updateAll()
+{
+    for (auto& sensor : mActiveSensors)
+    {
+        sensor->update();
+    }
+}
+
+void cDataThread::run()
+{
+    if (!startCommunications())
     {
         goto cleanup;
     }
@@ -70,27 +86,12 @@ void cDataThread::run()
         if (mAbort)
             return;
 
-        mpController->update();
+        updateAll();
 
-        for (auto& sensor : mActiveSensors)
-        {
-            sensor->update();
-        }
-    }
-
-    for (auto& sensor : mActiveSensors)
-    {
-        QObject::disconnect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
     }
 
 cleanup:
-    // Shutdown the network communications that are tied to this thread
-    for (auto& sensor : mSensors)
-    {
-        sensor->stopCommunications();
-    }
-
-    mpController->stopCommunications();
+    stopCommunications();
 
     QString msg("Data collection thread terminated.");
 

@@ -1,10 +1,12 @@
 
 #pragma once
 
-#include "DataModel.hpp"
+#include "RemoteDataModel.hpp"
 
 #include <QMainWindow>
 #include <QString>
+
+#include <nlohmann/json.hpp>
 
 
 // Qt Forward Declaration
@@ -15,6 +17,7 @@ class QMenu;
 class QTextEdit;
 class QLineEdit;
 class QToolBar;
+class QTableWidget;
 QT_END_NAMESPACE
 
 
@@ -53,10 +56,14 @@ private:
     void createActions();
     void createToolBars();
     void createStatusBar();
-    void createSensorModelsAndViews();
+    void createSensorModelsAndViews(const nlohmann::json& configDoc);
+
+    void initializeServer(const nlohmann::json& configDoc);
 
     cCeresSplashScreen* mpSplashScreen;
 
+    QString mDefaultDataPath;
+    
     QMenu* mpFileMenu;
 
     QMenu* mpHelpMenu;
@@ -64,6 +71,6 @@ private:
     Ui::MainWindow* mpUI;
     QString mCurrentFile;
 
-    cDataModel* mpMainModel;
+    cRemoteDataModel mMainModel;
 };
 

@@ -57,6 +57,7 @@ public:
 	virtual void processLidarDataFormat_2(cDataBuffer& buffer);
 	virtual void processImuData(cDataBuffer& buffer);
 	virtual void processLidarData(cDataBuffer& buffer);
+	virtual void processLidarDataFrameTimestamp(cDataBuffer& buffer);
 
 private:
 	cOusterLidarID    mBlockID;

@@ -3,6 +3,11 @@
 
 namespace ouster
 {
+	/**********************************************************
+	   WARNING: DO NOT CHANGE THE ORDER OF THESE ENUMS!!!!
+	   
+	   Only add one to the end of the list.
+	**********************************************************/
     enum class DataID : uint16_t
     {
         CONFIGURATION_INFO,
@@ -21,6 +26,7 @@ namespace ouster
         ALERTS,
         LIDAR_DATA,
         IMU_DATA,
+        LIDAR_DATA_FRAME_TIMESTAMP,
     };
 }
 

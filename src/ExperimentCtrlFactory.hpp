@@ -3,6 +3,7 @@
 
 #include <string>
 
+// Forward Declaration
 class cExperimentControlView;
 class cExperimentControlModel;
 
@@ -30,4 +31,4 @@ struct sExperimentControllerWidgets
 	{}
 };
 
-sExperimentControllerWidgets create_experiment_controller(const std::string& name);
+sExperimentControllerWidgets create_experiment_controller(const std::string& name, bool no_visualization = false);

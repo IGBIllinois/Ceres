@@ -569,7 +569,13 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
     }
     else if (data_model.is_object())
     {
+        std::string ip = data_model["ip"];
+        uint16_t port = data_model["port"];
 
+        auto* model = new cCtrlDataModelRemote(this);
+        bool result = model->try_to_connect(QString(ip.c_str()), port, false);
+
+        mpModel = model;
     }
 
     QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);

@@ -90,20 +90,26 @@ PRIVATE
     CtrlDataModelRemote.cpp
     CtrlDataModelLocal.hpp
     CtrlDataModelLocal.cpp
+    CtrlDataThread.hpp
+    CtrlDataThread.cpp
     CtrlDataModel.hpp
     CtrlDataModel.cpp
 	
     DataModel.hpp
     DataModel.cpp
+	
     DataThread.hpp
     DataThread.cpp
+	
+    TimestampProvider.hpp
+    TimestampProvider.cpp
 	
     MainWindow.hpp
     MainWindow.cpp
 
     CeresSplashScreen.hpp
     CeresSplashScreen.cpp
-    main.cpp
+    Ceres.cpp
 )
 
 
@@ -161,10 +167,16 @@ PRIVATE
     SensorFactory.hpp
     SensorFactory.cpp
 
-    DataThread.hpp
-    DataThread.cpp
+    RemoteDataModel.hpp
+    RemoteDataModel.cpp
     DataModel.hpp
     DataModel.cpp
+    DataThread.hpp
+    DataThread.cpp
+
+    TimestampProvider.hpp
+    TimestampProvider.cpp
+
     RemoteClientWindow.hpp
     RemoteClientWindow.cpp
 

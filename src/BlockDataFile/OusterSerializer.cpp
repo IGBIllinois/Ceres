@@ -316,9 +316,11 @@ void cOusterSerializer::write(uint16_t frameID, const cOusterLidarData& lidar_da
 {
     assert(mpDataFile);
 
-    mBlockID.dataID(DataID::LIDAR_DATA);
+    mBlockID.dataID(DataID::LIDAR_DATA_FRAME_TIMESTAMP);
 
     mDataBuffer.clear();
+
+    mDataBuffer << lidar_data.timestamp_ns();
 
     auto& data = lidar_data.data();
     uint16_t pixels_per_column = data.num_rows();

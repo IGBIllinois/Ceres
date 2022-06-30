@@ -2,17 +2,6 @@
 #include "DataModel.hpp"
 #include "Sensors/SensorModel.hpp"
 
-// Static Data
-std::chrono::time_point<std::chrono::high_resolution_clock> cDataModel::mStartTime;
-
-// Static Methods
-std::uint64_t cDataModel::timestamp_ns()
-{
-    const auto end = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration_cast<std::chrono::nanoseconds>(end - mStartTime).count();
-}
-
-
 cDataModel::cDataModel(QObject* parent)
 :
     QObject(parent)

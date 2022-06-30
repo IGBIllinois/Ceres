@@ -139,6 +139,9 @@ void cOusterParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     case DataID::LIDAR_DATA:
         processLidarData(buffer);
         break;
+    case DataID::LIDAR_DATA_FRAME_TIMESTAMP:
+        processLidarDataFrameTimestamp(buffer);
+        break;
     }
 }
 
@@ -387,6 +390,17 @@ void cOusterParser::processLidarData(cDataBuffer& buffer)
             mLidarData.channel(col, chn, pixel);
         }
     }
+}
+
+void cOusterParser::processLidarDataFrameTimestamp(cDataBuffer& buffer)
+{
+    uint64_t timestamp_ns = 0;
+
+    buffer >> timestamp_ns;
+
+    mLidarData.timestamp_ns(timestamp_ns);
+
+    processLidarData(buffer);
 }
 
 

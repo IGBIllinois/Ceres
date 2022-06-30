@@ -12,14 +12,18 @@
 Q_DECLARE_METATYPE(spidercam::sWorkingDimensions);
 Q_DECLARE_METATYPE(spidercam::sPosition);
 
-sExperimentControllerWidgets create_spidercam_controller()
+sExperimentControllerWidgets create_spidercam_controller(bool no_visualization)
 {
     // Register our custom spidercam types with Qt's meta type system.  Needed for using signals/slots
     qRegisterMetaType<spidercam::sWorkingDimensions>();
     qRegisterMetaType<spidercam::sPosition>();
 
     // Create the Spidercam Controller...
-    auto* pModel = new cSpidercamModel();
+    cSpidercamModel* pModel = new cSpidercamModel();
+
+    if (no_visualization)
+        return sExperimentControllerWidgets(pModel, nullptr);
+
     auto* pView = new cSpidercamView();
 
     QObject::connect(pModel, &cSpidercamModel::limitsChanged, pView, &cSpidercamView::updateLimits);

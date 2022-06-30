@@ -1,17 +1,10 @@
 
 #pragma once
 
-#include "BlockDataFile/BlockDataFile.hpp"
-
-#include <QObject>
 #include <QThread>
-#include <QMutex>
-#include <QWaitCondition>
 #include <vector>
-#include <nlohmann/json.hpp>
 
 // Forward Declarations
-class cExperimentControlModel;
 class cSensorModel;
 
 class cDataThread : public QThread
@@ -30,11 +23,12 @@ signals:
 
 protected:
     void run() override;
+    virtual void updateAll();
 
-private:
+    virtual bool startCommunications();
+    virtual bool stopCommunications();
 
 public:
-    cExperimentControlModel* mpController;
     std::vector<cSensorModel*> mSensors;
     std::vector<cSensorModel*> mActiveSensors;
 

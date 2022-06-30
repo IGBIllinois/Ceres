@@ -147,7 +147,7 @@ void cSpidercamExperimentState_Movement::run()
 	mInError = mController.isInError();
 	mInScriptMode = mController.isInScriptMode();
 
-	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mBusy && !mInError;
+	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mBusy; // && !mInError;
 
 	if (mMoveCommandSent) return;
 
@@ -177,7 +177,7 @@ cExperimentState::eRESULT cSpidercamExperimentState_Movement::finished()
 	mInError = mController.isInError();
 	mInScriptMode = mController.isInScriptMode();
 
-	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mInError;
+	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled; // && !mInError;
 	if (!readyForMotion)
 		return eRESULT::ABORT;
 

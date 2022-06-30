@@ -3,7 +3,7 @@
 #include <QApplication>
 
 #include "CeresSplashScreen.hpp"
-#include "MainWindow.hpp"
+#include "RemoteClientWindow.hpp"
 
 int main(int argc, char** argv)
 {
@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     cCeresSplashScreen* pSplash = new cCeresSplashScreen();
     pSplash->show();
 
-    cMainWindow mainWin;
+    cRemoteClientWindow mainWin;
     mainWin.initialize(pSplash);
     mainWin.show();
 
