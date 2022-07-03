@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="ripe.illinois.edu">
+        <file alias="ripe.icns">./Resources/Icons/ripe.icns</file>
+        <file alias="ripe.ico">./Resources/Icons/ripe.ico</file>
+        <file alias="about.png">./Resources/Images/About.png</file>
+        <file alias="splash.png">./Resources/Images/splash.png</file>
+        <file alias="bottom_logo.png">./Resources/Images/bottom_logo.png</file>
+    </qresource>
+</RCC>
