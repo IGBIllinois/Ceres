@@ -45,6 +45,20 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath)
     if (mFile.isOpen())
         return false;
 
+
+    auto ext = fileName.lastIndexOf('.');
+
+    char timestamp[100];
+
+    std::time_t t = std::time(nullptr);
+    std::strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", std::localtime(&t));
+
+    fileName.insert(ext, "_");
+    fileName.insert(ext + 1, timestamp);
+
+    std::replace_if(fileName.begin(), fileName.end(),
+        [](QString::value_type c) {return c <= QChar::Space; }, '_');
+
     mFile.open(fileName.toStdString());
 
     mSerializer.attach(&mFile);

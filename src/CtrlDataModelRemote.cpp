@@ -4,12 +4,18 @@
 
 #include <QtNetwork/QHostInfo>
 
+//Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
+//Q_DECLARE_METATYPE(QAbstractSocket::SocketState)
 
 cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
 :
     cCtrlDataModel(parent),
+    mConnected(false),
     mSocket(parent)
 {
+    qRegisterMetaType<QAbstractSocket::SocketError>();
+    qRegisterMetaType<QAbstractSocket::SocketState>();
+
     QObject::connect(&mSocket, &QTcpSocket::connected, this, &cCtrlDataModelRemote::connected);
     QObject::connect(&mSocket, &QTcpSocket::disconnected, this, &cCtrlDataModelRemote::disconnected);
     QObject::connect(&mSocket, &QTcpSocket::errorOccurred, this, &cCtrlDataModelRemote::errorOccurred);
@@ -30,36 +36,64 @@ cCtrlDataModelRemote::~cCtrlDataModelRemote()
 
 void cCtrlDataModelRemote::connected()
 {
+    QString msg("Connection to C4 established.");
+    emit statusMessage(msg);
 
+    mConnected = true;
 }
 
 void cCtrlDataModelRemote::disconnected()
 {
-
+    mConnected = false;
+    
+    QString msg = "Connection to the C4 has been lost!";
+    emit errorMessage("Connection Lost", msg);
 }
 
 void cCtrlDataModelRemote::errorOccurred(QAbstractSocket::SocketError socketError)
 {
+    if (mConnected)
+    {
+        QString msg = "Connection to the C4 has been lost!";
+        emit errorMessage("Connection Lost", msg);
+    }
 
+    mConnected = false;
 }
 
 void cCtrlDataModelRemote::hostFound()
+{}
+
+void cCtrlDataModelRemote::stateChanged(QAbstractSocket::SocketState socketState)
 {
 
 }
 
-void cCtrlDataModelRemote::stateChanged(QAbstractSocket::SocketState socketState);
-
-bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port, bool use_ipv6)
+bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port, 
+                                            bool use_ipv6, const QString& local_ip)
 {
+    QString msg("Testing connection to remote computer at ");
+    msg.append(hostname);
+    msg.append("...");
+
+    emit statusMessage(msg);
+
+    if (!local_ip.isEmpty())
+    {
+        QHostAddress local_endpoint(local_ip);
+        mSocket.bind(local_endpoint,0);
+    }
+
     QHostInfo info = QHostInfo::fromName(hostname);
     if (info.error() != QHostInfo::NoError)
     {
-        // qFatal() << info.errorString();
+        msg = "Could not establish required connection to the C4 computer!";
+        msg += info.errorString();
+        emit errorMessage("Remote Error", msg);
         return false;
     }
 
-    QHostAddress local_endpoint;
+    QHostAddress remote_endpoint;
 
     auto endpoints = info.addresses();
     for (auto& endpoint : endpoints)
@@ -68,23 +102,28 @@ bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port
         {
             if (QAbstractSocket::IPv6Protocol != endpoint.protocol())
                 continue;
-            local_endpoint = endpoint;
+            remote_endpoint = endpoint;
             break;
         }
         else
         {
             if (QAbstractSocket::IPv4Protocol != endpoint.protocol())
                 continue;
-            local_endpoint = endpoint;
+            remote_endpoint = endpoint;
             break;
         }
     }
 
-    if (local_endpoint.isNull())
+    if (remote_endpoint.isNull())
+    {
+        msg = "Could not resolve the C4 computer information ";
+        msg += hostname;
+        msg += ".";
+        emit errorMessage("Remote Error", msg);
         return false;
+    }
 
-    mSocket.connectToHost(local_endpoint, port);
-    mSocket.waitForConnected();
+    mSocket.connectToHost(remote_endpoint, port);
 
     return true;
 

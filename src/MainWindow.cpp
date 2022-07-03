@@ -569,11 +569,16 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
     }
     else if (data_model.is_object())
     {
-        std::string ip = data_model["ip"];
+        std::string c4_ip = data_model["c4_ip"];
         uint16_t port = data_model["port"];
 
+        std::string c3_ip;
+        if (data_model.contains("c3_ip"))
+            c3_ip = data_model["c3_ip"];
+
         auto* model = new cCtrlDataModelRemote(this);
-        bool result = model->try_to_connect(QString(ip.c_str()), port, false);
+        bool result = model->try_to_connect(QString(c4_ip.c_str()), port,
+                                        false, QString(c3_ip.c_str()));
 
         mpModel = model;
     }

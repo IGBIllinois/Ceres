@@ -16,7 +16,8 @@ public:
     explicit cCtrlDataModelRemote(QObject* parent = nullptr);
     ~cCtrlDataModelRemote();
 
-    bool try_to_connect(const QString& hostname, uint16_t port, bool use_ipv6);
+    bool try_to_connect(const QString& hostname, uint16_t port, 
+                        bool use_ipv6, const QString& local_ip);
 
     bool openDataFile(const QString& defaultPath) override;
     void closeDataFile();
@@ -33,6 +34,8 @@ private slots:
 private:
 //    cBlockDataFileWriter    mFile;
 //    cExperimentSerializer   mSerializer;
+
+    bool mConnected;
 
     QTcpSocket mSocket;
     QByteArray mReplyBuffer;

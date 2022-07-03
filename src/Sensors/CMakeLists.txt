@@ -37,6 +37,9 @@ PRIVATE
 #
     SensorModel.hpp
     SensorModel.cpp
+	
+    SensorFactory.cpp
+
 )
 
 #
@@ -48,6 +51,8 @@ set_property(SOURCE SensorModel.hpp PROPERTY SKIP_AUTOMOC ON)
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
 # Force use MultiThreadedDLL (-MD) and MultiThreadedDebugDLL (-MDd)
 set_property(TARGET Sensors PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+target_include_directories(Sensors PRIVATE ${COMMON_INCLUDE_DIR})
 
 target_link_libraries(Sensors PRIVATE ${Qt}::Core)
 target_link_libraries(Sensors PRIVATE nlohmann_json::nlohmann_json)

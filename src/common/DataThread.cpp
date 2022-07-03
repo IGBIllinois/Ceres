@@ -1,6 +1,6 @@
 
 #include "DataThread.hpp"
-#include "Sensors/SensorModel.hpp"
+#include "../Sensors/SensorModel.hpp"
 
 #include <QAbstractEventDispatcher>
 

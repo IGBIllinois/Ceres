@@ -334,5 +334,5 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
 //-----------------------------------------------------------------------------
 void cRemoteClientWindow::initializeServer(const nlohmann::json& configDoc)
 {
-    mMainModel.;
+    //mMainModel;
 }

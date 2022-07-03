@@ -1,12 +1,12 @@
 
 #include "SensorFactory.hpp"
 
-#include "Sensors/DummySensorFactory.hpp"
-#include "Sensors/Lidar/OusterFactory.hpp"
-#include "Sensors/GPS/SsnxFactory.hpp"
-#include "Sensors/Weather/WeatherDataFactory.hpp"
-#include "Sensors/Hyperspectral/HySpexFactory.hpp"
-#include "Sensors/RGB/AxisCommunicationsFactory.hpp"
+#include "DummySensorFactory.hpp"
+#include "Lidar/OusterFactory.hpp"
+#include "GPS/SsnxFactory.hpp"
+#include "Weather/WeatherDataFactory.hpp"
+#include "Hyperspectral/HySpexFactory.hpp"
+#include "RGB/AxisCommunicationsFactory.hpp"
 
 
 sSensorWidgets create_sensor(const std::string& name, 

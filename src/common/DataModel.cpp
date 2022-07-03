@@ -1,6 +1,6 @@
 
 #include "DataModel.hpp"
-#include "Sensors/SensorModel.hpp"
+#include "../Sensors/SensorModel.hpp"
 
 cDataModel::cDataModel(QObject* parent)
 :

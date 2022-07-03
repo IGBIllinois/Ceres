@@ -8,6 +8,10 @@
 #include <nlohmann/json.hpp>
 #include <list>
 
+#include <QByteArray>
+#include <QtNetwork/QTcpServer>
+
+
 // Forward Declarations
 class cSensorModel;
 

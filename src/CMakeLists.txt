@@ -1,5 +1,10 @@
 
+# Define some shortcuts for include files.
+set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
+set(BLOCK_DATA_FILE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BlockDataFile)
 
+# Add the "common" directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common)
 
 # Add the "block data file" directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/BlockDataFile)
@@ -12,6 +17,9 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ExperimentControllers)
 
 # Add the "sensors" directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Sensors)
+
+# Add the "RemoteClient" directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/RemoteClient)
 
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.
@@ -76,9 +84,6 @@ PRIVATE
     ExperimentCtrlFactory.hpp
     ExperimentCtrlFactory.cpp
 
-    SensorFactory.hpp
-    SensorFactory.cpp
-
     ExperimentManager.hpp
     ExperimentManager.cpp
     ExperimentTreeItem.hpp
@@ -95,20 +100,9 @@ PRIVATE
     CtrlDataModel.hpp
     CtrlDataModel.cpp
 	
-    DataModel.hpp
-    DataModel.cpp
-	
-    DataThread.hpp
-    DataThread.cpp
-	
-    TimestampProvider.hpp
-    TimestampProvider.cpp
-	
     MainWindow.hpp
     MainWindow.cpp
 
-    CeresSplashScreen.hpp
-    CeresSplashScreen.cpp
     Ceres.cpp
 )
 
@@ -128,6 +122,8 @@ if(APPLE)
         )
 endif()
 
+target_include_directories(Ceres PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(Ceres PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 #target_link_libraries(Ceres PRIVATE ${VTK_LIBRARIES})
 target_link_libraries(Ceres PRIVATE ${Qt}::Widgets)
@@ -137,75 +133,9 @@ target_link_libraries(Ceres PRIVATE BlockDataFile)
 target_link_libraries(Ceres PRIVATE ExperimentControllers)
 target_link_libraries(Ceres PRIVATE Sensors)
 target_link_libraries(Ceres PRIVATE Utilities)
+target_link_libraries(Ceres PRIVATE common)
 
 #vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
-
-
-#
-# Ceres Remote Data Acquition Client
-#
-add_executable(CeresRemoteClient WIN32 MACOSX_BUNDLE)
-
-target_compile_features(CeresRemoteClient PRIVATE cxx_std_17)
-
-
-target_sources(CeresRemoteClient
-PUBLIC
-    ExperimentTypes.hpp
-
-PRIVATE
-#    ${Cmake_hdr_moc}
-#    ${Cmake_form_hdr}
-
-    ${ui_files}
-    ${UI_RESOURCES}
-    ${platform_resource_files}
-
-#
-# General Application files
-#
-    SensorFactory.hpp
-    SensorFactory.cpp
-
-    RemoteDataModel.hpp
-    RemoteDataModel.cpp
-    DataModel.hpp
-    DataModel.cpp
-    DataThread.hpp
-    DataThread.cpp
-
-    TimestampProvider.hpp
-    TimestampProvider.cpp
-
-    RemoteClientWindow.hpp
-    RemoteClientWindow.cpp
-
-    CeresSplashScreen.hpp
-    CeresSplashScreen.cpp
-    CeresRemoteClient.cpp
-)
-
-
-#
-# Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
-# Force use MultiThreadedDLL (-MD) and MultiThreadedDebugDLL (-MDd)
-set_property(TARGET CeresRemoteClient PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
-
-if(APPLE)
-    set_target_properties(CeresRemoteClient PROPERTIES
-        RESOURCE "./Resources/Icons/ripe.icns"
-        MACOSX_BUNDLE_ICON_FILE ripe.icns
-        MACOSX_BUNDLE_COPYRIGHT "Copyright University of Illinois"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "edu.illinois.ripe"
-        )
-endif()
-
-target_link_libraries(CeresRemoteClient PRIVATE ${Qt}::Widgets)
-target_link_libraries(CeresRemoteClient PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(CeresRemoteClient PRIVATE BlockDataFile)
-target_link_libraries(CeresRemoteClient PRIVATE Sensors)
-target_link_libraries(CeresRemoteClient PRIVATE Utilities)
 
 #install(TARGETS asio_client RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}/asio")
 

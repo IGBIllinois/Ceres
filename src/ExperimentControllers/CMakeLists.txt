@@ -53,6 +53,8 @@ set_property(SOURCE ExperimentCtrlModel.hpp PROPERTY SKIP_AUTOMOC ON)
 # Force use MultiThreadedDLL (-MD) and MultiThreadedDebugDLL (-MDd)
 set_property(TARGET ExperimentControllers PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
+target_include_directories(ExperimentControllers PRIVATE ${COMMON_INCLUDE_DIR})
+
 target_link_libraries(ExperimentControllers PRIVATE ${Qt}::Widgets)
 target_link_libraries(ExperimentControllers PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(ExperimentControllers PRIVATE BlockDataFile)

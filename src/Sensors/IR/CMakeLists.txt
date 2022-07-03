@@ -38,7 +38,8 @@ PRIVATE
     ${IR_CAMERA_SOURCE_FILES}
 )
 
-#target_include_directories(ir_camera_static PRIVATE BlockDataFile)
+target_include_directories(ir_camera_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(ir_camera_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 target_link_libraries(ir_camera_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(ir_camera_static PUBLIC ${Qt}::Network)

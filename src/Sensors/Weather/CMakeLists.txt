@@ -50,7 +50,8 @@ PRIVATE
     ${WEATHER_SOURCE_FILES}
 )
 
-target_include_directories(weather_static PRIVATE BlockDataFile)
+target_include_directories(weather_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(weather_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 target_link_libraries(weather_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(weather_static PUBLIC ${Qt}::Network)

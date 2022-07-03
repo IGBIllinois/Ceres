@@ -2,7 +2,7 @@
 
 #include <QApplication>
 
-#include "CeresSplashScreen.hpp"
+#include "../common/CeresSplashScreen.hpp"
 #include "RemoteClientWindow.hpp"
 
 int main(int argc, char** argv)

@@ -52,7 +52,8 @@ PRIVATE
     ${HYPERSPECTRAL_SOURCE_FILES}
 )
 
-#target_include_directories(hyperspectral_static PRIVATE BlockDataFile)
+target_include_directories(hyperspectral_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(hyperspectral_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 target_link_libraries(hyperspectral_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(hyperspectral_static PUBLIC ${Qt}::Network)
