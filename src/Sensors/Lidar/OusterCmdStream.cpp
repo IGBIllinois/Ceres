@@ -20,8 +20,15 @@ cOusterCmdStream_Qt::~cOusterCmdStream_Qt()
     }
 }
 
-bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t port, bool use_ipv6)
+bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t port, 
+                                        bool use_ipv6, std::string_view local_ip)
 {
+    if (!local_ip.empty())
+    {
+        QHostAddress local_endpoint(std::string(local_ip).c_str());
+        mSocket.bind(local_endpoint);
+    }
+
     QHostInfo info = QHostInfo::fromName(QString(hostname.data()));
     if (info.error() != QHostInfo::NoError)
     {
@@ -29,7 +36,7 @@ bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t por
         return false;
     }
 
-    QHostAddress local_endpoint;
+    QHostAddress remote_endpoint;
 
     auto endpoints = info.addresses();
     for (auto& endpoint : endpoints)
@@ -38,22 +45,22 @@ bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t por
         {
             if (QAbstractSocket::IPv6Protocol != endpoint.protocol())
                 continue;
-            local_endpoint = endpoint;
+            remote_endpoint = endpoint;
             break;
         }
         else
         {
             if (QAbstractSocket::IPv4Protocol != endpoint.protocol())
                 continue;
-            local_endpoint = endpoint;
+            remote_endpoint = endpoint;
             break;
         }
     }
 
-    if (local_endpoint.isNull())
+    if (remote_endpoint.isNull())
         return false;
 
-    mSocket.connectToHost(local_endpoint, port);
+    mSocket.connectToHost(remote_endpoint, port);
     mSocket.waitForConnected();
 
     return true;
@@ -80,6 +87,32 @@ std::string cOusterCmdStream_Qt::recv_reply()
     reply.erase(reply.find_last_not_of(" \r\n\t") + 1);
 
     mReplyBuffer.clear();
+
+    return reply;
+}
+
+std::string cOusterCmdStream_Qt::recv_json_reply()
+{
+    if (!mSocket.waitForReadyRead())
+    {
+        return std::string();
+    }
+
+    std::string reply;
+
+    do
+    {
+        mReplyBuffer = mSocket.readAll();
+
+        reply.append(mReplyBuffer.constData(), mReplyBuffer.size());
+
+        auto pos = reply.find_last_not_of(" \r\n\t");
+        if (pos != std::string::npos)
+            reply.erase(pos + 1);
+
+        mReplyBuffer.clear();
+
+    } while (reply.back() != '}');
 
     return reply;
 }

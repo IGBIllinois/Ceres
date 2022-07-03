@@ -164,7 +164,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
     }
 
     auto sensor_ip = mActiveSensor.sensor_ip_address;
-    auto dst_ip = mActiveSensor.host_ip_address;
+    auto local_ip = mActiveSensor.host_ip_address;
     auto use_ipv6 = mActiveSensor.using_ipv6;
 
     QString msg("Trying to establishing command connection to ");
@@ -175,7 +175,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage(msg);
 
-    if (!mCmdStream.connect_to_sensor(sensor_ip, use_ipv6))
+    if (!mCmdStream.connect_to_sensor(sensor_ip, use_ipv6, local_ip))
     {
         emit errorMessage("LiDAR Error", "Could not establish command connection to OUSTER lidar!");
         return false;
@@ -183,7 +183,7 @@ bool cOusterModel::configure(const nlohmann::json& jsonCfg)
 
     // We have a valid connection, save our parameters for later reconnection.
     mSensorIpAddress = sensor_ip;
-    mDstIpAddress = dst_ip;
+    mDstIpAddress = local_ip;
     mUseIpv6 = use_ipv6;
 
 

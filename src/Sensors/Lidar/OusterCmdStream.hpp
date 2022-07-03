@@ -14,9 +14,12 @@ public:
 	~cOusterCmdStream_Qt();
 
 private:
-	bool try_to_connect(std::string_view hostname, uint16_t port, bool use_ipv6) override;
+	bool try_to_connect(std::string_view hostname, uint16_t port, 
+						bool use_ipv6, std::string_view local_ip) override;
+
 	int send_cmd(const std::string_view msg) override;
 	std::string recv_reply() override;
+	std::string recv_json_reply() override;
 
 	void errorHandler(QAbstractSocket::SocketError socketError);
 
