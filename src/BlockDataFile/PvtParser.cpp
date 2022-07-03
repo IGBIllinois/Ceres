@@ -3,7 +3,6 @@
 #include "PvtDataIdentifiers.hpp"
 #include "BlockDataFile.hpp"
 
-
 #include <cassert>
 
 using namespace pvt;

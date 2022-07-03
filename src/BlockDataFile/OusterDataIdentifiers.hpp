@@ -6,7 +6,7 @@ namespace ouster
 	/**********************************************************
 	   WARNING: DO NOT CHANGE THE ORDER OF THESE ENUMS!!!!
 	   
-	   Only add one to the end of the list.
+	   Only add new one to the end of the list.
 	**********************************************************/
     enum class DataID : uint16_t
     {

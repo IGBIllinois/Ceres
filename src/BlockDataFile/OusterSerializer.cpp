@@ -320,7 +320,10 @@ void cOusterSerializer::write(uint16_t frameID, const cOusterLidarData& lidar_da
 
     mDataBuffer.clear();
 
-    mDataBuffer << lidar_data.timestamp_ns();
+    mDataBuffer << frameID;
+
+    uint64_t timestamp = lidar_data.timestamp_ns();
+    mDataBuffer << timestamp;
 
     auto& data = lidar_data.data();
     uint16_t pixels_per_column = data.num_rows();

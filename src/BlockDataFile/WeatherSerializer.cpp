@@ -28,7 +28,8 @@ void cWeatherSerializer::writeConfigInfo(const std::string& info)
 {
     assert(mpDataFile);
 
-	mBlockID.dataID(DataID::CONFIGURATION_INFO);
+    mBlockID.setVersion(1, 0);
+    mBlockID.dataID(DataID::CONFIGURATION_INFO);
 
     mDataBuffer.clear();
     mDataBuffer << info;
@@ -40,12 +41,16 @@ void cWeatherSerializer::writeWindData_mps(bool valid, double speed_mps, double 
 {
     assert(mpDataFile);
 
+    mBlockID.setVersion(1, 0);
+
     mBlockID.dataID(DataID::WIND_DATA_VALID);
+
     mDataBuffer.clear();
     mDataBuffer << valid;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 
     mBlockID.dataID(DataID::WIND_SPEED_MPS);
+
     mDataBuffer.clear();
     mDataBuffer << speed_mps;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
@@ -59,6 +64,8 @@ void cWeatherSerializer::writeWindData_mps(bool valid, double speed_mps, double 
 void cWeatherSerializer::writeWindData_knots(bool valid, double speed_knots, double dir_deg)
 {
     assert(mpDataFile);
+
+    mBlockID.setVersion(1, 0);
 
     mBlockID.dataID(DataID::WIND_DATA_VALID);
     mDataBuffer.clear();

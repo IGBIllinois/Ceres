@@ -39,6 +39,7 @@ void cAxisCommunicationsSerializer::writeActiveCameraId(int in)
 {
     assert(mpDataFile);
 
+    mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::CAMERA_ID);
 
     mDataBuffer.clear();
@@ -54,6 +55,7 @@ void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& in)
     mImageWriter.setFormat("bmp");
     mImageWriter.write(in.toImage());
 
+    mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::JPEG);
 
     mDataBuffer.clear();
@@ -71,6 +73,7 @@ void cAxisCommunicationsSerializer::writeJPEG(const QImage& in)
     mImageWriter.setFormat("jpeg");
     mImageWriter.write(in);
 
+    mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::JPEG);
 
     mDataBuffer.clear();
@@ -85,6 +88,7 @@ void cAxisCommunicationsSerializer::write(const axis::sImageSize_t& in)
 {
     assert(mpDataFile);
 
+    mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::RESOLUTION);
 
     mDataBuffer.clear();

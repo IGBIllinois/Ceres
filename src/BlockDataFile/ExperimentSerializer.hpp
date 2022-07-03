@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Serializer for storing SSNX GPS data into a block based data file
+ * @brief Serializer for storing Experiment data into a block based data file
  */
 #pragma once
 

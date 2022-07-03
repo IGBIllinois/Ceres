@@ -1,32 +1,26 @@
 /**
  * @file
- * @brief Update function for simple point cloud visualizer
+ * @brief Serializer for storing Spidercam data into a block based data file
  */
 #pragma once
 
-#include "DataBuffer.hpp"
+#include "BlockSerializer.hpp"
 #include "SpidercamBlockId.hpp"
 
 // Forward Declarations
-class cBlockDataFileWriter;
 
 
-class cSpidercamSerializer
+class cSpidercamSerializer : public cBlockSerializer
 {
 public:
 	cSpidercamSerializer();
-	explicit cSpidercamSerializer(cBlockDataFileWriter* pDataFile);
+	explicit cSpidercamSerializer(std::size_t n, cBlockDataFileWriter* pDataFile = nullptr);
 	~cSpidercamSerializer() = default;
 
-	void attach(cBlockDataFileWriter* pDataFile);
-	cBlockDataFileWriter* detach();
-
-	void setVersion(uint8_t major, uint8_t minor);
-	void setBufferCapacity(std::size_t n);
+protected:
+	cBlockID& blockID() override;
 
 private:
     cSpidercamID    mBlockID;
-    cDataBuffer     mDataBuffer;
-	cBlockDataFileWriter* mpDataFile;
 };
 

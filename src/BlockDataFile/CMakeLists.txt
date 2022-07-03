@@ -29,6 +29,7 @@ PRIVATE
     ExperimentBlockId.hpp
     ExperimentDataIdentifiers.hpp
     ExperimentSerializer.hpp
+    ExperimentParser.hpp
 
 #
 # Headers for serializing/parsing Spidercam data
@@ -36,6 +37,7 @@ PRIVATE
     SpidercamBlockId.hpp
     SpidercamDataIdentifiers.hpp
     SpidercamSerializer.hpp
+    SpidercamParser.hpp
 
 #
 # Headers for serializing/parsing Ssnx GPS data
@@ -43,6 +45,7 @@ PRIVATE
     SsnxBlockId.hpp
     SsnxDataIdentifiers.hpp
     SsnxSerializer.hpp
+    SsnxParser.hpp
 
 #
 # Headers for serializing/parsing HySpex data
@@ -50,7 +53,9 @@ PRIVATE
     HySpexBlockId.hpp
     HySpexDataIdentifiers.hpp
     HySpexVNIR_3000N_Serializer.hpp
+    HySpexVNIR_3000N_Parser.hpp
     HySpexSWIR_384_Serializer.hpp
+    HySpexSWIR_384_Parser.hpp
 
 #
 # Headers for serializing/parsing OUSTER LiDAR data
@@ -67,6 +72,7 @@ PRIVATE
 	AxisCommunicationsBlockId.hpp
 	AxisDataIdentifiers.hpp
 	AxisCommunicationsSerializer.hpp
+	AxisCommunicationsParser.hpp
 
 #
 # Headers for serializing/parsing Weather data
@@ -74,6 +80,7 @@ PRIVATE
     WeatherBlockId.hpp
     WeatherDataIdentifiers.hpp
     WeatherSerializer.hpp
+    WeatherParser.hpp
 
 #
 # Headers for serializing/parsing Position/Velocity/Time data
@@ -91,9 +98,11 @@ PRIVATE
 
     WeatherBlockId.cpp
     WeatherSerializer.cpp
+    WeatherParser.cpp
 
 	AxisCommunicationsBlockId.cpp
 	AxisCommunicationsSerializer.cpp
+	AxisCommunicationsParser.cpp
 
     OusterBlockId.cpp
     OusterSerializer.cpp
@@ -101,16 +110,21 @@ PRIVATE
 
     HySpexBlockId.cpp
     HySpexVNIR_3000N_Serializer.cpp
+    HySpexVNIR_3000N_Parser.cpp
     HySpexSWIR_384_Serializer.cpp
+    HySpexSWIR_384_Parser.cpp
 
     SsnxBlockId.cpp
     SsnxSerializer.cpp
+    SsnxParser.cpp
 
     SpidercamBlockId.cpp
     SpidercamSerializer.cpp
+    SpidercamParser.cpp
 
     ExperimentBlockId.cpp
     ExperimentSerializer.cpp
+    ExperimentParser.cpp
 
 	BlockDataFile.cpp
     DataBuffer.cpp

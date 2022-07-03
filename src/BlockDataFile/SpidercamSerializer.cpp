@@ -10,41 +10,18 @@ using namespace spidercam;
 
 cSpidercamSerializer::cSpidercamSerializer()
 :
-    cSpidercamSerializer(nullptr)
+    cBlockSerializer()
 {}
 
-cSpidercamSerializer::cSpidercamSerializer(cBlockDataFileWriter* pDataFile)
+cSpidercamSerializer::cSpidercamSerializer(std::size_t n, cBlockDataFileWriter* pDataFile)
 :
-    mpDataFile(pDataFile)
+    cBlockSerializer(n, pDataFile)
 {
-    mDataBuffer.capacity(32 * 1024);
 }
 
-
-void cSpidercamSerializer::attach(cBlockDataFileWriter* pDataFile)
+cBlockID& cSpidercamSerializer::blockID()
 {
-    mpDataFile = pDataFile;
+    return mBlockID;
 }
-
-cBlockDataFileWriter* cSpidercamSerializer::detach()
-{
-    auto pFile = mpDataFile;
-    mpDataFile = nullptr;
-    return pFile;
-}
-
-
-void cSpidercamSerializer::setVersion(uint8_t major, uint8_t minor)
-{
-	mBlockID.majorVersion(major);
-	mBlockID.minorVersion(minor);
-}
-
-void cSpidercamSerializer::setBufferCapacity(std::size_t n)
-{
-    mDataBuffer.capacity(n);
-}
-
-
 
 

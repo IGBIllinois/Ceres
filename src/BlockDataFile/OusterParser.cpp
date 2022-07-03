@@ -394,10 +394,13 @@ void cOusterParser::processLidarData(cDataBuffer& buffer)
 
 void cOusterParser::processLidarDataFrameTimestamp(cDataBuffer& buffer)
 {
+    uint16_t frame_id = 0;
     uint64_t timestamp_ns = 0;
 
+    buffer >> frame_id;
     buffer >> timestamp_ns;
 
+    mLidarData.frame_id(frame_id);
     mLidarData.timestamp_ns(timestamp_ns);
 
     processLidarData(buffer);
