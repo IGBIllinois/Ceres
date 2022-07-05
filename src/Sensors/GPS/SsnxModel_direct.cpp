@@ -1,0 +1,246 @@
+
+#include "SsnxModel_direct.hpp"
+
+#include <QtSerialPort/QSerialPortInfo>
+
+#include <functional>
+
+
+using namespace ssnx;
+
+cSsnxModel_direct::cSsnxModel_direct(QObject* parent)
+:
+    cSsnxModel(parent),
+    mSerialPort(this),
+    mSerialBuffer(1024, '\0'),
+    mSerializer(4096)
+{
+}
+
+cSsnxModel_direct::~cSsnxModel_direct()
+{
+}
+
+bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
+{
+    try
+    {
+        auto serial_port = jsonCfg["serial_port"];
+
+#if defined(WIN32)
+        std::string portname = serial_port["windows"];
+#elif defined(__APPLE_CC__)
+        std::string portname = serial_port["macOS"];
+#else
+        std::string portname = serial_port["linux"];
+#endif
+
+        mSerialPort.setPort(QSerialPortInfo(QString::fromStdString(portname)));
+
+        mSerialPort.setBaudRate(QSerialPort::BaudRate::Baud115200);
+        mSerialPort.setFlowControl(QSerialPort::FlowControl::NoFlowControl);
+        mSerialPort.setParity(QSerialPort::Parity::NoParity);
+        mSerialPort.setStopBits(QSerialPort::StopBits::OneStop);
+        mSerialPort.setDataBits(QSerialPort::DataBits::Data8);
+
+        auto init_cmds = jsonCfg["initialization"];
+
+        for (auto& cmd : init_cmds)
+        {
+            sendAsciiCommand(cmd.get<std::string>());
+        }
+    }
+    catch (const std::exception& e)
+    {
+        QString str = "Error in the \"ssnx\" configuration: ";
+        str.append(e.what());
+        emit errorMessage("Configuration Error", str);
+        return false;
+    }
+
+    return true;
+}
+
+bool cSsnxModel_direct::startCommunications()
+{
+    if (!mSerialPort.open(QIODevice::ReadWrite))
+    {
+        emit errorMessage("SSNX Error", "Could not establish connection to GPS receiver!");
+        return false;
+    }
+
+    return true;
+}
+
+void cSsnxModel_direct::stopCommunications()
+{
+    closeConnection();
+}
+
+void cSsnxModel_direct::update()
+{
+    if (!isConnected()) return;
+    runOnce();
+}
+
+void cSsnxModel_direct::writeDataHeader(cBlockDataFileWriter& file)
+{
+    mSerializer.attach(&file);
+}
+
+void cSsnxModel_direct::endDataRecording()
+{
+    cGpsModel::endDataRecording();
+    mSerializer.detach();
+}
+
+void cSsnxModel_direct::closeConnection()
+{
+    mSerialPort.close();
+}
+
+bool cSsnxModel_direct::isConnected()
+{
+    return mSerialPort.isOpen();
+}
+
+void cSsnxModel_direct::communicationError(const std::string& errorString)
+{
+
+}
+
+void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDescriptor)
+{
+}
+
+void cSsnxModel_direct::newCommandReply(const std::string& reply, bool error)
+{
+}
+
+void cSsnxModel_direct::newFormattedInformationBlock(const std::string& contents, int index, int count)
+{
+}
+
+void cSsnxModel_direct::newAsciiDisplay(const std::string& asciiDisplay)
+{
+}
+
+void cSsnxModel_direct::stopReceived()
+{
+    clearConnectionDescriptor();
+
+    // If there are any commands left in the queue, move them to our
+    // holding queue
+    if (!mAsciiCommandQueue.empty())
+    {
+        mSavedCommandQueue.push(mAsciiCommandQueue.front());
+        mAsciiCommandQueue.pop();
+    }
+
+    // Move all of the commands back into the active command queue.
+    // The commands will be sent when the prompts are sent again.
+    mAsciiCommandQueue.swap(mSavedCommandQueue);
+}
+
+void cSsnxModel_direct::sentAsciiCommand(const std::string& command)
+{
+    mSavedCommandQueue.push(command);
+}
+
+int cSsnxModel_direct::readIncomingData(std::string& data)
+{
+    auto n = mSerialPort.bytesAvailable();
+    if (n == 0) return 0;
+
+    QByteArray buffer = mSerialPort.readAll();
+    data.append(buffer.toStdString());
+
+    if (data.size() > n) n = data.size();
+
+    return n;
+}
+
+int cSsnxModel_direct::sendOutgoingData(const std::string& data)
+{
+    mSerialPort.write(QByteArray::fromStdString(data));
+
+    return 0;
+}
+
+
+void cSsnxModel_direct::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
+{
+    mPvtValid = pvt.dataValid;
+    mPvtTimestamp_s = pvt.timestamp_s;
+
+    if (!mPvtValid) return;
+
+    mDatum = static_cast<cGpsModel::eDatum>(pvt.Datum);
+
+    mLatitude_rad = pvt.Lat_rad;
+    mLongitude_rad = pvt.Lon_rad;
+    mHeight_m = pvt.Height_m;;
+    mUndulation_m = pvt.Undulation_m;
+    mVn_mps = pvt.Vn_mps;
+    mVe_mps = pvt.Ve_mps;
+    mVu_mps = pvt.Vu_mps;
+    mGroundTrack_deg = pvt.GroundTrack_deg;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(pvt);
+    }
+
+    if (mRecordTrack)
+    {
+        sGpsPoint point = { mPvtTimestamp_s,
+            mLatitude_rad, mLongitude_rad, mHeight_m,
+            mVn_mps, mVe_mps, mVu_mps,
+            mGroundTrack_deg };
+
+        mTrack.emplace_back(point);
+    }
+
+    emit updatePVT(mPvtTimestamp_s,
+        mLatitude_rad, mLongitude_rad, mHeight_m,
+        mVn_mps, mVe_mps, mVu_mps,
+        mGroundTrack_deg, mDatum);
+}
+
+#if 0
+void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
+{}
+
+void cSsnxModel_direct::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
+{}
+
+void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
+{}
+
+void cSsnxModel_direct::receiverTime(const gps::ReceiverTime_1_t pvt)
+{
+    mTimeValid = pvt.dataValid;
+    mRxTimestamp_s = pvt.timestamp_s;
+
+    if (!mTimeValid) return;
+
+    mUtcHour = pvt.utcHour;
+    mUtcMinute = pvt.utcMinute;
+    mUtcSecond = pvt.utcSecond;
+    mUtcDay = pvt.utcDay;
+    mUtcMonth = pvt.utcMonth;
+    mUtcYear = pvt.utcYear;
+    mRxTimeLocked = pvt.TimeOfWeekWithin20ms || pvt.TimeOfWeekWithinThreshold;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(pvt);
+    }
+
+    emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
+}
+
+void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm)
+{}
+#endif
+
