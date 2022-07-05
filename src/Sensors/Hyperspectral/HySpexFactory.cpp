@@ -12,10 +12,23 @@
 #include <QDockWidget>
 #include <QMetaType>
 
-sSensorWidgets create_vnir_3000N_sensor(bool no_visualization)
+sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the HySpex VNIR 3000N model and view...
-    auto* pModel = new cHySpexVNIR_3000N_Model();
+    cHySpexVNIR_3000N_Model* pModel = nullptr; 
+
+    std::string protocol = sensorInfo["protocol"];
+
+    if (protocol == "direct")
+        pModel = new cHySpexVNIR_3000N_Model();
+    else if (protocol == "net")
+        pModel = new cHySpexVNIR_3000N_Model();
+    else if (protocol == "file")
+        pModel = new cHySpexVNIR_3000N_Model();
+
+    if (!pModel)
+        throw std::runtime_error("HySpex VNIR 3000N: Unknown protocol type!");
+
 
     if (no_visualization)
         return sSensorWidgets(pModel, nullptr);
@@ -29,10 +42,23 @@ sSensorWidgets create_vnir_3000N_sensor(bool no_visualization)
     return sSensorWidgets(pModel, dockWidget);
 }
 
-sSensorWidgets create_swir_384_sensor(bool no_visualization)
+sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the HySpex SWIR 384 model and view...
-    auto* pModel = new cHySpexSWIR_384_Model();
+    cHySpexSWIR_384_Model* pModel = nullptr;
+
+    std::string protocol = sensorInfo["protocol"];
+
+    if (protocol == "direct")
+        pModel = new cHySpexSWIR_384_Model();
+    else if (protocol == "net")
+        pModel = new cHySpexSWIR_384_Model();
+    else if (protocol == "file")
+        pModel = new cHySpexSWIR_384_Model();
+
+    if (!pModel)
+        throw std::runtime_error("HySpex SWIR 384: Unknown protocol type!");
+
 
     if (no_visualization)
         return sSensorWidgets(pModel, nullptr);
@@ -46,16 +72,16 @@ sSensorWidgets create_swir_384_sensor(bool no_visualization)
     return sSensorWidgets(pModel, dockWidget);
 }
 
-sSensorWidgets create_hyspex_sensor(const nlohmann::json& sensorInfo, 
+sSensorWidgets create_hyspex_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
     std::string sensor = sensorInfo["sensor"];
 
     if (sensor == "VNIR-3000N")
-        return create_vnir_3000N_sensor(no_visualization);
+        return create_vnir_3000N_sensor(sensorInfo, no_visualization);
 
     if (sensor == "SWIR-384")
-        return create_swir_384_sensor(no_visualization);
+        return create_swir_384_sensor(sensorInfo, no_visualization);
 
     return sSensorWidgets();
 }

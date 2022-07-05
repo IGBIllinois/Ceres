@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../../common/SensorFactory.hpp"
+#include "../SensorFactory.hpp"
 
 
 static char* axis_communications_id = "axis_communications";

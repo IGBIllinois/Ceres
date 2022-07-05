@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include "TimestampProvider.hpp"
-#include "DataThread.hpp"
+#include "DataModel.hpp"
+#include "RemoteDataThread.hpp"
+#include "BlockDataFile.hpp"
+#include "ExperimentSerializer.hpp"
 
-#include <QObject>
-#include <nlohmann/json.hpp>
 #include <list>
 
 #include <QByteArray>
@@ -20,31 +20,27 @@ class cSensorModel;
  * The cRemoteDataModel class is the base class for data acquisition.
  * 
  *****************************************************************************/
-class cRemoteDataModel : public QObject, public cTimestampProvider
+class cRemoteDataModel : public cDataModel
 {
     Q_OBJECT
 
 public:
     explicit cRemoteDataModel(QObject* parent = nullptr);
-    ~cRemoteDataModel();
+    virtual ~cRemoteDataModel();
 
-    void addSensor(cSensorModel* pSensor);
+    void addSensor(cSensorModel* pSensor) override;
 
-    virtual void startDataThread();
-    virtual void stopDataThread();
+    void startDataThread() override;
+    void stopDataThread() override;
 
-signals:
-    void statusMessage(QString msg);
-    void infoMessage(QString title, QString msg);
-    void warningMessage(QString title, QString msg);
-    void errorMessage(QString title, QString msg);
-
-private slots:
-    void onStatusUpdate(QString msg);
-    void onErrorUpdate(QString title, QString msg);
+    bool openDataFile(const QString& fileName) override;
+    void closeDataFile() override;
 
 protected:
-    cDataThread mThread;
+    cBlockDataFileWriter    mFile;
+    cExperimentSerializer   mSerializer;
+
+    cRemoteDataThread mThread;
 
     QTcpServer* mpTcpServer;
 

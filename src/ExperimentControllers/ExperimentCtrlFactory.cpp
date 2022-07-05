@@ -1,8 +1,8 @@
 
 #include "ExperimentCtrlFactory.hpp"
 
-#include "ExperimentControllers/DummyCtrlFactory.hpp"
-#include "ExperimentControllers/Spidercam/SpidercamCtrlFactory.hpp"
+#include "DummyCtrlFactory.hpp"
+#include "Spidercam/SpidercamCtrlFactory.hpp"
 
 
 sExperimentControllerWidgets create_experiment_controller(const std::string& name, bool no_visualization)

@@ -49,10 +49,16 @@ PRIVATE
     ${ui_files}
     ${UI_RESOURCES}
     ${platform_resource_files}
+	
+	CeresDataViewer.cpp
 )
 
 
 target_include_directories(CeresDataViewer PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
+#target_include_directories(Ceres PRIVATE ${UTILITIES_INCLUDE_DIR})
+#target_include_directories(Ceres PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
+target_include_directories(Ceres PRIVATE ${SENSORS_INCLUDE_DIR})
+
 
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)

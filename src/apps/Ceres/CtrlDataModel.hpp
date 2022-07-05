@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "TimestampProvider.hpp"
+#include "DataModel.hpp"
 #include "CtrlDataThread.hpp"
 
 #include <QObject>
@@ -26,7 +26,7 @@ namespace experiment
  * data acquisition.
  * 
  *****************************************************************************/
-class cCtrlDataModel : public QObject, public cTimestampProvider
+class cCtrlDataModel : public cDataModel
 {
     Q_OBJECT
 
@@ -35,10 +35,10 @@ public:
     ~cCtrlDataModel();
 
     void addExperimentControlModel(cExperimentControlModel* pModel);
-    void addSensor(cSensorModel* pSensor);
+    void addSensor(cSensorModel* pSensor) override;
 
-    virtual void startDataThread();
-    virtual void stopDataThread();
+    void startDataThread() override;
+    void stopDataThread() override;
 
     virtual bool openDataFile(const QString& defaultPath) = 0;
     virtual void closeDataFile() = 0;
@@ -56,16 +56,20 @@ public:
     void terminateExperiment();
 
 signals:
+/*
     void statusMessage(QString msg);
     void infoMessage(QString title, QString msg);
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
+*/
 
     void experimentCompleted();
 
 private slots:
+/*
     void onStatusUpdate(QString msg);
     void onErrorUpdate(QString title, QString msg);
+*/
 
     void onExperimentStateChange(int state);
 

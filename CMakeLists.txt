@@ -117,13 +117,16 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Find and include Qt
 set(Qt Qt5)
 
-find_package(${Qt} COMPONENTS Widgets Core Network Multimedia REQUIRED)
+find_package(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort REQUIRED)
 
 # Find and include my libraries for data collection
 find_package(Ouster REQUIRED)
+find_package(ssnx REQUIRED)
 find_package(ssnx2net REQUIRED)
 find_package(spidercam REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(Protobuf REQUIRED)
+
 
 #find_package(PkgConfig REQUIRED)
 

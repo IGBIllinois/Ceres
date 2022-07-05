@@ -1,12 +1,10 @@
 
 #include "DataModel.hpp"
-#include "../Sensors/SensorModel.hpp"
 
 cDataModel::cDataModel(QObject* parent)
 :
     QObject(parent)
 {
-    QObject::connect(&mThread, &cDataThread::statusMessage, this, &cDataModel::onStatusUpdate);
 }
 
 cDataModel::~cDataModel()
@@ -23,6 +21,7 @@ void cDataModel::onErrorUpdate(QString title, QString msg)
     emit errorMessage(title, msg);
 }
 
+/*
 void cDataModel::addSensor(cSensorModel* pSensor)
 {
     if (pSensor)
@@ -41,5 +40,6 @@ void cDataModel::stopDataThread()
 {
     mThread.stop();
 }
+*/
 
 

@@ -1,7 +1,7 @@
 
 #include "CtrlDataThread.hpp"
-#include "ExperimentControllers/ExperimentCtrlModel.hpp"
-#include "Sensors/SensorModel.hpp"
+#include "ExperimentCtrlModel.hpp"
+#include "SensorModel.hpp"
 
 cCtrlDataThread::cCtrlDataThread()
 :

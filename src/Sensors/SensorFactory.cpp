@@ -19,12 +19,12 @@ sSensorWidgets create_sensor(const std::string& name,
 
     if (name.compare(ssnx_id) == 0)
     {
-        return create_ssnx_sensor(no_visualization);
+        return create_ssnx_sensor(sensorInfo, no_visualization);
     }
 
     if (name.compare(ouster_id) == 0)
     {
-        return create_ouster_sensor(no_visualization);
+        return create_ouster_sensor(sensorInfo, no_visualization);
     }
 
     if (name.compare(weather_data_id) == 0)

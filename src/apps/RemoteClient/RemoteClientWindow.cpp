@@ -5,7 +5,7 @@
 #include "CeresSplashScreen.hpp"
 
 #include "SensorFactory.hpp"
-#include "Sensors/SensorModel.hpp"
+#include "SensorModel.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>
@@ -56,7 +56,7 @@ namespace
         }
 
         cfgPath = QApplication::applicationDirPath();
-        cfgPath += "/ceres_remote.json";
+        cfgPath += "/ceres_remote_client.json";
         if (QFile::exists(cfgPath))
             return cfgPath.toStdString();
 
@@ -188,7 +188,7 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
         createSensorModelsAndViews(configDoc);
 
         onStatusUpdate("Initializing TCP server...");
-        initializeServer(configDoc);
+        //initializeServer(configDoc);
     }
     catch (const std::exception& e)
     {

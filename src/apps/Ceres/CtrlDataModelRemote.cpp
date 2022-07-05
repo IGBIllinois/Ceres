@@ -1,6 +1,6 @@
 
 #include "CtrlDataModelRemote.hpp"
-#include "Sensors/SensorModel.hpp"
+#include "SensorModel.hpp"
 
 #include <QtNetwork/QHostInfo>
 

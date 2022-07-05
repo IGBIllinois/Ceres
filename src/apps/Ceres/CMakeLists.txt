@@ -47,7 +47,6 @@ target_compile_features(Ceres PRIVATE cxx_std_17)
 
 target_sources(Ceres
 PUBLIC
-    ExperimentTypes.hpp
 
 PRIVATE
 #    ${Cmake_hdr_moc}
@@ -60,9 +59,6 @@ PRIVATE
 #
 # General Application files
 #
-    ExperimentCtrlFactory.hpp
-    ExperimentCtrlFactory.cpp
-
     ExperimentManager.hpp
     ExperimentManager.cpp
     ExperimentTreeItem.hpp
@@ -103,6 +99,10 @@ endif()
 
 target_include_directories(Ceres PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(Ceres PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+target_include_directories(Ceres PRIVATE ${UTILITIES_INCLUDE_DIR})
+target_include_directories(Ceres PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
+target_include_directories(Ceres PRIVATE ${SENSORS_INCLUDE_DIR})
+
 
 #target_link_libraries(Ceres PRIVATE ${VTK_LIBRARIES})
 target_link_libraries(Ceres PRIVATE ${Qt}::Widgets)
@@ -115,6 +115,8 @@ target_link_libraries(Ceres PRIVATE Utilities)
 target_link_libraries(Ceres PRIVATE common)
 
 #vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
+
+set_target_properties(Ceres PROPERTIES FOLDER "Apps")
 
 #install(TARGETS asio_client RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}/asio")
 

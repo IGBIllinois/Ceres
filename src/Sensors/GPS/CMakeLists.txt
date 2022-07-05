@@ -7,10 +7,26 @@ set(GPS_PUBLIC_HEADERS
 # Add the source files used in the library
 set(GPS_SOURCE_FILES
 #
-# Septertino GPS receiver files
+# Different Septertino GPS Models based on data source
 #
+
+#	Data file
+    SsnxModel_file.hpp
+    SsnxModel_file.cpp
+
+#	Network stream from relay program on dolly
     SsnxGpsStream.hpp
     SsnxGpsStream.cpp
+    SsnxModel_net.hpp
+    SsnxModel_net.cpp
+
+#	Directly connected to GPS receiver's com port
+    SsnxModel_direct.hpp
+    SsnxModel_direct.cpp
+
+#
+# Septertino GPS receiver files
+#
     SsnxModel.hpp
     SsnxModel.cpp
     SsnxView.hpp
@@ -56,9 +72,11 @@ target_include_directories(gps_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 target_link_libraries(gps_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(gps_static PUBLIC ${Qt}::Network)
+target_link_libraries(gps_static PUBLIC ${Qt}::SerialPort)
 target_link_libraries(gps_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(gps_static PUBLIC BlockDataFile)
 target_link_libraries(gps_static PUBLIC ssnx2net::ssnx2net_static)
+target_link_libraries(gps_static PUBLIC ssnx::ssnx_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

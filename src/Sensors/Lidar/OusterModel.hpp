@@ -15,7 +15,7 @@
 
 const static uint32_t MIN_RANGE_MM = 300;
 
-class cOusterModel : public cLidarModel, private cOusterImuStream_Qt, private cOusterLidarStream_Qt
+class cOusterModel : public cLidarModel
 {
     Q_OBJECT
 
@@ -28,10 +28,7 @@ public:
      */
     char* descriptor() const override;
 
-    bool configure(const nlohmann::json& jsonCfg) override;
-
-    void writeDataHeader(cBlockDataFileWriter& file) override;
-    void endDataRecording() override;
+    virtual bool configure(const nlohmann::json& jsonCfg) = 0;
 
     uint16_t columnsPerFrame() const;
     uint16_t pixelsPerColumn() const;
@@ -56,14 +53,6 @@ public:
     cOusterLidarData      lidarData() const;
     ouster::imu_data_t    imuData() const;
 
-    /*
-     * Starts/Stops communication with the endpoint.
-     * These methods are called inside the QThread so that
-     * all of the communication happens within the same thread!
-     */
-    bool startCommunications() override;
-    void stopCommunications() override;
-
 signals:
     void updateSensorInfo();
     void updateTimeInfo();
@@ -72,42 +61,17 @@ signals:
     void updateLidarIntrinsics();
     void updateDataFormat();
 
-/*
-    void updateSensorInfo(ouster::sensor_info_t info);
-    void updateTimeInfo(ouster::time_info_t info);
-    void updateBeamIntrinsics(ouster::beam_intrinsics_t beam_intrinsics);
-    void updateImuIntrinsics(ouster::imu_intrinsics_t imu_intrinsics);
-    void updateLidarIntrinsics(ouster::lidar_intrinsics_t lidar_intrinsics);
-    void updateDataFormat(ouster::lidar_data_format_t lidar_data_format);
-    void updateImuData(ouster::imu_data_t data);
-    void updateAzimuthWindow(ouster::azimuth_range_t azimuth_range);
-*/
-
     void updateAzimuthWindow();
     void updateEncoderCount(int min, int max);
     void updateImuData();
     void updateLidarData();
 
 protected:
-    void onNewData(const ouster::imu_data_t& new_data) override;
-    void onNewData(uint16_t frameID, const cOusterLidarData& data) override;
+    virtual void onNewData(const ouster::imu_data_t& new_data) = 0;
+    virtual void onNewData(uint16_t frameID, const cOusterLidarData& data) = 0;
 
 protected:
-    void update() override;
-
-private:
-    bool mConnected;
     int mFrameCounter;
-
-    uint16_t mImuPort;
-    uint16_t mLidarPort;
-    std::string mSensorIpAddress;
-    std::string mDstIpAddress;
-    bool mUseIpv6;
-
-    cOusterCmdStream_Qt   mCmdStream;
-
-    ouster::sensor_network_info_t mActiveSensor;
 
     ouster::config_param_2_t		mConfigParameters;
     ouster::sensor_info_2_t		    mSensorInfo;
@@ -128,7 +92,5 @@ private:
     double mLidarOriginToBeamOrigin_mm;
     std::vector<double> mBeamAzimuthAngles_rad;
     std::vector<double> mBeamAltitudeAngles_rad;
-
-    cOusterSerializer mSerializer;
 };
 

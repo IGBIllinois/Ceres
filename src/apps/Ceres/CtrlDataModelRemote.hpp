@@ -2,8 +2,8 @@
 #pragma once
 
 #include "CtrlDataModel.hpp"
-#include "BlockDataFile/BlockDataFile.hpp"
-#include "BlockDataFile/ExperimentSerializer.hpp"
+#include "BlockDataFile.hpp"
+#include "ExperimentSerializer.hpp"
 
 #include <QByteArray>
 #include <QtNetwork/QTcpSocket>

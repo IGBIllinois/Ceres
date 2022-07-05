@@ -1,4 +1,9 @@
 
+set(COMMON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
+
+# Add the "common" directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common)
+
 
 #******************************************************************************
 # Ceres - The main data acquisition program

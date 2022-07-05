@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../../common/SensorFactory.hpp"
+#include "../SensorFactory.hpp"
 
 
 static char* weather_data_id = "weather_data";

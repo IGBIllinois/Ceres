@@ -38,6 +38,10 @@ PRIVATE
     SensorModel.hpp
     SensorModel.cpp
 	
+#
+# Factory for creating the different sensor models/views
+#
+    SensorFactory.hpp
     SensorFactory.cpp
 
 )

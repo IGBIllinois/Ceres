@@ -10,6 +10,8 @@ target_compile_features(ExperimentControllers PRIVATE cxx_std_17)
 
 target_sources(ExperimentControllers
 PUBLIC
+    ExperimentTypes.hpp
+
 #
 # Base Headers for all Experiment Controller classes
 #
@@ -40,6 +42,12 @@ PRIVATE
     PauseExperimentStateDlg.cpp
     ExperimentStates.hpp
     ExperimentStates.cpp
+	
+#
+# Factory for creating the different experiment control models/views
+#
+    ExperimentCtrlFactory.hpp
+    ExperimentCtrlFactory.cpp
 )
 
 #

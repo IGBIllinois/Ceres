@@ -13,7 +13,7 @@ include("SoftwareInformation/branding.cmake")
 
 
 set(ui_files
-  Resources/UI/RemoteClientWindow.ui
+  Resources/UI/MainWindow.ui
   Resources/UI/AboutDialog.ui
 )
 
@@ -60,6 +60,8 @@ PRIVATE
 #
     RemoteDataModel.hpp
     RemoteDataModel.cpp
+    RemoteDataThread.hpp
+    RemoteDataThread.cpp
 
     RemoteClientWindow.hpp
     RemoteClientWindow.cpp
@@ -84,6 +86,9 @@ endif()
 
 target_include_directories(CeresRemoteClient PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(CeresRemoteClient PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+target_include_directories(CeresRemoteClient PRIVATE ${SENSORS_INCLUDE_DIR})
+#target_include_directories(CeresRemoteClient PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
+#target_include_directories(CeresRemoteClient PRIVATE ${UTILITIES_INCLUDE_DIR})
 
 target_link_libraries(CeresRemoteClient PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresRemoteClient PRIVATE nlohmann_json::nlohmann_json)
@@ -91,6 +96,8 @@ target_link_libraries(CeresRemoteClient PRIVATE BlockDataFile)
 target_link_libraries(CeresRemoteClient PRIVATE Sensors)
 target_link_libraries(CeresRemoteClient PRIVATE Utilities)
 target_link_libraries(CeresRemoteClient PRIVATE common)
+
+set_target_properties(CeresRemoteClient PROPERTIES FOLDER "Apps")
 
 #install(TARGETS asio_client RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}/asio")
 

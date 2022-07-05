@@ -14,10 +14,21 @@
 // Example of how to declare a metatype in Qt
 //Q_DECLARE_METATYPE(ouster::sensor_info_t);
 
-sSensorWidgets create_axis_communications_f44_sensor(bool no_visualization)
+sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the Ouster model and view...
-    auto* pModel = new cAxisCommunicationsModel_F44();
+    cAxisCommunicationsModel_F44* pModel = nullptr;
+
+    std::string protocol = sensorInfo["protocol"];
+
+    if (protocol == "net")
+        pModel = new cAxisCommunicationsModel_F44();
+    else if (protocol == "file")
+        pModel = new cAxisCommunicationsModel_F44();
+
+    if (!pModel)
+        throw std::runtime_error("Axis F44: Unknown protocol type!");
+
 
     if (no_visualization)
         return sSensorWidgets(pModel, nullptr);
@@ -39,13 +50,13 @@ sSensorWidgets create_axis_communications_f44_sensor(bool no_visualization)
     return sSensorWidgets(pModel, dockWidget);
 }
 
-sSensorWidgets create_axis_communications_sensor(const nlohmann::json& sensorInfo, 
+sSensorWidgets create_axis_communications_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
     std::string sensor = sensorInfo["sensor"];
 
     if (sensor == "F44")
-        return create_axis_communications_f44_sensor(no_visualization);
+        return create_axis_communications_f44_sensor(sensorInfo, no_visualization);
 
     return sSensorWidgets();
 }

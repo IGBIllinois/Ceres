@@ -1,7 +1,7 @@
 
 #include "CtrlDataModelLocal.hpp"
-#include "Sensors/SensorModel.hpp"
-#include "ExperimentControllers/ExperimentCtrlModel.hpp"
+#include "SensorModel.hpp"
+#include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
 #include <QtWidgets>

@@ -1,13 +1,13 @@
 
 #include "CtrlDataModel.hpp"
-#include "Sensors/SensorModel.hpp"
-#include "ExperimentControllers/ExperimentCtrlModel.hpp"
+#include "SensorModel.hpp"
+#include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
 
 cCtrlDataModel::cCtrlDataModel(QObject* parent)
 :
-    QObject(parent)
+    cDataModel(parent)
 {
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cCtrlDataModel::onStatusUpdate);
 }
@@ -16,15 +16,6 @@ cCtrlDataModel::~cCtrlDataModel()
 {
 }
 
-void cCtrlDataModel::onStatusUpdate(QString msg)
-{
-    emit statusMessage(msg);
-}
-
-void cCtrlDataModel::onErrorUpdate(QString title, QString msg)
-{
-    emit errorMessage(title, msg);
-}
 
 void cCtrlDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)
 {

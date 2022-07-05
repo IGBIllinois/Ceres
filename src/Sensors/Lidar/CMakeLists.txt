@@ -7,16 +7,28 @@ set(LIDAR_PUBLIC_HEADERS
 # Add the source files used in the library
 set(LIDAR_SOURCE_FILES
 #
-# OUSTER LiDAR files
+# Different OUSTER Models based on data source
 #
-    OusterView.hpp
-    OusterView.cpp
+
+#	Data file
+    OusterModel_file.hpp
+    OusterModel_file.cpp
+
+#	Network stream from sensor
     OusterCmdStream.hpp
     OusterCmdStream.cpp
     OusterImuStream.hpp
     OusterImuStream.cpp
     OusterDataStream.hpp
     OusterDataStream.cpp
+    OusterModel_net.hpp
+    OusterModel_net.cpp
+
+#
+# Base OUSTER LiDAR files
+#
+    OusterView.hpp
+    OusterView.cpp
     OusterModel.hpp
     OusterModel.cpp
     OusterFactory.cpp
@@ -52,7 +64,7 @@ PRIVATE
     ${LIDAR_SOURCE_FILES}
 )
 
-target_include_directories(lidar_static PRIVATE ${COMMON_INCLUDE_DIR})
+#target_include_directories(lidar_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(lidar_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 target_link_libraries(lidar_static PUBLIC ${Qt}::Widgets)

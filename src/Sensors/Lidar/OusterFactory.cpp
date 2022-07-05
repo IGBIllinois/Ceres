@@ -3,7 +3,8 @@
 
 #include "OusterFactory.hpp"
 
-#include "OusterModel.hpp"
+#include "OusterModel_net.hpp"
+#include "OusterModel_file.hpp"
 #include "OusterView.hpp"
 #include <ouster/ouster_defs.h>
 
@@ -22,10 +23,21 @@ Q_DECLARE_METATYPE(ouster::azimuth_range_t);
 Q_DECLARE_METATYPE(ouster::imu_data_t);
 
 
-sSensorWidgets create_ouster_sensor(bool no_visualization)
+sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the Ouster model and view...
-    auto* pModel = new cOusterModel();
+    cOusterModel* pModel = nullptr;
+
+    std::string protocol = sensorInfo["protocol"];
+
+    if (protocol == "net")
+        pModel = new cOusterModel_net();
+    else if (protocol == "file")
+        pModel = new cOusterModel_file();
+
+    if (!pModel)
+        throw std::runtime_error("OUSTER: Unknown protocol type!");
+
 
     if (no_visualization)
         return sSensorWidgets(pModel, nullptr);

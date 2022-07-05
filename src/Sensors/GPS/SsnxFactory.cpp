@@ -1,19 +1,34 @@
 
 #include "SsnxFactory.hpp"
 
-#include "SsnxModel.hpp"
+#include "SsnxModel_file.hpp"
+#include "SsnxModel_net.hpp"
+#include "SsnxModel_direct.hpp"
 #include "SsnxView.hpp"
 
+#include <stdexcept>
 
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
 
 
-sSensorWidgets create_ssnx_sensor(bool no_visualization)
+sSensorWidgets create_ssnx_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the SSNX model and view...
-    auto* pModel = new cSsnxModel();
+    cSsnxModel* pModel = nullptr;
+
+    std::string protocol = sensorInfo["protocol"];
+
+    if (protocol == "direct")
+        pModel = new cSsnxModel_direct();
+    else if (protocol == "net")
+        pModel = new cSsnxModel_net();
+    else if (protocol == "file")
+        pModel = new cSsnxModel_file();
+
+    if (!pModel)
+        throw std::runtime_error("SSNX: Unknown protocol type!");
 
     if (no_visualization)
         return sSensorWidgets(pModel, nullptr);

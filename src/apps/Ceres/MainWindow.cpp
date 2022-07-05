@@ -13,11 +13,11 @@
 #include "ExperimentToolbar.hpp"
 
 #include "ExperimentCtrlFactory.hpp"
-#include "ExperimentControllers/ExperimentCtrlView.hpp"
-#include "ExperimentControllers/ExperimentCtrlModel.hpp"
+#include "ExperimentCtrlView.hpp"
+#include "ExperimentCtrlModel.hpp"
 
 #include "SensorFactory.hpp"
-#include "Sensors/SensorModel.hpp"
+#include "SensorModel.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>

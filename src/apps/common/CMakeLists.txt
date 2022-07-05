@@ -13,8 +13,6 @@ PRIVATE
 #
 # General Application files
 #
-    SensorFactory.hpp
-
     DataModel.hpp
     DataModel.cpp
 	
@@ -38,8 +36,13 @@ PRIVATE
 # Force use MultiThreadedDLL (-MD) and MultiThreadedDebugDLL (-MDd)
 set_property(TARGET common PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
+target_include_directories(common PRIVATE ${SENSORS_INCLUDE_DIR})
+
 target_link_libraries(common PRIVATE ${Qt}::Widgets)
 target_link_libraries(common PRIVATE nlohmann_json::nlohmann_json)
+
+set_target_properties(common PROPERTIES FOLDER "Apps")
+
 
 
 #set_target_properties(Sensors PROPERTIES FOLDER "Sensors")

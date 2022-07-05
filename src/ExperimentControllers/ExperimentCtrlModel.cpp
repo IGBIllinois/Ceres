@@ -1,7 +1,7 @@
 
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentStates.hpp"
-#include "../ExperimentTypes.hpp"
+#include "ExperimentTypes.hpp"
 
 
 

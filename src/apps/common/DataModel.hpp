@@ -2,10 +2,9 @@
 #pragma once
 
 #include "TimestampProvider.hpp"
-#include "DataThread.hpp"
 
 #include <QObject>
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
 
 // Forward Declarations
 class cSensorModel;
@@ -23,10 +22,10 @@ public:
     explicit cDataModel(QObject* parent = nullptr);
     ~cDataModel();
 
-    void addSensor(cSensorModel* pSensor);
+    virtual void addSensor(cSensorModel* pSensor) = 0;
 
-    virtual void startDataThread();
-    virtual void stopDataThread();
+    virtual void startDataThread() = 0;
+    virtual void stopDataThread() = 0;
 
     virtual bool openDataFile(const QString& defaultPath) = 0;
     virtual void closeDataFile() = 0;
@@ -37,11 +36,8 @@ signals:
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
 
-private slots:
+protected slots:
     void onStatusUpdate(QString msg);
     void onErrorUpdate(QString title, QString msg);
-
-protected:
-    cDataThread mThread;
 };
 

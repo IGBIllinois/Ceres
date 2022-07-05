@@ -13,7 +13,7 @@ class cDataThread : public QThread
 
 public:
     explicit cDataThread();
-    ~cDataThread();
+    virtual ~cDataThread();
 
     void start();
     void stop();

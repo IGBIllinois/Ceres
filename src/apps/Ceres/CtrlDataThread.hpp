@@ -12,7 +12,7 @@ class cCtrlDataThread : public cDataThread
 
 public:
     explicit cCtrlDataThread();
-    ~cCtrlDataThread();
+    virtual ~cCtrlDataThread();
 
 protected:
     void updateAll() override;
