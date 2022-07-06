@@ -106,7 +106,8 @@ bool cSsnxModel_direct::isConnected()
 
 void cSsnxModel_direct::communicationError(const std::string& errorString)
 {
-
+    QString msg = QString::fromStdString(errorString);
+    emit errorMessage(descriptor(), msg);
 }
 
 void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDescriptor)
@@ -168,7 +169,7 @@ int cSsnxModel_direct::sendOutgoingData(const std::string& data)
 }
 
 
-void cSsnxModel_direct::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
+void cSsnxModel_direct::pvtGeodetic(const gps::PVT_Geodetic_2_t& pvt)
 {
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
@@ -207,17 +208,16 @@ void cSsnxModel_direct::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
         mGroundTrack_deg, mDatum);
 }
 
-#if 0
 void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 {}
 
 void cSsnxModel_direct::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 {}
 
-void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
+void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t& pvt)
 {}
 
-void cSsnxModel_direct::receiverTime(const gps::ReceiverTime_1_t pvt)
+void cSsnxModel_direct::receiverTime(const gps::ReceiverTime_1_t& pvt)
 {
     mTimeValid = pvt.dataValid;
     mRxTimestamp_s = pvt.timestamp_s;
@@ -240,7 +240,7 @@ void cSsnxModel_direct::receiverTime(const gps::ReceiverTime_1_t pvt)
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
 }
 
-void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm)
+void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
 {}
-#endif
+
 

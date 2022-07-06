@@ -154,7 +154,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
         mCmdStream.setAzimuthWindow(azimuth_min_deg.value(), azimuth_max_deg.value());
     }
 
-    mCmdStream.retrieveSensorInfo();;
+    mCmdStream.retrieveSensorInfo();
 
     if (mode.has_value())
     {

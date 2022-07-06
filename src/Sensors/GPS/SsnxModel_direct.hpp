@@ -35,14 +35,12 @@ public:
 protected:
     void update() override;
 
-    void pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt) override;
-    /*
-        void posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov) override;
+    void pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt) override;
+    void posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov) override;
     void velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov) override;
-    void posProjected(const ssnx::gps::POS_Projected_1_t pvt) override;
-    void receiverTime(const ssnx::gps::ReceiverTime_1_t pvt) override;
-    void rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm) override;
-*/
+    void posProjected(const ssnx::gps::POS_Projected_1_t& pvt) override;
+    void receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt) override;
+    void rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm) override;
 
 private:
     void closeConnection() override;

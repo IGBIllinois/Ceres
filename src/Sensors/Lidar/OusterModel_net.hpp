@@ -41,6 +41,16 @@ protected:
 protected:
     void update() override;
 
+/*
+private:
+    bool retrieveConfigParam(cOusterCmdStream_Qt& cmdStream);
+    bool retrieveSensorInfo(cOusterCmdStream_Qt& cmdStream);
+    bool retrieveBeamIntrinsics(cOusterCmdStream_Qt& cmdStream);
+    bool retrieveImuIntrinsics(cOusterCmdStream_Qt& cmdStream);
+    bool retrieveLidarIntrinsics(cOusterCmdStream_Qt& cmdStream);
+    bool retrieveLidarDataFormat(cOusterCmdStream_Qt& cmdStream);
+*/
+
 private:
     bool mConnected;
 

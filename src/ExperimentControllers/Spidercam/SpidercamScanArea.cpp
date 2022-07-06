@@ -99,6 +99,14 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 
 	painter.setPen(QPen(mBorderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
+	QFont font = painter.font();
+	QFontMetrics metrics(font);
+	auto w1Bounds = metrics.boundingRect("W1X");
+	auto w2Bounds = metrics.boundingRect("XW2");
+	auto w3Bounds = metrics.boundingRect("XW3");
+	auto w4Bounds = metrics.boundingRect("W4X");
+	auto xBounds = metrics.boundingRect("X");
+
 	double w = width();
 	double h = height();
 
@@ -111,7 +119,12 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		mX_Scale = ideal_width / (mMaxX - mMinX);
 		mY_Scale = h / (mMaxY - mMinY);
 
-		painter.drawRect(mX_Offset, 0, h, h);
+		painter.drawRect(mX_Offset, mY_Offset, h, h);
+
+		painter.drawText(QPoint(mX_Offset - w1Bounds.width(), h), QString("W1"));
+		painter.drawText(QPoint(mX_Offset + h + xBounds.width(), h), QString("W2"));
+		painter.drawText(QPoint(mX_Offset + h + xBounds.width(), xBounds.height()), QString("W3"));
+		painter.drawText(QPoint(mX_Offset - w4Bounds.width(), w4Bounds.height()), QString("W4"));
 
 	}
 	else
@@ -122,6 +135,11 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		mY_Scale = ideal_height / (mMaxY - mMinY);
 
 		painter.drawRect(0, 0, w, w);
+
+		painter.drawText(QPoint(10, 10), QString("W1"));
+		painter.drawText(QPoint(10, 10), QString("W2"));
+		painter.drawText(QPoint(10, 10), QString("W3"));
+		painter.drawText(QPoint(10, 10), QString("W4"));
 
 		h = w;
 	}
