@@ -11,5 +11,8 @@ class cRemoteDataThread : public cDataThread
 public:
     explicit cRemoteDataThread();
     virtual ~cRemoteDataThread();
+
+    bool startCommunications() override;
+    bool stopCommunications() override;
 };
 

@@ -89,10 +89,10 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     auto data_path = cwd / "Data";
     mDefaultDataPath = QString::fromLatin1(data_path.string().c_str());
 
-    QObject::connect(&mMainModel, &cRemoteDataModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
-    QObject::connect(&mMainModel, &cRemoteDataModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
-    QObject::connect(&mMainModel, &cRemoteDataModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
-    QObject::connect(&mMainModel, &cRemoteDataModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
+    QObject::connect(&mMainModel, &cDataModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
+    QObject::connect(&mMainModel, &cDataModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
+    QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
+    QObject::connect(&mMainModel, &cDataModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
 }
 
 //-----------------------------------------------------------------------------
