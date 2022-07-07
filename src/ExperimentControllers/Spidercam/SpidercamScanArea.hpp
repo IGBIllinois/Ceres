@@ -9,6 +9,7 @@
 #include <QPainterPath>
 #include <Qpicture>
 #include <vector>
+#include <string>
 
 class cSpidercamScanArea : public QWidget
 {
@@ -24,6 +25,8 @@ public:
 
     void updateBounds(double minX, double maxX, double minY, double maxY);
     void updateDollyPosition(uint32_t x, uint32_t y);
+
+    void loadLayout(const std::string& layout_filename);
 
 public slots:
 
@@ -63,6 +66,21 @@ private:
     typedef std::vector<location> path_t;
     std::vector<path_t> mMeasurementPaths;
     path_t* mpActivePath;
+
+private:
+    struct experimentLayout_t
+    {
+        QColor  color;
+        QString label;
+        uint32_t x_mm;
+        uint32_t y_mm;
+        uint32_t height_mm;
+        uint32_t width_mm;
+    };
+
+    std::vector<experimentLayout_t> mLayouts;
+
+    void drawLayout(QPainter& painter, double height, const experimentLayout_t& layout);
 
 private:
     QPen   mMeasurementPen;

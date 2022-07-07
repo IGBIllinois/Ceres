@@ -66,6 +66,12 @@ void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 		mMaxY_mm = jsonCfg["max Y position (m)"] * M_TO_MM;
 		mMinHeight_mm = jsonCfg["min height (m)"] * M_TO_MM;
 		mMaxHeight_mm = jsonCfg["max height (m)"] * M_TO_MM;
+
+		if (jsonCfg.contains("layout"))
+		{
+			std::string layout_filename = jsonCfg["layout"];
+			mpScanArea->loadLayout(layout_filename);
+		}
 	}
 	catch (const std::exception& e)
 	{

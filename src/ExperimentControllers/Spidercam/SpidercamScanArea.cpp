@@ -1,7 +1,13 @@
 
 #include "SpidercamScanArea.hpp"
+#include "../../Utilities/Constants.hpp"
 
 #include <QPaintEvent>
+
+#include <fstream>
+
+#include <nlohmann/json.hpp>
+
 
 cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 :
@@ -92,6 +98,68 @@ void cSpidercamScanArea::updateBounds(double minX, double maxX, double minY, dou
 	mAspectRatio = (mMaxX - mMinX) / (mMaxY - mMinY);
 }
 
+void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
+{
+	if (layout_filename.empty())
+		return;
+
+	std::ifstream in;
+	in.open(layout_filename);
+	if (!in.is_open())
+		return;
+
+	nlohmann::json layoutDoc;
+	try
+	{
+		in >> layoutDoc;
+	}
+	catch (const nlohmann::json::parse_error& e)
+	{
+		return;
+	}
+	catch (const std::exception& e)
+	{
+		return;
+	}
+
+	try
+	{
+		auto layouts = layoutDoc["layout"];
+
+		for (auto layout : layouts)
+		{
+			experimentLayout_t expLayout;
+
+			std::string label = layout["label"];
+			expLayout.label = QString::fromStdString(label);
+
+			auto color = layout["color"];
+			int r = color["red"];
+			int g = color["green"];
+			int b = color["blue"];
+			int a = color["alpha"];
+			expLayout.color = QColor(r, g, b, a);
+
+			uint32_t east_m = layout["east (m)"];
+			uint32_t north_m = layout["north (m)"];
+			uint32_t west_m = layout["west (m)"];
+			uint32_t south_m = layout["south (m)"];
+
+			expLayout.x_mm = north_m * nConstants::M_TO_MM;
+			expLayout.y_mm = west_m * nConstants::M_TO_MM;
+			expLayout.height_mm = (east_m - west_m) * nConstants::M_TO_MM;
+			expLayout.width_mm = (south_m - north_m) * nConstants::M_TO_MM;
+
+			mLayouts.emplace_back(expLayout);
+		}
+
+	}
+	catch (const std::exception& e)
+	{
+		return;
+	}
+}
+
 void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 {
 	QPainter painter(this);
@@ -101,51 +169,89 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 
 	QFont font = painter.font();
 	QFontMetrics metrics(font);
-	auto w1Bounds = metrics.boundingRect("W1X");
-	auto w2Bounds = metrics.boundingRect("XW2");
-	auto w3Bounds = metrics.boundingRect("XW3");
-	auto w4Bounds = metrics.boundingRect("W4X");
-	auto xBounds = metrics.boundingRect("X");
+	auto w1Bounds = metrics.tightBoundingRect("W1X");
+	auto w2Bounds = metrics.tightBoundingRect("XW2");
+	auto w3Bounds = metrics.tightBoundingRect("XW3");
+	auto w4Bounds = metrics.tightBoundingRect("W4X");
 
-	double w = width();
-	double h = height();
+	double window_width = width();
+	double window_height = height();
 
-	double ideal_height = w / mAspectRatio;
-	if (h < ideal_height)
+	double test_height = (window_width - w1Bounds.width() - w2Bounds.width()) / mAspectRatio;
+	if (window_height < test_height)
 	{
-		double ideal_width = mAspectRatio * h;
-		mX_Offset = (0.5 * w) - (0.5 * ideal_width);
+		double ideal_width = mAspectRatio * window_height;
+		double l = window_width - w1Bounds.width() - w2Bounds.width();
+
+		mX_Offset = 0.5 * (l - ideal_width) + w1Bounds.width();
 		mY_Offset = 0.0;
 		mX_Scale = ideal_width / (mMaxX - mMinX);
-		mY_Scale = h / (mMaxY - mMinY);
+		mY_Scale = window_height / (mMaxY - mMinY);
 
-		painter.drawRect(mX_Offset, mY_Offset, h, h);
+		painter.drawRect(mX_Offset, mY_Offset, window_height, window_height);
 
-		painter.drawText(QPoint(mX_Offset - w1Bounds.width(), h), QString("W1"));
-		painter.drawText(QPoint(mX_Offset + h + xBounds.width(), h), QString("W2"));
-		painter.drawText(QPoint(mX_Offset + h + xBounds.width(), xBounds.height()), QString("W3"));
+		auto xBounds = metrics.tightBoundingRect("X");
+		painter.drawText(QPoint(mX_Offset - w1Bounds.width(), window_height), QString("W1"));
+		painter.drawText(QPoint(mX_Offset + window_height + xBounds.width(), window_height), QString("W2"));
+		painter.drawText(QPoint(mX_Offset + window_height + xBounds.width(), xBounds.height()), QString("W3"));
 		painter.drawText(QPoint(mX_Offset - w4Bounds.width(), w4Bounds.height()), QString("W4"));
-
 	}
 	else
 	{
-		mX_Offset = 0.0;
-		mY_Offset = 0.0;
-		mX_Scale = w / (mMaxX - mMinX);
-		mY_Scale = ideal_height / (mMaxY - mMinY);
+		double ideal_height = (window_width / mAspectRatio) - w1Bounds.height() - w4Bounds.height() - 6;
+		double l;
 
-		painter.drawRect(0, 0, w, w);
+		if (window_width > window_height)
+			l = window_height - w1Bounds.height() - w4Bounds.height() - 6;
+		else
+			l = window_width - w1Bounds.height() - w4Bounds.height() - 6;
 
-		painter.drawText(QPoint(10, 10), QString("W1"));
-		painter.drawText(QPoint(10, 10), QString("W2"));
-		painter.drawText(QPoint(10, 10), QString("W3"));
-		painter.drawText(QPoint(10, 10), QString("W4"));
+		mX_Offset = 0.5 * (window_width - ideal_height);
+		mY_Offset = 0.5 * (window_height - l);	//w4Bounds.height() + 3;
+		mX_Scale = l / (mMaxX - mMinX);
+		mY_Scale = l / (mMaxY - mMinY);
 
-		h = w;
+		painter.drawRect(mX_Offset, mY_Offset, l, l);
+
+		double y = mY_Offset + l + w1Bounds.height() + 3;
+		painter.drawText(QPoint(mX_Offset, y), QString("W1"));
+		painter.drawText(QPoint(mX_Offset + l - w3Bounds.width(), y), QString("W2"));
+		painter.drawText(QPoint(mX_Offset + l - w3Bounds.width(), mY_Offset - 3), QString("W3"));
+		painter.drawText(QPoint(mX_Offset, mY_Offset - 3), QString("W4"));
+
+		window_height = l;
 	}
 
-	drawDollyMarker(painter, h);
-	drawPath(painter, h);
+	for (const auto& layout : mLayouts)
+	{
+		drawLayout(painter, window_height, layout);
+	}
+
+	drawDollyMarker(painter, window_height);
+	drawPath(painter, window_height);
+}
+
+
+void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const experimentLayout_t& layout)
+{
+	painter.save();
+	painter.setPen(QPen(layout.color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
+	int x = mX_Scale * (layout.x_mm - mMinX) + mX_Offset;
+	int y = mY_Scale * (layout.y_mm - mMinY) + mY_Offset;
+	int w = mX_Scale * layout.width_mm;
+	int h = mY_Scale * layout.height_mm;
+
+	y = height - y - h;
+
+	painter.drawRect(x, y, w, h);
+
+	QFont font = painter.font();
+	QFontMetrics metrics(font);
+
+	painter.drawText(QPoint(x + 0.5 * w, y), layout.label);
+
+	painter.restore();
 }
 
 void cSpidercamScanArea::drawDollyMarker(QPainter& painter, double height)
