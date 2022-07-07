@@ -122,6 +122,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
         std::cout << std::endl;
         std::cout << "Please use the \"lidar_hostname\" command line option to select sensor." << std::endl;
 */
+        emit errorMessage("LiDAR Error", "Multiple Ouster sensors were detected on the network!");
         return false;
     }
 
@@ -148,13 +149,19 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
     mDstIpAddress = local_ip;
     mUseIpv6 = use_ipv6;
 
-
+/* BAF: Disabled for now.
     if (azimuth_min_deg.has_value() && azimuth_max_deg.has_value())
     {
+        QString msg("Setting azimuth window to ");
+        msg.append(QString::number(azimuth_min_deg.value()));
+        msg.append(" degrees to  ");
+        msg.append(QString::number(azimuth_max_deg.value()));
+        msg.append(" degrees.");
+        emit statusMessage(msg);
+
         mCmdStream.setAzimuthWindow(azimuth_min_deg.value(), azimuth_max_deg.value());
     }
-
-    mCmdStream.retrieveSensorInfo();
+*/
 
     if (mode.has_value())
     {
@@ -164,11 +171,21 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
     mCmdStream.setUdpDestAuto();
     mCmdStream.reinitialize();
 
+    emit statusMessage("Retrieving OUSTER lidar configuration parameters...");
+
     std::optional<ouster::config_param_2_t>		configParameters;
     do
     {
-        configParameters = mCmdStream.retrieveConfigParam(true);
+        try
+        {
+            configParameters = mCmdStream.retrieveConfigParam(true);
+        }
+        catch (const std::exception& e)
+        {
+        }
+
     } while (!configParameters.has_value());
+
     mConfigParameters = configParameters.value();
 
     mImuPort = mCmdStream.retrieveImuUdpPort(true);
@@ -177,9 +194,154 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
     return true;
 }
 
+bool cOusterModel_net::initialize()
+{
+    emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
+
+    //mCmdStream.enableLogging();
+
+    std::optional<ouster::sensor_info_2_t> sensorInfo;
+    do
+    {
+        try
+        {
+            sensorInfo = mCmdStream.retrieveSensorInfo();
+        }
+        catch (const std::exception& e)
+        {
+        }
+
+    } while (!sensorInfo.has_value());
+
+    mSensorInfo = sensorInfo.value();
+    emit updateSensorInfo();
+
+    mSerializer.setVersion(mSensorInfo.build_revision.major,
+        mSensorInfo.build_revision.minor);
+
+
+    std::optional<ouster::time_info_2_t> timeInfo;
+    do
+    {
+        try
+        {
+            timeInfo = mCmdStream.retrieveTimeInfo();
+        }
+        catch (const std::exception& e)
+        {
+        }
+
+    } while (!timeInfo.has_value());
+
+    mTimeInfo = timeInfo.value();
+    emit updateTimeInfo();
+
+    std::optional<ouster::beam_intrinsics_2_t> beamIntrinsics;
+    do
+    {
+        try
+        {
+            beamIntrinsics = mCmdStream.retrieveBeamIntrinsics();
+        }
+        catch (const std::exception& e)
+        {
+        }
+
+    } while (!beamIntrinsics.has_value());
+
+    mBeamIntrinsics = beamIntrinsics.value();
+    mLidarOriginToBeamOrigin_mm = mBeamIntrinsics.lidar_to_beam_origins_mm;
+
+    for (auto azimuth_deg : mBeamIntrinsics.azimuth_angles_deg)
+    {
+        mBeamAzimuthAngles_rad.push_back(-1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
+    }
+    for (auto altitude_deg : mBeamIntrinsics.altitude_angles_deg)
+    {
+        mBeamAltitudeAngles_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
+    }
+
+    emit updateBeamIntrinsics();
+
+    std::optional<ouster::imu_intrinsics_2_t>	imuIntrinsics;
+    do
+    {
+        try
+        {
+            imuIntrinsics = mCmdStream.retrieveImuIntrinsics();
+        }
+        catch (const std::exception& e)
+        {
+        }
+
+    } while (!imuIntrinsics.has_value());
+
+    mImuIntrinsics = imuIntrinsics.value();
+    emit updateImuIntrinsics();
+
+    std::optional<ouster::lidar_intrinsics_2_t> lidarIntrinsics;
+    do
+    {
+        try
+        {
+            lidarIntrinsics = mCmdStream.retrieveLidarIntrinsics();
+        }
+        catch (const std::exception& e)
+        {
+        }
+
+    } while (!lidarIntrinsics.has_value());
+
+    mLidarIntrinsics = lidarIntrinsics.value();
+    emit updateLidarIntrinsics();
+
+    std::optional<ouster::lidar_data_format_2_t> dataFormat;
+    do
+    {
+        try
+        {
+            dataFormat = mCmdStream.retrieveLidarDataFormat();
+        }
+        catch (const std::exception& e)
+        {
+        }
+
+    } while (!dataFormat.has_value());
+
+    mDataFormat = dataFormat.value();
+    cOusterLidarStream_Qt::setDataFormat(mDataFormat);
+    emit updateDataFormat();
+
+    mSerializer.setBufferCapacity(static_cast<std::size_t>(mDataFormat.pixels_per_column) *
+        static_cast<std::size_t>(mDataFormat.columns_per_frame) *
+        sizeof(ouster::lidar_data_block_t) + 32);
+
+    std::optional<ouster::azimuth_range_t> azimuthWindow;
+    do
+    {
+        try
+        {
+            azimuthWindow = mCmdStream.retrieveAzimuthWindow(true);
+        }
+        catch (const std::exception& e)
+        {
+        }
+
+    } while (!azimuthWindow.has_value());
+
+    mAzimuthWindow = azimuthWindow.value();
+    emit updateAzimuthWindow();
+
+    uint32_t min = minEncoderCount();
+    uint32_t max = maxEncoderCount();
+
+    emit updateEncoderCount(min, max);
+
+    return true;
+}
+
 bool cOusterModel_net::startCommunications()
 {
-
     emit statusMessage("Trying to establishing IMU connection...");
 
     if (!cOusterImuStream_Qt::startCommunications(mDstIpAddress, mImuPort, mUseIpv6))
@@ -196,99 +358,12 @@ bool cOusterModel_net::startCommunications()
         return false;
     }
 
-    emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
-
-    std::optional<ouster::sensor_info_2_t> sensorInfo;
-    do
-    {
-        sensorInfo = mCmdStream.retrieveSensorInfo();
-    } while (!sensorInfo.has_value());
-    mSensorInfo = sensorInfo.value();
-//    emit updateSensorInfo(mSensorInfo);
-    emit updateSensorInfo();
-
-    mSerializer.setVersion(mSensorInfo.build_revision.major,
-        mSensorInfo.build_revision.minor);
-
-
-    std::optional<ouster::time_info_2_t> timeInfo;
-    do
-    {
-        timeInfo = mCmdStream.retrieveTimeInfo();
-    } while (!timeInfo.has_value());
-    mTimeInfo = timeInfo.value();
-//    emit updateTimeInfo(mTimeInfo);
-    emit updateTimeInfo();
-
-    std::optional<ouster::beam_intrinsics_2_t> beamIntrinsics;
-    do
-    {
-        beamIntrinsics = mCmdStream.retrieveBeamIntrinsics();
-    } while (!beamIntrinsics.has_value());
-    mBeamIntrinsics = beamIntrinsics.value();
-
-    mLidarOriginToBeamOrigin_mm = mBeamIntrinsics.lidar_to_beam_origins_mm;
-    for (auto azimuth_deg : mBeamIntrinsics.azimuth_angles_deg)
-    {
-        mBeamAzimuthAngles_rad.push_back(-1.0 * azimuth_deg * nConstants::DEG_TO_RAD);
-    }
-    for (auto altitude_deg : mBeamIntrinsics.altitude_angles_deg)
-    {
-        mBeamAltitudeAngles_rad.push_back(altitude_deg * nConstants::DEG_TO_RAD);
-    }
-//    emit updateBeamIntrinsics(mBeamIntrinsics);
-    emit updateBeamIntrinsics();
-
-    std::optional<ouster::imu_intrinsics_2_t>	imuIntrinsics;
-    do
-    {
-        imuIntrinsics = mCmdStream.retrieveImuIntrinsics();
-    } while (!imuIntrinsics.has_value());
-    mImuIntrinsics = imuIntrinsics.value();
-//    emit updateImuIntrinsics(mImuIntrinsics);
-    emit updateImuIntrinsics();
-
-    std::optional<ouster::lidar_intrinsics_2_t> lidarIntrinsics;
-    do
-    {
-        lidarIntrinsics = mCmdStream.retrieveLidarIntrinsics();
-    } while (!lidarIntrinsics.has_value());
-    mLidarIntrinsics = lidarIntrinsics.value();
-//    emit updateLidarIntrinsics(mLidarIntrinsics);
-    emit updateLidarIntrinsics();
-
-    std::optional<ouster::lidar_data_format_2_t> dataFormat;
-    do
-    {
-        dataFormat = mCmdStream.retrieveLidarDataFormat();
-    } while (!dataFormat.has_value());
-    mDataFormat = dataFormat.value();
-    cOusterLidarStream_Qt::setDataFormat(mDataFormat);
-//    emit updateDataFormat(mDataFormat);
-    emit updateDataFormat();
-
-    mSerializer.setBufferCapacity(static_cast<std::size_t>(mDataFormat.pixels_per_column) *
-        static_cast<std::size_t>(mDataFormat.columns_per_frame) *
-        sizeof(ouster::lidar_data_block_t));
-
-    std::optional<ouster::azimuth_range_t> azimuthWindow;
-    do
-    {
-        azimuthWindow = mCmdStream.retrieveAzimuthWindow(true);
-    } while (!azimuthWindow.has_value());
-    mAzimuthWindow = azimuthWindow.value();
-//    emit updateAzimuthWindow(mAzimuthWindow);
-    emit updateAzimuthWindow();
-
-    uint32_t min = minEncoderCount();
-    uint32_t max = maxEncoderCount();
-
-    emit updateEncoderCount(min, max);
-
     cOusterImuStream_Qt::clear();
     cOusterLidarStream_Qt::clear();
 
     mConnected = true;
+
+    emit statusMessage("OUSTER LiDAR is up!");
 
     return true;
 }

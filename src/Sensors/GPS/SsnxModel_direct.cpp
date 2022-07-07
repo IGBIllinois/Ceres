@@ -23,6 +23,8 @@ cSsnxModel_direct::~cSsnxModel_direct()
 
 bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
 {
+    emit statusMessage("Connecting to SSNX GPS receiver...");
+
     try
     {
         auto serial_port = jsonCfg["serial_port"];
@@ -63,11 +65,17 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
 
 bool cSsnxModel_direct::startCommunications()
 {
+    emit statusMessage("Trying to establishing GPS connection...");
+
     if (!mSerialPort.open(QIODevice::ReadWrite))
     {
         emit errorMessage("SSNX Error", "Could not establish connection to GPS receiver!");
         return false;
     }
+
+    emit statusMessage("GPS connected!");
+
+    sendPromptRequest();
 
     return true;
 }
@@ -101,7 +109,7 @@ void cSsnxModel_direct::closeConnection()
 
 bool cSsnxModel_direct::isConnected()
 {
-    return mSerialPort.isOpen();
+    return true;    // mSerialPort.isOpen();
 }
 
 void cSsnxModel_direct::communicationError(const std::string& errorString)
@@ -112,6 +120,9 @@ void cSsnxModel_direct::communicationError(const std::string& errorString)
 
 void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDescriptor)
 {
+    QString msg = "newConnectionDescriptor: ";
+    msg += QString::fromStdString(connectionDescriptor);
+    emit statusMessage(msg);
 }
 
 void cSsnxModel_direct::newCommandReply(const std::string& reply, bool error)
@@ -124,6 +135,9 @@ void cSsnxModel_direct::newFormattedInformationBlock(const std::string& contents
 
 void cSsnxModel_direct::newAsciiDisplay(const std::string& asciiDisplay)
 {
+    QString msg = "newAsciiDisplay: ";
+    msg += QString::fromStdString(asciiDisplay);
+    emit statusMessage(msg);
 }
 
 void cSsnxModel_direct::stopReceived()
@@ -141,6 +155,8 @@ void cSsnxModel_direct::stopReceived()
     // Move all of the commands back into the active command queue.
     // The commands will be sent when the prompts are sent again.
     mAsciiCommandQueue.swap(mSavedCommandQueue);
+
+    emit statusMessage("STOP received from the GPS receiver!");
 }
 
 void cSsnxModel_direct::sentAsciiCommand(const std::string& command)
@@ -154,6 +170,8 @@ int cSsnxModel_direct::readIncomingData(std::string& data)
     if (n == 0) return 0;
 
     QByteArray buffer = mSerialPort.readAll();
+    emit statusMessage(buffer);
+
     data.append(buffer.toStdString());
 
     if (data.size() > n) n = data.size();
@@ -164,6 +182,8 @@ int cSsnxModel_direct::readIncomingData(std::string& data)
 int cSsnxModel_direct::sendOutgoingData(const std::string& data)
 {
     mSerialPort.write(QByteArray::fromStdString(data));
+
+    emit statusMessage(QString::fromStdString(data));
 
     return 0;
 }

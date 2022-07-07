@@ -22,6 +22,7 @@ public:
     virtual ~cOusterModel_net() = default;
 
     bool configure(const nlohmann::json& jsonCfg) override;
+    bool initialize() override;
 
     void writeDataHeader(cBlockDataFileWriter& file) override;
     void endDataRecording() override;
