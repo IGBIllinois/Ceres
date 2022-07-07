@@ -7,6 +7,7 @@
 // Forward Declarations
 class cBlockDataFileWriter;
 
+enum class eSensorStatus { UNKNOWN, CONFIGURED, INITIALIZED, RUNNING };
 
 /**
  * Abstract Base Class for all Sensor Based Models
@@ -32,11 +33,19 @@ public:
      */
     virtual char* descriptor() const = 0;
 
+    eSensorStatus status() const { return mStatus; };
+
     /*
      * Apply any configuration parameters to the sensor
      * model.
      */
     virtual bool configure(const nlohmann::json& jsonCfg);
+
+    /*
+     * Do any sensor initialization needed before the
+     * sensor model is moved to the data thread.
+     */
+    virtual bool initialize() { return true;  };
 
     /*
      * Write any "header" data block into the data file.
@@ -82,6 +91,8 @@ protected:
     cSensorModel(QObject* parent = nullptr);
 
 protected:
+    eSensorStatus mStatus = eSensorStatus::UNKNOWN;
+
     /**
      * A flag to signal that recording is active
      */
