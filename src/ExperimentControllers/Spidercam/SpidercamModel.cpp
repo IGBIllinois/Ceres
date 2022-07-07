@@ -1,7 +1,7 @@
 
 #include "SpidercamModel.hpp"
 #include "../../Utilities/Constants.hpp"
-#include "../../ExperimentTypes.hpp"
+#include "../ExperimentTypes.hpp"
 
 namespace
 {
@@ -144,7 +144,7 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage(msg);
 
-    if (!mController.try_to_connect(c2_ip, port))
+    if (!mController.try_to_connect(c2_ip, port, c3_ip))
     {
         emit errorMessage("Spidercam Error", "Could not establish required command connection to Spidercam C2 computer!");
 

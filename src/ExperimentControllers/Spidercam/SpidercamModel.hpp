@@ -6,7 +6,7 @@
 #include "SpidercamCtrl.hpp"
 #include "SpidercamUtils.hpp"
 #include "SpidercamExperimentStates.hpp"
-#include "../../BlockDataFile/SpidercamSerializer.hpp"
+#include "SpidercamSerializer.hpp"
 #include "../../Utilities/Timers.hpp"
 #include "../../Utilities/Utilities.hpp"
 
