@@ -87,7 +87,6 @@ void cDataThread::run()
             return;
 
         updateAll();
-
     }
 
 cleanup:
