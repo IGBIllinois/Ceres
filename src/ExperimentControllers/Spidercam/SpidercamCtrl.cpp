@@ -38,8 +38,14 @@ bool cSpidercamController::isConnected() const
 }
 
 
-bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t port, bool use_ipv6)
+bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t port,
+                                            std::string_view local_ip, bool use_ipv6)
 {
+    if (!local_ip.empty())
+    {
+        mLocalEndpoint = QHostAddress(std::string(local_ip).c_str());
+    }
+
     QHostInfo info = QHostInfo::fromName(QString(hostname.data()));
     if (info.error() != QHostInfo::NoError)
     {
@@ -92,6 +98,11 @@ bool cSpidercamController::startCommunications()
     if (mpSocket) return true;
 
     mpSocket = new QTcpSocket();
+
+    if (!mLocalEndpoint.isNull())
+    {
+        mpSocket->bind(mLocalEndpoint);
+    }
 
     mpSocket->connectToHost(mRemoteEndpoint, mPort);
 

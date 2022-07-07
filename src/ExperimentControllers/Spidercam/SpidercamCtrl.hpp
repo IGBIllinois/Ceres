@@ -20,7 +20,7 @@ public:
 
 	bool isConnected() const;
 
-	bool try_to_connect(std::string_view hostname, uint16_t port, bool use_ipv6 = false);
+	bool try_to_connect(std::string_view hostname, uint16_t port, std::string_view local_ip, bool use_ipv6 = false);
 
 	bool startCommunications();
 	void stopCommunications();
@@ -36,10 +36,10 @@ private:
 
 	const size_t MAX_REPLY_LENGTH = 16 * 1024;
 
+	QHostAddress mLocalEndpoint;
 	QHostAddress mRemoteEndpoint;
 	uint16_t mPort;
 
 	QTcpSocket* mpSocket;
-//	QTcpSocket mSocket;
 	QByteArray mReplyBuffer;
 };
