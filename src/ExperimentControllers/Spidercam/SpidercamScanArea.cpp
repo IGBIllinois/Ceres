@@ -130,9 +130,7 @@ void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
 		{
 			experimentLayout_t expLayout;
 
-			std::string label = layout["label"];
-			expLayout.label = QString::fromStdString(label);
-
+			// bounding box information
 			auto color = layout["color"];
 			int r = color["red"];
 			int g = color["green"];
@@ -149,6 +147,68 @@ void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
 			expLayout.y_mm = west_m * nConstants::M_TO_MM;
 			expLayout.height_mm = (east_m - west_m) * nConstants::M_TO_MM;
 			expLayout.width_mm = (south_m - north_m) * nConstants::M_TO_MM;
+
+			// caption information
+			auto caption = layout["caption"];
+
+			std::string label = caption["label"];
+			expLayout.caption.label = QString::fromStdString(label);
+
+			if (caption.contains("color"))
+			{
+				auto color = caption["color"];
+				int r = color["red"];
+				int g = color["green"];
+				int b = color["blue"];
+				int a = color["alpha"];
+				expLayout.caption.color = QColor(r, g, b, a);
+			}
+			else
+				expLayout.caption.color = expLayout.color;
+
+			if (caption.contains("font size"))
+				expLayout.caption.font_size = caption["font size"];
+			else
+				expLayout.caption.font_size = 0;
+
+			std::string align = caption["horizontal align"];
+			if (align == "left")
+				expLayout.caption.horizontal_align = eHorizontalAlignment::LEFT;
+			else if (align == "center")
+				expLayout.caption.horizontal_align = eHorizontalAlignment::CENTER;
+			else if (align == "right")
+				expLayout.caption.horizontal_align = eHorizontalAlignment::RIGHT;
+			else
+			{
+			}
+
+			align = caption["vertical align"];
+			if (align == "top")
+				expLayout.caption.vertical_align = eVerticalAlignment::TOP;
+			else if (align == "center")
+				expLayout.caption.vertical_align = eVerticalAlignment::CENTER;
+			else if (align == "bottom")
+				expLayout.caption.vertical_align = eVerticalAlignment::BOTTOM;
+			else
+			{
+			}
+
+			if (caption.contains("orientation (deg)"))
+			{
+				expLayout.caption.orientation_deg = caption["orientation (deg)"];
+
+				while (expLayout.caption.orientation_deg > 360.0f)
+				{
+					expLayout.caption.orientation_deg -= 360.0f;
+				}
+
+				while (expLayout.caption.orientation_deg < 0.0f)
+				{
+					expLayout.caption.orientation_deg = 360.0f + expLayout.caption.orientation_deg;
+				}
+			}
+			else
+				expLayout.caption.orientation_deg = 0.0f;
 
 			mLayouts.emplace_back(expLayout);
 		}
@@ -185,7 +245,7 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 
 		mX_Offset = 0.5 * (l - ideal_width) + w1Bounds.width();
 		mY_Offset = 0.0;
-		mX_Scale = ideal_width / (mMaxX - mMinX);
+		mX_Scale = window_height / (mMaxX - mMinX);
 		mY_Scale = window_height / (mMaxY - mMinY);
 
 		painter.drawRect(mX_Offset, mY_Offset, window_height, window_height);
@@ -246,10 +306,66 @@ void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const expe
 
 	painter.drawRect(x, y, w, h);
 
+	if (layout.caption.color != layout.color)
+		painter.setPen(QPen(layout.caption.color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
 	QFont font = painter.font();
 	QFontMetrics metrics(font);
 
-	painter.drawText(QPoint(x + 0.5 * w, y), layout.label);
+	QPoint textPoint = { 0,0 };
+
+	auto textBounds = metrics.tightBoundingRect(layout.caption.label);
+
+	int alignFlags = 0;
+
+	switch (layout.caption.horizontal_align)
+	{
+		case eHorizontalAlignment::LEFT:
+		{
+			textPoint.setX(x - textBounds.width() - 3);
+			break;
+		}
+		case eHorizontalAlignment::CENTER:
+		{
+			textPoint.setX(x + 0.5 * (w - textBounds.width()));
+			break;
+		}
+		case eHorizontalAlignment::RIGHT:
+		{
+			textPoint.setX(x + w + 3);
+			break;
+		}
+	}
+
+	switch (layout.caption.vertical_align)
+	{
+		case eVerticalAlignment::TOP:
+		{
+			textPoint.setY(y - 3);
+			break;
+		}
+		case eVerticalAlignment::CENTER:
+		{
+			textPoint.setY(y + 0.5 * (h - textBounds.height()));
+			break;
+		}
+		case eVerticalAlignment::BOTTOM:
+		{
+			textPoint.setY(y + h + textBounds.height() + 3);
+			break;
+		}
+	}
+
+	if (layout.caption.orientation_deg != 0.0f)
+	{
+		painter.translate(textPoint);
+		painter.rotate(layout.caption.orientation_deg);
+		painter.drawText(QPoint(0,0), layout.caption.label);
+	}
+	else
+	{
+		painter.drawText(textPoint, layout.caption.label);
+	}
 
 	painter.restore();
 }

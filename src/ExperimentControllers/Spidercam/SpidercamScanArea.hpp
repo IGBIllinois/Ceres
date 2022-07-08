@@ -68,10 +68,24 @@ private:
     path_t* mpActivePath;
 
 private:
-    struct experimentLayout_t
+    enum class eHorizontalAlignment { LEFT, CENTER, RIGHT };
+    enum class eVerticalAlignment { TOP, CENTER, BOTTOM };
+
+    struct captionLayout_t
     {
         QColor  color;
         QString label;
+        uint8_t font_size;
+        eHorizontalAlignment horizontal_align;
+        eVerticalAlignment   vertical_align;
+        float orientation_deg;
+    };
+
+    struct experimentLayout_t
+    {
+        captionLayout_t caption;
+
+        QColor  color;
         uint32_t x_mm;
         uint32_t y_mm;
         uint32_t height_mm;
