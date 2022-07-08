@@ -1,0 +1,196 @@
+
+// We are using Protobuf syntax version three.
+
+syntax = "proto3";
+
+// A Timestamp represents a point in time independent of any time zone or local
+// calendar, encoded as a count of seconds and fractions of seconds at
+// nanosecond resolution. The count is relative to an epoch at UTC midnight on
+// January 1, 1970, in the proleptic Gregorian calendar which extends the
+// Gregorian calendar backwards to year one.
+//
+//import "google/protobuf/timestamp.proto";
+
+/******************************************************************************
+ * Position, Velocity and Time (PVT) Packets
+ *****************************************************************************/
+
+enum eGpsSolutionType {
+	eGpsSolutionType_NONE = 0;
+	eGpsSolutionType_STAND_ALONE = 1;
+	eGpsSolutionType_DIFFERENTIAL = 2;
+	eGpsSolutionType_FIXED = 3;
+	eGpsSolutionType_RTK_FIXED = 4;
+	eGpsSolutionType_RTK_FLOAT = 5;
+	eGpsSolutionType_SBAS = 6;
+	eGpsSolutionType_MOVING_RTK_FIXED = 7;
+	eGpsSolutionType_MOVING_RTK_FLOAT = 8;
+	eGpsSolutionType_PPP = 9;
+}
+
+enum eTimeSystem {
+	eTimeSystem_GPS = 0;
+	eTimeSystem_GALILEO = 1;
+	eTimeSystem_GLONASS = 2;
+	eTimeSystem_BEIDOU = 3;
+}
+
+enum eDatum {
+	eDatum_WGS84 = 0;
+	eDatum_DGNSS = 1;
+	eDatum_ETRS89 = 2;
+	eDatum_NAD83 = 3;
+	eDatum_NAD83_PA11 = 4;
+	eDatum_NAD83_MA11 = 5;
+	eDatum_GDA94 = 6;
+	eDatum_FIRST_USER_DATUM = 7;
+	eDatum_SECOND_USER_DATUM = 8;
+}
+
+enum ePPP_LastSeed {
+	ePPP_LastSeed_NONE = 0;
+	ePPP_LastSeed_MANUAL = 1;
+	ePPP_LastSeed_DGPS = 2;
+	ePPP_LastSeed_RTK_FIXED = 3;
+}
+
+
+message ReceiverHeader 
+{
+	bool   dataValid = 1;
+	double gps_timestamp_s = 2;
+}
+
+message GeodeticPVT_2
+{
+	ReceiverHeader	rcv_info = 1;
+
+	eGpsSolutionType  SolutionType = 3;
+	bool		   HeightComputed = 4;
+	uint32         Error = 5;
+	double	       Lat_rad = 6;
+	double		   Lon_rad = 7;
+	double		   Height_m = 8;
+	float          Undulation_m = 9;
+	float          Vn_mps = 10;
+	float          Ve_mps = 11;
+	float          Vu_mps = 12;
+	float          GroundTrack_deg = 13;
+	double		   RxClkBias_ms = 14;
+	float          RxClkDrift_ppm = 15;
+	eTimeSystem    TimeSystem = 16;
+	eDatum         Datum = 17;
+	uint32         NrSV = 18;
+	bool		   SatClockCorrectionUsed = 19;
+	bool		   RangeCorrectionUsed = 20;
+	bool		   IonosphericInfoUsed = 21;
+	bool		   OrbitAccuracyInfoUsed = 22;
+	bool		   PrecisionApproachModeActive = 23;
+	uint32         ReferenceId = 24;
+	float          MeanCorrAge_s = 25;
+	fixed32        SignalInfo = 26;
+	uint32         AlertFlag = 27;
+
+	// Revision 1 and 2 fields
+	optional uint32 		NrBases = 28;
+	optional float 			AgeOfLastSeed_s = 29;
+	optional ePPP_LastSeed 	LastSeedType = 30;
+
+	// Revision 2 fields
+	optional float 		Latency_s = 31;
+	optional float 		HorzAccuracy_m = 32;
+	optional float 		VertAccuracy_m = 33;
+}
+
+message CovMatrix_1
+{
+	ReceiverHeader	rcv_info = 1;
+
+	eGpsSolutionType  SolutionType = 3;
+	bool		    HeightComputed = 4;
+	uint32         Error = 5;
+	double	       R1C1 = 6;
+	double	       R2C2 = 7;
+	double	       R3C3 = 8;
+	double	       R4C4 = 9;
+	double	       R1C2 = 10;
+	double	       R1C3 = 11;
+	double	       R1C4 = 12;
+	double	       R2C3 = 13;
+	double	       R2C4 = 14;
+	double	       R3C4 = 15;
+}
+
+message ProjectedPOS_1
+{
+	ReceiverHeader	rcv_info = 1;
+
+	eGpsSolutionType  SolutionType = 3;
+	bool		    HeightComputed = 4;
+	uint32         Error = 5;
+	double	       Northing_m = 6;
+	double		   Easting_m = 7;
+	double		   Altitude_m = 8;
+	uint32         Datum = 9;
+}
+
+/******************************************************************************
+ * Receiver Time Packet
+ *****************************************************************************/
+
+message ReceiverTime_1 
+{
+	ReceiverHeader	rcv_info = 1;
+
+	uint32      utcYear = 3;
+	uint32      utcMonth = 4;
+	uint32      utcDay = 5;
+	uint32      utcHour = 6;
+	uint32      utcMinute = 7;
+	uint32      utcSecond = 8;
+	uint32      deltaLS = 9;
+	bool		weekNumberValid = 10;
+	bool		timeOfWeekWithin20ms = 11;
+	bool		timeOfWeekWithinThreshold = 12;
+	bool		timeFromPTTI = 13;
+	bool		timeFromNTP = 14;
+}
+
+/******************************************************************************
+ * Differential Correction Packet
+ *****************************************************************************/
+
+enum eHeightType {
+	eHeightType_GEOMETRIC = 0;
+	eHeightType_PHYSICAL_TARGET_CRS = 1;
+	eHeightType_PHYSICAL_SOURCE_CRS = 2;
+}
+
+enum eQualityIndicator {
+	eQualityIndicator_UNKNOWN = 0;
+	eQualityIndicator_BETTER_THAN_21_MM = 1;
+	eQualityIndicator_BETWEEN_21_MM_AND_50_MM = 2;
+	eQualityIndicator_BETWEEN_51_MM_AND_200_MM = 3;
+	eQualityIndicator_BETWEEN_201_MM_AND_500_MM = 4;
+	eQualityIndicator_BETWEEN_501_MM_AND_2000_MM = 5;
+	eQualityIndicator_BETWEEN_2001_MM_AND_5000_MM = 6;
+	eQualityIndicator_WORSE_THAN_5001_MM = 7;
+	eQualityIndicator_BETWEEN_0_MM_AND_10_MM = 8;
+	eQualityIndicator_BETWEEN_11_MM_AND_20_MM = 9;
+	eQualityIndicator_BETWEEN_51_MM_AND_100_MM = 10;
+	eQualityIndicator_BETWEEN_101_MM_AND_200_MM = 11;
+	eQualityIndicator_WORSE_THAN_501_MM = 12;
+}
+
+	/* RTCM Datum */
+message RTCM_Datum_1
+{
+	ReceiverHeader	rcv_info = 1;
+
+	string			   sourceCRS = 3;
+	string			   targetCRS = 4;
+	uint32			   datum = 5;
+	eHeightType		   heightType = 6;
+	eQualityIndicator  horizontalQualityInd = 7;
+	eQualityIndicator  verticalQualityInd = 8;
+}

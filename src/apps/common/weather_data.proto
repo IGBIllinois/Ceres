@@ -1,0 +1,21 @@
+
+// We are using Protobuf syntax version three.
+
+syntax = "proto3";
+
+// A Timestamp represents a point in time independent of any time zone or local
+// calendar, encoded as a count of seconds and fractions of seconds at
+// nanosecond resolution. The count is relative to an epoch at UTC midnight on
+// January 1, 1970, in the proleptic Gregorian calendar which extends the
+// Gregorian calendar backwards to year one.
+//
+//import "google/protobuf/timestamp.proto";
+
+
+message WeatherData_1 
+{
+	bool  dataValid = 1;
+	float wind_speed_mph = 2;
+	float wind_direction_deg = 3;
+}
+
