@@ -6,7 +6,7 @@
 #include <ouster/ouster_utils.h>
 #include <ouster/OusterLidarData.h>
 
-#include <cassert>
+#include <stdexcept>
 
 using namespace ouster;
 
@@ -92,8 +92,8 @@ void cOusterParser::processData(BLOCK_MAJOR_VERSION_t major_version,
                                 BLOCK_DATA_ID_t data_id,
                                 cDataBuffer& buffer)
 {
-    mMajorVersion = major_version;
-    mMinorVersion = minor_version;
+    mBlockID.setVersion(major_version, minor_version);
+    mBlockID.dataID(static_cast<ouster::DataID>(data_id));
 
     switch (static_cast<ouster::DataID>(data_id))
     {
@@ -177,6 +177,9 @@ void cOusterParser::processConfigParam_2(cDataBuffer& buffer)
     buffer >> mConfigParams.azimuth_window.max_deg;
     buffer >> mConfigParams.phase_lock_enable;
     buffer >> mConfigParams.phase_lock_offset_deg;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processConfigParam_2.");
 }
 
 void cOusterParser::processSensorInfo_2(cDataBuffer& buffer)
@@ -194,6 +197,9 @@ void cOusterParser::processSensorInfo_2(cDataBuffer& buffer)
     buffer >> mSensorInfo.build_date;
 
     mSensorInfo.status = to_sensor_status(buffer);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processSensorInfo_2.");
 }
 
 void cOusterParser::processTimestamp_2(cDataBuffer& buffer)
@@ -206,6 +212,8 @@ void cOusterParser::processTimestamp_2(cDataBuffer& buffer)
     buffer >> mTimestamp.internal_osc;
     buffer >> mTimestamp.ptp_1588;
 
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processTimestamp_2.");
 }
 
 void cOusterParser::processSyncPulseIn_2(cDataBuffer& buffer)
@@ -216,6 +224,9 @@ void cOusterParser::processSyncPulseIn_2(cDataBuffer& buffer)
     buffer >> mSyncPulseIn.count;
 
     mSyncPulseIn.polarity = to_polarity(buffer);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processSyncPulseIn_2.");
 }
 
 void cOusterParser::processSyncPulseOut_2(cDataBuffer& buffer)
@@ -225,6 +236,9 @@ void cOusterParser::processSyncPulseOut_2(cDataBuffer& buffer)
     buffer >> mSyncPulseOut.frequency_hz;
 
     mSyncPulseOut.polarity = to_polarity(buffer);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processSyncPulseOut_2.");
 }
 
 void cOusterParser::processMultipurposeIO_2(cDataBuffer& buffer)
@@ -236,6 +250,9 @@ void cOusterParser::processMultipurposeIO_2(cDataBuffer& buffer)
     buffer >> mMultipurposeIo.frequency_hz;
 
     mMultipurposeIo.polarity = to_polarity(buffer);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processMultipurposeIO_2.");
 }
 
 void cOusterParser::processNmea_2(cDataBuffer& buffer)
@@ -253,17 +270,14 @@ void cOusterParser::processNmea_2(cDataBuffer& buffer)
     buffer >> mNmea.leap_seconds;
     buffer >> mNmea.ignore_valid_char;
     mNmea.polarity = to_polarity(buffer);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processNmea_2.");
 }
 
 void cOusterParser::processTimeInfo_2(cDataBuffer& buffer)
 {
-/*
-    buffer >> mTimeInfo.timestamp_info;
-    buffer >> mTimeInfo.sync_pulse_info;
-    buffer >> mTimeInfo.multipurpose_io_info;
-    buffer >> mTimeInfo.nmea_info;
-*/
-/* Timestamp Info */
+    /* Timestamp Info */
     buffer >> mTimeInfo.timestamp_info.time;
     mTimeInfo.timestamp_info.mode = to_timestamp_mode(buffer);
     buffer >> mTimeInfo.timestamp_info.sync_pulse_in;
@@ -298,6 +312,9 @@ void cOusterParser::processTimeInfo_2(cDataBuffer& buffer)
     buffer >> mTimeInfo.nmea_info.leap_seconds;
     buffer >> mTimeInfo.nmea_info.ignore_valid_char;
     mTimeInfo.nmea_info.polarity = to_polarity(buffer);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processTimeInfo_2.");
 }
 
 void cOusterParser::processBeamIntrinsics_2(cDataBuffer& buffer)
@@ -316,6 +333,9 @@ void cOusterParser::processBeamIntrinsics_2(cDataBuffer& buffer)
     mBeamIntrinsics.altitude_angles_deg.resize(n);
     for (std::size_t i = 0; i < n; ++i)
         buffer >> mBeamIntrinsics.altitude_angles_deg[i];
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processBeamIntrinsics_2.");
 }
 
 void cOusterParser::processImuIntrinsics_2(cDataBuffer& buffer)
@@ -325,6 +345,9 @@ void cOusterParser::processImuIntrinsics_2(cDataBuffer& buffer)
     mImuIntrinsics.imu_to_sensor_transform.resize(n);
     for (std::size_t i = 0; i < n; ++i)
         buffer >> mImuIntrinsics.imu_to_sensor_transform[i];
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processImuIntrinsics_2.");
 }
 
 void cOusterParser::processLidarIntrinsics_2(cDataBuffer& buffer)
@@ -334,6 +357,9 @@ void cOusterParser::processLidarIntrinsics_2(cDataBuffer& buffer)
     mLidarIntrinsics.lidar_to_sensor_transform.resize(n);
     for (std::size_t i = 0; i < n; ++i)
         buffer >> mLidarIntrinsics.lidar_to_sensor_transform[i];
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarIntrinsics_2.");
 }
 
 void cOusterParser::processLidarDataFormat_2(cDataBuffer& buffer)
@@ -350,6 +376,15 @@ void cOusterParser::processLidarDataFormat_2(cDataBuffer& buffer)
     buffer >> mLidarDataFormat.pixels_per_column;
     buffer >> mLidarDataFormat.column_window_min;
     buffer >> mLidarDataFormat.column_window_max;
+
+    if (mBlockID.minorVersion() == 3)
+    {
+        buffer >> mLidarDataFormat.udp_profile_lidar;
+        buffer >> mLidarDataFormat.udp_profile_imu;
+    }
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarDataFormat_2.");
 }
 
 void cOusterParser::processImuData(cDataBuffer& buffer)
@@ -365,6 +400,9 @@ void cOusterParser::processImuData(cDataBuffer& buffer)
     buffer >> mImuData.angular_velocity_Xaxis_deg_per_sec;
     buffer >> mImuData.angular_velocity_Yaxis_deg_per_sec;
     buffer >> mImuData.angular_velocity_Zaxis_deg_per_sec;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processImuData.");
 }
 
 void cOusterParser::processLidarData(cDataBuffer& buffer)
@@ -390,6 +428,9 @@ void cOusterParser::processLidarData(cDataBuffer& buffer)
             mLidarData.channel(col, chn, pixel);
         }
     }
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarData.");
 }
 
 void cOusterParser::processLidarDataFrameTimestamp(cDataBuffer& buffer)

@@ -26,6 +26,9 @@ void cSsnxParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     BLOCK_DATA_ID_t data_id,
     cDataBuffer& buffer)
 {
+    blockID().setVersion(major_version, minor_version);
+    blockID().dataID(data_id);
+
     switch (static_cast<ssnx::DataID>(data_id))
     {
     }

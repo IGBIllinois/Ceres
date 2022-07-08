@@ -59,12 +59,7 @@ public:
 	virtual void processLidarData(cDataBuffer& buffer);
 	virtual void processLidarDataFrameTimestamp(cDataBuffer& buffer);
 
-private:
-	cOusterLidarID    mBlockID;
-
-	BLOCK_MAJOR_VERSION_t mMajorVersion;
-	BLOCK_MINOR_VERSION_t mMinorVersion;
-
+protected:
 	ouster::config_param_2_t		mConfigParams;
 	ouster::sensor_info_2_t			mSensorInfo;
 	ouster::timestamp_2_t			mTimestamp;
@@ -79,5 +74,8 @@ private:
 	ouster::lidar_data_format_2_t	mLidarDataFormat;
 	ouster::imu_data_t				mImuData;
 	cOusterLidarData				mLidarData;
+
+private:
+	cOusterLidarID    mBlockID;
 };
 

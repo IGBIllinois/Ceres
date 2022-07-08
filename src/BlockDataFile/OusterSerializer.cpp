@@ -8,6 +8,7 @@
 #include <ouster/OusterLidarData.h>
 
 #include <cassert>
+#include <stdexcept>
 
 using namespace ouster;
 
@@ -57,6 +58,11 @@ void cOusterSerializer::write(const ouster::config_param_2_t& in)
     mDataBuffer << in.phase_lock_enable;
     mDataBuffer << in.phase_lock_offset_deg;
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing config_param_2_t data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -78,6 +84,11 @@ void cOusterSerializer::write(const ouster::sensor_info_2_t& in)
     mDataBuffer << in.build_date;
     mDataBuffer << to_int(in.status);
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing sensor_info_2_t data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -93,6 +104,11 @@ void cOusterSerializer::write(const ouster::timestamp_2_t& in)
     mDataBuffer << in.sync_pulse_in;
     mDataBuffer << in.internal_osc;
     mDataBuffer << in.ptp_1588;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing timestamp_2_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -110,6 +126,11 @@ void cOusterSerializer::write(const ouster::sync_pulse_in_2_t& in)
     mDataBuffer << in.count;
     mDataBuffer << to_int(in.polarity);
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing sync_pulse_in_2_t data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -124,6 +145,11 @@ void cOusterSerializer::write(const ouster::sync_pulse_out_2_t& in)
     mDataBuffer << in.angle_deg;
     mDataBuffer << in.frequency_hz;
     mDataBuffer << to_int(in.polarity);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing sync_pulse_out_2_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -140,6 +166,11 @@ void cOusterSerializer::write(const ouster::multipurpose_io_2_t& in)
     mDataBuffer << in.angle_deg;
     mDataBuffer << in.frequency_hz;
     mDataBuffer << to_int(in.polarity);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing multipurpose_io_2_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -164,6 +195,11 @@ void cOusterSerializer::write(const ouster::nmea_2_t& in)
     mDataBuffer << in.leap_seconds;
     mDataBuffer << in.ignore_valid_char;
     mDataBuffer << to_int(in.polarity);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing nmea_2_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -211,6 +247,11 @@ void cOusterSerializer::write(const ouster::time_info_2_t& in)
     mDataBuffer << in.nmea_info.ignore_valid_char;
     mDataBuffer << to_int(in.nmea_info.polarity);
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing time_info_2_t data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -233,6 +274,11 @@ void cOusterSerializer::write(const ouster::beam_intrinsics_2_t& in)
     for (std::size_t i = 0; i < n; ++i)
         mDataBuffer << in.altitude_angles_deg[i];
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing beam_intrinsics_2_t data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -249,6 +295,11 @@ void cOusterSerializer::write(const ouster::imu_intrinsics_2_t& in)
     for (std::size_t i = 0; i < n; ++i)
         mDataBuffer << in.imu_to_sensor_transform[i];
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing imu_intrinsics_2_t data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -264,6 +315,11 @@ void cOusterSerializer::write(const ouster::lidar_intrinsics_2_t& in)
     mDataBuffer << n;
     for (std::size_t i = 0; i < n; ++i)
         mDataBuffer << in.lidar_to_sensor_transform[i];
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing lidar_intrinsics_2_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -287,6 +343,17 @@ void cOusterSerializer::write(const ouster::lidar_data_format_2_t& in)
     mDataBuffer << in.column_window_min;
     mDataBuffer << in.column_window_max;
 
+    if (mBlockID.minorVersion() == 3)
+    {
+        mDataBuffer << in.udp_profile_lidar;
+        mDataBuffer << in.udp_profile_imu;
+    }
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing lidar_data_format_2_t data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -308,6 +375,11 @@ void cOusterSerializer::write(const ouster::imu_data_t& in)
     mDataBuffer << in.angular_velocity_Xaxis_deg_per_sec;
     mDataBuffer << in.angular_velocity_Yaxis_deg_per_sec;
     mDataBuffer << in.angular_velocity_Zaxis_deg_per_sec;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing imu_data_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -344,6 +416,11 @@ void cOusterSerializer::write(uint16_t frameID, const cOusterLidarData& lidar_da
             mDataBuffer << pixel.ambient_noise;
         }
     }
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing cOusterLidarData data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }

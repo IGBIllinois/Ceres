@@ -445,10 +445,37 @@ cDataBuffer& cDataBuffer::operator>>(double& out)
 
 cDataBuffer& cDataBuffer::operator>>(std::string& out)
 {
-	uint16_t len = 0;
-	operator>>(len);
-	read(out, len);
+	read(out);
 	return *this;
+}
+
+void cDataBuffer::read(std::string& out)
+{
+	uint16_t len = 0;
+	mReadIndex += ::read(len, rdbuf(), wrtbuf(), mUnderrun);
+
+	if (mUnderrun)
+		return;
+
+	// Check to make sure we have enough buffer space to put this variable into
+	// our internal storage.
+	if ((mReadIndex >= mWriteIndex) || (read_size() < len))
+	{
+		mUnderrun = true;
+		return;
+	}
+
+	out.clear();
+
+	if (len > 0)
+	{
+		out.resize(len);
+
+		// copy the string from the buffer
+		out.assign(reinterpret_cast<char*>(&mpBuffer[mReadIndex]), len);
+	}
+
+	mReadIndex += len;
 }
 
 void cDataBuffer::read(std::string& out, uint16_t len)
@@ -601,23 +628,24 @@ cDataBuffer& cDataBuffer::operator<<(const std::string& in)
 
 void cDataBuffer::write(const std::string& in)
 {
-	if (in.empty())
-	{
-		return;
-	}
-
 	uint16_t len = in.length();
 
 	// Check to make sure we have enough buffer space to put this variable into
 	// our internal storage.
-	if (write_size() < len)
+	if (write_size() < (len + sizeof(len)))
 	{
 		mOverrun = true;
 		return;
 	}
 
-	// put the string into the buffer
-	memcpy(&mpBuffer[mWriteIndex], in.data(), len);
+	// put the string length into the data buffer
+	mWriteIndex += ::write(len, wrtbuf(), end(), mOverrun);
+
+	if (len > 0)
+	{
+		// put the string into the buffer
+		memcpy(&mpBuffer[mWriteIndex], in.data(), len);
+	}
 
 	mWriteIndex += len;
 }
