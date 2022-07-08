@@ -29,6 +29,7 @@ cCtrlDataModelRemote::~cCtrlDataModelRemote()
 
     if (mSocket.isOpen())
     {
+        mConnected = false;
         mSocket.disconnectFromHost();
         mSocket.close();
     }
@@ -44,10 +45,13 @@ void cCtrlDataModelRemote::connected()
 
 void cCtrlDataModelRemote::disconnected()
 {
+    if (mConnected)
+    {
+        QString msg = "Connection to the C4 has been lost!";
+        emit errorMessage("Connection Lost", msg);
+    }
+
     mConnected = false;
-    
-    QString msg = "Connection to the C4 has been lost!";
-    emit errorMessage("Connection Lost", msg);
 }
 
 void cCtrlDataModelRemote::errorOccurred(QAbstractSocket::SocketError socketError)
@@ -66,7 +70,6 @@ void cCtrlDataModelRemote::hostFound()
 
 void cCtrlDataModelRemote::stateChanged(QAbstractSocket::SocketState socketState)
 {
-
 }
 
 bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port, 

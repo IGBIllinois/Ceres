@@ -58,7 +58,7 @@ private:
     void createStatusBar();
     void createSensorModelsAndViews(const nlohmann::json& configDoc);
 
-    void initializeServer(const nlohmann::json& configDoc);
+    bool initializeServer(const nlohmann::json& configDoc);
 
     cCeresSplashScreen* mpSplashScreen;
 

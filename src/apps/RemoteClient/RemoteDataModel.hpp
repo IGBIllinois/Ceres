@@ -28,6 +28,8 @@ public:
     explicit cRemoteDataModel(QObject* parent = nullptr);
     virtual ~cRemoteDataModel();
 
+    bool startTcpServer(const std::string& ip, uint16_t port);
+
     void addSensor(cSensorModel* pSensor) override;
 
     void startDataThread() override;
@@ -35,6 +37,10 @@ public:
 
     bool openDataFile(const QString& fileName) override;
     void closeDataFile() override;
+
+private slots:
+    void acceptError(QAbstractSocket::SocketError socketError);
+    void newConnection();
 
 protected:
     cBlockDataFileWriter    mFile;

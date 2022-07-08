@@ -14,10 +14,21 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cRemoteDataModel::onStatusUpdate);
 
     mpTcpServer = new QTcpServer();
+
+    QObject::connect(mpTcpServer, &QTcpServer::acceptError, this, &cRemoteDataModel::acceptError);
+    QObject::connect(mpTcpServer, &QTcpServer::newConnection, this, &cRemoteDataModel::newConnection);
 }
 
 cRemoteDataModel::~cRemoteDataModel()
 {
+    mpTcpServer->close();
+}
+
+bool cRemoteDataModel::startTcpServer(const std::string& ip, uint16_t port)
+{
+    QHostAddress local_endpoint(ip.c_str());
+
+    return mpTcpServer->listen(local_endpoint, port);
 }
 
 void cRemoteDataModel::addSensor(cSensorModel* pSensor)
@@ -80,5 +91,21 @@ void cRemoteDataModel::closeDataFile()
     mSerializer.endTime(time(nullptr));
     mSerializer.detach();
     mFile.close();
+}
+
+void cRemoteDataModel::acceptError(QAbstractSocket::SocketError socketError)
+{
+
+}
+
+void cRemoteDataModel::newConnection()
+{
+    QTcpSocket* client = mpTcpServer->nextPendingConnection();
+
+    if (client)
+    {
+        emit statusMessage("Connected to client.");
+        mConnections.push_back(client);
+    }
 }
 

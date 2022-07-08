@@ -188,7 +188,13 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
         createSensorModelsAndViews(configDoc);
 
         onStatusUpdate("Initializing TCP server...");
-        //initializeServer(configDoc);
+        if (!initializeServer(configDoc))
+        {
+            QMessageBox mb(QMessageBox::Critical, "TCP Server Error", "Could not start the TCP server!");
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
     }
     catch (const std::exception& e)
     {
@@ -202,7 +208,6 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
         exit(EXIT_FAILURE);
     }
-
 
     mpSplashScreen = nullptr;
 
@@ -332,7 +337,11 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
 }
 
 //-----------------------------------------------------------------------------
-void cRemoteClientWindow::initializeServer(const nlohmann::json& configDoc)
+bool cRemoteClientWindow::initializeServer(const nlohmann::json& configDoc)
 {
-    //mMainModel;
+    auto serverInfo = configDoc["server"];
+    std::string ip = serverInfo["ip"];
+    uint16_t port = serverInfo["port"];
+
+    return mMainModel.startTcpServer(ip, port);
 }

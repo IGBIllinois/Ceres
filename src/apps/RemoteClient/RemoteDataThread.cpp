@@ -20,9 +20,6 @@ bool cRemoteDataThread::startCommunications()
         return false;
     }
 
-//    msg = "Data thread is running...";
-//    emit statusMessage(msg);
-
     return true;
 }
 
