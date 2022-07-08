@@ -107,12 +107,8 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Find all the packages needed by this code
 
-#find_package(Eigen3 REQUIRED)
+find_package(Catch2 QUIET)
 
-# Find and include VTK
-
-#find_package(VTK COMPONENTS GUISupportQt IOImage InteractionImage RenderingOpenGL2 TestingCore REQUIRED)
-#find_package(PCL REQUIRED)
 
 # Find and include Qt
 set(Qt Qt5)
@@ -176,7 +172,11 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
 #******************************************************************************
 # TESTING
 #******************************************************************************
+if (Catch2_FOUND)
+  ENABLE_TESTING()
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/tests)
+else()
+  message(WARNING "The Catch2 testing library is missing.  Can not create tests!")
+endif()
 
-#ENABLE_TESTING()
-#add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/test)
 
