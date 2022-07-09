@@ -228,23 +228,18 @@ void cSsnxModel_direct::pvtGeodetic(const gps::PVT_Geodetic_2_t& pvt)
         mLatitude_rad, mLongitude_rad, mHeight_m,
         mVn_mps, mVe_mps, mVu_mps,
         mGroundTrack_deg, mDatum);
-
-    emit statusMessage("PVT_Geodetic_2_t data received!");
 }
 
 void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 {
-    emit statusMessage("PosCovGeodetic_1_t data received!");
 }
 
 void cSsnxModel_direct::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 {
-    emit statusMessage("VelCovGeodetic_1_t data received!");
 }
 
 void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t& pvt)
 {
-    emit statusMessage("POS_Projected_1_t data received!");
 }
 
 void cSsnxModel_direct::receiverTime(const gps::ReceiverTime_1_t& pvt)
@@ -268,13 +263,10 @@ void cSsnxModel_direct::receiverTime(const gps::ReceiverTime_1_t& pvt)
     }
 
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
-
-    emit statusMessage("ReceiverTime_1_t data received!");
 }
 
 void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
 {
-    emit statusMessage("RtcmDatum_1_t data received!");
 }
 
 
