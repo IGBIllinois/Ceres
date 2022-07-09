@@ -24,6 +24,7 @@ public:
 	 */
 	char* descriptor() const override { return "spidercam"; };
 
+	const spidercam::sPosition& currentPosition() const;
 
     /*
      * Apply any configuration parameters to the sensor
@@ -117,4 +118,12 @@ private:
     cSpidercamController mController;
 	cSpidercamSerializer mSerializer;
 };
+
+
+inline const spidercam::sPosition& cSpidercamModel::currentPosition() const
+{
+	return mCurrentPosition;
+}
+
+
 

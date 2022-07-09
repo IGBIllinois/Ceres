@@ -22,6 +22,10 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
+    bool windDataValid() const;
+    double windSpeed_mps() const;
+    double windDirection_deg() const;
+
     /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
@@ -48,4 +52,19 @@ private:
     std::string mConfigInfo;
     cWeatherSerializer mSerializer;
 };
+
+inline bool cWeatherDataModel_Http_Wind::windDataValid() const
+{
+    return mDataValid;
+}
+
+inline double cWeatherDataModel_Http_Wind::windSpeed_mps() const
+{
+    return mWindSpeed_mps;
+}
+
+inline double cWeatherDataModel_Http_Wind::windDirection_deg() const
+{
+    return mWindDirection_deg;
+}
 
