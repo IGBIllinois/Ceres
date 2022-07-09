@@ -4,12 +4,15 @@
 #include "SensorModel.hpp"
 
 #include <QTcpServer>
+#include <QTcpSocket>
 #include <QString>
 
 cRemoteDataModel::cRemoteDataModel(QObject* parent)
     :
     cDataModel(parent),
-    mpTcpServer(nullptr)
+    mThread(this),
+    mpTcpServer(nullptr),
+    mpClient(nullptr)
 {
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cRemoteDataModel::onStatusUpdate);
 
@@ -93,19 +96,104 @@ void cRemoteDataModel::closeDataFile()
     mFile.close();
 }
 
-void cRemoteDataModel::acceptError(QAbstractSocket::SocketError socketError)
+
+void cRemoteDataModel::startExperiment()
+{
+//    mThread.mpController->writeDataHeader(mFile);
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->writeDataHeader(mFile);
+    }
+
+    mSerializer.startTime(time(nullptr));
+}
+
+void cRemoteDataModel::stopExperiment()
+{
+//    mThread.mpController->stopDataRecording();
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->endDataRecording();
+    }
+
+    closeDataFile();
+
+}
+
+void cRemoteDataModel::experimentInfo(const std::string& title, 
+    const std::string& researcher, const std::string& cultivar, const std::string& doc)
 {
 
+}
+
+
+void cRemoteDataModel::spidercamPosition(const spidercam::sPosition& pos)
+{
+    emit statusMessage("Receiving spidercam data.");
+}
+
+void cRemoteDataModel::weatherData(bool valid, double wind_speed_mps, double wind_direction_deg)
+{
+    emit statusMessage("Receiving weather data.");
+}
+
+void cRemoteDataModel::acceptError(QAbstractSocket::SocketError socketError)
+{
 }
 
 void cRemoteDataModel::newConnection()
 {
     QTcpSocket* client = mpTcpServer->nextPendingConnection();
 
+    if (mpClient)
+    {
+        client->close();
+        client->deleteLater();
+    }
+
     if (client)
     {
         emit statusMessage("Connected to client.");
-        mConnections.push_back(client);
+        mpClient = client;
+
+        QObject::connect(mpClient, &QTcpSocket::readyRead, this, &cRemoteDataModel::processNewCommand);
+        QObject::connect(mpClient, &QTcpSocket::disconnected, this, &cRemoteDataModel::clientDisconnected);
+        QObject::connect(mpClient, &QTcpSocket::errorOccurred, this, &cRemoteDataModel::clientErrorOccurred);
+        QObject::connect(mpClient, &QTcpSocket::stateChanged, this, &cRemoteDataModel::clientStateChanged);
     }
+}
+
+void cRemoteDataModel::processNewCommand()
+{
+    QByteArray buffer = mpClient->readAll();
+
+    if (buffer.isEmpty()) return;
+
+    decode(buffer.constData(), buffer.size());
+}
+
+void cRemoteDataModel::clientDisconnected()
+{
+    QObject::disconnect(mpClient, &QTcpSocket::readyRead, this, &cRemoteDataModel::processNewCommand);
+    QObject::disconnect(mpClient, &QTcpSocket::disconnected, this, &cRemoteDataModel::clientDisconnected);
+    QObject::disconnect(mpClient, &QTcpSocket::errorOccurred, this, &cRemoteDataModel::clientErrorOccurred);
+    QObject::disconnect(mpClient, &QTcpSocket::stateChanged, this, &cRemoteDataModel::clientStateChanged);
+
+    mpClient->deleteLater();
+    mpClient = nullptr;
+
+    emit statusMessage("Client is disconnected!");
+}
+
+void cRemoteDataModel::clientErrorOccurred(QAbstractSocket::SocketError socketError)
+{
+
+}
+
+void cRemoteDataModel::clientStateChanged(QAbstractSocket::SocketState socketState)
+{
+
 }
 

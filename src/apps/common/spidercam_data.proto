@@ -21,5 +21,10 @@ message Spidercam_Position_1
 	uint32 x_mm = 2;
 	uint32 y_mm = 3;
 	uint32 z_mm = 4;
+	uint32 speed_mmps = 5;
+	float  pan_deg = 6;
+	float  pitch_deg = 7;
+	float  roll_deg = 8;
+	uint64 timestamp = 9;
 }
 

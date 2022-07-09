@@ -22,6 +22,9 @@ void cWeatherParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     BLOCK_DATA_ID_t data_id,
     cDataBuffer& buffer)
 {
+    mBlockID.setVersion(major_version, minor_version);
+    mBlockID.dataID(static_cast<weather::DataID>(data_id));
+
     switch (static_cast<weather::DataID>(data_id))
     {
     }

@@ -15,7 +15,7 @@ syntax = "proto3";
 message WeatherData_1 
 {
 	bool  dataValid = 1;
-	float wind_speed_mph = 2;
+	float wind_speed_mps = 2;
 	float wind_direction_deg = 3;
 }
 

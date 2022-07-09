@@ -6,26 +6,21 @@
 
 #pragma once
 
+#include "net_packet_decoder.hpp"
 
-#include <cstddef>
-
-
-class cCeresNetDecoder
+class cCeresNetDecoder : public cNetworkDecoder
 {
 public:
-
     cCeresNetDecoder() = default;
     virtual ~cCeresNetDecoder() = default;
 
-    /**
-     * @brief The decode method convert the byte stream from a TCP receiver port.
-     * The decode the various packets and call the various pure virtual 
-     * methods.
-     */
-    void decode(const void* pBuffer, std::size_t buf_length);
-
-
+/*
+ * The Ceres application sends these packets and should never receive them!
+ */
 private:
+    void experimentInfo(const std::string&, const std::string&, const std::string&, const std::string&) override {};
+    void spidercamPosition(const spidercam::sPosition& pos) override {};
+    void weatherData(bool valid, double wind_speed_mph, double wind_direction_deg) override {};
 };
 
 

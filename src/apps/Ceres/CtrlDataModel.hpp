@@ -34,7 +34,7 @@ public:
     explicit cCtrlDataModel(QObject* parent = nullptr);
     ~cCtrlDataModel();
 
-    void addExperimentControlModel(cExperimentControlModel* pModel);
+    virtual void addExperimentControlModel(cExperimentControlModel* pModel);
     void addSensor(cSensorModel* pSensor) override;
 
     void startDataThread() override;
@@ -49,7 +49,7 @@ public:
     std::string experimentTitle() const;
 
     bool isExperimentLoaded() const;
-    bool loadExperiment(const nlohmann::json& expDoc);
+    virtual bool loadExperiment(const nlohmann::json& expDoc);
 
     virtual void startExperiment() = 0;
     void pauseExperiment();
@@ -75,6 +75,8 @@ private slots:
 
 protected:
     std::string  mExperimentTitle;
+    std::string  mResearcher;
+    std::string  mCultivar;
     std::string  mExperimentDoc;
 
     cCtrlDataThread mThread;

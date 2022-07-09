@@ -264,12 +264,14 @@ void cMainWindow::fileNew()
 //-----------------------------------------------------------------------------
 void cMainWindow::fileAddExperiment()
 {
+/*
     QTreeWidgetItem* experiment = new QTreeWidgetItem();
     experiment->setText(0, "Hello");
     QTreeWidgetItem* title = new QTreeWidgetItem();
     title->setText(0, "Title");
     experiment->addChild(title);
     mpExperiments->addTopLevelItem(experiment);
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -566,6 +568,11 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 
         if (type == "local")
             mpModel = new cCtrlDataModelLocal(this);
+
+        QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+        QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+        QObject::connect(mpModel, &cCtrlDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+        QObject::connect(mpModel, &cCtrlDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
     }
     else if (data_model.is_object())
     {
@@ -577,16 +584,17 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
             c3_ip = data_model["c3_ip"];
 
         auto* model = new cCtrlDataModelRemote(this);
+        QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+        QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+        QObject::connect(mpModel, &cCtrlDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+        QObject::connect(mpModel, &cCtrlDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+
         bool result = model->try_to_connect(QString(c4_ip.c_str()), port,
                                         false, QString(c3_ip.c_str()));
 
         mpModel = model;
     }
 
-    QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::connect(mpModel, &cCtrlDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::connect(mpModel, &cCtrlDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
     QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
 }
 

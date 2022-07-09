@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include "ceres_remote_client.pb.h"
+#include "spidercam_data.pb.h"
+#include "weather_data.pb.h"
+
+#include <spidercam/spidercam_types.hpp>
 #include <cstdint>
 
 namespace ceres
@@ -18,11 +23,11 @@ enum class ePacketType : uint16_t
 {
 	UNKNOWN = 0,
 
-	COMMAND_PCK_1	= 1,
+	EXPERIMENT_INFO_1	= 1,
 
-	SPIDER_CAM_DATA_1 = 100,
+	SPIDER_CAM_DATA_1 = 1000,
 
-	WEATHER_DATA_1 = 200,
+	WEATHER_DATA_1 = 1100,
 };
 
 struct sPacketHeader_t 
@@ -38,6 +43,42 @@ struct sPacketHeader_t
    }
    timestamp;
 };
+
+
+/**********************************************************
+ * Ceres/Ceres Remote Client packets utilities
+ **********************************************************/
+struct sExperimentInfo_t
+{
+	std::string title;
+	std::string researcher;
+	std::string cultivar;
+	std::string doc;
+};
+
+sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt);
+int encode_exp_info_data(const std::string& title, const std::string& researcher,
+	const std::string& cultivar, const std::string& doc, ceres::net_buffer& buffer);
+
+
+/**********************************************************
+ * Spidercam packets utilities
+ **********************************************************/
+spidercam::sPosition to_spidercam_position_1(const Spidercam_Position_1& pckt);
+int encode_spidercam_pos(const spidercam::sPosition& pos, ceres::net_buffer& buffer);
+
+/**********************************************************
+ * Weather Data packets utilities
+ **********************************************************/
+struct sWeatherData_t
+{
+	bool  dataValid;
+	float wind_speed_mps;
+	float wind_direction_deg;
+};
+
+sWeatherData_t to_weather_data_1(const WeatherData_1& pckt);
+int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction_deg, ceres::net_buffer& buffer);
 
 
 ceres::net_buffer& operator>>(ceres::net_buffer& buffer, sPacketHeader_t& hdr);

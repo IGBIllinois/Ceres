@@ -1,6 +1,8 @@
 
 #include "CtrlDataModelRemote.hpp"
+#include "Spidercam/SpidercamModel.hpp"
 #include "SensorModel.hpp"
+#include "Weather/WeatherDataModel_Http_Wind.hpp"
 
 #include <QtNetwork/QHostInfo>
 
@@ -10,9 +12,13 @@
 cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
 :
     cCtrlDataModel(parent),
+    cCeresNetEncoder(4096),
     mConnected(false),
     mSocket(parent)
 {
+    mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
+    mSocket.setSocketOption(QAbstractSocket::SocketOption::KeepAliveOption, 1);
+
     qRegisterMetaType<QAbstractSocket::SocketError>();
     qRegisterMetaType<QAbstractSocket::SocketState>();
 
@@ -21,6 +27,11 @@ cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
     QObject::connect(&mSocket, &QTcpSocket::errorOccurred, this, &cCtrlDataModelRemote::errorOccurred);
     QObject::connect(&mSocket, &QTcpSocket::hostFound, this, &cCtrlDataModelRemote::hostFound);
     QObject::connect(&mSocket, &QTcpSocket::stateChanged, this, &cCtrlDataModelRemote::stateChanged);
+
+    mWindSpeedValid = false;
+    mWindSpeed_mps = 0.0;
+    mWind_dir_deg = 0.0;
+
 }
 
 cCtrlDataModelRemote::~cCtrlDataModelRemote()
@@ -35,10 +46,66 @@ cCtrlDataModelRemote::~cCtrlDataModelRemote()
     }
 }
 
+void cCtrlDataModelRemote::addExperimentControlModel(cExperimentControlModel* pModel)
+{
+    cCtrlDataModel::addExperimentControlModel(pModel);
+
+    auto* pSpidercam = dynamic_cast<cSpidercamModel*>(pModel);
+
+    if (pSpidercam)
+    {
+        sendSpidercamPosition(pSpidercam->currentPosition());
+
+        QObject::connect(pSpidercam, &cSpidercamModel::positionChanged, this, &cCtrlDataModelRemote::updatePosition);
+    }
+}
+
+void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
+{
+    cCtrlDataModel::addSensor(pSensor);
+
+    auto* pWeather = dynamic_cast<cWeatherDataModel_Http_Wind*>(pSensor);
+
+    if (pWeather)
+    {
+        if (pWeather->windDataValid())
+        {
+            mWindSpeedValid = true;
+            mWindSpeed_mps = pWeather->windSpeed_mps();
+            mWind_dir_deg = pWeather->windDirection_deg();
+
+
+//BAF            sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+        }
+
+        QObject::connect(pWeather, &cWeatherDataModel_Http_Wind::windDataChanged, this, &cCtrlDataModelRemote::updateWindData);
+    }
+}
+
+void cCtrlDataModelRemote::updatePosition(spidercam::sPosition pos)
+{
+    if (!mConnected) return;
+
+    sendSpidercamPosition(pos);
+}
+
+void cCtrlDataModelRemote::updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg)
+{
+    mWindSpeedValid = valid_wind_speed;
+    mWindSpeed_mps = wind_speed_mps;
+    mWind_dir_deg = wind_dir_deg;
+
+    if (!mConnected) return;
+
+//BAF    sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+}
+
 void cCtrlDataModelRemote::connected()
 {
     QString msg("Connection to C4 established.");
     emit statusMessage(msg);
+
+    mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
 
     mConnected = true;
 }
@@ -75,10 +142,9 @@ void cCtrlDataModelRemote::stateChanged(QAbstractSocket::SocketState socketState
 bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port, 
                                             bool use_ipv6, const QString& local_ip)
 {
-    QString msg("Testing connection to remote computer at ");
+    QString msg("Trying to connect to C4 at ");
     msg.append(hostname);
     msg.append("...");
-
     emit statusMessage(msg);
 
     if (!local_ip.isEmpty())
@@ -141,9 +207,27 @@ void cCtrlDataModelRemote::closeDataFile()
 {
 }
 
+bool cCtrlDataModelRemote::loadExperiment(const nlohmann::json& expDoc)
+{
+    bool result = cCtrlDataModel::loadExperiment(expDoc);
+
+    return result;
+}
+
 void cCtrlDataModelRemote::startExperiment()
 {
 }
 
+int cCtrlDataModelRemote::sendOutgoingData(const char* data, std::size_t len)
+{
+    if (!mConnected)
+        return 0;
+
+    auto n = mSocket.write(data, len);
+
+    mSocket.flush();
+
+    return n;
+}
 
 

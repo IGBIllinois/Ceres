@@ -94,6 +94,7 @@ bool cCtrlDataModel::loadExperiment(const nlohmann::json& expDoc)
         return false;
     }
 
+/*
     auto required_sensors = expDoc["sensors"];
 
     for (auto required_sensor : required_sensors)
@@ -109,14 +110,29 @@ bool cCtrlDataModel::loadExperiment(const nlohmann::json& expDoc)
             }
         }
     }
+*/
 
     if (mThread.mpController->loadExperiment(expDoc["experiment"]))
     {
+        mResearcher.clear();
+        mCultivar.clear();
+
         mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
+
+        if (expDoc.contains("researcher"))
+        {
+            mResearcher = expDoc["researcher"];
+        }
+
+        if (expDoc.contains("cultivar"))
+        {
+            mCultivar = expDoc["cultivar"];
+        }
+
         mExperimentDoc = to_string(expDoc);
     }
 
-    return false;
+    return true;
 }
 
 void cCtrlDataModel::pauseExperiment()

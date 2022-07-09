@@ -16,13 +16,31 @@ syntax = "proto3";
  * General Control Packets   Ceres -> Remote Client
  *****************************************************************************/
 
-message DataFile_1 
+message OpenDataFile_1 
 {
 	string filename = 1;
+}
+
+message ExperimentState_1 
+{
+	bool state = 1;
+}
+
+message ExperimentInfo_1 
+{
+	string title = 1;
+	string researcher = 2;
+	string cultivar = 3;
+	string file = 4;
 }
 
 
 /******************************************************************************
  * General Reply Packets   Remote Client -> Ceres
  *****************************************************************************/
+
+message Status_1 
+{
+	string error_message = 3;
+}
 

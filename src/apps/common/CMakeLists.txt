@@ -1,3 +1,5 @@
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 
@@ -14,9 +16,7 @@ source_group("Resources" FILES
 )
 
 # Generate the header/source files needed from the protobuf
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ceres_remote_client.proto)
-#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS spidercam_data.proto)
-#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS weather_data.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS DESCRIPTORS PROTO_DESCS ceres_remote_client.proto spidercam_data.proto weather_data.proto)
 
 
 target_sources(common
@@ -48,6 +48,16 @@ PRIVATE
 	ceres_net_encoder.hpp
 	ceres_net_encoder.cpp
 
+	ceres_remote_client_net_decoder.hpp
+	ceres_remote_client_net_decoder.cpp
+	ceres_remote_client_net_encoder.hpp
+	ceres_remote_client_net_encoder.cpp
+
+	net_packet_decoder.hpp
+	net_packet_decoder.cpp
+	net_packet_encoder.hpp
+	net_packet_encoder.cpp
+
 	${PROTO_HDRS}
 	${PROTO_SRCS}
 	ceres_remote_client.proto
@@ -59,7 +69,6 @@ PRIVATE
 # We skip these header files as they are public and MOC will be used 
 # in the main application
 #set_property(SOURCE CeresSplashScreen.hpp PROPERTY SKIP_AUTOMOC ON)
-#message(STATUS "Protobuf_INCLUDES=${Protobuf_INCLUDE}")
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
