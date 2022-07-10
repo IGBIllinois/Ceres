@@ -117,7 +117,7 @@ void cBlockDataFileWriter::open(const std::string& filename)
     }
 }
 
-bool cBlockDataFileWriter::isOpen()
+bool cBlockDataFileWriter::isOpen() const
 {
     return mFile.is_open();
 }
@@ -223,7 +223,7 @@ void cBlockDataFileReader::open(const std::string& filename)
     }
 }
 
-bool cBlockDataFileReader::isOpen()
+bool cBlockDataFileReader::isOpen() const
 {
     return mFile.is_open();
 }

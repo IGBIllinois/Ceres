@@ -77,7 +77,7 @@ public:
 	~cBlockDataFileWriter();
 
     void open(const std::string& filename);
-    bool isOpen();
+    bool isOpen() const;
     void close();
 
 	void writeBlock(const cBlockID& id);
@@ -104,7 +104,7 @@ public:
 	~cBlockDataFileReader();
 
 	void open(const std::string& filename);
-	bool isOpen();
+	bool isOpen() const;
 	void close();
 
 	void attach(cBlockParser* pParser);
