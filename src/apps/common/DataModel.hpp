@@ -27,9 +27,6 @@ public:
     virtual void startDataThread() = 0;
     virtual void stopDataThread() = 0;
 
-    virtual bool openDataFile(const QString& defaultPath) = 0;
-    virtual void closeDataFile() = 0;
-
 signals:
     void statusMessage(QString msg);
     void infoMessage(QString title, QString msg);

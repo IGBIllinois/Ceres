@@ -159,12 +159,7 @@ void cCtrlDataModel::onExperimentStateChange(int s)
         case State::COMPLETED:
         case State::TERMINATED:
         {
-            mThread.mpController->stopDataRecording();
-
-            for (auto& sensor : mThread.mActiveSensors)
-            {
-                sensor->endDataRecording();
-            }
+            endDataRecording();
 
             closeDataFile();
 

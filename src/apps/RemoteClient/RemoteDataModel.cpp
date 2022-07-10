@@ -10,10 +10,13 @@
 cRemoteDataModel::cRemoteDataModel(QObject* parent)
     :
     cDataModel(parent),
+    cCeresRemoteClientNetEncoder(4096),
     mThread(this),
     mpTcpServer(nullptr),
     mpClient(nullptr)
 {
+    mIsRecording = false;
+
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cRemoteDataModel::onStatusUpdate);
 
     mpTcpServer = new QTcpServer();
@@ -25,6 +28,22 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
 cRemoteDataModel::~cRemoteDataModel()
 {
     mpTcpServer->close();
+}
+
+const std::string& cRemoteDataModel::defaultDataPath() const
+{
+    return mDefaultDataPath;
+}
+
+void cRemoteDataModel::setDefaultDataPath(const std::string& data_path)
+{
+    mDefaultDataPath = data_path;
+
+    if (!mDefaultDataPath.empty())
+    {
+        if (mDefaultDataPath.back() != '/')
+            mDefaultDataPath += '/';
+    }
 }
 
 bool cRemoteDataModel::startTcpServer(const std::string& ip, uint16_t port)
@@ -58,17 +77,26 @@ void cRemoteDataModel::stopDataThread()
     mThread.stop();
 }
 
-bool cRemoteDataModel::openDataFile(const QString& fileName)
+void cRemoteDataModel::openDataFile(const std::string& fileName)
 {
-    if (fileName.isEmpty())
-        return false;
-
     if (mFile.isOpen())
-        return false;
+    {
+        return; // false;
+    }
 
-    QString qualifiedFileName = fileName;
+    if (fileName.empty() && mExperimentTitle.empty())
+    {
+        sendDataFileState(false);
+        return; // false;
+    }
 
-    auto ext = qualifiedFileName.lastIndexOf('.');
+    std::string qualifiedFileName = fileName;
+    if (qualifiedFileName.empty())
+    {
+        qualifiedFileName = mExperimentTitle;
+    }
+
+    auto ext = qualifiedFileName.find_last_of('.');
 
     char timestamp[100];
 
@@ -81,25 +109,49 @@ bool cRemoteDataModel::openDataFile(const QString& fileName)
     std::replace_if(qualifiedFileName.begin(), qualifiedFileName.end(),
         [](QString::value_type c) {return c <= QChar::Space; }, '_');
 
-    mFile.open(qualifiedFileName.toStdString());
+    std::string fullyQualifiedFileName = mDefaultDataPath + qualifiedFileName;
+    mFile.open(fullyQualifiedFileName);
 
-    mSerializer.attach(&mFile);
+    if (mFile.isOpen())
+    {
+        writeDataHeaders();
+        sendDataFileState(true);
+        return;
+    }
 
-    return mFile.isOpen();
-
+    sendDataFileState(false);
 }
 
 void cRemoteDataModel::closeDataFile()
 {
     mSerializer.endTime(time(nullptr));
+    mIsRecording = false;
+
     mSerializer.detach();
+    mSpidercamSerializer.detach();
+    mWeatherSerializer.detach();
+
     mFile.close();
+
+    sendDataFileState(false);
 }
 
 
-void cRemoteDataModel::startExperiment()
+void cRemoteDataModel::writeDataHeaders()
 {
-//    mThread.mpController->writeDataHeader(mFile);
+    mSerializer.attach(&mFile);
+    mSpidercamSerializer.attach(&mFile);
+    mWeatherSerializer.attach(&mFile);
+
+    mSerializer.writeTitle(mExperimentTitle);
+
+    if (!mResearcher.empty())
+        mSerializer.writeResearcher(mResearcher);
+
+    if (!mCultivar.empty())
+        mSerializer.writeCultivar(mCultivar);
+
+    mSerializer.writeExperimentDoc(mExperimentDoc);
 
     for (auto& sensor : mThread.mActiveSensors)
     {
@@ -109,23 +161,36 @@ void cRemoteDataModel::startExperiment()
     mSerializer.startTime(time(nullptr));
 }
 
+
+void cRemoteDataModel::startExperiment()
+{
+    mSerializer.startTimestamp(timestamp_ns());
+}
+
 void cRemoteDataModel::stopExperiment()
 {
-//    mThread.mpController->stopDataRecording();
-
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->endDataRecording();
     }
 
+    mSerializer.endTimestamp(timestamp_ns());
+
     closeDataFile();
 
+    mExperimentTitle.clear();
+    mResearcher.clear();
+    mCultivar.clear();
+    mExperimentDoc.clear();
 }
 
 void cRemoteDataModel::experimentInfo(const std::string& title, 
     const std::string& researcher, const std::string& cultivar, const std::string& doc)
 {
-
+    mExperimentTitle = title;
+    mResearcher = researcher;
+    mCultivar = cultivar;
+    mExperimentDoc = doc;
 }
 
 
@@ -157,6 +222,7 @@ void cRemoteDataModel::newConnection()
     {
         emit statusMessage("Connected to client.");
         mpClient = client;
+        mpClient->setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
 
         QObject::connect(mpClient, &QTcpSocket::readyRead, this, &cRemoteDataModel::processNewCommand);
         QObject::connect(mpClient, &QTcpSocket::disconnected, this, &cRemoteDataModel::clientDisconnected);
@@ -196,4 +262,18 @@ void cRemoteDataModel::clientStateChanged(QAbstractSocket::SocketState socketSta
 {
 
 }
+
+
+int cRemoteDataModel::sendOutgoingData(const char* data, std::size_t len)
+{
+    if (!mpClient)
+        return 0;
+
+    auto n = mpClient->write(data, len);
+
+    mpClient->flush();
+
+    return n;
+}
+
 

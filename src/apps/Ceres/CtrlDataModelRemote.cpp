@@ -28,6 +28,8 @@ cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
     QObject::connect(&mSocket, &QTcpSocket::hostFound, this, &cCtrlDataModelRemote::hostFound);
     QObject::connect(&mSocket, &QTcpSocket::stateChanged, this, &cCtrlDataModelRemote::stateChanged);
 
+    mDataFileIsOpen = false;
+
     mWindSpeedValid = false;
     mWindSpeed_mps = 0.0;
     mWind_dir_deg = 0.0;
@@ -74,8 +76,7 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
             mWindSpeed_mps = pWeather->windSpeed_mps();
             mWind_dir_deg = pWeather->windDirection_deg();
 
-
-//BAF            sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+            sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
         }
 
         QObject::connect(pWeather, &cWeatherDataModel_Http_Wind::windDataChanged, this, &cCtrlDataModelRemote::updateWindData);
@@ -97,7 +98,7 @@ void cCtrlDataModelRemote::updateWindData(bool valid_wind_speed, double wind_spe
 
     if (!mConnected) return;
 
-//BAF    sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+    sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
 }
 
 void cCtrlDataModelRemote::connected()
@@ -200,7 +201,19 @@ bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port
 
 bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath)
 {
-    return false;
+    sendOpenDataFile(mExperimentTitle);
+
+    return true;
+}
+
+bool cCtrlDataModelRemote::isDataFileOpen() const
+{
+    return mDataFileIsOpen;
+}
+
+void cCtrlDataModelRemote::endDataRecording()
+{
+
 }
 
 void cCtrlDataModelRemote::closeDataFile()
@@ -209,13 +222,26 @@ void cCtrlDataModelRemote::closeDataFile()
 
 bool cCtrlDataModelRemote::loadExperiment(const nlohmann::json& expDoc)
 {
+    if (!mConnected)
+        return false;
+
     bool result = cCtrlDataModel::loadExperiment(expDoc);
+
+    sendExperimentInfo(mExperimentTitle, mResearcher, mCultivar, mExperimentDoc);
 
     return result;
 }
 
 void cCtrlDataModelRemote::startExperiment()
 {
+}
+
+/**********************************************************
+ * Packet Handlers
+ *********************************************************/
+void cCtrlDataModelRemote::dataFileState(bool is_open)
+{
+    mDataFileIsOpen = is_open;
 }
 
 int cCtrlDataModelRemote::sendOutgoingData(const char* data, std::size_t len)

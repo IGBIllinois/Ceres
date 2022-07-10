@@ -448,6 +448,7 @@ void cMainWindow::createSubMenusAndActions()
     QAction* pMenuItem = nullptr;
 
     // Build the File Menu
+/*
     pMenuItem = new QAction(tr("&New"), this);
     pMenuItem->setShortcuts(QKeySequence::New);
     pMenuItem->setStatusTip(tr("Create a new file"));
@@ -463,6 +464,7 @@ void cMainWindow::createSubMenusAndActions()
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
+*/
 
     pMenuItem = new QAction(tr("E&xit"), this);
     pMenuItem->setShortcuts(QKeySequence::Quit);

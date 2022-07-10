@@ -29,6 +29,10 @@ private:
     virtual void experimentInfo(const std::string& title, 
         const std::string& researcher, const std::string& cultivar, const std::string& doc)= 0;
 
+    virtual void openDataFile(const std::string& fileName) = 0;
+    virtual void closeDataFile() = 0;
+    virtual void dataFileState(bool is_open) = 0;
+
     virtual void spidercamPosition(const spidercam::sPosition& pos) = 0;
 
     virtual void weatherData(bool valid, double wind_speed_mps, 

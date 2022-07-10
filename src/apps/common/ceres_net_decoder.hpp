@@ -19,6 +19,8 @@ public:
  */
 private:
     void experimentInfo(const std::string&, const std::string&, const std::string&, const std::string&) override {};
+    void openDataFile(const std::string&) override {};
+    void closeDataFile() override {};
     void spidercamPosition(const spidercam::sPosition& pos) override {};
     void weatherData(bool valid, double wind_speed_mph, double wind_direction_deg) override {};
 };

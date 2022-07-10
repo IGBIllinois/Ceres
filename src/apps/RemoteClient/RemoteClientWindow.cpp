@@ -87,7 +87,7 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
 
     auto cwd = std::filesystem::current_path();
     auto data_path = cwd / "Data";
-    mDefaultDataPath = QString::fromLatin1(data_path.string().c_str());
+    mMainModel.setDefaultDataPath(data_path.string());
 
     QObject::connect(&mMainModel, &cDataModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
     QObject::connect(&mMainModel, &cDataModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
@@ -166,7 +166,7 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 #ifdef WIN32
         if (folders.contains("windows"))
         {
-            mDefaultDataPath = QString::fromLatin1(folders["windows"].get<std::string>().c_str());
+            mMainModel.setDefaultDataPath(folders["windows"].get<std::string>());
         }
 #endif
     }

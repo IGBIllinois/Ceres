@@ -3,13 +3,14 @@
 
 #include "DataModel.hpp"
 #include "ceres_remote_client_net_decoder.hpp"
+#include "ceres_remote_client_net_encoder.hpp"
 #include "RemoteDataThread.hpp"
 #include "BlockDataFile.hpp"
 #include "ExperimentSerializer.hpp"
 #include "SpidercamSerializer.hpp"
 #include "WeatherSerializer.hpp"
 
-#include <list>
+#include <string>
 
 #include <QByteArray>
 #include <QtNetwork/QTcpServer>
@@ -23,13 +24,17 @@ class cSensorModel;
  * The cRemoteDataModel class is the base class for data acquisition.
  * 
  *****************************************************************************/
-class cRemoteDataModel : public cDataModel, private cCeresRemoteClientNetDecoder
+class cRemoteDataModel : public cDataModel, 
+    private cCeresRemoteClientNetDecoder, private cCeresRemoteClientNetEncoder
 {
     Q_OBJECT
 
 public:
     explicit cRemoteDataModel(QObject* parent = nullptr);
     virtual ~cRemoteDataModel();
+
+    const std::string& defaultDataPath() const;
+    void setDefaultDataPath(const std::string& data_path);
 
     bool startTcpServer(const std::string& ip, uint16_t port);
 
@@ -64,17 +69,28 @@ private:
     void startExperiment();
     void stopExperiment();
 
+/*
+ * Packet Handlers
+ */
     void experimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc) override;
+
+    void openDataFile(const std::string& fileName) override;
+    void closeDataFile() override;
 
     void spidercamPosition(const spidercam::sPosition& pos) override;
     void weatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
 
 private:
-    bool openDataFile(const QString& fileName) override;
-    void closeDataFile() override;
+    int sendOutgoingData(const char* data, std::size_t len) override;
+
+private:
+    void writeDataHeaders();
 
 protected:
+    std::string mDefaultDataPath;
+    bool mIsRecording;
+
     cBlockDataFileWriter    mFile;
     cExperimentSerializer   mSerializer;
     cSpidercamSerializer    mSpidercamSerializer;
@@ -85,6 +101,13 @@ protected:
     QTcpServer* mpTcpServer;
 
     QTcpSocket* mpClient;
+
+private:
+    // Experiment Info
+    std::string  mExperimentTitle;
+    std::string  mResearcher;
+    std::string  mCultivar;
+    std::string  mExperimentDoc;
 };
 
 

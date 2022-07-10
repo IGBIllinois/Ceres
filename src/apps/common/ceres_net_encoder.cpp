@@ -16,21 +16,30 @@ void cCeresNetEncoder::sendExperimentInfo(const std::string& title, const std::s
 {
     encode_exp_info_data(title, researcher, cultivar, doc, mBuffer);
     sendData();
-    clear();
+}
+
+void cCeresNetEncoder::sendOpenDataFile(const std::string& fileName)
+{
+    encode_open_data_file(fileName, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendCloseDataFile()
+{
+    encode_close_data_file(mBuffer);
+    sendData();
 }
 
 void cCeresNetEncoder::sendSpidercamPosition(const spidercam::sPosition& pos)
 {
     encode_spidercam_pos(pos, mBuffer);
     sendData();
-    clear();
 }
 
 void cCeresNetEncoder::sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg)
 {
     encode_weather_data(valid, wind_speed_mps, wind_direction_deg, mBuffer);
     sendData();
-    clear();
 }
 
 

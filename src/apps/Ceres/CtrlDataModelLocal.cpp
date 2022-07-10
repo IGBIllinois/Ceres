@@ -3,6 +3,7 @@
 #include "SensorModel.hpp"
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
+#include "TimestampProvider.hpp"
 
 #include <QtWidgets>
 
@@ -61,8 +62,17 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath)
 
     mFile.open(fileName.toStdString());
 
-    mSerializer.attach(&mFile);
+    if (mFile.isOpen())
+    {
+        writeDataHeaders();
+        return true;
+    }
 
+    return false;
+}
+
+bool cCtrlDataModelLocal::isDataFileOpen() const
+{
     return mFile.isOpen();
 }
 
@@ -71,15 +81,26 @@ void cCtrlDataModelLocal::closeDataFile()
     mSerializer.endTime(time(nullptr));
     mSerializer.detach();
     mFile.close();
+
+    mExperimentTitle.clear();
+    mResearcher.clear();
+    mCultivar.clear();
+    mExperimentDoc.clear();
 }
 
-void cCtrlDataModelLocal::startExperiment()
+void cCtrlDataModelLocal::writeDataHeaders()
 {
-    if (isExperimentRunning())
-    {
-        mThread.mpController->startExperiment();
-        return;
-    }
+    mSerializer.attach(&mFile);
+
+    mSerializer.writeTitle(mExperimentTitle);
+
+    if (!mResearcher.empty())
+        mSerializer.writeResearcher(mResearcher);
+
+    if (!mCultivar.empty())
+        mSerializer.writeCultivar(mCultivar);
+
+    mSerializer.writeExperimentDoc(mExperimentDoc);
 
     mThread.mpController->writeDataHeader(mFile);
 
@@ -89,6 +110,30 @@ void cCtrlDataModelLocal::startExperiment()
     }
 
     mSerializer.startTime(time(nullptr));
+}
+
+void cCtrlDataModelLocal::endDataRecording()
+{
+    mThread.mpController->stopDataRecording();
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->endDataRecording();
+    }
+
+    mSerializer.endTimestamp(timestamp_ns());
+}
+
+
+void cCtrlDataModelLocal::startExperiment()
+{
+    if (isExperimentRunning())
+    {
+        mThread.mpController->startExperiment();
+        return;
+    }
+
     mThread.mpController->startExperiment();
+    mSerializer.startTimestamp(timestamp_ns());
 }
 

@@ -41,6 +41,7 @@ public:
     void stopDataThread() override;
 
     virtual bool openDataFile(const QString& defaultPath) = 0;
+    virtual bool isDataFileOpen() const = 0;
     virtual void closeDataFile() = 0;
 
     bool isExperimentRunning();
@@ -72,6 +73,9 @@ private slots:
 */
 
     void onExperimentStateChange(int state);
+
+protected:
+    virtual void endDataRecording() = 0;
 
 protected:
     std::string  mExperimentTitle;

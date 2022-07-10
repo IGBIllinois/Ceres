@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CtrlDataModel.hpp"
+#include "ceres_net_decoder.hpp"
 #include "ceres_net_encoder.hpp"
 
 #include <spidercam/spidercam_types.hpp>
@@ -9,7 +10,8 @@
 #include <QByteArray>
 #include <QtNetwork/QTcpSocket>
 
-class cCtrlDataModelRemote : public cCtrlDataModel, protected cCeresNetEncoder
+class cCtrlDataModelRemote : public cCtrlDataModel, 
+    protected cCeresNetDecoder, protected cCeresNetEncoder
 {
     Q_OBJECT
 
@@ -24,6 +26,7 @@ public:
     void addSensor(cSensorModel* pSensor) override;
 
     bool openDataFile(const QString& defaultPath) override;
+    bool isDataFileOpen() const override;
     void closeDataFile();
 
     bool loadExperiment(const nlohmann::json& expDoc) override;
@@ -44,6 +47,15 @@ private slots:
     void stateChanged(QAbstractSocket::SocketState socketState);
 
 private:
+    void endDataRecording() override;
+
+/*
+ * Packet Handlers
+ */
+private:
+    void dataFileState(bool is_open) override;
+
+private:
     int sendOutgoingData(const char* data, std::size_t len) override;
 
 /*
@@ -56,6 +68,7 @@ private:
 
 private:
     bool mConnected;
+    bool mDataFileIsOpen;
 
     QTcpSocket mSocket;
     QByteArray mReplyBuffer;

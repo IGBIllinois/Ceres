@@ -10,12 +10,9 @@ cCeresRemoteClientNetEncoder::cCeresRemoteClientNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
 {}
 
-/*
-void cCeresRemoteClientNetEncoder::sendGeodetic(const gps::PVT_Geodetic_2_t& pvt)
+void cCeresRemoteClientNetEncoder::sendDataFileState(bool is_open)
 {
-    encodeGeodetic(pvt);
-    sendOutgoingData(static_cast<const char*>(mBuffer.data()), mBuffer.size());
-    clear();
+    encode_file_open_state(is_open, mBuffer);
+    sendData();
 }
-*/
 

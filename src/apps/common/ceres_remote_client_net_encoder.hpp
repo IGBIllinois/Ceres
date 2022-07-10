@@ -15,7 +15,7 @@ public:
     /*
      * Ceres Remote Client ----> Ceres
      */
-
+    void sendDataFileState(bool is_open);
 };
 
 

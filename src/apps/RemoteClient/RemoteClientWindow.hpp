@@ -62,8 +62,6 @@ private:
 
     cCeresSplashScreen* mpSplashScreen;
 
-    QString mDefaultDataPath;
-    
     QMenu* mpFileMenu;
 
     QMenu* mpHelpMenu;

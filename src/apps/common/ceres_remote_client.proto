@@ -39,6 +39,11 @@ message ExperimentInfo_1
  * General Reply Packets   Remote Client -> Ceres
  *****************************************************************************/
 
+ message FileOpenState_1 
+{
+	bool isopen = 1;
+}
+
 message Status_1 
 {
 	string error_message = 3;

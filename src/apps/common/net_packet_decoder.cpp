@@ -17,7 +17,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
     {
         buffer >> hdr;
      
-        if ((buf_length < hdr.length) || (hdr.length == 0))
+        if (buf_length < hdr.length)
         { 
             break;
         }
@@ -29,7 +29,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
             {
                 break;
             }
-            case ePacketType::EXPERIMENT_INFO_1:
+            case ePacketType::EXPERIMENT_INFO:
             {
                 ExperimentInfo_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
@@ -37,14 +37,57 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
                 experimentInfo(data.title, data.researcher, data.cultivar, data.doc);
                 break;
             }
-            case ePacketType::SPIDER_CAM_DATA_1:
+            case ePacketType::EXPERIMENT_INFO_REPLY:
+            {
+                break;
+            }
+            case ePacketType::OPEN_DATA_FILE:
+            {
+                OpenDataFile_1 packet;
+                packet.ParseFromArray(buffer.data(), hdr.length);
+                openDataFile(to_filename_1(packet));
+                break;
+            }
+            case ePacketType::CLOSE_DATA_FILE:
+            {
+                void closeDataFile();
+                break;
+            }
+            case ePacketType::DATA_FILE_STATE:
+            {
+                FileOpenState_1 packet;
+                packet.ParseFromArray(buffer.data(), hdr.length);
+                dataFileState(to_file_open_state_1(packet));
+                break;
+            }
+            case ePacketType::START_DATA_RECORDING:
+            {
+                break;
+            }
+            case ePacketType::START_DATA_RECORDING_REPLY:
+            {
+                break;
+            }
+            case ePacketType::STOP_DATA_RECORDING:
+            {
+                break;
+            }
+            case ePacketType::STOP_DATA_RECORDING_REPLY:
+            {
+                break;
+            }
+            case ePacketType::END_DATA_RECORDING:
+            {
+                break;
+            }
+            case ePacketType::SPIDER_CAM_DATA:
             {
                 Spidercam_Position_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
                 spidercamPosition(to_spidercam_position_1(packet));
                 break;
             }
-            case ePacketType::WEATHER_DATA_1:
+            case ePacketType::WEATHER_DATA:
             {
                 WeatherData_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);

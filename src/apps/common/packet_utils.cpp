@@ -77,7 +77,72 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::EXPERIMENT_INFO_1;
+    hdr.id = ePacketType::EXPERIMENT_INFO;
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::string to_filename_1(const OpenDataFile_1& pckt)
+{
+    return pckt.filename();
+}
+
+int encode_open_data_file(const std::string& filename, ceres::net_buffer& buffer)
+{
+    OpenDataFile_1 pckt;
+
+    pckt.set_filename(filename);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = ePacketType::OPEN_DATA_FILE;
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+int encode_close_data_file(ceres::net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = ePacketType::CLOSE_DATA_FILE;
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t);
+}
+
+bool to_file_open_state_1(const FileOpenState_1& pckt)
+{
+    return pckt.isopen();
+}
+
+int encode_file_open_state(bool open, ceres::net_buffer& buffer)
+{
+    FileOpenState_1 pckt;
+
+    pckt.set_isopen(open);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = ePacketType::OPEN_DATA_FILE;
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -134,7 +199,7 @@ int encode_spidercam_pos(const spidercam::sPosition& pos, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::SPIDER_CAM_DATA_1;
+    hdr.id = ePacketType::SPIDER_CAM_DATA;
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -172,7 +237,7 @@ int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::WEATHER_DATA_1;
+    hdr.id = ePacketType::WEATHER_DATA;
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
