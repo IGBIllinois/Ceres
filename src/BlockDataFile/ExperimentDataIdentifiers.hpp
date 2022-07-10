@@ -15,6 +15,9 @@ namespace experiment
         END_TIME,
         START_RECORDING_TIMESTAMP,
         END_RECORDING_TIMESTAMP,
+        RESEARCHER,
+        CULTIVAR,
+        EXPERIMENT_TITLE,
     };
 }
 
