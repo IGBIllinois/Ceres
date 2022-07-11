@@ -7,7 +7,7 @@
 // Forward Declarations
 class cBlockDataFileWriter;
 
-enum class eSensorStatus { UNKNOWN, CONFIGURED, INITIALIZED, RUNNING };
+enum class eSensorStatus { UNKNOWN, CONFIGURED, INITIALIZED, WARM_UP, RUNNING, STOPPED };
 
 /**
  * Abstract Base Class for all Sensor Based Models
@@ -48,16 +48,18 @@ public:
     virtual bool initialize() { return true;  };
 
     /*
+     * Attach/Detach the serializer to the data file.
+     */
+    virtual void enableDataRecording(cBlockDataFileWriter& file) = 0;
+    virtual void disableDataRecording() = 0;
+
+    /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    virtual void writeDataHeader(cBlockDataFileWriter& file) = 0;
-
-    /*
-     * Detach the serializer.
-     */
-    virtual void endDataRecording() = 0;
+    virtual void writeDataHeader() = 0;
+    virtual void writeDataFooter() {};
 
     /*
      * Returns true if sensor data is being recorded

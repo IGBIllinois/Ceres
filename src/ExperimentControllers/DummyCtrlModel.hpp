@@ -31,12 +31,18 @@ public:
 	 */
 	void startExperiment() override;
 
+	/*
+	 * Attach/Detach the serializer to the data file.
+	 */
+	virtual void enableDataRecording(cBlockDataFileWriter& file);
+	virtual void disableDataRecording();
+
     /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFileWriter& file) override;
+    void writeDataHeader() override;
 	void stopDataRecording() override;
 
 	bool startCommunications() override;

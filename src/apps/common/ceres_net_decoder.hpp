@@ -18,11 +18,17 @@ public:
  * The Ceres application sends these packets and should never receive them!
  */
 private:
-    void experimentInfo(const std::string&, const std::string&, const std::string&, const std::string&) override {};
-    void openDataFile(const std::string&) override {};
-    void closeDataFile() override {};
-    void spidercamPosition(const spidercam::sPosition& pos) override {};
-    void weatherData(bool valid, double wind_speed_mph, double wind_direction_deg) override {};
+    void onExperimentInfo(const std::string&, const std::string&, const std::string&, const std::string&) override final {};
+    void onStartExperiment() override final {};
+    void onStopExperiment() override final {};
+
+    void onOpenDataFile(const std::string&) override final {};
+    void onCloseDataFile() override final {};
+    void onStartDataRecording() override final {};
+    void onStopDataRecording() override final {};
+
+    void onSpidercamPosition(const spidercam::sPosition& pos) override final {};
+    void onWeatherData(bool valid, double wind_speed_mph, double wind_direction_deg) override final {};
 };
 
 

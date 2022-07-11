@@ -22,8 +22,9 @@ public:
     void startExperiment() override;
 
 protected:
-    void writeDataHeaders();
     void endDataRecording() override;
+
+    void dataRecordingStateChange(bool record) override;
 
 private:
     cBlockDataFileWriter    mFile;

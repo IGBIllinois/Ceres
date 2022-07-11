@@ -26,13 +26,15 @@ public:
     double windSpeed_mps() const;
     double windDirection_deg() const;
 
+    void enableDataRecording(cBlockDataFileWriter& file) override;
+    void disableDataRecording() override;
+
     /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFileWriter& pFile) override;
-    void endDataRecording() override;
+    void writeDataHeader() override;
 
 signals:
     void windDataChanged(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);

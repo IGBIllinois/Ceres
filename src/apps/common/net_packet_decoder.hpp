@@ -26,16 +26,22 @@ public:
     void decode(const void* pBuffer, std::size_t buf_length);
 
 private:
-    virtual void experimentInfo(const std::string& title, 
+    virtual void onExperimentInfo(const std::string& title, 
         const std::string& researcher, const std::string& cultivar, const std::string& doc)= 0;
 
-    virtual void openDataFile(const std::string& fileName) = 0;
-    virtual void closeDataFile() = 0;
-    virtual void dataFileState(bool is_open) = 0;
+    virtual void onStartExperiment() = 0;
+    virtual void onStopExperiment() = 0;
 
-    virtual void spidercamPosition(const spidercam::sPosition& pos) = 0;
+    virtual void onOpenDataFile(const std::string& fileName) = 0;
+    virtual void onCloseDataFile() = 0;
+    virtual void onDataFileState(bool is_open) = 0;
 
-    virtual void weatherData(bool valid, double wind_speed_mps, 
+    virtual void onStartDataRecording() = 0;
+    virtual void onStopDataRecording() = 0;
+
+    virtual void onSpidercamPosition(const spidercam::sPosition& pos) = 0;
+
+    virtual void onWeatherData(bool valid, double wind_speed_mps, 
         double wind_direction_deg) = 0;
 };
 

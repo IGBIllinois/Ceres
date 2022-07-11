@@ -53,15 +53,19 @@ void cHySpexSWIR_384_Model::update()
 
 }
 
-void cHySpexSWIR_384_Model::writeDataHeader(cBlockDataFileWriter& file)
+void cHySpexSWIR_384_Model::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cHySpexSWIR_384_Model::endDataRecording()
+void cHySpexSWIR_384_Model::disableDataRecording()
 {
-    cHyperspectralModel::endDataRecording();
+    cHyperspectralModel::disableDataRecording();
     mSerializer.detach();
+}
+
+void cHySpexSWIR_384_Model::writeDataHeader()
+{
 }
 
 

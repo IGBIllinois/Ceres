@@ -34,13 +34,16 @@ void cDummyModel::update()
 {
 }
 
-void cDummyModel::writeDataHeader(cBlockDataFileWriter& file)
+void cDummyModel::enableDataRecording(cBlockDataFileWriter& file)
 {
 }
 
-void cDummyModel::endDataRecording()
-{
-}
+void cDummyModel::disableDataRecording()
+{}
+
+void cDummyModel::writeDataHeader()
+{}
+
 
 
 

@@ -27,8 +27,8 @@ public:
 	void startTime(time_t time);
 	void endTime(time_t time);
 
-	void startTimestamp(uint64_t timestamp);
-	void endTimestamp(uint64_t timestamp);
+	void startRecordingTimestamp(uint64_t timestamp);
+	void endRecordingTimestamp(uint64_t timestamp);
 
 protected:
 	cBlockID& blockID() override;

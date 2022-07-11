@@ -40,10 +40,16 @@ void cCtrlDataModel::addSensor(cSensorModel* pSensor)
 void cCtrlDataModel::startDataThread()
 {
     mThread.start();
+
+    QObject::connect(mThread.mpController, &cExperimentControlModel::requestDataRecordingState,
+        this, &cCtrlDataModel::dataRecordingStateChange);
 }
 
 void cCtrlDataModel::stopDataThread()
 {
+    QObject::disconnect(mThread.mpController, &cExperimentControlModel::requestDataRecordingState,
+        this, &cCtrlDataModel::dataRecordingStateChange);
+
     mThread.stop();
 }
 
@@ -146,7 +152,6 @@ void cCtrlDataModel::terminateExperiment()
     if (mThread.mpController)
         mThread.mpController->terminateExperiment();
 }
-
 
 void cCtrlDataModel::onExperimentStateChange(int s)
 {

@@ -594,6 +594,17 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         bool result = model->try_to_connect(QString(c4_ip.c_str()), port,
                                         false, QString(c3_ip.c_str()));
 
+        auto* dockWidget = new QDockWidget();
+        model->createView(dockWidget);
+
+        if (dockWidget->widget() != nullptr)
+        {
+            dockWidget->setParent(this);
+
+            addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+            mpViewMenu->addAction(dockWidget->toggleViewAction());
+        }
+
         mpModel = model;
     }
 

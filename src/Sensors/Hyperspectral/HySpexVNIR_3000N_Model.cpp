@@ -52,15 +52,21 @@ void cHySpexVNIR_3000N_Model::update()
     if (!mConnected) return;
 }
 
-void cHySpexVNIR_3000N_Model::writeDataHeader(cBlockDataFileWriter& file)
+void cHySpexVNIR_3000N_Model::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cHySpexVNIR_3000N_Model::endDataRecording()
+void cHySpexVNIR_3000N_Model::disableDataRecording()
 {
-    cHyperspectralModel::endDataRecording();
+    cHyperspectralModel::disableDataRecording();
     mSerializer.detach();
 }
+
+void cHySpexVNIR_3000N_Model::writeDataHeader()
+{
+}
+
+
 
 

@@ -91,15 +91,19 @@ void cSsnxModel_direct::update()
     runOnce();
 }
 
-void cSsnxModel_direct::writeDataHeader(cBlockDataFileWriter& file)
+void cSsnxModel_direct::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cSsnxModel_direct::endDataRecording()
+void cSsnxModel_direct::disableDataRecording()
 {
-    cGpsModel::endDataRecording();
+    cGpsModel::disableDataRecording();
     mSerializer.detach();
+}
+
+void cSsnxModel_direct::writeDataHeader()
+{
 }
 
 void cSsnxModel_direct::closeConnection()

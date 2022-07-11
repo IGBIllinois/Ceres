@@ -8,7 +8,10 @@
 #include "SpidercamBlockId.hpp"
 
 // Forward Declarations
-
+namespace spidercam
+{
+	struct sPosition;
+}
 
 class cSpidercamSerializer : public cBlockSerializer
 {
@@ -16,6 +19,8 @@ public:
 	cSpidercamSerializer();
 	explicit cSpidercamSerializer(std::size_t n, cBlockDataFileWriter* pDataFile = nullptr);
 	~cSpidercamSerializer() = default;
+
+	void write(const spidercam::sPosition& pos);
 
 protected:
 	cBlockID& blockID() override;

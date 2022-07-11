@@ -97,9 +97,19 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     return true;
 }
 
-void cAxisCommunicationsModel_F44::writeDataHeader(cBlockDataFileWriter& file)
+void cAxisCommunicationsModel_F44::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
+}
+
+void cAxisCommunicationsModel_F44::disableDataRecording()
+{
+    cAxisCommunicationsModel::disableDataRecording();
+    mSerializer.detach();
+}
+
+void cAxisCommunicationsModel_F44::writeDataHeader()
+{
 //    mSerializer.write(mConfigParameters);
 //    mSerializer.write(mSensorInfo);
 //    mSerializer.write(mBeamIntrinsics);
@@ -107,13 +117,6 @@ void cAxisCommunicationsModel_F44::writeDataHeader(cBlockDataFileWriter& file)
 //    mSerializer.write(mLidarIntrinsics);
 //    mSerializer.write(mDataFormat);
 }
-
-void cAxisCommunicationsModel_F44::endDataRecording()
-{
-    cAxisCommunicationsModel::endDataRecording();
-    mSerializer.detach();
-}
-
 
 bool cAxisCommunicationsModel_F44::startCommunications()
 {

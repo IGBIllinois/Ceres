@@ -26,10 +26,11 @@ void cCtrlDataModelLocal::stopDataThread()
     if (mFile.isOpen())
     {
         mThread.mpController->stopDataRecording();
+        mThread.mpController->disableDataRecording();
 
         for (auto& sensor : mThread.mActiveSensors)
         {
-            sensor->endDataRecording();
+            sensor->disableDataRecording();
         }
 
         mFile.close();
@@ -62,13 +63,19 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath)
 
     mFile.open(fileName.toStdString());
 
-    if (mFile.isOpen())
+    if (!mFile.isOpen())
     {
-        writeDataHeaders();
-        return true;
+        return false;
     }
 
-    return false;
+    mSerializer.attach(&mFile);
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->enableDataRecording(mFile);
+    }
+
+    return true;
 }
 
 bool cCtrlDataModelLocal::isDataFileOpen() const
@@ -78,6 +85,13 @@ bool cCtrlDataModelLocal::isDataFileOpen() const
 
 void cCtrlDataModelLocal::closeDataFile()
 {
+    mThread.mpController->disableDataRecording();
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->disableDataRecording();
+    }
+
     mSerializer.endTime(time(nullptr));
     mSerializer.detach();
     mFile.close();
@@ -88,40 +102,23 @@ void cCtrlDataModelLocal::closeDataFile()
     mExperimentDoc.clear();
 }
 
-void cCtrlDataModelLocal::writeDataHeaders()
-{
-    mSerializer.attach(&mFile);
-
-    mSerializer.writeTitle(mExperimentTitle);
-
-    if (!mResearcher.empty())
-        mSerializer.writeResearcher(mResearcher);
-
-    if (!mCultivar.empty())
-        mSerializer.writeCultivar(mCultivar);
-
-    mSerializer.writeExperimentDoc(mExperimentDoc);
-
-    mThread.mpController->writeDataHeader(mFile);
-
-    for (auto& sensor : mThread.mActiveSensors)
-    {
-        sensor->writeDataHeader(mFile);
-    }
-
-    mSerializer.startTime(time(nullptr));
-}
-
 void cCtrlDataModelLocal::endDataRecording()
 {
     mThread.mpController->stopDataRecording();
+    mThread.mpController->writeDataFooter();
 
     for (auto& sensor : mThread.mActiveSensors)
     {
-        sensor->endDataRecording();
+        sensor->writeDataFooter();
     }
+}
 
-    mSerializer.endTimestamp(timestamp_ns());
+void cCtrlDataModelLocal::dataRecordingStateChange(bool record)
+{
+    if (record)
+        mSerializer.startRecordingTimestamp(timestamp_ns());
+    else
+        mSerializer.endRecordingTimestamp(timestamp_ns());
 }
 
 
@@ -133,7 +130,25 @@ void cCtrlDataModelLocal::startExperiment()
         return;
     }
 
+    mSerializer.writeTitle(mExperimentTitle);
+
+    if (!mResearcher.empty())
+        mSerializer.writeResearcher(mResearcher);
+
+    if (!mCultivar.empty())
+        mSerializer.writeCultivar(mCultivar);
+
+    mSerializer.writeExperimentDoc(mExperimentDoc);
+
+    mThread.mpController->writeDataHeader();
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->writeDataHeader();
+    }
+
+    mSerializer.startTime(time(nullptr));
+
     mThread.mpController->startExperiment();
-    mSerializer.startTimestamp(timestamp_ns());
 }
 

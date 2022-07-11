@@ -66,12 +66,13 @@ signals:
 
     void experimentCompleted();
 
-private slots:
-/*
-    void onStatusUpdate(QString msg);
-    void onErrorUpdate(QString title, QString msg);
-*/
+protected slots:
+    /*
+     * Toggles the recording state of the sensor.
+     */
+    virtual void dataRecordingStateChange(bool record) = 0;
 
+private slots:
     void onExperimentStateChange(int state);
 
 protected:

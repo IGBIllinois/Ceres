@@ -20,8 +20,10 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
-    void writeDataHeader(cBlockDataFileWriter& file) override;
-    void endDataRecording() override;
+    void enableDataRecording(cBlockDataFileWriter& file) override;
+    void disableDataRecording() override;
+
+    void writeDataHeader() override;
 
     /*
      * Starts/Stops communication with the endpoint.

@@ -26,7 +26,12 @@ bool cSensorModel::configure(const nlohmann::json& jsonCfg)
     return true;
 }
 
-void cSensorModel::writeDataHeader(cBlockDataFileWriter& file)
+void cSensorModel::enableDataRecording(cBlockDataFileWriter& file)
+{
+    mIsRecording = false;
+}
+
+void cSensorModel::disableDataRecording()
 {
     mIsRecording = false;
 }
@@ -34,11 +39,6 @@ void cSensorModel::writeDataHeader(cBlockDataFileWriter& file)
 void cSensorModel::dataRecordingStateChange(bool record)
 {
     mIsRecording = record;
-}
-
-void cSensorModel::endDataRecording()
-{
-    mIsRecording = false;
 }
 
 

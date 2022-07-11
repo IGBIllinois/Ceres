@@ -68,6 +68,9 @@ PRIVATE
 	
     CtrlDataModelRemote.hpp
     CtrlDataModelRemote.cpp
+    RemoteClientView.hpp
+    RemoteClientView.cpp
+	
     CtrlDataModelLocal.hpp
     CtrlDataModelLocal.cpp
     CtrlDataThread.hpp

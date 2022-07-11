@@ -18,6 +18,18 @@ void cCeresNetEncoder::sendExperimentInfo(const std::string& title, const std::s
     sendData();
 }
 
+void cCeresNetEncoder::sendStartExperiment()
+{
+    encode_start_experiment(mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendStopExperiment()
+{
+    encode_stop_experiment(mBuffer);
+    sendData();
+}
+
 void cCeresNetEncoder::sendOpenDataFile(const std::string& fileName)
 {
     encode_open_data_file(fileName, mBuffer);
@@ -29,6 +41,19 @@ void cCeresNetEncoder::sendCloseDataFile()
     encode_close_data_file(mBuffer);
     sendData();
 }
+
+void cCeresNetEncoder::sendStartDataRecording()
+{
+    encode_start_data_recording(mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendStopDataRecording()
+{
+    encode_stop_data_recording(mBuffer);
+    sendData();
+}
+
 
 void cCeresNetEncoder::sendSpidercamPosition(const spidercam::sPosition& pos)
 {

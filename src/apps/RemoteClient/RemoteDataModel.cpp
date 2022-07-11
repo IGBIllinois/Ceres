@@ -1,11 +1,11 @@
 
 #include "RemoteDataModel.hpp"
-
 #include "SensorModel.hpp"
 
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QString>
+
 
 cRemoteDataModel::cRemoteDataModel(QObject* parent)
     :
@@ -15,6 +15,10 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
     mpTcpServer(nullptr),
     mpClient(nullptr)
 {
+    mWindDataValid = false;
+    mWindSpeed_mps = 0.0;
+    mWindDirection_deg = 0.0;
+
     mIsRecording = false;
 
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cRemoteDataModel::onStatusUpdate);
@@ -30,19 +34,20 @@ cRemoteDataModel::~cRemoteDataModel()
     mpTcpServer->close();
 }
 
-const std::string& cRemoteDataModel::defaultDataPath() const
+std::string cRemoteDataModel::defaultDataPath() const
 {
-    return mDefaultDataPath;
+    return mDefaultDataPath.string();
 }
 
 void cRemoteDataModel::setDefaultDataPath(const std::string& data_path)
 {
+    using namespace std::filesystem;
+
     mDefaultDataPath = data_path;
 
-    if (!mDefaultDataPath.empty())
+    if (!exists(mDefaultDataPath))
     {
-        if (mDefaultDataPath.back() != '/')
-            mDefaultDataPath += '/';
+        create_directories(mDefaultDataPath);
     }
 }
 
@@ -60,6 +65,7 @@ void cRemoteDataModel::addSensor(cSensorModel* pSensor)
         if (!pSensor->initialize())
         {
             emit statusMessage("Sensor failed initialization!");
+            return;
         }
 
         pSensor->moveToThread(&mThread);
@@ -77,8 +83,10 @@ void cRemoteDataModel::stopDataThread()
     mThread.stop();
 }
 
-void cRemoteDataModel::openDataFile(const std::string& fileName)
+void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 {
+    using namespace std::filesystem;
+
     if (mFile.isOpen())
     {
         return; // false;
@@ -98,32 +106,61 @@ void cRemoteDataModel::openDataFile(const std::string& fileName)
 
     auto ext = qualifiedFileName.find_last_of('.');
 
-    char timestamp[100];
+    char timestamp[100] = {'\0'};
 
     std::time_t t = std::time(nullptr);
     std::strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", std::localtime(&t));
 
-    qualifiedFileName.insert(ext, "_");
-    qualifiedFileName.insert(ext + 1, timestamp);
+    qualifiedFileName += "_";
+    qualifiedFileName += timestamp;
+    qualifiedFileName += ".ceres";
 
     std::replace_if(qualifiedFileName.begin(), qualifiedFileName.end(),
         [](QString::value_type c) {return c <= QChar::Space; }, '_');
 
-    std::string fullyQualifiedFileName = mDefaultDataPath + qualifiedFileName;
-    mFile.open(fullyQualifiedFileName);
+    path fullyQualifiedFileName = mDefaultDataPath / qualifiedFileName;
 
-    if (mFile.isOpen())
+    path testPath = fullyQualifiedFileName;
+    testPath.remove_filename();
+    if (!exists(testPath))
     {
-        writeDataHeaders();
-        sendDataFileState(true);
+        create_directories(testPath);
+    }
+
+    QString msg = "Opening File: ";
+    msg.append(fullyQualifiedFileName.c_str());
+    emit statusMessage(msg);
+
+    mFile.open(fullyQualifiedFileName.string());
+
+    if (!mFile.isOpen())
+    {
+        sendDataFileState(false);
+        QString msg = "Failed to open file ";
+        msg.append(fullyQualifiedFileName.c_str());
+        emit statusMessage(msg);
         return;
     }
 
-    sendDataFileState(false);
+    mSerializer.attach(&mFile);
+    mSpidercamSerializer.attach(&mFile);
+    mWeatherSerializer.attach(&mFile);
+
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->enableDataRecording(mFile);
+    }
+
+    sendDataFileState(true);
 }
 
-void cRemoteDataModel::closeDataFile()
+void cRemoteDataModel::onCloseDataFile()
 {
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        sensor->disableDataRecording();
+    }
+
     mSerializer.endTime(time(nullptr));
     mIsRecording = false;
 
@@ -134,15 +171,25 @@ void cRemoteDataModel::closeDataFile()
     mFile.close();
 
     sendDataFileState(false);
+    emit statusMessage("Data file closed.");
 }
 
-
-void cRemoteDataModel::writeDataHeaders()
+void cRemoteDataModel::onStartDataRecording()
 {
-    mSerializer.attach(&mFile);
-    mSpidercamSerializer.attach(&mFile);
-    mWeatherSerializer.attach(&mFile);
+    mIsRecording = true;
+    emit requestDataRecordingState(true);
+    emit statusMessage("Data recording started.");
+}
 
+void cRemoteDataModel::onStopDataRecording()
+{
+    mIsRecording = false;
+    emit requestDataRecordingState(false);
+    emit statusMessage("Data recording stopped.");
+}
+
+void cRemoteDataModel::onStartExperiment()
+{
     mSerializer.writeTitle(mExperimentTitle);
 
     if (!mResearcher.empty())
@@ -155,36 +202,32 @@ void cRemoteDataModel::writeDataHeaders()
 
     for (auto& sensor : mThread.mActiveSensors)
     {
-        sensor->writeDataHeader(mFile);
+        sensor->writeDataHeader();
     }
 
     mSerializer.startTime(time(nullptr));
+
+    emit statusMessage("Experiment Started!");
 }
 
-
-void cRemoteDataModel::startExperiment()
+void cRemoteDataModel::onStopExperiment()
 {
-    mSerializer.startTimestamp(timestamp_ns());
-}
+    onStopDataRecording();
 
-void cRemoteDataModel::stopExperiment()
-{
     for (auto& sensor : mThread.mActiveSensors)
     {
-        sensor->endDataRecording();
+        sensor->writeDataFooter();
     }
-
-    mSerializer.endTimestamp(timestamp_ns());
-
-    closeDataFile();
 
     mExperimentTitle.clear();
     mResearcher.clear();
     mCultivar.clear();
     mExperimentDoc.clear();
+
+    emit statusMessage("Experiment Stopped!");
 }
 
-void cRemoteDataModel::experimentInfo(const std::string& title, 
+void cRemoteDataModel::onExperimentInfo(const std::string& title, 
     const std::string& researcher, const std::string& cultivar, const std::string& doc)
 {
     mExperimentTitle = title;
@@ -194,14 +237,27 @@ void cRemoteDataModel::experimentInfo(const std::string& title,
 }
 
 
-void cRemoteDataModel::spidercamPosition(const spidercam::sPosition& pos)
+void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition& pos)
 {
-    emit statusMessage("Receiving spidercam data.");
+    mDollyPosition = pos;
+
+    if (mIsRecording)
+    {
+        mSpidercamSerializer.write(mDollyPosition);
+    }
 }
 
-void cRemoteDataModel::weatherData(bool valid, double wind_speed_mps, double wind_direction_deg)
+void cRemoteDataModel::onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg)
 {
-    emit statusMessage("Receiving weather data.");
+    mWindDataValid = valid;
+    mWindSpeed_mps = wind_speed_mps;
+    mWindDirection_deg = wind_direction_deg;
+
+    if (mIsRecording)
+    {
+        mWeatherSerializer.writeWindData_mps(mWindDataValid, 
+            mWindSpeed_mps, mWindDirection_deg);
+    }
 }
 
 void cRemoteDataModel::acceptError(QAbstractSocket::SocketError socketError)

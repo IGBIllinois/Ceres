@@ -11,6 +11,7 @@
 #include "WeatherSerializer.hpp"
 
 #include <string>
+#include <filesystem>
 
 #include <QByteArray>
 #include <QtNetwork/QTcpServer>
@@ -33,7 +34,7 @@ public:
     explicit cRemoteDataModel(QObject* parent = nullptr);
     virtual ~cRemoteDataModel();
 
-    const std::string& defaultDataPath() const;
+    std::string defaultDataPath() const;
     void setDefaultDataPath(const std::string& data_path);
 
     bool startTcpServer(const std::string& ip, uint16_t port);
@@ -63,32 +64,27 @@ private slots:
     void clientStateChanged(QAbstractSocket::SocketState socketState);
 
 /*
- * Command handlers
- */
-private:
-    void startExperiment();
-    void stopExperiment();
-
-/*
  * Packet Handlers
  */
-    void experimentInfo(const std::string& title, const std::string& researcher,
+    void onExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc) override;
 
-    void openDataFile(const std::string& fileName) override;
-    void closeDataFile() override;
+    void onStartExperiment() override;
+    void onStopExperiment() override;
 
-    void spidercamPosition(const spidercam::sPosition& pos) override;
-    void weatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
+    void onOpenDataFile(const std::string& fileName) override;
+    void onCloseDataFile() override;
+    void onStartDataRecording() override;
+    void onStopDataRecording() override;
+
+    void onSpidercamPosition(const spidercam::sPosition& pos) override;
+    void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
 
 private:
     int sendOutgoingData(const char* data, std::size_t len) override;
 
-private:
-    void writeDataHeaders();
-
 protected:
-    std::string mDefaultDataPath;
+    std::filesystem::path mDefaultDataPath;
     bool mIsRecording;
 
     cBlockDataFileWriter    mFile;
@@ -108,6 +104,14 @@ private:
     std::string  mResearcher;
     std::string  mCultivar;
     std::string  mExperimentDoc;
+
+    // Spidercam Info
+    spidercam::sPosition mDollyPosition;
+
+    // Weather Info
+    bool mWindDataValid;
+    double mWindSpeed_mps;
+    double mWindDirection_deg;
 };
 
 

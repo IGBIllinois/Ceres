@@ -32,9 +32,14 @@ void cDummyControlModel::startExperiment()
 }
 
 
-void cDummyControlModel::writeDataHeader(cBlockDataFileWriter& file)
-{
-}
+void cDummyControlModel::enableDataRecording(cBlockDataFileWriter& file)
+{}
+
+void cDummyControlModel::disableDataRecording()
+{}
+
+void cDummyControlModel::writeDataHeader()
+{}
 
 void cDummyControlModel::stopDataRecording()
 {

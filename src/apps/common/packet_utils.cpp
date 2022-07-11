@@ -88,6 +88,32 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+int encode_start_experiment(ceres::net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = ePacketType::START_EXPERIMENT;
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t);
+}
+
+int encode_stop_experiment(ceres::net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = ePacketType::STOP_EXPERIMENT;
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t);
+}
+
 std::string to_filename_1(const OpenDataFile_1& pckt)
 {
     return pckt.filename();
@@ -153,6 +179,31 @@ int encode_file_open_state(bool open, ceres::net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+int encode_start_data_recording(ceres::net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = ePacketType::START_DATA_RECORDING;
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t);
+}
+
+int encode_stop_data_recording(ceres::net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = ePacketType::STOP_DATA_RECORDING;
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t);
+}
 
 /*
  * Spidercam Packets

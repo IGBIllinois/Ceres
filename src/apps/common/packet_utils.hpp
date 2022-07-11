@@ -34,10 +34,10 @@ enum class ePacketType : uint16_t
 	CLOSE_DATA_FILE,
 	DATA_FILE_STATE,
 	START_DATA_RECORDING,
-	START_DATA_RECORDING_REPLY,
 	STOP_DATA_RECORDING,
-	STOP_DATA_RECORDING_REPLY,
-	END_DATA_RECORDING,
+	DATA_RECORDING_STATE,
+	START_EXPERIMENT,
+	STOP_EXPERIMENT,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -74,6 +74,9 @@ sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt);
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
 	const std::string& cultivar, const std::string& doc, ceres::net_buffer& buffer);
 
+int encode_start_experiment(ceres::net_buffer& buffer);
+int encode_stop_experiment(ceres::net_buffer& buffer);
+
 std::string to_filename_1(const OpenDataFile_1& pckt);
 int encode_open_data_file(const std::string& filename, ceres::net_buffer& buffer);
 
@@ -81,6 +84,9 @@ int encode_close_data_file(ceres::net_buffer& buffer);
 
 bool to_file_open_state_1(const FileOpenState_1& pckt);
 int encode_file_open_state(bool open, ceres::net_buffer& buffer);
+
+int encode_start_data_recording(ceres::net_buffer& buffer);
+int encode_stop_data_recording(ceres::net_buffer& buffer);
 
 
 /**********************************************************

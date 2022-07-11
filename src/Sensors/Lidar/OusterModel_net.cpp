@@ -382,21 +382,25 @@ void cOusterModel_net::update()
     cOusterLidarStream_Qt::processOneDatagram();
 }
 
-void cOusterModel_net::writeDataHeader(cBlockDataFileWriter& file)
+void cOusterModel_net::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
+}
+
+void cOusterModel_net::disableDataRecording()
+{
+    cLidarModel::disableDataRecording();
+    mSerializer.detach();
+}
+
+void cOusterModel_net::writeDataHeader()
+{
     mSerializer.write(mConfigParameters);
     mSerializer.write(mSensorInfo);
     mSerializer.write(mBeamIntrinsics);
     mSerializer.write(mImuIntrinsics);
     mSerializer.write(mLidarIntrinsics);
     mSerializer.write(mDataFormat);
-}
-
-void cOusterModel_net::endDataRecording()
-{
-    cLidarModel::endDataRecording();
-    mSerializer.detach();
 }
 
 void cOusterModel_net::onNewData(const ouster::imu_data_t& data)

@@ -181,15 +181,21 @@ void cSpidercamModel::startExperiment()
 }
 
 
-void cSpidercamModel::writeDataHeader(cBlockDataFileWriter& file)
+void cSpidercamModel::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cSpidercamModel::stopDataRecording()
+void cSpidercamModel::disableDataRecording()
 {
     mSerializer.detach();
 }
+
+void cSpidercamModel::writeDataHeader()
+{}
+
+void cSpidercamModel::stopDataRecording()
+{}
 
 
 void cSpidercamModel::update()

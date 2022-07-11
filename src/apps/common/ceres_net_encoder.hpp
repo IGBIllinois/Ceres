@@ -24,8 +24,14 @@ public:
     void sendExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc);
 
+    void sendStartExperiment();
+    void sendStopExperiment();
+
     void sendOpenDataFile(const std::string& fileName);
     void sendCloseDataFile();
+
+    void sendStartDataRecording();
+    void sendStopDataRecording();
 
     void sendSpidercamPosition(const spidercam::sPosition& pos);
     void sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg);

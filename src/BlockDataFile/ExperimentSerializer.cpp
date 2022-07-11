@@ -104,7 +104,7 @@ void cExperimentSerializer::endTime(time_t time)
 
 }
 
-void cExperimentSerializer::startTimestamp(uint64_t timestamp)
+void cExperimentSerializer::startRecordingTimestamp(uint64_t timestamp)
 {
     assert(mpDataFile);
 
@@ -115,7 +115,7 @@ void cExperimentSerializer::startTimestamp(uint64_t timestamp)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cExperimentSerializer::endTimestamp(uint64_t timestamp)
+void cExperimentSerializer::endRecordingTimestamp(uint64_t timestamp)
 {
     assert(mpDataFile);
 

@@ -34,7 +34,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
                 ExperimentInfo_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
                 sExperimentInfo_t data = to_experiment_info_1(packet);
-                experimentInfo(data.title, data.researcher, data.cultivar, data.doc);
+                onExperimentInfo(data.title, data.researcher, data.cultivar, data.doc);
                 break;
             }
             case ePacketType::EXPERIMENT_INFO_REPLY:
@@ -45,38 +45,42 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
             {
                 OpenDataFile_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
-                openDataFile(to_filename_1(packet));
+                onOpenDataFile(to_filename_1(packet));
                 break;
             }
             case ePacketType::CLOSE_DATA_FILE:
             {
-                void closeDataFile();
+                onCloseDataFile();
                 break;
             }
             case ePacketType::DATA_FILE_STATE:
             {
                 FileOpenState_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
-                dataFileState(to_file_open_state_1(packet));
+                onDataFileState(to_file_open_state_1(packet));
                 break;
             }
             case ePacketType::START_DATA_RECORDING:
             {
-                break;
-            }
-            case ePacketType::START_DATA_RECORDING_REPLY:
-            {
+                onStartDataRecording();
                 break;
             }
             case ePacketType::STOP_DATA_RECORDING:
             {
+                onStopDataRecording();
                 break;
             }
-            case ePacketType::STOP_DATA_RECORDING_REPLY:
+            case ePacketType::START_EXPERIMENT:
             {
+                onStartExperiment();
                 break;
             }
-            case ePacketType::END_DATA_RECORDING:
+            case ePacketType::STOP_EXPERIMENT:
+            {
+                onStartExperiment();
+                break;
+            }
+            case ePacketType::DATA_RECORDING_STATE:
             {
                 break;
             }
@@ -84,7 +88,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
             {
                 Spidercam_Position_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
-                spidercamPosition(to_spidercam_position_1(packet));
+                onSpidercamPosition(to_spidercam_position_1(packet));
                 break;
             }
             case ePacketType::WEATHER_DATA:
@@ -92,7 +96,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
                 WeatherData_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
                 sWeatherData_t data = to_weather_data_1(packet);
-                weatherData(data.dataValid, data.wind_speed_mps, data.wind_direction_deg);
+                onWeatherData(data.dataValid, data.wind_speed_mps, data.wind_direction_deg);
                 break;
             }
         }

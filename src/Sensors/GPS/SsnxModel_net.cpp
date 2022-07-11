@@ -81,15 +81,19 @@ void cSsnxModel_net::update()
     processOneDatagram();
 }
 
-void cSsnxModel_net::writeDataHeader(cBlockDataFileWriter& file)
+void cSsnxModel_net::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cSsnxModel_net::endDataRecording()
+void cSsnxModel_net::disableDataRecording()
 {
-    cGpsModel::endDataRecording();
+    cGpsModel::disableDataRecording();
     mSerializer.detach();
+}
+
+void cSsnxModel_net::writeDataHeader()
+{
 }
 
 void cSsnxModel_net::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)

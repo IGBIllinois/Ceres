@@ -20,7 +20,7 @@ public:
  * The Ceres Remote Client application sends these packets and should never receive them!
  */
 private:
-    void dataFileState(bool is_open) override {};
+    void onDataFileState(bool is_open) override final {};
 
 };
 

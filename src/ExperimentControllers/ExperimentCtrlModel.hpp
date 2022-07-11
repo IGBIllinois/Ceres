@@ -76,19 +76,18 @@ public:
 //    virtual void terminateExperiment();
 
     /*
+     * Attach/Detach the serializer to the data file.
+     */
+    virtual void enableDataRecording(cBlockDataFileWriter& file) = 0;
+    virtual void disableDataRecording() = 0;
+
+    /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    virtual void writeDataHeader(cBlockDataFileWriter& file) = 0;
-
-    /*
-     * Sets the non-owning data file pointer to
-     * start the writing of sensor data.
-     */
-//    virtual void startDataRecording();
-
-//    virtual void pauseDataRecording() = 0;
+    virtual void writeDataHeader() = 0;
+    virtual void writeDataFooter() {};
 
     /*
      * Sets the non-owning data file pointer to null to

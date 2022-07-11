@@ -29,16 +29,17 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
 
     /*
+     * Attach/Detach the serializer.
+     */
+    void enableDataRecording(cBlockDataFileWriter& file) override;
+    void disableDataRecording() override;
+
+    /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFileWriter& file) override;
-
-    /*
-     * Detach the serializer.
-     */
-    void endDataRecording() override;
+    void writeDataHeader() override;
 
     /*
      * Starts/Stops communication with the endpoint.
