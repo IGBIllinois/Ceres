@@ -50,7 +50,7 @@ protected:
     void dataRecordingStateChange(bool record) override;
 
 public slots:
-    void updatePosition(spidercam::sPosition pos);
+    void updatePosition(spidercam::sPosition_1_t pos);
     void updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
 
 /*

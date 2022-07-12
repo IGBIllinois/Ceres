@@ -7,7 +7,7 @@
 // Forward Declarations
 namespace spidercam
 {
-    struct sPosition;
+    struct sPosition_1_t;
 }
 
 
@@ -33,7 +33,7 @@ public:
     void sendStartDataRecording();
     void sendStopDataRecording();
 
-    void sendSpidercamPosition(const spidercam::sPosition& pos);
+    void sendSpidercamPosition(const spidercam::sPosition_1_t& pos);
     void sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg);
 };
 

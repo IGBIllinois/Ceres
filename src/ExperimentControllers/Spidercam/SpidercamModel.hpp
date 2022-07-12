@@ -24,7 +24,7 @@ public:
 	 */
 	char* descriptor() const override { return "spidercam"; };
 
-	const spidercam::sPosition& currentPosition() const;
+	const spidercam::sPosition_1_t& currentPosition() const;
 
     /*
      * Apply any configuration parameters to the sensor
@@ -63,7 +63,7 @@ public:
 
 signals:
     void limitsChanged(spidercam::sWorkingDimensions limits);
-    void positionChanged(spidercam::sPosition pos);
+    void positionChanged(spidercam::sPosition_1_t pos);
 	void busyChanged(bool busy);
 	void movingChanged(bool moving);
 	void batteryLevelChanged(float level_pct);
@@ -93,7 +93,7 @@ protected:
 
 protected:
 
-	spidercam::sPosition mCurrentPosition;
+	spidercam::sPosition_1_t mCurrentPosition;
 
 
 	comparator<int, spidercam::window_compare<int, 2>> mBatteryLevel_pct;
@@ -126,7 +126,7 @@ private:
 };
 
 
-inline const spidercam::sPosition& cSpidercamModel::currentPosition() const
+inline const spidercam::sPosition_1_t& cSpidercamModel::currentPosition() const
 {
 	return mCurrentPosition;
 }

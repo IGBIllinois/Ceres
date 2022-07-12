@@ -2,9 +2,9 @@
 #include "GpsModel.hpp"
 
 
-cGpsModel::cGpsModel(QObject* parent)
+cGpsModel::cGpsModel(const std::string& name, QObject* parent)
 :
-    cSensorModel(parent)
+    cSensorModel(name, parent)
 {
     mDatum = eDatum::WGS84;
 

@@ -39,7 +39,7 @@ private:
     virtual void onStartDataRecording() = 0;
     virtual void onStopDataRecording() = 0;
 
-    virtual void onSpidercamPosition(const spidercam::sPosition& pos) = 0;
+    virtual void onSpidercamPosition(const spidercam::sPosition_1_t& pos) = 0;
 
     virtual void onWeatherData(bool valid, double wind_speed_mps, 
         double wind_direction_deg) = 0;

@@ -7,7 +7,7 @@
 
 cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
 :
-    cHyperspectralModel(parent)
+    cHyperspectralModel("VNIR 3000N", parent)
 {
     mConnected = false;
 }

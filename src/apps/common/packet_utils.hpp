@@ -92,8 +92,8 @@ int encode_stop_data_recording(ceres::net_buffer& buffer);
 /**********************************************************
  * Spidercam packets utilities
  **********************************************************/
-spidercam::sPosition to_spidercam_position_1(const Spidercam_Position_1& pckt);
-int encode_spidercam_pos(const spidercam::sPosition& pos, ceres::net_buffer& buffer);
+spidercam::sPosition_1_t to_spidercam_position_1(const Spidercam_Position_1& pckt);
+int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, ceres::net_buffer& buffer);
 
 
 /**********************************************************

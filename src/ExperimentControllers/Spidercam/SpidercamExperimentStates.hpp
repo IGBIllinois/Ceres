@@ -12,7 +12,7 @@ class cSpidercamController;
 class cSpidercamExperimentState_Movement : public cExperimentState
 {
 public:
-	cSpidercamExperimentState_Movement(const spidercam::sPosition& pos,
+	cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
 		cSpidercamController& controller, uint32_t tolerance_mm);
 
 	QString getStatusStr() override;
@@ -27,9 +27,10 @@ public:
 	eRESULT finished() override;
 
 private:
-	const spidercam::sPosition& mDollyPos;
+	const spidercam::sPosition_1_t& mDollyPos;
 	cSpidercamController& mController;
 
+	bool mMotionDetected;
 	bool mMoveCommandSent;
 	bool mStopCommandSent;
 	bool mBusy;

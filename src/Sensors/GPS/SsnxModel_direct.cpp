@@ -60,7 +60,7 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
-    return true;
+    return cSsnxModel::configure(jsonCfg);
 }
 
 bool cSsnxModel_direct::startCommunications()

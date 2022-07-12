@@ -15,7 +15,7 @@ public:
     char* sensorClass() const override { return "rgb"; };
 
 protected:
-    cRgbCameraModel(QObject* parent = nullptr);
+    cRgbCameraModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cRgbCameraModel() = default;
 };
 

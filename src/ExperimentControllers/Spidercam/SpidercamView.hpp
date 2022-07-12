@@ -28,7 +28,7 @@ public:
 
 public slots:
 	void updateLimits(spidercam::sWorkingDimensions limits);
-	void updatePosition(spidercam::sPosition pos);
+	void updatePosition(spidercam::sPosition_1_t pos);
     void updateRecordingState(bool recording);
 
 private:

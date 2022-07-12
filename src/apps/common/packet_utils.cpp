@@ -208,9 +208,9 @@ int encode_stop_data_recording(ceres::net_buffer& buffer)
 /*
  * Spidercam Packets
  */
-spidercam::sPosition to_spidercam_position_1(const Spidercam_Position_1& pckt)
+spidercam::sPosition_1_t to_spidercam_position_1(const Spidercam_Position_1& pckt)
 {
-    spidercam::sPosition data;
+    spidercam::sPosition_1_t data;
 
     data.X_mm = pckt.x_mm();
     data.Y_mm = pckt.y_mm();
@@ -232,7 +232,7 @@ spidercam::sPosition to_spidercam_position_1(const Spidercam_Position_1& pckt)
     return data;
 }
 
-int encode_spidercam_pos(const spidercam::sPosition& pos, net_buffer& buffer)
+int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer)
 {
     Spidercam_Position_1 pckt;
 

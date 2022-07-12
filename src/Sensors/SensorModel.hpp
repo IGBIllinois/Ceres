@@ -9,6 +9,11 @@ class cBlockDataFileWriter;
 
 enum class eSensorStatus { UNKNOWN, CONFIGURED, INITIALIZED, WARM_UP, RUNNING, STOPPED };
 
+const uint8_t   logSTATUS  = 0;
+const uint8_t   logINFO    = 1;
+const uint8_t   logWARNING = 2;
+const uint8_t   logERROR   = 3;
+
 /**
  * Abstract Base Class for all Sensor Based Models
  * 
@@ -33,6 +38,11 @@ public:
      */
     virtual char* descriptor() const = 0;
 
+    /*
+     * Returns a QString used as the name of the sensor.
+     */
+    const std::string& name() const;
+
     eSensorStatus status() const { return mStatus; };
 
     /*
@@ -45,7 +55,7 @@ public:
      * Do any sensor initialization needed before the
      * sensor model is moved to the data thread.
      */
-    virtual bool initialize() { return true;  };
+    virtual bool initialize();
 
     /*
      * Attach/Detach the serializer to the data file.
@@ -85,12 +95,18 @@ signals:
     void infoMessage(QString title, QString msg);
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
+    void logMessage(uint8_t type, QString device, QString msg);
+
+    void sensorStatusChanging(eSensorStatus status);
+    void sensorNameChanging(QString old_name, QString new_name);
 
 public:
     virtual void update() = 0;
 
 protected:
-    cSensorModel(QObject* parent = nullptr);
+    cSensorModel(const std::string& name, QObject* parent = nullptr);
+
+    void updateName(const std::string& name);
 
 protected:
     eSensorStatus mStatus = eSensorStatus::UNKNOWN;
@@ -106,5 +122,8 @@ protected:
     std::string mManufacturer;
     std::string mModel;
     std::string mSerialNumber;
+
+private:
+    std::string mSensorName;
 };
 

@@ -33,7 +33,7 @@ void cSpidercamDollyStatus::updateLimits(spidercam::sWorkingDimensions limits)
 	mMaxHeight_mm = limits.maxHeight_mm;
 }
 
-void cSpidercamDollyStatus::updatePosition(spidercam::sPosition pos)
+void cSpidercamDollyStatus::updatePosition(spidercam::sPosition_1_t pos)
 {
 
 	mpX_m->setText(QString::number(pos.X_mm * nConstants::MM_TO_M, 'f', 3));

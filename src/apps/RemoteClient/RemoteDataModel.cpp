@@ -20,6 +20,7 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
     mWindDirection_deg = 0.0;
 
     mIsRecording = false;
+    mIsExperimentRunning = false;
 
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cRemoteDataModel::onStatusUpdate);
 
@@ -156,6 +157,9 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 
 void cRemoteDataModel::onCloseDataFile()
 {
+    if (!mFile.isOpen())
+        return;
+
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->disableDataRecording();
@@ -190,6 +194,7 @@ void cRemoteDataModel::onStopDataRecording()
 
 void cRemoteDataModel::onStartExperiment()
 {
+    mIsExperimentRunning = true;
     mSerializer.writeTitle(mExperimentTitle);
 
     if (!mResearcher.empty())
@@ -224,6 +229,8 @@ void cRemoteDataModel::onStopExperiment()
     mCultivar.clear();
     mExperimentDoc.clear();
 
+    mIsExperimentRunning = false;
+
     emit statusMessage("Experiment Stopped!");
 }
 
@@ -237,7 +244,7 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
 }
 
 
-void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition& pos)
+void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
 {
     mDollyPosition = pos;
 
@@ -305,6 +312,18 @@ void cRemoteDataModel::clientDisconnected()
 
     mpClient->deleteLater();
     mpClient = nullptr;
+
+    if (mIsRecording)
+    {
+        onStopDataRecording();
+    }
+
+    if (mIsExperimentRunning)
+    {
+        onStopExperiment();
+    }
+
+    onCloseDataFile();
 
     emit statusMessage("Client is disconnected!");
 }

@@ -2,9 +2,9 @@
 #include "HyperspectralModel.hpp"
 
 
-cHyperspectralModel::cHyperspectralModel(QObject* parent)
+cHyperspectralModel::cHyperspectralModel(const std::string& name, QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel(name, parent)
 {
 }
 

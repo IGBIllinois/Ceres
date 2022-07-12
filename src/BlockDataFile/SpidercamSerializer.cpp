@@ -25,7 +25,7 @@ cBlockID& cSpidercamSerializer::blockID()
     return mBlockID;
 }
 
-void cSpidercamSerializer::write(const spidercam::sPosition& pos)
+void cSpidercamSerializer::write(const spidercam::sPosition_1_t& pos)
 {
     assert(mpDataFile);
 

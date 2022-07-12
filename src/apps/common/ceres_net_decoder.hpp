@@ -27,7 +27,7 @@ private:
     void onStartDataRecording() override final {};
     void onStopDataRecording() override final {};
 
-    void onSpidercamPosition(const spidercam::sPosition& pos) override final {};
+    void onSpidercamPosition(const spidercam::sPosition_1_t& pos) override final {};
     void onWeatherData(bool valid, double wind_speed_mph, double wind_direction_deg) override final {};
 };
 

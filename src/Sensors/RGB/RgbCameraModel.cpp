@@ -2,9 +2,9 @@
 #include "RgbCameraModel.hpp"
 
 
-cRgbCameraModel::cRgbCameraModel(QObject* parent)
+cRgbCameraModel::cRgbCameraModel(const std::string& name, QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel(name, parent)
 {
 }
 

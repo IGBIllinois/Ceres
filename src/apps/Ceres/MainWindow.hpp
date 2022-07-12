@@ -49,11 +49,12 @@ public slots:
     void onInfoMessage(QString title, QString msg);
     void onWarningMessage(QString title, QString msg);
     void onErrorMessage(QString title, QString msg);
+    void onLogMessage(uint8_t type, QString device, QString msg);
 
     void onExperimentCompleted();
 
 private slots:
-    void fileNew();
+    void fileRefresh();
     void fileAddExperiment();
     void experimentLoad();
     void experimentRun();

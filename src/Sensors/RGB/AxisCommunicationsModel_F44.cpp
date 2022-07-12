@@ -10,7 +10,7 @@ const std::size_t MAX_CAMERAS = 4;
 
 cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
 :
-    cAxisCommunicationsModel(parent),
+    cAxisCommunicationsModel("Axis F44 Webcam", parent),
     mImageData(),
     mImageBuffer(&mImageData),
     mpActiveCamera(nullptr)

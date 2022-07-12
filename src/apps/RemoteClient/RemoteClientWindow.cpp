@@ -3,6 +3,7 @@
 #include "ui_MainWindow.h"
 
 #include "CeresSplashScreen.hpp"
+#include "LogWidget.hpp"
 
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
@@ -77,7 +78,8 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     mpSplashScreen(nullptr),
     mpFileMenu(nullptr),
     mpHelpMenu(nullptr),
-    mpUI(new Ui::MainWindow)
+    mpUI(new Ui::MainWindow),
+    mpLogWindow(nullptr)
 {
     mpUI->setupUi(this);
 
@@ -89,10 +91,14 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     auto data_path = cwd / "Data";
     mMainModel.setDefaultDataPath(data_path.string());
 
+    mpLogWindow = new cLogWidget(this);
+
     QObject::connect(&mMainModel, &cDataModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
     QObject::connect(&mMainModel, &cDataModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
     QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
     QObject::connect(&mMainModel, &cDataModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
+
+    setCentralWidget(mpLogWindow);
 }
 
 //-----------------------------------------------------------------------------
@@ -245,6 +251,10 @@ void cRemoteClientWindow::onErrorMessage(QString title, QString msg)
     msg_box.exec();
 }
 
+void cRemoteClientWindow::onLogMessage(uint8_t type, QString device, QString msg)
+{
+
+}
 
 //-----------------------------------------------------------------------------
 void cRemoteClientWindow::createMainMenu()
@@ -313,6 +323,7 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         QObject::connect(widgets.pModel, &cSensorModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
         QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
         QObject::connect(widgets.pModel, &cSensorModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::logMessage,     this, &cRemoteClientWindow::onLogMessage);
 
         if (configDoc.contains(type))
         {

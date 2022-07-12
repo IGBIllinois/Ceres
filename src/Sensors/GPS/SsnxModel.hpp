@@ -19,7 +19,7 @@ public:
      */
     char* descriptor() const override;
 
-    virtual bool configure(const nlohmann::json& jsonCfg) = 0;
+    bool configure(const nlohmann::json& jsonCfg) override;
 
 signals:
     void updatePVT(double timestamp_s,

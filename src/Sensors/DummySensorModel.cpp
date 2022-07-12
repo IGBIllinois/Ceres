@@ -5,7 +5,7 @@
 
 cDummyModel::cDummyModel(QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel("Dummy", parent)
 {
 }
 

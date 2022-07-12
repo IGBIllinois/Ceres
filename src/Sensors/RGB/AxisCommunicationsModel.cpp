@@ -16,9 +16,9 @@ QByteArray to_QByteArray(const nlohmann::json& jsonDoc)
     return QByteArray(s.c_str(), s.size());
 }
 
-cAxisCommunicationsModel::cAxisCommunicationsModel(QObject* parent)
+cAxisCommunicationsModel::cAxisCommunicationsModel(const std::string& name, QObject* parent)
 :
-    cRgbCameraModel(parent),
+    cRgbCameraModel(name, parent),
     mpHttpManager(nullptr),
     mVapixVersion(0)
 {

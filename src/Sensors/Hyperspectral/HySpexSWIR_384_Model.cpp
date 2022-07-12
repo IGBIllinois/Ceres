@@ -7,7 +7,7 @@
 
 cHySpexSWIR_384_Model::cHySpexSWIR_384_Model(QObject* parent)
 :
-    cHyperspectralModel(parent)
+    cHyperspectralModel("SWIR 384", parent)
 {
     mConnected = false;
 }
@@ -16,6 +16,7 @@ char* cHySpexSWIR_384_Model::descriptor() const
 {
     return hyspex_id;
 }
+
 
 bool cHySpexSWIR_384_Model::configure(const nlohmann::json& jsonCfg)
 {

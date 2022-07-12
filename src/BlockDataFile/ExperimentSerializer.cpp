@@ -19,6 +19,39 @@ cExperimentSerializer::cExperimentSerializer(std::size_t n, cBlockDataFileWriter
 {
 }
 
+void cExperimentSerializer::writeBeginHeader()
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::BEGIN_HEADER);
+    mpDataFile->writeBlock(mBlockID);
+}
+
+void cExperimentSerializer::writeEndOfHeader()
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::END_OF_HEADER);
+    mpDataFile->writeBlock(mBlockID);
+}
+
+
+void cExperimentSerializer::writeBeginFooter()
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::BEGIN_FOOTER);
+    mpDataFile->writeBlock(mBlockID);
+}
+
+void cExperimentSerializer::writeEndOfFooter()
+{
+    assert(mpDataFile);
+
+    mBlockID.dataID(DataID::END_OF_FOOTER);
+    mpDataFile->writeBlock(mBlockID);
+}
+
 void cExperimentSerializer::writeTitle(const std::string& title)
 {
     assert(mpDataFile);

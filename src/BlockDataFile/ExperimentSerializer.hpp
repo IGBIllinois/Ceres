@@ -19,6 +19,12 @@ public:
 	explicit cExperimentSerializer(std::size_t n, cBlockDataFileWriter* pDataFile = nullptr);
 	~cExperimentSerializer() = default;
 
+	void writeBeginHeader();
+	void writeEndOfHeader();
+
+	void writeBeginFooter();
+	void writeEndOfFooter();
+
 	void writeTitle(const std::string& title);
 	void writeResearcher(const std::string& researcher);
 	void writeCultivar(const std::string& cultivar);

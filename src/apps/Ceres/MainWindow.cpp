@@ -235,6 +235,13 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 }
 
 //-----------------------------------------------------------------------------
+void cMainWindow::fileRefresh()
+{
+    mpExperiments->refresh();
+}
+
+//-----------------------------------------------------------------------------
+/*
 void cMainWindow::fileNew()
 {
     if (mpModel->isExperimentRunning())
@@ -243,7 +250,7 @@ void cMainWindow::fileNew()
     }
 
     auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
-    if ((pExperiment == nullptr) || ( ! pExperiment->hasExperimentDocument()))
+    if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
     {
         return;
     }
@@ -260,6 +267,7 @@ void cMainWindow::fileNew()
     }
 
 }
+*/
 
 //-----------------------------------------------------------------------------
 void cMainWindow::fileAddExperiment()
@@ -421,6 +429,10 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
     msg_box.exec();
 }
 
+void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
+{
+
+}
 
 void cMainWindow::onExperimentCompleted()
 {
@@ -448,15 +460,15 @@ void cMainWindow::createSubMenusAndActions()
     QAction* pMenuItem = nullptr;
 
     // Build the File Menu
-/*
-    pMenuItem = new QAction(tr("&New"), this);
-    pMenuItem->setShortcuts(QKeySequence::New);
-    pMenuItem->setStatusTip(tr("Create a new file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileNew);
+    pMenuItem = new QAction(tr("Refresh"), this);
+//    pMenuItem->setShortcuts(QKeySequence::New);
+    pMenuItem->setStatusTip(tr("Refresh the experiment window"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileRefresh);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
 
+/*
     pMenuItem = new QAction(tr("&Add Experiment"), this);
     pMenuItem->setShortcuts(QKeySequence::New);
     pMenuItem->setStatusTip(tr("Add an experiment to the list"));
@@ -591,9 +603,6 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         QObject::connect(mpModel, &cCtrlDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
         QObject::connect(mpModel, &cCtrlDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-        bool result = model->try_to_connect(QString(c4_ip.c_str()), port,
-                                        false, QString(c3_ip.c_str()));
-
         auto* dockWidget = new QDockWidget();
         model->createView(dockWidget);
 
@@ -604,6 +613,12 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
             addDockWidget(Qt::RightDockWidgetArea, dockWidget);
             mpViewMenu->addAction(dockWidget->toggleViewAction());
         }
+
+        bool result = model->try_to_connect(QString(c4_ip.c_str()), port,
+            false, QString(c3_ip.c_str()));
+
+        if (!result)
+        { }
 
         mpModel = model;
     }
@@ -682,6 +697,7 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
         QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
         QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::logMessage, this, &cMainWindow::onLogMessage);
 
         if (configDoc.contains(type))
         {

@@ -16,6 +16,7 @@ cRemoteClientView::cRemoteClientView(cCtrlDataModelRemote* pModel, QWidget* pare
 	QAbstractScrollArea(parent),
 	mpModel(pModel)
 {
+	setWindowTitle("Remote Status");
 	createWidgets();
 }
 
@@ -54,9 +55,12 @@ void cRemoteClientView::createWidgets()
 
 	mpTryReconnect = new QPushButton(this);
 	mpTryReconnect->setText("Try to Reconnect");
-//	mpTryReconnect->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//	mpTryReconnect->setSizePolicy(QSizePolicy::controlType);
+	mpTryReconnect->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	connect(mpTryReconnect, &QPushButton::pressed, this, &cRemoteClientView::tryReconnectPressed);
+
+	mpTryReconnect->setFixedSize(mpConnectionStatus->sizeHint());
+	mpConnectionStatus->setSizePolicy(mpTryReconnect->sizePolicy());
+	mpConnectionStatus->setFixedSize(mpTryReconnect->sizeHint());
 
 	mpSensorLabel = new QLabel(this);
 	mpSensorLabel->setText("OUSTER");
@@ -185,7 +189,7 @@ void cRemoteClientView::verticalLayout()
 
 void cRemoteClientView::setFloatingSize()
 {
-	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	setMinimumSize(687, 139);
 	setMaximumSize(687, 139);
 }

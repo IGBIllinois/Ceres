@@ -67,7 +67,7 @@ protected slots:
     void requestReceived(QNetworkReply* pReply);
 
 protected:
-    cAxisCommunicationsModel(QObject* parent = nullptr);
+    cAxisCommunicationsModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cAxisCommunicationsModel();
 
     void queryVapixSupport();

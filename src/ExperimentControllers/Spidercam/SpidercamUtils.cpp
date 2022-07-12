@@ -5,7 +5,7 @@
 
 using namespace spidercam;
 
-bool spidercam::hasPositionChanged(const sPosition& pos1, const sPosition& pos2, double tolerance_mm)
+bool spidercam::hasPositionChanged(const sPosition_1_t& pos1, const sPosition_1_t& pos2, double tolerance_mm)
 {
 	double diff = std::abs(pos1.X_mm - pos2.X_mm);
 	if (diff > tolerance_mm)
@@ -20,7 +20,7 @@ bool spidercam::hasPositionChanged(const sPosition& pos1, const sPosition& pos2,
 }
 
 
-bool spidercam::hasPosSpeedChanged(const sPosition& pos1, const sPosition& pos2, double tolerance_mm)
+bool spidercam::hasPosSpeedChanged(const sPosition_1_t& pos1, const sPosition_1_t& pos2, double tolerance_mm)
 {
 	double diff = std::abs(pos1.X_mm - pos2.X_mm);
 	if (diff > tolerance_mm)

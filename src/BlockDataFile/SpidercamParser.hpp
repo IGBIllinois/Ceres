@@ -21,7 +21,7 @@ public:
 
 	cBlockID& blockID() override;
 
-	spidercam::sPosition		getPosition() const { return mPosition; }
+	spidercam::sPosition_1_t	getPosition() const { return mPosition; }
 
 	void processData(BLOCK_MAJOR_VERSION_t major_version,
 		BLOCK_MINOR_VERSION_t minor_version,
@@ -32,7 +32,7 @@ protected:
 	virtual void processPosition(cDataBuffer& buffer);
 
 protected:
-	spidercam::sPosition		mPosition;
+	spidercam::sPosition_1_t	mPosition;
 
 private:
     cSpidercamID    mBlockID;

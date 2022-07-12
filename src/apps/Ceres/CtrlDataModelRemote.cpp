@@ -96,7 +96,7 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
     }
 }
 
-void cCtrlDataModelRemote::updatePosition(spidercam::sPosition pos)
+void cCtrlDataModelRemote::updatePosition(spidercam::sPosition_1_t pos)
 {
     if (!mConnected) return;
 
@@ -266,7 +266,7 @@ bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath)
     case 10: filename = "Nov"; break;
     case 11: filename = "Dec"; break;
     }
-    filename += std::to_string(ltm->tm_mday+1);
+    filename += std::to_string(ltm->tm_mday);
     filename += "/";
     filename += mExperimentTitle;
 

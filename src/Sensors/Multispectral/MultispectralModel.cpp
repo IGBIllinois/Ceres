@@ -2,10 +2,9 @@
 #include "MultispectralModel.hpp"
 
 
-cMultispectralModel::cMultispectralModel(QObject* parent)
+cMultispectralModel::cMultispectralModel(const std::string& name, QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel(name, parent)
 {
 }
-
 

@@ -10,7 +10,7 @@
 // Forward Declarations
 namespace spidercam
 {
-	struct sPosition;
+	struct sPosition_1_t;
 }
 
 class cSpidercamSerializer : public cBlockSerializer
@@ -20,7 +20,7 @@ public:
 	explicit cSpidercamSerializer(std::size_t n, cBlockDataFileWriter* pDataFile = nullptr);
 	~cSpidercamSerializer() = default;
 
-	void write(const spidercam::sPosition& pos);
+	void write(const spidercam::sPosition_1_t& pos);
 
 protected:
 	cBlockID& blockID() override;

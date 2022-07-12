@@ -55,7 +55,7 @@ void cCeresNetEncoder::sendStopDataRecording()
 }
 
 
-void cCeresNetEncoder::sendSpidercamPosition(const spidercam::sPosition& pos)
+void cCeresNetEncoder::sendSpidercamPosition(const spidercam::sPosition_1_t& pos)
 {
     encode_spidercam_pos(pos, mBuffer);
     sendData();

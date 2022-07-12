@@ -77,7 +77,7 @@ private slots:
     void onStartDataRecording() override;
     void onStopDataRecording() override;
 
-    void onSpidercamPosition(const spidercam::sPosition& pos) override;
+    void onSpidercamPosition(const spidercam::sPosition_1_t& pos) override;
     void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
 
 private:
@@ -86,6 +86,7 @@ private:
 protected:
     std::filesystem::path mDefaultDataPath;
     bool mIsRecording;
+    bool mIsExperimentRunning;
 
     cBlockDataFileWriter    mFile;
     cExperimentSerializer   mSerializer;
@@ -106,7 +107,7 @@ private:
     std::string  mExperimentDoc;
 
     // Spidercam Info
-    spidercam::sPosition mDollyPosition;
+    spidercam::sPosition_1_t mDollyPosition;
 
     // Weather Info
     bool mWindDataValid;

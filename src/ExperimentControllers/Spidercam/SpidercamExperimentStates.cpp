@@ -16,7 +16,7 @@ namespace
 
 
 
-cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spidercam::sPosition& pos, 
+cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
 	cSpidercamController& controller, uint32_t tolerance_mm)
 :
 	mDollyPos(pos), mController(controller), mRecordData(false), 
@@ -27,6 +27,7 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 	mY_NeedsInitialization = false;
 	mZ_NeedsInitialization = false;
 
+	mMotionDetected = false;
 	mMoveCommandSent = false;
 	mStopCommandSent = false;
 	mBusy = false;
@@ -110,6 +111,7 @@ bool cSpidercamExperimentState_Movement::recording()
 
 void cSpidercamExperimentState_Movement::initialize()
 {
+	mMotionDetected = false;
 	mMoveCommandSent = false;
 	mStopCommandSent = false;
 	mIsMoving = false;
@@ -149,7 +151,16 @@ void cSpidercamExperimentState_Movement::run()
 
 	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mBusy; // && !mInError;
 
-	if (mMoveCommandSent) return;
+	if (mMotionDetected) return;
+
+	if (mMoveCommandSent)
+	{
+		if ((mDollyPos.speed_mmps > 0) || mIsMoving)
+		{
+			mMotionDetected = true;
+			return;
+		}
+	}
 
 	if (!readyForMotion) return;
 
@@ -163,6 +174,7 @@ void cSpidercamExperimentState_Movement::pause()
 	if (!mStopCommandSent)
 		mStopCommandSent = mController.requestStop();
 
+	mMotionDetected = false;
 	mMoveCommandSent = false;
 	mBusy = false;
 	mIsMoving = false;

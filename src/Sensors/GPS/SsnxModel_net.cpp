@@ -48,7 +48,7 @@ bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
-    return true;
+    return cSsnxModel::configure(jsonCfg);
 }
 
 bool cSsnxModel_net::startCommunications()

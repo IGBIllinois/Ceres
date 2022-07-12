@@ -93,7 +93,7 @@ void cSpidercamView::updateLimits(spidercam::sWorkingDimensions limits)
 	mpScanArea->updateBounds(mMinX_mm, mMaxX_mm, mMinY_mm, mMaxY_mm);
 }
 
-void cSpidercamView::updatePosition(spidercam::sPosition pos)
+void cSpidercamView::updatePosition(spidercam::sPosition_1_t pos)
 {
 	mpScanArea->updateDollyPosition(pos.X_mm, pos.Y_mm);
 
