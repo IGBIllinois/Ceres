@@ -18,6 +18,10 @@ public:
     explicit cSsnxModel_direct(QObject* parent = nullptr);
     ~cSsnxModel_direct();
 
+    /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    uint16_t data_class_id() const override;
 
     bool configure(const nlohmann::json& jsonCfg) override;
 

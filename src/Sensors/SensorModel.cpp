@@ -1,6 +1,54 @@
 
 #include "SensorModel.hpp"
 
+namespace sensor
+{
+    std::string to_string(eStatus status)
+    {
+        switch (status)
+        {
+        case eStatus::UNKNOWN:
+            return "UNKNOWN";
+        case eStatus::CONFIGURED:
+            return "CONFIGURED";
+        case eStatus::INITIALIZED:
+            return "INITIALIZED";
+        case eStatus::CONNECTING:
+            return "CONNECTING";
+        case eStatus::WARM_UP:
+            return "WARM UP";
+        case eStatus::RUNNING:
+            return "RUNNING";
+        case eStatus::STOPPED:
+            return "STOPPED";
+        case eStatus::FAILED:
+            return "FAILED";
+        }
+
+        return "UNKNOWN";
+    }
+
+    eStatus to_sensor_status(const std::string& str)
+    {
+        if (str == "CONFIGURED" || str == "configured")
+            return eStatus::CONFIGURED;
+        if (str == "INITIALIZED" || str == "initialized")
+            return eStatus::INITIALIZED;
+        if (str == "CONNECTING" || str == "connecting")
+            return eStatus::CONNECTING;
+        if (str == "WARM UP" || str == "warm up")
+            return eStatus::WARM_UP;
+        if (str == "RUNNING" || str == "running")
+            return eStatus::RUNNING;
+        if (str == "STOPPED" || str == "stopped")
+            return eStatus::STOPPED;
+        if (str == "FAILED" || str == "failed")
+            return eStatus::FAILED;
+
+        return eStatus::UNKNOWN;
+    }
+}
+
 
 cSensorModel::cSensorModel(const std::string& name, QObject* parent)
 :
@@ -24,15 +72,13 @@ bool cSensorModel::configure(const nlohmann::json& jsonCfg)
         throw std::logic_error("Missing \"Serial Number\" entry.");
     mSerialNumber = jsonCfg["Serial Number"];
 
-    emit sensorStatusChanging(eSensorStatus::CONFIGURED);
-
+    setStatus(sensor::eStatus::CONFIGURED);
     return true;
 }
 
 bool cSensorModel::initialize()
 {
-    emit sensorStatusChanging(eSensorStatus::INITIALIZED);
-
+    setStatus(sensor::eStatus::INITIALIZED);
     return true;
 };
 
@@ -55,6 +101,12 @@ void cSensorModel::dataRecordingStateChange(bool record)
 bool cSensorModel::isRecording()
 {
     return mIsRecording;
+}
+
+void cSensorModel::setStatus(sensor::eStatus status)
+{
+    mStatus = status;
+    emit sensorStatusChanging(q_name(), mStatus);
 }
 
 void cSensorModel::updateName(const std::string& name)

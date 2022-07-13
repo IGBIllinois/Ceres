@@ -39,6 +39,11 @@ public:
      */
     static char* protocol() { return "http"; };
 
+    /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    uint16_t data_class_id() const override;
+
     const QImage& getCurrentImage() const;
 
     QUrl url() const { return mUrl; }

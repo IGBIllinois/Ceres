@@ -22,6 +22,9 @@ namespace experiment
         END_OF_HEADER,
         BEGIN_FOOTER,
         END_OF_FOOTER,
+        BEGIN_SENSOR_LIST,
+        END_OF_SENSOR_LIST,
+        SENSOR_DATA_BLOCK_INFO,
     };
 }
 

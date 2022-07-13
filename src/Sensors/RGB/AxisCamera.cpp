@@ -231,7 +231,7 @@ void cAxisCamera::bufferToImage()
 
     if (ok)
     {
-        emit imageGrabbed(mCameraID, mpCurrentImage);
+        emit frameGrabbed(mCameraID, mpCurrentImage);
         //                calcFPS(requestTime.msecsTo(QTime::currentTime()));
         //                requestTime = QTime::currentTime();
     }

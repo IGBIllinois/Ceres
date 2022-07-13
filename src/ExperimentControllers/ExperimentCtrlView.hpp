@@ -19,6 +19,10 @@ public:
      */
     virtual void configure(const nlohmann::json& jsonCfg);
 
+public slots:
+    virtual void experimentStateChanged(int state);
+    virtual void experimentStatusChanged(QString msg);
+
 protected:
 	cExperimentControlView() = default;
 };

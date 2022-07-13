@@ -9,6 +9,7 @@
 #include "ExperimentSerializer.hpp"
 #include "SpidercamSerializer.hpp"
 #include "WeatherSerializer.hpp"
+#include "SensorModel.hpp"
 
 #include <string>
 #include <filesystem>
@@ -16,9 +17,6 @@
 #include <QByteArray>
 #include <QtNetwork/QTcpServer>
 
-
-// Forward Declarations
-class cSensorModel;
 
 /*****************************************************************************
  * 
@@ -46,6 +44,13 @@ public:
 
 signals:
     void requestDataRecordingState(bool record);
+
+/*
+ * Signals handlers from the sensors
+ */
+private slots:
+    void updateSensorStatus(QString name, sensor::eStatus status);
+    void updateSensorName(QString old_name, QString new_name);
 
 /*
  * Signals handlers from the TCP server

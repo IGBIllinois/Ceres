@@ -30,6 +30,10 @@ public:
 	void writeCultivar(const std::string& cultivar);
 	void writeExperimentDoc(const std::string& doc);
 
+	void writeBeginSensorList();
+	void writeEndOfSensorList();
+	void writeSensorBlockInfo(uint16_t class_id, const std::string& name);
+
 	void startTime(time_t time);
 	void endTime(time_t time);
 

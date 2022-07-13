@@ -699,26 +699,31 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
         QObject::connect(widgets.pModel, &cSensorModel::logMessage, this, &cMainWindow::onLogMessage);
 
-        if (configDoc.contains(type))
+        if (!configDoc.contains(type))
         {
-            bool validSensor = false;
-            try
-            {
-                validSensor = widgets.pModel->configure(configDoc[type]);
-            }
-            catch (const std::exception& e)
-            {
-                validSensor = false;
-            }
+            QString msg = "The follow object is missing from the configuration file: ";
+            msg += QString::fromStdString(type);
+            onErrorMessage("Configuration Error", msg);
+            continue;
+        }
+
+        bool validSensor = false;
+        try
+        {
+            validSensor = widgets.pModel->configure(configDoc[type]);
+        }
+        catch (const std::exception& e)
+        {
+            validSensor = false;
+        }
 
 /*BAF
-            if (!validSensor)
-            {
-                remove_sensor(type, widgets);
-                continue;
-            }
-*/
+        if (!validSensor)
+        {
+            remove_sensor(type, widgets);
+            continue;
         }
+*/
 
         mpModel->addSensor(widgets.pModel);
 

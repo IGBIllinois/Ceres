@@ -56,6 +56,7 @@ public slots:
     void setActiveCamera(int id);
 
 protected slots:
+    void frameGrabbed(int id, QImage* img);
     void imageGrabbed(int id, QImage* img);
     void errorHappend(int id, QString msg);
     void stateChanged(int id, cAxisCamera::GrabbingState newState);

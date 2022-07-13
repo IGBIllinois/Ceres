@@ -105,12 +105,16 @@ void cCtrlDataModelLocal::closeDataFile()
 void cCtrlDataModelLocal::endDataRecording()
 {
     mThread.mpController->stopDataRecording();
+
+    mSerializer.writeBeginFooter();
     mThread.mpController->writeDataFooter();
 
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->writeDataFooter();
     }
+    mSerializer.writeEndOfFooter();
+
 }
 
 void cCtrlDataModelLocal::dataRecordingStateChange(bool record)
@@ -130,6 +134,7 @@ void cCtrlDataModelLocal::startExperiment()
         return;
     }
 
+    mSerializer.writeBeginHeader();
     mSerializer.writeTitle(mExperimentTitle);
 
     if (!mResearcher.empty())
@@ -142,12 +147,20 @@ void cCtrlDataModelLocal::startExperiment()
 
     mThread.mpController->writeDataHeader();
 
+    mSerializer.writeBeginSensorList();
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        mSerializer.writeSensorBlockInfo(sensor->data_class_id(), sensor->name());
+    }
+    mSerializer.writeEndOfSensorList();
+
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->writeDataHeader();
     }
 
     mSerializer.startTime(time(nullptr));
+    mSerializer.writeEndOfHeader();
 
     mThread.mpController->startExperiment();
 }

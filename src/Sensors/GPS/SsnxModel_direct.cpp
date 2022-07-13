@@ -21,6 +21,11 @@ cSsnxModel_direct::~cSsnxModel_direct()
 {
 }
 
+uint16_t cSsnxModel_direct::data_class_id() const
+{
+    return mSerializer.classID();
+}
+
 bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
 {
     emit statusMessage("Connecting to SSNX GPS receiver...");
@@ -72,8 +77,6 @@ bool cSsnxModel_direct::startCommunications()
         emit errorMessage("SSNX Error", "Could not establish connection to GPS receiver!");
         return false;
     }
-
-    emit statusMessage("GPS connected!");
 
     sendPromptRequest();
 
@@ -132,6 +135,8 @@ void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDes
     QString msg = "newConnectionDescriptor: ";
     msg += QString::fromStdString(connectionDescriptor);
     emit statusMessage(msg);
+
+    setStatus(sensor::eStatus::CONNECTING);
 }
 
 void cSsnxModel_direct::newCommandReply(const std::string& reply, bool error)
@@ -166,6 +171,8 @@ void cSsnxModel_direct::stopReceived()
     mAsciiCommandQueue.swap(mSavedCommandQueue);
 
     emit statusMessage("STOP received from the GPS receiver!");
+
+    setStatus(sensor::eStatus::STOPPED);
 }
 
 void cSsnxModel_direct::sentAsciiCommand(const std::string& command)
@@ -232,6 +239,9 @@ void cSsnxModel_direct::pvtGeodetic(const gps::PVT_Geodetic_2_t& pvt)
         mLatitude_rad, mLongitude_rad, mHeight_m,
         mVn_mps, mVe_mps, mVu_mps,
         mGroundTrack_deg, mDatum);
+
+    if (status() != sensor::eStatus::RUNNING)
+        setStatus(sensor::eStatus::RUNNING);
 }
 
 void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)

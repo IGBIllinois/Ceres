@@ -33,11 +33,65 @@ void cRemoteClientView::setConnectionStatus(const QString& status)
 
 void cRemoteClientView::enableReconnectButton(bool enable)
 {
-	if (enable)
-		mpStatusReconnectLayout->setCurrentWidget(mpTryReconnect);
-	else
-		mpStatusReconnectLayout->setCurrentWidget(mpConnectionStatus);
+	mpTryReconnect->setEnabled(enable);
+
 	update();
+}
+
+void cRemoteClientView::updateSensorStatus(const QString& sensor, const QString& status)
+{
+	for (auto sensor_status : mSensorStatus)
+	{
+		if (sensor_status.mpSensorLabel->text() == sensor)
+		{
+			sensor_status.mpSensorStatus->setText(status);
+			update();
+			return;
+		}
+	}
+
+	sSensorStatus_t new_sensor;
+
+	new_sensor.mpSensorLabel = new QLabel();
+	new_sensor.mpSensorLabel->setText(sensor);
+	new_sensor.mpSensorStatus = new QLineEdit();
+	new_sensor.mpSensorStatus->setReadOnly(true);
+	new_sensor.mpSensorStatus->setText(status);
+
+	mSensorStatus.emplace_back(new_sensor);
+
+	verticalLayout();
+
+//	QFormLayout* formLayout = dynamic_cast<QFormLayout*>(layout());
+//	if (formLayout)
+//		formLayout->addRow(new_sensor.mpSensorLabel, new_sensor.mpSensorStatus);
+
+	update();
+}
+
+void cRemoteClientView::sensorNameChange(const QString& old_name, const QString& new_name)
+{
+	for (auto sensor_status : mSensorStatus)
+	{
+		if (sensor_status.mpSensorLabel->text() == old_name)
+		{
+			sensor_status.mpSensorLabel->setText(new_name);
+			update();
+			return;
+		}
+	}
+}
+
+void cRemoteClientView::removeAllSensors()
+{
+	for (auto sensor : mSensorStatus)
+	{
+		sensor.mpSensorLabel->deleteLater();
+		sensor.mpSensorStatus->deleteLater();
+	}
+
+	update();
+	mSensorStatus.clear();
 }
 
 void cRemoteClientView::tryReconnectPressed()
@@ -47,82 +101,28 @@ void cRemoteClientView::tryReconnectPressed()
 
 void cRemoteClientView::createWidgets()
 {
-	mpConnectionStatusLabel = new QLabel(this);
+	mpConnectionStatusLabel = new QLabel();
 	mpConnectionStatusLabel->setText("Connection State:");
-	mpConnectionStatus = new QLineEdit(this);
+	mpConnectionStatus = new QLineEdit();
 	mpConnectionStatus->setReadOnly(true);
 	mpConnectionStatus->setAlignment(Qt::AlignCenter);
 
-	mpTryReconnect = new QPushButton(this);
+	mpTryReconnect = new QPushButton();
 	mpTryReconnect->setText("Try to Reconnect");
-	mpTryReconnect->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+	mpTryReconnect->setEnabled(false);
+//	mpTryReconnect->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	connect(mpTryReconnect, &QPushButton::pressed, this, &cRemoteClientView::tryReconnectPressed);
 
-	mpTryReconnect->setFixedSize(mpConnectionStatus->sizeHint());
-	mpConnectionStatus->setSizePolicy(mpTryReconnect->sizePolicy());
-	mpConnectionStatus->setFixedSize(mpTryReconnect->sizeHint());
+//	mpTryReconnect->setFixedHeight(mpConnectionStatus->sizeHint().height());
+//	mpTryReconnect->setFixedSize(mpConnectionStatus->sizeHint());
+//	mpConnectionStatus->setSizePolicy(mpTryReconnect->sizePolicy());
+//	mpConnectionStatus->setFixedHeight(mpTryReconnect->sizeHint().height());
 
-	mpSensorLabel = new QLabel(this);
-	mpSensorLabel->setText("OUSTER");
-	mpSensorStatus = new QLineEdit(this);
-	mpSensorStatus->setReadOnly(true);
-
-	mpStatusReconnectLayout = new QStackedLayout;
-	mpStatusReconnectLayout->addWidget(mpConnectionStatus);
-	mpStatusReconnectLayout->addWidget(mpTryReconnect);
-	mpStatusReconnectLayout->setCurrentWidget(mpConnectionStatus);
-
-/*
-	mpLongitudeLabel = new QLabel();
-	mpLongitudeLabel->setText("Longitude (deg):");
-	mpLongitude_deg = new QLineEdit();
-	mpLongitude_deg->setReadOnly(true);
-
-	mpHeightLabel = new QLabel();
-	mpHeightLabel->setText("Height (m):");
-	mpHeight_m = new QLineEdit();
-	mpHeight_m->setReadOnly(true);
-
-	mpNorthSpeedLabel = new QLabel();
-	mpNorthSpeedLabel->setText("North Speed (m/s):");
-	mpNorthVelocity_mps = new QLineEdit();
-	mpNorthVelocity_mps->setReadOnly(true);
-
-	mpEastSpeedLabel = new QLabel();
-	mpEastSpeedLabel->setText("East Speed (m/s):");
-	mpEastVelocity_mps = new QLineEdit();
-	mpEastVelocity_mps->setReadOnly(true);
-
-	mpVerticalSpeedLabel = new QLabel();
-	mpVerticalSpeedLabel->setText("Vertical Speed (m/s):");
-	mpUpVelocity_mps = new QLineEdit();
-	mpUpVelocity_mps->setReadOnly(true);
-
-	mpGroundTrackLabel = new QLabel();
-	mpGroundTrackLabel->setText("Ground Track (deg):");
-	mpGroundTrack_deg = new QLineEdit();
-	mpGroundTrack_deg->setReadOnly(true);
-
-	mpDatumLabel = new QLabel();
-	mpDatumLabel->setText("Datum:");
-	mpDatum = new QLineEdit();
-	mpDatum->setReadOnly(true);
-
-	mpTimestampLabel = new QLabel();
-	mpTimestampLabel->setText("Timestamp (s):");
-	mpTimestamp_s = new QLineEdit();
-	mpTimestamp_s->setReadOnly(true);
-
-	mpDateLabel = new QLabel();
-	mpDateLabel->setText("Date:");
-	mpDate = new QLineEdit();
-	mpDate->setReadOnly(true);
-
-	mpTimeLabel = new QLabel();
-	mpTimeLabel->setText("Time:");
-	mpTime = new QLineEdit();
-	mpTime->setReadOnly(true);
-*/
+//	mpStatusReconnectLayout = new QStackedLayout();
+//	mpStatusReconnectLayout->addWidget(mpConnectionStatus);
+//	mpStatusReconnectLayout->addWidget(mpTryReconnect);
+//	mpStatusReconnectLayout->setCurrentWidget(mpConnectionStatus);
+//	mpStatusReconnectLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 }
 
 void cRemoteClientView::horizontalLayout()
@@ -132,32 +132,8 @@ void cRemoteClientView::horizontalLayout()
 
 	auto* mainlayout = new QGridLayout(this);
 	mainlayout->addWidget(mpConnectionStatusLabel, 0, 0);
-//	mainlayout->addWidget(mpConnectionStatus, 0, 1);
-	mainlayout->addLayout(mpStatusReconnectLayout, 0, 1);
-	mainlayout->addWidget(mpSensorLabel, 0, 2);
-	mainlayout->addWidget(mpSensorStatus, 0, 3);
-
-
-/*
-	mainlayout->addWidget(mpHeightLabel, 0, 4);
-	mainlayout->addWidget(mpHeight_m, 0, 5);
-	mainlayout->addWidget(mpNorthSpeedLabel, 1, 0);
-	mainlayout->addWidget(mpNorthVelocity_mps, 1, 1);
-	mainlayout->addWidget(mpEastSpeedLabel, 1, 2);
-	mainlayout->addWidget(mpEastVelocity_mps, 1, 3);
-	mainlayout->addWidget(mpVerticalSpeedLabel, 1, 4);
-	mainlayout->addWidget(mpUpVelocity_mps, 1, 5);
-	mainlayout->addWidget(mpGroundTrackLabel, 2, 0);
-	mainlayout->addWidget(mpGroundTrack_deg, 2, 1);
-	mainlayout->addWidget(mpDatumLabel, 2, 2);
-	mainlayout->addWidget(mpDatum, 2, 3);
-	mainlayout->addWidget(mpTimestampLabel, 2, 4);
-	mainlayout->addWidget(mpTimestamp_s, 2, 5);
-	mainlayout->addWidget(mpDateLabel, 3, 0);
-	mainlayout->addWidget(mpDate, 3, 1);
-	mainlayout->addWidget(mpTimeLabel, 3, 2);
-	mainlayout->addWidget(mpTime, 3, 3);
-*/
+//	mainlayout->addLayout(mpStatusReconnectLayout, 0, 1);
+	mainlayout->addWidget(mpConnectionStatus, 0, 1);
 
 	setLayout(mainlayout);
 }
@@ -167,22 +143,18 @@ void cRemoteClientView::verticalLayout()
 	// We need to remove the old layout before we can add a new one!
 	delete layout();
 
-	auto* mainlayout = new QFormLayout(this);
-	mainlayout->addRow(mpConnectionStatusLabel, mpStatusReconnectLayout);
-	mainlayout->addRow(mpSensorLabel, mpSensorStatus);
+	auto* mainlayout = new QVBoxLayout(this);
+	mainlayout->addWidget(mpTryReconnect, 1);
 
-/*
-	mainlayout->addRow(mpLongitudeLabel, mpLongitude_deg);
-	mainlayout->addRow(mpHeightLabel, mpHeight_m);
-	mainlayout->addRow(mpNorthSpeedLabel, mpNorthVelocity_mps);
-	mainlayout->addRow(mpEastSpeedLabel, mpEastVelocity_mps);
-	mainlayout->addRow(mpVerticalSpeedLabel, mpUpVelocity_mps);
-	mainlayout->addRow(mpGroundTrackLabel, mpGroundTrack_deg);
-	mainlayout->addRow(mpDatumLabel, mpDatum);
-	mainlayout->addRow(mpTimestampLabel, mpTimestamp_s);
-	mainlayout->addRow(mpDateLabel, mpDate);
-	mainlayout->addRow(mpTimeLabel, mpTime);
-*/
+	auto* formlayout = new QFormLayout();
+	formlayout->addRow(mpConnectionStatusLabel, mpConnectionStatus);
+
+	for (auto sensor : mSensorStatus)
+	{
+		formlayout->addRow(sensor.mpSensorLabel, sensor.mpSensorStatus);
+	}
+
+	mainlayout->addLayout(formlayout);
 
 	setLayout(mainlayout);
 }

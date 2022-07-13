@@ -2,12 +2,21 @@
 #pragma once
 
 #include <QObject>
+
 #include <nlohmann/json.hpp>
+
+#include <string>
 
 // Forward Declarations
 class cBlockDataFileWriter;
 
-enum class eSensorStatus { UNKNOWN, CONFIGURED, INITIALIZED, WARM_UP, RUNNING, STOPPED };
+namespace sensor
+{
+    enum class eStatus { UNKNOWN, CONFIGURED, INITIALIZED, CONNECTING, WARM_UP, RUNNING, STOPPED, FAILED };
+
+    std::string to_string(eStatus status);
+    eStatus to_sensor_status(const std::string& str);
+}
 
 const uint8_t   logSTATUS  = 0;
 const uint8_t   logINFO    = 1;
@@ -39,11 +48,16 @@ public:
     virtual char* descriptor() const = 0;
 
     /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    virtual uint16_t data_class_id() const = 0;
+
+    /*
      * Returns a QString used as the name of the sensor.
      */
-    const std::string& name() const;
+    const std::string& name() const { return mSensorName; };
 
-    eSensorStatus status() const { return mStatus; };
+    sensor::eStatus status() const { return mStatus; };
 
     /*
      * Apply any configuration parameters to the sensor
@@ -97,7 +111,7 @@ signals:
     void errorMessage(QString title, QString msg);
     void logMessage(uint8_t type, QString device, QString msg);
 
-    void sensorStatusChanging(eSensorStatus status);
+    void sensorStatusChanging(QString name, sensor::eStatus status);
     void sensorNameChanging(QString old_name, QString new_name);
 
 public:
@@ -106,11 +120,12 @@ public:
 protected:
     cSensorModel(const std::string& name, QObject* parent = nullptr);
 
+    void setStatus(const sensor::eStatus status);
     void updateName(const std::string& name);
 
-protected:
-    eSensorStatus mStatus = eSensorStatus::UNKNOWN;
+    QString q_name() const { return QString::fromStdString(mSensorName); }
 
+protected:
     /**
      * A flag to signal that recording is active
      */
@@ -125,5 +140,6 @@ protected:
 
 private:
     std::string mSensorName;
+    sensor::eStatus mStatus = sensor::eStatus::UNKNOWN;
 };
 

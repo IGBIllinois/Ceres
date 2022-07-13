@@ -55,6 +55,7 @@ public:
     bool isGrabbing() const { return (mCurrentState == GrabbingState::On); }
 
 signals:
+    void frameGrabbed(int id, QImage* img);
     void imageGrabbed(int id, QImage* img);
     void errorHappend(int id, QString msg);
     void stateChanged(int id, GrabbingState newState);

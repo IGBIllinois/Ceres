@@ -16,6 +16,11 @@ cSsnxModel_net::~cSsnxModel_net()
 {
 }
 
+uint16_t cSsnxModel_net::data_class_id() const
+{
+    return mSerializer.classID();
+}
+
 bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
 {
     std::string ip;

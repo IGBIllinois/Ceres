@@ -7,6 +7,13 @@
 
 const std::size_t MAX_CAMERAS = 4;
 
+namespace
+{
+    bool operator>(const axis::sImageSize_t& lhs, const axis::sImageSize_t& rhs)
+    {
+        return ((lhs.height * lhs.width) > (rhs.height * rhs.width));
+    }
+}
 
 cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
 :
@@ -33,6 +40,7 @@ cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
 
 bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 {
+    axis::sImageSize_t max_image_size;
 
     try
     {
@@ -41,6 +49,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 
         if (!cAxisCommunicationsModel::configure(section))
         {
+            setStatus(sensor::eStatus::FAILED);
             return false;
         }
 
@@ -52,6 +61,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
             str.append("The F44 controller only supports a maximum of four cameras.");
             emit errorMessage("Configuration Error", str);
 
+            setStatus(sensor::eStatus::FAILED);
             return false;
         }
 
@@ -62,6 +72,9 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
             mCameras[i] = new cAxisCamera(id, this);
 
             axis::sImageSize_t image_size = axis::to_image_size(camera["resolution"]);
+            if (image_size > max_image_size)
+                max_image_size = image_size;
+
             auto it = std::find(mSupportedImageSizes.begin(), mSupportedImageSizes.end(), image_size);
             if (it == mSupportedImageSizes.end())
             {
@@ -69,6 +82,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
                 str.append("The F44 controller only supports a maximum of four cameras.");
                 emit errorMessage("Configuration Error", str);
 
+                setStatus(sensor::eStatus::FAILED);
                 return false;
             }
             mCameras[i]->setImageSize(image_size);
@@ -78,6 +92,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 
             mCameras[i]->setSource(mUrl);
 
+            connect(mCameras[i], &cAxisCamera::frameGrabbed, this, &cAxisCommunicationsModel_F44::frameGrabbed);
             connect(mCameras[i], &cAxisCamera::imageGrabbed, this, &cAxisCommunicationsModel_F44::imageGrabbed);
             connect(mCameras[i], &cAxisCamera::errorHappend, this, &cAxisCommunicationsModel_F44::errorHappend);
             connect(mCameras[i], &cAxisCamera::stateChanged, this, &cAxisCommunicationsModel_F44::stateChanged);
@@ -91,8 +106,13 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     }
     catch (const std::exception& e)
     {
+        setStatus(sensor::eStatus::FAILED);
         return false;
     }
+
+    size_t buffer_size = max_image_size.height * max_image_size.width * 32;
+
+    mSerializer.setBufferCapacity(buffer_size + 1024);
 
     return true;
 }
@@ -110,17 +130,19 @@ void cAxisCommunicationsModel_F44::disableDataRecording()
 
 void cAxisCommunicationsModel_F44::writeDataHeader()
 {
-//    mSerializer.write(mConfigParameters);
-//    mSerializer.write(mSensorInfo);
-//    mSerializer.write(mBeamIntrinsics);
-//    mSerializer.write(mImuIntrinsics);
-//    mSerializer.write(mLidarIntrinsics);
-//    mSerializer.write(mDataFormat);
+    if (!mpActiveCamera) return;
+
+    mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
+    mSerializer.write(mpActiveCamera->getImageSize());
+    mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
+
 }
 
 bool cAxisCommunicationsModel_F44::startCommunications()
 {
     mpActiveCamera->startGrabbing();
+
+    setStatus(sensor::eStatus::CONNECTING);
 
 	return true;
 }
@@ -202,6 +224,17 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
     }
 }
 
+void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
+{
+    mCurrentImage = *img;
+    emit onNewImage(mCurrentImage);
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.writeMpegFrame(mCurrentImage);
+    }
+}
+
 void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
 {
     mCurrentImage = *img;
@@ -219,6 +252,8 @@ void cAxisCommunicationsModel_F44::errorHappend(int id, QString msg)
     title += QString::number(id);
     title += " Error";
     emit errorMessage(title, msg);
+
+    setStatus(sensor::eStatus::FAILED);
 }
 
 void cAxisCommunicationsModel_F44::stateChanged(int id, cAxisCamera::GrabbingState newState)
@@ -239,6 +274,7 @@ void cAxisCommunicationsModel_F44::stateChanged(int id, cAxisCamera::GrabbingSta
         break;
     case cAxisCamera::GrabbingState::On:
         msg += " is now on.";
+        setStatus(sensor::eStatus::RUNNING);
         break;
     case cAxisCamera::GrabbingState::Error:
         msg += " has an error.";

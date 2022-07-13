@@ -4,7 +4,6 @@
 #include "OusterFactory.hpp"
 
 #include "OusterModel_net.hpp"
-#include "OusterModel_file.hpp"
 #include "OusterView.hpp"
 #include <ouster/ouster_defs.h>
 
@@ -32,8 +31,6 @@ sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_vi
 
     if (protocol == "net")
         pModel = new cOusterModel_net();
-    else if (protocol == "file")
-        pModel = new cOusterModel_file();
 
     if (!pModel)
         throw std::runtime_error("OUSTER: Unknown protocol type!");

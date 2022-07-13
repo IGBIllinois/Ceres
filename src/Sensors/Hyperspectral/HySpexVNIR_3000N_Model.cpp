@@ -17,6 +17,11 @@ char* cHySpexVNIR_3000N_Model::descriptor() const
     return hyspex_id;
 }
 
+uint16_t cHySpexVNIR_3000N_Model::data_class_id() const
+{
+    return mSerializer.classID();
+}
+
 bool cHySpexVNIR_3000N_Model::configure(const nlohmann::json& jsonCfg)
 {
     try

@@ -9,10 +9,14 @@ cDummyModel::cDummyModel(QObject* parent)
 {
 }
 
-
 char* cDummyModel::descriptor() const
 {
     return dummy_id;
+}
+
+uint16_t cDummyModel::data_class_id() const
+{
+    return 0;
 }
 
 bool cDummyModel::configure(const nlohmann::json& jsonCfg)

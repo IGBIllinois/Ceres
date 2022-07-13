@@ -19,6 +19,11 @@ public:
      */
     char* descriptor() const override;
 
+    /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    uint16_t data_class_id() const override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     void enableDataRecording(cBlockDataFileWriter& file) override;

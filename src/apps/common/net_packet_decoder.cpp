@@ -84,6 +84,35 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
             {
                 break;
             }
+            case ePacketType::STATUS_MESSAGE:
+            {
+                StatusMessage_1 packet;
+                packet.ParseFromArray(buffer.data(), hdr.length);
+                onStatusMessage(to_status_message_1(packet));
+                break;
+            }
+            case ePacketType::LOG_MESSAGE:
+            {
+                LogMessage_1 packet;
+                packet.ParseFromArray(buffer.data(), hdr.length);
+                break;
+            }
+            case ePacketType::SENSOR_STATUS:
+            {
+                SensorStatus_1 packet;
+                packet.ParseFromArray(buffer.data(), hdr.length);
+                sSensorStatus_t data = to_sensor_status_1(packet);
+                onSensorStatus(data.name, data.status);
+                break;
+            }
+            case ePacketType::SENSOR_NAME_CHANGE:
+            {
+                SensorNameChange_1 packet;
+                packet.ParseFromArray(buffer.data(), hdr.length);
+                sSensorNameChange_t data = to_sensor_name_change_1(packet);
+                onSensorNameChange(data.old_name, data.new_name);
+                break;
+            }
             case ePacketType::SPIDER_CAM_DATA:
             {
                 Spidercam_Position_1 packet;

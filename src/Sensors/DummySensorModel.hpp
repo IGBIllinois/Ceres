@@ -14,6 +14,11 @@ public:
      */
     char* sensorClass() const override { return "dummy"; };
 
+    /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    uint16_t data_class_id() const override;
+
     cDummyModel(QObject* parent = nullptr);
     virtual ~cDummyModel() = default;
 

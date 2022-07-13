@@ -2,8 +2,9 @@
 	"controller": "spidercam",
 	"sensors" :[
 		{
-			"type": "ouster",
-			"protocol": "net"
+		 "type": "weather_data",
+		 "protocol": "http",
+		 "data": "wind"
 		}
 	],
 	"spidercam":
@@ -21,12 +22,16 @@
 		"update interval (ms)": 250,
 		"position tolerance (cm)": 1.0
 	},
-	"ouster" :
+	"weather_data":
 	{
-		"Manufacturer": "OUSTER",
-		"Model": "OS-0-128",
-		"Serial Number": "992037000167",
-		"azimuth window": [135.0, 225.0],
-		"mode": "1024x10"
+		"http":
+		[
+			{
+				"data" : "wind",
+				"url" : "http://172.22.47.100/?command=dataquery&uri=dl:SpiderCam&format=json&mode=most-recent&p1=1",
+				"update interval (sec)": 30,
+				"max wind speed (mph)": 15
+			}
+		]
 	}
 }

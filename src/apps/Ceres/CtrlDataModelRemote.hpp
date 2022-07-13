@@ -48,6 +48,7 @@ public:
 
 protected:
     void dataRecordingStateChange(bool record) override;
+    void endDataRecording() override;
 
 public slots:
     void updatePosition(spidercam::sPosition_1_t pos);
@@ -62,18 +63,23 @@ private slots:
     void errorOccurred(QAbstractSocket::SocketError socketError);
     void hostFound();
     void stateChanged(QAbstractSocket::SocketState socketState);
+    void processNewCommand();
 
+/*
+ * Send data over the TCP socket
+ */
 private:
-    void endDataRecording() override;
+    int sendOutgoingData(const char* data, std::size_t len) override;
 
 /*
  * Packet Handlers
  */
 private:
     void onDataFileState(bool is_open) override;
-
-private:
-    int sendOutgoingData(const char* data, std::size_t len) override;
+    void onStatusMessage(const std::string& msg) override;
+    void onLogMessage(const std::string& msg) override;
+    void onSensorStatus(const std::string& sensor, const std::string& status) override;
+    void onSensorNameChange(const std::string& old_name, const std::string& new_name) override;
 
 /*
  *

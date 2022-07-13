@@ -17,6 +17,10 @@ char* cHySpexSWIR_384_Model::descriptor() const
     return hyspex_id;
 }
 
+uint16_t cHySpexSWIR_384_Model::data_class_id() const
+{
+    return mSerializer.classID();
+}
 
 bool cHySpexSWIR_384_Model::configure(const nlohmann::json& jsonCfg)
 {

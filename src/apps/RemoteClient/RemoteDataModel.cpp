@@ -63,6 +63,9 @@ void cRemoteDataModel::addSensor(cSensorModel* pSensor)
 {
     if (pSensor)
     {
+        connect(pSensor, &cSensorModel::sensorStatusChanging, this, &cRemoteDataModel::updateSensorStatus);
+        connect(pSensor, &cSensorModel::sensorNameChanging, this, &cRemoteDataModel::updateSensorName);
+
         if (!pSensor->initialize())
         {
             emit statusMessage("Sensor failed initialization!");
@@ -195,6 +198,8 @@ void cRemoteDataModel::onStopDataRecording()
 void cRemoteDataModel::onStartExperiment()
 {
     mIsExperimentRunning = true;
+
+    mSerializer.writeBeginHeader();
     mSerializer.writeTitle(mExperimentTitle);
 
     if (!mResearcher.empty())
@@ -205,12 +210,20 @@ void cRemoteDataModel::onStartExperiment()
 
     mSerializer.writeExperimentDoc(mExperimentDoc);
 
+    mSerializer.writeBeginSensorList();
+    for (auto& sensor : mThread.mActiveSensors)
+    {
+        mSerializer.writeSensorBlockInfo(sensor->data_class_id(), sensor->name());
+    }
+    mSerializer.writeEndOfSensorList();
+
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->writeDataHeader();
     }
 
     mSerializer.startTime(time(nullptr));
+    mSerializer.writeEndOfHeader();
 
     emit statusMessage("Experiment Started!");
 }
@@ -219,10 +232,12 @@ void cRemoteDataModel::onStopExperiment()
 {
     onStopDataRecording();
 
+    mSerializer.writeBeginFooter();
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->writeDataFooter();
     }
+    mSerializer.writeEndOfFooter();
 
     mExperimentTitle.clear();
     mResearcher.clear();
@@ -267,6 +282,32 @@ void cRemoteDataModel::onWeatherData(bool valid, double wind_speed_mps, double w
     }
 }
 
+/***   Signals handlers from the sensors   ****/
+void cRemoteDataModel::updateSensorStatus(QString name, sensor::eStatus status)
+{
+    if (mpClient)
+    {
+        sendSensorStatus(name.toStdString(),
+            to_string(status));
+
+        emit statusMessage("updateSensorStatus");
+    }
+}
+
+void cRemoteDataModel::updateSensorName(QString old_name, QString new_name)
+{
+    if (mpClient)
+    {
+        sendSensorNameChange(old_name.toStdString(),
+            new_name.toStdString());
+
+        emit statusMessage("updateSensorName");
+    }
+}
+
+
+/***   Signals handlers from the TCP server   ***/
+
 void cRemoteDataModel::acceptError(QAbstractSocket::SocketError socketError)
 {
 }
@@ -291,6 +332,13 @@ void cRemoteDataModel::newConnection()
         QObject::connect(mpClient, &QTcpSocket::disconnected, this, &cRemoteDataModel::clientDisconnected);
         QObject::connect(mpClient, &QTcpSocket::errorOccurred, this, &cRemoteDataModel::clientErrorOccurred);
         QObject::connect(mpClient, &QTcpSocket::stateChanged, this, &cRemoteDataModel::clientStateChanged);
+
+        for (auto& sensor : mThread.mSensors)
+        {
+            encodeSensorStatus(sensor->name(), to_string(sensor->status()));
+        }
+        cNetworkEncoder::sendData();
+        emit statusMessage("Sent sensor status.");
     }
 }
 

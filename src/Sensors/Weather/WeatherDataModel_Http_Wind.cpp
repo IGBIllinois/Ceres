@@ -17,6 +17,11 @@ cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind(QObject* parent)
 	mDataValid = false;
 }
 
+uint16_t cWeatherDataModel_Http_Wind::data_class_id() const
+{
+	return mSerializer.classID();
+}
+
 bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 {
 	bool valid_cfg = false;

@@ -10,9 +10,37 @@ cCeresRemoteClientNetEncoder::cCeresRemoteClientNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
 {}
 
+void cCeresRemoteClientNetEncoder::encodeSensorStatus(const std::string& sensor, const std::string& status)
+{
+    encode_sensor_status(sensor, status, mBuffer);
+}
+
 void cCeresRemoteClientNetEncoder::sendDataFileState(bool is_open)
 {
     encode_file_open_state(is_open, mBuffer);
+    sendData();
+}
+
+void cCeresRemoteClientNetEncoder::sendStatusMessage(const std::string& msg)
+{
+    encode_status_message(msg, mBuffer);
+    sendData();
+}
+
+void cCeresRemoteClientNetEncoder::sendLogMessage(const std::string& msg)
+{
+
+}
+
+void cCeresRemoteClientNetEncoder::sendSensorStatus(const std::string& sensor, const std::string& status)
+{
+    encode_sensor_status(sensor, status, mBuffer);
+    sendData();
+}
+
+void cCeresRemoteClientNetEncoder::sendSensorNameChange(const std::string& old_name, const std::string& new_name)
+{
+    encode_sensor_name_change(old_name, new_name, mBuffer);
     sendData();
 }
 

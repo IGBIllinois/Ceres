@@ -113,6 +113,7 @@ signals:
     void infoMessage(QString title, QString msg);
     void warningMessage(QString title, QString msg);
     void errorMessage(QString title, QString msg);
+    void experimentStatus(QString msg);
 
 signals:
     void experimentStateChanged(int state);

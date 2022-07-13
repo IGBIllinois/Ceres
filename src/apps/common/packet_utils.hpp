@@ -38,6 +38,10 @@ enum class ePacketType : uint16_t
 	DATA_RECORDING_STATE,
 	START_EXPERIMENT,
 	STOP_EXPERIMENT,
+	STATUS_MESSAGE,
+	LOG_MESSAGE,
+	SENSOR_STATUS,
+	SENSOR_NAME_CHANGE,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -87,6 +91,34 @@ int encode_file_open_state(bool open, ceres::net_buffer& buffer);
 
 int encode_start_data_recording(ceres::net_buffer& buffer);
 int encode_stop_data_recording(ceres::net_buffer& buffer);
+
+std::string to_status_message_1(const StatusMessage_1& pckt);
+int encode_status_message(const std::string& message, ceres::net_buffer& buffer);
+
+struct sLogMessage_t
+{
+	uint8_t  msg_type;
+	std::string device;
+	std::string message;
+};
+sLogMessage_t to_log_message_1(const LogMessage_1& pckt);
+int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& message, ceres::net_buffer& buffer);
+
+struct sSensorStatus_t
+{
+	std::string name;
+	std::string status;
+};
+sSensorStatus_t to_sensor_status_1(const SensorStatus_1& pckt);
+int encode_sensor_status(const std::string& device, const std::string& message, ceres::net_buffer& buffer);
+
+struct sSensorNameChange_t
+{
+	std::string old_name;
+	std::string new_name;
+};
+sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt);
+int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, ceres::net_buffer& buffer);
 
 
 /**********************************************************

@@ -35,6 +35,10 @@ char* cAxisCommunicationsModel::descriptor() const
     return axis_communications_id;
 }
 
+uint16_t cAxisCommunicationsModel::data_class_id() const
+{
+    return mSerializer.classID();
+}
 
 const QImage& cAxisCommunicationsModel::getCurrentImage() const
 {
@@ -68,6 +72,7 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
         QString str = "Error in the \"axis_communications\" configuration: ";
         str.append(e.what());
         emit errorMessage("Configuration Error", str);
+        setStatus(sensor::eStatus::FAILED);
         return false;
     }
 

@@ -16,6 +16,10 @@ public:
      * type sensor.
      */
     static char* data_type() { return "wind"; };
+    /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    uint16_t data_class_id() const override;
 
     cWeatherDataModel_Http_Wind(QObject* parent = nullptr);
     virtual ~cWeatherDataModel_Http_Wind() = default;
