@@ -1,7 +1,8 @@
 
 #pragma once
 
-//#include <QWidget>
+#include "ExperimentTypes.hpp"
+
 #include <QAbstractScrollArea>
 #include <nlohmann/json.hpp>
 
@@ -19,9 +20,15 @@ public:
      */
     virtual void configure(const nlohmann::json& jsonCfg);
 
+signals:
+    void statusMessage(QString msg);
+    void infoMessage(QString title, QString msg);
+    void warningMessage(QString title, QString msg);
+    void errorMessage(QString title, QString msg);
+
 public slots:
-    virtual void experimentStateChanged(int state);
-    virtual void experimentStatusChanged(QString msg);
+    virtual void experimentStateChanging(experiment::eState state);
+    virtual void experimentStatusUpdating(QString msg);
 
 protected:
 	cExperimentControlView() = default;

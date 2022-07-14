@@ -17,7 +17,7 @@ class cSensorModel;
 
 namespace experiment
 {
-    enum class State : uint8_t;
+    enum class eState : uint8_t;
 }
 
 /*****************************************************************************
@@ -43,6 +43,8 @@ public:
     virtual bool openDataFile(const QString& defaultPath) = 0;
     virtual bool isDataFileOpen() const = 0;
     virtual void closeDataFile() = 0;
+
+    bool systemReady() const;
 
     bool isExperimentRunning();
     bool isExperimentPaused();
@@ -73,7 +75,7 @@ protected slots:
     virtual void dataRecordingStateChange(bool record) = 0;
 
 private slots:
-    void onExperimentStateChange(int state);
+    void onExperimentStateChange(experiment::eState state);
 
 protected:
     virtual void endDataRecording() = 0;

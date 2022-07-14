@@ -24,6 +24,7 @@ public:
 	void initialize() override;
 	void run() override;
 	void pause() override;
+	void stop() override;
 	eRESULT finished() override;
 
 private:

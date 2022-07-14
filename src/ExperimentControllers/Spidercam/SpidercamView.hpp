@@ -32,6 +32,10 @@ public slots:
 	void updatePosition(spidercam::sPosition_1_t pos);
     void updateRecordingState(bool recording);
 
+protected:
+    void experimentStateChanging(experiment::eState state) override;
+    void experimentStatusUpdating(QString msg) override;
+
 private:
     double mMinX_mm = 0;
     double mMaxX_mm = 0;

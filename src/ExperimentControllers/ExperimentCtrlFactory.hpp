@@ -11,6 +11,7 @@ class cExperimentControlModel;
 //QT_BEGIN_NAMESPACE
 class QDockWidget;
 class QStatusBar;
+class QToolBar;
 //QT_END_NAMESPACE
 
 
@@ -20,14 +21,16 @@ struct sExperimentControllerWidgets
 	cExperimentControlView* pView;
 	QDockWidget* pDockableView;
 	QStatusBar* pStatusBar;
+	QToolBar* pToolBar;
 	// Future: property page
 
-	sExperimentControllerWidgets() : pModel(nullptr), pView(nullptr), pDockableView(nullptr), pStatusBar(nullptr)
+	sExperimentControllerWidgets() : pModel(nullptr), pView(nullptr), pDockableView(nullptr),
+		pStatusBar(nullptr), pToolBar(nullptr)
 	{}
 
 	sExperimentControllerWidgets(cExperimentControlModel* model, cExperimentControlView* view, 
-		QDockWidget* dock = nullptr, QStatusBar* status = nullptr)
-		: pModel(model), pView(view), pDockableView(dock), pStatusBar(status)
+		QDockWidget* dock = nullptr, QStatusBar* status = nullptr, QToolBar* toolbar = nullptr)
+		: pModel(model), pView(view), pDockableView(dock), pStatusBar(status), pToolBar(toolbar)
 	{}
 };
 

@@ -29,6 +29,7 @@ public:
 	virtual void initialize() = 0;
 	virtual void run() = 0;
 	virtual void pause() = 0;
+	virtual void stop() = 0;
 	virtual eRESULT finished() = 0;
 };
 
@@ -53,6 +54,7 @@ public:
 	void initialize() override {};
 	void run() override {};
 	void pause() override {};
+	void stop() override {};
 	eRESULT finished() override
 	{
 		return eRESULT::DONE;
@@ -74,6 +76,7 @@ public:
 	void initialize() override;
 	void run() override;
 	void pause() override;
+	void stop() override;
 	eRESULT finished() override;
 
 private:
@@ -102,6 +105,7 @@ public:
 	void initialize() override;
 	void run() override;
 	void pause() override;
+	void stop() override;
 	eRESULT finished() override;
 
 signals:

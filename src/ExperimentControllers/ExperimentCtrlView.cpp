@@ -6,8 +6,10 @@ void cExperimentControlView::configure(const nlohmann::json& jsonCfg)
 {
 }
 
-void cExperimentControlView::experimentStateChanged(int state)
+void cExperimentControlView::experimentStateChanging(experiment::eState state)
 {}
 
-void cExperimentControlView::experimentStatusChanged(QString msg)
-{}
+void cExperimentControlView::experimentStatusUpdating(QString msg)
+{
+	emit statusMessage(msg);
+}

@@ -17,12 +17,16 @@ public:
 	 */
 	char* descriptor() const override { return "dummy"; };
 
-
     /*
      * Apply any configuration parameters to the sensor
      * model.
      */
     void configure(const nlohmann::json& jsonCfg) override;
+
+	/*
+	 * Is the system ready to run an experiment?
+	*/
+	bool systemReady() const override;
 
 	/**
 	 * Started the loaded experiment.

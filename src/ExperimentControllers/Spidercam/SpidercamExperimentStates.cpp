@@ -171,7 +171,7 @@ void cSpidercamExperimentState_Movement::run()
 
 void cSpidercamExperimentState_Movement::pause()
 {
-	if (!mStopCommandSent)
+	if (mIsMoving)
 		mStopCommandSent = mController.requestStop();
 
 	mMotionDetected = false;
@@ -180,6 +180,12 @@ void cSpidercamExperimentState_Movement::pause()
 	mIsMoving = false;
 	mIsSetPointEnabled = false;
 	mInError = false;
+}
+
+void cSpidercamExperimentState_Movement::stop()
+{
+	if (mIsMoving)
+		mController.requestStop();
 }
 
 cExperimentState::eRESULT cSpidercamExperimentState_Movement::finished()

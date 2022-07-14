@@ -33,6 +33,11 @@ public:
     void configure(const nlohmann::json& jsonCfg) override;
 
 	/*
+	 * Is the system ready to run an experiment?
+	*/
+	bool systemReady() const override;
+
+	/*
 	 * Create a experiment state for the state machine
 	 */
 	cExperimentState* createState(const std::string& type) override;

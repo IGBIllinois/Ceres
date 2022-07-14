@@ -160,6 +160,20 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
     }
 }
 
+bool cSpidercamModel::systemReady() const
+{
+    if (!mInScriptMode && !mRunning)
+    {
+        QString str = "Make sure the C2 computer is in remote mode.\n";
+        str += "Please enter remote mode.";
+        emit warningMessage("Message", str);
+
+        return false;
+    }
+
+    return true;
+}
+
 cExperimentState* cSpidercamModel::createState(const std::string& type)
 {
     if (type == "movement")

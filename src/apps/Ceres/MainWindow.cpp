@@ -336,6 +336,11 @@ void cMainWindow::experimentRun()
         return;
     }
 
+    if (!mpModel->systemReady())
+    {
+        return;
+    }
+
     // Reload the experiment each time incase the experiment was tweaked
     experimentLoad();
 
@@ -374,7 +379,7 @@ void cMainWindow::experimentPause()
 
     mpExpLoad->setEnabled(false);
     mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(false);
+    mpExpPause->setEnabled(true);
     mpExpStop->setEnabled(true);
 
     emit experimentPaused();
@@ -646,6 +651,17 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
+    QObject::connect(mpController, &cExperimentControlView::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(mpController, &cExperimentControlView::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(mpController, &cExperimentControlView::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(mpController, &cExperimentControlView::errorMessage, this, &cMainWindow::onErrorMessage);
+
+    QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
+        mpController, &cExperimentControlView::experimentStatusUpdating);
+
+    QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
+        mpController, &cExperimentControlView::experimentStateChanging);
+
     mpModel->addExperimentControlModel(pModel);
 
     if (configDoc.contains(name))
@@ -669,6 +685,11 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     if (widgets.pStatusBar)
     {
         statusBar()->addPermanentWidget(widgets.pStatusBar);
+    }
+
+    if (widgets.pToolBar)
+    {
+        addToolBar(widgets.pToolBar);
     }
 }
 

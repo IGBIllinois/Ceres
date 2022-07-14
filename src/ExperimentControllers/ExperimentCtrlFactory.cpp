@@ -4,6 +4,8 @@
 #include "DummyCtrlFactory.hpp"
 #include "Spidercam/SpidercamCtrlFactory.hpp"
 
+#include <QObject>
+
 
 sExperimentControllerWidgets create_experiment_controller(const std::string& name, bool no_visualization)
 {

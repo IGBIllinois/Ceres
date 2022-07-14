@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "ExperimentTypes.hpp"
 #include "../Utilities/Utilities.hpp"
 
 #include <QObject>
@@ -10,11 +11,6 @@
 // Forward Declarations
 class cExperimentState;
 class cBlockDataFileWriter;
-
-namespace experiment
-{
-    enum class State : uint8_t;
-}
 
 
 class cExperimentControlModel : public QObject
@@ -35,6 +31,11 @@ public:
      * controller model.
      */
     virtual void configure(const nlohmann::json& jsonCfg) = 0;
+
+    /*
+     * Is the system ready to run an experiment?
+    */
+    virtual bool systemReady() const = 0;
 
     /*
      * Load an experiment from JSON file.
@@ -109,14 +110,14 @@ public:
     virtual void stopCommunications() = 0;
 
 signals:
-    void statusMessage(QString msg);
-    void infoMessage(QString title, QString msg);
-    void warningMessage(QString title, QString msg);
-    void errorMessage(QString title, QString msg);
-    void experimentStatus(QString msg);
+    void statusMessage(QString msg) const;
+    void infoMessage(QString title, QString msg) const;
+    void warningMessage(QString title, QString msg) const;
+    void errorMessage(QString title, QString msg) const;
 
 signals:
-    void experimentStateChanged(int state);
+    void experimentStatus(QString msg);
+    void experimentStateChanged(experiment::eState state);
     void requestDataRecordingState(bool record);
 
  /**

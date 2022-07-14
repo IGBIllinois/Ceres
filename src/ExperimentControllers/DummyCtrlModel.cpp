@@ -13,6 +13,11 @@ cDummyControlModel::~cDummyControlModel()
 
 }
 
+bool cDummyControlModel::systemReady() const
+{
+    return true;
+}
+
 bool cDummyControlModel::startCommunications()
 {
     return true;
