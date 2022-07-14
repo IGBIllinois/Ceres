@@ -57,6 +57,8 @@ cSensorModel::cSensorModel(const std::string& name, QObject* parent)
     QObject(parent),
     mSensorName(name)
 {
+    qRegisterMetaType<sensor::eStatus>();
+
     mIsRecording = false;
 }
 
