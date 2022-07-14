@@ -223,6 +223,7 @@ void cAxisCamera::replyDataAvailable()
 
 void cAxisCamera::bufferToImage()
 {
+
     bool ok = false;
     mpImageReader->setDevice(mpImageBuffer);
     mpImageBuffer->seek(0);

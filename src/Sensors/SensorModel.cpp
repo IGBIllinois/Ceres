@@ -49,6 +49,8 @@ namespace sensor
     }
 }
 
+Q_DECLARE_METATYPE(sensor::eStatus)
+
 
 cSensorModel::cSensorModel(const std::string& name, QObject* parent)
 :

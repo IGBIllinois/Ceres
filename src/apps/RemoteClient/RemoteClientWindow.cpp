@@ -235,18 +235,21 @@ void cRemoteClientWindow::onStatusUpdate(QString msg)
 
 void cRemoteClientWindow::onInfoMessage(QString title, QString msg)
 {
+    qInfo() << title << ": " << msg;
     QMessageBox msg_box(QMessageBox::Information, title, msg);
     msg_box.exec();
 }
 
 void cRemoteClientWindow::onWarningMessage(QString title, QString msg)
 {
+    qWarning() << title << ": " << msg;
     QMessageBox msg_box(QMessageBox::Warning, title, msg);
     msg_box.exec();
 }
 
 void cRemoteClientWindow::onErrorMessage(QString title, QString msg)
 {
+    qCritical() << title << ": " << msg;
     QMessageBox msg_box(QMessageBox::Critical, title, msg);
     msg_box.exec();
 }

@@ -107,6 +107,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     catch (const std::exception& e)
     {
         setStatus(sensor::eStatus::FAILED);
+        qCritical() << "Axis Communications F44 failed configuration";
         return false;
     }
 
