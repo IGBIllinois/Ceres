@@ -141,6 +141,8 @@ void cAxisCommunicationsModel_F44::writeDataHeader()
 
 bool cAxisCommunicationsModel_F44::startCommunications()
 {
+    if (!mConnected) return false;
+
     mpActiveCamera->startGrabbing();
 
     setStatus(sensor::eStatus::CONNECTING);
@@ -150,6 +152,7 @@ bool cAxisCommunicationsModel_F44::startCommunications()
 
 void cAxisCommunicationsModel_F44::stopCommunications()
 {
+    if (!mConnected) return;
     mpActiveCamera->stopGrabbing();
 }
 

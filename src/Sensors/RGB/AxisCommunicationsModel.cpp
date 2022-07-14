@@ -22,6 +22,7 @@ cAxisCommunicationsModel::cAxisCommunicationsModel(const std::string& name, QObj
     mpHttpManager(nullptr),
     mVapixVersion(0)
 {
+    mConnected = false;
     mpHttpManager = new QNetworkAccessManager(this);
 }
 
@@ -78,9 +79,9 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
 
     emit statusMessage("Quering Axis Communications server...");
 
-    queryVapixSupport();
-    querySupportedResolutions();
-    querySupportedImageFormats();
+    if (!queryVapixSupport()) return false;
+    if (!querySupportedResolutions()) return false;
+    if (!querySupportedImageFormats()) return false;
 
 /*
 	try
@@ -94,12 +95,15 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
 		return false;
 	}
 */
+    mConnected = true;
 
     return cRgbCameraModel::configure(jsonCfg);
 }
 
 bool cAxisCommunicationsModel::startCommunications()
 {
+    if (!mConnected) return false;
+
 	if (mpHttpManager) return true;
 
 	mpHttpManager  = new QNetworkAccessManager(this);
@@ -147,7 +151,7 @@ void cAxisCommunicationsModel::update()
 {
 }
 
-void cAxisCommunicationsModel::queryVapixSupport()
+bool cAxisCommunicationsModel::queryVapixSupport()
 {
     QUrl url(mUrl);
 
@@ -169,10 +173,13 @@ void cAxisCommunicationsModel::queryVapixSupport()
         query.setQuery(replyText);
         auto version = query.queryItemValue("Properties.API.HTTP.Version", QUrl::FullyDecoded);
         mVapixVersion = version.toInt();
+        return true;
     }
+
+    return false;
 }
 
-void cAxisCommunicationsModel::querySupportedResolutions()
+bool cAxisCommunicationsModel::querySupportedResolutions()
 {
     mSupportedImageSizes.clear();
 
@@ -202,10 +209,14 @@ void cAxisCommunicationsModel::querySupportedResolutions()
             image_size.remove(QChar('\n'));
             mSupportedImageSizes.push_back(axis::to_image_size(image_size.toStdString()));
         }
+
+        return true;
     }
+
+    return false;
 }
 
-void cAxisCommunicationsModel::querySupportedImageFormats()
+bool cAxisCommunicationsModel::querySupportedImageFormats()
 {
     mSupportedImageFormats.clear();
 
@@ -234,7 +245,11 @@ void cAxisCommunicationsModel::querySupportedImageFormats()
             format.remove(QChar('\n'));
             mSupportedImageFormats.push_back(axis::to_image_format(format.toStdString()));
         }
+
+        return true;
     }
+
+    return false;
 }
 
 axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera)

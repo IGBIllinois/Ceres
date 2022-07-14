@@ -44,6 +44,8 @@ public:
      */
     uint16_t data_class_id() const override;
 
+    bool isConnected() const { return mConnected; }
+
     const QImage& getCurrentImage() const;
 
     QUrl url() const { return mUrl; }
@@ -75,9 +77,9 @@ protected:
     cAxisCommunicationsModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cAxisCommunicationsModel();
 
-    void queryVapixSupport();
-    void querySupportedResolutions();
-    void querySupportedImageFormats();
+    bool queryVapixSupport();
+    bool querySupportedResolutions();
+    bool querySupportedImageFormats();
     axis::sImageSize_t queryImageResolution(uint8_t camera);
 
     QBitmap getBitmap(int cameraId, axis::sImageSize_t resolution = axis::sImageSize_t());
@@ -89,6 +91,7 @@ protected:
     virtual void processReply(const std::string& reply) {};
 
 protected:
+    bool mConnected;
     QNetworkAccessManager* mpHttpManager;
     QUrl mUrl;
 
