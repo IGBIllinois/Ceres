@@ -10,6 +10,7 @@
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QLineEdit;
+class QStatusBar;
 QT_END_NAMESPACE
 
 
@@ -45,5 +46,6 @@ private:
     QLineEdit* mpY_m;
     QLineEdit* mpZ_m;
 
+    QStatusBar* mpExperimentStatus;
 };
 

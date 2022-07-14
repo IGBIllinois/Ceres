@@ -5,11 +5,13 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QLabel>
+#include <QStatusBar>
 
 
 cSpidercamView::cSpidercamView()
 	:
-	mpScanArea(nullptr)
+	mpScanArea(nullptr), mpX_m(nullptr), mpY_m(nullptr), mpZ_m(nullptr),
+	mpExperimentStatus(nullptr)
 {
 	mpScanArea = new cSpidercamScanArea(this);
 
@@ -31,6 +33,12 @@ cSpidercamView::cSpidercamView()
 	mpZ_m = new QLineEdit();
 	mpZ_m->setReadOnly(true);
 
+	mpExperimentStatus = new QStatusBar();
+	mpExperimentStatus->setHidden(true);
+	mpExperimentStatus->setSizeGripEnabled(false);
+	mpExperimentStatus->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+
 	auto* mainlayout = new QVBoxLayout();
 	mainlayout->addWidget(mpScanArea);
 
@@ -44,6 +52,8 @@ cSpidercamView::cSpidercamView()
 	statuslayout->addWidget(mpZ_m);
 
 	mainlayout->addLayout(statuslayout);
+
+	mainlayout->addWidget(mpExperimentStatus);
 
 	setLayout(mainlayout);
 
