@@ -98,7 +98,10 @@ void cAxisCommunicationsSerializer::writeJPEG(const QImage& in)
     assert(mpDataFile);
 
     mImageWriter.setFormat("jpeg");
-    mImageWriter.write(in);
+    if (!mImageWriter.write(in))
+    {
+        throw std::runtime_error(mImageWriter.errorString().toStdString());
+    }
 
     mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::JPEG);
@@ -121,7 +124,10 @@ void cAxisCommunicationsSerializer::writeMpegFrame(const QImage& in)
     assert(mpDataFile);
 
     mImageWriter.setFormat("jpeg");
-    mImageWriter.write(in);
+    if (!mImageWriter.write(in))
+    {
+        throw std::runtime_error(mImageWriter.errorString().toStdString());
+    }
 
     mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::MPEG_FRAME);
@@ -133,7 +139,12 @@ void cAxisCommunicationsSerializer::writeMpegFrame(const QImage& in)
     assert(!mDataBuffer.overrun());
 
     if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing writeMpegFrame data.");
+    {
+        std::string msg = "ERROR, Buffer Overrun in writing writeMpegFrame data.  ";
+        msg += "Image size = ";
+        msg += std::to_string(mImageData.size());
+        throw std::runtime_error(msg);
+    }
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
     mImageData.clear();

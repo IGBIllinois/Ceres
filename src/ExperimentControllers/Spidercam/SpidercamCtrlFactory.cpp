@@ -4,6 +4,7 @@
 #include "SpidercamView.hpp"
 #include "SpidercamModel.hpp"
 #include "SpidercamDollyStatus.hpp"
+#include "SpidercamToolbar.hpp"
 
 #include <QWidget>
 #include <QString>
@@ -46,5 +47,9 @@ sExperimentControllerWidgets create_spidercam_controller(bool no_visualization)
 
     QObject::connect(pModel, &cSpidercamModel::batteryLevelChanged, pStatusBar, &cBatteryStatus::updateBatteryLevel);
 
-    return sExperimentControllerWidgets(pModel, pView, pDockWidget, pStatusBar);
+    auto* pToolBar = new cSpidercamToolbar();
+
+//    QObject::connect(pModel, &cSpidercamModel::batteryLevelChanged, pStatusBar, &cBatteryStatus::updateBatteryLevel);
+
+    return sExperimentControllerWidgets(pModel, pView, pDockWidget, pStatusBar, pToolBar);
 }

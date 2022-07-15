@@ -27,8 +27,11 @@ void cCeresRemoteClientNetEncoder::sendStatusMessage(const std::string& msg)
     sendData();
 }
 
-void cCeresRemoteClientNetEncoder::sendLogMessage(const std::string& msg)
+void cCeresRemoteClientNetEncoder::sendLogMessage(uint8_t msg_type,
+                        const std::string& device, const std::string& msg)
 {
+    encode_log_message(msg_type, device, msg, mBuffer);
+    sendData();
 
 }
 

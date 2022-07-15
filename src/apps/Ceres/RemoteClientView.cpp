@@ -7,6 +7,7 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include <QStackedLayout>
+#include <QGroupBox>
 
 #include <string>
 
@@ -14,7 +15,9 @@
 cRemoteClientView::cRemoteClientView(cCtrlDataModelRemote* pModel, QWidget* parent)
 	:
 	QAbstractScrollArea(parent),
-	mpModel(pModel)
+	mpModel(pModel), mpStatusMessage(nullptr),
+	mpLogType(nullptr), mpLogDevice(nullptr), mpLogMessage(nullptr)
+
 {
 	setWindowTitle("Remote Status");
 	createWidgets();
@@ -94,6 +97,16 @@ void cRemoteClientView::removeAllSensors()
 	mSensorStatus.clear();
 }
 
+void cRemoteClientView::updateStatusMsg(const QString& msg)
+{
+
+}
+
+void cRemoteClientView::updateLogMsg(int msg_type, const QString& device, const QString& msg)
+{
+
+}
+
 void cRemoteClientView::tryReconnectPressed()
 {
 	mpModel->try_reconnection();
@@ -110,19 +123,19 @@ void cRemoteClientView::createWidgets()
 	mpTryReconnect = new QPushButton();
 	mpTryReconnect->setText("Try to Reconnect");
 	mpTryReconnect->setEnabled(false);
-//	mpTryReconnect->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	connect(mpTryReconnect, &QPushButton::pressed, this, &cRemoteClientView::tryReconnectPressed);
 
-//	mpTryReconnect->setFixedHeight(mpConnectionStatus->sizeHint().height());
-//	mpTryReconnect->setFixedSize(mpConnectionStatus->sizeHint());
-//	mpConnectionStatus->setSizePolicy(mpTryReconnect->sizePolicy());
-//	mpConnectionStatus->setFixedHeight(mpTryReconnect->sizeHint().height());
+	mpStatusMessage = new QLineEdit();
+	mpStatusMessage->setReadOnly(true);
 
-//	mpStatusReconnectLayout = new QStackedLayout();
-//	mpStatusReconnectLayout->addWidget(mpConnectionStatus);
-//	mpStatusReconnectLayout->addWidget(mpTryReconnect);
-//	mpStatusReconnectLayout->setCurrentWidget(mpConnectionStatus);
-//	mpStatusReconnectLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+	mpLogType = new QLineEdit();
+	mpLogType->setReadOnly(true);
+
+	mpLogDevice = new QLineEdit();
+	mpLogDevice->setReadOnly(true);
+
+	mpLogMessage = new QLineEdit();
+	mpLogMessage->setReadOnly(true);
 }
 
 void cRemoteClientView::horizontalLayout()

@@ -87,6 +87,20 @@ void cRemoteDataModel::stopDataThread()
     mThread.stop();
 }
 
+void cRemoteDataModel::sendStatusMessage(const QString& msg)
+{
+    cCeresRemoteClientNetEncoder::sendStatusMessage(msg.toStdString());
+}
+
+void cRemoteDataModel::sendStatusMessage(const std::string& msg)
+{
+    cCeresRemoteClientNetEncoder::sendStatusMessage(msg);
+}
+
+/********************************************************************
+ * Packet Handlers
+ *******************************************************************/
+
 void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 {
     using namespace std::filesystem;
@@ -353,25 +367,34 @@ void cRemoteDataModel::processNewCommand()
 
 void cRemoteDataModel::clientDisconnected()
 {
+    qInfo() << "Disconnecting client...";
+
     QObject::disconnect(mpClient, &QTcpSocket::readyRead, this, &cRemoteDataModel::processNewCommand);
     QObject::disconnect(mpClient, &QTcpSocket::disconnected, this, &cRemoteDataModel::clientDisconnected);
     QObject::disconnect(mpClient, &QTcpSocket::errorOccurred, this, &cRemoteDataModel::clientErrorOccurred);
     QObject::disconnect(mpClient, &QTcpSocket::stateChanged, this, &cRemoteDataModel::clientStateChanged);
 
+    qInfo() << "Client delete later...";
+    mpClient->close();
     mpClient->deleteLater();
     mpClient = nullptr;
 
     if (mIsRecording)
     {
+        qInfo() << "onStopDataRecording...";
         onStopDataRecording();
     }
 
     if (mIsExperimentRunning)
     {
+        qInfo() << "onStopExperiment...";
         onStopExperiment();
     }
 
+    qInfo() << "onCloseDataFile...";
     onCloseDataFile();
+
+    qInfo() << "Client is disconnected!";
 
     emit statusMessage("Client is disconnected!");
 }

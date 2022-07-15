@@ -95,6 +95,8 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
             {
                 LogMessage_1 packet;
                 packet.ParseFromArray(buffer.data(), hdr.length);
+                auto data = to_log_message_1(packet);
+                onLogMessage(data.msg_type, data.device, data.message);
                 break;
             }
             case ePacketType::SENSOR_STATUS:

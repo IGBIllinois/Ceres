@@ -40,7 +40,7 @@ private:
     virtual void onStopDataRecording() = 0;
 
     virtual void onStatusMessage(const std::string& msg) = 0;
-    virtual void onLogMessage(const std::string& msg) = 0;
+    virtual void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) = 0;
     virtual void onSensorStatus(const std::string& sensor, const std::string& status) = 0;
     virtual void onSensorNameChange(const std::string& old_name, const std::string& new_name) = 0;
 

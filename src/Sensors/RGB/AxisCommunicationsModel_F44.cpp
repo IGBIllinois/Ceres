@@ -235,7 +235,14 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.writeMpegFrame(mCurrentImage);
+        try
+        {
+            mSerializer.writeMpegFrame(mCurrentImage);
+        }
+        catch (const std::exception& e)
+        {
+            qCritical() << e.what();
+        }
     }
 }
 
@@ -246,7 +253,14 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.writeJPEG(mCurrentImage);
+        try
+        {
+            mSerializer.writeJPEG(mCurrentImage);
+        }
+        catch (const std::exception& e)
+        {
+            qCritical() << e.what();
+        }
     }
 }
 

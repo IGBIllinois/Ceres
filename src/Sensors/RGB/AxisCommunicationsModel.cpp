@@ -122,7 +122,8 @@ void cAxisCommunicationsModel::requestReceived(QNetworkReply* pReply)
 {
 	pReply->deleteLater();
 
-    if (pReply->error() == QNetworkReply::NoError) {
+    if (pReply->error() == QNetworkReply::NoError) 
+    {
         // Get the http status code
         int v = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         if (v >= 200 && v < 300) // Success
@@ -289,8 +290,6 @@ axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera
 QString cAxisCommunicationsModel::queryServer(const QNetworkRequest& request)
 {
     QNetworkReply* reply = mpHttpManager->get(request);
-
-    reply->waitForReadyRead(5000);
 
     QEventLoop loop;
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);

@@ -22,6 +22,7 @@
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
+#include <QSound>
 
 
 #include <cassert>
@@ -447,6 +448,8 @@ void cMainWindow::onExperimentCompleted()
     mpExpStop->setEnabled(false);
 
     emit experimentStopped();
+
+    QSound::play(":/ripe.illinois.edu/end_experiment.wav");
 }
 
 

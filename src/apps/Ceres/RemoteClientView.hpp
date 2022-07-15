@@ -28,6 +28,9 @@ public:
     void sensorNameChange(const QString& old_name, const QString& new_name);
     void removeAllSensors();
 
+    void updateStatusMsg(const QString& msg);
+    void updateLogMsg(int msg_type, const QString& device, const QString& msg);
+
 public slots:
     void dockLocationChanged(Qt::DockWidgetArea area);
     void topLevelChanged(bool topLevel);
@@ -58,4 +61,10 @@ protected:
     };
 
     std::vector<sSensorStatus_t> mSensorStatus;
+
+    QLineEdit* mpStatusMessage;
+
+    QLineEdit* mpLogType;
+    QLineEdit* mpLogDevice;
+    QLineEdit* mpLogMessage;
 };

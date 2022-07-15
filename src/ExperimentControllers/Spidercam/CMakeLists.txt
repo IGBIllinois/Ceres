@@ -12,6 +12,8 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
 #
     SpidercamDollyStatus.hpp
     SpidercamDollyStatus.cpp
+    SpidercamToolbar.hpp
+    SpidercamToolbar.cpp
     SpidercamExperimentStates.hpp
     SpidercamExperimentStates.cpp
     SpidercamScanArea.hpp

@@ -367,7 +367,7 @@ void cCtrlDataModelRemote::onStatusMessage(const std::string& msg)
 
 }
 
-void cCtrlDataModelRemote::onLogMessage(const std::string& msg)
+void cCtrlDataModelRemote::onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg)
 {
 
 }
