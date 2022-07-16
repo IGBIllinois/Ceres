@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <vector>
 #include <QMainWindow>
 #include <QString>
 
@@ -23,6 +24,7 @@ class cCeresSplashScreen;
 class cCtrlDataModel;
 class cExperimentControlView;
 class cExperimentManager;
+class cExperimentTreeItem;
 
 namespace Ui 
 {
@@ -63,6 +65,9 @@ private slots:
     void helpAbout();
 
 private:
+    bool loadExperiment(const cExperimentTreeItem& experiment);
+
+private:
     void createMainMenu();
     void createSubMenusAndActions();
     void createActions();
@@ -99,5 +104,7 @@ private:
     cCtrlDataModel* mpModel;
 
     cExperimentControlView* mpController;
+
+    std::vector<cExperimentTreeItem*> mBatchProcess;
 };
 

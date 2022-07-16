@@ -28,10 +28,10 @@ public:
     virtual void stopDataThread() = 0;
 
 signals:
-    void statusMessage(QString msg);
-    void infoMessage(QString title, QString msg);
-    void warningMessage(QString title, QString msg);
-    void errorMessage(QString title, QString msg);
+    void statusMessage(QString msg) const;
+    void infoMessage(QString title, QString msg) const;
+    void warningMessage(QString title, QString msg) const;
+    void errorMessage(QString title, QString msg) const;
 
 protected slots:
     void onStatusUpdate(QString msg);

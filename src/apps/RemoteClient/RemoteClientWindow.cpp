@@ -231,6 +231,8 @@ void cRemoteClientWindow::onStatusUpdate(QString msg)
 
     if (statusBar())
         statusBar()->showMessage(msg);
+
+    mMainModel.sendStatusMessage(msg);
 }
 
 void cRemoteClientWindow::onInfoMessage(QString title, QString msg)
@@ -240,7 +242,7 @@ void cRemoteClientWindow::onInfoMessage(QString title, QString msg)
     msg_box.exec();
 }
 
-void cRemoteClientWindow::onWarningMessage(QString title, QString msg)
+void cRemoteClientWindow::onWarningMessage(QString title, QString msg) const
 {
     qWarning() << title << ": " << msg;
     QMessageBox msg_box(QMessageBox::Warning, title, msg);

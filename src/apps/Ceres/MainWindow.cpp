@@ -292,6 +292,26 @@ void cMainWindow::experimentLoad()
     }
 
     auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+
+    if (pExperiment == nullptr)
+    {
+        return;
+    }
+
+    if (pExperiment->hasExperimentDocument())
+    {
+        loadExperiment(*pExperiment);
+    }
+
+    auto n = pExperiment->childCount();
+    for (int i = 0; i < n; ++i)
+    {
+        auto* pExp = static_cast<cExperimentTreeItem*>(pExperiment->child(i));
+    }
+
+
+
+/*
     if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
     {
         cExperimentSelectDlg* dlg = new cExperimentSelectDlg(this);
@@ -307,17 +327,25 @@ void cMainWindow::experimentLoad()
             return;
         }
     }
+*/
+}
 
+//-----------------------------------------------------------------------------
+bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
+{
     QString msg = "Loading experiment \"";
-    msg += pExperiment->text(0);
+    msg += experiment.text(0);
     msg += "\" from file ";
-    msg += pExperiment->getFilename();
-
+    msg += experiment.getFilename();
     onStatusUpdate(msg);
-    auto expDoc = pExperiment->getExperimentDocument();
+
+    auto expDoc = experiment.getExperimentDocument();
     if (!mpModel->loadExperiment(expDoc))
     {
+        return false;
     }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -469,22 +497,11 @@ void cMainWindow::createSubMenusAndActions()
 
     // Build the File Menu
     pMenuItem = new QAction(tr("Refresh"), this);
-//    pMenuItem->setShortcuts(QKeySequence::New);
     pMenuItem->setStatusTip(tr("Refresh the experiment window"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileRefresh);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
-
-/*
-    pMenuItem = new QAction(tr("&Add Experiment"), this);
-    pMenuItem->setShortcuts(QKeySequence::New);
-    pMenuItem->setStatusTip(tr("Add an experiment to the list"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileAddExperiment);
-    mpFileMenu->addAction(pMenuItem);
-
-    mpFileMenu->addSeparator();
-*/
 
     pMenuItem = new QAction(tr("E&xit"), this);
     pMenuItem->setShortcuts(QKeySequence::Quit);
@@ -590,6 +607,16 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 
         if (type == "local")
             mpModel = new cCtrlDataModelLocal(this);
+        else
+        {
+            QString msg = "Unknown data model: ";
+            msg += type.c_str();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
 
         QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
         QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
@@ -605,14 +632,15 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         if (data_model.contains("c3_ip"))
             c3_ip = data_model["c3_ip"];
 
-        auto* model = new cCtrlDataModelRemote(this);
-        QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-        QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-        QObject::connect(mpModel, &cCtrlDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-        QObject::connect(mpModel, &cCtrlDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+        cCtrlDataModelRemote* pModel = new cCtrlDataModelRemote(this);
+
+        QObject::connect(pModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+        QObject::connect(pModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+        QObject::connect(pModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+        QObject::connect(pModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
         auto* dockWidget = new QDockWidget();
-        model->createView(dockWidget);
+        pModel->createView(dockWidget);
 
         if (dockWidget->widget() != nullptr)
         {
@@ -622,13 +650,13 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
             mpViewMenu->addAction(dockWidget->toggleViewAction());
         }
 
-        bool result = model->try_to_connect(QString(c4_ip.c_str()), port,
+        bool result = pModel->try_to_connect(QString(c4_ip.c_str()), port,
             false, QString(c3_ip.c_str()));
 
         if (!result)
         { }
 
-        mpModel = model;
+        mpModel = pModel;
     }
 
     QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);

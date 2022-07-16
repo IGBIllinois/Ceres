@@ -31,6 +31,8 @@ public:
 
     void createView(QDockWidget*& dockWidget);
 
+    bool systemReady() const override;
+
     bool try_to_connect(const QString& hostname, uint16_t port, 
                         bool use_ipv6, const QString& local_ip);
 
@@ -39,7 +41,7 @@ public:
     void addExperimentControlModel(cExperimentControlModel* pModel) override;
     void addSensor(cSensorModel* pSensor) override;
 
-    bool openDataFile(const QString& defaultPath) override;
+    bool openDataFile(const QString& defaultPath, bool autoSave = false) override;
     bool isDataFileOpen() const override;
     void closeDataFile();
 

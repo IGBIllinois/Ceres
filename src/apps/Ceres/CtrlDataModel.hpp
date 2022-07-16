@@ -40,11 +40,11 @@ public:
     void startDataThread() override;
     void stopDataThread() override;
 
-    virtual bool openDataFile(const QString& defaultPath) = 0;
+    virtual bool openDataFile(const QString& defaultPath, bool autoSave = false) = 0;
     virtual bool isDataFileOpen() const = 0;
     virtual void closeDataFile() = 0;
 
-    bool systemReady() const;
+    virtual bool systemReady() const;
 
     bool isExperimentRunning();
     bool isExperimentPaused();
@@ -59,13 +59,6 @@ public:
     void terminateExperiment();
 
 signals:
-/*
-    void statusMessage(QString msg);
-    void infoMessage(QString title, QString msg);
-    void warningMessage(QString title, QString msg);
-    void errorMessage(QString title, QString msg);
-*/
-
     void experimentCompleted();
 
 protected slots:

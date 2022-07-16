@@ -37,12 +37,44 @@ void cCtrlDataModelLocal::stopDataThread()
     }
 }
 
-bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath)
+bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, bool autoSave)
 {
-    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("New File"), defaultPath, tr("Ceres data (*.ceres);;All Files (*.*)"));
+    QString fileName;
 
-    if (fileName.isEmpty())
-        return false;
+    std::time_t t = std::time(nullptr);
+    tm* ltm = localtime(&t);
+
+    if (autoSave)
+    {
+        QString _filename = defaultPath;
+        _filename += "/";
+
+        switch (ltm->tm_mon)
+        {
+        case 0: _filename += "Jan"; break;
+        case 1: _filename += "Feb"; break;
+        case 2: _filename += "Mar"; break;
+        case 3: _filename += "Apr"; break;
+        case 4: _filename += "May"; break;
+        case 5: _filename += "June"; break;
+        case 6: _filename += "July"; break;
+        case 7: _filename += "Aug"; break;
+        case 8: _filename += "Sept"; break;
+        case 9: _filename += "Oct"; break;
+        case 10: _filename += "Nov"; break;
+        case 11: _filename += "Dec"; break;
+        }
+        _filename += QString::number(ltm->tm_mday);
+        _filename += "/";
+        _filename += QString::fromStdString(mExperimentTitle);
+    }
+    else
+    {
+        fileName = QFileDialog::getSaveFileName(nullptr, tr("New File"), defaultPath, tr("Ceres data (*.ceres);;All Files (*.*)"));
+
+        if (fileName.isEmpty())
+            return false;
+    }
 
     if (mFile.isOpen())
         return false;
@@ -52,8 +84,7 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath)
 
     char timestamp[100];
 
-    std::time_t t = std::time(nullptr);
-    std::strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", std::localtime(&t));
+    std::strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", ltm);
 
     fileName.insert(ext, "_");
     fileName.insert(ext + 1, timestamp);

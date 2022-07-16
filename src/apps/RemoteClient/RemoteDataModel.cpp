@@ -246,12 +246,15 @@ void cRemoteDataModel::onStopExperiment()
 {
     onStopDataRecording();
 
-    mSerializer.writeBeginFooter();
-    for (auto& sensor : mThread.mActiveSensors)
+    if (static_cast<bool>(mSerializer))
     {
-        sensor->writeDataFooter();
+        mSerializer.writeBeginFooter();
+        for (auto& sensor : mThread.mActiveSensors)
+        {
+            sensor->writeDataFooter();
+        }
+        mSerializer.writeEndOfFooter();
     }
-    mSerializer.writeEndOfFooter();
 
     mExperimentTitle.clear();
     mResearcher.clear();

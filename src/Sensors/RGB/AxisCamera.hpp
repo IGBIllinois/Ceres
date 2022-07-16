@@ -10,6 +10,8 @@
 #include <QBuffer>
 
 #include <vector>
+#include <fstream>
+
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE

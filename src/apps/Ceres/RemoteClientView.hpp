@@ -10,8 +10,10 @@
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QLineEdit;
+class QTextEdit;
 class QPushButton;
 class QStackedLayout;
+class QGroupBox;
 QT_END_NAMESPACE
 
 
@@ -62,9 +64,13 @@ protected:
 
     std::vector<sSensorStatus_t> mSensorStatus;
 
-    QLineEdit* mpStatusMessage;
+    QGroupBox* mpStatusMessageBox;
+    QTextEdit* mpStatusMessage;
 
+    QGroupBox* mpLogMessageBox;
+    QLabel*    mpLogTypeLabel;
     QLineEdit* mpLogType;
+    QLabel*    mpLogDeviceLabel;
     QLineEdit* mpLogDevice;
-    QLineEdit* mpLogMessage;
+    QTextEdit* mpLogMessage;
 };

@@ -5,38 +5,9 @@
 #include "../common/CeresSplashScreen.hpp"
 #include "RemoteClientWindow.hpp"
 
-#include <windows.h>
-#include <eh.h>
-#include <stdexcept>
-
 #include <fstream>
 
 static std::ofstream logFile;
-
-class SE_Exception : public std::exception
-{
-private:
-    const unsigned int nSE;
-public:
-    SE_Exception() noexcept : SE_Exception{ 0 } {}
-    SE_Exception(unsigned int n) noexcept : nSE{ n } {}
-    unsigned int getSeNumber() const noexcept { return nSE; }
-};
-
-class Scoped_SE_Translator
-{
-private:
-    const _se_translator_function old_SE_translator;
-public:
-    Scoped_SE_Translator(_se_translator_function new_SE_translator) noexcept
-        : old_SE_translator{ _set_se_translator(new_SE_translator) } {}
-    ~Scoped_SE_Translator() noexcept { _set_se_translator(old_SE_translator); }
-};
-
-void trans_func(unsigned int u, EXCEPTION_POINTERS*)
-{
-    throw SE_Exception(u);
-}
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -70,8 +41,6 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QS
 
 int main(int argc, char** argv)
 {
-    Scoped_SE_Translator scoped_se_translator{ trans_func };
-
     logFile.open("CeresRemoteClient.log", std::ios::trunc);
 
     qInstallMessageHandler(myMessageOutput);
@@ -91,19 +60,6 @@ int main(int argc, char** argv)
     delete pSplash; 
     pSplash = nullptr;
 
-    try
-    {
-        return app.exec();
-    }
-    catch (const SE_Exception& e)
-    {
-        logFile << e.getSeNumber() << std::endl;
-    }
-    catch (const std::exception& e)
-    {
-        logFile << e.what() << std::endl;
-    }
-
-    return 0;
+    return app.exec();
 }
 

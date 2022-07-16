@@ -162,6 +162,15 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
 
 bool cSpidercamModel::systemReady() const
 {
+    if (!mController.isConnected())
+    {
+        QString str = "The C3 computer is not connected to the Spidercam C2 computer.\n";
+        str += "Unable to run any experiment until connection is re-established.";
+        emit errorMessage("Error", str);
+
+        return false;
+    }
+
     if (!mInScriptMode && !mRunning)
     {
         QString str = "Make sure the C2 computer is in remote mode.\n";

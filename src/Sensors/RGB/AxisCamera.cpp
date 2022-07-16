@@ -10,6 +10,7 @@
 
 #include <nlohmann/json.hpp>
 
+
 cAxisCamera::cAxisCamera(int id, QObject* parent)
 :
     QObject(parent), mCameraID(id),
@@ -99,7 +100,7 @@ bool cAxisCamera::startGrabbing()
         query.addQueryItem("fps", QString::number(mFramesPerSeconds));
 
     if (mImageSize != axis::sImageSize_t())
-        query.addQueryItem("resolution", QString(axis::to_string(mImageSize).c_str()));
+        query.addQueryItem("resolution", QString::fromStdString(axis::to_string(mImageSize)));
 
     mCurrentUrl.setQuery(query);
 
@@ -196,7 +197,11 @@ void cAxisCamera::replyDataAvailable()
     {
         int i = mNetworkData.indexOf("Content-Length:");
         if (i < 0)
+        {
+            qWarning() << QString("Packet did not contain \"Content-Length:\"");
+            mNetworkData.clear();
             return;
+        }
 
         i += 16; // Adding the number of characters in "Content-Length:"
         int n = mNetworkData.indexOf('\r', i);
@@ -207,6 +212,7 @@ void cAxisCamera::replyDataAvailable()
         {
             QString str = mNetworkData.mid(i, n - i);
             qWarning() << QString("Could not convert %1 to number").arg(str);
+            mNetworkData.clear();
             return;
         }
 
@@ -214,7 +220,6 @@ void cAxisCamera::replyDataAvailable()
 
         auto len = mNetworkData.size() - n;
         mpImageBuffer->write(mNetworkData.right(len));
-
     }
 
     mNetworkData.clear();
@@ -232,8 +237,6 @@ void cAxisCamera::bufferToImage()
     if (ok)
     {
         emit frameGrabbed(mCameraID, mpCurrentImage);
-        //                calcFPS(requestTime.msecsTo(QTime::currentTime()));
-        //                requestTime = QTime::currentTime();
     }
     else
     {

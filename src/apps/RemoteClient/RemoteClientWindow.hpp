@@ -44,7 +44,7 @@ public:
 public slots:
     void onStatusUpdate(QString msg);
     void onInfoMessage(QString title, QString msg);
-    void onWarningMessage(QString title, QString msg);
+    void onWarningMessage(QString title, QString msg) const;
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString msg);
 

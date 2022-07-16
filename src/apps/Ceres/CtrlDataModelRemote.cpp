@@ -100,6 +100,21 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
     }
 }
 
+bool cCtrlDataModelRemote::systemReady() const
+{
+    if (!mConnected)
+    {
+        QString str = "Not connected to the remote computer!\n";
+        str += "Please try to reconnect before running an experiment.";
+
+        emit errorMessage("Error", str);
+        return false;
+    }
+
+    return cCtrlDataModel::systemReady();
+}
+
+
 void cCtrlDataModelRemote::updatePosition(spidercam::sPosition_1_t pos)
 {
     if (!mConnected) return;
@@ -182,7 +197,7 @@ void cCtrlDataModelRemote::try_reconnection()
     mSocket.connectToHost(mRemoteEndpoint, mPort);
 }
 
-bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath)
+bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, bool)
 {
     std::time_t t = std::time(nullptr);
     tm* ltm = localtime(&t);
@@ -259,6 +274,10 @@ void cCtrlDataModelRemote::startExperiment()
     sendStartExperiment();
 
     mThread.mpController->startExperiment();
+
+    QString msg = "Running experiment: ";
+    msg += QString::fromStdString(mExperimentTitle);
+    emit statusMessage(msg);
 }
 
 /**********************************************************
@@ -364,12 +383,12 @@ void cCtrlDataModelRemote::onDataFileState(bool is_open)
 
 void cCtrlDataModelRemote::onStatusMessage(const std::string& msg)
 {
-
+    mpView->updateStatusMsg(QString::fromStdString(msg));
 }
 
 void cCtrlDataModelRemote::onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg)
 {
-
+    mpView->updateLogMsg(msg_type, QString::fromStdString(device), QString::fromStdString(msg));
 }
 
 void cCtrlDataModelRemote::onSensorStatus(const std::string& sensor, const std::string& status)

@@ -2,6 +2,7 @@
 #include "RemoteClientView.hpp"
 
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QLabel>
 #include <QGridLayout>
 #include <QFormLayout>
@@ -65,10 +66,6 @@ void cRemoteClientView::updateSensorStatus(const QString& sensor, const QString&
 
 	verticalLayout();
 
-//	QFormLayout* formLayout = dynamic_cast<QFormLayout*>(layout());
-//	if (formLayout)
-//		formLayout->addRow(new_sensor.mpSensorLabel, new_sensor.mpSensorStatus);
-
 	update();
 }
 
@@ -99,12 +96,29 @@ void cRemoteClientView::removeAllSensors()
 
 void cRemoteClientView::updateStatusMsg(const QString& msg)
 {
-
+	mpStatusMessage->setText(msg);
 }
 
 void cRemoteClientView::updateLogMsg(int msg_type, const QString& device, const QString& msg)
 {
+	switch (msg_type)
+	{
+	case 0:
+		mpLogType->setText("status");
+		break;
+	case 1:
+		mpLogType->setText("info");
+		break;
+	case 2:
+		mpLogType->setText("warning");
+		break;
+	case 3:
+		mpLogType->setText("error");
+		break;
+	}
 
+	mpLogDevice->setText(device);
+	mpLogMessage->setText(msg);
 }
 
 void cRemoteClientView::tryReconnectPressed()
@@ -125,17 +139,40 @@ void cRemoteClientView::createWidgets()
 	mpTryReconnect->setEnabled(false);
 	connect(mpTryReconnect, &QPushButton::pressed, this, &cRemoteClientView::tryReconnectPressed);
 
-	mpStatusMessage = new QLineEdit();
+	mpStatusMessage = new QTextEdit();
 	mpStatusMessage->setReadOnly(true);
 
+	mpStatusMessageBox = new QGroupBox("Status Message");
+	auto* statusLayout = new QVBoxLayout(this);
+	statusLayout->addWidget(mpStatusMessage);
+	mpStatusMessageBox->setLayout(statusLayout);
+
+
+	mpLogTypeLabel = new QLabel();
+	mpLogTypeLabel->setText("Type:");
 	mpLogType = new QLineEdit();
 	mpLogType->setReadOnly(true);
 
+	mpLogDeviceLabel = new QLabel();
+	mpLogDeviceLabel->setText("Device:");
 	mpLogDevice = new QLineEdit();
 	mpLogDevice->setReadOnly(true);
 
-	mpLogMessage = new QLineEdit();
+	mpLogMessage = new QTextEdit();
 	mpLogMessage->setReadOnly(true);
+
+	mpLogMessageBox = new QGroupBox("Log Message");
+
+	auto* logLayout = new QVBoxLayout(this);
+
+	auto* logInfoLayout = new QFormLayout();
+	logInfoLayout->addRow(mpLogTypeLabel, mpLogType);
+	logInfoLayout->addRow(mpLogDeviceLabel, mpLogDevice);
+
+	logLayout->addLayout(logInfoLayout);
+
+	logLayout->addWidget(mpLogMessage);
+	mpLogMessageBox->setLayout(logLayout);
 }
 
 void cRemoteClientView::horizontalLayout()
@@ -145,7 +182,6 @@ void cRemoteClientView::horizontalLayout()
 
 	auto* mainlayout = new QGridLayout(this);
 	mainlayout->addWidget(mpConnectionStatusLabel, 0, 0);
-//	mainlayout->addLayout(mpStatusReconnectLayout, 0, 1);
 	mainlayout->addWidget(mpConnectionStatus, 0, 1);
 
 	setLayout(mainlayout);
@@ -168,6 +204,10 @@ void cRemoteClientView::verticalLayout()
 	}
 
 	mainlayout->addLayout(formlayout);
+
+	mainlayout->addWidget(mpStatusMessageBox);
+
+	mainlayout->addWidget(mpLogMessageBox);
 
 	setLayout(mainlayout);
 }

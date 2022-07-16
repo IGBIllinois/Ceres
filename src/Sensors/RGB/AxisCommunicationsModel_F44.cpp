@@ -111,7 +111,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
-    size_t buffer_size = max_image_size.height * max_image_size.width * 32;
+    size_t buffer_size = max_image_size.height * max_image_size.width;
 
     mSerializer.setBufferCapacity(buffer_size + 1024);
 
