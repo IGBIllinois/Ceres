@@ -65,6 +65,8 @@ PRIVATE
     ExperimentTreeItem.cpp
     ExperimentToolbar.hpp
     ExperimentToolbar.cpp
+    BatchExpConfirmDlg.hpp
+    BatchExpConfirmDlg.cpp
 	
     CtrlDataModelRemote.hpp
     CtrlDataModelRemote.cpp

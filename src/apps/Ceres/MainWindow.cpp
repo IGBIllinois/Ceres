@@ -11,6 +11,7 @@
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
 #include "ExperimentToolbar.hpp"
+#include "BatchExpConfirmDlg.hpp"
 
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentCtrlView.hpp"
@@ -303,13 +304,19 @@ void cMainWindow::experimentLoad()
         loadExperiment(*pExperiment);
     }
 
+/*
+    cBatchExpConfirmDlg* pDlg = new cBatchExpConfirmDlg(this);
+
     auto n = pExperiment->childCount();
     for (int i = 0; i < n; ++i)
     {
         auto* pExp = static_cast<cExperimentTreeItem*>(pExperiment->child(i));
     }
 
-
+    auto result = pDlg->exec();
+    if (result == QDialog::Rejected)
+        return;
+*/
 
 /*
     if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
