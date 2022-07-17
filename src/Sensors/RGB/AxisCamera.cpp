@@ -10,6 +10,7 @@
 
 #include <nlohmann/json.hpp>
 
+
 cAxisCamera::cAxisCamera(int id, QObject* parent)
 :
     QObject(parent), mCameraID(id),
@@ -99,7 +100,7 @@ bool cAxisCamera::startGrabbing()
         query.addQueryItem("fps", QString::number(mFramesPerSeconds));
 
     if (mImageSize != axis::sImageSize_t())
-        query.addQueryItem("resolution", QString(axis::to_string(mImageSize).c_str()));
+        query.addQueryItem("resolution", QString::fromStdString(axis::to_string(mImageSize)));
 
     mCurrentUrl.setQuery(query);
 
@@ -132,7 +133,7 @@ bool cAxisCamera::sendRequest()
 
     mCurrentImageSize = 0;
     mpImageBuffer->seek(0);
-//        requestTime = QTime::currentTime();
+
     emit stateChanged(mCameraID, GrabbingState::TurnOn);
     return true;
 }
@@ -173,9 +174,7 @@ void cAxisCamera::replyDataAvailable()
     if (bytesRemaining <= 0)
         return;
 
-    mpReply->startTransaction();
     mNetworkData = mpReply->readAll();
-    mpReply->commitTransaction();
 
     auto boundaryPos = mNetworkData.indexOf("--myboundary");
     if (boundaryPos < 0)
@@ -198,7 +197,11 @@ void cAxisCamera::replyDataAvailable()
     {
         int i = mNetworkData.indexOf("Content-Length:");
         if (i < 0)
+        {
+            qWarning() << QString("Packet did not contain \"Content-Length:\"");
+            mNetworkData.clear();
             return;
+        }
 
         i += 16; // Adding the number of characters in "Content-Length:"
         int n = mNetworkData.indexOf('\r', i);
@@ -207,7 +210,9 @@ void cAxisCamera::replyDataAvailable()
         mCurrentImageSize = mNetworkData.mid(i, n - i).toInt(&ok);
         if (!ok)
         {
-            // qWarning() << QString("Could not convert %1 to number").arg(line.mid(16));
+            QString str = mNetworkData.mid(i, n - i);
+            qWarning() << QString("Could not convert %1 to number").arg(str);
+            mNetworkData.clear();
             return;
         }
 
@@ -215,7 +220,6 @@ void cAxisCamera::replyDataAvailable()
 
         auto len = mNetworkData.size() - n;
         mpImageBuffer->write(mNetworkData.right(len));
-
     }
 
     mNetworkData.clear();
@@ -223,6 +227,7 @@ void cAxisCamera::replyDataAvailable()
 
 void cAxisCamera::bufferToImage()
 {
+
     bool ok = false;
     mpImageReader->setDevice(mpImageBuffer);
     mpImageBuffer->seek(0);
@@ -231,9 +236,7 @@ void cAxisCamera::bufferToImage()
 
     if (ok)
     {
-        emit imageGrabbed(mCameraID, mpCurrentImage);
-        //                calcFPS(requestTime.msecsTo(QTime::currentTime()));
-        //                requestTime = QTime::currentTime();
+        emit frameGrabbed(mCameraID, mpCurrentImage);
     }
     else
     {
@@ -251,7 +254,8 @@ void cAxisCamera::requestReceived(QNetworkReply* pReply)
 {
 	pReply->deleteLater();
 
-    if (pReply->error() == QNetworkReply::NoError) {
+    if (pReply->error() == QNetworkReply::NoError) 
+    {
         // Get the http status code
         int v = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         if (v >= 200 && v < 300) // Success
@@ -271,7 +275,7 @@ void cAxisCamera::requestReceived(QNetworkReply* pReply)
     else
     {
         // Error
-        pReply->errorString();
+        qWarning() << pReply->errorString();
     }
 }
 

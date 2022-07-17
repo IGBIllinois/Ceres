@@ -34,10 +34,14 @@ enum class ePacketType : uint16_t
 	CLOSE_DATA_FILE,
 	DATA_FILE_STATE,
 	START_DATA_RECORDING,
-	START_DATA_RECORDING_REPLY,
 	STOP_DATA_RECORDING,
-	STOP_DATA_RECORDING_REPLY,
-	END_DATA_RECORDING,
+	DATA_RECORDING_STATE,
+	START_EXPERIMENT,
+	STOP_EXPERIMENT,
+	STATUS_MESSAGE,
+	LOG_MESSAGE,
+	SENSOR_STATUS,
+	SENSOR_NAME_CHANGE,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -74,6 +78,9 @@ sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt);
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
 	const std::string& cultivar, const std::string& doc, ceres::net_buffer& buffer);
 
+int encode_start_experiment(ceres::net_buffer& buffer);
+int encode_stop_experiment(ceres::net_buffer& buffer);
+
 std::string to_filename_1(const OpenDataFile_1& pckt);
 int encode_open_data_file(const std::string& filename, ceres::net_buffer& buffer);
 
@@ -82,12 +89,43 @@ int encode_close_data_file(ceres::net_buffer& buffer);
 bool to_file_open_state_1(const FileOpenState_1& pckt);
 int encode_file_open_state(bool open, ceres::net_buffer& buffer);
 
+int encode_start_data_recording(ceres::net_buffer& buffer);
+int encode_stop_data_recording(ceres::net_buffer& buffer);
+
+std::string to_status_message_1(const StatusMessage_1& pckt);
+int encode_status_message(const std::string& message, ceres::net_buffer& buffer);
+
+struct sLogMessage_t
+{
+	uint8_t  msg_type;
+	std::string device;
+	std::string message;
+};
+sLogMessage_t to_log_message_1(const LogMessage_1& pckt);
+int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& message, ceres::net_buffer& buffer);
+
+struct sSensorStatus_t
+{
+	std::string name;
+	std::string status;
+};
+sSensorStatus_t to_sensor_status_1(const SensorStatus_1& pckt);
+int encode_sensor_status(const std::string& device, const std::string& message, ceres::net_buffer& buffer);
+
+struct sSensorNameChange_t
+{
+	std::string old_name;
+	std::string new_name;
+};
+sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt);
+int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, ceres::net_buffer& buffer);
+
 
 /**********************************************************
  * Spidercam packets utilities
  **********************************************************/
-spidercam::sPosition to_spidercam_position_1(const Spidercam_Position_1& pckt);
-int encode_spidercam_pos(const spidercam::sPosition& pos, ceres::net_buffer& buffer);
+spidercam::sPosition_1_t to_spidercam_position_1(const Spidercam_Position_1& pckt);
+int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, ceres::net_buffer& buffer);
 
 
 /**********************************************************

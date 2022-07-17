@@ -9,6 +9,16 @@
 
 #include <QByteArray>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QHostInfo>
+
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QDockWidget;
+QT_END_NAMESPACE
+
+class cRemoteClientView;
+
+
 
 class cCtrlDataModelRemote : public cCtrlDataModel, 
     protected cCeresNetDecoder, protected cCeresNetEncoder
@@ -19,21 +29,31 @@ public:
     explicit cCtrlDataModelRemote(QObject* parent = nullptr);
     ~cCtrlDataModelRemote();
 
+    void createView(QDockWidget*& dockWidget);
+
+    bool systemReady() const override;
+
     bool try_to_connect(const QString& hostname, uint16_t port, 
                         bool use_ipv6, const QString& local_ip);
+
+    void try_reconnection();
 
     void addExperimentControlModel(cExperimentControlModel* pModel) override;
     void addSensor(cSensorModel* pSensor) override;
 
-    bool openDataFile(const QString& defaultPath) override;
+    bool openDataFile(const QString& defaultPath, bool autoSave = false) override;
     bool isDataFileOpen() const override;
     void closeDataFile();
 
     bool loadExperiment(const nlohmann::json& expDoc) override;
     void startExperiment() override;
 
+protected:
+    void dataRecordingStateChange(bool record) override;
+    void endDataRecording() override;
+
 public slots:
-    void updatePosition(spidercam::sPosition pos);
+    void updatePosition(spidercam::sPosition_1_t pos);
     void updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
 
 /*
@@ -45,18 +65,23 @@ private slots:
     void errorOccurred(QAbstractSocket::SocketError socketError);
     void hostFound();
     void stateChanged(QAbstractSocket::SocketState socketState);
+    void processNewCommand();
 
+/*
+ * Send data over the TCP socket
+ */
 private:
-    void endDataRecording() override;
+    int sendOutgoingData(const char* data, std::size_t len) override;
 
 /*
  * Packet Handlers
  */
 private:
-    void dataFileState(bool is_open) override;
-
-private:
-    int sendOutgoingData(const char* data, std::size_t len) override;
+    void onDataFileState(bool is_open) override;
+    void onStatusMessage(const std::string& msg) override;
+    void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) override;
+    void onSensorStatus(const std::string& sensor, const std::string& status) override;
+    void onSensorNameChange(const std::string& old_name, const std::string& new_name) override;
 
 /*
  *
@@ -69,6 +94,11 @@ private:
 private:
     bool mConnected;
     bool mDataFileIsOpen;
+
+    cRemoteClientView* mpView;
+
+    QHostAddress mRemoteEndpoint;
+    uint16_t   mPort;
 
     QTcpSocket mSocket;
     QByteArray mReplyBuffer;

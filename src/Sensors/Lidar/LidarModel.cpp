@@ -2,9 +2,9 @@
 #include "LidarModel.hpp"
 
 
-cLidarModel::cLidarModel(QObject* parent)
+cLidarModel::cLidarModel(const std::string& name, QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel(name, parent)
 {
 }
 

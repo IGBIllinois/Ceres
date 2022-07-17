@@ -1,15 +1,18 @@
 
 #include "SpidercamView.hpp"
 #include "../../Utilities/Constants.hpp"
+#include "../ExperimentTypes.hpp"
 
 #include <QLayout>
 #include <QLineEdit>
 #include <QLabel>
+#include <QStatusBar>
 
 
 cSpidercamView::cSpidercamView()
 	:
-	mpScanArea(nullptr)
+	mpScanArea(nullptr), mpX_m(nullptr), mpY_m(nullptr), mpZ_m(nullptr),
+	mpExperimentStatus(nullptr)
 {
 	mpScanArea = new cSpidercamScanArea(this);
 
@@ -31,6 +34,13 @@ cSpidercamView::cSpidercamView()
 	mpZ_m = new QLineEdit();
 	mpZ_m->setReadOnly(true);
 
+	mpExperimentStatus = new QStatusBar();
+	mpExperimentStatus->setHidden(true);
+	mpExperimentStatus->setSizeGripEnabled(false);
+	mpExperimentStatus->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	mpExperimentStatus->setStyleSheet("background-color: rgb(8, 255, 8);");
+
+
 	auto* mainlayout = new QVBoxLayout();
 	mainlayout->addWidget(mpScanArea);
 
@@ -44,6 +54,8 @@ cSpidercamView::cSpidercamView()
 	statuslayout->addWidget(mpZ_m);
 
 	mainlayout->addLayout(statuslayout);
+
+	mainlayout->addWidget(mpExperimentStatus);
 
 	setLayout(mainlayout);
 
@@ -93,7 +105,7 @@ void cSpidercamView::updateLimits(spidercam::sWorkingDimensions limits)
 	mpScanArea->updateBounds(mMinX_mm, mMaxX_mm, mMinY_mm, mMaxY_mm);
 }
 
-void cSpidercamView::updatePosition(spidercam::sPosition pos)
+void cSpidercamView::updatePosition(spidercam::sPosition_1_t pos)
 {
 	mpScanArea->updateDollyPosition(pos.X_mm, pos.Y_mm);
 
@@ -105,4 +117,34 @@ void cSpidercamView::updatePosition(spidercam::sPosition pos)
 void cSpidercamView::updateRecordingState(bool recording)
 {
 	mpScanArea->setRecording(recording);
+}
+
+void cSpidercamView::experimentStateChanging(experiment::eState state)
+{
+	using namespace experiment;
+
+	switch (state)
+	{
+	case eState::LOADED:
+		mpExperimentStatus->setHidden(false);
+		break;
+	case eState::RUNNING:
+		mpExperimentStatus->setStyleSheet("background-color: rgb(8, 255, 8);");
+		break;
+	case eState::PAUSED:
+		mpExperimentStatus->setStyleSheet("background-color: rgb(255, 191, 0);");
+		break;
+	case eState::COMPLETED:
+	case eState::TERMINATED:
+		mpExperimentStatus->setHidden(true);
+		break;
+	case eState::EXP_ERROR:
+		mpExperimentStatus->setStyleSheet("background-color: rgb(235, 33, 46);");
+		break;
+	}
+}
+
+void cSpidercamView::experimentStatusUpdating(QString msg)
+{
+	mpExperimentStatus->showMessage(msg);
 }

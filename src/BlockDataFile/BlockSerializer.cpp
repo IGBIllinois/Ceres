@@ -16,6 +16,10 @@ cBlockSerializer::cBlockSerializer(std::size_t n, cBlockDataFileWriter* pDataFil
     mDataBuffer.capacity(n);
 }
 
+uint16_t cBlockSerializer::classID() const
+{
+    return const_cast<cBlockSerializer*>(this)->blockID().classID();
+}
 
 void cBlockSerializer::attach(cBlockDataFileWriter* pDataFile)
 {

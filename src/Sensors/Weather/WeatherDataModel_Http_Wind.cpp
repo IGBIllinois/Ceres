@@ -17,6 +17,11 @@ cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind(QObject* parent)
 	mDataValid = false;
 }
 
+uint16_t cWeatherDataModel_Http_Wind::data_class_id() const
+{
+	return mSerializer.classID();
+}
+
 bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 {
 	bool valid_cfg = false;
@@ -145,17 +150,22 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 	return true;
 }
 
-void cWeatherDataModel_Http_Wind::writeDataHeader(cBlockDataFileWriter& file)
+void cWeatherDataModel_Http_Wind::enableDataRecording(cBlockDataFileWriter& file)
 {
 	mSerializer.attach(&file);
+}
+
+void cWeatherDataModel_Http_Wind::disableDataRecording()
+{
+	cWeatherDataModel_Http::disableDataRecording();
+	mSerializer.detach();
+}
+
+void cWeatherDataModel_Http_Wind::writeDataHeader()
+{
 	mSerializer.writeConfigInfo(mConfigInfo);
 }
 
-void cWeatherDataModel_Http_Wind::endDataRecording()
-{
-	cWeatherDataModel_Http::endDataRecording();
-	mSerializer.detach();
-}
 
 void cWeatherDataModel_Http_Wind::processReply(const std::string& reply)
 {

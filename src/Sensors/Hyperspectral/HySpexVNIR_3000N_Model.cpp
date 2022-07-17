@@ -7,7 +7,7 @@
 
 cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
 :
-    cHyperspectralModel(parent)
+    cHyperspectralModel("VNIR 3000N", parent)
 {
     mConnected = false;
 }
@@ -15,6 +15,11 @@ cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
 char* cHySpexVNIR_3000N_Model::descriptor() const
 {
     return hyspex_id;
+}
+
+uint16_t cHySpexVNIR_3000N_Model::data_class_id() const
+{
+    return mSerializer.classID();
 }
 
 bool cHySpexVNIR_3000N_Model::configure(const nlohmann::json& jsonCfg)
@@ -52,15 +57,21 @@ void cHySpexVNIR_3000N_Model::update()
     if (!mConnected) return;
 }
 
-void cHySpexVNIR_3000N_Model::writeDataHeader(cBlockDataFileWriter& file)
+void cHySpexVNIR_3000N_Model::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cHySpexVNIR_3000N_Model::endDataRecording()
+void cHySpexVNIR_3000N_Model::disableDataRecording()
 {
-    cHyperspectralModel::endDataRecording();
+    cHyperspectralModel::disableDataRecording();
     mSerializer.detach();
 }
+
+void cHySpexVNIR_3000N_Model::writeDataHeader()
+{
+}
+
+
 
 

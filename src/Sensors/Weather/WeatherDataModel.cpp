@@ -5,7 +5,7 @@
 
 cWeatherDataModel::cWeatherDataModel(QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel("Weather", parent)
 {
 }
 

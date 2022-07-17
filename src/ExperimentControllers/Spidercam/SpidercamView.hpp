@@ -10,6 +10,7 @@
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QLineEdit;
+class QStatusBar;
 QT_END_NAMESPACE
 
 
@@ -28,8 +29,12 @@ public:
 
 public slots:
 	void updateLimits(spidercam::sWorkingDimensions limits);
-	void updatePosition(spidercam::sPosition pos);
+	void updatePosition(spidercam::sPosition_1_t pos);
     void updateRecordingState(bool recording);
+
+protected:
+    void experimentStateChanging(experiment::eState state) override;
+    void experimentStatusUpdating(QString msg) override;
 
 private:
     double mMinX_mm = 0;
@@ -45,5 +50,6 @@ private:
     QLineEdit* mpY_m;
     QLineEdit* mpZ_m;
 
+    QStatusBar* mpExperimentStatus;
 };
 

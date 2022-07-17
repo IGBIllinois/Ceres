@@ -7,7 +7,7 @@
 
 cHySpexSWIR_384_Model::cHySpexSWIR_384_Model(QObject* parent)
 :
-    cHyperspectralModel(parent)
+    cHyperspectralModel("SWIR 384", parent)
 {
     mConnected = false;
 }
@@ -15,6 +15,11 @@ cHySpexSWIR_384_Model::cHySpexSWIR_384_Model(QObject* parent)
 char* cHySpexSWIR_384_Model::descriptor() const
 {
     return hyspex_id;
+}
+
+uint16_t cHySpexSWIR_384_Model::data_class_id() const
+{
+    return mSerializer.classID();
 }
 
 bool cHySpexSWIR_384_Model::configure(const nlohmann::json& jsonCfg)
@@ -53,15 +58,19 @@ void cHySpexSWIR_384_Model::update()
 
 }
 
-void cHySpexSWIR_384_Model::writeDataHeader(cBlockDataFileWriter& file)
+void cHySpexSWIR_384_Model::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cHySpexSWIR_384_Model::endDataRecording()
+void cHySpexSWIR_384_Model::disableDataRecording()
 {
-    cHyperspectralModel::endDataRecording();
+    cHyperspectralModel::disableDataRecording();
     mSerializer.detach();
+}
+
+void cHySpexSWIR_384_Model::writeDataHeader()
+{
 }
 
 

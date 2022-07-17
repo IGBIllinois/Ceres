@@ -18,6 +18,11 @@ cOusterModel_net::cOusterModel_net(QObject* parent)
     mUseIpv6 = false;
 }
 
+uint16_t cOusterModel_net::data_class_id() const
+{
+    return mSerializer.classID();
+}
+
 bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
 {
     std::optional<double> azimuth_min_deg;
@@ -191,7 +196,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
     mImuPort = mCmdStream.retrieveImuUdpPort(true);
     mLidarPort = mCmdStream.retrieveLidarUdpPort(true);
 
-    return true;
+    return cLidarModel::configure(jsonCfg);
 }
 
 bool cOusterModel_net::initialize()
@@ -215,6 +220,8 @@ bool cOusterModel_net::initialize()
 
     mSensorInfo = sensorInfo.value();
     emit updateSensorInfo();
+
+    updateName(mSensorInfo.product_line);
 
     mSerializer.setVersion(mSensorInfo.build_revision.major,
         mSensorInfo.build_revision.minor);
@@ -337,7 +344,7 @@ bool cOusterModel_net::initialize()
 
     emit updateEncoderCount(min, max);
 
-    return true;
+    return cOusterModel::initialize();
 }
 
 bool cOusterModel_net::startCommunications()
@@ -347,6 +354,7 @@ bool cOusterModel_net::startCommunications()
     if (!cOusterImuStream_Qt::startCommunications(mDstIpAddress, mImuPort, mUseIpv6))
     {
         emit errorMessage("LiDAR Error", "Could not establish IMU data connection to OUSTER lidar!");
+        setStatus(sensor::eStatus::FAILED);
         return false;
     }
 
@@ -355,6 +363,7 @@ bool cOusterModel_net::startCommunications()
     if (!cOusterLidarStream_Qt::startCommunications(mDstIpAddress, mLidarPort, mUseIpv6))
     {
         emit errorMessage("LiDAR Error", "Could not establish data connection to OUSTER lidar!");
+        setStatus(sensor::eStatus::FAILED);
         return false;
     }
 
@@ -363,7 +372,7 @@ bool cOusterModel_net::startCommunications()
 
     mConnected = true;
 
-    emit statusMessage("OUSTER LiDAR is up!");
+    setStatus(sensor::eStatus::CONNECTING);
 
     return true;
 }
@@ -372,6 +381,8 @@ void cOusterModel_net::stopCommunications()
 {
     cOusterImuStream_Qt::stopCommunications();
     cOusterLidarStream_Qt::stopCommunications();
+
+    setStatus(sensor::eStatus::STOPPED);
 }
 
 void cOusterModel_net::update()
@@ -380,23 +391,30 @@ void cOusterModel_net::update()
 
     cOusterImuStream_Qt::processOneDatagram();
     cOusterLidarStream_Qt::processOneDatagram();
+
+    if (status() != sensor::eStatus::RUNNING)
+        setStatus(sensor::eStatus::RUNNING);
 }
 
-void cOusterModel_net::writeDataHeader(cBlockDataFileWriter& file)
+void cOusterModel_net::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
+}
+
+void cOusterModel_net::disableDataRecording()
+{
+    cLidarModel::disableDataRecording();
+    mSerializer.detach();
+}
+
+void cOusterModel_net::writeDataHeader()
+{
     mSerializer.write(mConfigParameters);
     mSerializer.write(mSensorInfo);
     mSerializer.write(mBeamIntrinsics);
     mSerializer.write(mImuIntrinsics);
     mSerializer.write(mLidarIntrinsics);
     mSerializer.write(mDataFormat);
-}
-
-void cOusterModel_net::endDataRecording()
-{
-    cLidarModel::endDataRecording();
-    mSerializer.detach();
 }
 
 void cOusterModel_net::onNewData(const ouster::imu_data_t& data)
@@ -407,7 +425,6 @@ void cOusterModel_net::onNewData(const ouster::imu_data_t& data)
     }
 
     mLastImuData = data;
-//    emit updateImuData(data);
     emit updateImuData();
 }
 

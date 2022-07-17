@@ -80,6 +80,11 @@ bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t po
     // Test connection parameters
     QTcpSocket socket;
  
+    if (!mLocalEndpoint.isNull())
+    {
+        socket.bind(mLocalEndpoint);
+    }
+
     socket.connectToHost(remote_endpoint, port);
 
     bool result = socket.waitForConnected();

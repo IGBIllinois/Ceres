@@ -18,6 +18,13 @@ namespace experiment
         RESEARCHER,
         CULTIVAR,
         EXPERIMENT_TITLE,
+        BEGIN_HEADER,
+        END_OF_HEADER,
+        BEGIN_FOOTER,
+        END_OF_FOOTER,
+        BEGIN_SENSOR_LIST,
+        END_OF_SENSOR_LIST,
+        SENSOR_DATA_BLOCK_INFO,
     };
 }
 

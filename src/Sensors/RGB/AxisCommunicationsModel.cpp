@@ -16,12 +16,13 @@ QByteArray to_QByteArray(const nlohmann::json& jsonDoc)
     return QByteArray(s.c_str(), s.size());
 }
 
-cAxisCommunicationsModel::cAxisCommunicationsModel(QObject* parent)
+cAxisCommunicationsModel::cAxisCommunicationsModel(const std::string& name, QObject* parent)
 :
-    cRgbCameraModel(parent),
+    cRgbCameraModel(name, parent),
     mpHttpManager(nullptr),
     mVapixVersion(0)
 {
+    mConnected = false;
     mpHttpManager = new QNetworkAccessManager(this);
 }
 
@@ -35,6 +36,10 @@ char* cAxisCommunicationsModel::descriptor() const
     return axis_communications_id;
 }
 
+uint16_t cAxisCommunicationsModel::data_class_id() const
+{
+    return mSerializer.classID();
+}
 
 const QImage& cAxisCommunicationsModel::getCurrentImage() const
 {
@@ -68,14 +73,15 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
         QString str = "Error in the \"axis_communications\" configuration: ";
         str.append(e.what());
         emit errorMessage("Configuration Error", str);
+        setStatus(sensor::eStatus::FAILED);
         return false;
     }
 
     emit statusMessage("Quering Axis Communications server...");
 
-    queryVapixSupport();
-    querySupportedResolutions();
-    querySupportedImageFormats();
+    if (!queryVapixSupport()) return false;
+    if (!querySupportedResolutions()) return false;
+    if (!querySupportedImageFormats()) return false;
 
 /*
 	try
@@ -89,12 +95,15 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
 		return false;
 	}
 */
+    mConnected = true;
 
     return cRgbCameraModel::configure(jsonCfg);
 }
 
 bool cAxisCommunicationsModel::startCommunications()
 {
+    if (!mConnected) return false;
+
 	if (mpHttpManager) return true;
 
 	mpHttpManager  = new QNetworkAccessManager(this);
@@ -113,7 +122,8 @@ void cAxisCommunicationsModel::requestReceived(QNetworkReply* pReply)
 {
 	pReply->deleteLater();
 
-    if (pReply->error() == QNetworkReply::NoError) {
+    if (pReply->error() == QNetworkReply::NoError) 
+    {
         // Get the http status code
         int v = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         if (v >= 200 && v < 300) // Success
@@ -142,7 +152,7 @@ void cAxisCommunicationsModel::update()
 {
 }
 
-void cAxisCommunicationsModel::queryVapixSupport()
+bool cAxisCommunicationsModel::queryVapixSupport()
 {
     QUrl url(mUrl);
 
@@ -164,10 +174,13 @@ void cAxisCommunicationsModel::queryVapixSupport()
         query.setQuery(replyText);
         auto version = query.queryItemValue("Properties.API.HTTP.Version", QUrl::FullyDecoded);
         mVapixVersion = version.toInt();
+        return true;
     }
+
+    return false;
 }
 
-void cAxisCommunicationsModel::querySupportedResolutions()
+bool cAxisCommunicationsModel::querySupportedResolutions()
 {
     mSupportedImageSizes.clear();
 
@@ -197,10 +210,14 @@ void cAxisCommunicationsModel::querySupportedResolutions()
             image_size.remove(QChar('\n'));
             mSupportedImageSizes.push_back(axis::to_image_size(image_size.toStdString()));
         }
+
+        return true;
     }
+
+    return false;
 }
 
-void cAxisCommunicationsModel::querySupportedImageFormats()
+bool cAxisCommunicationsModel::querySupportedImageFormats()
 {
     mSupportedImageFormats.clear();
 
@@ -229,7 +246,11 @@ void cAxisCommunicationsModel::querySupportedImageFormats()
             format.remove(QChar('\n'));
             mSupportedImageFormats.push_back(axis::to_image_format(format.toStdString()));
         }
+
+        return true;
     }
+
+    return false;
 }
 
 axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera)
@@ -269,8 +290,6 @@ axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera
 QString cAxisCommunicationsModel::queryServer(const QNetworkRequest& request)
 {
     QNetworkReply* reply = mpHttpManager->get(request);
-
-    reply->waitForReadyRead(5000);
 
     QEventLoop loop;
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);

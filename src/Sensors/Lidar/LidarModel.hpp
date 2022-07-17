@@ -15,7 +15,7 @@ public:
     char* sensorClass() const override { return "lidar"; };
 
 protected:
-    cLidarModel(QObject* parent = nullptr);
+    cLidarModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cLidarModel() = default;
 };
 

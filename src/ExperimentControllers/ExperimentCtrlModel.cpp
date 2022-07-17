@@ -4,6 +4,8 @@
 #include "ExperimentTypes.hpp"
 
 
+Q_DECLARE_METATYPE(experiment::eState)
+
 
 cExperimentControlModel::cExperimentControlModel(QObject* parent)
 :
@@ -13,6 +15,7 @@ cExperimentControlModel::cExperimentControlModel(QObject* parent)
     mActiveStateNumber(0),
     mpActiveState(nullptr)
 {
+    qRegisterMetaType<experiment::eState>();
 }
 
 
@@ -93,7 +96,7 @@ bool cExperimentControlModel::loadExperiment(const nlohmann::json& expDoc)
         }
     }
 
-    emit experimentStateChanged(to_int(State::LOADED));
+    emit experimentStateChanged(eState::LOADED);
 
     return true;
 }
@@ -109,6 +112,13 @@ void cExperimentControlModel::startExperiment()
     if (mPaused)
     {
         mPaused = false;
+        emit experimentStateChanged(eState::RUNNING);
+
+        QString msg;
+        msg.sprintf("Step %d: ", mActiveStateNumber);
+        msg += mpActiveState->getStatusStr();
+        emit experimentStatus(msg);
+
         return;
     }
 
@@ -120,7 +130,7 @@ void cExperimentControlModel::startExperiment()
     mpActiveState = mExperiment[mActiveStateNumber];
     mpActiveState->initialize();
 
-    emit experimentStateChanged(to_int(State::RUNNING));
+    emit experimentStateChanged(eState::RUNNING);
 }
 
 void cExperimentControlModel::terminateExperiment()
@@ -135,10 +145,13 @@ void cExperimentControlModel::terminateExperiment()
 
     recordingStateChanged(false);
 
+    if (mpActiveState)
+        mpActiveState->stop();
+
     mRunning = false;
     mPaused = false;
-    emit experimentStateChanged(to_int(State::TERMINATED));
-    emit statusMessage("Experiment stopped!");
+    emit experimentStateChanged(eState::TERMINATED);
+    emit experimentStatus("Experiment stopped!");
 }
 
 void cExperimentControlModel::pauseExperiment()
@@ -152,8 +165,8 @@ void cExperimentControlModel::pauseExperiment()
     }
 
     mPaused = true;
-    emit experimentStateChanged(to_int(State::PAUSED));
-    emit statusMessage("Experiment paused...");
+    emit experimentStateChanged(eState::PAUSED);
+    emit experimentStatus("Experiment paused...");
 }
 
 
@@ -193,13 +206,13 @@ void cExperimentControlModel::updateExperimentStateMachine()
             QString msg;
             msg.sprintf("Step %d: ", mActiveStateNumber);
             msg += mpActiveState->getStatusStr();
-            emit statusMessage(msg);
+            emit experimentStatus(msg);
         }
         else
         {
             recordingStateChanged(false);
             mRunning = false;
-            emit experimentStateChanged(to_int(State::COMPLETED));
+            emit experimentStateChanged(eState::COMPLETED);
             emit statusMessage("Experiment completed!");
         }
     }

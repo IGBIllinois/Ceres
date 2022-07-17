@@ -301,6 +301,7 @@ void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const expe
 	int y = mY_Scale * (layout.y_mm - mMinY) + mY_Offset;
 	int w = mX_Scale * layout.width_mm;
 	int h = mY_Scale * layout.height_mm;
+	double aspectRatio = static_cast<double>(w) / static_cast<double>(h);
 
 	y = height - y - h;
 
@@ -310,29 +311,66 @@ void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const expe
 		painter.setPen(QPen(layout.caption.color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
 	QFont font = painter.font();
+
+	if (layout.caption.font_size > 0)
+	{
+		font.setPointSizeF(layout.caption.font_size);
+		painter.setFont(font);
+	}
+
 	QFontMetrics metrics(font);
 
 	QPoint textPoint = { 0,0 };
 
+	auto bounds = metrics.boundingRect(layout.caption.label);
 	auto textBounds = metrics.tightBoundingRect(layout.caption.label);
+	int halfWidth = textBounds.width() / 2;
+	int halfHeight = textBounds.height() / 2;
+	int deltaWidth = bounds.width() - textBounds.width();
+	int deltaHeigth = bounds.height() - textBounds.height();
+
+	// Compute the text center point
+	QPoint textLeftCenter = { 0,0 };
+	QPoint textOffset = { 0,0 };
 
 	int alignFlags = 0;
+
+	double orientation_rad = layout.caption.orientation_deg * nConstants::DEG_TO_RAD;
+	double cos_orientation = cos(orientation_rad);
+	double sin_orientation = sin(orientation_rad);
 
 	switch (layout.caption.horizontal_align)
 	{
 		case eHorizontalAlignment::LEFT:
 		{
-			textPoint.setX(x - textBounds.width() - 3);
+			int lp = textBounds.width() * abs(cos_orientation);
+			int x1 = x - lp;
+			textLeftCenter.setX(x1);
+			int xh = halfHeight * abs(sin_orientation);
+			if (sin_orientation > 0.0)
+			{
+				xh += halfHeight * abs(sin_orientation);
+			}
+
+			textOffset.setX(- xh - 3 * abs(cos_orientation));
 			break;
 		}
 		case eHorizontalAlignment::CENTER:
 		{
-			textPoint.setX(x + 0.5 * (w - textBounds.width()));
+			int cp = (w / 2);
+			int lp = halfWidth * cos_orientation;
+			lp += halfHeight * sin_orientation;
+			int x1 = x + (cp - lp);
+			textLeftCenter.setX(x1);
+			textOffset.setX(deltaHeigth * sin_orientation);
 			break;
 		}
 		case eHorizontalAlignment::RIGHT:
 		{
-			textPoint.setX(x + w + 3);
+			int x1 = x + w;
+			textLeftCenter.setX(x1);
+			int xh = bounds.height() * abs(sin_orientation);
+			textOffset.setX(xh + 3 * abs(cos_orientation));
 			break;
 		}
 	}
@@ -341,20 +379,34 @@ void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const expe
 	{
 		case eVerticalAlignment::TOP:
 		{
-			textPoint.setY(y - 3);
+			int y1 = y - textBounds.width() * sin_orientation;
+			textLeftCenter.setY(y1);
+			textOffset.setY(-3);
 			break;
 		}
 		case eVerticalAlignment::CENTER:
 		{
-			textPoint.setY(y + 0.5 * (h - textBounds.height()));
+			int cp = (h / 2);
+			int lp = halfWidth * sin_orientation;
+			int y1 = y + (cp - lp);
+			textLeftCenter.setY(y1);
+			textOffset.setY(deltaHeigth * sin_orientation);
 			break;
 		}
 		case eVerticalAlignment::BOTTOM:
 		{
-			textPoint.setY(y + h + textBounds.height() + 3);
+			int lp = h + halfHeight * abs(sin_orientation);
+			int y1 = y + lp;
+			textLeftCenter.setY(y1);
+			textOffset.setY(halfHeight + deltaHeigth + 3);
 			break;
 		}
 	}
+
+//	textLowerLeftCorner.setX(textCenter.x() - (textBounds.width() / 2) * abs(sin_orientation));
+//	textLowerLeftCorner.setY(textCenter.y() - (textBounds.height() / 2) * abs(cos_orientation));
+
+	textPoint = textLeftCenter + textOffset;
 
 	if (layout.caption.orientation_deg != 0.0f)
 	{

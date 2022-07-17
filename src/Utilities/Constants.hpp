@@ -3,10 +3,9 @@
 
 #include <cmath>
 
-
 namespace nConstants
 {
-	const static double PI = std::asin(+1.0);
+	const static double PI = 2.0 * std::asin(+1.0);
 	const static double TWO_PI = 2.0 * PI;
 
 	const static double RAD_TO_DEG = 180.0 / PI;

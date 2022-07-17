@@ -5,14 +5,18 @@
 
 cDummyModel::cDummyModel(QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel("Dummy", parent)
 {
 }
-
 
 char* cDummyModel::descriptor() const
 {
     return dummy_id;
+}
+
+uint16_t cDummyModel::data_class_id() const
+{
+    return 0;
 }
 
 bool cDummyModel::configure(const nlohmann::json& jsonCfg)
@@ -34,13 +38,16 @@ void cDummyModel::update()
 {
 }
 
-void cDummyModel::writeDataHeader(cBlockDataFileWriter& file)
+void cDummyModel::enableDataRecording(cBlockDataFileWriter& file)
 {
 }
 
-void cDummyModel::endDataRecording()
-{
-}
+void cDummyModel::disableDataRecording()
+{}
+
+void cDummyModel::writeDataHeader()
+{}
+
 
 
 

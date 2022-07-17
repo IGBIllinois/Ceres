@@ -1,7 +1,6 @@
 
 #include "SsnxFactory.hpp"
 
-#include "SsnxModel_file.hpp"
 #include "SsnxModel_net.hpp"
 #include "SsnxModel_direct.hpp"
 #include "SsnxView.hpp"
@@ -24,8 +23,6 @@ sSensorWidgets create_ssnx_sensor(const nlohmann::json& sensorInfo, bool no_visu
         pModel = new cSsnxModel_direct();
     else if (protocol == "net")
         pModel = new cSsnxModel_net();
-    else if (protocol == "file")
-        pModel = new cSsnxModel_file();
 
     if (!pModel)
         throw std::runtime_error("SSNX: Unknown protocol type!");

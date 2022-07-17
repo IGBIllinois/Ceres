@@ -36,7 +36,10 @@ PRIVATE
 	
     CeresSplashScreen.hpp
     CeresSplashScreen.cpp
-	
+
+    LogWidget.hpp
+    LogWidget.cpp
+
 	net_buffer.hpp
 	net_buffer.cpp
 	

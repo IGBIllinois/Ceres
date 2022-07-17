@@ -13,8 +13,10 @@ namespace axis
         TIMESTAMP,
         CAMERA_ID,
         RESOLUTION,
+        FRAMES_PER_SECOND,
         BITMAP,
         JPEG,
+        MPEG_FRAME,
     };
 }
 

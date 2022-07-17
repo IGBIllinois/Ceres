@@ -40,16 +40,30 @@ void cCtrlDataModel::addSensor(cSensorModel* pSensor)
 void cCtrlDataModel::startDataThread()
 {
     mThread.start();
+
+    QObject::connect(mThread.mpController, &cExperimentControlModel::requestDataRecordingState,
+        this, &cCtrlDataModel::dataRecordingStateChange);
 }
 
 void cCtrlDataModel::stopDataThread()
 {
+    QObject::disconnect(mThread.mpController, &cExperimentControlModel::requestDataRecordingState,
+        this, &cCtrlDataModel::dataRecordingStateChange);
+
     mThread.stop();
 }
 
 std::string cCtrlDataModel::experimentTitle() const
 {
     return mExperimentTitle;
+}
+
+bool cCtrlDataModel::systemReady() const
+{
+    if (!mThread.mpController)
+        return false;
+
+    return mThread.mpController->systemReady();
 }
 
 bool cCtrlDataModel::isExperimentRunning()
@@ -147,17 +161,14 @@ void cCtrlDataModel::terminateExperiment()
         mThread.mpController->terminateExperiment();
 }
 
-
-void cCtrlDataModel::onExperimentStateChange(int s)
+void cCtrlDataModel::onExperimentStateChange(experiment::eState state)
 {
     using namespace experiment;
 
-    auto state = to_state(s);
-
     switch (state)
     {
-        case State::COMPLETED:
-        case State::TERMINATED:
+        case eState::COMPLETED:
+        case eState::TERMINATED:
         {
             endDataRecording();
 

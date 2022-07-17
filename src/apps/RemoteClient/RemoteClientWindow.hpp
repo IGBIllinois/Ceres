@@ -23,8 +23,7 @@ QT_END_NAMESPACE
 
 // Forward Declarations
 class cCeresSplashScreen;
-class cExperimentControlView;
-class cExperimentManager;
+class cLogWidget;
 
 
 namespace Ui 
@@ -45,8 +44,9 @@ public:
 public slots:
     void onStatusUpdate(QString msg);
     void onInfoMessage(QString title, QString msg);
-    void onWarningMessage(QString title, QString msg);
+    void onWarningMessage(QString title, QString msg) const;
     void onErrorMessage(QString title, QString msg);
+    void onLogMessage(uint8_t type, QString device, QString msg);
 
 private slots:
 
@@ -61,6 +61,8 @@ private:
     bool initializeServer(const nlohmann::json& configDoc);
 
     cCeresSplashScreen* mpSplashScreen;
+
+    cLogWidget* mpLogWindow;
 
     QMenu* mpFileMenu;
 

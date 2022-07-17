@@ -15,7 +15,7 @@ public:
     char* sensorClass() const override { return "multispectral"; };
 
 protected:
-    cMultispectralModel(QObject* parent = nullptr);
+    cMultispectralModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cMultispectralModel() = default;
 };
 

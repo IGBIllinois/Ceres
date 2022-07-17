@@ -31,8 +31,10 @@ public:
 	~cAxisCommunicationsSerializer() = default;
 
 	void writeActiveCameraId(int in);
+	void writeFramesPerSecond(int frames_per_sec);
 	void writeBitmap(const QBitmap& in);
 	void writeJPEG(const QImage& in);
+	void writeMpegFrame(const QImage& in);
 
 	void write(const axis::sImageSize_t&  in);
 

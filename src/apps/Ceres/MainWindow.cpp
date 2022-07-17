@@ -11,6 +11,7 @@
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
 #include "ExperimentToolbar.hpp"
+#include "BatchExpConfirmDlg.hpp"
 
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentCtrlView.hpp"
@@ -22,6 +23,7 @@
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
+#include <QSound>
 
 
 #include <cassert>
@@ -235,6 +237,13 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 }
 
 //-----------------------------------------------------------------------------
+void cMainWindow::fileRefresh()
+{
+    mpExperiments->refresh();
+}
+
+//-----------------------------------------------------------------------------
+/*
 void cMainWindow::fileNew()
 {
     if (mpModel->isExperimentRunning())
@@ -243,7 +252,7 @@ void cMainWindow::fileNew()
     }
 
     auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
-    if ((pExperiment == nullptr) || ( ! pExperiment->hasExperimentDocument()))
+    if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
     {
         return;
     }
@@ -260,6 +269,7 @@ void cMainWindow::fileNew()
     }
 
 }
+*/
 
 //-----------------------------------------------------------------------------
 void cMainWindow::fileAddExperiment()
@@ -283,6 +293,32 @@ void cMainWindow::experimentLoad()
     }
 
     auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+
+    if (pExperiment == nullptr)
+    {
+        return;
+    }
+
+    if (pExperiment->hasExperimentDocument())
+    {
+        loadExperiment(*pExperiment);
+    }
+
+/*
+    cBatchExpConfirmDlg* pDlg = new cBatchExpConfirmDlg(this);
+
+    auto n = pExperiment->childCount();
+    for (int i = 0; i < n; ++i)
+    {
+        auto* pExp = static_cast<cExperimentTreeItem*>(pExperiment->child(i));
+    }
+
+    auto result = pDlg->exec();
+    if (result == QDialog::Rejected)
+        return;
+*/
+
+/*
     if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
     {
         cExperimentSelectDlg* dlg = new cExperimentSelectDlg(this);
@@ -298,17 +334,25 @@ void cMainWindow::experimentLoad()
             return;
         }
     }
+*/
+}
 
+//-----------------------------------------------------------------------------
+bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
+{
     QString msg = "Loading experiment \"";
-    msg += pExperiment->text(0);
+    msg += experiment.text(0);
     msg += "\" from file ";
-    msg += pExperiment->getFilename();
-
+    msg += experiment.getFilename();
     onStatusUpdate(msg);
-    auto expDoc = pExperiment->getExperimentDocument();
+
+    auto expDoc = experiment.getExperimentDocument();
     if (!mpModel->loadExperiment(expDoc))
     {
+        return false;
     }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -325,6 +369,11 @@ void cMainWindow::experimentRun()
             mpExpPause->setEnabled(true);
             mpExpStop->setEnabled(true);
         }
+        return;
+    }
+
+    if (!mpModel->systemReady())
+    {
         return;
     }
 
@@ -366,7 +415,7 @@ void cMainWindow::experimentPause()
 
     mpExpLoad->setEnabled(false);
     mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(false);
+    mpExpPause->setEnabled(true);
     mpExpStop->setEnabled(true);
 
     emit experimentPaused();
@@ -421,6 +470,10 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
     msg_box.exec();
 }
 
+void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
+{
+
+}
 
 void cMainWindow::onExperimentCompleted()
 {
@@ -430,6 +483,8 @@ void cMainWindow::onExperimentCompleted()
     mpExpStop->setEnabled(false);
 
     emit experimentStopped();
+
+    QSound::play(":/ripe.illinois.edu/end_experiment.wav");
 }
 
 
@@ -448,23 +503,12 @@ void cMainWindow::createSubMenusAndActions()
     QAction* pMenuItem = nullptr;
 
     // Build the File Menu
-/*
-    pMenuItem = new QAction(tr("&New"), this);
-    pMenuItem->setShortcuts(QKeySequence::New);
-    pMenuItem->setStatusTip(tr("Create a new file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileNew);
+    pMenuItem = new QAction(tr("Refresh"), this);
+    pMenuItem->setStatusTip(tr("Refresh the experiment window"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileRefresh);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
-
-    pMenuItem = new QAction(tr("&Add Experiment"), this);
-    pMenuItem->setShortcuts(QKeySequence::New);
-    pMenuItem->setStatusTip(tr("Add an experiment to the list"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileAddExperiment);
-    mpFileMenu->addAction(pMenuItem);
-
-    mpFileMenu->addSeparator();
-*/
 
     pMenuItem = new QAction(tr("E&xit"), this);
     pMenuItem->setShortcuts(QKeySequence::Quit);
@@ -570,6 +614,16 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 
         if (type == "local")
             mpModel = new cCtrlDataModelLocal(this);
+        else
+        {
+            QString msg = "Unknown data model: ";
+            msg += type.c_str();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
 
         QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
         QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
@@ -585,16 +639,31 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         if (data_model.contains("c3_ip"))
             c3_ip = data_model["c3_ip"];
 
-        auto* model = new cCtrlDataModelRemote(this);
-        QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-        QObject::connect(mpModel, &cCtrlDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-        QObject::connect(mpModel, &cCtrlDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-        QObject::connect(mpModel, &cCtrlDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+        cCtrlDataModelRemote* pModel = new cCtrlDataModelRemote(this);
 
-        bool result = model->try_to_connect(QString(c4_ip.c_str()), port,
-                                        false, QString(c3_ip.c_str()));
+        QObject::connect(pModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+        QObject::connect(pModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+        QObject::connect(pModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+        QObject::connect(pModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-        mpModel = model;
+        auto* dockWidget = new QDockWidget();
+        pModel->createView(dockWidget);
+
+        if (dockWidget->widget() != nullptr)
+        {
+            dockWidget->setParent(this);
+
+            addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+            mpViewMenu->addAction(dockWidget->toggleViewAction());
+        }
+
+        bool result = pModel->try_to_connect(QString(c4_ip.c_str()), port,
+            false, QString(c3_ip.c_str()));
+
+        if (!result)
+        { }
+
+        mpModel = pModel;
     }
 
     QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
@@ -620,6 +689,17 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
+    QObject::connect(mpController, &cExperimentControlView::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(mpController, &cExperimentControlView::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(mpController, &cExperimentControlView::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(mpController, &cExperimentControlView::errorMessage, this, &cMainWindow::onErrorMessage);
+
+    QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
+        mpController, &cExperimentControlView::experimentStatusUpdating);
+
+    QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
+        mpController, &cExperimentControlView::experimentStateChanging);
+
     mpModel->addExperimentControlModel(pModel);
 
     if (configDoc.contains(name))
@@ -643,6 +723,11 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     if (widgets.pStatusBar)
     {
         statusBar()->addPermanentWidget(widgets.pStatusBar);
+    }
+
+    if (widgets.pToolBar)
+    {
+        addToolBar(widgets.pToolBar);
     }
 }
 
@@ -671,27 +756,33 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
         QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
         QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::logMessage, this, &cMainWindow::onLogMessage);
 
-        if (configDoc.contains(type))
+        if (!configDoc.contains(type))
         {
-            bool validSensor = false;
-            try
-            {
-                validSensor = widgets.pModel->configure(configDoc[type]);
-            }
-            catch (const std::exception& e)
-            {
-                validSensor = false;
-            }
+            QString msg = "The follow object is missing from the configuration file: ";
+            msg += QString::fromStdString(type);
+            onErrorMessage("Configuration Error", msg);
+            continue;
+        }
+
+        bool validSensor = false;
+        try
+        {
+            validSensor = widgets.pModel->configure(configDoc[type]);
+        }
+        catch (const std::exception& e)
+        {
+            validSensor = false;
+        }
 
 /*BAF
-            if (!validSensor)
-            {
-                remove_sensor(type, widgets);
-                continue;
-            }
-*/
+        if (!validSensor)
+        {
+            remove_sensor(type, widgets);
+            continue;
         }
+*/
 
         mpModel->addSensor(widgets.pModel);
 

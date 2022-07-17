@@ -160,6 +160,29 @@ void cSpidercamModel::configure(const nlohmann::json& jsonCfg)
     }
 }
 
+bool cSpidercamModel::systemReady() const
+{
+    if (!mController.isConnected())
+    {
+        QString str = "The C3 computer is not connected to the Spidercam C2 computer.\n";
+        str += "Unable to run any experiment until connection is re-established.";
+        emit errorMessage("Error", str);
+
+        return false;
+    }
+
+    if (!mInScriptMode && !mRunning)
+    {
+        QString str = "Make sure the C2 computer is in remote mode.\n";
+        str += "Please enter remote mode.";
+        emit warningMessage("Message", str);
+
+        return false;
+    }
+
+    return true;
+}
+
 cExperimentState* cSpidercamModel::createState(const std::string& type)
 {
     if (type == "movement")
@@ -181,15 +204,21 @@ void cSpidercamModel::startExperiment()
 }
 
 
-void cSpidercamModel::writeDataHeader(cBlockDataFileWriter& file)
+void cSpidercamModel::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cSpidercamModel::stopDataRecording()
+void cSpidercamModel::disableDataRecording()
 {
     mSerializer.detach();
 }
+
+void cSpidercamModel::writeDataHeader()
+{}
+
+void cSpidercamModel::stopDataRecording()
+{}
 
 
 void cSpidercamModel::update()

@@ -4,19 +4,20 @@
 #include "SpidercamView.hpp"
 #include "SpidercamModel.hpp"
 #include "SpidercamDollyStatus.hpp"
+#include "SpidercamToolbar.hpp"
 
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
 
 Q_DECLARE_METATYPE(spidercam::sWorkingDimensions);
-Q_DECLARE_METATYPE(spidercam::sPosition);
+Q_DECLARE_METATYPE(spidercam::sPosition_1_t);
 
 sExperimentControllerWidgets create_spidercam_controller(bool no_visualization)
 {
     // Register our custom spidercam types with Qt's meta type system.  Needed for using signals/slots
     qRegisterMetaType<spidercam::sWorkingDimensions>();
-    qRegisterMetaType<spidercam::sPosition>();
+    qRegisterMetaType<spidercam::sPosition_1_t>();
 
     // Create the Spidercam Controller...
     cSpidercamModel* pModel = new cSpidercamModel();
@@ -46,5 +47,9 @@ sExperimentControllerWidgets create_spidercam_controller(bool no_visualization)
 
     QObject::connect(pModel, &cSpidercamModel::batteryLevelChanged, pStatusBar, &cBatteryStatus::updateBatteryLevel);
 
-    return sExperimentControllerWidgets(pModel, pView, pDockWidget, pStatusBar);
+    auto* pToolBar = new cSpidercamToolbar();
+
+//    QObject::connect(pModel, &cSpidercamModel::batteryLevelChanged, pStatusBar, &cBatteryStatus::updateBatteryLevel);
+
+    return sExperimentControllerWidgets(pModel, pView, pDockWidget, pStatusBar, pToolBar);
 }

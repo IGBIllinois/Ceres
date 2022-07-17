@@ -20,8 +20,11 @@ public:
  * The Ceres Remote Client application sends these packets and should never receive them!
  */
 private:
-    void dataFileState(bool is_open) override {};
-
+    void onDataFileState(bool is_open) override final {};
+    void onStatusMessage(const std::string& msg) override final {};
+    void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) override final {};
+    void onSensorStatus(const std::string& sensor, const std::string& status) override final {};
+    void onSensorNameChange(const std::string& old_name, const std::string& new_name) override final {};
 };
 
 

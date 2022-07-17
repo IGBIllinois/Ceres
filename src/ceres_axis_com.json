@@ -2,13 +2,9 @@
 	"controller": "spidercam",
 	"sensors" :[
 		{
-		 "type": "weather_data",
-		 "protocol": "http",
-		 "data": "wind"
-		},
-		{
-			"type": "hyspex",
-			"sensor": "VNIR-3000N"
+			"type": "axis_communications",
+			"sensor": "F44",
+			"protocol": "net"
 		}
 	],
 	"spidercam":
@@ -26,16 +22,29 @@
 		"update interval (ms)": 250,
 		"position tolerance (cm)": 1.0
 	},
-	"weather_data":
+	"axis_communications":
 	{
-		"http":
-		[
-			{
-				"data" : "wind",
-				"url" : "http://172.22.47.100/?command=dataquery&uri=dl:SpiderCam&format=json&mode=most-recent&p1=1",
-				"update interval (sec)": 30,
-				"max wind speed (mph)": 15
-			}
-		]
+		"F44":
+		{
+			"url": "http://172.16.2.141",
+			"Manufacturer": "Axis Communications",
+			"Model": "AXIS F44 DUAL AUDO INPUT",
+			"Serial Number": "B8A44F1E88FB",
+			"default camera id": 1,
+			"cameras":
+			[
+				{
+					"id": 1,
+					"resolution": "640x480",
+					"frames per second": 1
+				},
+				{
+					"id": 1,
+					"resolution": "640x480",
+					"frames per second": 1
+				}
+			]
+			
+		}
 	}
 }

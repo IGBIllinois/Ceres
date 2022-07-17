@@ -5,7 +5,7 @@
 
 namespace experiment
 {
-    enum class State : uint8_t
+    enum class eState : uint8_t
     {
         IDLE,
         LOADED,
@@ -13,11 +13,11 @@ namespace experiment
         PAUSED,
         COMPLETED,
         TERMINATED,
-        ERROR,
+        EXP_ERROR,
     };
 
-    inline uint8_t to_int(State state)   { return static_cast<uint8_t>(state); }
-    inline State to_state(uint8_t state) { return static_cast<State>(state); }
+    inline uint8_t to_int(eState state)   { return static_cast<uint8_t>(state); }
+    inline eState to_state(uint8_t state) { return static_cast<eState>(state); }
 
     enum class Event
     {

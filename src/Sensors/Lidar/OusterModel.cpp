@@ -7,7 +7,7 @@
 
 cOusterModel::cOusterModel(QObject* parent)
 :
-    cLidarModel(parent),
+    cLidarModel("OUSTER", parent),
     mLastFrameID(0),
     mLidarOriginToBeamOrigin_mm(0)
 {

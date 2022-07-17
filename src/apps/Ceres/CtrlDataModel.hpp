@@ -17,7 +17,7 @@ class cSensorModel;
 
 namespace experiment
 {
-    enum class State : uint8_t;
+    enum class eState : uint8_t;
 }
 
 /*****************************************************************************
@@ -40,9 +40,11 @@ public:
     void startDataThread() override;
     void stopDataThread() override;
 
-    virtual bool openDataFile(const QString& defaultPath) = 0;
+    virtual bool openDataFile(const QString& defaultPath, bool autoSave = false) = 0;
     virtual bool isDataFileOpen() const = 0;
     virtual void closeDataFile() = 0;
+
+    virtual bool systemReady() const;
 
     bool isExperimentRunning();
     bool isExperimentPaused();
@@ -57,22 +59,16 @@ public:
     void terminateExperiment();
 
 signals:
-/*
-    void statusMessage(QString msg);
-    void infoMessage(QString title, QString msg);
-    void warningMessage(QString title, QString msg);
-    void errorMessage(QString title, QString msg);
-*/
-
     void experimentCompleted();
 
-private slots:
-/*
-    void onStatusUpdate(QString msg);
-    void onErrorUpdate(QString title, QString msg);
-*/
+protected slots:
+    /*
+     * Toggles the recording state of the sensor.
+     */
+    virtual void dataRecordingStateChange(bool record) = 0;
 
-    void onExperimentStateChange(int state);
+private slots:
+    void onExperimentStateChange(experiment::eState state);
 
 protected:
     virtual void endDataRecording() = 0;

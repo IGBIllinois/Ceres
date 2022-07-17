@@ -18,6 +18,8 @@ public:
 	explicit cBlockSerializer(std::size_t n, cBlockDataFileWriter* pDataFile = nullptr);
 	~cBlockSerializer() = default;
 
+	uint16_t classID() const;
+
 	void attach(cBlockDataFileWriter* pDataFile);
 	cBlockDataFileWriter* detach();
 

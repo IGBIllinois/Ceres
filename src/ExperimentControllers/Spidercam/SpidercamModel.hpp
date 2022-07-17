@@ -24,13 +24,18 @@ public:
 	 */
 	char* descriptor() const override { return "spidercam"; };
 
-	const spidercam::sPosition& currentPosition() const;
+	const spidercam::sPosition_1_t& currentPosition() const;
 
     /*
      * Apply any configuration parameters to the sensor
      * model.
      */
     void configure(const nlohmann::json& jsonCfg) override;
+
+	/*
+	 * Is the system ready to run an experiment?
+	*/
+	bool systemReady() const override;
 
 	/*
 	 * Create a experiment state for the state machine
@@ -44,12 +49,18 @@ public:
 	 */
 	void startExperiment() override;
 
+	/*
+	 * Attach/Detach the serializer to the data file.
+	 */
+	void enableDataRecording(cBlockDataFileWriter& file) override;
+	void disableDataRecording() override;
+
     /*
      * Write any "header" data block into the data file.
      * A header data block is a metadata block that is
      * constant over the span of the experiment.
      */
-    void writeDataHeader(cBlockDataFileWriter& file) override;
+    void writeDataHeader() override;
 	void stopDataRecording() override;
 
 	bool startCommunications() override;
@@ -57,7 +68,7 @@ public:
 
 signals:
     void limitsChanged(spidercam::sWorkingDimensions limits);
-    void positionChanged(spidercam::sPosition pos);
+    void positionChanged(spidercam::sPosition_1_t pos);
 	void busyChanged(bool busy);
 	void movingChanged(bool moving);
 	void batteryLevelChanged(float level_pct);
@@ -87,7 +98,7 @@ protected:
 
 protected:
 
-	spidercam::sPosition mCurrentPosition;
+	spidercam::sPosition_1_t mCurrentPosition;
 
 
 	comparator<int, spidercam::window_compare<int, 2>> mBatteryLevel_pct;
@@ -120,7 +131,7 @@ private:
 };
 
 
-inline const spidercam::sPosition& cSpidercamModel::currentPosition() const
+inline const spidercam::sPosition_1_t& cSpidercamModel::currentPosition() const
 {
 	return mCurrentPosition;
 }

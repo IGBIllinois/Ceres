@@ -13,6 +13,11 @@ cDummyControlModel::~cDummyControlModel()
 
 }
 
+bool cDummyControlModel::systemReady() const
+{
+    return true;
+}
+
 bool cDummyControlModel::startCommunications()
 {
     return true;
@@ -32,9 +37,14 @@ void cDummyControlModel::startExperiment()
 }
 
 
-void cDummyControlModel::writeDataHeader(cBlockDataFileWriter& file)
-{
-}
+void cDummyControlModel::enableDataRecording(cBlockDataFileWriter& file)
+{}
+
+void cDummyControlModel::disableDataRecording()
+{}
+
+void cDummyControlModel::writeDataHeader()
+{}
 
 void cDummyControlModel::stopDataRecording()
 {

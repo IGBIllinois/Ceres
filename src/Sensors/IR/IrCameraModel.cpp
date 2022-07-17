@@ -2,10 +2,11 @@
 #include "IrCameraModel.hpp"
 
 
-cIrCameralModel::cIrCameralModel(QObject* parent)
+cIrCameralModel::cIrCameralModel(const std::string& name, QObject* parent)
 :
-	cSensorModel(parent)
+	cSensorModel(name, parent)
 {
 }
+
 
 

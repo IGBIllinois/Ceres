@@ -14,6 +14,11 @@ public:
      */
     char* sensorClass() const override { return "dummy"; };
 
+    /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    uint16_t data_class_id() const override;
+
     cDummyModel(QObject* parent = nullptr);
     virtual ~cDummyModel() = default;
 
@@ -24,8 +29,10 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
-    void writeDataHeader(cBlockDataFileWriter& file) override;
-    void endDataRecording() override;
+    void enableDataRecording(cBlockDataFileWriter& file) override;
+    void disableDataRecording() override;
+
+    void writeDataHeader() override;
 
     /*
      * Starts/Stops communication with the endpoint.

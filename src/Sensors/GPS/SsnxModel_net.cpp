@@ -16,6 +16,11 @@ cSsnxModel_net::~cSsnxModel_net()
 {
 }
 
+uint16_t cSsnxModel_net::data_class_id() const
+{
+    return mSerializer.classID();
+}
+
 bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
 {
     std::string ip;
@@ -48,7 +53,7 @@ bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
-    return true;
+    return cSsnxModel::configure(jsonCfg);
 }
 
 bool cSsnxModel_net::startCommunications()
@@ -81,15 +86,19 @@ void cSsnxModel_net::update()
     processOneDatagram();
 }
 
-void cSsnxModel_net::writeDataHeader(cBlockDataFileWriter& file)
+void cSsnxModel_net::enableDataRecording(cBlockDataFileWriter& file)
 {
     mSerializer.attach(&file);
 }
 
-void cSsnxModel_net::endDataRecording()
+void cSsnxModel_net::disableDataRecording()
 {
-    cGpsModel::endDataRecording();
+    cGpsModel::disableDataRecording();
     mSerializer.detach();
+}
+
+void cSsnxModel_net::writeDataHeader()
+{
 }
 
 void cSsnxModel_net::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)

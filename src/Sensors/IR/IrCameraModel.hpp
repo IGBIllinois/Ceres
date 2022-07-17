@@ -15,7 +15,7 @@ public:
     char* sensorClass() const override { return "ir"; };
 
 protected:
-    cIrCameralModel(QObject* parent = nullptr);
+    cIrCameralModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cIrCameralModel() = default;
 };
 

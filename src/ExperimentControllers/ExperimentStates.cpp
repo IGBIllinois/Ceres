@@ -58,6 +58,10 @@ void cExperimentState_Delay::pause()
 {
 }
 
+void cExperimentState_Delay::stop()
+{
+}
+
 cExperimentState::eRESULT cExperimentState_Delay::finished()
 {
 	return mElapsedTime_sec >= mWaitTime_sec ? eRESULT::DONE : eRESULT::WAITING;
@@ -106,6 +110,10 @@ void cExperimentState_Pause::run()
 }
 
 void cExperimentState_Pause::pause()
+{
+}
+
+void cExperimentState_Pause::stop()
 {
 }
 

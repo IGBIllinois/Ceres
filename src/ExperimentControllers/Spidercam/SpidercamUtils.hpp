@@ -15,7 +15,7 @@ namespace spidercam
 		static bool outside_threshold(const T& current, const T& previous) { return (current < (previous - threshold)) || (current > (previous + threshold)); };
 	};
 
-	bool hasPositionChanged(const sPosition& pos1, const sPosition& pos2, double tolerance_mm);
-	bool hasPosSpeedChanged(const sPosition& pos1, const sPosition& pos2, double tolerance_mm);
+	bool hasPositionChanged(const sPosition_1_t& pos1, const sPosition_1_t& pos2, double tolerance_mm);
+	bool hasPosSpeedChanged(const sPosition_1_t& pos1, const sPosition_1_t& pos2, double tolerance_mm);
 
 }	// End of namespace: spidercam

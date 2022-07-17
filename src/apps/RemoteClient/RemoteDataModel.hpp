@@ -9,15 +9,14 @@
 #include "ExperimentSerializer.hpp"
 #include "SpidercamSerializer.hpp"
 #include "WeatherSerializer.hpp"
+#include "SensorModel.hpp"
 
 #include <string>
+#include <filesystem>
 
 #include <QByteArray>
 #include <QtNetwork/QTcpServer>
 
-
-// Forward Declarations
-class cSensorModel;
 
 /*****************************************************************************
  * 
@@ -33,7 +32,7 @@ public:
     explicit cRemoteDataModel(QObject* parent = nullptr);
     virtual ~cRemoteDataModel();
 
-    const std::string& defaultDataPath() const;
+    std::string defaultDataPath() const;
     void setDefaultDataPath(const std::string& data_path);
 
     bool startTcpServer(const std::string& ip, uint16_t port);
@@ -43,8 +42,22 @@ public:
     void startDataThread() override;
     void stopDataThread() override;
 
+    void sendStatusMessage(const QString& msg);
+    void sendStatusMessage(const std::string& msg);
+
+    void sendLogMessage(uint8_t type, const QString& device, const QString& msg);
+    void sendLogMessage(uint8_t type, const std::string& device, const std::string& msg);
+
+
 signals:
     void requestDataRecordingState(bool record);
+
+/*
+ * Signals handlers from the sensors
+ */
+private slots:
+    void updateSensorStatus(QString name, sensor::eStatus status);
+    void updateSensorName(QString old_name, QString new_name);
 
 /*
  * Signals handlers from the TCP server
@@ -63,33 +76,29 @@ private slots:
     void clientStateChanged(QAbstractSocket::SocketState socketState);
 
 /*
- * Command handlers
- */
-private:
-    void startExperiment();
-    void stopExperiment();
-
-/*
  * Packet Handlers
  */
-    void experimentInfo(const std::string& title, const std::string& researcher,
+    void onExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc) override;
 
-    void openDataFile(const std::string& fileName) override;
-    void closeDataFile() override;
+    void onStartExperiment() override;
+    void onStopExperiment() override;
 
-    void spidercamPosition(const spidercam::sPosition& pos) override;
-    void weatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
+    void onOpenDataFile(const std::string& fileName) override;
+    void onCloseDataFile() override;
+    void onStartDataRecording() override;
+    void onStopDataRecording() override;
+
+    void onSpidercamPosition(const spidercam::sPosition_1_t& pos) override;
+    void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
 
 private:
     int sendOutgoingData(const char* data, std::size_t len) override;
 
-private:
-    void writeDataHeaders();
-
 protected:
-    std::string mDefaultDataPath;
+    std::filesystem::path mDefaultDataPath;
     bool mIsRecording;
+    bool mIsExperimentRunning;
 
     cBlockDataFileWriter    mFile;
     cExperimentSerializer   mSerializer;
@@ -108,6 +117,14 @@ private:
     std::string  mResearcher;
     std::string  mCultivar;
     std::string  mExperimentDoc;
+
+    // Spidercam Info
+    spidercam::sPosition_1_t mDollyPosition;
+
+    // Weather Info
+    bool mWindDataValid;
+    double mWindSpeed_mps;
+    double mWindDirection_deg;
 };
 
 
