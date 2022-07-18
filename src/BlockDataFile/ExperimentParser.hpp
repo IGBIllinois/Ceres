@@ -28,7 +28,11 @@ public:
 		BLOCK_DATA_ID_t data_id,
 		cDataBuffer& buffer) override;
 
-	virtual void process_DataField(cDataBuffer& buffer);
+	virtual void processBeginHeader(cDataBuffer& buffer);
+	virtual void processEndOfHeader(cDataBuffer& buffer);
+
+	virtual void processBeginFooter(cDataBuffer& buffer);
+	virtual void processEndOfFooter(cDataBuffer& buffer);
 
 private:
     cExperimentID         mBlockID;
