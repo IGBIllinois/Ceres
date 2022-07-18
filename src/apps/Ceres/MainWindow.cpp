@@ -287,6 +287,8 @@ void cMainWindow::fileAddExperiment()
 //-----------------------------------------------------------------------------
 void cMainWindow::experimentLoad()
 {
+    mBatchFileName.clear();
+
     if (mpModel->isExperimentRunning())
     {
         //TODO: Something here!
@@ -302,39 +304,31 @@ void cMainWindow::experimentLoad()
     if (pExperiment->hasExperimentDocument())
     {
         loadExperiment(*pExperiment);
+        return;
     }
 
-/*
+    if (0 == pExperiment->childCount())
+    {
+        return;
+    }
+
     cBatchExpConfirmDlg* pDlg = new cBatchExpConfirmDlg(this);
 
-    auto n = pExperiment->childCount();
-    for (int i = 0; i < n; ++i)
-    {
-        auto* pExp = static_cast<cExperimentTreeItem*>(pExperiment->child(i));
-    }
+    pDlg->initialize(pExperiment);
 
     auto result = pDlg->exec();
     if (result == QDialog::Rejected)
         return;
-*/
 
-/*
-    if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
-    {
-        cExperimentSelectDlg* dlg = new cExperimentSelectDlg(this);
-        dlg->initialize(*mpExperiments);
-        auto result = dlg->exec();
-        if (result == QDialog::Rejected)
-            return;
-        
-        pExperiment = dlg->currentItem();
-        if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
-        {
-            //TODO: Something here!
-            return;
-        }
-    }
-*/
+    mBatchProcess = pDlg->getSelectedExperiments();
+
+    if (mBatchProcess.empty())
+        return;
+
+    auto expFile = mBatchProcess.front();
+    mBatchProcess.erase(mBatchProcess.begin());
+
+    loadExperiment(expFile);
 }
 
 //-----------------------------------------------------------------------------
@@ -346,11 +340,43 @@ bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
     msg += experiment.getFilename();
     onStatusUpdate(msg);
 
+    std::string name = experiment.text(0).toStdString();
     auto expDoc = experiment.getExperimentDocument();
-    if (!mpModel->loadExperiment(expDoc))
+    if (!mpModel->loadExperiment(name, expDoc))
     {
         return false;
     }
+
+    return true;
+}
+
+bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
+{
+    std::ifstream in;
+    in.open(experiment_file);
+
+    if (!in.is_open())
+    {
+        throw std::invalid_argument("Could not open file.");
+    }
+
+    nlohmann::json jsonDoc;
+    in >> jsonDoc;
+
+    std::string name = jsonDoc["experiment_name"];
+
+    QString msg = "Loading experiment \"";
+    msg += QString::fromStdString(name);
+    msg += "\" from file ";
+    msg += QString::fromStdString(experiment_file.string());
+    onStatusUpdate(msg);
+
+    if (!mpModel->loadExperiment(name, jsonDoc))
+    {
+        return false;
+    }
+
+    mBatchFileName = name;
 
     return true;
 }
@@ -378,20 +404,26 @@ void cMainWindow::experimentRun()
     }
 
     // Reload the experiment each time incase the experiment was tweaked
-    experimentLoad();
+    if (mBatchFileName.empty())
+    {
+        experimentLoad();
+    }
 
     if (!mpModel->isExperimentLoaded())
     {
         return;
     }
 
-    if (!mpModel->openDataFile(mDefaultDataPath))
-        return;
-
-    QString msg = "Running experiment: ";
-    msg += mpModel->experimentTitle().c_str();
-
-    onStatusUpdate(msg);
+    if (mBatchFileName.empty())
+    {
+        if (!mpModel->openDataFile(mDefaultDataPath))
+            return;
+    }
+    else
+    {
+        if (!mpModel->openDataFile(mDefaultDataPath, mBatchFileName))
+            return;
+    }
 
     mpModel->startExperiment();
 
@@ -485,6 +517,20 @@ void cMainWindow::onExperimentCompleted()
     emit experimentStopped();
 
     QSound::play(":/ripe.illinois.edu/end_experiment.wav");
+
+    mBatchFileName.clear();
+
+    while (!mBatchProcess.empty())
+    {
+        auto expFile = mBatchProcess.front();
+        mBatchProcess.erase(mBatchProcess.begin());
+
+        if (loadExperiment(expFile))
+        {
+            experimentRun();
+            break;
+        }
+    }
 }
 
 
@@ -797,6 +843,11 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         if (widgets.pStatusBar)
         {
             statusBar()->addPermanentWidget(widgets.pStatusBar);
+        }
+
+        if (widgets.pToolBar)
+        {
+            addToolBar(widgets.pToolBar);
         }
     }
 }

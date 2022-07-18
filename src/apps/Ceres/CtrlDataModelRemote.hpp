@@ -41,11 +41,13 @@ public:
     void addExperimentControlModel(cExperimentControlModel* pModel) override;
     void addSensor(cSensorModel* pSensor) override;
 
-    bool openDataFile(const QString& defaultPath, bool autoSave = false) override;
+    bool openDataFile(const QString& defaultPath, 
+                      const std::string& defaultFilename = std::string()) override;
+
     bool isDataFileOpen() const override;
     void closeDataFile();
 
-    bool loadExperiment(const nlohmann::json& expDoc) override;
+    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc) override;
     void startExperiment() override;
 
 protected:

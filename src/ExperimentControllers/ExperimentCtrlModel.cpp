@@ -72,7 +72,7 @@ cExperimentState* cExperimentControlModel::createState(const std::string& type)
 }
 
 
-bool cExperimentControlModel::loadExperiment(const nlohmann::json& expDoc)
+bool cExperimentControlModel::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
 {
     using namespace experiment;
 
@@ -96,7 +96,14 @@ bool cExperimentControlModel::loadExperiment(const nlohmann::json& expDoc)
         }
     }
 
+    mExperimentName = expName;
+
     emit experimentStateChanged(eState::LOADED);
+
+    QString msg = "Experiment \"";
+    msg += QString::fromStdString(mExperimentName);
+    msg += "\" is loaded.";
+    emit statusMessage(msg);
 
     return true;
 }
@@ -131,6 +138,10 @@ void cExperimentControlModel::startExperiment()
     mpActiveState->initialize();
 
     emit experimentStateChanged(eState::RUNNING);
+
+    QString msg = "Running experiment: ";
+    msg += QString::fromStdString(mExperimentName);
+    emit statusMessage(msg);
 }
 
 void cExperimentControlModel::terminateExperiment()
@@ -152,6 +163,7 @@ void cExperimentControlModel::terminateExperiment()
     mPaused = false;
     emit experimentStateChanged(eState::TERMINATED);
     emit experimentStatus("Experiment stopped!");
+    mExperimentName.clear();
 }
 
 void cExperimentControlModel::pauseExperiment()
@@ -214,6 +226,7 @@ void cExperimentControlModel::updateExperimentStateMachine()
             mRunning = false;
             emit experimentStateChanged(eState::COMPLETED);
             emit statusMessage("Experiment completed!");
+            mExperimentName.clear();
         }
     }
 }

@@ -90,7 +90,7 @@ bool cCtrlDataModel::isExperimentLoaded() const
     return mThread.mpController->hasExperiment();
 }
 
-bool cCtrlDataModel::loadExperiment(const nlohmann::json& expDoc)
+bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
 {
     if (isExperimentRunning())
     {
@@ -126,7 +126,7 @@ bool cCtrlDataModel::loadExperiment(const nlohmann::json& expDoc)
     }
 */
 
-    if (mThread.mpController->loadExperiment(expDoc["experiment"]))
+    if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
     {
         mResearcher.clear();
         mCultivar.clear();

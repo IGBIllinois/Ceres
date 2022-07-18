@@ -2,6 +2,8 @@
 #pragma once
 
 #include <vector>
+#include <filesystem>
+
 #include <QMainWindow>
 #include <QString>
 
@@ -66,6 +68,7 @@ private slots:
 
 private:
     bool loadExperiment(const cExperimentTreeItem& experiment);
+    bool loadExperiment(const std::filesystem::path& experiment);
 
 private:
     void createMainMenu();
@@ -105,6 +108,7 @@ private:
 
     cExperimentControlView* mpController;
 
-    std::vector<cExperimentTreeItem*> mBatchProcess;
+    std::string mBatchFileName;
+    std::vector<std::filesystem::path> mBatchProcess;
 };
 
