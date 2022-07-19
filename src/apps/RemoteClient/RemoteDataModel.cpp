@@ -7,6 +7,24 @@
 #include <QString>
 
 
+namespace
+{
+    std::string to_human_readable_size(std::uintmax_t fs)
+    {
+        int i = 0;
+        double mantissa = fs;
+        for (; mantissa >= 1024.0; mantissa /= 1024.0, ++i) {}
+        mantissa = std::ceil(mantissa * 10.0) / 10.0;
+
+        std::string result = std::to_string(mantissa);
+        result += "BKMGTPE"[i];
+        if (i > 0)
+            result += "B";
+
+        return result;
+    }
+}
+
 cRemoteDataModel::cRemoteDataModel(QObject* parent)
     :
     cDataModel(parent),
@@ -97,6 +115,17 @@ void cRemoteDataModel::sendStatusMessage(const std::string& msg)
     cCeresRemoteClientNetEncoder::sendStatusMessage(msg);
 }
 
+
+void cRemoteDataModel::sendLogMessage(uint8_t type, const QString& device, const QString& msg)
+{
+    cCeresRemoteClientNetEncoder::sendLogMessage(type, device.toStdString(), msg.toStdString());
+}
+
+void cRemoteDataModel::sendLogMessage(uint8_t type, const std::string& device, const std::string& msg)
+{
+    cCeresRemoteClientNetEncoder::sendLogMessage(type, device, msg);
+}
+
 /********************************************************************
  * Packet Handlers
  *******************************************************************/
@@ -136,9 +165,9 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
     std::replace_if(qualifiedFileName.begin(), qualifiedFileName.end(),
         [](QString::value_type c) {return c <= QChar::Space; }, '_');
 
-    path fullyQualifiedFileName = mDefaultDataPath / qualifiedFileName;
+    mFullyQualifiedFileName = mDefaultDataPath / qualifiedFileName;
 
-    path testPath = fullyQualifiedFileName;
+    path testPath = mFullyQualifiedFileName;
     testPath.remove_filename();
     if (!exists(testPath))
     {
@@ -146,16 +175,17 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
     }
 
     QString msg = "Opening File: ";
-    msg.append(fullyQualifiedFileName.c_str());
+    msg.append(mFullyQualifiedFileName.c_str());
     emit statusMessage(msg);
 
-    mFile.open(fullyQualifiedFileName.string());
+    mFile.open(mFullyQualifiedFileName.string());
 
     if (!mFile.isOpen())
     {
         sendDataFileState(false);
         QString msg = "Failed to open file ";
-        msg.append(fullyQualifiedFileName.c_str());
+        msg.append(mFullyQualifiedFileName.c_str());
+        sendLogMessage(logERROR, "Remote Client", msg);
         emit statusMessage(msg);
         return;
     }
@@ -174,6 +204,8 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 
 void cRemoteDataModel::onCloseDataFile()
 {
+    using namespace std::filesystem;
+
     if (!mFile.isOpen())
         return;
 
@@ -193,6 +225,12 @@ void cRemoteDataModel::onCloseDataFile()
 
     sendDataFileState(false);
     emit statusMessage("Data file closed.");
+
+    auto fs = file_size(mFullyQualifiedFileName);
+    std::string msg = mFullyQualifiedFileName.filename().string();
+    msg += ", size = ";
+    msg += to_human_readable_size(fs);
+    sendLogMessage(logINFO, "Remote Client", msg);
 }
 
 void cRemoteDataModel::onStartDataRecording()

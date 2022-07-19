@@ -100,6 +100,7 @@ protected:
     bool mIsRecording;
     bool mIsExperimentRunning;
 
+    std::filesystem::path   mFullyQualifiedFileName;
     cBlockDataFileWriter    mFile;
     cExperimentSerializer   mSerializer;
     cSpidercamSerializer    mSpidercamSerializer;
