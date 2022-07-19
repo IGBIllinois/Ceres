@@ -20,6 +20,30 @@ public:
 
 	cBlockID& blockID() override;
 
+	bool hasBeginHeader() const { return mHasBeginHeader; }
+	bool hasEndOfHeader() const { return mHasEndOfHeader; }
+
+	bool hasBeginFooter() const { return mHasBeginFooter; }
+	bool hasEndOfFooter() const { return mHasEndOfFooter; }
+
+	const std::string& title() const { return mTitle; }
+	const std::string& researcher() const { return mResearcher; }
+	const std::string& cultivar() const { return mCultivar; }
+	const std::string& experimentDoc() const { return mExperimentDoc; }
+
+	/*
+	void writeBeginSensorList();
+	void writeEndOfSensorList();
+	void writeSensorBlockInfo(uint16_t class_id, const std::string& name);
+
+	void startTime(time_t time);
+	void endTime(time_t time);
+
+	void startRecordingTimestamp(uint64_t timestamp);
+	void endRecordingTimestamp(uint64_t timestamp);
+	*/
+
+
 	void startTime(time_t time);
 	void endTime(time_t time);
 
@@ -34,7 +58,27 @@ public:
 	virtual void processBeginFooter(cDataBuffer& buffer);
 	virtual void processEndOfFooter(cDataBuffer& buffer);
 
+	virtual void processTitle(cDataBuffer& buffer);
+	virtual void processResearcher(cDataBuffer& buffer);
+	virtual void processCultivar(cDataBuffer& buffer);
+	virtual void processExperimentDoc(cDataBuffer& buffer);
+
 private:
     cExperimentID         mBlockID;
+
+	bool mHasBeginHeader = false;
+	bool mHasEndOfHeader = false;
+
+	bool mHasBeginFooter = false;
+	bool mHasEndOfFooter = false;
+
+	bool mHasBeginSensorList = false;
+	bool mHasEndOfSensorList = false;
+
+	std::string mTitle;
+	std::string mResearcher;
+	std::string mCultivar;
+	std::string mExperimentDoc;
+
 };
 

@@ -28,6 +28,7 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     switch (static_cast<experiment::DataID>(data_id))
     {
     case DataID::EXPERIMENT:
+        processExperimentDoc(buffer);
         break;
     case DataID::START_TIME:
         break;
@@ -38,10 +39,13 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     case DataID::END_RECORDING_TIMESTAMP:
         break;
     case DataID::RESEARCHER:
+        processResearcher(buffer);
         break;
     case DataID::CULTIVAR:
+        processCultivar(buffer);
         break;
     case DataID::EXPERIMENT_TITLE:
+        processTitle(buffer);
         break;
     case DataID::BEGIN_HEADER:
         processBeginHeader(buffer);
@@ -67,22 +71,59 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
 void cExperimentParser::processBeginHeader(cDataBuffer& buffer)
 {
     auto n = buffer.read_size();
+    mHasBeginHeader = n == 0;
 }
 
 void cExperimentParser::processEndOfHeader(cDataBuffer& buffer)
 {
-
+    auto n = buffer.read_size();
+    mHasEndOfHeader = n == 0;
 }
 
 void cExperimentParser::processBeginFooter(cDataBuffer& buffer)
 {
-
+    auto n = buffer.read_size();
+    mHasBeginFooter = n == 0;
 }
 
 void cExperimentParser::processEndOfFooter(cDataBuffer& buffer)
 {
-
+    auto n = buffer.read_size();
+    mHasEndOfFooter = n == 0;
 }
+
+void cExperimentParser::processTitle(cDataBuffer& buffer)
+{
+    buffer >> mTitle;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processTitle.");
+}
+
+void cExperimentParser::processResearcher(cDataBuffer& buffer)
+{
+    buffer >> mResearcher;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processResearcher.");
+}
+
+void cExperimentParser::processCultivar(cDataBuffer& buffer)
+{
+    buffer >> mCultivar;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processCultivar.");
+}
+
+void cExperimentParser::processExperimentDoc(cDataBuffer& buffer)
+{
+    buffer >> mExperimentDoc;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processExperimentDoc.");
+}
+
 
 /*
 void cExperimentParser::process_DataField(cDataBuffer& buffer)

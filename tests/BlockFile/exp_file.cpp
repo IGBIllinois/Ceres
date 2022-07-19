@@ -10,17 +10,6 @@
 
 const char* TEST_FILENAME = "test.exp";
 /*
-void writeBeginHeader();
-void writeEndOfHeader();
-
-void writeBeginFooter();
-void writeEndOfFooter();
-
-void writeTitle(const std::string& title);
-void writeResearcher(const std::string& researcher);
-void writeCultivar(const std::string& cultivar);
-void writeExperimentDoc(const std::string& doc);
-
 void writeBeginSensorList();
 void writeEndOfSensorList();
 void writeSensorBlockInfo(uint16_t class_id, const std::string& name);
@@ -62,7 +51,195 @@ TEST_CASE("Begin/End Marker tests", "[experiment tests]")
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-//			REQUIRE(pvt.timeUnit() == pvt::eTIME_UNITS::NANOSECONDS);
+			REQUIRE(exp.hasBeginHeader());
+			REQUIRE(!exp.hasEndOfHeader());
+			REQUIRE(!exp.hasBeginFooter());
+			REQUIRE(!exp.hasEndOfFooter());
+
+			result = rd.processBlock();
+			REQUIRE(!result);
+
+			rd.close();
+		}
+
+		{
+			cBlockDataFileWriter wrt;
+			wrt.open(TEST_FILENAME);
+
+			REQUIRE(wrt.isOpen());
+			cExperimentSerializer exp(1024, &wrt);
+			exp.setVersion(1, 0);
+
+			exp.writeEndOfHeader();
+
+			wrt.close();
+		}
+
+		{
+			cBlockDataFileReader rd;
+
+			rd.open(TEST_FILENAME);
+
+			REQUIRE(rd.isOpen());
+
+			cExperimentParser exp;
+			rd.attach(&exp);
+
+			auto result = rd.processBlock();
+			REQUIRE(result);
+
+			REQUIRE(!exp.hasBeginHeader());
+			REQUIRE(exp.hasEndOfHeader());
+			REQUIRE(!exp.hasBeginFooter());
+			REQUIRE(!exp.hasEndOfFooter());
+
+			result = rd.processBlock();
+			REQUIRE(!result);
+
+			rd.close();
+		}
+	}
+
+	SECTION("Testing write/read of begin/end footer markers...")
+	{
+		{
+			cBlockDataFileWriter wrt;
+			wrt.open(TEST_FILENAME);
+
+			REQUIRE(wrt.isOpen());
+			cExperimentSerializer exp(1024, &wrt);
+			exp.setVersion(1, 0);
+
+			exp.writeBeginFooter();
+
+			wrt.close();
+		}
+
+		{
+			cBlockDataFileReader rd;
+
+			rd.open(TEST_FILENAME);
+
+			REQUIRE(rd.isOpen());
+
+			cExperimentParser exp;
+			rd.attach(&exp);
+
+			auto result = rd.processBlock();
+			REQUIRE(result);
+
+			REQUIRE(!exp.hasBeginHeader());
+			REQUIRE(!exp.hasEndOfHeader());
+			REQUIRE(exp.hasBeginFooter());
+			REQUIRE(!exp.hasEndOfFooter());
+
+			result = rd.processBlock();
+			REQUIRE(!result);
+
+			rd.close();
+		}
+
+		{
+			cBlockDataFileWriter wrt;
+			wrt.open(TEST_FILENAME);
+
+			REQUIRE(wrt.isOpen());
+			cExperimentSerializer exp(1024, &wrt);
+			exp.setVersion(1, 0);
+
+			exp.writeEndOfFooter();
+
+			wrt.close();
+		}
+
+		{
+			cBlockDataFileReader rd;
+
+			rd.open(TEST_FILENAME);
+
+			REQUIRE(rd.isOpen());
+
+			cExperimentParser exp;
+			rd.attach(&exp);
+
+			auto result = rd.processBlock();
+			REQUIRE(result);
+
+			REQUIRE(!exp.hasBeginHeader());
+			REQUIRE(!exp.hasEndOfHeader());
+			REQUIRE(!exp.hasBeginFooter());
+			REQUIRE(exp.hasEndOfFooter());
+
+			result = rd.processBlock();
+			REQUIRE(!result);
+
+			rd.close();
+		}
+	}
+}
+
+
+TEST_CASE("Experiment header tests", "[experiment tests]")
+{
+	SECTION("Testing write/read of empty header data...")
+	{
+		{
+			cBlockDataFileWriter wrt;
+			wrt.open(TEST_FILENAME);
+
+			REQUIRE(wrt.isOpen());
+			cExperimentSerializer exp(1024, &wrt);
+			exp.setVersion(1, 0);
+
+			exp.writeBeginHeader();
+
+			exp.writeTitle("");
+			exp.writeResearcher("");
+			exp.writeCultivar("");
+			exp.writeExperimentDoc("");
+
+			exp.writeEndOfHeader();
+
+
+			wrt.close();
+		}
+
+		{
+			cBlockDataFileReader rd;
+
+			rd.open(TEST_FILENAME);
+
+			REQUIRE(rd.isOpen());
+
+			cExperimentParser exp;
+			rd.attach(&exp);
+
+			auto result = rd.processBlock();
+			REQUIRE(result);
+			REQUIRE(exp.hasBeginHeader());
+
+			result = rd.processBlock();
+			REQUIRE(result);
+			REQUIRE(exp.title().empty());
+
+			result = rd.processBlock();
+			REQUIRE(result);
+			REQUIRE(exp.researcher().empty());
+
+			result = rd.processBlock();
+			REQUIRE(result);
+			REQUIRE(exp.cultivar().empty());
+
+			result = rd.processBlock();
+			REQUIRE(result);
+			REQUIRE(exp.experimentDoc().empty());
+
+			result = rd.processBlock();
+			REQUIRE(result);
+			REQUIRE(exp.hasEndOfHeader());
+
+			result = rd.processBlock();
+			REQUIRE(!result);
 
 			rd.close();
 		}
