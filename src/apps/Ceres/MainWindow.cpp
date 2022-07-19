@@ -504,7 +504,20 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
 
 void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
 {
+    switch (type)
+    {
+    case logINFO:
+        onInfoMessage(device, msg);
+        break;
+    case logWARNING:
+        onWarningMessage(device, msg);
+        break;
+    case logERROR:
+        onErrorMessage(device, msg);
+        break;
+    }
 
+    onStatusUpdate(msg);
 }
 
 void cMainWindow::onExperimentCompleted()
@@ -799,9 +812,9 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         }
 
         QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-        QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
-        QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
-        QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
+//        QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
+//        QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
+//        QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
         QObject::connect(widgets.pModel, &cSensorModel::logMessage, this, &cMainWindow::onLogMessage);
 
         if (!configDoc.contains(type))

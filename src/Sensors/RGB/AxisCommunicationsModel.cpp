@@ -72,7 +72,7 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
     {
         QString str = "Error in the \"axis_communications\" configuration: ";
         str.append(e.what());
-        emit errorMessage("Configuration Error", str);
+        emit logMessage(logERROR, q_name(), str);
         setStatus(sensor::eStatus::FAILED);
         return false;
     }
@@ -313,7 +313,9 @@ QString cAxisCommunicationsModel::queryServer(const QNetworkRequest& request)
     else
     {
         // Error
-        emit errorMessage("Axis Communication Error", reply->errorString());
+        QString msg = "Axis Communication Error: ";
+        msg += reply->errorString();
+        emit logMessage(logERROR, q_name(), msg);
     }
 
     return replyText;

@@ -47,15 +47,27 @@ PRIVATE
     ${ui_files}
     ${UI_RESOURCES}
     ${platform_resource_files}
+
+	ExperimentParser.hpp
+	ExperimentParser.cpp
+
+	CeresDataFile.hpp
+	CeresDataFile.cpp
+	
+	CentralWidget.hpp
+	CentralWidget.cpp
+	MainWindow.hpp
+	MainWindow.cpp
 	
 	CeresDataViewer.cpp
 )
 
 
 target_include_directories(CeresDataViewer PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
-#target_include_directories(Ceres PRIVATE ${UTILITIES_INCLUDE_DIR})
-#target_include_directories(Ceres PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
-target_include_directories(Ceres PRIVATE ${SENSORS_INCLUDE_DIR})
+target_include_directories(CeresDataViewer PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+target_include_directories(CeresDataViewer PRIVATE ${UTILITIES_INCLUDE_DIR})
+#target_include_directories(CeresDataViewer PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
+target_include_directories(CeresDataViewer PRIVATE ${SENSORS_INCLUDE_DIR})
 
 
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)

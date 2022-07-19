@@ -106,9 +106,9 @@ public slots:
 
 signals:
     void statusMessage(QString msg);
-    void infoMessage(QString title, QString msg);
-    void warningMessage(QString title, QString msg);
-    void errorMessage(QString title, QString msg);
+//    void infoMessage(QString title, QString msg);
+//    void warningMessage(QString title, QString msg);
+//    void errorMessage(QString title, QString msg);
     void logMessage(uint8_t type, QString device, QString msg);
 
     void sensorStatusChanging(QString name, sensor::eStatus status);

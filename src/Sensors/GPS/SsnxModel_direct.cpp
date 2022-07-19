@@ -59,9 +59,9 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
     }
     catch (const std::exception& e)
     {
-        QString str = "Error in the \"ssnx\" configuration: ";
-        str.append(e.what());
-        emit errorMessage("Configuration Error", str);
+        QString msg = "Error in the \"ssnx\" configuration: ";
+        msg.append(e.what());
+        emit logMessage(logERROR, q_name(), msg);
         return false;
     }
 
@@ -74,7 +74,7 @@ bool cSsnxModel_direct::startCommunications()
 
     if (!mSerialPort.open(QIODevice::ReadWrite))
     {
-        emit errorMessage("SSNX Error", "Could not establish connection to GPS receiver!");
+        emit logMessage(logERROR, q_name(), "Could not establish connection to GPS receiver!");
         return false;
     }
 
@@ -127,7 +127,7 @@ bool cSsnxModel_direct::isConnected()
 void cSsnxModel_direct::communicationError(const std::string& errorString)
 {
     QString msg = QString::fromStdString(errorString);
-    emit errorMessage(descriptor(), msg);
+    emit logMessage(logERROR, q_name(), msg);
 }
 
 void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDescriptor)

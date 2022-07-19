@@ -114,8 +114,20 @@ cRemoteClientWindow::~cRemoteClientWindow()
 void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 {
     mpSplashScreen = pSplashScreen;
-    mpSplashScreen = pSplashScreen;
 
+    createMainMenu();
+    createSubMenusAndActions();
+    createActions();
+
+    createToolBars();
+
+    createStatusBar();
+
+    mpSplashScreen = nullptr;
+}
+
+void cRemoteClientWindow::startDataAcquitionSystem()
+{
     std::string cfgFileName = getCfgFilePath();
     nlohmann::json configDoc;
 
@@ -177,17 +189,6 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 #endif
     }
 
-    onStatusUpdate("Initializing menus...");
-    createMainMenu();
-    createSubMenusAndActions();
-    createActions();
-
-    onStatusUpdate("Initializing toolbars...");
-    createToolBars();
-
-    onStatusUpdate("Initializing status bar...");
-    createStatusBar();
-
     try
     {
         onStatusUpdate("Initializing sensors...");
@@ -214,8 +215,6 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
         exit(EXIT_FAILURE);
     }
-
-    mpSplashScreen = nullptr;
 
     mMainModel.startDataThread();
 }
@@ -258,7 +257,7 @@ void cRemoteClientWindow::onErrorMessage(QString title, QString msg)
 
 void cRemoteClientWindow::onLogMessage(uint8_t type, QString device, QString msg)
 {
-
+    mMainModel.sendLogMessage(type, device, msg);
 }
 
 //-----------------------------------------------------------------------------
@@ -325,9 +324,6 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         }
 
         QObject::connect(widgets.pModel, &cSensorModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
-        QObject::connect(widgets.pModel, &cSensorModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
-        QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
-        QObject::connect(widgets.pModel, &cSensorModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
         QObject::connect(widgets.pModel, &cSensorModel::logMessage,     this, &cRemoteClientWindow::onLogMessage);
 
         if (configDoc.contains(type))

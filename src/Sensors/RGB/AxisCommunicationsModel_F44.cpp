@@ -59,7 +59,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
         {
             QString str = "Error in the \"axis_communications\" configuration:\n";
             str.append("The F44 controller only supports a maximum of four cameras.");
-            emit errorMessage("Configuration Error", str);
+            emit logMessage(logERROR, q_name(), str);
 
             setStatus(sensor::eStatus::FAILED);
             return false;
@@ -80,7 +80,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
             {
                 QString str = "Error in the \"axis_communications\" configuration:\n";
                 str.append("The F44 controller only supports a maximum of four cameras.");
-                emit errorMessage("Configuration Error", str);
+                emit logMessage(logERROR, q_name(), str);
 
                 setStatus(sensor::eStatus::FAILED);
                 return false;
@@ -108,6 +108,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     {
         setStatus(sensor::eStatus::FAILED);
         qCritical() << "Axis Communications F44 failed configuration";
+        emit logMessage(logERROR, q_name(), "Axis Communications F44 failed configuration");
         return false;
     }
 
@@ -241,7 +242,10 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
         }
         catch (const std::exception& e)
         {
-            qCritical() << e.what();
+            QString msg = "Error in writing MPEG frame: ";
+            msg += e.what();
+            emit logMessage(logERROR, q_name(), msg);
+            qCritical() << msg;
         }
     }
 }
@@ -259,7 +263,10 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
         }
         catch (const std::exception& e)
         {
-            qCritical() << e.what();
+            QString msg = "Error in writing JPEG: ";
+            msg += e.what();
+            emit logMessage(logERROR, q_name(), msg);
+            qCritical() << msg;
         }
     }
 }
@@ -268,8 +275,7 @@ void cAxisCommunicationsModel_F44::errorHappend(int id, QString msg)
 {
     QString title = "Camera ";
     title += QString::number(id);
-    title += " Error";
-    emit errorMessage(title, msg);
+    emit logMessage(logERROR, title, msg);
 
     setStatus(sensor::eStatus::FAILED);
 }

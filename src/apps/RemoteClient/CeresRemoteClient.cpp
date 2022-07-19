@@ -41,21 +41,24 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QS
 
 int main(int argc, char** argv)
 {
-    logFile.open("CeresRemoteClient.log", std::ios::trunc);
+    logFile.open("CeresRemoteClient.log", std::ios::app);
+    logFile << "=========== Ceres Remote Client Started ===========";
 
     qInstallMessageHandler(myMessageOutput);
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication app(argc, argv);
 
-    cCeresSplashScreen* pSplash = new cCeresSplashScreen();
-    pSplash->show();
+    cCeresSplashScreen* pSplash = nullptr;
+//    cCeresSplashScreen* pSplash = new cCeresSplashScreen();
+//    pSplash->show();
 
     cRemoteClientWindow mainWin;
     mainWin.initialize(pSplash);
     mainWin.show();
+    mainWin.startDataAcquitionSystem();
 
-    pSplash->finish(&mainWin);
+//    pSplash->finish(&mainWin);
 
     delete pSplash; 
     pSplash = nullptr;

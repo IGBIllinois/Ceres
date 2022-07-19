@@ -67,7 +67,9 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 	else
 	{
 		// Error
-		emit errorMessage("Wind Data Communication Error", reply->errorString());
+		QString msg = "Wind Data Communication Error: ";
+		msg += reply->errorString();
+		emit logMessage(logERROR, q_name(), msg);
 
 		return false;
 	}
@@ -142,7 +144,9 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 	}
 	catch (const std::exception& e)
 	{
-		emit errorMessage("Wind Data Communication Error", e.what());
+		QString msg = "Wind Data Communication Error: ";
+		msg += e.what();
+		emit logMessage(logERROR, q_name(), msg);
 
 		return false;
 	}
