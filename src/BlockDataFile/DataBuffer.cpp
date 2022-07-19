@@ -459,7 +459,7 @@ void cDataBuffer::read(std::string& out)
 
 	// Check to make sure we have enough buffer space to put this variable into
 	// our internal storage.
-	if ((mReadIndex >= mWriteIndex) || (read_size() < len))
+	if ((mReadIndex > mWriteIndex) || (read_size() < len))
 	{
 		mUnderrun = true;
 		return;
