@@ -40,7 +40,7 @@ public:
     /*
      * Load an experiment from JSON file.
      */
-    bool loadExperiment(const nlohmann::json& expDoc);
+    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
 
     /*
      * Is there an experiment (state machine) loaded in the experiment
@@ -149,6 +149,7 @@ protected:
 
     edge_detect<bool>	mRecording;
 
+    std::string mExperimentName;
     std::vector<cExperimentState*> mExperiment;
     std::size_t mActiveStateNumber;
     cExperimentState* mpActiveState;

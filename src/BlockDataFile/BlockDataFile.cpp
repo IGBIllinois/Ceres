@@ -282,23 +282,27 @@ bool cBlockDataFileReader::processBlock()
         {
             return false;
         }
+
+        mBuffer.reset();
     }
-
-    if (mBuffer.capacity() < len)
+    else
     {
-        mBuffer.capacity(len);
-    }
+        if (mBuffer.capacity() < len)
+        {
+            mBuffer.capacity(len);
+        }
 
-    mBuffer.reset();
-    mFile.read(reinterpret_cast<char*>(mBuffer.data(len)), len);
+        mBuffer.reset();
+        mFile.read(reinterpret_cast<char*>(mBuffer.data(len)), len);
 
-    uint32_t file_crc = 0;
-    mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
+        uint32_t file_crc = 0;
+        mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
 
-    uint32_t c = crc(blockId, mBuffer.data(), len);
-    if (file_crc != c)
-    {
-        return false;
+        uint32_t c = crc(blockId, mBuffer.data(), len);
+        if (file_crc != c)
+        {
+            return false;
+        }
     }
 
     auto parser = mParsers.find(classID);

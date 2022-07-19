@@ -40,7 +40,9 @@ public:
     void startDataThread() override;
     void stopDataThread() override;
 
-    virtual bool openDataFile(const QString& defaultPath, bool autoSave = false) = 0;
+    virtual bool openDataFile(const QString& defaultPath, 
+                              const std::string& defaultFileName = std::string()) = 0;
+
     virtual bool isDataFileOpen() const = 0;
     virtual void closeDataFile() = 0;
 
@@ -52,7 +54,7 @@ public:
     std::string experimentTitle() const;
 
     bool isExperimentLoaded() const;
-    virtual bool loadExperiment(const nlohmann::json& expDoc);
+    virtual bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
 
     virtual void startExperiment() = 0;
     void pauseExperiment();

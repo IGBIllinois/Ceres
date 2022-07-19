@@ -16,9 +16,13 @@ PRIVATE
 	${OUSTER_PUBLIC_HEADERS}
 
 	block_file.cpp
+	exp_file.cpp
 	pvt_file.cpp
+	axis_comm_file.cpp
 	ouster_file.cpp
 	ssnx_file.cpp
+	spidercam_file.cpp
+	weather_file.cpp
 )
 
 target_include_directories(BlockFileTests PRIVATE 

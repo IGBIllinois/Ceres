@@ -197,7 +197,7 @@ void cCtrlDataModelRemote::try_reconnection()
     mSocket.connectToHost(mRemoteEndpoint, mPort);
 }
 
-bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, bool)
+bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::string&)
 {
     std::time_t t = std::time(nullptr);
     tm* ltm = localtime(&t);
@@ -251,12 +251,12 @@ void cCtrlDataModelRemote::dataRecordingStateChange(bool record)
         sendStopDataRecording();
 }
 
-bool cCtrlDataModelRemote::loadExperiment(const nlohmann::json& expDoc)
+bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
 {
     if (!mConnected)
         return false;
 
-    bool result = cCtrlDataModel::loadExperiment(expDoc);
+    bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
 
     sendExperimentInfo(mExperimentTitle, mResearcher, mCultivar, mExperimentDoc);
 

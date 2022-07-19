@@ -37,36 +37,43 @@ void cCtrlDataModelLocal::stopDataThread()
     }
 }
 
-bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, bool autoSave)
+bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, const std::string& defaultFileName)
 {
     QString fileName;
 
     std::time_t t = std::time(nullptr);
     tm* ltm = localtime(&t);
 
-    if (autoSave)
+    if (!defaultFileName.empty())
     {
-        QString _filename = defaultPath;
-        _filename += "/";
+        using namespace std::filesystem;
+
+        path testPath = defaultPath.toStdString();
 
         switch (ltm->tm_mon)
         {
-        case 0: _filename += "Jan"; break;
-        case 1: _filename += "Feb"; break;
-        case 2: _filename += "Mar"; break;
-        case 3: _filename += "Apr"; break;
-        case 4: _filename += "May"; break;
-        case 5: _filename += "June"; break;
-        case 6: _filename += "July"; break;
-        case 7: _filename += "Aug"; break;
-        case 8: _filename += "Sept"; break;
-        case 9: _filename += "Oct"; break;
-        case 10: _filename += "Nov"; break;
-        case 11: _filename += "Dec"; break;
+        case 0: testPath /= "Jan"; break;
+        case 1: testPath /= "Feb"; break;
+        case 2: testPath /= "Mar"; break;
+        case 3: testPath /= "Apr"; break;
+        case 4: testPath /= "May"; break;
+        case 5: testPath /= "June"; break;
+        case 6: testPath /= "July"; break;
+        case 7: testPath /= "Aug"; break;
+        case 8: testPath /= "Sept"; break;
+        case 9: testPath /= "Oct"; break;
+        case 10: testPath /= "Nov"; break;
+        case 11: testPath /= "Dec"; break;
         }
-        _filename += QString::number(ltm->tm_mday);
-        _filename += "/";
-        _filename += QString::fromStdString(mExperimentTitle);
+        testPath += std::to_string(ltm->tm_mday);
+
+        if (!exists(testPath))
+        {
+            create_directories(testPath);
+        }
+        testPath /= defaultFileName;
+        fileName = QString::fromStdString(testPath.string());
+        fileName += ".ceres";
     }
     else
     {
@@ -92,7 +99,8 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, bool autoSave
     std::replace_if(fileName.begin(), fileName.end(),
         [](QString::value_type c) {return c <= QChar::Space; }, '_');
 
-    mFile.open(fileName.toStdString());
+    std::string filename = fileName.toStdString();
+    mFile.open(filename);
 
     if (!mFile.isOpen())
     {
