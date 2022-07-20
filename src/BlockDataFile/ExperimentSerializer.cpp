@@ -147,12 +147,12 @@ void cExperimentSerializer::startTime(time_t time)
 
     mDataBuffer.clear();
 
-    mDataBuffer << (ltm->tm_year + 1900);
-    mDataBuffer << (ltm->tm_mon + 1);
-    mDataBuffer << ltm->tm_mday;
-    mDataBuffer << ltm->tm_hour;
-    mDataBuffer << ltm->tm_min;
-    mDataBuffer << ltm->tm_sec;
+    mDataBuffer << static_cast<int32_t>(ltm->tm_year + 1900);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_mon + 1);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_mday);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_hour);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_min);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_sec);
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -168,12 +168,12 @@ void cExperimentSerializer::endTime(time_t time)
 
     mDataBuffer.clear();
 
-    mDataBuffer << (ltm->tm_year + 1900);
-    mDataBuffer << (ltm->tm_mon + 1);
-    mDataBuffer << ltm->tm_mday;
-    mDataBuffer << ltm->tm_hour;
-    mDataBuffer << ltm->tm_min;
-    mDataBuffer << ltm->tm_sec;
+    mDataBuffer << static_cast<int32_t>(ltm->tm_year + 1900);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_mon + 1);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_mday);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_hour);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_min);
+    mDataBuffer << static_cast<int32_t>(ltm->tm_sec);
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 

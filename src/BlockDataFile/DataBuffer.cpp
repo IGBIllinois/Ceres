@@ -451,6 +451,15 @@ cDataBuffer& cDataBuffer::operator>>(std::string& out)
 
 void cDataBuffer::read(std::string& out)
 {
+	if (read_size() == 0)
+	{
+		// In earlier versions, an empty string was written with
+		// zero data.  Now, a length of zero is written into the
+		// data buffer.  This is to support the older version.
+		out.clear();
+		return;
+	}
+
 	uint16_t len = 0;
 	mReadIndex += ::read(len, rdbuf(), wrtbuf(), mUnderrun);
 
@@ -628,7 +637,11 @@ cDataBuffer& cDataBuffer::operator<<(const std::string& in)
 
 void cDataBuffer::write(const std::string& in)
 {
-	uint16_t len = in.length();
+	uint16_t len = 0;
+	if (in.length() > 65533)
+		len = 65533;
+	else
+		len = in.length();
 
 	// Check to make sure we have enough buffer space to put this variable into
 	// our internal storage.

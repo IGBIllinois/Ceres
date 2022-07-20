@@ -50,6 +50,16 @@ private:
     void onExperimentResearcher(const std::string& researcher) override;
     void onExperimentDoc(const std::string& doc) override;
 
+    void onStartTime(sExperimentTime_t start_time) override;
+    void onEndTime(sExperimentTime_t end_time) override;
+
+    void onStartRecordingTimestamp(uint64_t timestamp) override;
+    void onEndRecordingTimestamp(uint64_t timestamp) override;
+
+    void onBeginSensorList() override;
+    void onEndOfSensorList() override;
+    void onSensorBlockInfo(unsigned int class_id, const std::string& name) override;
+
 private:
     bool mHasBeginHeader = false;
     bool mHeaderComplete = false;
@@ -67,5 +77,17 @@ private:
     QLineEdit* mpCultivar;
     QLabel*    mpResearcherLabel;
     QLineEdit* mpResearcher;
+
+    QGroupBox* mpStartTimeInfo;
+    QLabel*    mpStartTimeLabel;
+    QLineEdit* mpStartTime;
+    QLabel*    mpStartDateLabel;
+    QLineEdit* mpStartDate;
+
+    QGroupBox* mpEndTimeInfo;
+    QLabel*    mpEndTimeLabel;
+    QLineEdit* mpEndTime;
+    QLabel*    mpEndDateLabel;
+    QLineEdit* mpEndDate;
 };
 

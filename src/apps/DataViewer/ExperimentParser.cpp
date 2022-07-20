@@ -31,8 +31,10 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
         processExperimentDoc(buffer);
         break;
     case DataID::START_TIME:
+        processStartTime(buffer);
         break;
     case DataID::END_TIME:
+        processEndTime(buffer);
         break;
     case DataID::START_RECORDING_TIMESTAMP:
         break;
@@ -60,10 +62,13 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
         onEndOfFooter();
         break;
     case DataID::BEGIN_SENSOR_LIST:
+        onBeginSensorList();
         break;
     case DataID::END_OF_SENSOR_LIST:
+        onEndOfSensorList();
         break;
     case DataID::SENSOR_DATA_BLOCK_INFO:
+        processSensorBlockInfo(buffer);
         break;
     }
 }
@@ -112,19 +117,59 @@ void cExperimentParser::processExperimentDoc(cDataBuffer& buffer)
     onExperimentDoc(experimentDoc);
 }
 
-
-/*
-void cExperimentParser::process_DataField(cDataBuffer& buffer)
+void cExperimentParser::processStartTime(cDataBuffer& buffer)
 {
-    uint8_t u;
-    buffer >> u;
-    //    mPositionUnit = static_cast<pvt::ePOSTION_UNITS>(u);
+    sExperimentTime_t start_time;
+
+    int32_t x = 0;
+    buffer >> x; start_time.year = x;
+    buffer >> x; start_time.month = x;
+    buffer >> x; start_time.day = x;
+    buffer >> x; start_time.hour = x;
+    buffer >> x; start_time.minutes = x;
+    buffer >> x; start_time.seconds = x;
+
+    onStartTime(start_time);
 }
-*/
 
+void cExperimentParser::processEndTime(cDataBuffer& buffer)
+{
+    sExperimentTime_t end_time;
 
+    int32_t x = 0;
+    buffer >> x; end_time.year = x;
+    buffer >> x; end_time.month = x;
+    buffer >> x; end_time.day = x;
+    buffer >> x; end_time.hour = x;
+    buffer >> x; end_time.minutes = x;
+    buffer >> x; end_time.seconds = x;
 
+    onEndTime(end_time);
+}
 
+void cExperimentParser::processStartRecordingTimestamp(cDataBuffer& buffer)
+{
+    uint64_t timestamp = 0;
+    buffer >> timestamp;
+    onStartRecordingTimestamp(timestamp);
+}
 
+void cExperimentParser::processEndRecordingTimestamp(cDataBuffer& buffer)
+{
+    uint64_t timestamp = 0;
+    buffer >> timestamp;
+    onEndRecordingTimestamp(timestamp);
+}
+
+void cExperimentParser::processSensorBlockInfo(cDataBuffer& buffer)
+{
+    uint16_t class_id = 0;
+    std::string name;
+
+    buffer >> class_id;
+    buffer >> name;
+
+    onSensorBlockInfo(class_id, name);
+}
 
 

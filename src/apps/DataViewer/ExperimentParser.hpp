@@ -11,6 +11,15 @@
 
  // Forward Declarations
 
+struct sExperimentTime_t
+{
+	int year;		// Year
+	int month;		// Month within year [1, 12]
+	int day;		// Day of the month [1, 31]
+	int hour;		// Hour since midnight [0, 23]
+	int minutes;	// Minutes after the hour [0, 59]
+	int seconds;	// Seconds after the minute [0, 59]
+};
 
 class cExperimentParser : public cBlockParser
 {
@@ -19,19 +28,6 @@ public:
 	~cExperimentParser() = default;
 
 	cBlockID& blockID() override;
-
-	/*
-	void writeBeginSensorList();
-	void writeEndOfSensorList();
-	void writeSensorBlockInfo(uint16_t class_id, const std::string& name);
-
-	void startTime(time_t time);
-	void endTime(time_t time);
-
-	void startRecordingTimestamp(uint64_t timestamp);
-	void endRecordingTimestamp(uint64_t timestamp);
-	*/
-
 
 protected:
 	virtual void onBeginHeader() = 0;
@@ -45,6 +41,17 @@ protected:
 	virtual void onExperimentResearcher(const std::string& researcher) = 0;
 	virtual void onExperimentDoc(const std::string& doc) = 0;
 
+	virtual void onBeginSensorList() = 0;
+	virtual void onEndOfSensorList() = 0;
+	virtual void onSensorBlockInfo(unsigned int class_id, const std::string& name) = 0;
+
+
+	virtual void onStartTime(sExperimentTime_t start_time) = 0;
+	virtual void onEndTime(sExperimentTime_t end_time) = 0;
+
+	virtual void onStartRecordingTimestamp(uint64_t timestamp) = 0;
+	virtual void onEndRecordingTimestamp(uint64_t timestamp) = 0;
+
 private:
 	void processData(BLOCK_MAJOR_VERSION_t major_version,
 		BLOCK_MINOR_VERSION_t minor_version,
@@ -55,6 +62,11 @@ private:
 	void processResearcher(cDataBuffer& buffer);
 	void processCultivar(cDataBuffer& buffer);
 	void processExperimentDoc(cDataBuffer& buffer);
+	void processStartTime(cDataBuffer& buffer);
+	void processEndTime(cDataBuffer& buffer);
+	void processStartRecordingTimestamp(cDataBuffer& buffer);
+	void processEndRecordingTimestamp(cDataBuffer& buffer);
+	void processSensorBlockInfo(cDataBuffer& buffer);
 
 private:
     cExperimentID         mBlockID;
