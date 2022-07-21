@@ -48,6 +48,10 @@ PRIVATE
     ${UI_RESOURCES}
     ${platform_resource_files}
 
+	WeatherParser.hpp
+	WeatherParser.cpp
+	SpidercamParser.hpp
+	SpidercamParser.cpp
 	ExperimentParser.hpp
 	ExperimentParser.cpp
 

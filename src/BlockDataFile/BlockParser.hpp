@@ -20,6 +20,7 @@ public:
 
 	void setVersion(uint8_t major, uint8_t minor);
 
+	cBlockID blockID() const;
 	virtual cBlockID& blockID() = 0;
 
 	virtual void processData(BLOCK_MAJOR_VERSION_t major_version, 

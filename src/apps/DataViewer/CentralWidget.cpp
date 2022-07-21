@@ -122,6 +122,9 @@ void cCentralWidget::initialize()
     pMainLayout->addLayout(infoLayout);
 
     setLayout(pMainLayout);
+
+    mDataFile.attach(static_cast<cExperimentParser*>(this));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -162,6 +165,8 @@ bool cCentralWidget::readHeaderData()
     return true;
 }
 
+//-----------------------------------------------------------------------------
+// Experiment Parser Data
 //-----------------------------------------------------------------------------
 void cCentralWidget::onBeginHeader()
 {
@@ -264,3 +269,11 @@ void cCentralWidget::onSensorBlockInfo(unsigned int class_id, const std::string&
 {
     std::cerr << class_id;
 }
+
+//-----------------------------------------------------------------------------
+// Spidercam Parser Data
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Weather Parser Data
+//-----------------------------------------------------------------------------

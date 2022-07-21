@@ -9,8 +9,10 @@
 
 #include <ctime>
 
- // Forward Declarations
+// Forward Declarations
 
+
+// Experiment Data Types
 struct sExperimentTime_t
 {
 	int year;		// Year

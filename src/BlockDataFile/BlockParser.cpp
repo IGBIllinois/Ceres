@@ -12,6 +12,10 @@ void cBlockParser::setVersion(uint8_t major, uint8_t minor)
     blockID().setVersion(major, minor);
 }
 
+cBlockID cBlockParser::blockID() const
+{
+    return const_cast<cBlockParser*>(this)->blockID();
+}
 
 
 

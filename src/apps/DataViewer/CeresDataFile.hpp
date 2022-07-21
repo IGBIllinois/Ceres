@@ -18,6 +18,7 @@ public:
     void close();
 
     void attach(cBlockParser* pParser);
+    cBlockParser* detach(const cBlockParser* pParser);
     cBlockParser* detach(cBlockID id);
 
     bool updateData();

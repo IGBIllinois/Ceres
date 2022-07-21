@@ -3,6 +3,8 @@
 
 #include "CeresDataFile.hpp"
 #include "ExperimentParser.hpp"
+#include "SpidercamParser.hpp"
+#include "WeatherParser.hpp"
 
 #include <QWidget>
 
@@ -18,7 +20,8 @@ QT_END_NAMESPACE
 // Forward Declarations
 
 
-class cCentralWidget : public QWidget, protected cExperimentParser
+class cCentralWidget : public QWidget, protected cExperimentParser, 
+                        protected cSpidercamParser, protected cWeatherParser
 {
     Q_OBJECT
 
@@ -40,6 +43,9 @@ private:
     bool readHeaderData();
 
 private:
+    //-----------------------------------------------------
+    // Experiment Data
+    //-----------------------------------------------------
     void onBeginHeader() override;
     void onEndOfHeader() override;
 
@@ -60,6 +66,18 @@ private:
     void onBeginSensorList() override;
     void onEndOfSensorList() override;
     void onSensorBlockInfo(unsigned int class_id, const std::string& name) override;
+
+    //-----------------------------------------------------
+    // Spidercam Data
+    //-----------------------------------------------------
+    void onPosition(const spidercam::sPosition_1_t& pos) override;
+
+    //-----------------------------------------------------
+    // Weather Data
+    //-----------------------------------------------------
+    void onWindSpeed_mps(bool valid, double speed_mps) override;
+    void onWindSpeed_knots(bool valid, double speed_knots) override;
+    void onWindDirection_deg(bool valid, double dir_deg) override;
 
 private:
     cCeresDataFile mDataFile;

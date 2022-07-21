@@ -26,7 +26,6 @@ void cCeresDataFile::close()
 {
     if (!mFileReader.isOpen()) return;
 
-//    mFileReader.detach(static_cast<cExperimentParser*>(this)->blockID());
 //    mFileReader.attach(static_cast<cPvtParser*>(this));
 
     mFileReader.close();
@@ -34,12 +33,17 @@ void cCeresDataFile::close()
 
 void cCeresDataFile::attach(cBlockParser* pParser)
 {
+    mFileReader.attach(pParser);
+}
 
+cBlockParser* cCeresDataFile::detach(const cBlockParser* pParser)
+{
+    return mFileReader.detach(pParser->blockID());
 }
 
 cBlockParser* cCeresDataFile::detach(cBlockID id)
 {
-
+    return mFileReader.detach(id);
 }
 
 //-----------------------------------------------------------------------------

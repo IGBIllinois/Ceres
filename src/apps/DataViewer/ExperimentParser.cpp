@@ -37,8 +37,10 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
         processEndTime(buffer);
         break;
     case DataID::START_RECORDING_TIMESTAMP:
+        processStartRecordingTimestamp(buffer);
         break;
     case DataID::END_RECORDING_TIMESTAMP:
+        processEndRecordingTimestamp(buffer);
         break;
     case DataID::RESEARCHER:
         processResearcher(buffer);
@@ -129,6 +131,9 @@ void cExperimentParser::processStartTime(cDataBuffer& buffer)
     buffer >> x; start_time.minutes = x;
     buffer >> x; start_time.seconds = x;
 
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processStartTime.");
+
     onStartTime(start_time);
 }
 
@@ -144,6 +149,9 @@ void cExperimentParser::processEndTime(cDataBuffer& buffer)
     buffer >> x; end_time.minutes = x;
     buffer >> x; end_time.seconds = x;
 
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processEndTime.");
+
     onEndTime(end_time);
 }
 
@@ -151,6 +159,10 @@ void cExperimentParser::processStartRecordingTimestamp(cDataBuffer& buffer)
 {
     uint64_t timestamp = 0;
     buffer >> timestamp;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processStartRecordingTimestamp.");
+
     onStartRecordingTimestamp(timestamp);
 }
 
@@ -158,6 +170,10 @@ void cExperimentParser::processEndRecordingTimestamp(cDataBuffer& buffer)
 {
     uint64_t timestamp = 0;
     buffer >> timestamp;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processEndRecordingTimestamp.");
+
     onEndRecordingTimestamp(timestamp);
 }
 
@@ -168,6 +184,9 @@ void cExperimentParser::processSensorBlockInfo(cDataBuffer& buffer)
 
     buffer >> class_id;
     buffer >> name;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processSensorBlockInfo.");
 
     onSensorBlockInfo(class_id, name);
 }
