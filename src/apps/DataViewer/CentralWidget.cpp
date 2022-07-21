@@ -140,7 +140,7 @@ void cCentralWidget::loadSourceFile()
 {
     std::string filename = mpLoadSrcFile->text().toStdString();
 
-    if (!open(filename))
+    if (!mDataFile.open(filename))
     {
         return;
     }
@@ -152,7 +152,7 @@ bool cCentralWidget::readHeaderData()
 {
     while (!mHeaderComplete)
     {
-        auto result = updateData();
+        auto result = mDataFile.updateData();
         if (!result)
         {
             return false;

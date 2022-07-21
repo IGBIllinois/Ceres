@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CeresDataFile.hpp"
+#include "ExperimentParser.hpp"
 
 #include <QWidget>
 
@@ -17,7 +18,7 @@ QT_END_NAMESPACE
 // Forward Declarations
 
 
-class cCentralWidget : public QWidget, public cCeresDataFile
+class cCentralWidget : public QWidget, protected cExperimentParser
 {
     Q_OBJECT
 
@@ -61,6 +62,7 @@ private:
     void onSensorBlockInfo(unsigned int class_id, const std::string& name) override;
 
 private:
+    cCeresDataFile mDataFile;
     bool mHasBeginHeader = false;
     bool mHeaderComplete = false;
     bool mHasBeginFooter = false;

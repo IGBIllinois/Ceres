@@ -245,6 +245,13 @@ void cBlockDataFileReader::attach(cBlockParser* pParser)
 
 cBlockParser* cBlockDataFileReader::detach(cBlockID id)
 {
+    auto it = mParsers.find(id.classID());
+    if (mParsers.end() != it)
+    {
+        mParsers.erase(it);
+        return it->second;
+    }
+
     return nullptr;
 }
 
