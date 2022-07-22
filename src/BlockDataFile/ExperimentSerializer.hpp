@@ -39,6 +39,7 @@ public:
 
 	void startRecordingTimestamp(uint64_t timestamp);
 	void endRecordingTimestamp(uint64_t timestamp);
+	void heartbeatTimestamp(uint64_t timestamp);
 
 protected:
 	cBlockID& blockID() override;

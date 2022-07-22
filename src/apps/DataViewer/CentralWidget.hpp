@@ -38,6 +38,7 @@ signals:
 private slots:
     void browseSourceFile();
     void loadSourceFile();
+    void playSourceFile();
 
 private:
     bool readHeaderData();
@@ -62,10 +63,13 @@ private:
 
     void onStartRecordingTimestamp(uint64_t timestamp) override;
     void onEndRecordingTimestamp(uint64_t timestamp) override;
+    void onHeartbeatTimestamp(uint64_t timestamp) override;
 
     void onBeginSensorList() override;
     void onEndOfSensorList() override;
     void onSensorBlockInfo(unsigned int class_id, const std::string& name) override;
+
+    void onUnknownDataID(BLOCK_DATA_ID_t data_id) override;
 
     //-----------------------------------------------------
     // Spidercam Data
@@ -86,28 +90,46 @@ private:
     bool mHasBeginFooter = false;
     bool mFooterComplete = false;
 
-    QLineEdit*   mpLoadSrcFile;
-    QPushButton* mpLoadSrcButton;
-    QPushButton* mpLoadButton;
+    QLineEdit*   mpLoadSrcFile = nullptr;
+    QPushButton* mpLoadSrcButton = nullptr;
+    QPushButton* mpLoadButton = nullptr;
+    QPushButton* mpPlayButton = nullptr;
 
-    QGroupBox* mpExperimentInfo;
-    QLabel*    mpTitleLabel;
-    QLineEdit* mpTitle;
-    QLabel*    mpCultivarLabel;
-    QLineEdit* mpCultivar;
-    QLabel*    mpResearcherLabel;
-    QLineEdit* mpResearcher;
 
-    QGroupBox* mpStartTimeInfo;
-    QLabel*    mpStartTimeLabel;
-    QLineEdit* mpStartTime;
-    QLabel*    mpStartDateLabel;
-    QLineEdit* mpStartDate;
+    QGroupBox* mpExperimentInfo = nullptr;
+    QLabel*    mpTitleLabel = nullptr;
+    QLineEdit* mpTitle = nullptr;
+    QLabel*    mpCultivarLabel = nullptr;
+    QLineEdit* mpCultivar = nullptr;
+    QLabel*    mpResearcherLabel = nullptr;
+    QLineEdit* mpResearcher = nullptr;
 
-    QGroupBox* mpEndTimeInfo;
-    QLabel*    mpEndTimeLabel;
-    QLineEdit* mpEndTime;
-    QLabel*    mpEndDateLabel;
-    QLineEdit* mpEndDate;
+    QGroupBox* mpStartTimeInfo = nullptr;
+    QLabel*    mpStartTimeLabel = nullptr;
+    QLineEdit* mpStartTime = nullptr;
+    QLabel*    mpStartDateLabel = nullptr;
+    QLineEdit* mpStartDate = nullptr;
+
+    QGroupBox* mpEndTimeInfo = nullptr;
+    QLabel*    mpEndTimeLabel = nullptr;
+    QLineEdit* mpEndTime = nullptr;
+    QLabel*    mpEndDateLabel = nullptr;
+    QLineEdit* mpEndDate = nullptr;
+
+    QGroupBox* mpSpidercamInfo = nullptr;
+    QLabel* mpDollyXLabel = nullptr;
+    QLineEdit* mpDollyX_mm = nullptr;
+    QLabel* mpDollyYLabel = nullptr;
+    QLineEdit* mpDollyY_mm = nullptr;
+    QLabel* mpDollyZLabel = nullptr;
+    QLineEdit* mpDollyZ_mm = nullptr;
+    QLabel* mpDollySpeedLabel = nullptr;
+    QLineEdit* mpDollySpeed_mmps = nullptr;
+
+    QGroupBox* mpWeatherInfo = nullptr;
+    QLabel* mpWindSpeedLabel = nullptr;
+    QLineEdit* mpWindSpeed_mps = nullptr;
+    QLabel* mpWindDirectionLabel = nullptr;
+    QLineEdit* mpWindDirection_deg = nullptr;
 };
 

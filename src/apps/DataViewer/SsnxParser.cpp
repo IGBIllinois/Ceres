@@ -1,5 +1,5 @@
 
-#include "SsnxSerializer.hpp"
+#include "SsnxParser.hpp"
 #include "SsnxDataIdentifiers.hpp"
 #include "BlockDataFile.hpp"
 
@@ -11,69 +11,283 @@
 
 using namespace ssnx;
 
-cSsnxSerializer::cSsnxSerializer()
+cSsnxParser::cSsnxParser()
 :
-    cBlockSerializer()
+    cBlockParser()
 {}
 
-cSsnxSerializer::cSsnxSerializer(std::size_t n, cBlockDataFileWriter* pDataFile)
-:
-    cBlockSerializer(n, pDataFile)
-{
-}
-
-cBlockID& cSsnxSerializer::blockID()
+cBlockID& cSsnxParser::blockID()
 {
     return mBlockID;
 }
 
-void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_1_t& in)
+void cSsnxParser::processData(BLOCK_MAJOR_VERSION_t major_version,
+    BLOCK_MINOR_VERSION_t minor_version,
+    BLOCK_DATA_ID_t data_id,
+    cDataBuffer& buffer)
 {
-    assert(mpDataFile);
+    blockID().setVersion(major_version, minor_version);
+    blockID().dataID(data_id);
 
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::PVT_CARTESIAN);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.NrSV;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.Mode;
-    mDataBuffer << in.System;
-    mDataBuffer << in.Info;
-    mDataBuffer << in.SBASprn;
-    mDataBuffer << in.X_m;
-    mDataBuffer << in.Y_m;
-    mDataBuffer << in.Z_m;
-    mDataBuffer << in.Vx_mps;
-    mDataBuffer << in.Vy_mps;
-    mDataBuffer << in.Vz_mps;
-    mDataBuffer << in.RxClkBias_ms;
-    mDataBuffer << in.RxClkDrift_ppm;
-    mDataBuffer << in.MeanCorrAge_s;
-    mDataBuffer << in.BaseStationID;
-    mDataBuffer << in.GroundTrack_deg;
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing PVT_Cartesian_1_t data.");
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    switch (static_cast<ssnx::DataID>(data_id))
+    {
+    case DataID::PVT_CARTESIAN:
+        if (major_version == 1)
+            processPVT_Cartesian_1_t(buffer);
+        else if (major_version == 2)
+        {
+            switch (minor_version)
+            {
+            case 0:
+                processPVT_Cartesian_2_t(buffer);
+                break;
+            case 1:
+                processPVT_Cartesian_2_1_t(buffer);
+                break;
+            case 2:
+                processPVT_Cartesian_2_2_t(buffer);
+                break;
+            }
+        }
+        break;
+    case DataID::PVT_GEODETIC:
+        if (major_version == 1)
+            processPVT_Geodetic_1_t(buffer);
+        else if (major_version == 2)
+        {
+            switch (minor_version)
+            {
+            case 0:
+                processPVT_Geodetic_2_t(buffer);
+                break;
+            case 1:
+                processPVT_Geodetic_2_1_t(buffer);
+                break;
+            case 2:
+                processPVT_Geodetic_2_2_t(buffer);
+                break;
+            }
+        }
+        break;
+    case DataID::POS_COV_GEODETIC:
+        processPosCovGeodetic_1_t(buffer);
+        break;
+    case DataID::VEL_COV_GEODETIC:
+        processVelCovGeodetic_1_t(buffer);
+        break;
+    case DataID::DOP:
+        processDOP_1_t(buffer);
+        break;
+    case DataID::PVT_RESIDUALS:
+        processPVT_Residuals_1_t(buffer);
+        break;
+    case DataID::RAIM_STATISTICS:
+        processRAIMStatistics_1_t(buffer);
+        break;
+    case DataID::POS_PROJECTED:
+        processPOS_Projected_1_t(buffer);
+        break;
+    case DataID::RECEIVER_TIME:
+        processReceiverTime_1_t(buffer);
+        break;
+    case DataID::RTCM_DATUM:
+        processRtcmDatum_1_t(buffer);
+        break;
+    }
 }
 
+void cSsnxParser::processPVT_Cartesian_1_t(cDataBuffer& buffer)
+{
+    PVT_Cartesian_1_t data;
+
+   buffer >> data.dataValid;
+   buffer >> data.timestamp_s;
+   buffer >> data.NrSV;
+   buffer >> data.Error;
+   buffer >> data.Mode;
+   buffer >> data.System;
+   buffer >> data.Info;
+   buffer >> data.SBASprn;
+   buffer >> data.X_m;
+   buffer >> data.Y_m;
+   buffer >> data.Z_m;
+   buffer >> data.Vx_mps;
+   buffer >> data.Vy_mps;
+   buffer >> data.Vz_mps;
+   buffer >> data.RxClkBias_ms;
+   buffer >> data.RxClkDrift_ppm;
+   buffer >> data.MeanCorrAge_s;
+   buffer >> data.BaseStationID;
+   buffer >> data.GroundTrack_deg;
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Cartesian_2_t(cDataBuffer& buffer)
+{
+    PVT_Cartesian_2_t data;
+
+    buffer >> data.dataValid;
+    buffer >> data.timestamp_s;
+    buffer >> to_int(in.Mode);
+    buffer >> data.HeightComputed;
+    buffer >> data.Error;
+    buffer >> data.X_m;
+    buffer >> data.Y_m;
+    buffer >> data.Z_m;
+    buffer >> data.Undulation_m;
+    buffer >> data.Vx_mps;
+    buffer >> data.Vy_mps;
+    buffer >> data.Vz_mps;
+    buffer >> data.GroundTrack_deg;
+    buffer >> data.RxClkBias_ms;
+    buffer >> data.RxClkDrift_ppm;
+    buffer >> to_int(in.TimeSystem);
+    buffer >> to_int(in.Datum);
+    buffer >> data.NrSV;
+    buffer >> data.SatClockCorrectionUsed;
+    buffer >> data.RangeCorrectionUsed;
+    buffer >> data.IonosphericInfoUsed;
+    buffer >> data.OrbitAccuracyInfoUsed;
+    buffer >> data.PrecisionApproachModeActive;
+    buffer >> data.ReferenceId;
+    buffer >> data.MeanCorrAge_s;
+    buffer >> data.SignalInfo;
+    buffer >> data.AlertFlag;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Cartesian_2_1_t(cDataBuffer& buffer)
+{
+    PVT_Cartesian_2_1_t data;
+
+    mDataBuffer << in.NrBases.value();
+    mDataBuffer << in.AgeOfSeed_s.value();
+    mDataBuffer << to_int(in.LastSeed.value());
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Cartesian_2_2_t(cDataBuffer& buffer)
+{
+    PVT_Cartesian_2_2_t data;
+
+    buffer >> data.NrBases;
+    buffer >> data.AgeOfSeed_s;
+    buffer >> to_int(in.LastSeed);
+    buffer >> data.Latency_s;
+    buffer >> data.HAccuracy_m;
+    buffer >> data.VAccuracy_m;
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Geodetic_1_t(cDataBuffer& buffer)
+{
+    PVT_Geodetic_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Geodetic_2_t(cDataBuffer& buffer)
+{
+    PVT_Geodetic_2_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Geodetic_2_1_t(cDataBuffer& buffer)
+{
+    PVT_Geodetic_2_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Geodetic_2_2_t(cDataBuffer& buffer)
+{
+    PVT_Geodetic_2_2_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPosCovGeodetic_1_t(cDataBuffer& buffer)
+{
+    PosCovGeodetic_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processVelCovGeodetic_1_t(cDataBuffer& buffer)
+{
+    VelCovGeodetic_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processDOP_1_t(cDataBuffer& buffer)
+{
+    DOP_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPVT_Residuals_1_t(cDataBuffer& buffer)
+{
+    PVT_Residuals_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processRAIMStatistics_1_t(cDataBuffer& buffer)
+{
+    RAIMStatistics_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processPOS_Projected_1_t(cDataBuffer& buffer)
+{
+    POS_Projected_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processReceiverTime_1_t(cDataBuffer& buffer)
+{
+    ReceiverTime_1_t data;
+
+
+    onNewData(data);
+}
+
+void cSsnxParser::processRtcmDatum_1_t(cDataBuffer& buffer)
+{
+    RtcmDatum_1_t data;
+
+
+    onNewData(data);
+}
+
+
+#if 0
 void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_2_t& in)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(2, 0);
-    mBlockID.dataID(DataID::PVT_CARTESIAN);
-
-    mDataBuffer.clear();
     mDataBuffer << in.dataValid;
     mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_uint8(in.Mode);
+    mDataBuffer << to_int(in.Mode);
     mDataBuffer << in.HeightComputed;
     mDataBuffer << in.Error;
     mDataBuffer << in.X_m;
@@ -86,8 +300,8 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_2_t& in)
     mDataBuffer << in.GroundTrack_deg;
     mDataBuffer << in.RxClkBias_ms;
     mDataBuffer << in.RxClkDrift_ppm;
-    mDataBuffer << to_uint8(in.TimeSystem);
-    mDataBuffer << to_uint8(in.Datum);
+    mDataBuffer << to_int(in.TimeSystem);
+    mDataBuffer << to_int(in.Datum);
     mDataBuffer << in.NrSV;
     mDataBuffer << in.SatClockCorrectionUsed;
     mDataBuffer << in.RangeCorrectionUsed;
@@ -105,7 +319,7 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_2_t& in)
         mBlockID.minorVersion(1);
         mDataBuffer << in.NrBases.value();
         mDataBuffer << in.AgeOfSeed_s.value();
-        mDataBuffer << to_uint16(in.LastSeed.value());
+        mDataBuffer << to_int(in.LastSeed.value());
     }
 
     /* Version 2.2 of this packet*/
@@ -116,11 +330,6 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_2_t& in)
         mDataBuffer << in.HAccuracy_m.value();
         mDataBuffer << in.VAccuracy_m.value();
     }
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing PVT_Cartesian_2_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -154,11 +363,6 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Geodetic_1_t& in)
     mDataBuffer << in.BaseStationID;
     mDataBuffer << in.GroundTrack_deg;
 
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing PVT_Geodetic_1_t data.");
-
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -172,7 +376,7 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Geodetic_2_t& in)
     mDataBuffer.clear();
     mDataBuffer << in.dataValid;
     mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_uint8(in.Mode);
+    mDataBuffer << to_int(in.Mode);
     mDataBuffer << in.HeightComputed;
     mDataBuffer << in.Error;
     mDataBuffer << in.Lat_rad;
@@ -185,8 +389,8 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Geodetic_2_t& in)
     mDataBuffer << in.GroundTrack_deg;
     mDataBuffer << in.RxClkBias_ms;
     mDataBuffer << in.RxClkDrift_ppm;
-    mDataBuffer << to_uint8(in.TimeSystem);
-    mDataBuffer << to_uint8(in.Datum);
+    mDataBuffer << to_int(in.TimeSystem);
+    mDataBuffer << to_int(in.Datum);
     mDataBuffer << in.NrSV;
     mDataBuffer << in.SatClockCorrectionUsed;
     mDataBuffer << in.RangeCorrectionUsed;
@@ -204,7 +408,7 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Geodetic_2_t& in)
         mBlockID.minorVersion(1);
         mDataBuffer << in.NrBases.value();
         mDataBuffer << in.AgeOfSeed_s.value();
-        mDataBuffer << to_uint16(in.LastSeed.value());
+        mDataBuffer << to_int(in.LastSeed.value());
     }
 
     /* Version 2.2 of this packet*/
@@ -215,11 +419,6 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Geodetic_2_t& in)
         mDataBuffer << in.HAccuracy_m.value();
         mDataBuffer << in.VAccuracy_m.value();
     }
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing PVT_Geodetic_2_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -234,7 +433,7 @@ void cSsnxSerializer::write(const ssnx::gps::PosCovGeodetic_1_t& in)
     mDataBuffer.clear();
     mDataBuffer << in.dataValid;
     mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_uint8(in.Mode);
+    mDataBuffer << to_int(in.Mode);
     mDataBuffer << in.HeightComputed;
     mDataBuffer << in.Error;
     mDataBuffer << in.Cov_latlat_m;
@@ -247,11 +446,6 @@ void cSsnxSerializer::write(const ssnx::gps::PosCovGeodetic_1_t& in)
     mDataBuffer << in.Cov_lonhgt_m;
     mDataBuffer << in.Cov_lonb_m;
     mDataBuffer << in.Cov_hgtb_m;
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing PosCovGeodetic_1_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -266,7 +460,7 @@ void cSsnxSerializer::write(const ssnx::gps::VelCovGeodetic_1_t& in)
     mDataBuffer.clear();
     mDataBuffer << in.dataValid;
     mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_uint8(in.Mode);
+    mDataBuffer << to_int(in.Mode);
     mDataBuffer << in.HeightComputed;
     mDataBuffer << in.Error;
     mDataBuffer << in.Cov_VnVn_mps;
@@ -279,11 +473,6 @@ void cSsnxSerializer::write(const ssnx::gps::VelCovGeodetic_1_t& in)
     mDataBuffer << in.Cov_VeVu_mps;
     mDataBuffer << in.Cov_VeDt_mps;
     mDataBuffer << in.Cov_VuDt_mps;
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing VelCovGeodetic_1_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -305,11 +494,6 @@ void cSsnxSerializer::write(const ssnx::gps::DOP_1_t& in)
     mDataBuffer << in.VDOP;
     mDataBuffer << in.HPL_m;
     mDataBuffer << in.VPL_m;
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing DOP_1_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -336,12 +520,7 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Residuals_1_t& in)
         mDataBuffer << satResidual.DopplerL1Res;
         mDataBuffer << satResidual.DopplerL2Res;
     }
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing PVT_Residuals_1_t data.");
-
+        
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -376,11 +555,6 @@ void cSsnxSerializer::write(const ssnx::gps::RAIMStatistics_1_t& in)
         mDataBuffer << satData.RrateMDB;
     }
 
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing RAIMStatistics_1_t data.");
-
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -394,18 +568,13 @@ void cSsnxSerializer::write(const ssnx::gps::POS_Projected_1_t& in)
     mDataBuffer.clear();
     mDataBuffer << in.dataValid;
     mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_uint8(in.Mode);
+    mDataBuffer << to_int(in.Mode);
     mDataBuffer << in.HeightComputed;
     mDataBuffer << in.Error;
     mDataBuffer << in.Northing_m;
     mDataBuffer << in.Easting_m;
     mDataBuffer << in.Alt_m;
     mDataBuffer << in.Datum;
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing POS_Projected_1_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -433,11 +602,6 @@ void cSsnxSerializer::write(const ssnx::gps::ReceiverTime_1_t& in)
     mDataBuffer << in.TimeFromPTTI;
     mDataBuffer << in.TimeFromNTP;
 
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing ReceiverTime_1_t data.");
-
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -454,18 +618,13 @@ void cSsnxSerializer::write(const ssnx::gps::RtcmDatum_1_t& in)
     mDataBuffer << in.sourceCRS;
     mDataBuffer << in.targetCRS;
     mDataBuffer << in.datum;
-    mDataBuffer << to_uint8(in.heightType);
-    mDataBuffer << to_uint8(in.horizontalQualityInd);
-    mDataBuffer << to_uint8(in.verticalQualityInd);
-
-    assert(!mDataBuffer.overrun());
-
-    if (mDataBuffer.overrun())
-        throw std::runtime_error("ERROR, Buffer Overrun in writing RtcmDatum_1_t data.");
+    mDataBuffer << to_int(in.heightType);
+    mDataBuffer << to_int(in.horizontalQualityInd);
+    mDataBuffer << to_int(in.verticalQualityInd);
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
-
+#endif
 
 
 

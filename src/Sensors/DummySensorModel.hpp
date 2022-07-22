@@ -12,7 +12,7 @@ public:
      * Returns a string used as a class descriptor of the
      * type sensor.
      */
-    char* sensorClass() const override { return "dummy"; };
+    const char* sensorClass() const override { return "dummy"; };
 
     /*
      * Returns the class identifier used by the sensor's serializer
@@ -25,7 +25,7 @@ public:
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    char* descriptor() const override;
+    const char* descriptor() const override;
 
     bool configure(const nlohmann::json& jsonCfg) override;
 

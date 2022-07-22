@@ -36,6 +36,11 @@ void cPvtSerializer::write(ePOSTION_UNITS unit)
     mDataBuffer.clear();
     mDataBuffer << static_cast<uint8_t>(unit);
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write (position units) data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -47,6 +52,11 @@ void cPvtSerializer::write(eVELOCITY_UNITS unit)
 
     mDataBuffer.clear();
     mDataBuffer << static_cast<uint8_t>(unit);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write (velocity units) data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -60,6 +70,11 @@ void cPvtSerializer::write(eTIME_UNITS unit)
     mDataBuffer.clear();
     mDataBuffer << static_cast<uint8_t>(unit);
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write (time units) data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -71,6 +86,11 @@ void cPvtSerializer::write_position(double x)
 
     mDataBuffer.clear();
     mDataBuffer << x;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write_position (1d) data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -84,6 +104,11 @@ void cPvtSerializer::write_position(double x, double y)
     mDataBuffer.clear();
     mDataBuffer << x;
     mDataBuffer << y;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write_position (2d) data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -99,6 +124,11 @@ void cPvtSerializer::write_position(double x, double y, double z)
     mDataBuffer << y;
     mDataBuffer << z;
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write_position (3d) data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -110,6 +140,11 @@ void cPvtSerializer::write_velocity(double x)
 
     mDataBuffer.clear();
     mDataBuffer << x;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write_velocity (1d) data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -123,6 +158,11 @@ void cPvtSerializer::write_velocity(double x, double y)
     mDataBuffer.clear();
     mDataBuffer << x;
     mDataBuffer << y;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write_velocity (2d) data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
@@ -138,6 +178,11 @@ void cPvtSerializer::write_velocity(double x, double y, double z)
     mDataBuffer << y;
     mDataBuffer << z;
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write_velocity (3d) data.");
+
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
@@ -149,6 +194,11 @@ void cPvtSerializer::write_timestamp(std::uint64_t t)
 
     mDataBuffer.clear();
     mDataBuffer << t;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing write_timestamp data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }

@@ -12,7 +12,7 @@ public:
      * Returns a string used as a class descriptor of the
      * type sensor.
      */
-    char* sensorClass() const override { return "rgb"; };
+    const char* sensorClass() const override { return "rgb"; };
 
 protected:
     cRgbCameraModel(const std::string& name, QObject* parent = nullptr);

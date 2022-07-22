@@ -72,6 +72,11 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     case DataID::SENSOR_DATA_BLOCK_INFO:
         processSensorBlockInfo(buffer);
         break;
+    case DataID::RECORDING_HEARTBEAT_TIMESTAMP:
+        processHeartbeatTimestamp(buffer);
+        break;
+    default:
+        onUnknownDataID(data_id);
     }
 }
 
@@ -175,6 +180,17 @@ void cExperimentParser::processEndRecordingTimestamp(cDataBuffer& buffer)
         throw std::runtime_error("ERROR, Buffer under run in processEndRecordingTimestamp.");
 
     onEndRecordingTimestamp(timestamp);
+}
+
+void cExperimentParser::processHeartbeatTimestamp(cDataBuffer& buffer)
+{
+    uint64_t timestamp = 0;
+    buffer >> timestamp;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processHeartbeatTimestamp.");
+
+    onHeartbeatTimestamp(timestamp);
 }
 
 void cExperimentParser::processSensorBlockInfo(cDataBuffer& buffer)

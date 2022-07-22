@@ -5,6 +5,9 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QString>
+#include <QTimer>
+
+#include <sstream>
 
 
 namespace
@@ -16,7 +19,10 @@ namespace
         for (; mantissa >= 1024.0; mantissa /= 1024.0, ++i) {}
         mantissa = std::ceil(mantissa * 10.0) / 10.0;
 
-        std::string result = std::to_string(mantissa);
+        std::ostringstream out;
+        out.precision(3);
+        out << std::fixed << mantissa;
+        std::string result = out.str();
         result += "BKMGTPE"[i];
         if (i > 0)
             result += "B";
@@ -31,7 +37,9 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
     cCeresRemoteClientNetEncoder(4096),
     mThread(this),
     mpTcpServer(nullptr),
-    mpClient(nullptr)
+    mpClient(nullptr),
+    mSerializer(8192), mSpidercamSerializer(1024), mWeatherSerializer(1024)
+
 {
     mWindDataValid = false;
     mWindSpeed_mps = 0.0;
@@ -44,8 +52,11 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
 
     mpTcpServer = new QTcpServer();
 
-    QObject::connect(mpTcpServer, &QTcpServer::acceptError, this, &cRemoteDataModel::acceptError);
-    QObject::connect(mpTcpServer, &QTcpServer::newConnection, this, &cRemoteDataModel::newConnection);
+    connect(mpTcpServer, &QTcpServer::acceptError, this, &cRemoteDataModel::acceptError);
+    connect(mpTcpServer, &QTcpServer::newConnection, this, &cRemoteDataModel::newConnection);
+
+    mpHeartbeatTimer = new QTimer(this);
+    connect(mpHeartbeatTimer, &QTimer::timeout, this, &cRemoteDataModel::onHeartbeat);
 }
 
 cRemoteDataModel::~cRemoteDataModel()
@@ -235,15 +246,27 @@ void cRemoteDataModel::onCloseDataFile()
 
 void cRemoteDataModel::onStartDataRecording()
 {
+    if (mIsRecording) return;
+
     mIsRecording = true;
     emit requestDataRecordingState(true);
+
+    mSerializer.startRecordingTimestamp(timestamp_ns());
+    mpHeartbeatTimer->start(1000);
+
     emit statusMessage("Data recording started.");
 }
 
 void cRemoteDataModel::onStopDataRecording()
 {
+    if (!mIsRecording) return;
+
     mIsRecording = false;
+    mpHeartbeatTimer->stop();
+
     emit requestDataRecordingState(false);
+    mSerializer.endRecordingTimestamp(timestamp_ns());
+
     emit statusMessage("Data recording stopped.");
 }
 
@@ -311,6 +334,9 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
     mResearcher = researcher;
     mCultivar = cultivar;
     mExperimentDoc = doc;
+
+    if (mSerializer.bufferCapacity() < mExperimentDoc.size())
+        mSerializer.setBufferCapacity(mExperimentDoc.size() + 32);
 }
 
 
@@ -334,6 +360,14 @@ void cRemoteDataModel::onWeatherData(bool valid, double wind_speed_mps, double w
     {
         mWeatherSerializer.writeWindData_mps(mWindDataValid, 
             mWindSpeed_mps, mWindDirection_deg);
+    }
+}
+
+void cRemoteDataModel::onHeartbeat()
+{
+    if (mIsRecording)
+    {
+        mSerializer.heartbeatTimestamp(timestamp_ns());
     }
 }
 

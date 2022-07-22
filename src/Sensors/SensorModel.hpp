@@ -40,12 +40,12 @@ public:
      * Returns a string used as a class descriptor of the 
      * type sensor.
      */
-    virtual char* sensorClass() const = 0;
+    virtual const char* sensorClass() const = 0;
 
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    virtual char* descriptor() const = 0;
+    virtual const char* descriptor() const = 0;
 
     /*
      * Returns the class identifier used by the sensor's serializer

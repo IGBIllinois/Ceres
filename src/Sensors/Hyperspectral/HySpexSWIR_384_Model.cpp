@@ -12,7 +12,7 @@ cHySpexSWIR_384_Model::cHySpexSWIR_384_Model(QObject* parent)
     mConnected = false;
 }
 
-char* cHySpexSWIR_384_Model::descriptor() const
+const char* cHySpexSWIR_384_Model::descriptor() const
 {
     return hyspex_id;
 }

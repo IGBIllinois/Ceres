@@ -124,6 +124,8 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
     createStatusBar();
 
     mpSplashScreen = nullptr;
+
+    QTimer::singleShot(1000, this, &cRemoteClientWindow::startDataAcquitionSystem);
 }
 
 void cRemoteClientWindow::startDataAcquitionSystem()

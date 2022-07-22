@@ -53,6 +53,9 @@ protected:
 
 	virtual void onStartRecordingTimestamp(uint64_t timestamp) = 0;
 	virtual void onEndRecordingTimestamp(uint64_t timestamp) = 0;
+	virtual void onHeartbeatTimestamp(uint64_t timestamp) = 0;
+
+	virtual void onUnknownDataID(BLOCK_DATA_ID_t data_id) {};
 
 private:
 	void processData(BLOCK_MAJOR_VERSION_t major_version,
@@ -68,6 +71,7 @@ private:
 	void processEndTime(cDataBuffer& buffer);
 	void processStartRecordingTimestamp(cDataBuffer& buffer);
 	void processEndRecordingTimestamp(cDataBuffer& buffer);
+	void processHeartbeatTimestamp(cDataBuffer& buffer);
 	void processSensorBlockInfo(cDataBuffer& buffer);
 
 private:

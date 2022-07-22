@@ -33,6 +33,11 @@ cBlockDataFileWriter* cBlockSerializer::detach()
     return pFile;
 }
 
+std::size_t cBlockSerializer::bufferCapacity() const
+{
+    return mDataBuffer.capacity();
+}
+
 void cBlockSerializer::setBufferCapacity(std::size_t n)
 {
     mDataBuffer.capacity(n);

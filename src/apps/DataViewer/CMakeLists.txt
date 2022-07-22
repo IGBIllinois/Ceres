@@ -47,6 +47,12 @@ PRIVATE
     ${ui_files}
     ${UI_RESOURCES}
     ${platform_resource_files}
+	
+    SsnxTypes.hpp
+    SsnxParser.hpp
+    SsnxParser.cpp
+    SsnxModel_file.hpp
+    SsnxModel_file.cpp
 
 	WeatherParser.hpp
 	WeatherParser.cpp
@@ -78,6 +84,7 @@ target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)
 
 target_link_libraries(CeresDataViewer PRIVATE BlockDataFile)
+target_link_libraries(CeresDataViewer PRIVATE Sensors)
 
 
 #

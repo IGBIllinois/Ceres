@@ -9,7 +9,7 @@ cDummyModel::cDummyModel(QObject* parent)
 {
 }
 
-char* cDummyModel::descriptor() const
+const char* cDummyModel::descriptor() const
 {
     return dummy_id;
 }

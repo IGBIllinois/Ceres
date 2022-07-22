@@ -53,6 +53,12 @@ signals:
     void requestDataRecordingState(bool record);
 
 /*
+ * Signals handlers from the timer
+ */
+private slots:
+    void onHeartbeat();
+
+/*
  * Signals handlers from the sensors
  */
 private slots:
@@ -109,8 +115,9 @@ protected:
     cRemoteDataThread mThread;
 
     QTcpServer* mpTcpServer;
-
     QTcpSocket* mpClient;
+
+    QTimer* mpHeartbeatTimer;
 
 private:
     // Experiment Info

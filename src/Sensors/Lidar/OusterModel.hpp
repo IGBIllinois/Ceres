@@ -26,7 +26,7 @@ public:
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    char* descriptor() const override;
+    const char* descriptor() const override;
 
     virtual bool configure(const nlohmann::json& jsonCfg) = 0;
 

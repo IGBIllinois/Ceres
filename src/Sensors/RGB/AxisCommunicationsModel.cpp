@@ -31,7 +31,7 @@ cAxisCommunicationsModel::~cAxisCommunicationsModel()
 	stopCommunications();
 }
 
-char* cAxisCommunicationsModel::descriptor() const
+const char* cAxisCommunicationsModel::descriptor() const
 {
     return axis_communications_id;
 }

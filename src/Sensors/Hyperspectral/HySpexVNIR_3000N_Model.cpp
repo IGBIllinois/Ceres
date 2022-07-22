@@ -12,7 +12,7 @@ cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
     mConnected = false;
 }
 
-char* cHySpexVNIR_3000N_Model::descriptor() const
+const char* cHySpexVNIR_3000N_Model::descriptor() const
 {
     return hyspex_id;
 }

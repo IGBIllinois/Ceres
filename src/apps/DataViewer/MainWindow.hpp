@@ -15,8 +15,13 @@ class QLineEdit;
 class QToolBar;
 QT_END_NAMESPACE
 
-
 // Forward Declarations
+class cSsnxModel_file;
+class cSsnxView;
+
+class cOusterModel_net;
+class cOusterView;
+
 
 namespace Ui 
 {
@@ -48,5 +53,10 @@ private:
     QMenu* mpFileMenu;
 
     Ui::MainWindow* mpUI;
+
+    cSsnxModel_file* mpSsnxModel;
+    cSsnxView*       mpSsnxView;
+
+    cOusterView* mpOusterView;
 };
 

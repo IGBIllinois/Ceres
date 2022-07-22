@@ -26,6 +26,11 @@ void cExperimentSerializer::writeBeginHeader()
     setVersion(1, 0);
     mBlockID.dataID(DataID::BEGIN_HEADER);
     mpDataFile->writeBlock(mBlockID);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeBeginHeader data.");
 }
 
 void cExperimentSerializer::writeEndOfHeader()
@@ -35,6 +40,11 @@ void cExperimentSerializer::writeEndOfHeader()
     setVersion(1, 0);
     mBlockID.dataID(DataID::END_OF_HEADER);
     mpDataFile->writeBlock(mBlockID);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeEndOfHeader data.");
 }
 
 
@@ -45,6 +55,11 @@ void cExperimentSerializer::writeBeginFooter()
     setVersion(1, 0);
     mBlockID.dataID(DataID::BEGIN_FOOTER);
     mpDataFile->writeBlock(mBlockID);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeBeginFooter data.");
 }
 
 void cExperimentSerializer::writeEndOfFooter()
@@ -54,6 +69,11 @@ void cExperimentSerializer::writeEndOfFooter()
     setVersion(1, 0);
     mBlockID.dataID(DataID::END_OF_FOOTER);
     mpDataFile->writeBlock(mBlockID);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeEndOfFooter data.");
 }
 
 void cExperimentSerializer::writeTitle(const std::string& title)
@@ -66,6 +86,11 @@ void cExperimentSerializer::writeTitle(const std::string& title)
     mDataBuffer.clear();
     mDataBuffer << title;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeTitle data.");
 }
 
 void cExperimentSerializer::writeResearcher(const std::string& researcher)
@@ -78,6 +103,11 @@ void cExperimentSerializer::writeResearcher(const std::string& researcher)
     mDataBuffer.clear();
     mDataBuffer << researcher;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeResearcher data.");
 }
 
 void cExperimentSerializer::writeCultivar(const std::string& cultivar)
@@ -90,6 +120,11 @@ void cExperimentSerializer::writeCultivar(const std::string& cultivar)
     mDataBuffer.clear();
     mDataBuffer << cultivar;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeCultivar data.");
 }
 
 void cExperimentSerializer::writeExperimentDoc(const std::string& doc)
@@ -102,6 +137,11 @@ void cExperimentSerializer::writeExperimentDoc(const std::string& doc)
     mDataBuffer.clear();
     mDataBuffer << doc;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeExperimentDoc data.");
 }
 
 void cExperimentSerializer::writeBeginSensorList()
@@ -111,6 +151,11 @@ void cExperimentSerializer::writeBeginSensorList()
     setVersion(1, 0);
     mBlockID.dataID(DataID::BEGIN_SENSOR_LIST);
     mpDataFile->writeBlock(mBlockID);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeBeginSensorList data.");
 }
 
 void cExperimentSerializer::writeEndOfSensorList()
@@ -120,6 +165,11 @@ void cExperimentSerializer::writeEndOfSensorList()
     setVersion(1, 0);
     mBlockID.dataID(DataID::END_OF_SENSOR_LIST);
     mpDataFile->writeBlock(mBlockID);
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeEndOfSensorList data.");
 }
 
 void cExperimentSerializer::writeSensorBlockInfo(uint16_t class_id, const std::string& name)
@@ -133,6 +183,11 @@ void cExperimentSerializer::writeSensorBlockInfo(uint16_t class_id, const std::s
     mDataBuffer << class_id;
     mDataBuffer << name;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeSensorBlockInfo data.");
 }
 
 
@@ -155,6 +210,11 @@ void cExperimentSerializer::startTime(time_t time)
     mDataBuffer << static_cast<int32_t>(ltm->tm_sec);
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing startTime data.");
 }
 
 void cExperimentSerializer::endTime(time_t time)
@@ -177,6 +237,10 @@ void cExperimentSerializer::endTime(time_t time)
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing endTime data.");
 }
 
 void cExperimentSerializer::startRecordingTimestamp(uint64_t timestamp)
@@ -189,6 +253,11 @@ void cExperimentSerializer::startRecordingTimestamp(uint64_t timestamp)
     mDataBuffer.clear();
     mDataBuffer << timestamp;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing startRecordingTimestamp data.");
 }
 
 void cExperimentSerializer::endRecordingTimestamp(uint64_t timestamp)
@@ -201,6 +270,28 @@ void cExperimentSerializer::endRecordingTimestamp(uint64_t timestamp)
     mDataBuffer.clear();
     mDataBuffer << timestamp;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing endRecordingTimestamp data.");
+}
+
+void cExperimentSerializer::heartbeatTimestamp(uint64_t timestamp)
+{
+    assert(mpDataFile);
+
+    setVersion(1, 0);
+    mBlockID.dataID(DataID::RECORDING_HEARTBEAT_TIMESTAMP);
+
+    mDataBuffer.clear();
+    mDataBuffer << timestamp;
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing heartbeatTimestamp data.");
 }
 
 

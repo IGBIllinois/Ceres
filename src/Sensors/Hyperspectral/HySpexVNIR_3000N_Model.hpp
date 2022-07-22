@@ -17,7 +17,7 @@ public:
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    char* descriptor() const override;
+    const char* descriptor() const override;
 
     /*
      * Returns the class identifier used by the sensor's serializer

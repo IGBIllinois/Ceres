@@ -10,10 +10,6 @@ set(GPS_SOURCE_FILES
 # Different Septertino GPS Models based on data source
 #
 
-#	Data file
-    SsnxModel_file.hpp
-    SsnxModel_file.cpp
-
 #	Network stream from relay program on dolly
     SsnxGpsStream.hpp
     SsnxGpsStream.cpp

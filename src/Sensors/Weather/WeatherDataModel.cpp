@@ -9,7 +9,7 @@ cWeatherDataModel::cWeatherDataModel(QObject* parent)
 {
 }
 
-char* cWeatherDataModel::descriptor() const
+const char* cWeatherDataModel::descriptor() const
 {
 	return weather_data_id;
 }

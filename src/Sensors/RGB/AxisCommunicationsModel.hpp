@@ -25,19 +25,19 @@ public:
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    char* descriptor() const override;
+    const char* descriptor() const override;
 
     /*
      * Returns a string used as a data descriptor of the
      * type sensor.
      */
-    static char* data_type() { return "rgb"; };
+    static const char* data_type() { return "rgb"; };
 
     /*
      * Returns a string used as a protocol descriptor of the
      * type sensor.
      */
-    static char* protocol() { return "http"; };
+    static const char* protocol() { return "http"; };
 
     /*
      * Returns the class identifier used by the sensor's serializer

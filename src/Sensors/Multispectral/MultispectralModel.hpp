@@ -12,7 +12,7 @@ public:
      * Returns a string used as a class descriptor of the
      * type sensor.
      */
-    char* sensorClass() const override { return "multispectral"; };
+    const char* sensorClass() const override { return "multispectral"; };
 
 protected:
     cMultispectralModel(const std::string& name, QObject* parent = nullptr);

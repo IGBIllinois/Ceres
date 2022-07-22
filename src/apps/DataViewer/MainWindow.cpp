@@ -3,6 +3,8 @@
 #include "ui_MainWindow.h"
 #include "CentralWidget.hpp"
 
+#include "GPS/SsnxView.hpp"
+
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
@@ -54,6 +56,9 @@ void cMainWindow::initialize()
     setCentralWidget(pCentral);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
     onStatusUpdate("");
+
+    mpSsnxView = new cSsnxView();
+    mpSsnxView->show();
 }
 
 //-----------------------------------------------------------------------------

@@ -13,7 +13,7 @@ cSsnxModel::~cSsnxModel()
 {
 }
 
-char* cSsnxModel::descriptor() const 
+const char* cSsnxModel::descriptor() const 
 {
     return ssnx_id;
 };

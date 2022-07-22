@@ -25,6 +25,7 @@ namespace experiment
         BEGIN_SENSOR_LIST,
         END_OF_SENSOR_LIST,
         SENSOR_DATA_BLOCK_INFO,
+        RECORDING_HEARTBEAT_TIMESTAMP,
     };
 }
 

@@ -23,6 +23,7 @@ public:
 	void attach(cBlockDataFileWriter* pDataFile);
 	cBlockDataFileWriter* detach();
 
+	std::size_t bufferCapacity() const;
 	void setBufferCapacity(std::size_t n);
 
 	void setVersion(uint8_t major, uint8_t minor);

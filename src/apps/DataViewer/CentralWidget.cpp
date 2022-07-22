@@ -13,8 +13,7 @@
 
 //-----------------------------------------------------------------------------
 cCentralWidget::cCentralWidget(QWidget* parent) :
-    QWidget(parent),
-    mpLoadSrcFile(nullptr), mpLoadSrcButton(nullptr)
+    QWidget(parent)
 {
     initialize();
 }
@@ -40,6 +39,11 @@ void cCentralWidget::initialize()
     mpLoadButton->setText("Load");
     mpLoadButton->setEnabled(true);
     connect(mpLoadButton, &QPushButton::pressed, this, &cCentralWidget::loadSourceFile);
+
+    mpPlayButton = new QPushButton(this);
+    mpPlayButton->setText("Play");
+    mpPlayButton->setEnabled(false);
+    connect(mpPlayButton, &QPushButton::pressed, this, &cCentralWidget::playSourceFile);
 
     mpTitleLabel = new QLabel("Title:");
     mpTitle = new QLineEdit();
@@ -90,6 +94,48 @@ void cCentralWidget::initialize()
     endInfoLayout->addWidget(mpEndDate);
     mpEndTimeInfo->setLayout(endInfoLayout);
 
+    mpDollyXLabel = new QLabel("X (mm):");
+    mpDollyX_mm = new QLineEdit();
+    mpDollyX_mm->setReadOnly(true);
+    mpDollyYLabel = new QLabel("Y (mm):");
+    mpDollyY_mm = new QLineEdit();
+    mpDollyY_mm->setReadOnly(true);
+    mpDollyZLabel = new QLabel("Z (mm):");
+    mpDollyZ_mm = new QLineEdit();
+    mpDollyZ_mm->setReadOnly(true);
+    mpDollySpeedLabel = new QLabel("Speed (mm/sec):");
+    mpDollySpeed_mmps = new QLineEdit();
+    mpDollySpeed_mmps->setReadOnly(true);
+
+    mpSpidercamInfo = new QGroupBox("Dolly Position");
+    auto* posLayout = new QFormLayout();
+    posLayout->addRow(mpDollyXLabel, mpDollyX_mm);
+    posLayout->addRow(mpDollyYLabel, mpDollyY_mm);
+    posLayout->addRow(mpDollyZLabel, mpDollyZ_mm);
+    auto* speedLayout = new QFormLayout();
+    speedLayout->addRow(mpDollySpeedLabel, mpDollySpeed_mmps);
+    auto* dollyInfoLayout = new QHBoxLayout();
+    dollyInfoLayout->addLayout(posLayout);
+    dollyInfoLayout->addLayout(speedLayout);
+    mpSpidercamInfo->setLayout(dollyInfoLayout);
+
+
+    mpWindSpeedLabel = new QLabel("Speed (m/s):");
+    mpWindSpeed_mps = new QLineEdit();
+    mpWindSpeed_mps->setReadOnly(true);
+    mpWindDirectionLabel = new QLabel("Direction (deg):");
+    mpWindDirection_deg = new QLineEdit();
+    mpWindDirection_deg->setReadOnly(true);
+
+    QGroupBox* mpWeatherInfo = new QGroupBox("Wind Data");
+    auto* windInfoLayout = new QHBoxLayout();
+    windInfoLayout->addWidget(mpWindSpeedLabel);
+    windInfoLayout->addWidget(mpWindSpeed_mps);
+    windInfoLayout->addWidget(mpWindDirectionLabel);
+    windInfoLayout->addWidget(mpWindDirection_deg);
+    mpWeatherInfo->setLayout(windInfoLayout);
+
+
     // Layout the dialog...
 
     QVBoxLayout* pMainLayout = new QVBoxLayout();
@@ -120,11 +166,16 @@ void cCentralWidget::initialize()
     infoLayout->addLayout(timeInfoLayout);
 
     pMainLayout->addLayout(infoLayout);
+    pMainLayout->addWidget(mpSpidercamInfo);
+    pMainLayout->addWidget(mpWeatherInfo);
+    
+    pMainLayout->addWidget(mpPlayButton);
 
     setLayout(pMainLayout);
 
     mDataFile.attach(static_cast<cExperimentParser*>(this));
-
+    mDataFile.attach(static_cast<cSpidercamParser*>(this));
+    mDataFile.attach(static_cast<cWeatherParser*>(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -148,7 +199,8 @@ void cCentralWidget::loadSourceFile()
         return;
     }
 
-    readHeaderData();
+    if (readHeaderData())
+        mpPlayButton->setEnabled(true);
 }
 
 bool cCentralWidget::readHeaderData()
@@ -163,6 +215,22 @@ bool cCentralWidget::readHeaderData()
     }
 
     return true;
+}
+
+//-----------------------------------------------------------------------------
+void cCentralWidget::playSourceFile()
+{
+    std::size_t n = 0;
+
+    auto result = mDataFile.updateData();
+
+    while (result)
+    {
+        ++n;
+        result = mDataFile.updateData();
+    }
+
+    mpPlayButton->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -259,6 +327,9 @@ void cCentralWidget::onStartRecordingTimestamp(uint64_t timestamp)
 void cCentralWidget::onEndRecordingTimestamp(uint64_t timestamp)
 {}
 
+void cCentralWidget::onHeartbeatTimestamp(uint64_t timestamp)
+{}
+
 void cCentralWidget::onBeginSensorList()
 {}
 
@@ -266,14 +337,44 @@ void cCentralWidget::onEndOfSensorList()
 {}
 
 void cCentralWidget::onSensorBlockInfo(unsigned int class_id, const std::string& name)
+{}
+
+void cCentralWidget::onUnknownDataID(BLOCK_DATA_ID_t data_id)
 {
-    std::cerr << class_id;
+    std::cerr << data_id << "\n";
 }
 
 //-----------------------------------------------------------------------------
 // Spidercam Parser Data
 //-----------------------------------------------------------------------------
 
+void cCentralWidget::onPosition(const spidercam::sPosition_1_t& pos)
+{
+    mpDollyX_mm->setText(QString::number(pos.X_mm));
+    mpDollyY_mm->setText(QString::number(pos.Y_mm));
+    mpDollyZ_mm->setText(QString::number(pos.Z_mm));
+    mpDollySpeed_mmps->setText(QString::number(pos.speed_mmps));
+}
+
 //-----------------------------------------------------------------------------
 // Weather Parser Data
 //-----------------------------------------------------------------------------
+
+void cCentralWidget::onWindSpeed_mps(bool valid, double speed_mps)
+{
+    if (valid)
+        mpWindSpeed_mps->setText(QString::number(speed_mps, 'g', 1));
+    else
+        mpWindSpeed_mps->setText("Calm");
+}
+
+void cCentralWidget::onWindSpeed_knots(bool valid, double speed_knots)
+{}
+
+void cCentralWidget::onWindDirection_deg(bool valid, double dir_deg)
+{
+    if (valid)
+        mpWindDirection_deg->setText(QString::number(dir_deg, 'g', 1));
+    else
+        mpWindDirection_deg->setText("");
+}

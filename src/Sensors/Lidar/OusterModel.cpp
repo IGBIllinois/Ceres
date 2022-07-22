@@ -14,7 +14,7 @@ cOusterModel::cOusterModel(QObject* parent)
     mFrameCounter = 0;
 }
 
-char* cOusterModel::descriptor() const
+const char* cOusterModel::descriptor() const
 {
     return ouster_id;
 }
