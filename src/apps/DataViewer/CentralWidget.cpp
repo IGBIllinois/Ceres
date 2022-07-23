@@ -1,6 +1,7 @@
 
 
 #include "CentralWidget.hpp"
+#include "SsnxModel_file.hpp"
 
 #include <QtWidgets>
 #include <QLayout>
@@ -178,6 +179,12 @@ void cCentralWidget::initialize()
     mDataFile.attach(static_cast<cWeatherParser*>(this));
 }
 
+void cCentralWidget::attach(cBlockParser* pParser)
+{
+    mDataFile.attach(pParser);
+}
+
+
 //-----------------------------------------------------------------------------
 void cCentralWidget::browseSourceFile()
 {
@@ -193,6 +200,9 @@ void cCentralWidget::browseSourceFile()
 void cCentralWidget::loadSourceFile()
 {
     std::string filename = mpLoadSrcFile->text().toStdString();
+
+    if (mDataFile.is_open())
+        mDataFile.close();
 
     if (!mDataFile.open(filename))
     {

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CeresDataFile.hpp"
+
 #include "ExperimentParser.hpp"
 #include "SpidercamParser.hpp"
 #include "WeatherParser.hpp"
@@ -10,10 +11,10 @@
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
-    class QLabel;
-    class QLineEdit;
-    class QPushButton;
-    class QGroupBox;
+class QLabel;
+class QLineEdit;
+class QPushButton;
+class QGroupBox;
 QT_END_NAMESPACE
 
 
@@ -31,6 +32,8 @@ public:
 
     void initialize();
     
+    void attach(cBlockParser* pParser);
+
 signals:
     void statusMessage(QString msg);
     void errorMessage(QString title, QString msg);
@@ -85,6 +88,7 @@ private:
 
 private:
     cCeresDataFile mDataFile;
+
     bool mHasBeginHeader = false;
     bool mHeaderComplete = false;
     bool mHasBeginFooter = false;

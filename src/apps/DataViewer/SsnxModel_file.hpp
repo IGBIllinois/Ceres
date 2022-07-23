@@ -1,12 +1,13 @@
 
 #pragma once
 
-#include "SsnxModel.hpp"
+#include "SsnxTypes.hpp"
 #include "SsnxParser.hpp"
+#include "GPS/GpsTypes.hpp"
 
 #include <QObject>
 
-class cSsnxModel_file : public cSsnxModel, public cSsnxParser
+class cSsnxModel_file : public QObject, public cSsnxParser
 {
     Q_OBJECT
 
@@ -14,22 +15,41 @@ public:
     explicit cSsnxModel_file(QObject* parent = nullptr);
     ~cSsnxModel_file();
 
-    bool configure(const nlohmann::json& jsonCfg) override;
+signals:
+    void updatePVT(double timestamp_s,
+        double lat_rad, double lng_rad, double height_m,
+        double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,
+        double groundTrack_deg, gps::eDatum datum);
 
-    void enableDataRecording(cBlockDataFileWriter& file) override {};
-    void disableDataRecording() override {};
-
-    void writeDataHeader() override {};
-
-    /*
-     * Starts/Stops communication with the endpoint.
-     * These methods are called inside the QThread so that
-     * all of the communication happens within the same thread!
-     */
-    bool startCommunications() override;
-    void stopCommunications() override;
+    void updateUTC(int hour, int min, int sec, int day, int month, int year);
 
 protected:
-    void update() override;
+	void onNewData(const ssnx::PVT_Cartesian_1_t& data) override {};
+	void onNewData(const ssnx::PVT_Cartesian_2_t& data) override {};
+	void onNewData(const ssnx::PVT_Cartesian_2_1_t& data) override {};
+	void onNewData(const ssnx::PVT_Cartesian_2_2_t& data) override {};
+	void onNewData(const ssnx::PVT_Geodetic_1_t& data) override;
+	void onNewData(const ssnx::PVT_Geodetic_2_t& data) override;
+	void onNewData(const ssnx::PVT_Geodetic_2_1_t& data) override;
+	void onNewData(const ssnx::PVT_Geodetic_2_2_t& data) override;
+	void onNewData(const ssnx::PosCovGeodetic_1_t& data) override {};
+	void onNewData(const ssnx::VelCovGeodetic_1_t& data) override {};
+	void onNewData(const ssnx::DOP_1_t& data) override {};
+	void onNewData(const ssnx::PVT_Residuals_1_t& data) override {};
+	void onNewData(const ssnx::RAIMStatistics_1_t& data) override {};
+	void onNewData(const ssnx::POS_Projected_1_t& data) override {};
+	void onNewData(const ssnx::ReceiverTime_1_t& data) override;
+	void onNewData(const ssnx::RtcmDatum_1_t& data) override {};
+
+private:
+	double mTimestamp_s;
+	double mLatitude_rad;
+	double mLongitude_rad;
+	double mHeight_m;
+	double mNorthSpeed_mps;
+	double mEastSpeed_mps;
+	double mVertSpeed_mps;
+	double mGroundTrack_deg;
+	gps::eDatum mDatum;
 };
 

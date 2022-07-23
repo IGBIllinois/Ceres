@@ -16,6 +16,8 @@ class QToolBar;
 QT_END_NAMESPACE
 
 // Forward Declarations
+class cCentralWidget;
+
 class cSsnxModel_file;
 class cSsnxView;
 
@@ -53,9 +55,10 @@ private:
     QMenu* mpFileMenu;
 
     Ui::MainWindow* mpUI;
+    cCentralWidget* mpCentralWidget = nullptr;
 
-    cSsnxModel_file* mpSsnxModel;
-    cSsnxView*       mpSsnxView;
+    cSsnxModel_file* mpSsnxModel = nullptr;
+    cSsnxView*       mpSsnxView = nullptr;
 
     cOusterView* mpOusterView;
 };

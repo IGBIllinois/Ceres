@@ -47,6 +47,12 @@ PRIVATE
     ${ui_files}
     ${UI_RESOURCES}
     ${platform_resource_files}
+
+    AxisCommunicationsParser.hpp
+    AxisCommunicationsParser.cpp
+
+    OusterParser.hpp
+    OusterParser.cpp
 	
     SsnxTypes.hpp
     SsnxParser.hpp

@@ -3,6 +3,7 @@
 #include "ui_MainWindow.h"
 #include "CentralWidget.hpp"
 
+#include "SsnxModel_file.hpp"
 #include "GPS/SsnxView.hpp"
 
 #include <QtWidgets>
@@ -48,17 +49,25 @@ void cMainWindow::initialize()
     onStatusUpdate("Initializing status bar...");
     createStatusBar();
 
-    auto* pCentral = new cCentralWidget(this);
-    pCentral->setEnabled(true);
-    connect(pCentral, &cCentralWidget::statusMessage, this, &cMainWindow::onStatusUpdate);
-    connect(pCentral, &cCentralWidget::errorMessage, this, &cMainWindow::onErrorMessage);
+    mpCentralWidget = new cCentralWidget(this);
+    mpCentralWidget->setEnabled(true);
+    connect(mpCentralWidget, &cCentralWidget::statusMessage, this, &cMainWindow::onStatusUpdate);
+    connect(mpCentralWidget, &cCentralWidget::errorMessage, this, &cMainWindow::onErrorMessage);
 
-    setCentralWidget(pCentral);
+    setCentralWidget(mpCentralWidget);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
     onStatusUpdate("");
 
+    mpSsnxModel = new cSsnxModel_file();
+    mpCentralWidget->attach(mpSsnxModel);
+
     mpSsnxView = new cSsnxView();
-    mpSsnxView->show();
+    mpSsnxView->topLevelChanged(true);
+
+    QObject::connect(mpSsnxModel, &cSsnxModel_file::updatePVT, mpSsnxView, &cSsnxView::updatePVT);
+    QObject::connect(mpSsnxModel, &cSsnxModel_file::updateUTC, mpSsnxView, &cSsnxView::updateUTC);
+
+//    mpSsnxView->show();
 }
 
 //-----------------------------------------------------------------------------

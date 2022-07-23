@@ -33,6 +33,7 @@ set(GPS_SOURCE_FILES
 #
 # General GPS View-Model-Controller files
 #
+	GpsTypes.hpp
     GpsView.hpp
     GpsView.cpp
     GpsModel.hpp

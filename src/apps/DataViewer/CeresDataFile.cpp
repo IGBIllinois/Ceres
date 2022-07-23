@@ -13,20 +13,20 @@ cCeresDataFile::~cCeresDataFile()
 bool cCeresDataFile::open(const std::string& file_name)
 {
     mFileReader.open(file_name);
-    if (!mFileReader.isOpen()) return false;
 
-//    mFileReader.attach(static_cast<cExperimentParser*>(this));
-//    mFileReader.attach(static_cast<cPvtParser*>(this));
+    return mFileReader.isOpen();
+}
 
-    return true;
+//-----------------------------------------------------------------------------
+bool cCeresDataFile::is_open()
+{
+    return mFileReader.isOpen();
 }
 
 //-----------------------------------------------------------------------------
 void cCeresDataFile::close()
 {
     if (!mFileReader.isOpen()) return;
-
-//    mFileReader.attach(static_cast<cPvtParser*>(this));
 
     mFileReader.close();
 }

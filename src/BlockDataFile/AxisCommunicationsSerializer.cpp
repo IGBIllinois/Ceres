@@ -42,7 +42,7 @@ void cAxisCommunicationsSerializer::writeActiveCameraId(int in)
     mBlockID.dataID(DataID::CAMERA_ID);
 
     mDataBuffer.clear();
-    mDataBuffer << in;
+    mDataBuffer << static_cast<int32_t>(in);
 
     assert(!mDataBuffer.overrun());
 
@@ -60,7 +60,7 @@ void cAxisCommunicationsSerializer::writeFramesPerSecond(int frames_per_sec)
     mBlockID.dataID(DataID::FRAMES_PER_SECOND);
 
     mDataBuffer.clear();
-    mDataBuffer << frames_per_sec;
+    mDataBuffer << static_cast<int32_t>(frames_per_sec);
 
     assert(!mDataBuffer.overrun());
 
@@ -176,8 +176,8 @@ void cAxisCommunicationsSerializer::write(const axis::sImageSize_t& in)
     mBlockID.dataID(DataID::RESOLUTION);
 
     mDataBuffer.clear();
-    mDataBuffer << in.width;
-    mDataBuffer << in.height;
+    mDataBuffer << static_cast<uint16_t>(in.width);
+    mDataBuffer << static_cast<uint16_t>(in.height);
 
     assert(!mDataBuffer.overrun());
 
