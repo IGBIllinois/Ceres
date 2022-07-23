@@ -101,14 +101,14 @@ void cSsnxModel_net::writeDataHeader()
 {
 }
 
-void cSsnxModel_net::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
+void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
 {
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
 
     if (!mPvtValid) return;
 
-    mDatum = static_cast<cGpsModel::eDatum>(pvt.Datum);
+    mDatum = static_cast<::gps::eDatum>(pvt.Datum);
 
     mLatitude_rad = pvt.Lat_rad;
     mLongitude_rad = pvt.Lon_rad;
@@ -126,7 +126,7 @@ void cSsnxModel_net::pvtGeodetic(const gps::PVT_Geodetic_2_t pvt)
 
     if (mRecordTrack)
     {
-        sGpsPoint point = { mPvtTimestamp_s,
+        ::gps::sGpsPoint point = { mPvtTimestamp_s,
             mLatitude_rad, mLongitude_rad, mHeight_m,
             mVn_mps, mVe_mps, mVu_mps,
             mGroundTrack_deg };
@@ -149,7 +149,7 @@ void cSsnxModel_net::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 void cSsnxModel_net::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
 {}
 
-void cSsnxModel_net::receiverTime(const gps::ReceiverTime_1_t pvt)
+void cSsnxModel_net::receiverTime(const ssnx::gps::ReceiverTime_1_t pvt)
 {
     mTimeValid = pvt.dataValid;
     mRxTimestamp_s = pvt.timestamp_s;

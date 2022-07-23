@@ -2,7 +2,6 @@
 #pragma once
 
 #include <QAbstractScrollArea>
-#include "GpsModel.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE

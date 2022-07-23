@@ -6,7 +6,7 @@ cGpsModel::cGpsModel(const std::string& name, QObject* parent)
 :
     cSensorModel(name, parent)
 {
-    mDatum = eDatum::WGS84;
+    mDatum = gps::eDatum::WGS84;
 
     mPvtValid = false;
     mPvtTimestamp_s = 0.0;
@@ -45,27 +45,27 @@ bool cGpsModel::isTimeValid() const
     return mTimeValid;
 }
 
-cGpsModel::eDatum cGpsModel::getDatum() const
+gps::eDatum cGpsModel::getDatum() const
 {
     return mDatum;
 }
 
-cGpsModel::sPosition cGpsModel::getPosition() const
+gps::sPosition cGpsModel::getPosition() const
 {
     return { mPvtTimestamp_s, mLatitude_rad, mLongitude_rad , mHeight_m };
 }
 
-cGpsModel::sVelocity cGpsModel::getVelocity() const
+gps::sVelocity cGpsModel::getVelocity() const
 {
     return { mPvtTimestamp_s, mVn_mps, mVe_mps , mVu_mps };
 }
 
-cGpsModel::sUtcDate cGpsModel::getDate() const
+gps::sUtcDate cGpsModel::getDate() const
 {
     return { mRxTimestamp_s, mUtcDay, mUtcMonth , mUtcYear };
 }
 
-cGpsModel::sUtcTime cGpsModel::getTime() const
+gps::sUtcTime cGpsModel::getTime() const
 {
     return { mRxTimestamp_s, mUtcHour, mUtcMinute , mUtcSecond };
 }
