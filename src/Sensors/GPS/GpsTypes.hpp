@@ -1,0 +1,63 @@
+
+#pragma once
+
+namespace  gps
+{
+    enum class eDatum
+    {
+        WGS84,
+        DGNSS,
+        ETRS89,
+        NAD83,
+        NAD83_PA11,
+        NAD83_MA11,
+        GDA94,
+        FIRST_USER_DATUM,
+        SECOND_USER_DATUM
+    };
+
+    struct sGpsPoint
+    {
+        double  Timestamp_s;
+        double  Latitude_rad;
+        double  Longitude_rad;
+        double  Height_m;
+        double  Vn_mps;
+        double  Ve_mps;
+        double  Vu_mps;
+        double  GroundTrack_deg;
+    };
+
+    struct sPosition
+    {
+        double  Timestamp_s;
+        double  Latitude_rad;
+        double  Longitude_rad;
+        double  Height_m;
+    };
+
+    struct sVelocity
+    {
+        double  Timestamp_s;
+        double  Vn_mps;
+        double  Ve_mps;
+        double  Vu_mps;
+    };
+
+    struct sUtcDate
+    {
+        double  Timestamp_s;
+        int  utcDay;
+        int  utcMonth;
+        int  utcYear;
+    };
+
+    struct sUtcTime
+    {
+        double  Timestamp_s;
+        int  utcHour;
+        int  utcMinute;
+        int  utcSecond;
+    };
+};
+
