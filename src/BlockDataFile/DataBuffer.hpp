@@ -238,6 +238,14 @@ public:
     cDataBuffer& operator>>(double& out);
     cDataBuffer& operator>>(std::string& out);
 
+    template<typename T>
+    T get()
+    {
+        T result;
+        operator>>(result);
+        return result;
+    }
+
     void read(std::string& out);
     void read(std::string& out, uint16_t len);
     void read(std::byte*& out, uint16_t len);
@@ -272,6 +280,12 @@ public:
     cDataBuffer& operator<<(const float in);
     cDataBuffer& operator<<(const double in);
     cDataBuffer& operator<<(const std::string& in);
+
+    template<typename T>
+    void put(const T& in)
+    {
+        operator<<(in);
+    }
 
     void write(const std::string& in);
     void write(const std::byte* in, uint16_t len);

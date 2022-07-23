@@ -379,7 +379,9 @@ cDataBuffer& cDataBuffer::operator>>(bool& out)
 
 cDataBuffer& cDataBuffer::operator>>(char& out)
 {
-	mReadIndex += ::read(out, rdbuf(), wrtbuf(), mUnderrun);
+	uint8_t ch;
+	mReadIndex += ::read(ch, rdbuf(), wrtbuf(), mUnderrun);
+	out = ch;
 	return *this;
 }
 
@@ -565,7 +567,7 @@ cDataBuffer& cDataBuffer::operator<<(const bool in)
 
 cDataBuffer& cDataBuffer::operator<<(const char in)
 {
-	mWriteIndex += ::write(in, wrtbuf(), end(), mOverrun);
+	mWriteIndex += ::write<uint8_t>(in, wrtbuf(), end(), mOverrun);
 	return *this;
 }
 
