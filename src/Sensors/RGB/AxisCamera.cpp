@@ -82,6 +82,12 @@ axis::sImageSize_t cAxisCamera::getImageSize() const
 void cAxisCamera::setImageSize(axis::sImageSize_t image_size)
 {
     mImageSize = image_size;
+    if ((mpCurrentImage->width() != mImageSize.width) ||
+        (mpCurrentImage->height() != mImageSize.height))
+    {
+        delete mpCurrentImage;
+        mpCurrentImage = new QImage(mImageSize.width, mImageSize.height, QImage::Format_RGB888);
+    }
 }
 
 QImage* cAxisCamera::currentImage() const
