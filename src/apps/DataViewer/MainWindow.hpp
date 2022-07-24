@@ -24,6 +24,9 @@ class cSsnxView;
 class cOusterModel_net;
 class cOusterView;
 
+class cAxisCommunicationsModel_file;
+class cAxisCommunicationsView;
+
 
 namespace Ui 
 {
@@ -46,6 +49,9 @@ public slots:
     void onWarningMessage(QString title, QString msg);
     void onErrorMessage(QString title, QString msg);
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     void createMainMenu();
     void createSubMenusAndActions();
@@ -61,5 +67,8 @@ private:
     cSsnxView*       mpSsnxView = nullptr;
 
     cOusterView* mpOusterView;
+
+    cAxisCommunicationsModel_file* mpAxisModel = nullptr;
+    cAxisCommunicationsView* mpAxisView = nullptr;
 };
 

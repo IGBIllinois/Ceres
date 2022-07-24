@@ -38,26 +38,27 @@ public:
 	const cOusterLidarData&			getLidarData() const { return mLidarData; }
 
 
+protected:
 	void processData(BLOCK_MAJOR_VERSION_t major_version,
 		             BLOCK_MINOR_VERSION_t minor_version, 
 		             BLOCK_DATA_ID_t data_id, 
 		             cDataBuffer& buffer) override;
 
-	virtual void processConfigParam_2(cDataBuffer& buffer);
-	virtual void processSensorInfo_2(cDataBuffer& buffer);
-	virtual void processTimestamp_2(cDataBuffer& buffer);
-	virtual void processSyncPulseIn_2(cDataBuffer& buffer);
-	virtual void processSyncPulseOut_2(cDataBuffer& buffer);
-	virtual void processMultipurposeIO_2(cDataBuffer& buffer);
-	virtual void processNmea_2(cDataBuffer& buffer);
-	virtual void processTimeInfo_2(cDataBuffer& buffer);
-	virtual void processBeamIntrinsics_2(cDataBuffer& buffer);
-	virtual void processImuIntrinsics_2(cDataBuffer& buffer);
-	virtual void processLidarIntrinsics_2(cDataBuffer& buffer);
-	virtual void processLidarDataFormat_2(cDataBuffer& buffer);
-	virtual void processImuData(cDataBuffer& buffer);
-	virtual void processLidarData(cDataBuffer& buffer);
-	virtual void processLidarDataFrameTimestamp(cDataBuffer& buffer);
+	void processConfigParam_2(cDataBuffer& buffer);
+	void processSensorInfo_2(cDataBuffer& buffer);
+	void processTimestamp_2(cDataBuffer& buffer);
+	void processSyncPulseIn_2(cDataBuffer& buffer);
+	void processSyncPulseOut_2(cDataBuffer& buffer);
+	void processMultipurposeIO_2(cDataBuffer& buffer);
+	void processNmea_2(cDataBuffer& buffer);
+	void processTimeInfo_2(cDataBuffer& buffer);
+	void processBeamIntrinsics_2(cDataBuffer& buffer);
+	void processImuIntrinsics_2(cDataBuffer& buffer);
+	void processLidarIntrinsics_2(cDataBuffer& buffer);
+	void processLidarDataFormat_2(cDataBuffer& buffer);
+	void processImuData(cDataBuffer& buffer);
+	void processLidarData(cDataBuffer& buffer);
+	void processLidarDataFrameTimestamp(cDataBuffer& buffer);
 
 protected:
 	ouster::config_param_2_t		mConfigParams;

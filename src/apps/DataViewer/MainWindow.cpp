@@ -6,6 +6,9 @@
 #include "SsnxModel_file.hpp"
 #include "GPS/SsnxView.hpp"
 
+#include "AxisCommunicationsModel_file.hpp"
+#include "RGB/AxisCommunicationsView.hpp"
+
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
@@ -36,6 +39,12 @@ cMainWindow::~cMainWindow()
 {
     delete mpUI;
     mpUI = nullptr;
+
+    delete mpSsnxModel;
+    delete mpSsnxView;
+
+    delete mpAxisModel;
+    delete mpAxisView;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,7 +76,17 @@ void cMainWindow::initialize()
     QObject::connect(mpSsnxModel, &cSsnxModel_file::updatePVT, mpSsnxView, &cSsnxView::updatePVT);
     QObject::connect(mpSsnxModel, &cSsnxModel_file::updateUTC, mpSsnxView, &cSsnxView::updateUTC);
 
-//    mpSsnxView->show();
+    mpSsnxView->show();
+
+    mpAxisModel = new cAxisCommunicationsModel_file();
+    mpCentralWidget->attach(mpAxisModel);
+
+    mpAxisView = new cAxisCommunicationsView(nullptr);
+    mpAxisView->topLevelChanged(true);
+
+    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::onNewImage, mpAxisView, &cAxisCommunicationsView::imageUpdated);
+
+    mpAxisView->show();
 }
 
 //-----------------------------------------------------------------------------
@@ -96,6 +115,14 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
 {
     QMessageBox msg_box(QMessageBox::Critical, title, msg);
     msg_box.exec();
+}
+
+void cMainWindow::closeEvent(QCloseEvent* event)
+{
+    mpSsnxView->close();
+    mpAxisView->close();
+
+    QWidget::closeEvent(event);
 }
 
 //-----------------------------------------------------------------------------

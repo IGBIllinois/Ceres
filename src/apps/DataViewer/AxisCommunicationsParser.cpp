@@ -78,18 +78,47 @@ void cAxisCommunicationsParser::processFramesPerSecond(cDataBuffer& buffer)
 
 void cAxisCommunicationsParser::processBitmap(cDataBuffer& buffer)
 {
+    QBitmap bitmap;
+    mImageReader.setFormat("bmp");
+
+    uint32_t size;
+    buffer >> size;
+
 }
 
 void cAxisCommunicationsParser::processJPEG(cDataBuffer& buffer)
 {
+    mImageReader.setFormat("jpeg");
 }
 
 void cAxisCommunicationsParser::processMpegFrame(cDataBuffer& buffer)
 {
+    mImageReader.setFormat("jpeg");
+
+    uint32_t size;
+    buffer >> size;
+
+    mImageData.resize(size);
+    buffer.read(mImageData.data(), size);
+
+    mImageBuffer.seek(0);
+    QImage image = mImageReader.read();
+    auto ok = image.isNull();
+
+    onMpegFrame(image);
+
+    mImageData.clear();
+    mImageBuffer.seek(0);
 }
 
 void cAxisCommunicationsParser::processImageSize(cDataBuffer& buffer)
 {
+    sImageSize_t data;
+
+    buffer >> data.width;
+    buffer >> data.height;
+
+    onImageSize(data);
 }
 
 

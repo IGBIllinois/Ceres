@@ -317,6 +317,10 @@ bool cBlockDataFileReader::processBlock()
     {
         parser->second->processData(majorVersion, minorVersion, data_id, mBuffer);
     }
+    else
+    {
+        unknownClassID(classID);
+    }
 
     return !mFile.eof();
 }

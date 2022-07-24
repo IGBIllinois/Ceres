@@ -11,6 +11,11 @@
 
 #include <memory>
 #include <iostream>
+#include <chrono>
+#include <thread>
+
+using namespace std::this_thread;
+using namespace std::chrono;
 
 //-----------------------------------------------------------------------------
 cCentralWidget::cCentralWidget(QWidget* parent) :
@@ -238,6 +243,7 @@ void cCentralWidget::playSourceFile()
     {
         ++n;
         result = mDataFile.updateData();
+        sleep_for(milliseconds(10));
     }
 
     mpPlayButton->setEnabled(false);

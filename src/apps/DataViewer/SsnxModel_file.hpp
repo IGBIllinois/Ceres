@@ -51,5 +51,8 @@ private:
 	double mVertSpeed_mps;
 	double mGroundTrack_deg;
 	gps::eDatum mDatum;
+
+	int numPVT = 0;
+	int numUTC = 0;
 };
 

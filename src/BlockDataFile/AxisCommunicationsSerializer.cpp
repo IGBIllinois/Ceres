@@ -81,7 +81,7 @@ void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& in)
     mImageWriter.write(in.toImage());
 
     mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::JPEG);
+    mBlockID.dataID(DataID::BITMAP);
 
     mDataBuffer.clear();
     mDataBuffer << mImageData.size();

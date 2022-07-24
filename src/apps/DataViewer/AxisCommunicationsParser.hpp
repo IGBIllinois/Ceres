@@ -34,8 +34,8 @@ public:
 	virtual void onActiveCameraId(int id) = 0;
 	virtual void onFramesPerSecond(int frames_per_sec) = 0;
 	virtual void onBitmap(const QBitmap& in) = 0;
-	virtual void onJPEG(const QImage& in) = 0;
-	virtual void onMpegFrame(const QImage& in) = 0;
+	virtual void onJPEG(const QImage& image) = 0;
+	virtual void onMpegFrame(const QImage& image) = 0;
 	virtual void onImageSize(const axis::sImageSize_t& in) = 0;
 
 protected:

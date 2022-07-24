@@ -112,6 +112,8 @@ public:
 
 	bool processBlock();
 
+	virtual void unknownClassID(BLOCK_CLASS_ID_t classID) {};
+
 private:
 	//    FILE* mpFile;
 	std::ifstream mFile;
