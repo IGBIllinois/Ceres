@@ -468,8 +468,8 @@ void cDataBuffer::read(std::string& out)
 	if (mUnderrun)
 		return;
 
-	// Check to make sure we have enough buffer space to put this variable into
-	// our internal storage.
+	// Check to make sure we have enough data in the read size of the buffer
+	// to fulfill the read request.
 	if ((mReadIndex > mWriteIndex) || (read_size() < len))
 	{
 		mUnderrun = true;
@@ -491,8 +491,8 @@ void cDataBuffer::read(std::string& out)
 
 void cDataBuffer::read(std::string& out, uint16_t len)
 {
-	// Check to make sure we have enough buffer space to put this variable into
-	// our internal storage.
+	// Check to make sure we have enough data in the read size of the buffer
+	// to fulfill the read request.
 	if ((mReadIndex >= mWriteIndex) || (read_size() < len))
 	{
 		mUnderrun = true;
@@ -509,15 +509,31 @@ void cDataBuffer::read(std::string& out, uint16_t len)
 
 void cDataBuffer::read(std::byte*& out, uint16_t len)
 {
-	// Check to make sure we have enough buffer space to put this variable into
-	// our internal storage.
+	// Check to make sure we have enough data in the read size of the buffer
+	// to fulfill the read request.
 	if ((mReadIndex >= mWriteIndex) || (read_size() < len))
 	{
 		mUnderrun = true;
 		return;
 	}
 
-	// copy the string from the buffer
+	// copy the byte block from the buffer
+	memcpy(out, reinterpret_cast<char*>(&mpBuffer[mReadIndex]), len);
+
+	mReadIndex += len;
+}
+
+void cDataBuffer::read(char* out, std::size_t len)
+{
+	// Check to make sure we have enough data in the read size of the buffer
+	// to fulfill the read request.
+	if ((mReadIndex >= mWriteIndex) || (read_size() < len))
+	{
+		mUnderrun = true;
+		return;
+	}
+
+	// copy the char block from the buffer
 	memcpy(out, reinterpret_cast<char*>(&mpBuffer[mReadIndex]), len);
 
 	mReadIndex += len;

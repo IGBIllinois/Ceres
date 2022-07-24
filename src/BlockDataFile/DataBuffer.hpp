@@ -249,6 +249,7 @@ public:
     void read(std::string& out);
     void read(std::string& out, uint16_t len);
     void read(std::byte*& out, uint16_t len);
+    void read(char* out, std::size_t len);
 //@}
 
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
