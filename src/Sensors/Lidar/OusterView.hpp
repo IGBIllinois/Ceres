@@ -3,7 +3,7 @@
 
 #include "../../Utilities/ColorGradient.hpp"
 
-#include <ouster/ouster_defs.h>
+//#include <ouster/ouster_defs.h>
 #include <ouster/OusterVizWidget.hpp>
 
 

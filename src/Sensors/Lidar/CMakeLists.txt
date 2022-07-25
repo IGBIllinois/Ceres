@@ -10,10 +10,6 @@ set(LIDAR_SOURCE_FILES
 # Different OUSTER Models based on data source
 #
 
-#	Data file
-    OusterModel_file.hpp
-    OusterModel_file.cpp
-
 #	Network stream from sensor
     OusterCmdStream.hpp
     OusterCmdStream.cpp
