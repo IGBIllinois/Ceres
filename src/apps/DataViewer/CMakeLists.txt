@@ -56,6 +56,8 @@ PRIVATE
     OusterTypes.hpp
     OusterParser.hpp
     OusterParser.cpp
+    OusterModel_file.hpp
+    OusterModel_file.cpp
 	
     SsnxTypes.hpp
     SsnxParser.hpp

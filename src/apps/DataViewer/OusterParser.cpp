@@ -104,6 +104,57 @@ namespace
         buffer >> data.column_window_min;
         buffer >> data.column_window_max;
     }
+
+#ifdef USE_OUSTER_DEFS
+    void to_LidarData_2(cDataBuffer& buffer, cOusterLidarData& data)
+    {
+        uint16_t pixels_per_column = 0;
+        uint16_t columns_per_frame = 0;
+
+        buffer >> pixels_per_column;
+        buffer >> columns_per_frame;
+
+        data.resize(pixels_per_column, columns_per_frame);
+
+        lidar_data_block_t pixel;
+
+        for (uint16_t col = 0; col < columns_per_frame; ++col)
+        {
+            for (uint16_t chn = 0; chn < pixels_per_column; ++chn)
+            {
+                buffer >> pixel.range_mm;
+                buffer >> pixel.intensity;
+                buffer >> pixel.reflectivity;
+                buffer >> pixel.ambient_noise;
+                data.channel(col, chn, pixel);
+            }
+        }
+    }
+#else
+    void to_LidarData_2(cDataBuffer& buffer, lidar_data_frame_t& data)
+    {
+        buffer >> data.pixels_per_column;
+        buffer >> data.columns_per_frame;
+
+        data.channels.resize(data.columns_per_frame);
+
+        for (uint16_t col = 0; col < data.columns_per_frame; ++col)
+        {
+            data.channels[col].pixels.resize(data.pixels_per_column);
+
+            for (uint16_t p = 0; p < data.pixels_per_column; ++p)
+            {
+                auto& pixel = data.channels[col].pixels[p];
+                buffer >> pixel.range_mm;
+                buffer >> pixel.intensity;
+                buffer >> pixel.reflectivity;
+                buffer >> pixel.ambient_noise;
+            }
+        }
+
+
+    }
+#endif
 }
 
 cOusterParser::cOusterParser()
@@ -450,21 +501,6 @@ void cOusterParser::processLidarDataFormat_2(cDataBuffer& buffer)
     onLidarDataFormat_2(data);
 }
 
-void cOusterParser::processLidarDataFormat_2_3(cDataBuffer& buffer)
-{
-    lidar_data_format_2_3_t data;
-
-    to_LidarDataFormat_2(buffer, data);
-
-    buffer >> data.udp_profile_lidar;
-    buffer >> data.udp_profile_imu;
-
-    if (buffer.underrun())
-        throw std::runtime_error("ERROR, Buffer under run in processLidarDataFormat_2_3.");
-
-    onLidarDataFormat_2(data);
-}
-
 void cOusterParser::processImuData(cDataBuffer& buffer)
 {
     imu_data_t data;
@@ -487,32 +523,30 @@ void cOusterParser::processImuData(cDataBuffer& buffer)
     onImuData(data);
 }
 
+#ifdef USE_OUSTER_DEFS
+void cOusterParser::processLidarDataFormat_2_3(cDataBuffer& buffer)
+{
+    lidar_data_format_2_t data;
+
+    to_LidarDataFormat_2(buffer, data);
+
+    buffer >> data.udp_profile_lidar;
+    buffer >> data.udp_profile_imu;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarDataFormat_2_3.");
+
+    onLidarDataFormat_2(data);
+}
+
 void cOusterParser::processLidarData(cDataBuffer& buffer)
 {
-    uint16_t pixels_per_column = 0;
-    uint16_t columns_per_frame = 0;
-
-    buffer >> pixels_per_column;
-    buffer >> columns_per_frame;
-
-    mLidarData.resize(pixels_per_column, columns_per_frame);
-
-    lidar_data_block_t pixel;
-
-    for (uint16_t col = 0; col < columns_per_frame; ++col)
-    {
-        for (uint16_t chn = 0; chn < pixels_per_column; ++chn)
-        {
-            buffer >> pixel.range_mm;
-            buffer >> pixel.intensity;
-            buffer >> pixel.reflectivity;
-            buffer >> pixel.ambient_noise;
-            mLidarData.channel(col, chn, pixel);
-        }
-    }
+    to_LidarData_2(buffer, mLidarData);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processLidarData.");
+
+    onLidarData(mLidarData);
 }
 
 void cOusterParser::processLidarDataFrameTimestamp(cDataBuffer& buffer)
@@ -526,7 +560,59 @@ void cOusterParser::processLidarDataFrameTimestamp(cDataBuffer& buffer)
     mLidarData.frame_id(frame_id);
     mLidarData.timestamp_ns(timestamp_ns);
 
-    processLidarData(buffer);
+    to_LidarData_2(buffer, mLidarData);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarDataFrameTimestamp.");
+
+    onLidarData(mLidarData);
 }
 
+#else
+void cOusterParser::processLidarDataFormat_2_3(cDataBuffer& buffer)
+{
+    lidar_data_format_2_3_t data;
+
+    to_LidarDataFormat_2(buffer, data);
+
+    buffer >> data.udp_profile_lidar;
+    buffer >> data.udp_profile_imu;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarDataFormat_2_3.");
+
+    onLidarDataFormat_2(data);
+}
+
+void cOusterParser::processLidarData(cDataBuffer& buffer)
+{
+    static uint16_t frame_id = 0;
+
+    lidar_data_frame_t data;
+
+    data.frame_id = frame_id++;
+
+    to_LidarData_2(buffer, data);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarData.");
+
+    onLidarData(data);
+}
+
+void cOusterParser::processLidarDataFrameTimestamp(cDataBuffer& buffer)
+{
+    lidar_data_frame_t data;
+
+    buffer >> data.frame_id;
+    buffer >> data.timestamp_ns;
+
+    to_LidarData_2(buffer, data);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarDataFrameTimestamp.");
+
+    onLidarData(data);
+}
+#endif
 

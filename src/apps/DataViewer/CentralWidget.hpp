@@ -8,6 +8,7 @@
 #include "WeatherParser.hpp"
 
 #include <QWidget>
+#include <QTimer>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -42,6 +43,7 @@ private slots:
     void browseSourceFile();
     void loadSourceFile();
     void playSourceFile();
+    void updateFrame();
 
 private:
     bool readHeaderData();
@@ -135,5 +137,7 @@ private:
     QLineEdit* mpWindSpeed_mps = nullptr;
     QLabel* mpWindDirectionLabel = nullptr;
     QLineEdit* mpWindDirection_deg = nullptr;
+
+    QTimer mTimer;
 };
 

@@ -266,14 +266,6 @@ namespace ouster
         std::vector<alert_info_t> log;
     };
 
-    struct lidar_data_block_t
-    {
-        uint32_t range_mm = 0;
-        uint16_t intensity = 0;
-        uint16_t reflectivity = 0;
-        uint16_t ambient_noise = 0;
-    };
-
     struct imu_data_t
     {
         uint64_t	diagnostic_time_ns = 0;
@@ -288,6 +280,31 @@ namespace ouster
         float angular_velocity_Yaxis_deg_per_sec = 0;
         float angular_velocity_Zaxis_deg_per_sec = 0;
     };
+
+    struct lidar_data_block_t
+    {
+        uint32_t range_mm = 0;
+        uint16_t intensity = 0;
+        uint16_t reflectivity = 0;
+        uint16_t ambient_noise = 0;
+    };
+
+    struct lidar_channel_t
+    {
+        std::vector<lidar_data_block_t> pixels;
+    };
+
+    struct lidar_data_frame_t
+    {
+        uint16_t frame_id = 0;
+        uint64_t timestamp_ns = 0;
+
+        uint16_t pixels_per_column = 0;
+        uint16_t columns_per_frame = 0;
+
+        std::vector<lidar_channel_t> channels;
+    };
+
 
 } // End namespace ouster
 

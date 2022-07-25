@@ -4,13 +4,17 @@
  */
 #pragma once
 
+#define USE_OUSTER_DEFS
+
 #include "BlockParser.hpp"
 #include "OusterBlockId.hpp"
-#include "OusterTypes.hpp"
 
-
-// Forward Declarations
-class cOusterLidarData;
+#ifdef USE_OUSTER_DEFS
+	#include <ouster/ouster_defs.h>
+	#include <ouster/OusterLidarData.h>
+#else
+	#include "OusterTypes.hpp"
+#endif
 
 
 class cOusterParser : public cBlockParser
@@ -33,9 +37,14 @@ public:
 	virtual void onImuIntrinsics_2(const ouster::imu_intrinsics_2_t& data) = 0;
 	virtual void onLidarIntrinsics_2(const ouster::lidar_intrinsics_2_t& data) = 0;
 	virtual void onLidarDataFormat_2(const ouster::lidar_data_format_2_t& data) = 0;
-	virtual void onLidarDataFormat_2(const ouster::lidar_data_format_2_3_t& data) = 0;
 	virtual void onImuData(const ouster::imu_data_t& data) = 0;
-//	const cOusterLidarData&			getLidarData() const { return mLidarData; }
+
+#ifdef USE_OUSTER_DEFS
+	virtual void onLidarData(const cOusterLidarData& data) = 0;
+#else
+	virtual void onLidarDataFormat_2(const ouster::lidar_data_format_2_3_t& data) = 0;
+	virtual void onLidarData(const ouster::lidar_data_frame_t& data) = 0;
+#endif
 
 
 protected:
@@ -63,5 +72,11 @@ protected:
 
 private:
 	cOusterLidarID    mBlockID;
+
+#ifdef USE_OUSTER_DEFS
+	cOusterLidarData	mLidarData;
+#else
+	ouster::lidar_data_frame_t mLiderData;
+#endif
 };
 

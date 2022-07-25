@@ -9,6 +9,8 @@
 #include "AxisCommunicationsModel_file.hpp"
 #include "RGB/AxisCommunicationsView.hpp"
 
+#include "Lidar/OusterView.hpp"
+
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>

@@ -21,7 +21,7 @@ class cCentralWidget;
 class cSsnxModel_file;
 class cSsnxView;
 
-class cOusterModel_net;
+class cOusterModel_file;
 class cOusterView;
 
 class cAxisCommunicationsModel_file;
@@ -66,7 +66,8 @@ private:
     cSsnxModel_file* mpSsnxModel = nullptr;
     cSsnxView*       mpSsnxView = nullptr;
 
-    cOusterView* mpOusterView;
+    cOusterModel_file*  mpOusterModel = nullptr;
+    cOusterView*        mpOusterView = nullptr;
 
     cAxisCommunicationsModel_file* mpAxisModel = nullptr;
     cAxisCommunicationsView* mpAxisView = nullptr;

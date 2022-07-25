@@ -11,17 +11,14 @@
 
 #include <memory>
 #include <iostream>
-#include <chrono>
-#include <thread>
 
-using namespace std::this_thread;
-using namespace std::chrono;
 
 //-----------------------------------------------------------------------------
 cCentralWidget::cCentralWidget(QWidget* parent) :
-    QWidget(parent)
+    QWidget(parent), mTimer(this)
 {
     initialize();
+    connect(&mTimer, &QTimer::timeout, this, &cCentralWidget::updateFrame);
 }
 
 //-----------------------------------------------------------------------------
@@ -235,18 +232,18 @@ bool cCentralWidget::readHeaderData()
 //-----------------------------------------------------------------------------
 void cCentralWidget::playSourceFile()
 {
-    std::size_t n = 0;
+    mpPlayButton->setEnabled(false);
+    mTimer.start(100);
+}
 
+
+//-----------------------------------------------------------------------------
+void cCentralWidget::updateFrame()
+{
     auto result = mDataFile.updateData();
 
-    while (result)
-    {
-        ++n;
-        result = mDataFile.updateData();
-        sleep_for(milliseconds(10));
-    }
-
-    mpPlayButton->setEnabled(false);
+    if (!result)
+        mTimer.stop();
 }
 
 //-----------------------------------------------------------------------------
