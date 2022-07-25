@@ -10,9 +10,6 @@
 #include <ouster/ouster_defs.h>
 #include <ouster/OusterLidarData.h>
 
-// Forward Declarations
-class cOusterLidarData;
-
 
 class cOusterParser : public cBlockParser
 {
