@@ -53,6 +53,7 @@ PRIVATE
     AxisCommunicationsModel_file.hpp
     AxisCommunicationsModel_file.cpp
 
+    OusterTypes.hpp
     OusterParser.hpp
     OusterParser.cpp
 	

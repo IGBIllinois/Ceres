@@ -3,9 +3,6 @@
 #include "OusterDataIdentifiers.hpp"
 #include "BlockDataFile.hpp"
 
-#include <ouster/ouster_utils.h>
-#include <ouster/OusterLidarData.h>
-
 #include <stdexcept>
 
 using namespace ouster;
@@ -14,9 +11,26 @@ namespace
 {
     ouster::version_t to_version(cDataBuffer& buffer)
     {
-        std::string s;
-        buffer >> s;
-        return ::to_version(s);
+        std::string str;
+        buffer >> str;
+
+        ouster::version_t version = ouster::invalid_version;
+
+        if (str[0] != 'v')
+            return version;
+        auto first = str.find_first_of('.');
+        version.major = std::stoi(str.substr(1, first));
+        auto next = str.find_first_of('.', first + 1);
+        version.minor = std::stoi(str.substr(first + 1, next));
+        std::size_t pos = 0;
+        std::string s = str.substr(next + 1);
+        version.patch = std::stoi(s, &pos);
+        if (pos < s.length())
+        {
+            version.extra = s.substr(pos);
+        }
+
+        return version;
     }
 
     ouster::eOPERATING_MODE to_operating_mode(cDataBuffer& buffer)
@@ -74,6 +88,22 @@ namespace
         buffer >> status;
         return static_cast<ouster::azimuth_status>(status);
     };
+
+    void to_LidarDataFormat_2(cDataBuffer& buffer, lidar_data_format_2_t& data)
+    {
+        buffer >> data.columns_per_frame;
+        buffer >> data.columns_per_packet;
+
+        uint32_t n = 0;
+        buffer >> n;
+        data.pixel_shift_by_row.resize(n);
+        for (std::size_t i = 0; i < n; ++i)
+            buffer >> data.pixel_shift_by_row[i];
+
+        buffer >> data.pixels_per_column;
+        buffer >> data.column_window_min;
+        buffer >> data.column_window_max;
+    }
 }
 
 cOusterParser::cOusterParser()
@@ -131,7 +161,10 @@ void cOusterParser::processData(BLOCK_MAJOR_VERSION_t major_version,
         processLidarIntrinsics_2(buffer);
         break;
     case DataID::LIDAR_DATA_FORMAT:
-        processLidarDataFormat_2(buffer);
+        if (minor_version == 3)
+            processLidarDataFormat_2_3(buffer);
+        else
+            processLidarDataFormat_2(buffer);
         break;
     case DataID::IMU_DATA:
         processImuData(buffer);
@@ -147,262 +180,311 @@ void cOusterParser::processData(BLOCK_MAJOR_VERSION_t major_version,
 
 void cOusterParser::processConfigParam_2(cDataBuffer& buffer)
 {
-    buffer >> mConfigParams.udp_ip;
-    buffer >> mConfigParams.udp_dest;
-    buffer >> mConfigParams.lidar_port;
-    buffer >> mConfigParams.imu_port;
+    config_param_2_t data;
+    buffer >> data.udp_ip;
+    buffer >> data.udp_dest;
+    buffer >> data.lidar_port;
+    buffer >> data.imu_port;
 
-    mConfigParams.timestamp_mode = to_timestamp_mode(buffer);
-    mConfigParams.sync_pulse_in_polarity = to_polarity(buffer);
-    mConfigParams.nmea_in_polarity = to_polarity(buffer);
+    data.timestamp_mode = to_timestamp_mode(buffer);
+    data.sync_pulse_in_polarity = to_polarity(buffer);
+    data.nmea_in_polarity = to_polarity(buffer);
 
-    buffer >> mConfigParams.nmea_ignore_valid_char;
+    buffer >> data.nmea_ignore_valid_char;
 
-    mConfigParams.nmea_baud_rate = to_nmea_baud_rate(buffer);
+    data.nmea_baud_rate = to_nmea_baud_rate(buffer);
 
-    buffer >> mConfigParams.nmea_leap_seconds;
+    buffer >> data.nmea_leap_seconds;
 
-    mConfigParams.multipurpose_io_mode = to_pin_mode(buffer);
-    mConfigParams.sync_pulse_out_polarity = to_polarity(buffer);
+    data.multipurpose_io_mode = to_pin_mode(buffer);
+    data.sync_pulse_out_polarity = to_polarity(buffer);
 
-    buffer >> mConfigParams.sync_pulse_out_frequency_hz;
-    buffer >> mConfigParams.sync_pulse_out_angle;
-    buffer >> mConfigParams.sync_pulse_out_pulse_width;
-    buffer >> mConfigParams.auto_start_flag;
+    buffer >> data.sync_pulse_out_frequency_hz;
+    buffer >> data.sync_pulse_out_angle;
+    buffer >> data.sync_pulse_out_pulse_width;
+    buffer >> data.auto_start_flag;
 
-    mConfigParams.operating_mode = to_operating_mode(buffer);
-    mConfigParams.lidar_mode = to_lidar_mode(buffer);
+    data.operating_mode = to_operating_mode(buffer);
+    data.lidar_mode = to_lidar_mode(buffer);
 
-    buffer >> mConfigParams.azimuth_window.min_deg;
-    buffer >> mConfigParams.azimuth_window.max_deg;
-    buffer >> mConfigParams.phase_lock_enable;
-    buffer >> mConfigParams.phase_lock_offset_deg;
+    buffer >> data.azimuth_window.min_deg;
+    buffer >> data.azimuth_window.max_deg;
+    buffer >> data.phase_lock_enable;
+    buffer >> data.phase_lock_offset_deg;
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processConfigParam_2.");
+
+    onConfigParam_2(data);
 }
 
 void cOusterParser::processSensorInfo_2(cDataBuffer& buffer)
 {
-    buffer >> mSensorInfo.product_line;
-    buffer >> mSensorInfo.product_part_number;
-    buffer >> mSensorInfo.product_serial_number;
-    buffer >> mSensorInfo.base_part_number;
-    buffer >> mSensorInfo.base_serial_number;
-    buffer >> mSensorInfo.image_rev;
+    sensor_info_2_t data;
 
-    mSensorInfo.build_revision = to_version(buffer);
-    mSensorInfo.proto_revision = to_version(buffer);
+    buffer >> data.product_line;
+    buffer >> data.product_part_number;
+    buffer >> data.product_serial_number;
+    buffer >> data.base_part_number;
+    buffer >> data.base_serial_number;
+    buffer >> data.image_rev;
 
-    buffer >> mSensorInfo.build_date;
+    data.build_revision = to_version(buffer);
+    data.proto_revision = to_version(buffer);
 
-    mSensorInfo.status = to_sensor_status(buffer);
+    buffer >> data.build_date;
+
+    data.status = to_sensor_status(buffer);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processSensorInfo_2.");
+
+    onSensorInfo_2(data);
 }
 
 void cOusterParser::processTimestamp_2(cDataBuffer& buffer)
 {
-    buffer >> mTimestamp.time;
+    timestamp_2_t data;
 
-    mTimestamp.mode = to_timestamp_mode(buffer);
+    buffer >> data.time;
 
-    buffer >> mTimestamp.sync_pulse_in;
-    buffer >> mTimestamp.internal_osc;
-    buffer >> mTimestamp.ptp_1588;
+    data.mode = to_timestamp_mode(buffer);
+
+    buffer >> data.sync_pulse_in;
+    buffer >> data.internal_osc;
+    buffer >> data.ptp_1588;
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processTimestamp_2.");
+
+    onTimestamp_2(data);
 }
 
 void cOusterParser::processSyncPulseIn_2(cDataBuffer& buffer)
 {
-    buffer >> mSyncPulseIn.locked;
-    buffer >> mSyncPulseIn.last_period_nsec;
-    buffer >> mSyncPulseIn.count_unfiltered;
-    buffer >> mSyncPulseIn.count;
+    sync_pulse_in_2_t data;
 
-    mSyncPulseIn.polarity = to_polarity(buffer);
+    buffer >> data.locked;
+    buffer >> data.last_period_nsec;
+    buffer >> data.count_unfiltered;
+    buffer >> data.count;
+
+    data.polarity = to_polarity(buffer);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processSyncPulseIn_2.");
+
+    onSyncPulseIn_2(data);
 }
 
 void cOusterParser::processSyncPulseOut_2(cDataBuffer& buffer)
 {
-    buffer >> mSyncPulseOut.pulse_width_ms;
-    buffer >> mSyncPulseOut.angle_deg;
-    buffer >> mSyncPulseOut.frequency_hz;
+    sync_pulse_out_2_t data;
 
-    mSyncPulseOut.polarity = to_polarity(buffer);
+    buffer >> data.pulse_width_ms;
+    buffer >> data.angle_deg;
+    buffer >> data.frequency_hz;
+
+    data.polarity = to_polarity(buffer);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processSyncPulseOut_2.");
+
+    onSyncPulseOut_2(data);
 }
 
 void cOusterParser::processMultipurposeIO_2(cDataBuffer& buffer)
 {
-    mMultipurposeIo.mode = to_pin_mode(buffer);
+    multipurpose_io_2_t data;
 
-    buffer >> mMultipurposeIo.pulse_width_ms;
-    buffer >> mMultipurposeIo.angle_deg;
-    buffer >> mMultipurposeIo.frequency_hz;
+    data.mode = to_pin_mode(buffer);
 
-    mMultipurposeIo.polarity = to_polarity(buffer);
+    buffer >> data.pulse_width_ms;
+    buffer >> data.angle_deg;
+    buffer >> data.frequency_hz;
+
+    data.polarity = to_polarity(buffer);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processMultipurposeIO_2.");
+
+    onMultipurposeIo_2(data);
 }
 
 void cOusterParser::processNmea_2(cDataBuffer& buffer)
 {
-    buffer >> mNmea.locked;
-    mNmea.baud_rate = to_nmea_baud_rate(buffer);
-    buffer >> mNmea.bit_count;
-    buffer >> mNmea.bit_count_unfiltered;
-    buffer >> mNmea.start_char_count;
-    buffer >> mNmea.char_count;
-    buffer >> mNmea.last_read_message;
-    buffer >> mNmea.date_decoded_count;
-    buffer >> mNmea.not_valid_count;
-    buffer >> mNmea.utc_decoded_count;
-    buffer >> mNmea.leap_seconds;
-    buffer >> mNmea.ignore_valid_char;
-    mNmea.polarity = to_polarity(buffer);
+    nmea_2_t data;
+
+    buffer >> data.locked;
+    data.baud_rate = to_nmea_baud_rate(buffer);
+    buffer >> data.bit_count;
+    buffer >> data.bit_count_unfiltered;
+    buffer >> data.start_char_count;
+    buffer >> data.char_count;
+    buffer >> data.last_read_message;
+    buffer >> data.date_decoded_count;
+    buffer >> data.not_valid_count;
+    buffer >> data.utc_decoded_count;
+    buffer >> data.leap_seconds;
+    buffer >> data.ignore_valid_char;
+    data.polarity = to_polarity(buffer);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processNmea_2.");
+
+    onNmea_2(data);
 }
 
 void cOusterParser::processTimeInfo_2(cDataBuffer& buffer)
 {
+    time_info_2_t data;
+
     /* Timestamp Info */
-    buffer >> mTimeInfo.timestamp_info.time;
-    mTimeInfo.timestamp_info.mode = to_timestamp_mode(buffer);
-    buffer >> mTimeInfo.timestamp_info.sync_pulse_in;
-    buffer >> mTimeInfo.timestamp_info.internal_osc;
-    buffer >> mTimeInfo.timestamp_info.ptp_1588;
+    buffer >> data.timestamp_info.time;
+    data.timestamp_info.mode = to_timestamp_mode(buffer);
+    buffer >> data.timestamp_info.sync_pulse_in;
+    buffer >> data.timestamp_info.internal_osc;
+    buffer >> data.timestamp_info.ptp_1588;
 
     /* Sync Pulse Info */
-    buffer >> mTimeInfo.sync_pulse_info.locked;
-    buffer >> mTimeInfo.sync_pulse_info.last_period_nsec;
-    buffer >> mTimeInfo.sync_pulse_info.count_unfiltered;
-    buffer >> mTimeInfo.sync_pulse_info.count;
-    mTimeInfo.sync_pulse_info.polarity = to_polarity(buffer);
+    buffer >> data.sync_pulse_info.locked;
+    buffer >> data.sync_pulse_info.last_period_nsec;
+    buffer >> data.sync_pulse_info.count_unfiltered;
+    buffer >> data.sync_pulse_info.count;
+    data.sync_pulse_info.polarity = to_polarity(buffer);
 
     /* Multipurpose IO Info */
-    mTimeInfo.multipurpose_io_info.mode = to_pin_mode(buffer);
-    buffer >> mTimeInfo.multipurpose_io_info.pulse_width_ms;
-    buffer >> mTimeInfo.multipurpose_io_info.angle_deg;
-    buffer >> mTimeInfo.multipurpose_io_info.frequency_hz;
-    mTimeInfo.multipurpose_io_info.polarity = to_polarity(buffer);
+    data.multipurpose_io_info.mode = to_pin_mode(buffer);
+    buffer >> data.multipurpose_io_info.pulse_width_ms;
+    buffer >> data.multipurpose_io_info.angle_deg;
+    buffer >> data.multipurpose_io_info.frequency_hz;
+    data.multipurpose_io_info.polarity = to_polarity(buffer);
 
     /* NMEA Info */
-    buffer >> mTimeInfo.nmea_info.locked;
-    mTimeInfo.nmea_info.baud_rate = to_nmea_baud_rate(buffer);
-    buffer >> mTimeInfo.nmea_info.bit_count;
-    buffer >> mTimeInfo.nmea_info.bit_count_unfiltered;
-    buffer >> mTimeInfo.nmea_info.start_char_count;
-    buffer >> mTimeInfo.nmea_info.char_count;
-    buffer >> mTimeInfo.nmea_info.last_read_message;
-    buffer >> mTimeInfo.nmea_info.date_decoded_count;
-    buffer >> mTimeInfo.nmea_info.not_valid_count;
-    buffer >> mTimeInfo.nmea_info.utc_decoded_count;
-    buffer >> mTimeInfo.nmea_info.leap_seconds;
-    buffer >> mTimeInfo.nmea_info.ignore_valid_char;
-    mTimeInfo.nmea_info.polarity = to_polarity(buffer);
+    buffer >> data.nmea_info.locked;
+    data.nmea_info.baud_rate = to_nmea_baud_rate(buffer);
+    buffer >> data.nmea_info.bit_count;
+    buffer >> data.nmea_info.bit_count_unfiltered;
+    buffer >> data.nmea_info.start_char_count;
+    buffer >> data.nmea_info.char_count;
+    buffer >> data.nmea_info.last_read_message;
+    buffer >> data.nmea_info.date_decoded_count;
+    buffer >> data.nmea_info.not_valid_count;
+    buffer >> data.nmea_info.utc_decoded_count;
+    buffer >> data.nmea_info.leap_seconds;
+    buffer >> data.nmea_info.ignore_valid_char;
+    data.nmea_info.polarity = to_polarity(buffer);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processTimeInfo_2.");
+
+    onTimeInfo_2(data);
 }
 
 void cOusterParser::processBeamIntrinsics_2(cDataBuffer& buffer)
 {
-    buffer >> mBeamIntrinsics.lidar_to_beam_origins_mm;
+    beam_intrinsics_2_t data;
+
+    buffer >> data.lidar_to_beam_origins_mm;
 
     uint32_t n = 0;
     buffer >> n;
-    mBeamIntrinsics.azimuth_angles_deg.resize(n);
+    data.azimuth_angles_deg.resize(n);
 
     for (std::size_t i = 0; i < n; ++i)
-        buffer >> mBeamIntrinsics.azimuth_angles_deg[i];
+        buffer >> data.azimuth_angles_deg[i];
 
     n = 0;
     buffer >> n;
-    mBeamIntrinsics.altitude_angles_deg.resize(n);
+    data.altitude_angles_deg.resize(n);
     for (std::size_t i = 0; i < n; ++i)
-        buffer >> mBeamIntrinsics.altitude_angles_deg[i];
+        buffer >> data.altitude_angles_deg[i];
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processBeamIntrinsics_2.");
+
+    onBeamIntrinsics_2(data);
 }
 
 void cOusterParser::processImuIntrinsics_2(cDataBuffer& buffer)
 {
+    imu_intrinsics_2_t data;
+
     uint32_t n = 0;
     buffer >> n;
-    mImuIntrinsics.imu_to_sensor_transform.resize(n);
+    data.imu_to_sensor_transform.resize(n);
     for (std::size_t i = 0; i < n; ++i)
-        buffer >> mImuIntrinsics.imu_to_sensor_transform[i];
+        buffer >> data.imu_to_sensor_transform[i];
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processImuIntrinsics_2.");
+
+    onImuIntrinsics_2(data);
 }
 
 void cOusterParser::processLidarIntrinsics_2(cDataBuffer& buffer)
 {
+    lidar_intrinsics_2_t data;
+
     uint32_t n = 0;
     buffer >> n;
-    mLidarIntrinsics.lidar_to_sensor_transform.resize(n);
+    data.lidar_to_sensor_transform.resize(n);
     for (std::size_t i = 0; i < n; ++i)
-        buffer >> mLidarIntrinsics.lidar_to_sensor_transform[i];
+        buffer >> data.lidar_to_sensor_transform[i];
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processLidarIntrinsics_2.");
+
+    onLidarIntrinsics_2(data);
 }
 
 void cOusterParser::processLidarDataFormat_2(cDataBuffer& buffer)
 {
-    buffer >> mLidarDataFormat.columns_per_frame;
-    buffer >> mLidarDataFormat.columns_per_packet;
+    lidar_data_format_2_t data;
 
-    uint32_t n = 0;
-    buffer >> n;
-    mLidarDataFormat.pixel_shift_by_row.resize(n);
-    for (std::size_t i = 0; i < n; ++i)
-        buffer >> mLidarDataFormat.pixel_shift_by_row[i];
-
-    buffer >> mLidarDataFormat.pixels_per_column;
-    buffer >> mLidarDataFormat.column_window_min;
-    buffer >> mLidarDataFormat.column_window_max;
-
-    if (mBlockID.minorVersion() == 3)
-    {
-        buffer >> mLidarDataFormat.udp_profile_lidar;
-        buffer >> mLidarDataFormat.udp_profile_imu;
-    }
+    to_LidarDataFormat_2(buffer, data);
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processLidarDataFormat_2.");
+
+    onLidarDataFormat_2(data);
+}
+
+void cOusterParser::processLidarDataFormat_2_3(cDataBuffer& buffer)
+{
+    lidar_data_format_2_3_t data;
+
+    to_LidarDataFormat_2(buffer, data);
+
+    buffer >> data.udp_profile_lidar;
+    buffer >> data.udp_profile_imu;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processLidarDataFormat_2_3.");
+
+    onLidarDataFormat_2(data);
 }
 
 void cOusterParser::processImuData(cDataBuffer& buffer)
 {
-    buffer >> mImuData.diagnostic_time_ns;
-    buffer >> mImuData.accelerometer_read_time_ns;
-    buffer >> mImuData.gyroscope_read_time_ns;
+    imu_data_t data;
 
-    buffer >> mImuData.acceleration_Xaxis_g;
-    buffer >> mImuData.acceleration_Yaxis_g;
-    buffer >> mImuData.acceleration_Zaxis_g;
+    buffer >> data.diagnostic_time_ns;
+    buffer >> data.accelerometer_read_time_ns;
+    buffer >> data.gyroscope_read_time_ns;
 
-    buffer >> mImuData.angular_velocity_Xaxis_deg_per_sec;
-    buffer >> mImuData.angular_velocity_Yaxis_deg_per_sec;
-    buffer >> mImuData.angular_velocity_Zaxis_deg_per_sec;
+    buffer >> data.acceleration_Xaxis_g;
+    buffer >> data.acceleration_Yaxis_g;
+    buffer >> data.acceleration_Zaxis_g;
+
+    buffer >> data.angular_velocity_Xaxis_deg_per_sec;
+    buffer >> data.angular_velocity_Yaxis_deg_per_sec;
+    buffer >> data.angular_velocity_Zaxis_deg_per_sec;
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processImuData.");
+
+    onImuData(data);
 }
 
 void cOusterParser::processLidarData(cDataBuffer& buffer)
