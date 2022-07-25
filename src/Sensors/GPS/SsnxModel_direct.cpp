@@ -201,6 +201,49 @@ int cSsnxModel_direct::sendOutgoingData(const std::string& data)
     return 0;
 }
 
+void cSsnxModel_direct::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t& pvt)
+{
+/*
+    pvt.dataValid;
+    pvt.timestamp_s;
+    eSolutionType  Mode;
+    bool		   HeightComputed;
+    uint8_t        Error;
+    double		   X_m;
+    double		   Y_m;
+    double		   Z_m;
+    float          Undulation_m;
+    float          Vx_mps;
+    float          Vy_mps;
+    float          Vz_mps;
+    float          GroundTrack_deg;
+    double		   RxClkBias_ms;
+    float          RxClkDrift_ppm;
+    eTimeSystem    TimeSystem;
+    eDatum         Datum;
+    uint8_t        NrSV;
+    bool		   SatClockCorrectionUsed;
+    bool		   RangeCorrectionUsed;
+    bool		   IonosphericInfoUsed;
+    bool		   OrbitAccuracyInfoUsed;
+    bool		   PrecisionApproachModeActive;
+    uint16_t       ReferenceId;
+    float          MeanCorrAge_s;
+    uint32_t       SignalInfo;
+    uint8_t        AlertFlag;
+
+    // Version 2.1 of this packet
+    std::optional<uint8_t>        NrBases;
+    std::optional<uint16_t>		  AgeOfSeed_s;
+    std::optional<ePPP_LastSeed>  LastSeed;
+
+    // Version 2.2 of this packet
+    std::optional<float>          Latency_s;
+    std::optional<float>          HAccuracy_m;
+    std::optional<float>          VAccuracy_m;
+*/
+
+}
 
 void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
 {
