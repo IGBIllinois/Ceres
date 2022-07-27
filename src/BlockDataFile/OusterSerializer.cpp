@@ -35,7 +35,7 @@ void cOusterSerializer::write(const ouster::config_param_2_t& in)
 	mBlockID.dataID(DataID::CONFIGURATION_INFO);
 
     mDataBuffer.clear();
-    mDataBuffer <<in.udp_ip;
+    mDataBuffer << in.udp_ip;
     mDataBuffer << in.udp_dest;
     mDataBuffer << in.lidar_port;
     mDataBuffer << in.imu_port;

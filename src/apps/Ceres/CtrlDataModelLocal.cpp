@@ -112,6 +112,8 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, const std::st
 
     mSerializer.attach(&mFile);
 
+    mThread.mpController->enableDataRecording(mFile);
+
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->enableDataRecording(mFile);
@@ -133,6 +135,8 @@ void cCtrlDataModelLocal::closeDataFile()
     {
         sensor->disableDataRecording();
     }
+
+    mThread.mpController->disableDataRecording();
 
     mSerializer.endTime(time(nullptr));
     mSerializer.detach();

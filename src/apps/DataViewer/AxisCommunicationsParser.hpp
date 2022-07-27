@@ -36,7 +36,7 @@ public:
 	virtual void onBitmap(const QBitmap& in) = 0;
 	virtual void onJPEG(const QImage& image) = 0;
 	virtual void onMpegFrame(const QImage& image) = 0;
-	virtual void onImageSize(const axis::sImageSize_t& in) = 0;
+	virtual void onImageSize(int width, int height) = 0;
 
 protected:
 	void processData(BLOCK_MAJOR_VERSION_t major_version,

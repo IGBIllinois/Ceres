@@ -194,9 +194,16 @@ void cAxisCamera::replyDataAvailable()
         mNetworkData = mNetworkData.chopped(boundaryPos);
     }
 
-    if ((mpImageBuffer->pos() >= mCurrentImageSize) && (mCurrentImageSize>0))
+    auto buffer_pos = mpImageBuffer->pos();
+    if ((buffer_pos >= mCurrentImageSize) && (mCurrentImageSize>0))
     {
         bufferToImage();
+/*
+        mpImageBuffer->seek(mCurrentImageSize);
+        auto remainder = mpImageBuffer->readAll();
+        auto b1 = remainder.at(0);
+        auto b2 = remainder.at(1);
+*/
     }
 
     if (mNetworkData.contains("--myboundary"))
@@ -238,6 +245,7 @@ void cAxisCamera::bufferToImage()
     mpImageReader->setDevice(mpImageBuffer);
     mpImageBuffer->seek(0);
     ok = mpImageReader->read(mpCurrentImage);
+    auto buffer_pos = mpImageBuffer->pos();
     mpImageBuffer->seek(0);
 
     if (ok)

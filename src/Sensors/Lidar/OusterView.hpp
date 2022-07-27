@@ -3,7 +3,6 @@
 
 #include "../../Utilities/ColorGradient.hpp"
 
-//#include <ouster/ouster_defs.h>
 #include <ouster/OusterVizWidget.hpp>
 
 
@@ -44,12 +43,6 @@ private:
 	void setDockedSize();
 
 private:
-
-/*
-	double mGx;
-	double mGy;
-	double mGz;
-*/
 
 	cColorGradient mColorGradient;
 

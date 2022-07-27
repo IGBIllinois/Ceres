@@ -344,6 +344,20 @@ bool cOusterModel_net::initialize()
 
     emit updateEncoderCount(min, max);
 
+    if (!cOusterImuStream_Qt::determineLocalEndpoint(mDstIpAddress, mImuPort, mUseIpv6))
+    {
+        emit logMessage(logERROR, q_name(), "Could not establish IMU data connection to OUSTER lidar!");
+        setStatus(sensor::eStatus::FAILED);
+         return false;
+    }
+
+    if (!cOusterLidarStream_Qt::determineLocalEndpoint(mDstIpAddress, mImuPort, mUseIpv6))
+    {
+        emit logMessage(logERROR, q_name(), "Could not establish data connection to OUSTER lidar!");
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+    }
+
     return cOusterModel::initialize();
 }
 

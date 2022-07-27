@@ -33,6 +33,7 @@ cOusterView::cOusterView(cOusterModel* pModel, QWidget* parent)
     cOusterVizWidget(),
     mpModel(pModel)
 {
+    assert(pModel);
     setWindowTitle("OUSTER LiDAR");
 }
 

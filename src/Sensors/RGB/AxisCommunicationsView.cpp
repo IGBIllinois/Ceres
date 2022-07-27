@@ -11,7 +11,7 @@
 
 cAxisCommunicationsView::cAxisCommunicationsView(cAxisCommunicationsModel* pModel, QWidget* parent)
 	:
-    cRgbCameraView(),
+    cRgbCameraView(parent),
     mpModel(pModel)
 {
     setWindowTitle("RGB Camera");

@@ -129,6 +129,7 @@ void cCentralWidget::initialize()
     mpWindDirectionLabel = new QLabel("Direction (deg):");
     mpWindDirection_deg = new QLineEdit();
     mpWindDirection_deg->setReadOnly(true);
+    mpWindDirection_deg->setAlignment(Qt::AlignCenter);
 
     QGroupBox* mpWeatherInfo = new QGroupBox("Wind Data");
     auto* windInfoLayout = new QHBoxLayout();
@@ -387,7 +388,16 @@ void cCentralWidget::onWindSpeed_knots(bool valid, double speed_knots)
 void cCentralWidget::onWindDirection_deg(bool valid, double dir_deg)
 {
     if (valid)
-        mpWindDirection_deg->setText(QString::number(dir_deg, 'g', 1));
+    {
+        QString dir = QString::number(static_cast<int>(dir_deg));
+
+        if (dir_deg < 10.0)
+            dir.insert(0, "00");
+        else if (dir_deg < 100.0)
+            dir.insert(0, "0");
+
+        mpWindDirection_deg->setText(dir);
+    }
     else
         mpWindDirection_deg->setText("");
 }

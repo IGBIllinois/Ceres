@@ -9,6 +9,7 @@
 #include "AxisCommunicationsModel_file.hpp"
 #include "RGB/AxisCommunicationsView.hpp"
 
+#include "OusterModel_file.hpp"
 #include "Lidar/OusterView.hpp"
 
 #include <QtWidgets>
@@ -41,12 +42,6 @@ cMainWindow::~cMainWindow()
 {
     delete mpUI;
     mpUI = nullptr;
-
-    delete mpSsnxModel;
-    delete mpSsnxView;
-
-    delete mpAxisModel;
-    delete mpAxisView;
 }
 
 //-----------------------------------------------------------------------------
@@ -69,26 +64,40 @@ void cMainWindow::initialize()
     layout()->setSizeConstraint(QLayout::SetFixedSize);
     onStatusUpdate("");
 
-    mpSsnxModel = new cSsnxModel_file();
+    mpSsnxModel = new cSsnxModel_file(this);
     mpCentralWidget->attach(mpSsnxModel);
 
-    mpSsnxView = new cSsnxView();
+    mpSsnxView = new cSsnxView(this);
     mpSsnxView->topLevelChanged(true);
+    mpSsnxView->setWindowFlag(Qt::Tool);
 
     QObject::connect(mpSsnxModel, &cSsnxModel_file::updatePVT, mpSsnxView, &cSsnxView::updatePVT);
     QObject::connect(mpSsnxModel, &cSsnxModel_file::updateUTC, mpSsnxView, &cSsnxView::updateUTC);
 
-    mpSsnxView->show();
-
-    mpAxisModel = new cAxisCommunicationsModel_file();
+    mpAxisModel = new cAxisCommunicationsModel_file(this);
     mpCentralWidget->attach(mpAxisModel);
 
-    mpAxisView = new cAxisCommunicationsView(nullptr);
+    mpAxisView = new cAxisCommunicationsView(nullptr, this);
     mpAxisView->topLevelChanged(true);
+    mpAxisView->setWindowFlag(Qt::Tool);
 
     QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::onNewImage, mpAxisView, &cAxisCommunicationsView::imageUpdated);
 
-    mpAxisView->show();
+    mpOusterModel = new cOusterModel_file(this);
+    mpCentralWidget->attach(mpOusterModel);
+
+    mpOusterView = new cOusterView(mpOusterModel, this);
+    mpOusterView->topLevelChanged(true);
+    mpOusterView->setWindowFlag(Qt::Tool);
+
+    QObject::connect(mpOusterModel, &cOusterModel::updateBeamIntrinsics, mpOusterView, &cOusterView::beamIntrinsicsChanged);
+    QObject::connect(mpOusterModel, &cOusterModel::updateImuIntrinsics, mpOusterView, &cOusterView::imuIntrinsicsChanged);
+    QObject::connect(mpOusterModel, &cOusterModel::updateLidarIntrinsics, mpOusterView, &cOusterView::lidarIntrinsicsChanged);
+    QObject::connect(mpOusterModel, &cOusterModel::updateDataFormat, mpOusterView, &cOusterView::dataFormatChanged);
+    QObject::connect(mpOusterModel, &cOusterModel::updateAzimuthWindow, mpOusterView, &cOusterView::azimuthWindowChanged);
+    QObject::connect(mpOusterModel, &cOusterModel::updateImuData, mpOusterView, &cOusterView::imuDataChanged);
+    QObject::connect(mpOusterModel, &cOusterModel::updateLidarData, mpOusterView, &cOusterView::displayData);
+    //    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::onNewImage, mpAxisView, &cAxisCommunicationsView::imageUpdated);
 }
 
 //-----------------------------------------------------------------------------
@@ -119,10 +128,29 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
     msg_box.exec();
 }
 
+void cMainWindow::showEvent(QShowEvent* event)
+{
+    QWidget::showEvent(event);
+
+    if (event->type() == QEvent::Show)
+    {
+        QSize frame_size = frameSize();
+        auto p = pos();
+        mpSsnxView->show();
+        mpSsnxView->activateWindow();
+        mpAxisView->show();
+        mpAxisView->activateWindow();
+        mpOusterView->show();
+        mpOusterView->activateWindow();
+
+        activateWindow();
+    }
+}
+
 void cMainWindow::closeEvent(QCloseEvent* event)
 {
-    mpSsnxView->close();
-    mpAxisView->close();
+//    mpSsnxView->close();
+//    mpAxisView->close();
 
     QWidget::closeEvent(event);
 }

@@ -24,14 +24,15 @@ public:
 
     virtual void addSensor(cSensorModel* pSensor) = 0;
 
-    virtual void startDataThread() = 0;
-    virtual void stopDataThread() = 0;
-
 signals:
     void statusMessage(QString msg) const;
     void infoMessage(QString title, QString msg) const;
     void warningMessage(QString title, QString msg) const;
     void errorMessage(QString title, QString msg) const;
+
+public slots:
+    virtual void startDataThread() = 0;
+    virtual void stopDataThread() = 0;
 
 protected slots:
     void onStatusUpdate(QString msg);

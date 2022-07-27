@@ -18,29 +18,9 @@ cOusterImuStream_Qt::~cOusterImuStream_Qt()
     stopCommunications();
 }
 
-bool cOusterImuStream_Qt::startCommunications(std::string_view sensor, uint16_t port, bool use_ipv6)
+bool cOusterImuStream_Qt::determineLocalEndpoint(std::string_view sensor, uint16_t port, bool use_ipv6)
 {
-    if (mpSocket) return true;
-
-    mpSocket = new QUdpSocket();
-
-    return cOusterImuStream::connect_to_sensor(sensor, port, use_ipv6);
-}
-
-void cOusterImuStream_Qt::stopCommunications()
-{
-    if (mpSocket && mpSocket->isOpen())
-    {
-        mpSocket->disconnectFromHost();
-        mpSocket->close();
-    }
-
-    delete mpSocket; mpSocket = nullptr;
-}
-
-bool cOusterImuStream_Qt::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
-{
-    QHostInfo info = QHostInfo::fromName(QString(host.data()));
+    QHostInfo info = QHostInfo::fromName(QString(sensor.data()));
     if (info.error() != QHostInfo::NoError)
     {
         std::cerr << info.errorString().toStdString() << std::endl;
@@ -71,9 +51,70 @@ bool cOusterImuStream_Qt::try_to_connect(std::string_view host, uint16_t port, b
     if (local_endpoint.isNull())
         return false;
 
-    mpSocket->bind(local_endpoint, port);
+    mLocalEndpoint = local_endpoint;
 
     return true;
+
+}
+
+bool cOusterImuStream_Qt::startCommunications(std::string_view sensor, uint16_t port, bool use_ipv6)
+{
+    if (mpSocket) return true;
+
+    mpSocket = new QUdpSocket();
+
+    return cOusterImuStream::connect_to_sensor(sensor, port, use_ipv6);
+}
+
+void cOusterImuStream_Qt::stopCommunications()
+{
+    if (mpSocket && mpSocket->isOpen())
+    {
+        mpSocket->disconnectFromHost();
+        mpSocket->close();
+    }
+
+    delete mpSocket; mpSocket = nullptr;
+}
+
+bool cOusterImuStream_Qt::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
+{
+/*
+    QHostInfo info = QHostInfo::fromName(QString(host.data()));
+    if (info.error() != QHostInfo::NoError)
+    {
+        std::cerr << info.errorString().toStdString() << std::endl;
+        return false;
+    }
+
+    QHostAddress local_endpoint;
+
+    auto endpoints = info.addresses();
+    for (auto& endpoint : endpoints)
+    {
+        if (use_ipv6)
+        {
+            if (QAbstractSocket::IPv6Protocol != endpoint.protocol())
+                continue;
+            local_endpoint = endpoint;
+            break;
+        }
+        else
+        {
+            if (QAbstractSocket::IPv4Protocol != endpoint.protocol())
+                continue;
+            local_endpoint = endpoint;
+            break;
+        }
+    }
+
+    if (local_endpoint.isNull())
+        return false;
+*/
+
+    return mpSocket->bind(mLocalEndpoint, port);
+
+//    return true;
 }
 
 void cOusterImuStream_Qt::clear()

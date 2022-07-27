@@ -17,6 +17,44 @@ cOusterLidarStream_Qt::~cOusterLidarStream_Qt()
     stopCommunications();
 }
 
+bool cOusterLidarStream_Qt::determineLocalEndpoint(std::string_view sensor, uint16_t port, bool use_ipv6)
+{
+    QHostInfo info = QHostInfo::fromName(QString(sensor.data()));
+    if (info.error() != QHostInfo::NoError)
+    {
+        std::cerr << info.errorString().toStdString() << std::endl;
+        return false;
+    }
+
+    QHostAddress local_endpoint;
+
+    auto endpoints = info.addresses();
+    for (auto& endpoint : endpoints)
+    {
+        if (use_ipv6)
+        {
+            if (QAbstractSocket::IPv6Protocol != endpoint.protocol())
+                continue;
+            local_endpoint = endpoint;
+            break;
+        }
+        else
+        {
+            if (QAbstractSocket::IPv4Protocol != endpoint.protocol())
+                continue;
+            local_endpoint = endpoint;
+            break;
+        }
+    }
+
+    if (local_endpoint.isNull())
+        return false;
+
+    mLocalEndpoint = local_endpoint;
+
+    return true;
+}
+
 bool cOusterLidarStream_Qt::startCommunications(std::string_view sensor, uint16_t port, bool use_ipv6)
 {
     if (mpSocket) return true;
@@ -39,6 +77,7 @@ void cOusterLidarStream_Qt::stopCommunications()
 
 bool cOusterLidarStream_Qt::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
 {
+/*
     QHostInfo info = QHostInfo::fromName(QString(host.data()));
     if (info.error() != QHostInfo::NoError)
     {
@@ -69,10 +108,11 @@ bool cOusterLidarStream_Qt::try_to_connect(std::string_view host, uint16_t port,
 
     if (local_endpoint.isNull())
         return false;
+*/
 
-    mpSocket->bind(local_endpoint, port);
+    return mpSocket->bind(mLocalEndpoint, port);
 
-    return true;
+//    return true;
 }
 
 void cOusterLidarStream_Qt::clear()

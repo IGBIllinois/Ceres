@@ -168,6 +168,7 @@ void cWeatherDataModel_Http_Wind::disableDataRecording()
 void cWeatherDataModel_Http_Wind::writeDataHeader()
 {
 	mSerializer.writeConfigInfo(mConfigInfo);
+	mSerializer.writeWindData_mps(mDataValid, mWindSpeed_mps, mWindDirection_deg);
 }
 
 

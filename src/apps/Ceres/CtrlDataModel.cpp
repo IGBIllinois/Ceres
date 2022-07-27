@@ -32,6 +32,12 @@ void cCtrlDataModel::addSensor(cSensorModel* pSensor)
 {
     if (pSensor)
     {
+        if (!pSensor->initialize())
+        {
+            emit statusMessage("Sensor failed initialization!");
+            return;
+        }
+
         pSensor->moveToThread(&mThread);
         mThread.mSensors.push_back(pSensor);
     }

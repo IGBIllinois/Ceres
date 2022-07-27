@@ -15,10 +15,14 @@ cAxisCommunicationsModel_file::~cAxisCommunicationsModel_file()
 }
 
 void cAxisCommunicationsModel_file::onActiveCameraId(int id)
-{}
+{
+    mCameraId = id;
+}
 
 void cAxisCommunicationsModel_file::onFramesPerSecond(int frames_per_sec)
-{}
+{
+    mFramesPerSec = frames_per_sec;
+}
 
 void cAxisCommunicationsModel_file::onBitmap(const QBitmap& in)
 {}
@@ -29,10 +33,13 @@ void cAxisCommunicationsModel_file::onJPEG(const QImage& in)
 void cAxisCommunicationsModel_file::onMpegFrame(const QImage& image)
 {
     mImage = image;
-    onNewImage(mImage);
+    emit onNewImage(mImage);
     ++numImages;
 }
 
-void cAxisCommunicationsModel_file::onImageSize(const axis::sImageSize_t& in)
-{}
+void cAxisCommunicationsModel_file::onImageSize(int width, int height)
+{
+    mImageWidth = width;
+    mImageHeight = height;
+}
 

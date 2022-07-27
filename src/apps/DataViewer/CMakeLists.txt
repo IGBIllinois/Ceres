@@ -94,6 +94,7 @@ target_include_directories(CeresDataViewer PRIVATE ${SENSORS_INCLUDE_DIR})
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)
 
+target_link_libraries(CeresDataViewer PRIVATE Utilities)
 target_link_libraries(CeresDataViewer PRIVATE BlockDataFile)
 target_link_libraries(CeresDataViewer PRIVATE Sensors)
 

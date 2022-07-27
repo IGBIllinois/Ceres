@@ -25,10 +25,14 @@ protected:
 	void onBitmap(const QBitmap& in) override;
 	void onJPEG(const QImage& in) override;
 	void onMpegFrame(const QImage& image) override;
-	void onImageSize(const axis::sImageSize_t& in) override;
+	void onImageSize(int width, int height) override;
 
 private:
 	QImage mImage;
+	int mCameraId = 0;
+	int mFramesPerSec = 0;
+	int mImageWidth = 0;
+	int mImageHeight = 0;
 
 	int numImages = 0;
 };

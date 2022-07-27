@@ -109,16 +109,18 @@ void cAxisCommunicationsParser::processMpegFrame(cDataBuffer& buffer)
 
     mImageData.clear();
     mImageBuffer.seek(0);
+    mImageReader.canRead();
 }
 
 void cAxisCommunicationsParser::processImageSize(cDataBuffer& buffer)
 {
-    sImageSize_t data;
+    uint16_t width = 0;
+    uint16_t height = 0;
 
-    buffer >> data.width;
-    buffer >> data.height;
+    buffer >> width;
+    buffer >> height;
 
-    onImageSize(data);
+    onImageSize(width, height);
 }
 
 

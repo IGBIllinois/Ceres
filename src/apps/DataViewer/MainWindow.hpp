@@ -50,6 +50,7 @@ public slots:
     void onErrorMessage(QString title, QString msg);
 
 protected:
+    void showEvent(QShowEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
 
 private:

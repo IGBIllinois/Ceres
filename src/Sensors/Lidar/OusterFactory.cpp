@@ -52,8 +52,10 @@ sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_vi
     QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterView::lidarIntrinsicsChanged);
     QObject::connect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterView::dataFormatChanged);
     QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterView::azimuthWindowChanged);
-    QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged);
-    QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData);
+//    QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged);
+//    QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData);
+    QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged, Qt::QueuedConnection);
+    QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData, Qt::QueuedConnection);
 
     return sSensorWidgets(pModel, dockWidget);
 }

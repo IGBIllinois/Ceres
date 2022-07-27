@@ -233,7 +233,7 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
     mpSplashScreen = nullptr;
 
-    mpModel->startDataThread();
+    QTimer::singleShot(1000, mpModel, &cDataModel::startDataThread);
 }
 
 //-----------------------------------------------------------------------------
