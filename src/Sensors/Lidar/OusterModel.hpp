@@ -57,7 +57,7 @@ signals:
     void updateDataFormat();
 
     void updateAzimuthWindow();
-    void updateEncoderCount(int min, int max);
+//    void updateEncoderCount(int min, int max);
     void updateImuData();
     void updateLidarData();
 

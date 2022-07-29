@@ -237,7 +237,7 @@ void cSpidercamModel::update()
         mCurrentPosition = pos;
         emit positionChanged(mCurrentPosition);
 
-        if (mRecording)
+        if (mRecording && mSerializer)
         {
             mSerializer.write(mCurrentPosition);
         }

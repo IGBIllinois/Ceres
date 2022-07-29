@@ -18,7 +18,7 @@ bool cCeresDataFile::open(const std::string& file_name)
 }
 
 //-----------------------------------------------------------------------------
-bool cCeresDataFile::is_open()
+bool cCeresDataFile::is_open() const
 {
     return mFileReader.isOpen();
 }
@@ -31,6 +31,25 @@ void cCeresDataFile::close()
     mFileReader.close();
 }
 
+//-----------------------------------------------------------------------------
+bool cCeresDataFile::fail() const
+{
+    return mFileReader.fail();
+}
+
+//-----------------------------------------------------------------------------
+bool cCeresDataFile::good() const
+{
+    return mFileReader.good();
+}
+
+//-----------------------------------------------------------------------------
+bool cCeresDataFile::eof() const
+{
+    return mFileReader.eof();
+}
+
+//-----------------------------------------------------------------------------
 void cCeresDataFile::attach(cBlockParser* pParser)
 {
     mFileReader.attach(pParser);

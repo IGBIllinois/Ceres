@@ -2,7 +2,6 @@
 #include "SsnxGpsStream.hpp"
 
 #include <QtNetwork/QHostInfo>
-#include <iostream>
 
 
 cSsnxGpsStream::cSsnxGpsStream()
@@ -37,7 +36,7 @@ bool cSsnxGpsStream::try_to_connect(std::string_view host, uint16_t port, bool u
     QHostInfo info = QHostInfo::fromName(QString(host.data()));
     if (info.error() != QHostInfo::NoError)
     {
-        std::cerr << info.errorString().toStdString() << std::endl;
+        qCritical() << info.errorString();
         return false;
     }
 

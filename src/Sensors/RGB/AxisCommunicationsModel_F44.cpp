@@ -121,7 +121,6 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 
 void cAxisCommunicationsModel_F44::enableDataRecording(cBlockDataFileWriter& file)
 {
-    saveCount = 0;
     mSerializer.attach(&file);
 }
 
@@ -129,7 +128,6 @@ void cAxisCommunicationsModel_F44::disableDataRecording()
 {
     cAxisCommunicationsModel::disableDataRecording();
     mSerializer.detach();
-    QString msg = QString::number(saveCount);
 }
 
 void cAxisCommunicationsModel_F44::writeDataHeader()
@@ -241,7 +239,6 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
         try
         {
             mSerializer.writeMpegFrame(mCurrentImage);
-            ++saveCount;
         }
         catch (const std::exception& e)
         {

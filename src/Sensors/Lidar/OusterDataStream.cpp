@@ -2,7 +2,6 @@
 #include "OusterDataStream.hpp"
 
 #include <QtNetwork/QHostInfo>
-#include <iostream>
 
 
 cOusterLidarStream_Qt::cOusterLidarStream_Qt(QObject* parent)
@@ -22,7 +21,7 @@ bool cOusterLidarStream_Qt::determineLocalEndpoint(std::string_view sensor, uint
     QHostInfo info = QHostInfo::fromName(QString(sensor.data()));
     if (info.error() != QHostInfo::NoError)
     {
-        std::cerr << info.errorString().toStdString() << std::endl;
+        qCritical() << info.errorString();
         return false;
     }
 
@@ -48,7 +47,15 @@ bool cOusterLidarStream_Qt::determineLocalEndpoint(std::string_view sensor, uint
     }
 
     if (local_endpoint.isNull())
+    {
+        QString msg = "Could not find the local endpoint with: ";
+        msg += QString(sensor.data());
+        msg += ", ";
+        msg += QString::number(port);
+        msg += use_ipv6 ? " IPv6" : " IPv4";
+        qCritical() << msg;
         return false;
+    }
 
     mLocalEndpoint = local_endpoint;
 
@@ -77,42 +84,7 @@ void cOusterLidarStream_Qt::stopCommunications()
 
 bool cOusterLidarStream_Qt::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
 {
-/*
-    QHostInfo info = QHostInfo::fromName(QString(host.data()));
-    if (info.error() != QHostInfo::NoError)
-    {
-        std::cerr << info.errorString().toStdString() << std::endl;
-        return false;
-    }
-
-    QHostAddress local_endpoint;
-
-    auto endpoints = info.addresses();
-    for(auto & endpoint : endpoints)
-    {
-        if (use_ipv6)
-        {
-            if (QAbstractSocket::IPv6Protocol != endpoint.protocol())
-                continue;
-            local_endpoint = endpoint;
-            break;
-        }
-        else
-        {
-            if (QAbstractSocket::IPv4Protocol != endpoint.protocol())
-                continue;
-            local_endpoint = endpoint;
-            break;
-        }
-    }
-
-    if (local_endpoint.isNull())
-        return false;
-*/
-
     return mpSocket->bind(mLocalEndpoint, port);
-
-//    return true;
 }
 
 void cOusterLidarStream_Qt::clear()

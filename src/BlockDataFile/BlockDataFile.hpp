@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <fstream>
 #include <map>
+#include <mutex>
 
 // Forward Declares
 
@@ -80,11 +81,15 @@ public:
     bool isOpen() const;
     void close();
 
-	void writeBlock(const cBlockID& id);
-	void writeBlock(const cBlockID& id, const std::byte* buf, std::size_t len);
+	bool fail() const;
+	bool good() const;
+
+	bool writeBlock(const cBlockID& id);
+	bool writeBlock(const cBlockID& id, const std::byte* buf, std::size_t len);
 
 private:
     std::ofstream mFile;
+	std::mutex mWriteMutex;
 };
 
 
@@ -106,6 +111,10 @@ public:
 	void open(const std::string& filename);
 	bool isOpen() const;
 	void close();
+
+	bool fail() const;
+	bool good() const;
+	bool eof() const;
 
 	void attach(cBlockParser* pParser);
 	cBlockParser* detach(cBlockID id);

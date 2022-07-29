@@ -15,11 +15,14 @@ cCtrlDataModelLocal::cCtrlDataModelLocal(QObject* parent)
     cCtrlDataModel(parent),
     mSerializer(4096)
 {
+    mpHeartbeatTimer = new QTimer(this);
+    connect(mpHeartbeatTimer, &QTimer::timeout, this, &cCtrlDataModelLocal::onHeartbeat);
 }
 
 cCtrlDataModelLocal::~cCtrlDataModelLocal()
 {
     stopDataThread();
+    mpHeartbeatTimer->deleteLater();
 }
 
 void cCtrlDataModelLocal::stopDataThread()
@@ -160,15 +163,20 @@ void cCtrlDataModelLocal::endDataRecording()
         sensor->writeDataFooter();
     }
     mSerializer.writeEndOfFooter();
-
 }
 
 void cCtrlDataModelLocal::dataRecordingStateChange(bool record)
 {
     if (record)
+    {
         mSerializer.startRecordingTimestamp(timestamp_ns());
+        mpHeartbeatTimer->start(1000);
+    }
     else
+    {
         mSerializer.endRecordingTimestamp(timestamp_ns());
+        mpHeartbeatTimer->stop();
+    }
 }
 
 
@@ -209,5 +217,14 @@ void cCtrlDataModelLocal::startExperiment()
     mSerializer.writeEndOfHeader();
 
     mThread.mpController->startExperiment();
+}
+
+/***   Signals handlers   ****/
+void cCtrlDataModelLocal::onHeartbeat()
+{
+    if (mSerializer)
+    {
+        mSerializer.heartbeatTimestamp(timestamp_ns());
+    }
 }
 

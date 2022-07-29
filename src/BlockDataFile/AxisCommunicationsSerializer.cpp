@@ -70,7 +70,7 @@ void cAxisCommunicationsSerializer::writeFramesPerSecond(int frames_per_sec)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& in)
+void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& img)
 {
     assert(mpDataFile);
 
@@ -78,7 +78,7 @@ void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& in)
     mImageBuffer.seek(0);
 
     mImageWriter.setFormat("bmp");
-    mImageWriter.write(in.toImage());
+    mImageWriter.write(img.toImage());
 
     mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::BITMAP);
@@ -98,7 +98,7 @@ void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& in)
     mImageBuffer.seek(0);
 }
 
-void cAxisCommunicationsSerializer::writeJPEG(const QImage& in)
+void cAxisCommunicationsSerializer::writeJPEG(const QImage& img)
 {
     assert(mpDataFile);
 
@@ -106,7 +106,7 @@ void cAxisCommunicationsSerializer::writeJPEG(const QImage& in)
     mImageBuffer.seek(0);
 
     mImageWriter.setFormat("jpeg");
-    if (!mImageWriter.write(in))
+    if (!mImageWriter.write(img))
     {
         throw std::runtime_error(mImageWriter.errorString().toStdString());
     }
@@ -129,7 +129,7 @@ void cAxisCommunicationsSerializer::writeJPEG(const QImage& in)
     mImageBuffer.seek(0);
 }
 
-void cAxisCommunicationsSerializer::writeMpegFrame(const QImage& in)
+void cAxisCommunicationsSerializer::writeMpegFrame(const QImage& img)
 {
     assert(mpDataFile);
 
@@ -137,14 +137,12 @@ void cAxisCommunicationsSerializer::writeMpegFrame(const QImage& in)
     mImageBuffer.seek(0);
 
     mImageWriter.setFormat("jpeg");
-    if (!mImageWriter.write(in))
+    if (!mImageWriter.write(img))
     {
         mImageBuffer.seek(0);
         mImageData.clear();
         throw std::runtime_error(mImageWriter.errorString().toStdString());
     }
-
-    auto n = mImageBuffer.pos();
 
     mBlockID.setVersion(1, 0);
     mBlockID.dataID(DataID::MPEG_FRAME);

@@ -292,6 +292,13 @@ void cRemoteDataModel::onStartExperiment()
     }
     mSerializer.writeEndOfSensorList();
 
+    // Write Data Header
+
+    mSpidercamSerializer.write(mDollyPosition);
+
+    mWeatherSerializer.writeWindData_mps(mWindDataValid,
+        mWindSpeed_mps, mWindDirection_deg);
+
     for (auto& sensor : mThread.mActiveSensors)
     {
         sensor->writeDataHeader();

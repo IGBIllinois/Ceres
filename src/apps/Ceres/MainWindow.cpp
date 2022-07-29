@@ -27,7 +27,6 @@
 
 
 #include <cassert>
-#include <iostream>
 #include <sstream>
 #include <filesystem>
 
@@ -462,6 +461,8 @@ void cMainWindow::experimentStop()
     }
 
     mpModel->terminateExperiment();
+
+    mBatchProcess.clear();
 
     onExperimentCompleted();
 }

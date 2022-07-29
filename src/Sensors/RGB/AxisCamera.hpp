@@ -92,9 +92,6 @@ private:
 
     int mCurrentImageSize;
 
-    quint64 mTimestampInMs;
-    QRegExp mTimestampRegexp;
-
     uint8_t mFramesPerSeconds;
     axis::sImageSize_t mImageSize;
 };

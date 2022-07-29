@@ -5,6 +5,9 @@
 #include "BlockDataFile.hpp"
 #include "ExperimentSerializer.hpp"
 
+#include <QTimer>
+
+
 class cCtrlDataModelLocal : public cCtrlDataModel
 {
     Q_OBJECT
@@ -28,10 +31,19 @@ protected:
 
     void dataRecordingStateChange(bool record) override;
 
+/*
+ * Signals handlers from the timer
+ */
+private slots:
+    void onHeartbeat();
+
+
 private:
     cBlockDataFileWriter    mFile;
     cExperimentSerializer   mSerializer;
 
     QMutex mMutex;
+
+    QTimer* mpHeartbeatTimer = nullptr;
 };
 

@@ -2,7 +2,6 @@
 #include "SsnxModel_file.hpp"
 #include <functional>
 
-#include <iostream>
 
 using namespace ssnx;
 
@@ -14,13 +13,10 @@ cSsnxModel_file::cSsnxModel_file(QObject* parent)
 
 cSsnxModel_file::~cSsnxModel_file()
 {
-	std::cerr << numPVT << numUTC;
 }
 
 void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_1_t& data)
 {
-	++numPVT;
-
 	mTimestamp_s = data.timestamp_s;
 	mLatitude_rad = data.Lat_rad;
 	mLongitude_rad = data.Lon_rad;
@@ -37,8 +33,6 @@ void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_1_t& data)
 
 void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_2_t& data)
 {
-	++numPVT;
-
 	mTimestamp_s = data.timestamp_s;
 	mLatitude_rad = data.Lat_rad;
 	mLongitude_rad = data.Lon_rad;
@@ -55,8 +49,6 @@ void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_2_t& data)
 
 void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_2_1_t& data)
 {
-	++numPVT;
-
 	mTimestamp_s = data.timestamp_s;
 	mLatitude_rad = data.Lat_rad;
 	mLongitude_rad = data.Lon_rad;
@@ -73,8 +65,6 @@ void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_2_1_t& data)
 
 void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_2_2_t& data)
 {
-	++numPVT;
-
 	mTimestamp_s = data.timestamp_s;
 	mLatitude_rad = data.Lat_rad;
 	mLongitude_rad = data.Lon_rad;
@@ -91,8 +81,6 @@ void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_2_2_t& data)
 
 void cSsnxModel_file::onNewData(const ssnx::ReceiverTime_1_t& data)
 {
-	++numUTC;
-
 	emit updateUTC(data.utcHour, data.utcMinute, data.utcSecond,
                     data.utcDay, data.utcMonth, data.utcYear);
 }

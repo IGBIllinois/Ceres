@@ -32,9 +32,9 @@ public:
 
 	void writeActiveCameraId(int in);
 	void writeFramesPerSecond(int frames_per_sec);
-	void writeBitmap(const QBitmap& in);
-	void writeJPEG(const QImage& in);
-	void writeMpegFrame(const QImage& in);
+	void writeBitmap(const QBitmap& img);
+	void writeJPEG(const QImage& img);
+	void writeMpegFrame(const QImage& img);
 
 	void write(const axis::sImageSize_t&  in);
 

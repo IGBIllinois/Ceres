@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <algorithm>
-
+#include <stdexcept>
 
 namespace
 {
@@ -127,8 +127,20 @@ void cBlockDataFileWriter::close()
     mFile.close();
 }
 
-void cBlockDataFileWriter::writeBlock(const cBlockID& id)
+bool cBlockDataFileWriter::fail() const
 {
+    return mFile.fail() || mFile.bad();
+}
+
+bool cBlockDataFileWriter::good() const
+{
+    return mFile.good();
+}
+
+bool cBlockDataFileWriter::writeBlock(const cBlockID& id)
+{
+    std::lock_guard<std::mutex> write_guard(mWriteMutex);
+
     std::uint32_t n = 0;
     mFile.write(reinterpret_cast<const char*>(&n), sizeof(n));
 
@@ -144,15 +156,18 @@ void cBlockDataFileWriter::writeBlock(const cBlockID& id)
 
     uint32_t c = crc(id);
     mFile.write(reinterpret_cast<const char*>(&c), sizeof(c));
+
+    return mFile.good();
 }
 
-void cBlockDataFileWriter::writeBlock(const cBlockID& id, const std::byte* buf, std::size_t len)
+bool cBlockDataFileWriter::writeBlock(const cBlockID& id, const std::byte* buf, std::size_t len)
 {
     if (len == 0)
     {
-        writeBlock(id);
-        return;
+        return writeBlock(id);
     }
+
+    std::lock_guard<std::mutex> write_guard(mWriteMutex);
 
     std::uint32_t n = len;
     mFile.write(reinterpret_cast<const char*>(&n), sizeof(n));
@@ -171,6 +186,8 @@ void cBlockDataFileWriter::writeBlock(const cBlockID& id, const std::byte* buf, 
 
     uint32_t c = crc(id, buf, len);
     mFile.write(reinterpret_cast<const char*>(&c), sizeof(c));
+
+    return mFile.good();
 }
 
 
@@ -233,6 +250,21 @@ void cBlockDataFileReader::close()
     mFile.close();
 }
 
+bool cBlockDataFileReader::fail() const
+{
+    return mFile.fail() || mFile.bad();
+}
+
+bool cBlockDataFileReader::good() const
+{
+    return mFile.good();
+}
+
+bool cBlockDataFileReader::eof() const
+{
+    return mFile.eof();
+}
+
 void cBlockDataFileReader::attach(cBlockParser* pParser)
 {
     if (!pParser) return;
@@ -257,8 +289,21 @@ cBlockParser* cBlockDataFileReader::detach(cBlockID id)
 
 bool cBlockDataFileReader::processBlock()
 {
+    if (mFile.eof())
+        return false;
+
+    if (mFile.fail())
+    {
+        throw std::runtime_error("I/O error: failbit is set.");
+    }
+
     std::uint32_t len = 0;
     mFile.read(reinterpret_cast<char*>(&len), sizeof(len));
+    if (mFile.bad())
+    {
+        throw std::runtime_error("I/O error while reading block length.");
+    }
+
     if (mByteSwapNeeded)
     {
     }
@@ -269,9 +314,29 @@ bool cBlockDataFileReader::processBlock()
     BLOCK_DATA_ID_t data_id = 0;
 
     mFile.read(reinterpret_cast<char*>(&classID), sizeof(classID));;
+    if (mFile.bad())
+    {
+        throw std::runtime_error("I/O error while reading block class ID.");
+    }
+
     mFile.read(reinterpret_cast<char*>(&majorVersion), sizeof(majorVersion));;
+    if (mFile.bad())
+    {
+        throw std::runtime_error("I/O error while reading block major version.");
+    }
+
     mFile.read(reinterpret_cast<char*>(&minorVersion), sizeof(minorVersion));;
+    if (mFile.bad())
+    {
+        throw std::runtime_error("I/O error while reading block minor version.");
+    }
+
     mFile.read(reinterpret_cast<char*>(&data_id), sizeof(data_id));
+    if (mFile.bad())
+    {
+        throw std::runtime_error("I/O error while reading data ID.");
+    }
+
 
     if (mByteSwapNeeded)
     {
@@ -284,10 +349,23 @@ bool cBlockDataFileReader::processBlock()
     {
         uint32_t file_crc = 0;
         mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
+        if (mFile.bad())
+        {
+            throw std::runtime_error("I/O error while reading file CRC.");
+        }
 
         if (file_crc != crc(blockId))
         {
-            return false;
+            std::string msg = "CRC failure: Class ID=";
+            msg += std::to_string(classID);
+            msg += ", Major Version=";
+            msg += std::to_string(majorVersion);
+            msg += ", Minor Version=";
+            msg += std::to_string(minorVersion);
+            msg += ", Data ID=";
+            msg += std::to_string(data_id);
+            msg += ", Data Lenth=0";
+            throw std::runtime_error(msg);
         }
 
         mBuffer.reset();
@@ -301,14 +379,32 @@ bool cBlockDataFileReader::processBlock()
 
         mBuffer.reset();
         mFile.read(reinterpret_cast<char*>(mBuffer.data(len)), len);
+        if (mFile.bad())
+        {
+            throw std::runtime_error("I/O error while reading block data.");
+        }
 
         uint32_t file_crc = 0;
         mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
+        if (mFile.bad())
+        {
+            throw std::runtime_error("I/O error while reading file CRC.");
+        }
 
         uint32_t c = crc(blockId, mBuffer.data(), len);
         if (file_crc != c)
         {
-            return false;
+            std::string msg = "CRC failure: Class ID=";
+            msg += std::to_string(classID);
+            msg += ", Major Version=";
+            msg += std::to_string(majorVersion);
+            msg += ", Minor Version=";
+            msg += std::to_string(minorVersion);
+            msg += ", Data ID=";
+            msg += std::to_string(data_id);
+            msg += ", Data Lenth=";
+            msg += std::to_string(len);
+            throw std::runtime_error(msg);
         }
     }
 

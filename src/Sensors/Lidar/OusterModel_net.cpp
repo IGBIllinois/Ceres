@@ -203,7 +203,7 @@ bool cOusterModel_net::initialize()
 {
     emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
 
-    //mCmdStream.enableLogging();
+    mCmdStream.enableLogging();
 
     std::optional<ouster::sensor_info_2_t> sensorInfo;
     do
@@ -257,6 +257,11 @@ bool cOusterModel_net::initialize()
     } while (!beamIntrinsics.has_value());
 
     mBeamIntrinsics = beamIntrinsics.value();
+    if (mBeamIntrinsics.azimuth_angles_deg.empty())
+    {
+        qCritical() << "Bad mBeamIntrinsics data!";
+        return false;
+    }
     mLidarOriginToBeamOrigin_mm = mBeamIntrinsics.lidar_to_beam_origins_mm;
 
     for (auto azimuth_deg : mBeamIntrinsics.azimuth_angles_deg)
@@ -284,6 +289,11 @@ bool cOusterModel_net::initialize()
     } while (!imuIntrinsics.has_value());
 
     mImuIntrinsics = imuIntrinsics.value();
+    if (mImuIntrinsics.imu_to_sensor_transform.empty())
+    {
+        qCritical() << "Bad mImuIntrinsics data!";
+        return false;
+    }
     emit updateImuIntrinsics();
 
     std::optional<ouster::lidar_intrinsics_2_t> lidarIntrinsics;
@@ -300,6 +310,11 @@ bool cOusterModel_net::initialize()
     } while (!lidarIntrinsics.has_value());
 
     mLidarIntrinsics = lidarIntrinsics.value();
+    if (mLidarIntrinsics.lidar_to_sensor_transform.empty())
+    {
+        qCritical() << "Bad mLidarIntrinsics data!";
+        return false;
+    }
     emit updateLidarIntrinsics();
 
     std::optional<ouster::lidar_data_format_2_t> dataFormat;
@@ -316,6 +331,11 @@ bool cOusterModel_net::initialize()
     } while (!dataFormat.has_value());
 
     mDataFormat = dataFormat.value();
+    if ((mDataFormat.columns_per_frame != 1024) || (mDataFormat.pixels_per_column != 128))
+    {
+        qCritical() << "Bad mDataFormat data!";
+        return false;
+    }
     cOusterLidarStream_Qt::setDataFormat(mDataFormat);
     emit updateDataFormat();
 
@@ -339,16 +359,11 @@ bool cOusterModel_net::initialize()
     mAzimuthWindow = azimuthWindow.value();
     emit updateAzimuthWindow();
 
-    uint32_t min = minEncoderCount();
-    uint32_t max = maxEncoderCount();
-
-    emit updateEncoderCount(min, max);
-
     if (!cOusterImuStream_Qt::determineLocalEndpoint(mDstIpAddress, mImuPort, mUseIpv6))
     {
         emit logMessage(logERROR, q_name(), "Could not establish IMU data connection to OUSTER lidar!");
         setStatus(sensor::eStatus::FAILED);
-         return false;
+        return false;
     }
 
     if (!cOusterLidarStream_Qt::determineLocalEndpoint(mDstIpAddress, mImuPort, mUseIpv6))

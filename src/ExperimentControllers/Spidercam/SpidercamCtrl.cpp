@@ -1,8 +1,6 @@
 
 #include "SpidercamCtrl.hpp"
 
-#include <iostream>
-
 
 cSpidercamController::cSpidercamController(QObject* parent)
     :
@@ -49,7 +47,7 @@ bool cSpidercamController::try_to_connect(std::string_view hostname, uint16_t po
     QHostInfo info = QHostInfo::fromName(QString(hostname.data()));
     if (info.error() != QHostInfo::NoError)
     {
-        std::cerr << info.errorString().toStdString() << std::endl;
+        qCritical() << info.errorString();
         return false;
     }
 
@@ -177,19 +175,19 @@ void cSpidercamController::errorHandler(QAbstractSocket::SocketError socketError
     switch (socketError) 
     {
     case QAbstractSocket::RemoteHostClosedError:
-        std::cerr << "Remote host closed connection!" << std::endl;
+        qCritical() << "Remote host closed connection!";
         break;
     case QAbstractSocket::HostNotFoundError:
-        std::cerr << "The host was not found. Please check the host name and port settings." << std::endl;
+        qCritical() << "The host was not found. Please check the host name and port settings.";
         break;
     case QAbstractSocket::ConnectionRefusedError:
-        std::cerr << "The connection was refused by the peer. ";
-        std::cerr << "Make sure the fortune server is running, ";
-        std::cerr << "and check that the host name and port ";
-        std::cerr << "settings are correct." << std::endl;
+        qCritical() << "The connection was refused by the peer. "
+                    << "Make sure the fortune server is running, "
+                    << "and check that the host name and port "
+                    << "settings are correct.";
         break;
     default:
-        std::cerr << "The following error occurred: " << mpSocket->errorString().toStdString() << std::endl;
+        qCritical() << "The following error occurred: " << mpSocket->errorString();
     }
 
 }

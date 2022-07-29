@@ -1,7 +1,6 @@
 
 #include "AxisCommunicationsModel_file.hpp"
 
-#include <iostream>
 
 cAxisCommunicationsModel_file::cAxisCommunicationsModel_file(QObject* parent)
 :
@@ -10,18 +9,19 @@ cAxisCommunicationsModel_file::cAxisCommunicationsModel_file(QObject* parent)
 }
 
 cAxisCommunicationsModel_file::~cAxisCommunicationsModel_file()
-{
-    std::cerr << numImages;
-}
+{}
 
 void cAxisCommunicationsModel_file::onActiveCameraId(int id)
 {
     mCameraId = id;
+    emit updateActiveCameraId(mCameraId);
+
 }
 
 void cAxisCommunicationsModel_file::onFramesPerSecond(int frames_per_sec)
 {
     mFramesPerSec = frames_per_sec;
+    emit updateFramesRate(mFramesPerSec);
 }
 
 void cAxisCommunicationsModel_file::onBitmap(const QBitmap& in)
@@ -41,5 +41,6 @@ void cAxisCommunicationsModel_file::onImageSize(int width, int height)
 {
     mImageWidth = width;
     mImageHeight = height;
+    emit updateImageSize(mImageWidth, mImageHeight);
 }
 

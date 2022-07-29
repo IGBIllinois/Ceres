@@ -25,7 +25,7 @@ class cOusterModel_file;
 class cOusterView;
 
 class cAxisCommunicationsModel_file;
-class cAxisCommunicationsView;
+class cAxisCommunicationsView_file;
 
 
 namespace Ui 
@@ -71,6 +71,6 @@ private:
     cOusterView*        mpOusterView = nullptr;
 
     cAxisCommunicationsModel_file* mpAxisModel = nullptr;
-    cAxisCommunicationsView* mpAxisView = nullptr;
+    cAxisCommunicationsView_file* mpAxisView = nullptr;
 };
 

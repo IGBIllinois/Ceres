@@ -7,7 +7,7 @@
 #include "GPS/SsnxView.hpp"
 
 #include "AxisCommunicationsModel_file.hpp"
-#include "RGB/AxisCommunicationsView.hpp"
+#include "AxisCommunicationsView_file.hpp"
 
 #include "OusterModel_file.hpp"
 #include "Lidar/OusterView.hpp"
@@ -19,7 +19,6 @@
 
 
 #include <cassert>
-#include <iostream>
 #include <sstream>
 #include <chrono>
 
@@ -77,11 +76,22 @@ void cMainWindow::initialize()
     mpAxisModel = new cAxisCommunicationsModel_file(this);
     mpCentralWidget->attach(mpAxisModel);
 
-    mpAxisView = new cAxisCommunicationsView(nullptr, this);
+    mpAxisView = new cAxisCommunicationsView_file(this);
+    mpAxisView->initialize();
     mpAxisView->topLevelChanged(true);
     mpAxisView->setWindowFlag(Qt::Tool);
 
-    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::onNewImage, mpAxisView, &cAxisCommunicationsView::imageUpdated);
+    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::updateActiveCameraId, 
+                    mpAxisView, &cAxisCommunicationsView_file::activeCameraIdUpdated);
+
+    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::updateFramesRate, 
+                    mpAxisView, &cAxisCommunicationsView_file::framesRateUpdated);
+
+    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::updateImageSize,
+                    mpAxisView, &cAxisCommunicationsView_file::imageSizeUpdated);
+
+    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::onNewImage,
+            mpAxisView, &cAxisCommunicationsView::imageUpdated);
 
     mpOusterModel = new cOusterModel_file(this);
     mpCentralWidget->attach(mpOusterModel);

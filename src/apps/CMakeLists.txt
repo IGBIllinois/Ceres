@@ -65,3 +65,11 @@ add_subdirectory(RemoteClient)
 message("Creating data viewer application...")
 add_subdirectory(DataViewer)
 
+
+#******************************************************************************
+# Data Verificaton
+#******************************************************************************
+
+message("Creating data verification application...")
+add_subdirectory(DataVerification)
+

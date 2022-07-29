@@ -70,7 +70,6 @@ protected slots:
 private:
     QByteArray mImageData;
     QBuffer mImageBuffer;
-    std::size_t saveCount = 0;
 
     cAxisCamera* mpActiveCamera;
 

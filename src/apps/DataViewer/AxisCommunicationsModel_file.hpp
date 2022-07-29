@@ -17,7 +17,10 @@ public:
     virtual ~cAxisCommunicationsModel_file();
 
 signals:
-    void onNewImage(const QImage& image);
+	void updateActiveCameraId(int id);
+	void updateFramesRate(int frames_per_sec);
+	void updateImageSize(int width, int height);
+	void onNewImage(const QImage& image);
 
 protected:
 	void onActiveCameraId(int id) override;

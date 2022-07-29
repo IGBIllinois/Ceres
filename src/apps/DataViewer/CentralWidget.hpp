@@ -139,5 +139,7 @@ private:
     QLineEdit* mpWindDirection_deg = nullptr;
 
     QTimer mTimer;
+
+    std::uint64_t mRecordingStartTime_ns = 0;
 };
 

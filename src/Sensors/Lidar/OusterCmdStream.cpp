@@ -2,7 +2,6 @@
 #include "OusterCmdStream.hpp"
 
 #include <QtNetwork/QHostInfo>
-#include <iostream>
 
 
 cOusterCmdStream_Qt::cOusterCmdStream_Qt(QObject* parent)
@@ -32,7 +31,7 @@ bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t por
     QHostInfo info = QHostInfo::fromName(QString(hostname.data()));
     if (info.error() != QHostInfo::NoError)
     {
-        std::cerr << info.errorString().toStdString() << std::endl;
+        qCritical() << info.errorString();
         return false;
     }
 
@@ -63,6 +62,8 @@ bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t por
     mSocket.connectToHost(remote_endpoint, port);
     mSocket.waitForConnected();
 
+    auto buf_size = mSocket.readBufferSize();
+    qInfo() << "Read Buffer Size: " << buf_size;
 
     return true;
 }
@@ -126,19 +127,19 @@ void cOusterCmdStream_Qt::errorHandler(QAbstractSocket::SocketError socketError)
     switch (socketError) 
     {
     case QAbstractSocket::RemoteHostClosedError:
-        std::cerr << "Remote host closed connection!" << std::endl;
+        qCritical() << "Remote host closed connection!";
         break;
     case QAbstractSocket::HostNotFoundError:
-        std::cerr << "The host was not found. Please check the host name and port settings." << std::endl;
+        qCritical() << "The host was not found. Please check the host name and port settings.";
         break;
     case QAbstractSocket::ConnectionRefusedError:
-        std::cerr << "The connection was refused by the peer. ";
-        std::cerr << "Make sure the fortune server is running, ";
-        std::cerr << "and check that the host name and port ";
-        std::cerr << "settings are correct." << std::endl;
+        qCritical() << "The connection was refused by the peer. "
+                    << "Make sure the fortune server is running, "
+                    << "and check that the host name and port "
+                    << "settings are correct.";
         break;
     default:
-        std::cerr << "The following error occurred: " << mSocket.errorString().toStdString() << std::endl;
+        qCritical() << "The following error occurred: " << mSocket.errorString();
     }
 
 }

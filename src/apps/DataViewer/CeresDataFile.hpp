@@ -15,8 +15,12 @@ public:
     ~cCeresDataFile();
 
     bool open(const std::string& file_name);
-    bool is_open();
+    bool is_open() const;
     void close();
+
+    bool fail() const;
+    bool good() const;
+    bool eof() const;
 
     void attach(cBlockParser* pParser);
     cBlockParser* detach(const cBlockParser* pParser);

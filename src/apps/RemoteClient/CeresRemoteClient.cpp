@@ -2,47 +2,61 @@
 
 #include <QApplication>
 
-#include "../common/CeresSplashScreen.hpp"
 #include "RemoteClientWindow.hpp"
 
 #include <fstream>
+#include <string>
+#include <chrono>
 
 static std::ofstream logFile;
+static std::chrono::time_point<std::chrono::system_clock> startTime;
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
+    std::chrono::time_point<std::chrono::system_clock> logTime = std::chrono::system_clock::now();
+    std::chrono::duration<double> timestamp = logTime - startTime;
     QByteArray localMsg = msg.toLocal8Bit();
-    const char* file = context.file ? context.file : "";
-    const char* function = context.function ? context.function : "";
-    switch (type) {
+    switch (type) 
+    {
     case QtDebugMsg:
-        logFile << "Debug: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        logFile << timestamp.count() << ", ";
+        logFile << "Debug: " << localMsg.constData();
         break;
     case QtInfoMsg:
-        logFile << "Info: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        logFile << timestamp.count() << ", ";
+        logFile << "Info: " << localMsg.constData();
         break;
     case QtWarningMsg:
-        logFile << "Warning: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        logFile << timestamp.count() << ", ";
+        logFile << "Warning: " << localMsg.constData();
         break;
     case QtCriticalMsg:
-        logFile << "Critical: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        logFile << timestamp.count() << ", ";
+        logFile << "Critical: " << localMsg.constData();
         break;
     case QtFatalMsg:
-        logFile << "Fatal: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        logFile << timestamp.count() << ", ";
+        logFile << "Fatal: " << localMsg.constData();
         break;
+    default:
+        return;
     }
+    if (context.file)
+    {
+        logFile << " (" << context.file << ":" << context.line;
+        logFile << ", " << context.function << ")";
+
+    } 
+    logFile << std::endl;
 }
 
 
 int main(int argc, char** argv)
 {
     logFile.open("CeresRemoteClient.log", std::ios::app);
-    logFile << "=========== Ceres Remote Client Started ===========";
+    logFile << "=========== Ceres Remote Client Started ===========" << std::endl;
+    startTime = std::chrono::system_clock::now();
+
 
     qInstallMessageHandler(myMessageOutput);
 
@@ -50,18 +64,10 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
 
     cCeresSplashScreen* pSplash = nullptr;
-//    cCeresSplashScreen* pSplash = new cCeresSplashScreen();
-//    pSplash->show();
 
     cRemoteClientWindow mainWin;
     mainWin.initialize(pSplash);
     mainWin.show();
-//    mainWin.startDataAcquitionSystem();
-
-//    pSplash->finish(&mainWin);
-
-    delete pSplash; 
-    pSplash = nullptr;
 
     return app.exec();
 }

@@ -10,7 +10,6 @@
 #include <QPushButton>
 
 #include <memory>
-#include <iostream>
 
 
 //-----------------------------------------------------------------------------
@@ -234,17 +233,33 @@ bool cCentralWidget::readHeaderData()
 void cCentralWidget::playSourceFile()
 {
     mpPlayButton->setEnabled(false);
-    mTimer.start(100);
+    mTimer.start(10);
 }
-
 
 //-----------------------------------------------------------------------------
 void cCentralWidget::updateFrame()
 {
-    auto result = mDataFile.updateData();
+    try
+    {
+        auto result = mDataFile.updateData();
 
-    if (!result)
-        mTimer.stop();
+        if (!result)
+        {
+            mTimer.stop();
+        }
+    }
+    catch (const std::runtime_error& e)
+    {
+        if (mDataFile.eof())
+        {
+            mTimer.stop();
+        }
+        else
+        {
+            QString msg = e.what();
+            emit statusMessage(msg);
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -305,15 +320,24 @@ void cCentralWidget::onStartTime(sExperimentTime_t start_time)
 */
     QString date = QString::number(start_time.month);
     date += "/";
+    if (start_time.day < 10)
+        date += "0";
     date += QString::number(start_time.day);
     date += "/";
     date += QString::number(start_time.year);
     mpStartDate->setText(date);
 
-    QString time = QString::number(start_time.hour);
+    QString time;
+    if (start_time.hour < 10)
+        time += "0";
+    time += QString::number(start_time.hour);
     time += ":";
+    if (start_time.minutes < 10)
+        time += "0";
     time += QString::number(start_time.minutes);
     time += ":";
+    if (start_time.seconds < 10)
+        time += "0";
     time += QString::number(start_time.seconds);
     mpStartTime->setText(time);
 }
@@ -322,27 +346,52 @@ void cCentralWidget::onEndTime(sExperimentTime_t end_time)
 {
     QString date = QString::number(end_time.month);
     date += "/";
+    if (end_time.day < 10)
+        date += "0";
     date += QString::number(end_time.day);
     date += "/";
     date += QString::number(end_time.year);
     mpEndDate->setText(date);
 
-    QString time = QString::number(end_time.hour);
+    QString time;
+    if (end_time.hour < 10)
+        time += "0";
+    time += QString::number(end_time.hour);
     time += ":";
+    if (end_time.minutes < 10)
+        time += "0";
     time += QString::number(end_time.minutes);
     time += ":";
+    if (end_time.seconds < 10)
+        time += "0";
     time += QString::number(end_time.seconds);
     mpEndTime->setText(time);
 }
 
 void cCentralWidget::onStartRecordingTimestamp(uint64_t timestamp)
-{}
+{
+    mRecordingStartTime_ns = timestamp;
+}
 
 void cCentralWidget::onEndRecordingTimestamp(uint64_t timestamp)
-{}
+{
+    std::uint64_t diffTime_ns = timestamp - mRecordingStartTime_ns;
+    double diffTime_sec = static_cast<double>(diffTime_ns) / 1000000000.0;
+
+    QString msg = "Total recording time: ";
+    msg += QString::number(diffTime_sec);
+    emit statusMessage(msg);
+}
 
 void cCentralWidget::onHeartbeatTimestamp(uint64_t timestamp)
-{}
+{
+    std::uint64_t diffTime_ns = timestamp - mRecordingStartTime_ns;
+    double diffTime_sec = static_cast<double>(diffTime_ns) / 1000000000.0;
+
+    QString msg = "Record time: ";
+    msg += QString::number(diffTime_sec);
+    emit statusMessage(msg);
+}
 
 void cCentralWidget::onBeginSensorList()
 {}
@@ -355,7 +404,7 @@ void cCentralWidget::onSensorBlockInfo(unsigned int class_id, const std::string&
 
 void cCentralWidget::onUnknownDataID(BLOCK_DATA_ID_t data_id)
 {
-    std::cerr << data_id << "\n";
+    qWarning() << data_id;
 }
 
 //-----------------------------------------------------------------------------

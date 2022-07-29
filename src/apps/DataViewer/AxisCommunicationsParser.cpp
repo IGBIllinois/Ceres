@@ -93,15 +93,19 @@ void cAxisCommunicationsParser::processJPEG(cDataBuffer& buffer)
 
 void cAxisCommunicationsParser::processMpegFrame(cDataBuffer& buffer)
 {
+    mImageReader.setDevice(&mImageBuffer);
     mImageReader.setFormat("jpeg");
 
     uint32_t size;
     buffer >> size;
 
-    mImageData.resize(size);
+    mImageData.resize(size+16);
     buffer.read(mImageData.data(), size);
 
     mImageBuffer.seek(0);
+
+    auto can_read = mImageReader.canRead();
+
     QImage image = mImageReader.read();
     auto ok = image.isNull();
 
@@ -109,7 +113,6 @@ void cAxisCommunicationsParser::processMpegFrame(cDataBuffer& buffer)
 
     mImageData.clear();
     mImageBuffer.seek(0);
-    mImageReader.canRead();
 }
 
 void cAxisCommunicationsParser::processImageSize(cDataBuffer& buffer)
