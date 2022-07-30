@@ -15,7 +15,8 @@ PRIVATE
 # Base Headers for the serializing/parsing block data files
 #
 
-	BlockDataFile.hpp
+	BlockDataFileExceptions.hpp
+    BlockDataFile.hpp
 	BlockId.hpp
 	ClassIdentifiers.hpp
     DataBuffer.hpp
