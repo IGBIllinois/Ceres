@@ -1,11 +1,14 @@
 
 #include "BlockDataFile.hpp"
 #include "BlockId.hpp"
+#include "BlockDataFileExceptions.hpp"
 
 #include <cstddef>
 #include <cstdint>
 #include <algorithm>
-#include <stdexcept>
+#include <cerrno>
+#include <cstring>
+
 
 namespace
 {
@@ -129,7 +132,12 @@ void cBlockDataFileWriter::close()
 
 bool cBlockDataFileWriter::fail() const
 {
-    return mFile.fail() || mFile.bad();
+    return mFile.fail();
+}
+
+bool cBlockDataFileWriter::bad() const
+{
+    return mFile.bad();
 }
 
 bool cBlockDataFileWriter::good() const
@@ -215,13 +223,18 @@ cBlockDataFileReader::~cBlockDataFileReader()
 }
 
 
-void cBlockDataFileReader::open(const std::string& filename)
+bool cBlockDataFileReader::open(const std::string& filename)
 {
     mFile.open(filename, std::ios_base::binary);
     if (mFile.is_open())
     {
         unsigned char header[BLOCK_FILE_HEADER_SIZE] = { 0 };
         mFile.read(reinterpret_cast<char*>(header), BLOCK_FILE_HEADER_SIZE);
+        if (mFile.bad() || mFile.fail())
+        {
+            mFile.close();
+            return false;
+        }
 
         bool result = std::equal(std::begin(header), std::end(header),
             std::begin(BLOCK_FILE_HEADER), std::end(BLOCK_FILE_HEADER));
@@ -229,15 +242,26 @@ void cBlockDataFileReader::open(const std::string& filename)
         if (!result)
         {
             mFile.close();
-            return;
+            return false;
         }
 
         uint16_t bom = 0;
         mFile.read(reinterpret_cast<char*>(&bom), sizeof(bom));
+        if (mFile.bad() || mFile.fail())
+        {
+            mFile.close();
+            return false;
+        }
 
         const uint16_t BLOCK_FILE_BOM_SWAP = 0xAA55;
         mByteSwapNeeded = bom == BLOCK_FILE_BOM_SWAP;
     }
+    else
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool cBlockDataFileReader::isOpen() const
@@ -252,7 +276,12 @@ void cBlockDataFileReader::close()
 
 bool cBlockDataFileReader::fail() const
 {
-    return mFile.fail() || mFile.bad();
+    return mFile.fail();
+}
+
+bool cBlockDataFileReader::bad() const
+{
+    return mFile.bad();
 }
 
 bool cBlockDataFileReader::good() const
@@ -294,14 +323,14 @@ bool cBlockDataFileReader::processBlock()
 
     if (mFile.fail())
     {
-        throw std::runtime_error("I/O error: failbit is set.");
+        throw bdf::formatting_error("I/O error while processing block.");
     }
 
     std::uint32_t len = 0;
     mFile.read(reinterpret_cast<char*>(&len), sizeof(len));
     if (mFile.bad())
     {
-        throw std::runtime_error("I/O error while reading block length.");
+        throw bdf::stream_error(errno, std::strerror(errno));
     }
 
     if (mByteSwapNeeded)
@@ -365,7 +394,7 @@ bool cBlockDataFileReader::processBlock()
             msg += ", Data ID=";
             msg += std::to_string(data_id);
             msg += ", Data Lenth=0";
-            throw std::runtime_error(msg);
+            throw bdf::crc_error(classID, majorVersion, minorVersion, data_id, msg);
         }
 
         mBuffer.reset();
@@ -404,7 +433,7 @@ bool cBlockDataFileReader::processBlock()
             msg += std::to_string(data_id);
             msg += ", Data Lenth=";
             msg += std::to_string(len);
-            throw std::runtime_error(msg);
+            throw bdf::crc_error(classID, majorVersion, minorVersion, data_id, msg);
         }
     }
 

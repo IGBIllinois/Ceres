@@ -82,6 +82,7 @@ public:
     void close();
 
 	bool fail() const;
+	bool bad() const;
 	bool good() const;
 
 	bool writeBlock(const cBlockID& id);
@@ -108,11 +109,12 @@ public:
 
 	~cBlockDataFileReader();
 
-	void open(const std::string& filename);
+	bool open(const std::string& filename);
 	bool isOpen() const;
 	void close();
 
 	bool fail() const;
+	bool bad() const;
 	bool good() const;
 	bool eof() const;
 
