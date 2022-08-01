@@ -101,7 +101,12 @@ cBlockDataFileWriter::cBlockDataFileWriter()
 cBlockDataFileWriter::cBlockDataFileWriter(const std::string& filename)
     : cBlockDataFileWriter()
 {
-    open(filename);
+    if (!open(filename))
+    {
+        std::string msg = "Failed to open file: ";
+        msg += filename;
+        throw bdf::io_error(msg);
+    }
 }
 
 cBlockDataFileWriter::~cBlockDataFileWriter()
@@ -110,14 +115,31 @@ cBlockDataFileWriter::~cBlockDataFileWriter()
 }
 
 
-void cBlockDataFileWriter::open(const std::string& filename)
+bool cBlockDataFileWriter::open(const std::string& filename)
 {
     mFile.open(filename, std::ios_base::binary | std::ios_base::trunc);
-    if (mFile.is_open())
+    if (mFile.good() && mFile.is_open())
     {
         mFile.write(reinterpret_cast<const char*>(BLOCK_FILE_HEADER), sizeof(BLOCK_FILE_HEADER));
+        if (!mFile.good())
+        {
+            mFile.close();
+            return false;
+        }
+
         mFile.write(reinterpret_cast<const char*>(&BLOCK_FILE_BOM), sizeof(BLOCK_FILE_BOM));
+        if (!mFile.good())
+        {
+            mFile.close();
+            return false;
+        }
     }
+    else
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool cBlockDataFileWriter::isOpen() const
