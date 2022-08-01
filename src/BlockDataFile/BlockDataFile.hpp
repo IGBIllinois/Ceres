@@ -77,7 +77,7 @@ public:
 
 	~cBlockDataFileWriter();
 
-    void open(const std::string& filename);
+    bool open(const std::string& filename);
     bool isOpen() const;
     void close();
 
