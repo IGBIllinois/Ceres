@@ -21,7 +21,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
 {
     mpUI->setupUi(this);
 
-    setWindowTitle(tr("Ceres Data Verification"));
+    setWindowTitle(tr("Ceres Data Repair Tool"));
 
     setUnifiedTitleAndToolBarOnMac(true);
 }

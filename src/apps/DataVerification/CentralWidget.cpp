@@ -22,28 +22,33 @@ cCentralWidget::cCentralWidget(QWidget* parent) :
     QWidget(parent)
 {
     initialize();
-
-//    mpVerifier = new cDataVerifier();
-//    connect(mpVerifier, &cDataVerifier::fileResults, this, &cCentralWidget::fileResultsUpdated);
 }
 
 //-----------------------------------------------------------------------------
 cCentralWidget::~cCentralWidget()
 {
-//    mpVerifier->deleteLater();
 }
 
 //-----------------------------------------------------------------------------
 void cCentralWidget::initialize()
 {
-    mpLoadSrcFile = new QLineEdit();
-    mpLoadSrcFile->setReadOnly(true);
-    mpLoadSrcFile->setMinimumWidth(500);
+    mpLoadSrcPath = new QLineEdit();
+    mpLoadSrcPath->setReadOnly(true);
+    mpLoadSrcPath->setMinimumWidth(500);
 
     mpLoadSrcButton = new QPushButton(this);
     mpLoadSrcButton->setText("Browse");
     mpLoadSrcButton->setEnabled(true);
     connect(mpLoadSrcButton, &QPushButton::pressed, this, &cCentralWidget::browseSourceFile);
+
+    mpFailedPath = new QLineEdit();
+    mpFailedPath->setReadOnly(true);
+    mpFailedPath->setMinimumWidth(500);
+
+    mpScanButton = new QPushButton(this);
+    mpScanButton->setText("Scan");
+    mpScanButton->setEnabled(false);
+    connect(mpScanButton, &QPushButton::pressed, this, &cCentralWidget::scanDataFiles);
 
     mpScanResults = new QListWidget(this);
     mpScanResults->setSelectionMode(QAbstractItemView::NoSelection);
@@ -51,7 +56,6 @@ void cCentralWidget::initialize()
     // Layout the dialog...
 
     QVBoxLayout* pMainLayout = new QVBoxLayout();
-//    pMainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
     auto* srcLayout = new QHBoxLayout();
 
@@ -60,11 +64,24 @@ void cCentralWidget::initialize()
 
     srcLayout->addWidget(pSourceLabel);
     srcLayout->addSpacing(24);
-    srcLayout->addWidget(mpLoadSrcFile);
+    srcLayout->addWidget(mpLoadSrcPath);
     srcLayout->addSpacing(3);
     srcLayout->addWidget(mpLoadSrcButton);
 
     pMainLayout->addLayout(srcLayout, 1);
+
+    auto* failedLayout = new QHBoxLayout();
+
+    QLabel* pFailedLabel = new QLabel();
+    pFailedLabel->setText("Failed Directory:");
+
+    failedLayout->addWidget(pFailedLabel);
+    failedLayout->addSpacing(29);
+    failedLayout->addWidget(mpFailedPath);
+
+    pMainLayout->addLayout(failedLayout, 1);
+
+    pMainLayout->addWidget(mpScanButton, 1);
     pMainLayout->addWidget(mpScanResults, 1);
 
     setLayout(pMainLayout);
@@ -89,19 +106,26 @@ void cCentralWidget::browseSourceFile()
     if (path.isEmpty())
         return;
 
-    mpLoadSrcFile->setText(path);
-    mpLoadSrcButton->setEnabled(false);
+    mCurrentDataDirectory = path;
+
+    mpLoadSrcPath->setText(path);
+
+    path += "/failed";
+    mpFailedPath->setText(path);
+
+    mpScanButton->setEnabled(true);
 
     mpScanResults->clear();
-
-    emit scanForDataFiles(path);
 }
 
-void cCentralWidget::scanForDataFiles(const QString& path)
+void cCentralWidget::scanDataFiles()
 {
+    mpLoadSrcButton->setEnabled(false);
+    mpScanButton->setEnabled(false);
+
     mFilesToTest.clear();
 
-    QDir dir(path);
+    QDir dir(mCurrentDataDirectory);
 
     auto files = dir.entryInfoList(QDir::Files);
     for (auto file : files)
@@ -121,12 +145,18 @@ void cCentralWidget::scanForDataFiles(const QString& path)
 
         return;
     }
+    QDir failed(mCurrentDataDirectory + "/failed");
+    if (!failed.exists())
+    {
+
+    }
 
     mCurrentFileName = mFilesToTest.front();
     mFilesToTest.pop_front();
 
-    cDataVerifier* pVerifier = new cDataVerifier();
+    cDataVerifier* pVerifier = new cDataVerifier(mCurrentDataDirectory);
     connect(pVerifier, &cDataVerifier::fileResults, this, &cCentralWidget::fileResultsUpdated);
+    connect(pVerifier, &cDataVerifier::statusMessage, this, &cCentralWidget::statusMessage);
 
     pVerifier->open(mCurrentFileName.toStdString());
 
@@ -173,7 +203,7 @@ void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
     mCurrentFileName = mFilesToTest.front();
     mFilesToTest.pop_front();
 
-    cDataVerifier* pVerifier = new cDataVerifier();
+    cDataVerifier* pVerifier = new cDataVerifier(mCurrentDataDirectory);
     connect(pVerifier, &cDataVerifier::fileResults, this, &cCentralWidget::fileResultsUpdated);
 
     pVerifier->open(mCurrentFileName.toStdString());

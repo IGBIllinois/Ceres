@@ -73,3 +73,11 @@ add_subdirectory(DataViewer)
 message("Creating data verification application...")
 add_subdirectory(DataVerification)
 
+
+#******************************************************************************
+# Data Repair
+#******************************************************************************
+
+message("Creating data repair application...")
+add_subdirectory(DataRepair)
+

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "DataVerifier.hpp"
+#include "DataRepair.hpp"
 
 #include <QWidget>
 #include <QTimer>
@@ -36,18 +36,19 @@ signals:
 
 private slots:
     void browseSourceFile();
-    void scanDataFiles();
+    void repairDataFiles();
     void fileResultsUpdated(bool valid, QString msg);
 
 private:
-    QLineEdit*   mpLoadSrcPath = nullptr;
-    QPushButton* mpLoadSrcButton = nullptr;
-    QLineEdit*   mpFailedPath = nullptr;
-    QPushButton* mpScanButton = nullptr;
-    QListWidget* mpScanResults = nullptr;
+    QLineEdit*   mpLoadFailedPath = nullptr;
+    QPushButton* mpLoadFailedButton = nullptr;
+    QLineEdit*   mpRepairPath = nullptr;
+    QPushButton* mpRepairButton = nullptr;
+    QListWidget* mpRepairResults = nullptr;
 
+    QStringList mFilesToRepair;
     QString     mCurrentDataDirectory;
-    QStringList mFilesToTest;
+    QString     mRepairedDataDirectory;
     QString     mCurrentFileName;
 };
 

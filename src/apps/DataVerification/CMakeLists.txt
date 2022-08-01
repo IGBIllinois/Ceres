@@ -48,6 +48,13 @@ PRIVATE
     ${UI_RESOURCES}
     ${platform_resource_files}
 
+	OusterTypes.hpp
+	OusterParser.hpp
+	OusterParser.cpp
+	AxisCommunicationsParser.hpp
+	AxisCommunicationsParser.cpp
+	ParserExceptions.hpp
+
 	DataVerifier.hpp
 	DataVerifier.cpp
 	
