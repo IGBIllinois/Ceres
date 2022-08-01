@@ -330,7 +330,9 @@ bool cBlockDataFileReader::processBlock()
     mFile.read(reinterpret_cast<char*>(&len), sizeof(len));
     if (mFile.bad())
     {
-        throw bdf::stream_error(errno, std::strerror(errno));
+        std::string msg = "I/O error while reading block length: ";
+        msg += std::strerror(errno);
+        throw bdf::stream_error(errno, msg);
     }
 
     if (mByteSwapNeeded)
@@ -345,25 +347,33 @@ bool cBlockDataFileReader::processBlock()
     mFile.read(reinterpret_cast<char*>(&classID), sizeof(classID));;
     if (mFile.bad())
     {
-        throw std::runtime_error("I/O error while reading block class ID.");
+        std::string msg = "I/O error while reading class id: ";
+        msg += std::strerror(errno);
+        throw bdf::stream_error(errno, msg);
     }
 
     mFile.read(reinterpret_cast<char*>(&majorVersion), sizeof(majorVersion));;
     if (mFile.bad())
     {
-        throw std::runtime_error("I/O error while reading block major version.");
+        std::string msg = "I/O error while reading major version: ";
+        msg += std::strerror(errno);
+        throw bdf::stream_error(errno, msg);
     }
 
     mFile.read(reinterpret_cast<char*>(&minorVersion), sizeof(minorVersion));;
     if (mFile.bad())
     {
-        throw std::runtime_error("I/O error while reading block minor version.");
+        std::string msg = "I/O error while reading minor version: ";
+        msg += std::strerror(errno);
+        throw bdf::stream_error(errno, msg);
     }
 
     mFile.read(reinterpret_cast<char*>(&data_id), sizeof(data_id));
     if (mFile.bad())
     {
-        throw std::runtime_error("I/O error while reading data ID.");
+        std::string msg = "I/O error while reading data id: ";
+        msg += std::strerror(errno);
+        throw bdf::stream_error(errno, msg);
     }
 
 
@@ -380,7 +390,9 @@ bool cBlockDataFileReader::processBlock()
         mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
         if (mFile.bad())
         {
-            throw std::runtime_error("I/O error while reading file CRC.");
+            std::string msg = "I/O error while reading file CRC: ";
+            msg += std::strerror(errno);
+            throw bdf::stream_error(errno, msg);
         }
 
         if (file_crc != crc(blockId))
@@ -410,14 +422,18 @@ bool cBlockDataFileReader::processBlock()
         mFile.read(reinterpret_cast<char*>(mBuffer.data(len)), len);
         if (mFile.bad())
         {
-            throw std::runtime_error("I/O error while reading block data.");
+            std::string msg = "I/O error while reading block data: ";
+            msg += std::strerror(errno);
+            throw bdf::stream_error(errno, msg);
         }
 
         uint32_t file_crc = 0;
         mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
         if (mFile.bad())
         {
-            throw std::runtime_error("I/O error while reading file CRC.");
+            std::string msg = "I/O error while reading file CRC: ";
+            msg += std::strerror(errno);
+            throw bdf::stream_error(errno, msg);
         }
 
         uint32_t c = crc(blockId, mBuffer.data(), len);
