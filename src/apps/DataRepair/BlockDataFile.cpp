@@ -659,13 +659,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
     }
     case ClassIDs::SSNX:
     {
-        if (blockID.majorVersion() != 1)
-            return eBlockStatus::BAD_MAJOR_VERSION;
-
-        if (blockID.minorVersion() != 0)
-            return eBlockStatus::BAD_MINOR_VERSION;
-
-        break;
+        return checkSsnxBlock(blockID, len);
     }
     case ClassIDs::HYSPEX:
     {
@@ -1322,6 +1316,13 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkSpidercamBlock(con
 
     return eBlockStatus::OK;
 }
+
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkSsnxBlock(const cBlockID blockID, uint32_t len)
+{
+    Fix this !
+    return eBlockStatus::OK;
+}
+
 
 cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkWeatherBlock(const cBlockID blockID, uint32_t len)
 {

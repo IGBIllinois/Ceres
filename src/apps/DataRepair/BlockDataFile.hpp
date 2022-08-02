@@ -149,6 +149,7 @@ private:
 	eBlockStatus checkAxisCommunicationBlock(const cBlockID blockID, uint32_t len);
 	eBlockStatus checkOusterLidarBlock(const cBlockID blockID, uint32_t len);
 	eBlockStatus checkSpidercamBlock(const cBlockID blockID, uint32_t len);
+	eBlockStatus checkSsnxBlock(const cBlockID blockID, uint32_t len);
 	eBlockStatus checkWeatherBlock(const cBlockID blockID, uint32_t len);
 
 private:
