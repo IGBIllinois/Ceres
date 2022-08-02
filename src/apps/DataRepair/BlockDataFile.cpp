@@ -3,6 +3,9 @@
 #include "BlockId.hpp"
 #include "BlockDataFileExceptions.hpp"
 #include "../BlockDataFile/ClassIdentifiers.hpp"
+#include "../BlockDataFile/ExperimentDataIdentifiers.hpp"
+#include "../BlockDataFile/AxisDataIdentifiers.hpp"
+#include "../BlockDataFile/SpidercamDataIdentifiers.hpp"
 #include "../BlockDataFile/OusterDataIdentifiers.hpp"
 #include "../BlockDataFile/WeatherDataIdentifiers.hpp"
 
@@ -339,6 +342,10 @@ bool cBlockDataFileReader::processBlock()
         msg += std::strerror(errno);
         throw bdf::stream_error(errno, msg);
     }
+    if (mFile.fail())
+    {
+        throw bdf::formatting_error("I/O error while processing block.");
+    }
 
     if (mByteSwapNeeded)
     {
@@ -358,6 +365,10 @@ bool cBlockDataFileReader::processBlock()
         msg += std::strerror(errno);
         throw bdf::stream_error(errno, msg);
     }
+    if (mFile.fail())
+    {
+        throw bdf::formatting_error("I/O error while processing block.");
+    }
 
     mStartOfMajorVersion = mFile.tellg();
 
@@ -367,6 +378,10 @@ bool cBlockDataFileReader::processBlock()
         std::string msg = "I/O error while reading major version: ";
         msg += std::strerror(errno);
         throw bdf::stream_error(errno, msg);
+    }
+    if (mFile.fail())
+    {
+        throw bdf::formatting_error("I/O error while processing block.");
     }
 
     mStartOfMinorVersion = mFile.tellg();
@@ -378,6 +393,10 @@ bool cBlockDataFileReader::processBlock()
         msg += std::strerror(errno);
         throw bdf::stream_error(errno, msg);
     }
+    if (mFile.fail())
+    {
+        throw bdf::formatting_error("I/O error while processing block.");
+    }
 
     mStartOfDataID = mFile.tellg();
     mFile.read(reinterpret_cast<char*>(&data_id), sizeof(data_id));
@@ -386,6 +405,10 @@ bool cBlockDataFileReader::processBlock()
         std::string msg = "I/O error while reading data id: ";
         msg += std::strerror(errno);
         throw bdf::stream_error(errno, msg);
+    }
+    if (mFile.fail())
+    {
+        throw bdf::formatting_error("I/O error while processing block.");
     }
 
 
@@ -399,78 +422,56 @@ bool cBlockDataFileReader::processBlock()
     if (len == 0)
     {
         mStartOfCRC = mFile.tellg();
-        uint32_t file_crc = 0;
-        mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
-        if (mFile.bad())
+        uint32_t file_crc = readCRC();
+        uint32_t crc = ::crc(blockId);
+        if (file_crc != crc)
         {
-            std::string msg = "I/O error while reading file CRC: ";
-            msg += std::strerror(errno);
-            throw bdf::stream_error(errno, msg);
-        }
-
-        if (file_crc != crc(blockId))
-        {
-            if (!tryToFixBlockId(blockId))
+            if (tryToFixBlockId(blockId))
             {
-                std::string msg = "CRC failure: Class ID=";
-                msg += std::to_string(classID);
-                msg += ", Major Version=";
-                msg += std::to_string(majorVersion);
-                msg += ", Minor Version=";
-                msg += std::to_string(minorVersion);
-                msg += ", Data ID=";
-                msg += std::to_string(data_id);
-                msg += ", Data Lenth=0";
-                throw bdf::crc_error(classID, majorVersion, minorVersion, data_id, msg);
+                return !mFile.eof();
             }
+
+            std::string msg = "CRC failure: Class ID=";
+            msg += std::to_string(classID);
+            msg += ", Major Version=";
+            msg += std::to_string(majorVersion);
+            msg += ", Minor Version=";
+            msg += std::to_string(minorVersion);
+            msg += ", Data ID=";
+            msg += std::to_string(data_id);
+            msg += ", Data Lenth=0";
+            throw bdf::crc_error(classID, majorVersion, minorVersion, data_id, msg);
         }
 
         mBuffer.reset();
     }
     else
     {
-        if (mBuffer.capacity() < len)
-        {
-            mBuffer.capacity(len);
-        }
-
-        mBuffer.reset();
-        mStartOfData = mFile.tellg();
-        mFile.read(reinterpret_cast<char*>(mBuffer.data(len)), len);
-        if (mFile.bad())
-        {
-            std::string msg = "I/O error while reading block data: ";
-            msg += std::strerror(errno);
-            throw bdf::stream_error(errno, msg);
-        }
+        mStartOfPayload = mFile.tellg();
+        readPayload(len, mBuffer);
 
         mStartOfCRC = mFile.tellg();
-        uint32_t file_crc = 0;
-        mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
-        if (mFile.bad())
-        {
-            std::string msg = "I/O error while reading file CRC: ";
-            msg += std::strerror(errno);
-            throw bdf::stream_error(errno, msg);
-        }
+        uint32_t file_crc = readCRC();
 
-        uint32_t c = crc(blockId, mBuffer.data(), len);
-        if (file_crc != c)
+        uint32_t crc = ::crc(blockId, mBuffer.data(), len);
+        if (file_crc != crc)
         {
             if (tryToFixBlock(blockId, mBuffer, len))
             {
-                std::string msg = "CRC failure: Class ID=";
-                msg += std::to_string(classID);
-                msg += ", Major Version=";
-                msg += std::to_string(majorVersion);
-                msg += ", Minor Version=";
-                msg += std::to_string(minorVersion);
-                msg += ", Data ID=";
-                msg += std::to_string(data_id);
-                msg += ", Data Lenth=";
-                msg += std::to_string(len);
-                throw bdf::crc_error(classID, majorVersion, minorVersion, data_id, msg);
+                return !mFile.eof();
             }
+
+            std::string msg = "CRC failure: Class ID=";
+            msg += std::to_string(classID);
+            msg += ", Major Version=";
+            msg += std::to_string(majorVersion);
+            msg += ", Minor Version=";
+            msg += std::to_string(minorVersion);
+            msg += ", Data ID=";
+            msg += std::to_string(data_id);
+            msg += ", Data Lenth=";
+            msg += std::to_string(len);
+            throw bdf::crc_error(classID, majorVersion, minorVersion, data_id, msg);
         }
     }
 
@@ -486,25 +487,82 @@ bool cBlockDataFileReader::processBlock()
     return !mFile.eof();
 }
 
+void cBlockDataFileReader::readPayload(uint32_t len, cDataBuffer& buffer)
+{
+    if (buffer.capacity() < len)
+    {
+        buffer.capacity(len);
+    }
+
+    buffer.reset();
+    mFile.read(reinterpret_cast<char*>(buffer.data(len)), len);
+    if (mFile.bad())
+    {
+        std::string msg = "I/O error while reading block data: ";
+        msg += std::strerror(errno);
+        throw bdf::stream_error(errno, msg);
+    }
+    if (mFile.fail())
+    {
+        throw bdf::formatting_error("I/O error while processing block.");
+    }
+}
+
+uint32_t cBlockDataFileReader::readCRC()
+{
+    uint32_t file_crc = 0;
+    mFile.read(reinterpret_cast<char*>(&file_crc), sizeof(file_crc));
+    if (mFile.bad())
+    {
+        std::string msg = "I/O error while reading file CRC: ";
+        msg += std::strerror(errno);
+        throw bdf::stream_error(errno, msg);
+    }
+    if (mFile.fail())
+    {
+        throw bdf::formatting_error("I/O error while processing block.");
+    }
+
+    return file_crc;
+}
+
 bool cBlockDataFileReader::tryToFixBlockId(const cBlockID blockID)
 {
-    switch (checkBlockId(blockID))
+    auto result = checkBlockId(blockID, 0);
+    if (result != eBlockStatus::OK)
     {
-    case eBlockStatus::OK:
-    default:
-        break;
+        return fixAtBlockId(blockID, 0, result);
     }
-//    mFile.seekg(mStartOfBlock);
+    
+    uint32_t testLen = 0;
+    BLOCK_CLASS_ID_t classID = 0;
+    BLOCK_MAJOR_VERSION_t majorVer = 0;
+    BLOCK_MINOR_VERSION_t minorVer = 0;
+    BLOCK_DATA_ID_t dataID = 0;
+
+    mFile.seekg(mStartOfCRC);
+    mFile.read(reinterpret_cast<char*>(&testLen), sizeof(testLen));
+    mFile.read(reinterpret_cast<char*>(&classID), sizeof(classID));
+    mFile.read(reinterpret_cast<char*>(&majorVer), sizeof(majorVer));
+    mFile.read(reinterpret_cast<char*>(&minorVer), sizeof(minorVer));
+    mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+
+    cBlockID testID(static_cast<ClassIDs>(classID), majorVer, minorVer);
+    testID.dataID(dataID);
+    if (eBlockStatus::OK == checkBlockId(testID, testLen))
+    {
+        return fixAtCRC(blockID, testID, testLen);
+    }
+
     return false;
 }
 
 bool cBlockDataFileReader::tryToFixBlock(const cBlockID blockID, const cDataBuffer buffer, const uint32_t len)
 {
-    switch (checkBlockId(blockID))
+    auto result = checkBlockId(blockID, len);
+    if (result != eBlockStatus::OK)
     {
-    case eBlockStatus::OK:
-    default:
-        break;
+        return fixAtBlockId(blockID, len, result);
     }
 
     uint32_t testLen = 0;
@@ -517,27 +575,37 @@ bool cBlockDataFileReader::tryToFixBlock(const cBlockID blockID, const cDataBuff
     std::size_t i = 0;
     for (; i < n; ++i)
     {
-        if (i > 4)
-        {
-            testLen = *(reinterpret_cast<const uint32_t*>(buffer.data(i-4)));
-        }
-        classID = *(reinterpret_cast<const BLOCK_CLASS_ID_t*>(buffer.data(i)));
-        majorVer = *(reinterpret_cast<const BLOCK_MAJOR_VERSION_t*>(buffer.data(i+2)));
-        minorVer = *(reinterpret_cast<const BLOCK_MINOR_VERSION_t*>(buffer.data(i+3)));
-        dataID = *(reinterpret_cast<const BLOCK_DATA_ID_t*>(buffer.data(i+4)));
+        testLen = *(reinterpret_cast<const uint32_t*>(buffer.data(i)));
+        classID = *(reinterpret_cast<const BLOCK_CLASS_ID_t*>(buffer.data(i+4)));
+        majorVer = *(reinterpret_cast<const BLOCK_MAJOR_VERSION_t*>(buffer.data(i+6)));
+        minorVer = *(reinterpret_cast<const BLOCK_MINOR_VERSION_t*>(buffer.data(i+7)));
+        dataID = *(reinterpret_cast<const BLOCK_DATA_ID_t*>(buffer.data(i+8)));
         cBlockID testID(static_cast<ClassIDs>(classID), majorVer, minorVer);
         testID.dataID(dataID);
         if (eBlockStatus::OK == checkBlockId(testID, testLen))
         {
-            break;
+            return fixAtDataBuffer();
         }
+    }
+
+    mFile.seekg(mStartOfCRC);
+    mFile.read(reinterpret_cast<char*>(&testLen), sizeof(testLen));
+    mFile.read(reinterpret_cast<char*>(&classID), sizeof(classID));
+    mFile.read(reinterpret_cast<char*>(&majorVer), sizeof(majorVer));
+    mFile.read(reinterpret_cast<char*>(&minorVer), sizeof(minorVer));
+    mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+
+    cBlockID testID(static_cast<ClassIDs>(classID), majorVer, minorVer);
+    testID.dataID(dataID);
+    if (eBlockStatus::OK == checkBlockId(testID, testLen))
+    {
+        return fixAtCRC(blockID, buffer, len, testID, testLen);
     }
 
     return false;
 }
 
-
-cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlockID blockID, uint32_t testLen)
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlockID blockID, uint32_t len)
 {
     switch (static_cast<ClassIDs>(blockID.classID()))
     {
@@ -549,7 +617,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
         if (blockID.minorVersion() != 0)
             return eBlockStatus::BAD_MINOR_VERSION;
 
-        break;
+        return checkExperimentBlock(blockID, len);
     }
     case ClassIDs::PVT:
     {
@@ -569,17 +637,11 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
         if (blockID.minorVersion() != 0)
             return eBlockStatus::BAD_MINOR_VERSION;
 
-        break;
+        return checkSpidercamBlock(blockID, len);
     }
     case ClassIDs::OUSTER:
     {
-        if (blockID.majorVersion() != 1)
-            return eBlockStatus::BAD_MAJOR_VERSION;
-
-        if (blockID.minorVersion() != 0)
-            return eBlockStatus::BAD_MINOR_VERSION;
-
-        break;
+        return eBlockStatus::BAD_CLASS_ID;
     }
     case ClassIDs::OUSTER_LIDAR:
     {
@@ -589,41 +651,11 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
         if (blockID.minorVersion() != 3)
             return eBlockStatus::BAD_MINOR_VERSION;
 
-        auto dataId = static_cast<ouster::DataID>(blockID.dataID());
-
-        switch (dataId)
-        {
-        case ouster::DataID::CONFIGURATION_INFO:
-        case ouster::DataID::BEAM_INTRINSICS:
-        case ouster::DataID::IMU_INTRINSICS:
-        case ouster::DataID::IMU_DATA:
-        case ouster::DataID::LIDAR_DATA:
-        case ouster::DataID::LIDAR_DATA_FORMAT:
-        case ouster::DataID::LIDAR_DATA_FRAME_TIMESTAMP:
-        case ouster::DataID::LIDAR_INTRINSICS:
-        case ouster::DataID::MULTIPURPOSE_IO:
-        case ouster::DataID::NMEA:
-        case ouster::DataID::SENSOR_INFO:
-        case ouster::DataID::SYNC_PULSE_IN:
-        case ouster::DataID::SYNC_PULSE_OUT:
-        case ouster::DataID::TIMESTAMP:
-        case ouster::DataID::TIME_INFO:
-            break;
-        default:
-            return eBlockStatus::BAD_DATA_ID;
-        }
-
-        break;
+        return checkOusterLidarBlock(blockID, len);
     }
     case ClassIDs::SEPTENTRIO:
     {
-        if (blockID.majorVersion() != 1)
-            return eBlockStatus::BAD_MAJOR_VERSION;
-
-        if (blockID.minorVersion() != 0)
-            return eBlockStatus::BAD_MINOR_VERSION;
-
-        break;
+        return eBlockStatus::BAD_CLASS_ID;
     }
     case ClassIDs::SSNX:
     {
@@ -637,43 +669,19 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
     }
     case ClassIDs::HYSPEX:
     {
-        if (blockID.majorVersion() != 1)
-            return eBlockStatus::BAD_MAJOR_VERSION;
-
-        if (blockID.minorVersion() != 0)
-            return eBlockStatus::BAD_MINOR_VERSION;
-
-        break;
+        return eBlockStatus::BAD_CLASS_ID;
     }
     case ClassIDs::HYSPEX_SWIR_384:
     {
-        if (blockID.majorVersion() != 1)
-            return eBlockStatus::BAD_MAJOR_VERSION;
-
-        if (blockID.minorVersion() != 0)
-            return eBlockStatus::BAD_MINOR_VERSION;
-
-        break;
+        return eBlockStatus::BAD_CLASS_ID;
     }
     case ClassIDs::HYSPEX_VNIR_3000N:
     {
-        if (blockID.majorVersion() != 1)
-            return eBlockStatus::BAD_MAJOR_VERSION;
-
-        if (blockID.minorVersion() != 0)
-            return eBlockStatus::BAD_MINOR_VERSION;
-
-        break;
+        return eBlockStatus::BAD_CLASS_ID;
     }
     case ClassIDs::AXIS_COMMUNICATIONS:
     {
-        if (blockID.majorVersion() != 1)
-            return eBlockStatus::BAD_MAJOR_VERSION;
-
-        if (blockID.minorVersion() != 0)
-            return eBlockStatus::BAD_MINOR_VERSION;
-
-        break;
+        return eBlockStatus::BAD_CLASS_ID;
     }
     case ClassIDs::AXIS_COMMUNICATIONS_CAMERA:
     {
@@ -683,7 +691,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
         if (blockID.minorVersion() != 0)
             return eBlockStatus::BAD_MINOR_VERSION;
 
-        break;
+        return checkAxisCommunicationBlock(blockID, len);
     }
     case ClassIDs::WEATHER:
     {
@@ -693,26 +701,652 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
         if (blockID.minorVersion() != 0)
             return eBlockStatus::BAD_MINOR_VERSION;
 
-        auto dataId = static_cast<weather::DataID>(blockID.dataID());
-
-        switch (dataId)
-        {
-        case weather::DataID::CONFIGURATION_INFO:
-        case weather::DataID::WIND_DATA_VALID:
-        case weather::DataID::WIND_SPEED_MPS:
-        case weather::DataID::WIND_SPEED_KNOTS:
-        case weather::DataID::WIND_DIRECTION_DEG:
-            break;
-
-        default:
-            return eBlockStatus::BAD_DATA_ID;
-        }
-
-        break;
+        return checkWeatherBlock(blockID, len);
     }
     default:
         return eBlockStatus::BAD_CLASS_ID;
     };
+
+    return eBlockStatus::OK;
+}
+
+bool cBlockDataFileReader::fixAtBlockId(const cBlockID originalBlockID, uint32_t originalLen, eBlockStatus blockStatus)
+{
+    std::ifstream::pos_type mStartPos = 0;
+    std::ifstream::pos_type mEndPos = 0;
+    switch (blockStatus)
+    {
+    case eBlockStatus::BAD_CLASS_ID:
+        mEndPos = mStartPos = mStartOfClassID;
+        mEndPos += 6;
+        break;
+    case eBlockStatus::BAD_MAJOR_VERSION:
+        mEndPos = mStartPos = mStartOfMajorVersion;
+        mEndPos += 4;
+        break;
+    case eBlockStatus::BAD_MINOR_VERSION:
+        mEndPos = mStartPos = mStartOfMinorVersion;
+        mEndPos += 3;
+        break;
+    case eBlockStatus::BAD_DATA_ID:
+        mEndPos = mStartPos = mStartOfDataID;
+        mEndPos += 2;
+        break;
+    case eBlockStatus::BAD_PAYLOAD:
+        mEndPos = mStartPos = mStartOfPayload;
+        break;
+    default:
+        return false;
+    }
+
+    uint32_t insertedLen = 0;
+    BLOCK_CLASS_ID_t classID = 0;
+    BLOCK_MAJOR_VERSION_t majorVer = 0;
+    BLOCK_MINOR_VERSION_t minorVer = 0;
+    BLOCK_DATA_ID_t dataID = 0;
+    cBlockID insertedBlockID;
+    uint32_t insertedCRC = 0;
+
+    do
+    {
+        mFile.seekg(mStartPos);
+        mFile.read(reinterpret_cast<char*>(&insertedLen), sizeof(insertedLen));
+        mFile.read(reinterpret_cast<char*>(&classID), sizeof(classID));
+        mFile.read(reinterpret_cast<char*>(&majorVer), sizeof(majorVer));
+        mFile.read(reinterpret_cast<char*>(&minorVer), sizeof(minorVer));
+        mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+
+        insertedBlockID.classID(static_cast<ClassIDs>(classID));
+        insertedBlockID.setVersion(majorVer, minorVer);
+        insertedBlockID.dataID(dataID);
+
+        mStartPos += 1;
+
+        if (mStartPos == mEndPos)
+            return false;
+
+    } while (eBlockStatus::OK != checkBlockId(insertedBlockID, insertedLen));
+
+    cDataBuffer insertedBuffer;
+
+    mStartPos = mFile.tellg();
+
+    if (insertedLen == 0)
+    {
+        insertedCRC = ::crc(insertedBlockID);
+        std::ifstream::pos_type crc_pos = mFile.tellg();
+        uint32_t test_crc = readCRC();
+        if (insertedCRC == test_crc)
+        {
+            cBlockID testID = originalBlockID;
+            if (!recoverBlockID(testID, originalLen, blockStatus))
+            {
+                return false;
+            }
+
+            if (originalLen == 0)
+            {
+                uint32_t test_crc = readCRC();
+                if (test_crc != ::crc(testID))
+                    return false;
+
+                processBlock(testID);
+                processBlock(insertedBlockID);
+                return true;
+            }
+
+            readPayload(originalLen, mBuffer);
+            uint32_t test_crc = readCRC();
+            auto crc = ::crc(testID, mBuffer.data(), originalLen);
+            if (crc == test_crc)
+            {
+                processBlock(testID, mBuffer.data(), originalLen);
+                processBlock(insertedBlockID);
+                return true;
+            }
+
+            return false;
+        }
+
+        mFile.seekg(crc_pos);
+        cBlockID testID = originalBlockID;
+        if (!recoverBlockID(testID, originalLen, blockStatus))
+        {
+            return false;
+        }
+
+        crc_pos = mFile.tellg();
+        test_crc = readCRC();
+        if (insertedCRC == test_crc)
+        {
+            if (originalLen == 0)
+            {
+                uint32_t test_crc = readCRC();
+                if (test_crc != ::crc(testID))
+                    return false;
+
+                processBlock(testID);
+                processBlock(insertedBlockID);
+                return true;
+            }
+
+            readPayload(originalLen, mBuffer);
+            uint32_t test_crc = readCRC();
+            auto crc = ::crc(testID, mBuffer.data(), originalLen);
+            if (crc == test_crc)
+            {
+                processBlock(testID, mBuffer.data(), originalLen);
+                processBlock(insertedBlockID);
+                return true;
+            }
+
+            return false;
+        }
+        else if (originalLen == 0)
+        {
+            uint32_t crc1 = readCRC();
+            if ((test_crc != ::crc(testID)) || (insertedCRC != crc1))
+                return false;
+
+            processBlock(testID);
+            processBlock(insertedBlockID);
+            return true;
+        }
+
+        mFile.seekg(crc_pos);
+        readPayload(originalLen, mBuffer);
+        auto crc = ::crc(testID, mBuffer.data(), originalLen);
+        uint32_t crc1 = readCRC();
+        uint32_t crc2 = readCRC();
+
+        if (((crc == crc1) || (crc == crc2)) && ((insertedCRC == crc1) || (insertedCRC == crc2)))
+        {
+            processBlock(testID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID);
+            return true;
+        }
+
+        return false;
+    }
+
+    // There are multiple patterns that could happen here:
+    // Case 0: inserted, inserted crc, block id, original, original crc
+    // Case 1: inserted, block id, original, original crc, inserted crc
+    // Case 2: inserted, block id, original, inserted crc, original crc
+    // Case 3: inserted, block id, inserted crc, original, original crc
+    // Case 4: block id, original, original crc, inserted, inserted crc
+    // Case 5: block id, original, inserted, original crc, inserted crc
+    // Case 6: block id, original, inserted, inserted crc, original crc
+    // Case 7: block id, inserted, inserted crc, original, original crc
+    // Case 8: block id, inserted, original, original crc, inserted crc
+    // Case 9: block id, inserted, original, inserted crc, original crc
+
+    // We will start by testing if the inserted block is complete
+    // inserted, inserted crc, original, original crc
+    std::ifstream::pos_type start_pos = mFile.tellg();
+    readPayload(insertedLen, insertedBuffer);
+    std::ifstream::pos_type crc_pos = mFile.tellg();
+    uint32_t test_crc = readCRC();
+    insertedCRC = ::crc(insertedBlockID, insertedBuffer.data(), insertedLen);
+    if (insertedCRC == test_crc)
+    {
+        // We are in case 0!
+        cBlockID testID = originalBlockID;
+        if (!recoverBlockID(testID, originalLen, blockStatus))
+        {
+            return false;
+        }
+
+        readPayload(originalLen, mBuffer);
+        auto crc = ::crc(testID, mBuffer.data(), originalLen);
+        uint32_t test_crc = readCRC();
+        if (crc == test_crc)
+        {
+            processBlock(testID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID, insertedBuffer.data(), insertedLen);
+            return true;
+
+        }
+
+        return false;
+    }
+
+    // Test for cases 1, 2, and 3...
+    mFile.seekg(crc_pos);
+    cBlockID testID = originalBlockID;
+    if (recoverBlockID(testID, originalLen, blockStatus))
+    {
+        start_pos = mFile.tellg();
+
+        // Try cases one and two...
+        readPayload(originalLen, mBuffer);
+        auto crc = ::crc(testID, mBuffer.data(), originalLen);
+
+        uint32_t crc1 = readCRC();
+        uint32_t crc2 = readCRC();
+
+        if (((crc == crc1) || (crc == crc2)) && ((insertedCRC == crc1) || (insertedCRC == crc2)))
+        {
+            // Case 1 or 2!
+            processBlock(testID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID, insertedBuffer.data(), insertedLen);
+            return true;
+        }
+
+        // Try cases three...
+        mFile.seekg(start_pos);
+        test_crc = readCRC();
+        if (insertedCRC == test_crc)
+        {
+            // Case 3!
+            readPayload(originalLen, mBuffer);
+            auto crc = ::crc(testID, mBuffer.data(), originalLen);
+            test_crc = readCRC();
+            if (crc == test_crc)
+            {
+                processBlock(testID, mBuffer.data(), originalLen);
+                processBlock(insertedBlockID, insertedBuffer.data(), insertedLen);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Test for cases 4, 5, 6, 7, 8, and 9...
+    mFile.seekg(start_pos);
+    testID = originalBlockID;
+    if (recoverBlockID(testID, originalLen, blockStatus))
+    {
+        start_pos = mFile.tellg();
+
+        // Try cases 4, 5, and 6...
+        readPayload(originalLen, mBuffer);
+        auto crc = ::crc(testID, mBuffer.data(), originalLen);
+
+        crc_pos = mFile.tellg();
+        test_crc = readCRC();
+        if (crc == test_crc)
+        {
+            // Case 4!
+            readPayload(insertedLen, insertedBuffer);
+            insertedCRC = ::crc(insertedBlockID, insertedBuffer.data(), insertedLen);
+
+            uint32_t test_crc = readCRC();
+
+            if (test_crc == insertedCRC)
+            {
+                processBlock(testID, mBuffer.data(), originalLen);
+                processBlock(insertedBlockID, insertedBuffer.data(), insertedLen);
+                return true;
+            }
+
+            return false;
+        }
+
+        // Try cases five and six...
+        mFile.seekg(crc_pos);
+        readPayload(insertedLen, insertedBuffer);
+        insertedCRC = ::crc(insertedBlockID, insertedBuffer.data(), insertedLen);
+
+        uint32_t crc1 = readCRC();
+        uint32_t crc2 = readCRC();
+
+        if (((crc == crc1) || (crc == crc2)) && ((insertedCRC == crc1) || (insertedCRC == crc2)))
+        {
+            // Case 5 or 6!
+            processBlock(testID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID, insertedBuffer.data(), insertedLen);
+            return true;
+        }
+
+        // Try cases 7, 8, and 9...
+        mFile.seekg(start_pos);
+        readPayload(insertedLen, insertedBuffer);
+        insertedCRC = ::crc(insertedBlockID, insertedBuffer.data(), insertedLen);
+
+        crc_pos = mFile.tellg();
+        test_crc = readCRC();
+        if (insertedCRC == test_crc)
+        {
+            // Case 7!
+            readPayload(originalLen, mBuffer);
+            auto crc = ::crc(testID, mBuffer.data(), originalLen);
+            
+            uint32_t test_crc = readCRC();
+
+            if (test_crc == crc)
+            {
+                processBlock(testID, mBuffer.data(), originalLen);
+                processBlock(insertedBlockID, insertedBuffer.data(), insertedLen);
+                return true;
+            }
+
+            return false;
+        }
+
+        // Try cases eight and nine...
+        mFile.seekg(crc_pos);
+        readPayload(originalLen, mBuffer);
+        crc = ::crc(testID, mBuffer.data(), originalLen);
+
+        crc1 = readCRC();
+        crc2 = readCRC();
+
+        if (((crc == crc1) || (crc == crc2)) && ((insertedCRC == crc1) || (insertedCRC == crc2)))
+        {
+            // Case 8 or 9!
+            processBlock(testID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID, insertedBuffer.data(), insertedLen);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool cBlockDataFileReader::recoverBlockID(cBlockID& blockID, uint32_t len, eBlockStatus blockStatus)
+{
+    BLOCK_CLASS_ID_t classID = 0;
+    BLOCK_MAJOR_VERSION_t majorVer = 0;
+    BLOCK_MINOR_VERSION_t minorVer = 0;
+    BLOCK_DATA_ID_t dataID = 0;
+
+    switch (blockStatus)
+    {
+    case eBlockStatus::BAD_CLASS_ID:
+        mFile.read(reinterpret_cast<char*>(&classID), sizeof(classID));
+        mFile.read(reinterpret_cast<char*>(&majorVer), sizeof(majorVer));
+        mFile.read(reinterpret_cast<char*>(&minorVer), sizeof(minorVer));
+        mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+
+        blockID.classID(static_cast<ClassIDs>(classID));
+        blockID.setVersion(majorVer, minorVer);
+        blockID.dataID(dataID);
+        break;
+    case eBlockStatus::BAD_MAJOR_VERSION:
+        mFile.read(reinterpret_cast<char*>(&majorVer), sizeof(majorVer));
+        mFile.read(reinterpret_cast<char*>(&minorVer), sizeof(minorVer));
+        mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+
+        blockID.setVersion(majorVer, minorVer);
+        blockID.dataID(dataID);
+        break;
+    case eBlockStatus::BAD_MINOR_VERSION:
+        mFile.read(reinterpret_cast<char*>(&minorVer), sizeof(minorVer));
+        mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+
+        blockID.minorVersion(minorVer);
+        blockID.dataID(dataID);
+        break;
+    case eBlockStatus::BAD_DATA_ID:
+        mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+        blockID.dataID(dataID);
+        break;
+    case eBlockStatus::BAD_PAYLOAD:
+    default:
+        return false;
+    }
+
+    return (eBlockStatus::OK == checkBlockId(blockID, len));
+}
+
+bool cBlockDataFileReader::fixAtDataBuffer()
+{
+    return false;
+}
+
+bool cBlockDataFileReader::fixAtCRC(const cBlockID originalBlockID,
+    const cBlockID insertedBlockID, uint32_t insertedLen)
+{
+    uint32_t originalCRC = ::crc(originalBlockID);
+    return false;
+}
+
+bool cBlockDataFileReader::fixAtCRC(const cBlockID originalBlockID, const cDataBuffer originalBuffer,
+    uint32_t originalLen, const cBlockID insertedBlockID, uint32_t insertedLen)
+{
+    uint32_t originalCRC = ::crc(originalBlockID, originalBuffer.data(), originalLen);
+
+    if (insertedLen == 0)
+    {
+        uint32_t file_crc = readCRC();
+
+        auto crc = ::crc(insertedBlockID);
+        if (file_crc != crc)
+        {
+            if (file_crc != originalCRC)
+                return false;
+
+            // Ok, we just read the CRC of the original block!
+            processBlock(originalBlockID, originalBuffer.data(), originalLen);
+
+            // Read the crc for the inserted block
+            uint32_t file_crc = readCRC();
+            if (file_crc != crc)
+                return false;
+
+            processBlock(insertedBlockID);
+            return true;
+        }
+
+        // Read the crc for the original block
+        file_crc = readCRC();
+        if (file_crc != originalCRC)
+            return false;
+
+        processBlock(originalBlockID, originalBuffer.data(), originalLen);
+        processBlock(insertedBlockID);
+        return true;
+    }
+
+    // We are assuming this payload was inserted intacted!
+    readPayload(insertedLen, mBuffer);
+    auto crc = ::crc(insertedBlockID, mBuffer.data(), insertedLen);
+    uint32_t crc1 = readCRC();
+    uint32_t crc2 = readCRC();
+
+    if (crc == crc1)
+    {
+        if (crc2 != originalCRC)
+        {
+            uint32_t testLen = crc2;
+            BLOCK_CLASS_ID_t classID = 0;
+            BLOCK_MAJOR_VERSION_t majorVer = 0;
+            BLOCK_MINOR_VERSION_t minorVer = 0;
+            BLOCK_DATA_ID_t dataID = 0;
+
+            mFile.read(reinterpret_cast<char*>(&classID), sizeof(classID));
+            mFile.read(reinterpret_cast<char*>(&majorVer), sizeof(majorVer));
+            mFile.read(reinterpret_cast<char*>(&minorVer), sizeof(minorVer));
+            mFile.read(reinterpret_cast<char*>(&dataID), sizeof(dataID));
+
+            cBlockID testID(static_cast<ClassIDs>(classID), majorVer, minorVer);
+            testID.dataID(dataID);
+            if (eBlockStatus::OK == checkBlockId(testID, testLen))
+            {
+                return fixAtCRC(originalBlockID, originalBuffer, originalLen, testID, testLen);
+            }
+
+            return false;
+        }
+
+        processBlock(originalBlockID, originalBuffer.data(), originalLen);
+        processBlock(insertedBlockID, mBuffer.data(), insertedLen);
+        return true;
+    }
+    else if (crc1 == originalCRC)
+    {
+        if (crc2 != crc)
+            return false;
+
+        processBlock(originalBlockID, originalBuffer.data(), originalLen);
+        processBlock(insertedBlockID, mBuffer.data(), insertedLen);
+        return true;
+    }
+
+    return false;
+}
+
+
+/**********************************************************
+ * Data Block Verification
+ **********************************************************/
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkExperimentBlock(const cBlockID blockID, uint32_t len)
+{
+    auto dataId = static_cast<experiment::DataID>(blockID.dataID());
+
+    switch (dataId)
+    {
+    case experiment::DataID::EXPERIMENT:
+        break;
+    case experiment::DataID::START_TIME:
+        if (len != 24) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::END_TIME:
+        if (len != 24) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::START_RECORDING_TIMESTAMP:
+        if (len != 8) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::END_RECORDING_TIMESTAMP:
+        if (len != 8) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::RESEARCHER:
+    case experiment::DataID::CULTIVAR:
+        break;
+    case experiment::DataID::EXPERIMENT_TITLE:
+        if (len == 0) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::BEGIN_HEADER:
+        if (len != 0) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::END_OF_HEADER:
+        if (len != 0) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::BEGIN_FOOTER:
+        if (len != 0) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::END_OF_FOOTER:
+        if (len != 0) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::BEGIN_SENSOR_LIST:
+        if (len != 0) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::END_OF_SENSOR_LIST:
+        if (len != 0) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case experiment::DataID::SENSOR_DATA_BLOCK_INFO:
+        break;
+    case experiment::DataID::RECORDING_HEARTBEAT_TIMESTAMP:
+        if (len != 8) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    default:
+        return eBlockStatus::BAD_DATA_ID;
+    }
+
+    return eBlockStatus::OK;
+}
+
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkAxisCommunicationBlock(const cBlockID blockID, uint32_t len)
+{
+    auto dataId = static_cast<axis::DataID>(blockID.dataID());
+
+    switch (dataId)
+    {
+    case axis::DataID::TIMESTAMP:
+        return eBlockStatus::BAD_PAYLOAD;
+    case axis::DataID::CAMERA_ID:
+        if (len != 4) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case axis::DataID::RESOLUTION:
+        if (len != 4) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case axis::DataID::FRAMES_PER_SECOND:
+        if (len != 4) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case axis::DataID::BITMAP:
+    case axis::DataID::JPEG:
+    case axis::DataID::MPEG_FRAME:
+        if (len < 4) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    default:
+        return eBlockStatus::BAD_DATA_ID;
+    }
+
+    return eBlockStatus::OK;
+}
+
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkOusterLidarBlock(const cBlockID blockID, uint32_t len)
+{
+    auto dataId = static_cast<ouster::DataID>(blockID.dataID());
+
+    switch (dataId)
+    {
+    case ouster::DataID::CONFIGURATION_INFO:
+    case ouster::DataID::BEAM_INTRINSICS:
+    case ouster::DataID::IMU_INTRINSICS:
+    case ouster::DataID::IMU_DATA:
+    case ouster::DataID::LIDAR_DATA:
+    case ouster::DataID::LIDAR_DATA_FORMAT:
+    case ouster::DataID::LIDAR_DATA_FRAME_TIMESTAMP:
+    case ouster::DataID::LIDAR_INTRINSICS:
+    case ouster::DataID::MULTIPURPOSE_IO:
+    case ouster::DataID::NMEA:
+    case ouster::DataID::SENSOR_INFO:
+    case ouster::DataID::SYNC_PULSE_IN:
+    case ouster::DataID::SYNC_PULSE_OUT:
+    case ouster::DataID::TIMESTAMP:
+    case ouster::DataID::TIME_INFO:
+        break;
+    default:
+        return eBlockStatus::BAD_DATA_ID;
+    }
+
+    return eBlockStatus::OK;
+}
+
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkSpidercamBlock(const cBlockID blockID, uint32_t len)
+{
+    auto dataId = static_cast<spidercam::DataID>(blockID.dataID());
+
+    switch (dataId)
+    {
+    case spidercam::DataID::DOLLY_POSITION:
+        if (len != 72) return eBlockStatus::BAD_PAYLOAD;
+        break;
+
+    default:
+        return eBlockStatus::BAD_DATA_ID;
+    }
+
+    return eBlockStatus::OK;
+}
+
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkWeatherBlock(const cBlockID blockID, uint32_t len)
+{
+    auto dataId = static_cast<weather::DataID>(blockID.dataID());
+
+    switch (dataId)
+    {
+    case weather::DataID::CONFIGURATION_INFO:
+        break;
+    case weather::DataID::WIND_DATA_VALID:
+        if (len != 1) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case weather::DataID::WIND_SPEED_MPS:
+        if (len != 8) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case weather::DataID::WIND_SPEED_KNOTS:
+        if (len != 8) return eBlockStatus::BAD_PAYLOAD;
+        break;
+    case weather::DataID::WIND_DIRECTION_DEG:
+        if (len != 8) return eBlockStatus::BAD_PAYLOAD;
+        break;
+
+    default:
+        return eBlockStatus::BAD_DATA_ID;
+    }
 
     return eBlockStatus::OK;
 }

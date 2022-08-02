@@ -168,7 +168,7 @@ void cCentralWidget::repairDataFiles()
     pRepair->open(mCurrentFileName.toStdString());
 
     auto* pItem = new QListWidgetItem();
-    QString text = "Scanning ";
+    QString text = "Repairing ";
     text += mCurrentFileName;
     text += "...";
     pItem->setText(text);
@@ -217,7 +217,7 @@ void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
     pRepair->open(mCurrentFileName.toStdString());
 
     pItem = new QListWidgetItem();
-    QString text = "Scanning ";
+    QString text = "Repairing ";
     text += mCurrentFileName;
     text += "...";
     pItem->setText(text);
