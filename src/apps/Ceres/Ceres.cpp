@@ -8,7 +8,7 @@
 
 #include <fstream>
 
-static std::ofstream logFile;
+static std::ofstream g_logFile;
 
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -18,24 +18,24 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QS
     const char* function = context.function ? context.function : "";
     switch (type) {
     case QtDebugMsg:
-        logFile << "Debug: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        g_logFile << "Debug: " << localMsg.constData() << " (" << file;
+        g_logFile << ":" << context.line << ", " << function << ")" << std::endl;
         break;
     case QtInfoMsg:
-        logFile << "Info: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        g_logFile << "Info: " << localMsg.constData() << " (" << file;
+        g_logFile << ":" << context.line << ", " << function << ")" << std::endl;
         break;
     case QtWarningMsg:
-        logFile << "Warning: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        g_logFile << "Warning: " << localMsg.constData() << " (" << file;
+        g_logFile << ":" << context.line << ", " << function << ")" << std::endl;
         break;
     case QtCriticalMsg:
-        logFile << "Critical: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        g_logFile << "Critical: " << localMsg.constData() << " (" << file;
+        g_logFile << ":" << context.line << ", " << function << ")" << std::endl;
         break;
     case QtFatalMsg:
-        logFile << "Fatal: " << localMsg.constData() << " (" << file;
-        logFile << ":" << context.line << ", " << function << ")" << std::endl;
+        g_logFile << "Fatal: " << localMsg.constData() << " (" << file;
+        g_logFile << ":" << context.line << ", " << function << ")" << std::endl;
         break;
     }
 }
@@ -43,7 +43,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QS
 
 int main(int argc, char** argv)
 {
-    logFile.open("ceres.log", std::ios::trunc);
+    g_logFile.open("ceres.log", std::ios::trunc);
 
     qInstallMessageHandler(myMessageOutput);
 

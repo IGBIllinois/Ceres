@@ -22,8 +22,14 @@ public:
 
 	const cExperimentTreeItem* experiments() const;
 
+signals:
+	void runExperiment();
+
 public slots:
 	void refresh();
+
+protected:
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
 	void loadExperiments();

@@ -60,10 +60,10 @@ public slots:
 private slots:
     void fileRefresh();
     void fileAddExperiment();
-    void experimentLoad();
-    void experimentRun();
-    void experimentPause();
-    void experimentStop();
+    void onExperimentLoad();
+    void onExperimentRun();
+    void onExperimentPause();
+    void onExperimentStop();
     void helpAbout();
 
 private:

@@ -284,7 +284,7 @@ void cMainWindow::fileAddExperiment()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::experimentLoad()
+void cMainWindow::onExperimentLoad()
 {
     mBatchFileName.clear();
 
@@ -381,7 +381,7 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::experimentRun()
+void cMainWindow::onExperimentRun()
 {
     if (mpModel->isExperimentRunning())
     {
@@ -405,7 +405,7 @@ void cMainWindow::experimentRun()
     // Reload the experiment each time incase the experiment was tweaked
     if (mBatchFileName.empty())
     {
-        experimentLoad();
+        onExperimentLoad();
     }
 
     if (!mpModel->isExperimentLoaded())
@@ -435,7 +435,7 @@ void cMainWindow::experimentRun()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::experimentPause()
+void cMainWindow::onExperimentPause()
 {
     if (!mpModel->isExperimentRunning())
     {
@@ -453,7 +453,7 @@ void cMainWindow::experimentPause()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::experimentStop()
+void cMainWindow::onExperimentStop()
 {
     if (!mpModel->isExperimentRunning())
     {
@@ -541,7 +541,7 @@ void cMainWindow::onExperimentCompleted()
 
         if (loadExperiment(expFile))
         {
-            experimentRun();
+            onExperimentRun();
             break;
         }
     }
@@ -579,25 +579,25 @@ void cMainWindow::createSubMenusAndActions()
     // Build the Experiment Menu
     mpExpLoad = new QAction(tr("&Load"), this);
     mpExpLoad->setStatusTip(tr("Load experiment..."));
-    connect(mpExpLoad, &QAction::triggered, this, &cMainWindow::experimentLoad);
+    connect(mpExpLoad, &QAction::triggered, this, &cMainWindow::onExperimentLoad);
     mpExperimentMenu->addAction(mpExpLoad);
 
     mpExperimentMenu->addSeparator();
 
     mpExpRun = new QAction(tr("&Run"), this);
     mpExpRun->setStatusTip(tr("Run experiment..."));
-    connect(mpExpRun, &QAction::triggered, this, &cMainWindow::experimentRun);
+    connect(mpExpRun, &QAction::triggered, this, &cMainWindow::onExperimentRun);
     mpExperimentMenu->addAction(mpExpRun);
 
     mpExpPause = new QAction(tr("&Pause"), this);
     mpExpPause->setStatusTip(tr("Pause the currently running experiment"));
-    connect(mpExpPause, &QAction::triggered, this, &cMainWindow::experimentPause);
+    connect(mpExpPause, &QAction::triggered, this, &cMainWindow::onExperimentPause);
     mpExperimentMenu->addAction(mpExpPause);
     mpExpPause->setEnabled(false);
 
     mpExpStop = new QAction(tr("&Stop"), this);
     mpExpStop->setStatusTip(tr("Stop the currently running experiment"));
-    connect(mpExpStop, &QAction::triggered, this, &cMainWindow::experimentStop);
+    connect(mpExpStop, &QAction::triggered, this, &cMainWindow::onExperimentStop);
     mpExperimentMenu->addAction(mpExpStop);
     mpExpStop->setEnabled(false);
 
@@ -626,10 +626,10 @@ void cMainWindow::createToolBars()
     connect(this, &cMainWindow::experimentPaused, toolbar, &cExperimentToolbar::experimentPaused);
     connect(this, &cMainWindow::experimentStopped, toolbar, &cExperimentToolbar::experimentStopped);
 
-    connect(toolbar, &cExperimentToolbar::loadSelected, this, &cMainWindow::experimentLoad);
-    connect(toolbar, &cExperimentToolbar::runSelected, this, &cMainWindow::experimentRun);
-    connect(toolbar, &cExperimentToolbar::pauseSelected, this, &cMainWindow::experimentPause);
-    connect(toolbar, &cExperimentToolbar::stopSelected, this, &cMainWindow::experimentStop);
+    connect(toolbar, &cExperimentToolbar::loadSelected, this, &cMainWindow::onExperimentLoad);
+    connect(toolbar, &cExperimentToolbar::runSelected, this, &cMainWindow::onExperimentRun);
+    connect(toolbar, &cExperimentToolbar::pauseSelected, this, &cMainWindow::onExperimentPause);
+    connect(toolbar, &cExperimentToolbar::stopSelected, this, &cMainWindow::onExperimentStop);
 
     addToolBar(toolbar);
 }
@@ -657,6 +657,8 @@ void cMainWindow::createDockWindows(const nlohmann::json& configDoc)
     QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
+    connect(mpExperiments, &cExperimentManager::runExperiment, this, &cMainWindow::onExperimentRun);
+
 
     dock->setWidget(mpExperiments);
     addDockWidget(Qt::LeftDockWidgetArea, dock);

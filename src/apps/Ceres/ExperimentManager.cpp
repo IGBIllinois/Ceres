@@ -8,6 +8,8 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QMenu>
 
 #include <string>
 
@@ -38,6 +40,18 @@ void cExperimentManager::refresh()
     clear();
     loadExperiments();
 }
+
+void cExperimentManager::contextMenuEvent(QContextMenuEvent* event)
+{
+    QMenu contextMenu(this);
+
+    QAction run("Run...", this);
+    connect(&run, &QAction::triggered, this, &cExperimentManager::runExperiment);
+    contextMenu.addAction(&run);
+
+    contextMenu.exec(event->globalPos());
+}
+
 
 const cExperimentTreeItem* cExperimentManager::experiments() const
 {
@@ -90,9 +104,28 @@ void cExperimentManager::loadExperiments(cExperimentTreeItem& root, const std::f
             {
                 auto* pItem = new cExperimentTreeItem(&root, entry.path());
             }
+            catch (const std::invalid_argument&)
+            {
+            }
+            catch (const nlohmann::json::parse_error& e)
+            {
+                QString msg = "Parsing error in ";
+                msg += entry.path().filename().string().c_str();
+                msg += ".\n";
+                msg += e.what();
+
+                QMessageBox mb(QMessageBox::Critical, "Experiment File Error", msg);
+                mb.exec();
+            }
             catch (const std::exception& e)
             {
-                std::string msg = e.what();
+                QString msg = "Unknown error in ";
+                msg += entry.path().filename().string().c_str();
+                msg += ".\n";
+                msg += e.what();
+
+                QMessageBox mb(QMessageBox::Critical, "Experiment File Error", msg);
+                mb.exec();
             }
         }
     }

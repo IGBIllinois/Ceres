@@ -24,6 +24,14 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const std::filesys
     nlohmann::json jsonDoc;
     in >> jsonDoc;
 
+    if (!jsonDoc.contains("experiment_name"))
+    {
+        if (!in.is_open())
+        {
+            throw std::invalid_argument("File is not an experiment file.");
+        }
+    }
+
     QString name = static_cast<std::string>(jsonDoc["experiment_name"]).c_str();
     setText(0, name);
 

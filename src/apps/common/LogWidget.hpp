@@ -2,6 +2,8 @@
 #pragma once
 
 #include <QAbstractScrollArea>
+#include <QListWidget>
+#include <QHeaderView>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
