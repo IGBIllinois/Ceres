@@ -7,14 +7,18 @@
 
 
 //-----------------------------------------------------------------------------
-cDataRepair::cDataRepair(const QString& repairedDir, QObject* parent)
+cDataRepair::cDataRepair(const QString& dataDir, const QString& repairedDir, QObject* parent)
     : QObject(parent)
 {
+    mCurrentDataDirectory = dataDir;
     mRepairedDataDirectory = repairedDir;
 }
 
 cDataRepair::~cDataRepair()
-{}
+{
+    cBlockDataFileReader::close();
+    mFileWriter.close();
+}
 
 //-----------------------------------------------------------------------------
 bool cDataRepair::open(const std::string& file_name)
@@ -71,22 +75,35 @@ void cDataRepair::run()
         std::string msg = e.what();
         emit fileResults(false, e.what());
     }
+    catch (const bdf::unexpected_eof& e)
+    {
+        moveFileToRepaired(false);
+
+        QString msg = "Unexpected EOF: ";
+        msg += e.what();
+        emit fileResults(true, msg);
+        return;
+    }
     catch (const std::exception& e)
     {
         if (eof())
         {
-            emit fileResults(true, QString());
+            if (!moveFileToRepaired())
+                emit fileResults(false, "File size mismatch!");
+            else
+                emit fileResults(true, QString());
         }
         else
         {
             emit fileResults(false, e.what());
         }
-        cBlockDataFileReader::close();
         return;
     }
 
-    emit fileResults(true, QString());
-    cBlockDataFileReader::close();
+    if (!moveFileToRepaired())
+        emit fileResults(false, "File size mismatch!");
+    else
+        emit fileResults(true, QString());
 }
 
 void cDataRepair::processBlock(const cBlockID& id)
@@ -97,6 +114,73 @@ void cDataRepair::processBlock(const cBlockID& id)
 void cDataRepair::processBlock(const cBlockID& id, const std::byte* buf, std::size_t len)
 {
     mFileWriter.writeBlock(id, buf, len);
+}
+
+//-----------------------------------------------------------------------------
+bool cDataRepair::moveFileToRepaired(bool size_check)
+{
+    if (cBlockDataFileReader::isOpen())
+        cBlockDataFileReader::close();
+
+    if (size_check)
+    {
+        auto src = QFileInfo(mCurrentFileName).size();
+        auto dst = QFileInfo(mRepairedFileName).size();
+        std::size_t diff = 0;
+        if (dst > src)
+            diff = dst - src;
+        else
+            diff = src - dst;
+
+        // The 4096 is one hard drive data block.
+        if (diff > 4096)
+        {
+            return false;
+        }
+    }
+
+    if (!QDir().exists(mCurrentDataDirectory))
+        return false;
+
+    // Move the failed data file to a "recovered" directory
+    // to signal that the file was fully repaired!
+    {
+        QString path = mCurrentDataDirectory;
+        path += "/recovered";
+
+        QDir recoveredDir(path);
+        if (!recoveredDir.exists())
+        {
+            if (!QDir().mkdir(path))
+                return false;
+        }
+
+        QString filename = QFileInfo(mCurrentFileName).fileName();
+        QString newName = path + "/" + filename;
+
+        QDir().rename(mCurrentFileName, newName);
+    }
+
+    // Move the fully repaired data file back into the main data
+    // directory.
+    {
+        QDir path = mRepairedDataDirectory;
+        path.cdUp();
+
+        QString filename = QFileInfo(mRepairedFileName).fileName();
+        auto fi = QFileInfo(path, filename);
+        if (!fi.exists())
+        {
+            QString newName = fi.absoluteFilePath();
+            if (!QDir().rename(mRepairedFileName, newName))
+            {
+                std::string fn1 = mRepairedFileName.toStdString();
+                std::string fn2 = newName.toStdString();
+            }
+        }
+    }
+
+    return true;
 }
 
 

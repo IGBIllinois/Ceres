@@ -13,7 +13,8 @@ class cDataRepair : public QObject, public QRunnable, private cBlockDataFileRead
     Q_OBJECT
 
 public:
-	cDataRepair(const QString& repairedDir, QObject* parent = nullptr);
+	cDataRepair(const QString& dataDir, const QString& repairedDir, 
+                QObject* parent = nullptr);
     ~cDataRepair();
 
     bool open(const std::string& file_name);
@@ -28,9 +29,12 @@ private:
     void processBlock(const cBlockID& id) override;
     void processBlock(const cBlockID& id, const std::byte* buf, std::size_t len) override;
 
+    bool moveFileToRepaired(bool size_check = true);
+
 private:
     cBlockDataFileWriter mFileWriter;
 
+    QString     mCurrentDataDirectory;
     QString     mRepairedDataDirectory;
     QString     mCurrentFileName;
     QString     mRepairedFileName;

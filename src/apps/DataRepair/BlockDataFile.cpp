@@ -4,8 +4,10 @@
 #include "BlockDataFileExceptions.hpp"
 #include "../BlockDataFile/ClassIdentifiers.hpp"
 #include "../BlockDataFile/ExperimentDataIdentifiers.hpp"
+#include "../BlockDataFile/PvtDataIdentifiers.hpp"
 #include "../BlockDataFile/AxisDataIdentifiers.hpp"
 #include "../BlockDataFile/SpidercamDataIdentifiers.hpp"
+#include "../BlockDataFile/SsnxDataIdentifiers.hpp"
 #include "../BlockDataFile/OusterDataIdentifiers.hpp"
 #include "../BlockDataFile/WeatherDataIdentifiers.hpp"
 
@@ -344,6 +346,9 @@ bool cBlockDataFileReader::processBlock()
     }
     if (mFile.fail())
     {
+        if (mFile.eof())
+            return false;
+
         throw bdf::formatting_error("I/O error while processing block.");
     }
 
@@ -504,6 +509,13 @@ void cBlockDataFileReader::readPayload(uint32_t len, cDataBuffer& buffer)
     }
     if (mFile.fail())
     {
+        if (mFile.eof())
+        {
+            std::string msg = "Could not read payload of size=";
+            msg += std::to_string(len);
+            throw bdf::unexpected_eof(msg);
+        }
+
         throw bdf::formatting_error("I/O error while processing block.");
     }
 }
@@ -584,7 +596,7 @@ bool cBlockDataFileReader::tryToFixBlock(const cBlockID blockID, const cDataBuff
         testID.dataID(dataID);
         if (eBlockStatus::OK == checkBlockId(testID, testLen))
         {
-            return fixAtDataBuffer();
+            return fixAtDataBuffer(i, blockID, len, testID, testLen);
         }
     }
 
@@ -627,7 +639,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
         if (blockID.minorVersion() != 0)
             return eBlockStatus::BAD_MINOR_VERSION;
 
-        break;
+        return checkPvtBlock(blockID, len);
     }
     case ClassIDs::SPIDERCAM:
     {
@@ -1085,8 +1097,190 @@ bool cBlockDataFileReader::recoverBlockID(cBlockID& blockID, uint32_t len, eBloc
     return (eBlockStatus::OK == checkBlockId(blockID, len));
 }
 
-bool cBlockDataFileReader::fixAtDataBuffer()
+bool cBlockDataFileReader::fixAtDataBuffer(const std::size_t pos,
+    const cBlockID originalBlockID, uint32_t originalLen,
+    const cBlockID insertedBlockID, uint32_t insertedLen)
 {
+    if (pos == 0)
+    {
+        return fixAtStartPayload(originalBlockID, originalLen,
+            insertedBlockID, insertedLen);
+    }
+
+    return false;
+}
+
+bool cBlockDataFileReader::fixAtStartPayload(const cBlockID originalBlockID, uint32_t originalLen,
+            const cBlockID insertedBlockID, uint32_t insertedLen)
+{
+    // This is a check to make sure we are setting the file position
+    // correctly
+    mFile.seekg(mStartOfPayload);
+
+    uint32_t testLen = 0;
+    BLOCK_CLASS_ID_t testClassID = 0;
+    BLOCK_MAJOR_VERSION_t testMajorVer = 0;
+    BLOCK_MINOR_VERSION_t testMinorVer = 0;
+    BLOCK_DATA_ID_t testDataID = 0;
+
+    mFile.read(reinterpret_cast<char*>(&testLen), sizeof(testLen));
+    if (testLen != insertedLen)
+        return false;
+
+    mFile.read(reinterpret_cast<char*>(&testClassID), sizeof(testClassID));
+    if (testClassID != insertedBlockID.classID())
+        return false;
+
+    mFile.read(reinterpret_cast<char*>(&testMajorVer), sizeof(testMajorVer));
+    if (testMajorVer != insertedBlockID.majorVersion())
+        return false;
+
+    mFile.read(reinterpret_cast<char*>(&testMinorVer), sizeof(testMinorVer));
+    if (testMinorVer != insertedBlockID.minorVersion())
+        return false;
+
+    mFile.read(reinterpret_cast<char*>(&testDataID), sizeof(testDataID));
+    if (testDataID != insertedBlockID.dataID())
+        return false;
+
+    if (insertedLen == 0)
+    {
+        auto pos_crc = mFile.tellg();
+        auto test_crc = readCRC();
+        auto inserted_crc = ::crc(insertedBlockID);
+        if (test_crc == inserted_crc)
+        {
+            // Ok the original block must follow!
+            if (originalLen == 0)
+            {
+                auto test_crc = readCRC();
+                auto crc = ::crc(originalBlockID);
+                if (test_crc == crc)
+                {
+                    processBlock(originalBlockID);
+                    processBlock(insertedBlockID);
+                    return true;
+                }
+
+                return false;
+            }
+
+            readPayload(originalLen, mBuffer);
+            auto test_crc = readCRC();
+            auto crc = ::crc(originalBlockID, mBuffer.data(), originalLen);
+            if (test_crc == crc)
+            {
+                processBlock(originalBlockID, mBuffer.data(), originalLen);
+                processBlock(insertedBlockID);
+                return true;
+            }
+
+            return false;
+        }
+
+        mFile.seekg(pos_crc);
+
+        // Ok the original block payload must follow, and then both
+        // CRC checked...
+        readPayload(originalLen, mBuffer);
+        auto crc = ::crc(originalBlockID, mBuffer.data(), originalLen);
+
+        auto crc1 = readCRC();
+        auto crc2 = readCRC();
+        if (((crc == crc1) || (crc == crc2)) && ((inserted_crc == crc1) || (inserted_crc == crc2)))
+        {
+            processBlock(originalBlockID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID);
+            return true;
+        }
+
+        return false;
+    }
+
+    // Here we have multiple cases...
+    // Case 0: original payload, original crc, inserted payload, inserted crc
+    // Case 1: original payload, inserted payload, original crc, inserted crc
+    // Case 2: original payload, inserted payload, inserted crc, original crc
+    // Case 3: inserted payload, inserted crc, original payload, original crc
+    // Case 4: inserted payload, original payload, inserted crc, original crc
+    // Case 5: inserted payload, original payload, original crc, inserted crc
+
+    cDataBuffer insertedPayload;
+
+    auto start_pos = mFile.tellg();
+
+    // Test case 0...
+    readPayload(originalLen, mBuffer);
+    auto crc = ::crc(originalBlockID, mBuffer.data(), originalLen);
+    auto crc_pos = mFile.tellg();
+    auto test_crc = readCRC();
+    if (test_crc == crc)
+    {
+        // In case 0!
+        readPayload(insertedLen, insertedPayload);
+        auto crc = ::crc(insertedBlockID, insertedPayload.data(), insertedLen);
+        auto test_crc = readCRC();
+        if (test_crc == crc)
+        {
+            processBlock(originalBlockID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID, insertedPayload.data(), insertedLen);
+            return true;
+        }
+        return false;
+    }
+
+    mFile.seekg(crc_pos);
+
+    // Test case 1 and 2...
+    readPayload(insertedLen, insertedPayload);
+    auto inserted_crc = ::crc(insertedBlockID, insertedPayload.data(), insertedLen);
+    auto crc1 = readCRC();
+    auto crc2 = readCRC();
+    if (((crc == crc1) || (crc == crc2)) && ((inserted_crc == crc1) || (inserted_crc == crc2)))
+    {
+        // In case 1 or 2!
+        processBlock(originalBlockID, mBuffer.data(), originalLen);
+        processBlock(insertedBlockID, insertedPayload.data(), insertedLen);
+        return true;
+    }
+
+    mFile.seekg(start_pos);
+
+    // Test case 3...
+    readPayload(insertedLen, insertedPayload);
+    inserted_crc = ::crc(insertedBlockID, insertedPayload.data(), insertedLen);
+    crc_pos = mFile.tellg();
+    test_crc = readCRC();
+    if (test_crc == crc)
+    {
+        // In case 3!
+        readPayload(originalLen, mBuffer);
+        auto crc = ::crc(originalBlockID, mBuffer.data(), originalLen);
+        auto test_crc = readCRC();
+        if (test_crc == crc)
+        {
+            processBlock(originalBlockID, mBuffer.data(), originalLen);
+            processBlock(insertedBlockID, insertedPayload.data(), insertedLen);
+            return true;
+        }
+        return false;
+    }
+
+    mFile.seekg(crc_pos);
+
+    // Test case 4 and 5...
+    readPayload(originalLen, mBuffer);
+    crc = ::crc(originalBlockID, mBuffer.data(), originalLen);
+    crc1 = readCRC();
+    crc2 = readCRC();
+    if (((crc == crc1) || (crc == crc2)) && ((inserted_crc == crc1) || (inserted_crc == crc2)))
+    {
+        // In case 4 or 5!
+        processBlock(originalBlockID, mBuffer.data(), originalLen);
+        processBlock(insertedBlockID, insertedPayload.data(), insertedLen);
+        return true;
+    }
+
     return false;
 }
 
@@ -1242,6 +1436,30 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkExperimentBlock(co
     return eBlockStatus::OK;
 }
 
+cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkPvtBlock(const cBlockID blockID, uint32_t len)
+{
+    auto dataId = static_cast<pvt::DataID>(blockID.dataID());
+
+    switch (dataId)
+    {
+    case pvt::DataID::POSITION_UNIT:
+    case pvt::DataID::VELOCITY_UNIT:
+    case pvt::DataID::TIME_UNIT:
+    case pvt::DataID::POSITION_1D:
+    case pvt::DataID::POSITION_2D:
+    case pvt::DataID::POSITION_3D:
+    case pvt::DataID::VELOCITY_1D:
+    case pvt::DataID::VELOCITY_2D:
+    case pvt::DataID::VELOCITY_3D:
+    case pvt::DataID::TIMESTAMP:
+        break;
+    default:
+        return eBlockStatus::BAD_DATA_ID;
+    }
+
+    return eBlockStatus::OK;
+}
+
 cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkAxisCommunicationBlock(const cBlockID blockID, uint32_t len)
 {
     auto dataId = static_cast<axis::DataID>(blockID.dataID());
@@ -1319,7 +1537,87 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkSpidercamBlock(con
 
 cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkSsnxBlock(const cBlockID blockID, uint32_t len)
 {
-    Fix this !
+    auto dataId = static_cast<ssnx::DataID>(blockID.dataID());
+
+    switch (dataId)
+    {
+    case ssnx::DataID::PVT_CARTESIAN:
+        if ((blockID.majorVersion() < 1) || (blockID.majorVersion() > 2))
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        //if (len != 72) return eBlockStatus::BAD_PAYLOAD;
+        return eBlockStatus::OK;
+    case ssnx::DataID::PVT_GEODETIC:
+        if ((blockID.majorVersion() < 1) || (blockID.majorVersion() > 2))
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() > 2)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::POS_COV_GEODETIC:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::VEL_COV_GEODETIC:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::DOP:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::PVT_RESIDUALS:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::RAIM_STATISTICS:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::PVT_GEODETIC_AUTH:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::POS_PROJECTED:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::RECEIVER_TIME:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+    case ssnx::DataID::RTCM_DATUM:
+        if (blockID.majorVersion() != 1)
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() != 0)
+            return eBlockStatus::BAD_MINOR_VERSION;
+        return eBlockStatus::OK;
+
+    default:
+        if ((blockID.majorVersion() < 1) || (blockID.majorVersion() > 2))
+            return eBlockStatus::BAD_MAJOR_VERSION;
+        if (blockID.minorVersion() > 2)
+            return eBlockStatus::BAD_MINOR_VERSION;
+
+        return eBlockStatus::BAD_DATA_ID;
+    }
+
     return eBlockStatus::OK;
 }
 

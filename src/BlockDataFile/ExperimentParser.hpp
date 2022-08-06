@@ -36,9 +36,6 @@ public:
 	void writeEndOfSensorList();
 	void writeSensorBlockInfo(uint16_t class_id, const std::string& name);
 
-	void startTime(time_t time);
-	void endTime(time_t time);
-
 	void startRecordingTimestamp(uint64_t timestamp);
 	void endRecordingTimestamp(uint64_t timestamp);
 	*/

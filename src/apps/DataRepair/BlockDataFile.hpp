@@ -134,9 +134,15 @@ private:
 
 private:
 	bool fixAtBlockId(const cBlockID originalBlockID, uint32_t originalLen, eBlockStatus blockStatus);
-	bool fixAtDataBuffer();
 
-	bool fixAtCRC(const cBlockID originalBlockID, 
+	bool fixAtDataBuffer(const std::size_t pos, 
+		const cBlockID originalBlockID, uint32_t originalLen,
+		const cBlockID insertedBlockID, uint32_t insertedLen);
+
+	bool fixAtStartPayload(const cBlockID originalBlockID, uint32_t originalLen,
+							const cBlockID insertedBlockID, uint32_t insertedLen);
+
+	bool fixAtCRC(const cBlockID originalBlockID,
 		const cBlockID insertedBlockID, uint32_t insertedLen);
 
 	bool fixAtCRC(const cBlockID originalBlockID, const cDataBuffer originalBuffer,
@@ -146,6 +152,7 @@ private:
 
 private:
 	eBlockStatus checkExperimentBlock(const cBlockID blockID, uint32_t len);
+	eBlockStatus checkPvtBlock(const cBlockID blockID, uint32_t len);
 	eBlockStatus checkAxisCommunicationBlock(const cBlockID blockID, uint32_t len);
 	eBlockStatus checkOusterLidarBlock(const cBlockID blockID, uint32_t len);
 	eBlockStatus checkSpidercamBlock(const cBlockID blockID, uint32_t len);

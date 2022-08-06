@@ -73,5 +73,20 @@ namespace bdf
         explicit formatting_error(const char* _Message) : base(_Message)
         {}
     };
+
+    class unexpected_eof : public io_error
+    {
+    public:
+        using base = bdf::io_error;
+
+        explicit unexpected_eof(const std::string& _Message)
+            : base(_Message.c_str())
+        {}
+
+        explicit unexpected_eof(const char* _Message)
+            : base(_Message)
+        {}
+    };
+
 }
 

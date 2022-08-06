@@ -161,7 +161,7 @@ void cCentralWidget::repairDataFiles()
     mCurrentFileName = mFilesToRepair.front();
     mFilesToRepair.pop_front();
 
-    cDataRepair* pRepair = new cDataRepair(mRepairedDataDirectory);
+    cDataRepair* pRepair = new cDataRepair(mCurrentDataDirectory, mRepairedDataDirectory);
     connect(pRepair, &cDataRepair::fileResults, this, &cCentralWidget::fileResultsUpdated);
     connect(pRepair, &cDataRepair::statusMessage, this, &cCentralWidget::statusMessage);
 
@@ -210,7 +210,7 @@ void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
     mCurrentFileName = mFilesToRepair.front();
     mFilesToRepair.pop_front();
 
-    cDataRepair* pRepair = new cDataRepair(mRepairedDataDirectory);
+    cDataRepair* pRepair = new cDataRepair(mCurrentDataDirectory, mRepairedDataDirectory);
     connect(pRepair, &cDataRepair::fileResults, this, &cCentralWidget::fileResultsUpdated);
     connect(pRepair, &cDataRepair::statusMessage, this, &cCentralWidget::statusMessage);
 
