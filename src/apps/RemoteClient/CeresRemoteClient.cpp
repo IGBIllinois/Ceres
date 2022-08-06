@@ -8,54 +8,72 @@
 #include <string>
 #include <chrono>
 
-static std::ofstream logFile;
-static std::chrono::time_point<std::chrono::system_clock> startTime;
+static std::ofstream g_logFile;
+static std::chrono::time_point<std::chrono::system_clock> g_startTime;
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     std::chrono::time_point<std::chrono::system_clock> logTime = std::chrono::system_clock::now();
-    std::chrono::duration<double> timestamp = logTime - startTime;
+    std::chrono::duration<double> timestamp = logTime - g_startTime;
     QByteArray localMsg = msg.toLocal8Bit();
     switch (type) 
     {
     case QtDebugMsg:
-        logFile << timestamp.count() << ", ";
-        logFile << "Debug: " << localMsg.constData();
+        g_logFile << timestamp.count() << ", ";
+        g_logFile << "Debug: " << localMsg.constData();
         break;
     case QtInfoMsg:
-        logFile << timestamp.count() << ", ";
-        logFile << "Info: " << localMsg.constData();
+        g_logFile << timestamp.count() << ", ";
+        g_logFile << "Info: " << localMsg.constData();
         break;
     case QtWarningMsg:
-        logFile << timestamp.count() << ", ";
-        logFile << "Warning: " << localMsg.constData();
+        g_logFile << timestamp.count() << ", ";
+        g_logFile << "Warning: " << localMsg.constData();
         break;
     case QtCriticalMsg:
-        logFile << timestamp.count() << ", ";
-        logFile << "Critical: " << localMsg.constData();
+        g_logFile << timestamp.count() << ", ";
+        g_logFile << "Critical: " << localMsg.constData();
         break;
     case QtFatalMsg:
-        logFile << timestamp.count() << ", ";
-        logFile << "Fatal: " << localMsg.constData();
+        g_logFile << timestamp.count() << ", ";
+        g_logFile << "Fatal: " << localMsg.constData();
         break;
     default:
         return;
     }
     if (context.file)
     {
-        logFile << " (" << context.file << ":" << context.line;
-        logFile << ", " << context.function << ")";
+        g_logFile << " (" << context.file << ":" << context.line;
+        g_logFile << ", " << context.function << ")";
 
     } 
-    logFile << std::endl;
+    g_logFile << std::endl;
 }
 
 
 int main(int argc, char** argv)
 {
-    logFile.open("CeresRemoteClient.log", std::ios::app);
-    logFile << "=========== Ceres Remote Client Started ===========" << std::endl;
-    startTime = std::chrono::system_clock::now();
+    {
+        std::string filename = "CeresRemoteClient";
+
+        char timestamp[100] = { '\0' };
+        std::time_t t = std::time(nullptr);
+        std::strftime(timestamp, sizeof(timestamp), "%Y%m%d", std::localtime(&t));
+
+        filename += "_";
+        filename += timestamp;
+
+        filename += ".log";
+        g_logFile.open(filename, std::ios::app);
+
+        std::string title = "=========== Ceres Remote Client Started ";
+        std::strftime(timestamp, sizeof(timestamp), "(%H:%M:%S)", std::localtime(&t));
+        title += timestamp;
+        title += " ===========";
+
+        g_logFile << title << std::endl;
+        g_startTime = std::chrono::system_clock::now();
+    }
 
 
     qInstallMessageHandler(myMessageOutput);
@@ -69,6 +87,13 @@ int main(int argc, char** argv)
     mainWin.initialize(pSplash);
     mainWin.show();
 
-    return app.exec();
+    try
+    {
+        return app.exec();
+    }
+    catch (const std::exception& e)
+    {
+        g_logFile << "Fatal Exception: " << e.what() << std::endl;
+    }
 }
 
