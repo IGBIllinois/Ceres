@@ -122,6 +122,9 @@ bool cDataRepair::moveFileToRepaired(bool size_check)
     if (cBlockDataFileReader::isOpen())
         cBlockDataFileReader::close();
 
+    if (mFileWriter.isOpen())
+        mFileWriter.close();
+
     if (size_check)
     {
         auto src = QFileInfo(mCurrentFileName).size();
