@@ -203,6 +203,27 @@ int cSsnxModel_direct::sendOutgoingData(const std::string& data)
 
 void cSsnxModel_direct::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t& pvt)
 {
+    mCartesianPVT.dataValid = pvt.dataValid;
+    mCartesianPVT.timestamp_s = pvt.timestamp_s;
+
+    if (!mCartesianPVT.dataValid) return;
+
+    mCartesianPVT.datum = static_cast<::gps::eDatum>(pvt.Datum);
+    mCartesianPVT.X_m = pvt.X_m;
+    mCartesianPVT.Y_m = pvt.Y_m;
+    mCartesianPVT.Z_m = pvt.Z_m;
+    mCartesianPVT.Vx_mps = pvt.Vx_mps;
+    mCartesianPVT.Vy_mps = pvt.Vy_mps;
+    mCartesianPVT.Vz_mps = pvt.Vz_mps;
+    mCartesianPVT.groundtrack_deg = pvt.GroundTrack_deg;
+
+    if (pvt.HAccuracy_m.has_value())
+        mCartesianPVT.hAccuracy_m = pvt.HAccuracy_m.value();
+
+    if (pvt.VAccuracy_m.has_value())
+        mCartesianPVT.vAccuracy_m = pvt.VAccuracy_m.value();
+
+
 /*
     pvt.dataValid;
     pvt.timestamp_s;
@@ -243,6 +264,10 @@ void cSsnxModel_direct::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t& pvt)
     std::optional<float>          VAccuracy_m;
 */
 
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(pvt);
+    }
 }
 
 void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
@@ -278,7 +303,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
         mTrack.emplace_back(point);
     }
 
-    emit updatePVT(mPvtTimestamp_s,
+    emit updateGeodeticPVT(mPvtTimestamp_s,
         mLatitude_rad, mLongitude_rad, mHeight_m,
         mVn_mps, mVe_mps, mVu_mps,
         mGroundTrack_deg, mDatum);

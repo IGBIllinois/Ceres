@@ -134,7 +134,7 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
         mTrack.emplace_back(point);
     }
 
-    emit updatePVT(mPvtTimestamp_s,
+    emit updateGeodeticPVT(mPvtTimestamp_s,
         mLatitude_rad, mLongitude_rad, mHeight_m,
         mVn_mps, mVe_mps, mVu_mps,
         mGroundTrack_deg, mDatum);

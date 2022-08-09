@@ -38,7 +38,7 @@ sSensorWidgets create_ssnx_sensor(const nlohmann::json& sensorInfo, bool no_visu
     QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cGpsView::dockLocationChanged);
     QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cGpsView::topLevelChanged);
 
-    QObject::connect(pModel, &cSsnxModel::updatePVT, pView, &cSsnxView::updatePVT);
+    QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxView::updatePVT);
     QObject::connect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxView::updateUTC);
 
     return sSensorWidgets(pModel, dockWidget);
@@ -52,7 +52,7 @@ void remove_ssnx_sensor(sSensorWidgets widgets)
     auto* dockWidget = widgets.pDockableView;
     auto* pView = static_cast<cSsnxView*>(dockWidget->widget());
 
-    QObject::disconnect(pModel, &cSsnxModel::updatePVT, pView, &cSsnxView::updatePVT);
+    QObject::disconnect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxView::updatePVT);
     QObject::disconnect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxView::updateUTC);
 
     QObject::disconnect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cGpsView::dockLocationChanged);

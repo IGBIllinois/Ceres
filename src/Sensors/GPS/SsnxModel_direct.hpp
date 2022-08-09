@@ -72,12 +72,23 @@ private:
     ///< the command queue in case the receiver is turned off and then back on
     std::queue<std::string> mSavedCommandQueue; 
     
-    double  mX_m;
-    double  mY_m;
-    double  mZ_m;
-    double  mVx_mps;
-    double  mVy_mps;
-    double  mVz_mps;
+    struct sCartesian_t
+    {
+        bool dataValid = false;
+        double  timestamp_s;
+        ::gps::eDatum datum = ::gps::eDatum::WGS84;
+        double  X_m = 0;
+        double  Y_m = 0;
+        double  Z_m = 0;
+        double  Vx_mps = 0;
+        double  Vy_mps = 0;
+        double  Vz_mps = 0;
+        double  groundtrack_deg = 0;
+        float   hAccuracy_m = -1.0f;
+        float   vAccuracy_m = -1.0f;
+    };
+
+    sCartesian_t mCartesianPVT;
 
     cSsnxSerializer mSerializer;
 };

@@ -22,10 +22,10 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
 
 signals:
-    void updatePVT(double timestamp_s,
+    void updateGeodeticPVT(double timestamp_s,
         double lat_rad, double lng_rad, double height_m,
         double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,
-        double groundTrack_deg, gps::eDatum datum);
+        double groundTrack_deg, ::gps::eDatum datum);
 
     void updateUTC(int hour, int min, int sec, int day, int month, int year);
 };
