@@ -357,6 +357,7 @@ void cSsnxParser::processPVT_Cartesian_2_2_t(cDataBuffer& buffer)
     buffer >> data.Latency_s;
     buffer >> data.HAccuracy_m;
     buffer >> data.VAccuracy_m;
+    buffer >> data.InRtkMode;
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processPVT_Cartesian_2_2_t.");

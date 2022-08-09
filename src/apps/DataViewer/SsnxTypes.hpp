@@ -172,6 +172,7 @@ namespace ssnx
 		float  Latency_s;
 		float  HAccuracy_m;
 		float  VAccuracy_m;
+		bool   InRtkMode;
 	};
 
 	/* PVT in geodetic coordinates */

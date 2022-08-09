@@ -41,6 +41,7 @@ public:
 protected:
     void update() override;
 
+    void pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t pvt) override;
     void pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt) override;
     void posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov) override;
     void velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov) override;

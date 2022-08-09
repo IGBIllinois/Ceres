@@ -101,6 +101,16 @@ void cSsnxModel_net::writeDataHeader()
 {
 }
 
+void cSsnxModel_net::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t pvt)
+{
+    if (!pvt.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(pvt);
+    }
+}
+
 void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
 {
     mPvtValid = pvt.dataValid;

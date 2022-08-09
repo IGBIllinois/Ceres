@@ -115,6 +115,7 @@ void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_2_t& in)
         mDataBuffer << in.Latency_s.value();
         mDataBuffer << in.HAccuracy_m.value();
         mDataBuffer << in.VAccuracy_m.value();
+        mDataBuffer << in.InRtkMode.value();
     }
 
     assert(!mDataBuffer.overrun());
