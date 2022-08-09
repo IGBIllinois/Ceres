@@ -37,7 +37,7 @@ signals:
 private slots:
     void browseSourceFile();
     void scanDataFiles();
-    void fileResultsUpdated(bool valid, QString msg);
+    void fileResultsUpdated(int id, bool valid, QString msg);
 
 private:
     QLineEdit*   mpLoadSrcPath = nullptr;
@@ -49,5 +49,6 @@ private:
     QString     mCurrentDataDirectory;
     QStringList mFilesToTest;
     QString     mCurrentFileName;
+    int         mActiveScanCount;
 };
 

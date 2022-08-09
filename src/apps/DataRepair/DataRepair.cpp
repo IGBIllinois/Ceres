@@ -7,8 +7,8 @@
 
 
 //-----------------------------------------------------------------------------
-cDataRepair::cDataRepair(const QString& dataDir, const QString& repairedDir, QObject* parent)
-    : QObject(parent)
+cDataRepair::cDataRepair(int id, const QString& dataDir, const QString& repairedDir, QObject* parent)
+    : QObject(parent), mId(id)
 {
     mCurrentDataDirectory = dataDir;
     mRepairedDataDirectory = repairedDir;
@@ -44,7 +44,7 @@ void cDataRepair::run()
 {
     if (!cBlockDataFileReader::isOpen())
     {
-        emit fileResults(false, "File is not open!");
+        emit fileResults(mId, false, "File is not open!");
         return;
     }
 
@@ -54,7 +54,7 @@ void cDataRepair::run()
         {
             if (fail())
             {
-                emit fileResults(false, "I/O Error: failbit is set.");
+                emit fileResults(mId, false, "I/O Error: failbit is set.");
                 cBlockDataFileReader::close();
                 return;
             }
@@ -73,7 +73,7 @@ void cDataRepair::run()
     catch (const bdf::stream_error& e)
     {
         std::string msg = e.what();
-        emit fileResults(false, e.what());
+        emit fileResults(mId, false, e.what());
     }
     catch (const bdf::unexpected_eof& e)
     {
@@ -81,7 +81,7 @@ void cDataRepair::run()
 
         QString msg = "Unexpected EOF: ";
         msg += e.what();
-        emit fileResults(true, msg);
+        emit fileResults(mId, true, msg);
         return;
     }
     catch (const std::exception& e)
@@ -89,21 +89,21 @@ void cDataRepair::run()
         if (eof())
         {
             if (!moveFileToRepaired())
-                emit fileResults(false, "File size mismatch!");
+                emit fileResults(mId, false, "File size mismatch!");
             else
-                emit fileResults(true, QString());
+                emit fileResults(mId, true, QString());
         }
         else
         {
-            emit fileResults(false, e.what());
+            emit fileResults(mId, false, e.what());
         }
         return;
     }
 
     if (!moveFileToRepaired())
-        emit fileResults(false, "File size mismatch!");
+        emit fileResults(mId, false, "File size mismatch!");
     else
-        emit fileResults(true, QString());
+        emit fileResults(mId, true, QString());
 }
 
 void cDataRepair::processBlock(const cBlockID& id)

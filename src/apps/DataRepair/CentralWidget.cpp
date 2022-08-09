@@ -21,6 +21,7 @@
 cCentralWidget::cCentralWidget(QWidget* parent) :
     QWidget(parent)
 {
+    mActiveScanCount = 0;
     initialize();
 }
 
@@ -126,6 +127,12 @@ void cCentralWidget::browseSourceFile()
 void cCentralWidget::repairDataFiles()
 {
     mpLoadFailedButton->setEnabled(false);
+    mpRepairButton->setEnabled(false);
+
+    emit statusMessage("Scan started...");
+
+    update();
+
     mFilesToRepair.clear();
 
     if (!QDir().mkpath(mRepairedDataDirectory))
@@ -158,32 +165,55 @@ void cCentralWidget::repairDataFiles()
         return;
     }
 
-    mCurrentFileName = mFilesToRepair.front();
-    mFilesToRepair.pop_front();
+    auto maxThreads = QThreadPool::globalInstance()->maxThreadCount();
+    mActiveScanCount = 0;
 
-    cDataRepair* pRepair = new cDataRepair(mCurrentDataDirectory, mRepairedDataDirectory);
-    connect(pRepair, &cDataRepair::fileResults, this, &cCentralWidget::fileResultsUpdated);
-    connect(pRepair, &cDataRepair::statusMessage, this, &cCentralWidget::statusMessage);
+    for (; mActiveScanCount < maxThreads;)
+    {
+        if (mFilesToRepair.empty())
+            break;
 
-    pRepair->open(mCurrentFileName.toStdString());
+        mCurrentFileName = mFilesToRepair.front();
+        mFilesToRepair.pop_front();
 
-    auto* pItem = new QListWidgetItem();
-    QString text = "Repairing ";
-    text += mCurrentFileName;
-    text += "...";
-    pItem->setText(text);
-    mpRepairResults->insertItem(mpRepairResults->count(), pItem);
-    mpRepairResults->setCurrentItem(pItem);
+        auto* pItem = new QListWidgetItem();
+        QString text = "Repairing ";
+        text += mCurrentFileName;
+        text += "...";
+        pItem->setText(text);
+        auto n = mpRepairResults->count();
+        mpRepairResults->insertItem(n, pItem);
+        mpRepairResults->setCurrentItem(pItem);
 
-    QThreadPool::globalInstance()->start(pRepair);
+        cDataRepair* pRepair = new cDataRepair(n, mCurrentDataDirectory, mRepairedDataDirectory);
+        connect(pRepair, &cDataRepair::fileResults, this, &cCentralWidget::fileResultsUpdated);
+        connect(pRepair, &cDataRepair::statusMessage, this, &cCentralWidget::statusMessage);
+
+        if (!pRepair->open(mCurrentFileName.toStdString()))
+        {
+            QString text = mCurrentFileName;
+            text += "... could not be loaded.";
+            pItem->setText(text);
+            disconnect(pRepair, &cDataRepair::fileResults, this, &cCentralWidget::fileResultsUpdated);
+            disconnect(pRepair, &cDataRepair::statusMessage, this, &cCentralWidget::statusMessage);
+            delete pRepair;
+            continue;
+        }
+
+        QThreadPool::globalInstance()->start(pRepair);
+        ++mActiveScanCount;
+    }
 }
 
 //-----------------------------------------------------------------------------
-void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
+void cCentralWidget::fileResultsUpdated(int id, bool valid, QString msg)
 {
+    --mActiveScanCount;
+
     emit statusMessage(msg);
 
-    auto* pItem = mpRepairResults->currentItem();
+    auto* pItem = mpRepairResults->item(id);
+//    auto* pItem = mpRepairResults->currentItem();
 
     if (valid)
     {
@@ -200,9 +230,11 @@ void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
 
     if (mFilesToRepair.empty())
     {
-        mpLoadFailedButton->setEnabled(true);
-
-        emit statusMessage("Scan Finished.");
+        if (mActiveScanCount <= 0)
+        {
+            mpLoadFailedButton->setEnabled(true);
+            emit statusMessage("Scan Finished.");
+        }
 
         return;
     }
@@ -210,20 +242,23 @@ void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
     mCurrentFileName = mFilesToRepair.front();
     mFilesToRepair.pop_front();
 
-    cDataRepair* pRepair = new cDataRepair(mCurrentDataDirectory, mRepairedDataDirectory);
-    connect(pRepair, &cDataRepair::fileResults, this, &cCentralWidget::fileResultsUpdated);
-    connect(pRepair, &cDataRepair::statusMessage, this, &cCentralWidget::statusMessage);
-
-    pRepair->open(mCurrentFileName.toStdString());
-
     pItem = new QListWidgetItem();
     QString text = "Repairing ";
     text += mCurrentFileName;
     text += "...";
     pItem->setText(text);
-    mpRepairResults->insertItem(mpRepairResults->count(), pItem);
+    auto n = mpRepairResults->count();
+    mpRepairResults->insertItem(n, pItem);
     mpRepairResults->setCurrentItem(pItem);
 
+    cDataRepair* pRepair = new cDataRepair(n, mCurrentDataDirectory, mRepairedDataDirectory);
+    connect(pRepair, &cDataRepair::fileResults, this, &cCentralWidget::fileResultsUpdated);
+    connect(pRepair, &cDataRepair::statusMessage, this, &cCentralWidget::statusMessage);
+
+    pRepair->open(mCurrentFileName.toStdString());
+
     QThreadPool::globalInstance()->start(pRepair);
+
+    ++mActiveScanCount;
 }
 

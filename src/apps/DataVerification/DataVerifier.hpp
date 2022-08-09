@@ -16,7 +16,7 @@ class cDataVerifier : public QObject, public QRunnable,
     Q_OBJECT
 
 public:
-    cDataVerifier(const QString& dataDir, QObject* parent = nullptr);
+    cDataVerifier(int id, const QString& dataDir, QObject* parent = nullptr);
     ~cDataVerifier();
 
     bool open(const std::string& file_name);
@@ -25,7 +25,7 @@ public:
 
 signals:
     void statusMessage(QString msg);
-    void fileResults(bool valid, QString msg);
+    void fileResults(int id, bool valid, QString msg);
 
 protected:
 	void moveFileToFailed();
@@ -55,6 +55,7 @@ private:
 	void onImageSize(int width, int height) override;
 
 private:
+	const int mId;
     cBlockDataFileReader mFileReader;
 
 	QString     mCurrentDataDirectory;

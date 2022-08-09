@@ -37,7 +37,7 @@ signals:
 private slots:
     void browseSourceFile();
     void repairDataFiles();
-    void fileResultsUpdated(bool valid, QString msg);
+    void fileResultsUpdated(int id, bool valid, QString msg);
 
 private:
     QLineEdit*   mpLoadFailedPath = nullptr;
@@ -50,5 +50,6 @@ private:
     QString     mCurrentDataDirectory;
     QString     mRepairedDataDirectory;
     QString     mCurrentFileName;
+    int         mActiveScanCount;
 };
 

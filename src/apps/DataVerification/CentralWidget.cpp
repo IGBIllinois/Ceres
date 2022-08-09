@@ -21,6 +21,7 @@
 cCentralWidget::cCentralWidget(QWidget* parent) :
     QWidget(parent)
 {
+    mActiveScanCount = 0;
     initialize();
 }
 
@@ -123,6 +124,10 @@ void cCentralWidget::scanDataFiles()
     mpLoadSrcButton->setEnabled(false);
     mpScanButton->setEnabled(false);
 
+    emit statusMessage("Scan started...");
+
+    update();
+
     mFilesToTest.clear();
 
     QDir dir(mCurrentDataDirectory);
@@ -151,32 +156,53 @@ void cCentralWidget::scanDataFiles()
 
     }
 
-    mCurrentFileName = mFilesToTest.front();
-    mFilesToTest.pop_front();
+    auto maxThreads = QThreadPool::globalInstance()->maxThreadCount();
+    mActiveScanCount = 0;
 
-    cDataVerifier* pVerifier = new cDataVerifier(mCurrentDataDirectory);
-    connect(pVerifier, &cDataVerifier::fileResults, this, &cCentralWidget::fileResultsUpdated);
-    connect(pVerifier, &cDataVerifier::statusMessage, this, &cCentralWidget::statusMessage);
+    for (; mActiveScanCount < maxThreads;)
+    {
+        if (mFilesToTest.empty())
+            break;
 
-    pVerifier->open(mCurrentFileName.toStdString());
+        mCurrentFileName = mFilesToTest.front();
+        mFilesToTest.pop_front();
 
-    auto* pItem = new QListWidgetItem();
-    QString text = "Scanning ";
-    text += mCurrentFileName;
-    text += "...";
-    pItem->setText(text);
-    mpScanResults->insertItem(mpScanResults->count(), pItem);
-    mpScanResults->setCurrentItem(pItem);
+        auto* pItem = new QListWidgetItem();
+        QString text = "Scanning ";
+        text += mCurrentFileName;
+        text += "...";
+        pItem->setText(text);
+        auto n = mpScanResults->count();
+        mpScanResults->insertItem(n, pItem);
+        mpScanResults->setCurrentItem(pItem);
 
-    QThreadPool::globalInstance()->start(pVerifier);
+        cDataVerifier* pVerifier = new cDataVerifier(n, mCurrentDataDirectory);
+        connect(pVerifier, &cDataVerifier::fileResults, this, &cCentralWidget::fileResultsUpdated);
+        connect(pVerifier, &cDataVerifier::statusMessage, this, &cCentralWidget::statusMessage);
+
+        if (!pVerifier->open(mCurrentFileName.toStdString()))
+        {
+            QString text = mCurrentFileName;
+            text += "... could not be loaded.";
+            pItem->setText(text);
+            delete pVerifier;
+            continue;
+        }
+
+        QThreadPool::globalInstance()->start(pVerifier);
+        ++mActiveScanCount;
+    }
 }
 
 //-----------------------------------------------------------------------------
-void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
+void cCentralWidget::fileResultsUpdated(int id, bool valid, QString msg)
 {
+    --mActiveScanCount;
+
     emit statusMessage(msg);
 
-    auto* pItem = mpScanResults->currentItem();
+    auto* pItem = mpScanResults->item(id);
+//    auto* pItem = mpScanResults->currentItem();
 
     if (valid)
     {
@@ -193,9 +219,11 @@ void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
 
     if (mFilesToTest.empty())
     {
-        mpLoadSrcButton->setEnabled(true);
-
-        emit statusMessage("Scan Finished.");
+        if (mActiveScanCount <= 0)
+        {
+            mpLoadSrcButton->setEnabled(true);
+            emit statusMessage("Scan Finished.");
+        }
 
         return;
     }
@@ -203,19 +231,21 @@ void cCentralWidget::fileResultsUpdated(bool valid, QString msg)
     mCurrentFileName = mFilesToTest.front();
     mFilesToTest.pop_front();
 
-    cDataVerifier* pVerifier = new cDataVerifier(mCurrentDataDirectory);
-    connect(pVerifier, &cDataVerifier::fileResults, this, &cCentralWidget::fileResultsUpdated);
-
-    pVerifier->open(mCurrentFileName.toStdString());
-
     pItem = new QListWidgetItem();
     QString text = "Scanning ";
     text += mCurrentFileName;
     text += "...";
     pItem->setText(text);
-    mpScanResults->insertItem(mpScanResults->count(), pItem);
+    auto n = mpScanResults->count();
+    mpScanResults->insertItem(n, pItem);
     mpScanResults->setCurrentItem(pItem);
 
+    cDataVerifier* pVerifier = new cDataVerifier(n, mCurrentDataDirectory);
+    connect(pVerifier, &cDataVerifier::fileResults, this, &cCentralWidget::fileResultsUpdated);
+
+    pVerifier->open(mCurrentFileName.toStdString());
+
     QThreadPool::globalInstance()->start(pVerifier);
+    ++mActiveScanCount;
 }
 

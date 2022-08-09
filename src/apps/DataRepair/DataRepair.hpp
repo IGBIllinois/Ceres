@@ -13,7 +13,7 @@ class cDataRepair : public QObject, public QRunnable, private cBlockDataFileRead
     Q_OBJECT
 
 public:
-	cDataRepair(const QString& dataDir, const QString& repairedDir, 
+	cDataRepair(int id, const QString& dataDir, const QString& repairedDir, 
                 QObject* parent = nullptr);
     ~cDataRepair();
 
@@ -23,7 +23,7 @@ public:
 
 signals:
     void statusMessage(QString msg);
-    void fileResults(bool valid, QString msg);
+    void fileResults(int id, bool valid, QString msg);
 
 private:
     void processBlock(const cBlockID& id) override;
@@ -32,6 +32,7 @@ private:
     bool moveFileToRepaired(bool size_check = true);
 
 private:
+    const int mId;
     cBlockDataFileWriter mFileWriter;
 
     QString     mCurrentDataDirectory;

@@ -8,8 +8,8 @@
 
 
 //-----------------------------------------------------------------------------
-cDataVerifier::cDataVerifier(const QString& dataDir, QObject* parent)
-    : QObject(parent)
+cDataVerifier::cDataVerifier(int id, const QString& dataDir, QObject* parent)
+    : QObject(parent), mId(id)
 {
     mCurrentDataDirectory = dataDir;
 }
@@ -29,7 +29,7 @@ void cDataVerifier::run()
 {
     if (!mFileReader.isOpen())
     {
-        emit fileResults(false, "File is not open!");
+        emit fileResults(mId, false, "File is not open!");
         return;
     }
 
@@ -39,7 +39,7 @@ void cDataVerifier::run()
         {
             if (mFileReader.fail())
             {
-                emit fileResults(false, "I/O Error: failbit is set.");
+                emit fileResults(mId, false, "I/O Error: failbit is set.");
                 mFileReader.close();
                 return;
             }
@@ -59,7 +59,7 @@ void cDataVerifier::run()
     {
         mFileReader.close();
         std::string msg = e.what();
-        emit fileResults(false, e.what());
+        emit fileResults(mId, false, e.what());
 
         moveFileToFailed();
         return;
@@ -68,18 +68,18 @@ void cDataVerifier::run()
     {
         if (mFileReader.eof())
         {
-            emit fileResults(true, QString());
+            emit fileResults(mId, true, QString());
         }
         else
         {
-            emit fileResults(false, e.what());
+            emit fileResults(mId, false, e.what());
             moveFileToFailed();
         }
         mFileReader.close();
         return;
     }
 
-    emit fileResults(true, QString());
+    emit fileResults(mId, true, QString());
     mFileReader.close();
 }
 
