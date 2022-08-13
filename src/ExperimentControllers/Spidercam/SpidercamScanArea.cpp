@@ -31,6 +31,13 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mDollyBrush.setColor(mDollyColor);
 	mDollyBrush.setStyle(Qt::SolidPattern);
 
+	mHasSecondaryPosition = false;
+	QColor color(0, 0, 255);
+	mSecondaryDollyPen.setColor(color);
+	mSecondaryDollyPen.setWidth(1);
+	mSecondaryDollyBrush.setColor(color);
+	mSecondaryDollyBrush.setStyle(Qt::SolidPattern);
+
 	mIsRecording = false;
 	mpActivePath = nullptr;
 }
@@ -86,6 +93,13 @@ void cSpidercamScanArea::updateDollyPosition(uint32_t x, uint32_t y)
 	}
 
 	repaint();
+}
+
+void cSpidercamScanArea::updateSecondaryDollyPosition(bool valid, uint32_t x, uint32_t y)
+{
+	mHasSecondaryPosition = valid;
+	mSecondaryDollyPosition.setX(x);
+	mSecondaryDollyPosition.setY(y);
 }
 
 void cSpidercamScanArea::updateBounds(double minX, double maxX, double minY, double maxY)
@@ -287,7 +301,13 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		drawLayout(painter, window_height, layout);
 	}
 
-	drawDollyMarker(painter, window_height);
+	if (mHasSecondaryPosition)
+	{
+		drawDollyMarker(painter, window_height,
+			mSecondaryDollyPosition, mSecondaryDollyPen, mSecondaryDollyBrush);
+	}
+
+	drawDollyMarker(painter, window_height, mDollyPosition, mDollyPen, mDollyBrush);
 	drawPath(painter, window_height);
 }
 
@@ -422,19 +442,20 @@ void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const expe
 	painter.restore();
 }
 
-void cSpidercamScanArea::drawDollyMarker(QPainter& painter, double height)
+void cSpidercamScanArea::drawDollyMarker(QPainter& painter, double height,
+	const QPoint& pos, const QPen& pen, const QBrush& brush)
 {
-	int x = mX_Scale * (mDollyPosition.x() - mMinX) + mX_Offset;
-	int y = mY_Scale * (mDollyPosition.y() - mMinY) + mY_Offset;
+	int x = mX_Scale * (pos.x() - mMinX) + mX_Offset;
+	int y = mY_Scale * (pos.y() - mMinY) + mY_Offset;
 
 	y = height - y;
 
 	QPoint center(x, y);
 
-	painter.setPen(mDollyPen);
+	painter.setPen(pen);
 	painter.drawEllipse(center, 2*mDollyMarkerRadius, 2*mDollyMarkerRadius);
 
-	painter.setBrush(mDollyBrush);
+	painter.setBrush(brush);
 	painter.drawEllipse(center, mDollyMarkerRadius, mDollyMarkerRadius);
 
 }

@@ -29,18 +29,15 @@ public:
     void loadLayout(const std::string& layout_filename);
 
 public slots:
-
-    //    void setBorderPenWidth(int width);
-//    void setBorderPenColor(const QColor& color);
-
- //   void setMeasurementPenWidth(int width);
- //   void setMeasurementPenColor(const QColor& color);
+    void updateSecondaryDollyPosition(bool valid, uint32_t x, uint32_t y);
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
 
 private:
-    void drawDollyMarker(QPainter& painter, double height);
+    void drawDollyMarker(QPainter& painter, double height, 
+        const QPoint& pos, const QPen& pen, const QBrush& brush);
+
     void drawPath(QPainter& painter, double height);
 
 private:
@@ -108,5 +105,10 @@ private:
     QBrush mDollyBrush;
     QColor mDollyColor;
     int    mDollyMarkerRadius;
+
+    bool   mHasSecondaryPosition;
+    QPoint mSecondaryDollyPosition;
+    QPen   mSecondaryDollyPen;
+    QBrush mSecondaryDollyBrush;
 };
 
