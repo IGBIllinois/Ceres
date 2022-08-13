@@ -32,7 +32,7 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mDollyBrush.setStyle(Qt::SolidPattern);
 
 	mHasSecondaryPosition = false;
-	QColor color(0, 0, 255);
+	QColor color(128, 128, 128, 128);
 	mSecondaryDollyPen.setColor(color);
 	mSecondaryDollyPen.setWidth(1);
 	mSecondaryDollyBrush.setColor(color);
