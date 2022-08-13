@@ -296,6 +296,11 @@ void cCtrlDataModelRemote::connected()
 
 void cCtrlDataModelRemote::disconnected()
 {
+    if (isExperimentRunning())
+    {
+        terminateExperiment();
+    }
+
     if (mConnected)
     {
         QString msg = "Connection to the C4 has been lost!";

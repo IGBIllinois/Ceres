@@ -161,9 +161,8 @@ void cExperimentControlModel::terminateExperiment()
 
     mRunning = false;
     mPaused = false;
-    emit experimentStateChanged(eState::TERMINATED);
-    emit experimentStatus("Experiment stopped!");
     mExperimentName.clear();
+    emit experimentStateChanged(eState::TERMINATED);
 }
 
 void cExperimentControlModel::pauseExperiment()
@@ -224,9 +223,8 @@ void cExperimentControlModel::updateExperimentStateMachine()
         {
             recordingStateChanged(false);
             mRunning = false;
-            emit experimentStateChanged(eState::COMPLETED);
-            emit statusMessage("Experiment completed!");
             mExperimentName.clear();
+            emit experimentStateChanged(eState::COMPLETED);
         }
     }
 }

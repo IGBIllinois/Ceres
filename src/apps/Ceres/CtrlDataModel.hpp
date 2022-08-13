@@ -61,6 +61,7 @@ public:
     void terminateExperiment();
 
 signals:
+    void experimentTerminated();
     void experimentCompleted();
 
 protected slots:
@@ -82,5 +83,8 @@ protected:
     std::string  mExperimentDoc;
 
     cCtrlDataThread mThread;
+
+private:
+    void doExperimentCleanup();
 };
 

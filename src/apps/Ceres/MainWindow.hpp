@@ -55,6 +55,7 @@ public slots:
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString msg);
 
+    void onExperimentTerminated();
     void onExperimentCompleted();
 
 private slots:

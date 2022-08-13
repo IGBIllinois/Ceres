@@ -462,9 +462,7 @@ void cMainWindow::onExperimentStop()
 
     mpModel->terminateExperiment();
 
-    mBatchProcess.clear();
-
-    onExperimentCompleted();
+//    onExperimentTerminated();
 }
 
 //-----------------------------------------------------------------------------
@@ -521,8 +519,11 @@ void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
     onStatusUpdate(msg);
 }
 
-void cMainWindow::onExperimentCompleted()
+void cMainWindow::onExperimentTerminated()
 {
+    mBatchFileName.clear();
+    mBatchProcess.clear();
+
     mpExpLoad->setEnabled(true);
     mpExpRun->setEnabled(true);
     mpExpPause->setEnabled(false);
@@ -530,8 +531,11 @@ void cMainWindow::onExperimentCompleted()
 
     emit experimentStopped();
 
-    QSound::play(":/ripe.illinois.edu/end_experiment.wav");
+    onStatusUpdate("Experiment stopped!");
+}
 
+void cMainWindow::onExperimentCompleted()
+{
     mBatchFileName.clear();
 
     while (!mBatchProcess.empty())
@@ -542,9 +546,19 @@ void cMainWindow::onExperimentCompleted()
         if (loadExperiment(expFile))
         {
             onExperimentRun();
-            break;
+            return;
         }
     }
+
+    mpExpLoad->setEnabled(true);
+    mpExpRun->setEnabled(true);
+    mpExpPause->setEnabled(false);
+    mpExpStop->setEnabled(false);
+
+    emit experimentStopped();
+
+    QSound::play(":/ripe.illinois.edu/end_experiment.wav");
+    onStatusUpdate("Experiment completed!");
 }
 
 
@@ -728,6 +742,7 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         mpModel = pModel;
     }
 
+    QObject::connect(mpModel, &cCtrlDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
     QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
 }
 

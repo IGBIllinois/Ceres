@@ -173,20 +173,34 @@ void cCtrlDataModel::onExperimentStateChange(experiment::eState state)
 
     switch (state)
     {
+        case eState::PAUSED:
+            break;
         case eState::COMPLETED:
-        case eState::TERMINATED:
         {
-            endDataRecording();
-
-            closeDataFile();
-
-            mExperimentTitle.clear();
-            mExperimentDoc.clear();
+            doExperimentCleanup();
 
             emit experimentCompleted();
 
             break;
         }
+        case eState::TERMINATED:
+        {
+            doExperimentCleanup();
+
+            emit experimentTerminated();
+
+            break;
+        }
     }
+}
+
+void cCtrlDataModel::doExperimentCleanup()
+{
+    endDataRecording();
+
+    closeDataFile();
+
+    mExperimentTitle.clear();
+    mExperimentDoc.clear();
 }
 
