@@ -15,6 +15,39 @@ cSsnxModel_file::~cSsnxModel_file()
 {
 }
 
+void cSsnxModel_file::onNewData(const ssnx::PVT_Cartesian_2_t& data)
+{
+	mX_m = data.X_m;
+	mY_m = data.Y_m;
+	mZ_m = data.Z_m;
+	mVx_mps = data.Vx_mps;
+	mVy_mps = data.Vy_mps;
+	mVz_mps = data.Vz_mps;
+	mCartGroundTrack_deg = data.GroundTrack_deg;
+}
+
+void cSsnxModel_file::onNewData(const ssnx::PVT_Cartesian_2_1_t& data)
+{
+	mX_m = data.X_m;
+	mY_m = data.Y_m;
+	mZ_m = data.Z_m;
+	mVx_mps = data.Vx_mps;
+	mVy_mps = data.Vy_mps;
+	mVz_mps = data.Vz_mps;
+	mCartGroundTrack_deg = data.GroundTrack_deg;
+}
+
+void cSsnxModel_file::onNewData(const ssnx::PVT_Cartesian_2_2_t& data)
+{
+	mX_m = data.X_m;
+	mY_m = data.Y_m;
+	mZ_m = data.Z_m;
+	mVx_mps = data.Vx_mps;
+	mVy_mps = data.Vy_mps;
+	mVz_mps = data.Vz_mps;
+	mCartGroundTrack_deg = data.GroundTrack_deg;
+}
+
 void cSsnxModel_file::onNewData(const ssnx::PVT_Geodetic_1_t& data)
 {
 	mTimestamp_s = data.timestamp_s;

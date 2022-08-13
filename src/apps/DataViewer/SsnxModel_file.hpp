@@ -25,9 +25,9 @@ signals:
 
 protected:
 	void onNewData(const ssnx::PVT_Cartesian_1_t& data) override {};
-	void onNewData(const ssnx::PVT_Cartesian_2_t& data) override {};
-	void onNewData(const ssnx::PVT_Cartesian_2_1_t& data) override {};
-	void onNewData(const ssnx::PVT_Cartesian_2_2_t& data) override {};
+	void onNewData(const ssnx::PVT_Cartesian_2_t& data) override;
+	void onNewData(const ssnx::PVT_Cartesian_2_1_t& data) override;
+	void onNewData(const ssnx::PVT_Cartesian_2_2_t& data) override;
 	void onNewData(const ssnx::PVT_Geodetic_1_t& data) override;
 	void onNewData(const ssnx::PVT_Geodetic_2_t& data) override;
 	void onNewData(const ssnx::PVT_Geodetic_2_1_t& data) override;
@@ -42,6 +42,14 @@ protected:
 	void onNewData(const ssnx::RtcmDatum_1_t& data) override {};
 
 private:
+	double mX_m;
+	double mY_m;
+	double mZ_m;
+	double mVx_mps;
+	double mVy_mps;
+	double mVz_mps;
+	double mCartGroundTrack_deg;
+
 	double mTimestamp_s;
 	double mLatitude_rad;
 	double mLongitude_rad;
