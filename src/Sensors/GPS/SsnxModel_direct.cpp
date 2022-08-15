@@ -78,7 +78,8 @@ bool cSsnxModel_direct::startCommunications()
         return false;
     }
 
-    sendPromptRequest();
+    forcePromptRequest();
+//    sendPromptRequest();
 
     return true;
 }
@@ -314,14 +315,53 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
 
 void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 {
+    if (!cov.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(cov);
+    }
 }
 
 void cSsnxModel_direct::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 {
+    if (!cov.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(cov);
+    }
 }
 
 void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t& pvt)
 {
+    mPosPojected.dataValid = pvt.dataValid;
+    mPosPojected.timestamp_s = pvt.timestamp_s;
+
+    if (!mPosPojected.dataValid) return;
+
+    mPosPojected.datum = static_cast<::gps::eDatum>(pvt.Datum);
+    mPosPojected.HeightComputed = pvt.HeightComputed;
+    mPosPojected.Northing_m = pvt.Northing_m;
+    mPosPojected.Easting_m = pvt.Easting_m;
+    mPosPojected.Alt_m = pvt.Alt_m;
+
+/*
+    bool           dataValid;
+    double         timestamp_s;
+    eSolutionType  Mode;
+    bool		   HeightComputed;
+    uint8_t        Error;
+    double	       Northing_m;
+    double		   Easting_m;
+    double		   Alt_m;
+    uint8_t        Datum;
+*/
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(pvt);
+    }
 }
 
 void cSsnxModel_direct::receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt)
@@ -349,6 +389,12 @@ void cSsnxModel_direct::receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt)
 
 void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
 {
+    if (!rtcm.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(rtcm);
+    }
 }
 
 

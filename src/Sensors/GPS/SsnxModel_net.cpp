@@ -151,13 +151,34 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
 }
 
 void cSsnxModel_net::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
-{}
+{
+    if (!cov.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(cov);
+    }
+}
 
 void cSsnxModel_net::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
-{}
+{
+    if (!cov.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(cov);
+    }
+}
 
 void cSsnxModel_net::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
-{}
+{
+    if (!pvt.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(pvt);
+    }
+}
 
 void cSsnxModel_net::receiverTime(const ssnx::gps::ReceiverTime_1_t pvt)
 {
@@ -183,7 +204,14 @@ void cSsnxModel_net::receiverTime(const ssnx::gps::ReceiverTime_1_t pvt)
 }
 
 void cSsnxModel_net::rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm)
-{}
+{
+    if (!rtcm.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(rtcm);
+    }
+}
 
 void cSsnxModel_net::processDatagram(const void* pBuffer, std::size_t buf_length)
 {

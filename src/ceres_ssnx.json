@@ -27,9 +27,26 @@
 	{
 		"Manufacturer": "Septentrio",
 		"Model": "Altus-NR3",
-		"Serial Number": "123456",
+		"Serial Number": "6106326",
 		"host": "172.16.1.3",
 		"port":10000
+	},
+	"ssnx direct":
+	{
+		"Manufacturer": "Septentrio",
+		"Model": "Altus-NR3",
+		"Serial Number": "6106326",
+		"serial_port":
+		{
+			"windows": "COM4",
+			"macOS": "/dev/ttyUSB0",
+			"linux": "/dev/ttyUSB0"
+		},
+		"initialization": [
+			"spm, Rover, StandAlone+RTK",
+			"sbtp, off",
+			"sso, Stream1, <CD>, PVTGeodetic+Time, OnChange"
+		]
 	},
 	"weather_data":
 	{

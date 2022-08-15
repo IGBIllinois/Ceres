@@ -90,6 +90,19 @@ private:
 
     sCartesian_t mCartesianPVT;
 
+    struct sPosPojected_t
+    {
+        bool    dataValid = false;
+        double  timestamp_s = 0;
+        ::gps::eDatum datum = ::gps::eDatum::WGS84;
+        bool    HeightComputed = false;
+        double	Northing_m = 0;
+        double  Easting_m = 0;
+        double  Alt_m = 0;
+    };
+
+    sPosPojected_t mPosPojected;
+
     cSsnxSerializer mSerializer;
 };
 
