@@ -18,6 +18,7 @@ PRIVATE
 	BlockDataFileExceptions.hpp
     BlockDataFile.hpp
 	BlockId.hpp
+    Crc.hpp
 	ClassIdentifiers.hpp
     DataBuffer.hpp
 	RawDataBuffer.hpp
@@ -128,6 +129,7 @@ PRIVATE
     ExperimentParser.cpp
 
 	BlockDataFile.cpp
+	Crc.cpp
     DataBuffer.cpp
     RawDataBuffer.cpp
 	BlockSerializer.cpp
