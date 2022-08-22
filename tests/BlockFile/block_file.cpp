@@ -52,6 +52,12 @@ TEST_CASE("Simple CRC tests", "[crc]")
 		buffer.resize(64);
 		crc = ::crc(id, buffer.data(), buffer.size());
 		REQUIRE(crc == 0xB1C457FAUL);
+
+		// 64 byte buffer with zeros
+		for (int i = 0; i < buffer.size(); ++i)
+			buffer[i] = static_cast<std::byte>(i);
+		crc = ::crc(id, buffer.data(), buffer.size());
+		REQUIRE(crc == 0xD447FA40UL);
 	}
 }
 

@@ -280,6 +280,8 @@ bool cBlockDataFileReader::processBlock()
 
     std::uint32_t len = 0;
     mFile.read(reinterpret_cast<char*>(&len), sizeof(len));
+    if (mFile.eof())
+        return false;
     if (mFile.bad())
     {
         std::string msg = "I/O error while reading block length: ";
