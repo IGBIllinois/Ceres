@@ -8,7 +8,6 @@
 #include "ExperimentSerializer.hpp"
 #include "ExperimentParser.hpp"
 
-const char* TEST_FILENAME = "test.exp";
 /*
 void writeBeginSensorList();
 void writeEndOfSensorList();
@@ -25,6 +24,8 @@ TEST_CASE("Begin/End Marker tests", "[experiment tests]")
 {
 	SECTION("Testing write/read of begin/end header markers...")
 	{
+		const char* TEST_FILENAME = "exp_header_test.ceres";
+
 		{
 			cBlockDataFileWriter wrt;
 			wrt.open(TEST_FILENAME);
@@ -102,6 +103,8 @@ TEST_CASE("Begin/End Marker tests", "[experiment tests]")
 
 	SECTION("Testing write/read of begin/end footer markers...")
 	{
+		const char* TEST_FILENAME = "exp_footer_test.ceres";
+
 		{
 			cBlockDataFileWriter wrt;
 			wrt.open(TEST_FILENAME);
@@ -183,6 +186,8 @@ TEST_CASE("Experiment header tests", "[experiment tests]")
 {
 	SECTION("Testing write/read of empty header data...")
 	{
+		const char* TEST_FILENAME = "exp_empty_header_test.ceres";
+
 		{
 			cBlockDataFileWriter wrt;
 			wrt.open(TEST_FILENAME);

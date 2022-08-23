@@ -10,6 +10,7 @@
 
 #include <ssnx/gps_data.hpp>
 
+
 /*
 void write(const ssnx::gps::PVT_Cartesian_1_t& in);
 void write(const ssnx::gps::PVT_Cartesian_2_t& in);
@@ -30,6 +31,8 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 {
 	SECTION("Testing write/read of PVT_Cartesian_1_t data...")
 	{
+		const char* TEST_FILENAME = "ssnx_cartesian_test.ceres";
+
 		ssnx::gps::PVT_Cartesian_1_t original_data;
 
 		original_data.BaseStationID = 1;
@@ -54,7 +57,7 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.ssnx");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 			cSsnxSerializer ssnx(1024, &wrt);
@@ -66,7 +69,7 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 		{
 			cBlockDataFileReader rd;
 
-			rd.open("test.ssnx");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 

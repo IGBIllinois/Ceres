@@ -65,32 +65,17 @@ TEST_CASE("Simple block file creation tests", "[initialization]")
 {
 	SECTION("Testing opening read/write files...")
 	{
+		const char* TEST_FILENAME = "block_file_empty_test.ceres";
+
 		cBlockDataFileWriter wrt;
-		wrt.open("test.ceres");
+		wrt.open(TEST_FILENAME);
 
 		REQUIRE(wrt.isOpen());
 
 		wrt.close();
 
 		cBlockDataFileReader rd;
-		rd.open("test.ceres");
-
-		REQUIRE(rd.isOpen());
-
-		rd.close();
-	}
-
-	SECTION("Testing read/write of string data...")
-	{
-		cBlockDataFileWriter wrt;
-		wrt.open("test.ceres");
-
-		REQUIRE(wrt.isOpen());
-
-		wrt.close();
-
-		cBlockDataFileReader rd;
-		rd.open("test.ceres");
+		rd.open(TEST_FILENAME);
 
 		REQUIRE(rd.isOpen());
 

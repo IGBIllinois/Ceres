@@ -11,11 +11,13 @@
 #include <ouster/OusterLidarData.h>
 
 
-TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
+TEST_CASE("Lidar Sensor Info tests", "[initialization]")
 {
 
 	SECTION("Testing read/write of sensor info data...")
 	{
+		const char* TEST_FILENAME = "ouster_sensor_info_test.ceres";
+
 		using namespace ouster;
 		sensor_info_2_t original_data;
 		original_data.product_line = "OS-0-128";
@@ -33,7 +35,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.lidar_data");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 
@@ -46,7 +48,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileReader rd;
-			rd.open("test.lidar_data");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 
@@ -76,6 +78,8 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 	SECTION("Testing read/write of IMU intrinsics data...")
 	{
+		const char* TEST_FILENAME = "ouster_imu_intrinsics_test.ceres";
+
 		using namespace ouster;
 		imu_intrinsics_2_t original_data;
 		original_data.imu_to_sensor_transform.resize(16);
@@ -98,7 +102,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.lidar_data");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 
@@ -111,7 +115,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileReader rd;
-			rd.open("test.lidar_data");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 
@@ -134,6 +138,8 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 	SECTION("Testing read/write of beam intrinsics data...")
 	{
+		const char* TEST_FILENAME = "ouster_beam_intrinsics_test.ceres";
+
 		using namespace ouster;
 		beam_intrinsics_2_t original_data;
 		original_data.altitude_angles_deg.resize(128);
@@ -176,7 +182,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.lidar_data");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 
@@ -189,7 +195,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileReader rd;
-			rd.open("test.lidar_data");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 
@@ -212,6 +218,8 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 	SECTION("Testing read/write of lidar intrinsics data...")
 	{
+		const char* TEST_FILENAME = "ouster_lidar_intrinsics_test.ceres";
+
 		using namespace ouster;
 		lidar_intrinsics_2_t original_data;
 
@@ -220,7 +228,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.lidar_data");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 
@@ -233,7 +241,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileReader rd;
-			rd.open("test.lidar_data");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 
@@ -254,6 +262,8 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 	SECTION("Testing read/write of time info data...")
 	{
+		const char* TEST_FILENAME = "ouster_time_info_test.ceres";
+
 		using namespace ouster;
 		time_info_2_t original_data;
 
@@ -291,7 +301,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.lidar_data");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 
@@ -304,7 +314,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileReader rd;
-			rd.open("test.lidar_data");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 
@@ -355,6 +365,8 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 	SECTION("Testing read/write of lidar data format data...")
 	{
+		const char* TEST_FILENAME = "ouster_lidar_data_format_test.ceres";
+
 		using namespace ouster;
 		lidar_data_format_2_t original_data;
 
@@ -377,7 +389,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.lidar_data");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 
@@ -390,7 +402,7 @@ TEST_CASE("Lidar Sonsor Info tests", "[initialization]")
 
 		{
 			cBlockDataFileReader rd;
-			rd.open("test.lidar_data");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 
@@ -421,6 +433,8 @@ TEST_CASE("Lidar IMU/LiDAR Data tests", "[stream data]")
 
 	SECTION("Testing write/read of lidar data...")
 	{
+		const char* TEST_FILENAME = "ouster_lidar_data_test.ceres";
+
 		using namespace ouster;
 		cOusterLidarData original_data;
 
@@ -446,7 +460,7 @@ TEST_CASE("Lidar IMU/LiDAR Data tests", "[stream data]")
 
 		{
 			cBlockDataFileWriter wrt;
-			wrt.open("test.lidar_data");
+			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
 			cOusterSerializer ouster(1024, &wrt);
@@ -460,7 +474,7 @@ TEST_CASE("Lidar IMU/LiDAR Data tests", "[stream data]")
 		{
 			cBlockDataFileReader rd;
 
-			rd.open("test.lidar_data");
+			rd.open(TEST_FILENAME);
 
 			REQUIRE(rd.isOpen());
 
