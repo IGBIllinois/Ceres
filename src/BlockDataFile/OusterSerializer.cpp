@@ -39,20 +39,20 @@ void cOusterSerializer::write(const ouster::config_param_2_t& in)
     mDataBuffer << in.udp_dest;
     mDataBuffer << in.lidar_port;
     mDataBuffer << in.imu_port;
-    mDataBuffer << to_int(in.timestamp_mode);
-    mDataBuffer << to_int(in.sync_pulse_in_polarity);
-    mDataBuffer << to_int(in.nmea_in_polarity);
+    mDataBuffer << to_uint8(in.timestamp_mode);
+    mDataBuffer << to_uint8(in.sync_pulse_in_polarity);
+    mDataBuffer << to_uint8(in.nmea_in_polarity);
     mDataBuffer << in.nmea_ignore_valid_char;
-    mDataBuffer << to_int(in.nmea_baud_rate);
+    mDataBuffer << to_uint8(in.nmea_baud_rate);
     mDataBuffer << in.nmea_leap_seconds;
-    mDataBuffer << to_int(in.multipurpose_io_mode);
-    mDataBuffer << to_int(in.sync_pulse_out_polarity);
+    mDataBuffer << to_uint8(in.multipurpose_io_mode);
+    mDataBuffer << to_uint8(in.sync_pulse_out_polarity);
     mDataBuffer << in.sync_pulse_out_frequency_hz;
     mDataBuffer << in.sync_pulse_out_angle;
     mDataBuffer << in.sync_pulse_out_pulse_width;
     mDataBuffer << in.auto_start_flag;
-    mDataBuffer << to_int(in.operating_mode);
-    mDataBuffer << to_int(in.lidar_mode);
+    mDataBuffer << to_uint8(in.operating_mode);
+    mDataBuffer << to_uint8(in.lidar_mode);
     mDataBuffer << in.azimuth_window.min_deg;
     mDataBuffer << in.azimuth_window.max_deg;
     mDataBuffer << in.phase_lock_enable;
@@ -82,7 +82,7 @@ void cOusterSerializer::write(const ouster::sensor_info_2_t& in)
     mDataBuffer << to_string(in.build_revision);
     mDataBuffer << to_string(in.proto_revision);
     mDataBuffer << in.build_date;
-    mDataBuffer << to_int(in.status);
+    mDataBuffer << to_uint8(in.status);
 
     assert(!mDataBuffer.overrun());
 
@@ -100,7 +100,7 @@ void cOusterSerializer::write(const ouster::timestamp_2_t& in)
 
     mDataBuffer.clear();
     mDataBuffer << in.time;
-    mDataBuffer << to_int(in.mode);
+    mDataBuffer << to_uint8(in.mode);
     mDataBuffer << in.sync_pulse_in;
     mDataBuffer << in.internal_osc;
     mDataBuffer << in.ptp_1588;
@@ -124,7 +124,7 @@ void cOusterSerializer::write(const ouster::sync_pulse_in_2_t& in)
     mDataBuffer << in.last_period_nsec;
     mDataBuffer << in.count_unfiltered;
     mDataBuffer << in.count;
-    mDataBuffer << to_int(in.polarity);
+    mDataBuffer << to_uint8(in.polarity);
 
     assert(!mDataBuffer.overrun());
 
@@ -144,7 +144,7 @@ void cOusterSerializer::write(const ouster::sync_pulse_out_2_t& in)
     mDataBuffer << in.pulse_width_ms;
     mDataBuffer << in.angle_deg;
     mDataBuffer << in.frequency_hz;
-    mDataBuffer << to_int(in.polarity);
+    mDataBuffer << to_uint8(in.polarity);
 
     assert(!mDataBuffer.overrun());
 
@@ -161,11 +161,11 @@ void cOusterSerializer::write(const ouster::multipurpose_io_2_t& in)
     mBlockID.dataID(DataID::MULTIPURPOSE_IO);
 
     mDataBuffer.clear();
-    mDataBuffer << to_int(in.mode);
+    mDataBuffer << to_uint8(in.mode);
     mDataBuffer << in.pulse_width_ms;
     mDataBuffer << in.angle_deg;
     mDataBuffer << in.frequency_hz;
-    mDataBuffer << to_int(in.polarity);
+    mDataBuffer << to_uint8(in.polarity);
 
     assert(!mDataBuffer.overrun());
 
@@ -183,7 +183,7 @@ void cOusterSerializer::write(const ouster::nmea_2_t& in)
 
     mDataBuffer.clear();
     mDataBuffer << in.locked;
-    mDataBuffer << to_int(in.baud_rate);
+    mDataBuffer << to_uint8(in.baud_rate);
     mDataBuffer << in.bit_count;
     mDataBuffer << in.bit_count_unfiltered;
     mDataBuffer << in.start_char_count;
@@ -194,7 +194,7 @@ void cOusterSerializer::write(const ouster::nmea_2_t& in)
     mDataBuffer << in.utc_decoded_count;
     mDataBuffer << in.leap_seconds;
     mDataBuffer << in.ignore_valid_char;
-    mDataBuffer << to_int(in.polarity);
+    mDataBuffer << to_uint8(in.polarity);
 
     assert(!mDataBuffer.overrun());
 
@@ -213,7 +213,7 @@ void cOusterSerializer::write(const ouster::time_info_2_t& in)
     mDataBuffer.clear();
     /* Timestamp Info */
     mDataBuffer << in.timestamp_info.time;
-    mDataBuffer << to_int(in.timestamp_info.mode);
+    mDataBuffer << to_uint8(in.timestamp_info.mode);
     mDataBuffer << in.timestamp_info.sync_pulse_in;
     mDataBuffer << in.timestamp_info.internal_osc;
     mDataBuffer << in.timestamp_info.ptp_1588;
@@ -223,18 +223,18 @@ void cOusterSerializer::write(const ouster::time_info_2_t& in)
     mDataBuffer << in.sync_pulse_info.last_period_nsec;
     mDataBuffer << in.sync_pulse_info.count_unfiltered;
     mDataBuffer << in.sync_pulse_info.count;
-    mDataBuffer << to_int(in.sync_pulse_info.polarity);
+    mDataBuffer << to_uint8(in.sync_pulse_info.polarity);
 
     /* Multipurpose IO Info */
-    mDataBuffer << to_int(in.multipurpose_io_info.mode);
+    mDataBuffer << to_uint8(in.multipurpose_io_info.mode);
     mDataBuffer << in.multipurpose_io_info.pulse_width_ms;
     mDataBuffer << in.multipurpose_io_info.angle_deg;
     mDataBuffer << in.multipurpose_io_info.frequency_hz;
-    mDataBuffer << to_int(in.multipurpose_io_info.polarity);
+    mDataBuffer << to_uint8(in.multipurpose_io_info.polarity);
 
     /* NMEA Info */
     mDataBuffer << in.nmea_info.locked;
-    mDataBuffer << to_int(in.nmea_info.baud_rate);
+    mDataBuffer << to_uint8(in.nmea_info.baud_rate);
     mDataBuffer << in.nmea_info.bit_count;
     mDataBuffer << in.nmea_info.bit_count_unfiltered;
     mDataBuffer << in.nmea_info.start_char_count;
@@ -245,7 +245,7 @@ void cOusterSerializer::write(const ouster::time_info_2_t& in)
     mDataBuffer << in.nmea_info.utc_decoded_count;
     mDataBuffer << in.nmea_info.leap_seconds;
     mDataBuffer << in.nmea_info.ignore_valid_char;
-    mDataBuffer << to_int(in.nmea_info.polarity);
+    mDataBuffer << to_uint8(in.nmea_info.polarity);
 
     assert(!mDataBuffer.overrun());
 
