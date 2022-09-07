@@ -12,7 +12,6 @@
 
 
 /*
-void write(const ssnx::gps::PVT_Cartesian_1_t& in);
 void write(const ssnx::gps::PVT_Cartesian_2_t& in);
 void write(const ssnx::gps::PVT_Geodetic_1_t& in);
 void write(const ssnx::gps::PVT_Geodetic_2_t& in);
@@ -35,8 +34,9 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 
 		ssnx::gps::PVT_Cartesian_1_t original_data;
 
-		original_data.BaseStationID = 1;
 		original_data.dataValid = true;
+		original_data.timestamp_s = 12345.6789;
+		original_data.BaseStationID = 1;
 		original_data.Error = 0;
 		original_data.GroundTrack_deg = 45.0;
 		original_data.Info = 1;
@@ -47,7 +47,6 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 		original_data.RxClkDrift_ppm = 2;
 		original_data.SBASprn = 15;
 		original_data.System = 3;
-		original_data.timestamp_s = 12345.6789;
 		original_data.Vx_mps = 0.0;
 		original_data.Vy_mps = 0.0;
 		original_data.Vz_mps = 0.0;
@@ -62,7 +61,7 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 			REQUIRE(wrt.isOpen());
 			cSsnxSerializer ssnx(1024, &wrt);
 			ssnx.setVersion(1, 0);
-
+			ssnx.write(original_data);
 			wrt.close();
 		}
 
@@ -79,7 +78,117 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-//			REQUIRE(pvt.timeUnit() == pvt::eTIME_UNITS::NANOSECONDS);
+			auto info = ssnx.getPVT_Cartesian_1();
+
+			REQUIRE(info.BaseStationID == original_data.BaseStationID);
+			REQUIRE(info.dataValid == original_data.dataValid);
+			REQUIRE(info.Error == original_data.Error);
+			REQUIRE(info.GroundTrack_deg == original_data.GroundTrack_deg);
+			REQUIRE(info.Info == original_data.Info);
+			REQUIRE(info.MeanCorrAge_s == original_data.MeanCorrAge_s);
+			REQUIRE(info.Mode == original_data.Mode);
+			REQUIRE(info.NrSV == original_data.NrSV);
+			REQUIRE(info.RxClkBias_ms == original_data.RxClkBias_ms);
+			REQUIRE(info.RxClkDrift_ppm == original_data.RxClkDrift_ppm);
+			REQUIRE(info.SBASprn == original_data.SBASprn);
+			REQUIRE(info.System == original_data.System);
+			REQUIRE(info.timestamp_s == original_data.timestamp_s);
+			REQUIRE(info.Vx_mps == original_data.Vx_mps);
+			REQUIRE(info.Vy_mps == original_data.Vy_mps);
+			REQUIRE(info.Vz_mps == original_data.Vz_mps);
+			REQUIRE(info.X_m == original_data.X_m);
+			REQUIRE(info.Y_m == original_data.Y_m);
+			REQUIRE(info.Z_m == original_data.Z_m);
+
+			rd.close();
+		}
+	}
+
+	SECTION("Testing write/read of PVT_Cartesian_2_t data...")
+	{
+		const char* TEST_FILENAME = "ssnx_cartesian_test.ceres";
+
+		ssnx::gps::PVT_Cartesian_2_t original_data;
+
+		original_data.dataValid = true;
+		original_data.timestamp_s = 12345.6789;
+		original_data.Mode = ssnx::gps::eSolutionType::STAND_ALONE;
+		original_data.HeightComputed = true;
+		original_data.Error = 0;
+		original_data.X_m = 1000000;
+		original_data.Y_m = 1500000;
+		original_data.Z_m = 2000000;
+		original_data.Undulation_m = 1.5;
+		original_data.Vx_mps = 0.0;
+		original_data.Vy_mps = 0.0;
+		original_data.Vz_mps = 0.0;
+		original_data.GroundTrack_deg = 279.0;
+		original_data.RxClkBias_ms = 100.0;
+		original_data.RxClkDrift_ppm = 150.0;
+		original_data.TimeSystem = ssnx::gps::eTimeSystem::GPS;
+		original_data.Datum = ssnx::gps::eDatum::NAD83;
+		original_data.NrSV = 0;
+		original_data.SatClockCorrectionUsed = false;
+		original_data.RangeCorrectionUsed = false;
+		original_data.IonosphericInfoUsed = false;
+		original_data.OrbitAccuracyInfoUsed = false;
+		original_data.PrecisionApproachModeActive = false;
+		original_data.ReferenceId = 1;
+		original_data.MeanCorrAge_s = 30.2;
+		original_data.SignalInfo = 12345;
+		original_data.AlertFlag = 0;
+
+		/* Version 2.1 of this packet*/
+		original_data.NrBases = 1;
+		original_data.AgeOfSeed_s = 5;
+		original_data.LastSeed = ssnx::gps::ePPP_LastSeed::RTK_FIXED;
+
+		/* Version 2.2 of this packet*/
+		original_data.Latency_s = 6.12f;
+		original_data.HAccuracy_m = 0.5f;
+		original_data.VAccuracy_m = 0.5f;
+		original_data.InRtkMode = true;
+
+		{
+			cBlockDataFileWriter wrt;
+			wrt.open(TEST_FILENAME);
+
+			REQUIRE(wrt.isOpen());
+			cSsnxSerializer ssnx(1024, &wrt);
+			ssnx.setVersion(1, 0);
+			ssnx.write(original_data);
+			wrt.close();
+		}
+
+		{
+			cBlockDataFileReader rd;
+
+			rd.open(TEST_FILENAME);
+
+			REQUIRE(rd.isOpen());
+
+			cSsnxParser ssnx;
+			rd.attach(&ssnx);
+
+			auto result = rd.processBlock();
+			REQUIRE(result);
+
+			auto info = ssnx.getPVT_Cartesian_2();
+
+			REQUIRE(info.dataValid == original_data.dataValid);
+			REQUIRE(info.timestamp_s == original_data.timestamp_s);
+			REQUIRE(info.Error == original_data.Error);
+			REQUIRE(info.GroundTrack_deg == original_data.GroundTrack_deg);
+			REQUIRE(info.MeanCorrAge_s == original_data.MeanCorrAge_s);
+			REQUIRE(info.NrSV == original_data.NrSV);
+			REQUIRE(info.RxClkBias_ms == original_data.RxClkBias_ms);
+			REQUIRE(info.RxClkDrift_ppm == original_data.RxClkDrift_ppm);
+			REQUIRE(info.Vx_mps == original_data.Vx_mps);
+			REQUIRE(info.Vy_mps == original_data.Vy_mps);
+			REQUIRE(info.Vz_mps == original_data.Vz_mps);
+			REQUIRE(info.X_m == original_data.X_m);
+			REQUIRE(info.Y_m == original_data.Y_m);
+			REQUIRE(info.Z_m == original_data.Z_m);
 
 			rd.close();
 		}

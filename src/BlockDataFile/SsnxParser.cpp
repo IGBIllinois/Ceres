@@ -3,13 +3,57 @@
 #include "SsnxDataIdentifiers.hpp"
 #include "BlockDataFile.hpp"
 
-#include <ssnx/gps_data.hpp>
 #include <ssnx/ssn_utils.hpp>
 
 #include <optional>
 #include <cassert>
 
 using namespace ssnx;
+
+namespace
+{
+    gps::eSolutionType to_solution_type(cDataBuffer& buffer)
+    {
+        uint8_t data = 0;
+        buffer >> data;
+        return static_cast<gps::eSolutionType>(data);
+    };
+
+    gps::eTimeSystem to_time_system(cDataBuffer& buffer)
+    {
+        uint8_t data = 0;
+        buffer >> data;
+        return static_cast<gps::eTimeSystem>(data);
+    };
+
+    gps::eDatum to_datum(cDataBuffer& buffer)
+    {
+        uint8_t data = 0;
+        buffer >> data;
+        return static_cast<gps::eDatum>(data);
+    };
+
+    gps::ePPP_LastSeed to_last_seed(cDataBuffer& buffer)
+    {
+        uint16_t data = 0;
+        buffer >> data;
+        return static_cast<gps::ePPP_LastSeed>(data);
+    };
+
+    gps::eHeightType to_height_type(cDataBuffer& buffer)
+    {
+        uint8_t data = 0;
+        buffer >> data;
+        return static_cast<gps::eHeightType>(data);
+    };
+
+    gps::eQualityIndicator to_quality_indicator(cDataBuffer& buffer)
+    {
+        uint8_t data = 0;
+        buffer >> data;
+        return static_cast<gps::eQualityIndicator>(data);
+    };
+}
 
 cSsnxParser::cSsnxParser()
 :
@@ -31,396 +75,329 @@ void cSsnxParser::processData(BLOCK_MAJOR_VERSION_t major_version,
 
     switch (static_cast<ssnx::DataID>(data_id))
     {
+    case DataID::PVT_CARTESIAN:
+        if (major_version == 1)
+            processPVT_Cartesian_1_t(buffer);
+        else
+            processPVT_Cartesian_2_t(buffer);
+        break;
+    case DataID::PVT_GEODETIC:
+        if (major_version == 1)
+            processPVT_Geodetic_1_t(buffer);
+        else
+            processPVT_Geodetic_2_t(buffer);
+        break;
+    case DataID::POS_COV_GEODETIC:
+        processPosCovGeodetic_1_t(buffer);
+        break;
+    case DataID::VEL_COV_GEODETIC:
+        processVelCovGeodetic_1_t(buffer);
+        break;
+    case DataID::DOP:
+        processDOP_1_t(buffer);
+        break;
+    case DataID::PVT_RESIDUALS:
+        processPVT_Residuals_1_t(buffer);
+        break;
+    case DataID::RAIM_STATISTICS:
+        processRAIMStatistics_1_t(buffer);
+        break;
+    case DataID::POS_PROJECTED:
+        processPOS_Projected_1_t(buffer);
+        break;
+    case DataID::RECEIVER_TIME:
+        processReceiverTime_1_t(buffer);
+        break;
+    case DataID::RTCM_DATUM:
+        processRtcmDatum_1_t(buffer);
+        break;
     }
 }
 
-void cSsnxParser::process_DataField(cDataBuffer& buffer)
+void cSsnxParser::processPVT_Cartesian_1_t(cDataBuffer& buffer)
 {
-    uint8_t u;
-    buffer >> u;
-    //    mPositionUnit = static_cast<pvt::ePOSTION_UNITS>(u);
+    buffer >> mPVT_Cartesian_1.dataValid;
+    buffer >> mPVT_Cartesian_1.timestamp_s;
+    buffer >> mPVT_Cartesian_1.NrSV;
+    buffer >> mPVT_Cartesian_1.Error;
+    buffer >> mPVT_Cartesian_1.Mode;
+    buffer >> mPVT_Cartesian_1.System;
+    buffer >> mPVT_Cartesian_1.Info;
+    buffer >> mPVT_Cartesian_1.SBASprn;
+    buffer >> mPVT_Cartesian_1.X_m;
+    buffer >> mPVT_Cartesian_1.Y_m;
+    buffer >> mPVT_Cartesian_1.Z_m;
+    buffer >> mPVT_Cartesian_1.Vx_mps;
+    buffer >> mPVT_Cartesian_1.Vy_mps;
+    buffer >> mPVT_Cartesian_1.Vz_mps;
+    buffer >> mPVT_Cartesian_1.RxClkBias_ms;
+    buffer >> mPVT_Cartesian_1.RxClkDrift_ppm;
+    buffer >> mPVT_Cartesian_1.MeanCorrAge_s;
+    buffer >> mPVT_Cartesian_1.BaseStationID;
+    buffer >> mPVT_Cartesian_1.GroundTrack_deg;
 }
 
-#if 0
-void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_1_t& in)
+void cSsnxParser::processPVT_Cartesian_2_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::PVT_CARTESIAN);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.NrSV;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.Mode;
-    mDataBuffer << in.System;
-    mDataBuffer << in.Info;
-    mDataBuffer << in.SBASprn;
-    mDataBuffer << in.X_m;
-    mDataBuffer << in.Y_m;
-    mDataBuffer << in.Z_m;
-    mDataBuffer << in.Vx_mps;
-    mDataBuffer << in.Vy_mps;
-    mDataBuffer << in.Vz_mps;
-    mDataBuffer << in.RxClkBias_ms;
-    mDataBuffer << in.RxClkDrift_ppm;
-    mDataBuffer << in.MeanCorrAge_s;
-    mDataBuffer << in.BaseStationID;
-    mDataBuffer << in.GroundTrack_deg;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
-}
-
-void cSsnxSerializer::write(const ssnx::gps::PVT_Cartesian_2_t& in)
-{
-    assert(mpDataFile);
-
-    mBlockID.setVersion(2, 0);
-    mBlockID.dataID(DataID::PVT_CARTESIAN);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_int(in.Mode);
-    mDataBuffer << in.HeightComputed;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.X_m;
-    mDataBuffer << in.Y_m;
-    mDataBuffer << in.Z_m;
-    mDataBuffer << in.Undulation_m;
-    mDataBuffer << in.Vx_mps;
-    mDataBuffer << in.Vy_mps;
-    mDataBuffer << in.Vz_mps;
-    mDataBuffer << in.GroundTrack_deg;
-    mDataBuffer << in.RxClkBias_ms;
-    mDataBuffer << in.RxClkDrift_ppm;
-    mDataBuffer << to_int(in.TimeSystem);
-    mDataBuffer << to_int(in.Datum);
-    mDataBuffer << in.NrSV;
-    mDataBuffer << in.SatClockCorrectionUsed;
-    mDataBuffer << in.RangeCorrectionUsed;
-    mDataBuffer << in.IonosphericInfoUsed;
-    mDataBuffer << in.OrbitAccuracyInfoUsed;
-    mDataBuffer << in.PrecisionApproachModeActive;
-    mDataBuffer << in.ReferenceId;
-    mDataBuffer << in.MeanCorrAge_s;
-    mDataBuffer << in.SignalInfo;
-    mDataBuffer << in.AlertFlag;
+    buffer >> mPVT_Cartesian_2.dataValid;
+    buffer >> mPVT_Cartesian_2.timestamp_s;
+    mPVT_Cartesian_2.Mode = to_solution_type(buffer);
+    buffer >> mPVT_Cartesian_2.HeightComputed;
+    buffer >> mPVT_Cartesian_2.Error;
+    buffer >> mPVT_Cartesian_2.X_m;
+    buffer >> mPVT_Cartesian_2.Y_m;
+    buffer >> mPVT_Cartesian_2.Z_m;
+    buffer >> mPVT_Cartesian_2.Undulation_m;
+    buffer >> mPVT_Cartesian_2.Vx_mps;
+    buffer >> mPVT_Cartesian_2.Vy_mps;
+    buffer >> mPVT_Cartesian_2.Vz_mps;
+    buffer >> mPVT_Cartesian_2.GroundTrack_deg;
+    buffer >> mPVT_Cartesian_2.RxClkBias_ms;
+    buffer >> mPVT_Cartesian_2.RxClkDrift_ppm;
+    mPVT_Cartesian_2.TimeSystem = to_time_system(buffer);
+    mPVT_Cartesian_2.Datum = to_datum(buffer);
+    buffer >> mPVT_Cartesian_2.NrSV;
+    buffer >> mPVT_Cartesian_2.SatClockCorrectionUsed;
+    buffer >> mPVT_Cartesian_2.RangeCorrectionUsed;
+    buffer >> mPVT_Cartesian_2.IonosphericInfoUsed;
+    buffer >> mPVT_Cartesian_2.OrbitAccuracyInfoUsed;
+    buffer >> mPVT_Cartesian_2.PrecisionApproachModeActive;
+    buffer >> mPVT_Cartesian_2.ReferenceId;
+    buffer >> mPVT_Cartesian_2.MeanCorrAge_s;
+    buffer >> mPVT_Cartesian_2.SignalInfo;
+    buffer >> mPVT_Cartesian_2.AlertFlag;
 
     /* Version 2.1 of this packet*/
-    if (in.NrBases.has_value())
+    if (mBlockID.minorVersion() > 0)
     {
-        mBlockID.minorVersion(1);
-        mDataBuffer << in.NrBases.value();
-        mDataBuffer << in.AgeOfSeed_s.value();
-        mDataBuffer << to_int(in.LastSeed.value());
+        mPVT_Cartesian_2.NrBases = buffer.get<uint8_t>();
+        mPVT_Cartesian_2.AgeOfSeed_s = buffer.get<uint16_t>();
+        mPVT_Cartesian_2.LastSeed = to_last_seed(buffer);
     }
 
     /* Version 2.2 of this packet*/
-    if (in.Latency_s.has_value())
+    if (mBlockID.minorVersion() > 1)
     {
-        mBlockID.minorVersion(2);
-        mDataBuffer << in.Latency_s.value();
-        mDataBuffer << in.HAccuracy_m.value();
-        mDataBuffer << in.VAccuracy_m.value();
+        mPVT_Cartesian_2.Latency_s = buffer.get<float>();
+        mPVT_Cartesian_2.HAccuracy_m = buffer.get<float>();
+        mPVT_Cartesian_2.VAccuracy_m = buffer.get<float>();
+        mPVT_Cartesian_2.InRtkMode = buffer.get<bool>();
     }
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cSsnxSerializer::write(const ssnx::gps::PVT_Geodetic_1_t& in)
+void cSsnxParser::processPVT_Geodetic_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::PVT_GEODETIC);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.NrSV;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.Mode;
-    mDataBuffer << in.System;
-    mDataBuffer << in.Info;
-    mDataBuffer << in.SBASprn;
-    mDataBuffer << in.Lat_rad;
-    mDataBuffer << in.Lon_rad;
-    mDataBuffer << in.Alt_m;
-    mDataBuffer << in.Vn_mps;
-    mDataBuffer << in.Ve_mps;
-    mDataBuffer << in.Vu_mps;
-    mDataBuffer << in.RxClkBias_ms;
-    mDataBuffer << in.RxClkDrift_ppm;
-    mDataBuffer << in.GeoidHeight_m;
-    mDataBuffer << in.MeanCorrAge_s;
-    mDataBuffer << in.BaseStationID;
-    mDataBuffer << in.GroundTrack_deg;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    buffer >> mPVT_Geodetic_1.dataValid;
+    buffer >> mPVT_Geodetic_1.timestamp_s;
+    buffer >> mPVT_Geodetic_1.NrSV;
+    buffer >> mPVT_Geodetic_1.Error;
+    buffer >> mPVT_Geodetic_1.Mode;
+    buffer >> mPVT_Geodetic_1.System;
+    buffer >> mPVT_Geodetic_1.Info;
+    buffer >> mPVT_Geodetic_1.SBASprn;
+    buffer >> mPVT_Geodetic_1.Lat_rad;
+    buffer >> mPVT_Geodetic_1.Lon_rad;
+    buffer >> mPVT_Geodetic_1.Alt_m;
+    buffer >> mPVT_Geodetic_1.Vn_mps;
+    buffer >> mPVT_Geodetic_1.Ve_mps;
+    buffer >> mPVT_Geodetic_1.Vu_mps;
+    buffer >> mPVT_Geodetic_1.RxClkBias_ms;
+    buffer >> mPVT_Geodetic_1.RxClkDrift_ppm;
+    buffer >> mPVT_Geodetic_1.GeoidHeight_m;
+    buffer >> mPVT_Geodetic_1.MeanCorrAge_s;
+    buffer >> mPVT_Geodetic_1.BaseStationID;
+    buffer >> mPVT_Geodetic_1.GroundTrack_deg;
 }
 
-void cSsnxSerializer::write(const ssnx::gps::PVT_Geodetic_2_t& in)
+void cSsnxParser::processPVT_Geodetic_2_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
+    mPVT_Geodetic_2;
 
-    mBlockID.setVersion(2, 0);
-    mBlockID.dataID(DataID::PVT_GEODETIC);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_int(in.Mode);
-    mDataBuffer << in.HeightComputed;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.Lat_rad;
-    mDataBuffer << in.Lon_rad;
-    mDataBuffer << in.Height_m;
-    mDataBuffer << in.Undulation_m;
-    mDataBuffer << in.Vn_mps;
-    mDataBuffer << in.Ve_mps;
-    mDataBuffer << in.Vu_mps;
-    mDataBuffer << in.GroundTrack_deg;
-    mDataBuffer << in.RxClkBias_ms;
-    mDataBuffer << in.RxClkDrift_ppm;
-    mDataBuffer << to_int(in.TimeSystem);
-    mDataBuffer << to_int(in.Datum);
-    mDataBuffer << in.NrSV;
-    mDataBuffer << in.SatClockCorrectionUsed;
-    mDataBuffer << in.RangeCorrectionUsed;
-    mDataBuffer << in.IonosphericInfoUsed;
-    mDataBuffer << in.OrbitAccuracyInfoUsed;
-    mDataBuffer << in.PrecisionApproachModeActive;
-    mDataBuffer << in.ReferenceId;
-    mDataBuffer << in.MeanCorrAge_s;
-    mDataBuffer << in.SignalInfo;
-    mDataBuffer << in.AlertFlag;
+    buffer >> mPVT_Geodetic_2.dataValid;
+    buffer >> mPVT_Geodetic_2.timestamp_s;
+    mPVT_Geodetic_2.Mode = to_solution_type(buffer);
+    buffer >> mPVT_Geodetic_2.HeightComputed;
+    buffer >> mPVT_Geodetic_2.Error;
+    buffer >> mPVT_Geodetic_2.Lat_rad;
+    buffer >> mPVT_Geodetic_2.Lon_rad;
+    buffer >> mPVT_Geodetic_2.Height_m;
+    buffer >> mPVT_Geodetic_2.Undulation_m;
+    buffer >> mPVT_Geodetic_2.Vn_mps;
+    buffer >> mPVT_Geodetic_2.Ve_mps;
+    buffer >> mPVT_Geodetic_2.Vu_mps;
+    buffer >> mPVT_Geodetic_2.GroundTrack_deg;
+    buffer >> mPVT_Geodetic_2.RxClkBias_ms;
+    buffer >> mPVT_Geodetic_2.RxClkDrift_ppm;
+    mPVT_Geodetic_2.TimeSystem = to_time_system(buffer);
+    mPVT_Geodetic_2.Datum = to_datum(buffer);
+    buffer >> mPVT_Geodetic_2.NrSV;
+    buffer >> mPVT_Geodetic_2.SatClockCorrectionUsed;
+    buffer >> mPVT_Geodetic_2.RangeCorrectionUsed;
+    buffer >> mPVT_Geodetic_2.IonosphericInfoUsed;
+    buffer >> mPVT_Geodetic_2.OrbitAccuracyInfoUsed;
+    buffer >> mPVT_Geodetic_2.PrecisionApproachModeActive;
+    buffer >> mPVT_Geodetic_2.ReferenceId;
+    buffer >> mPVT_Geodetic_2.MeanCorrAge_s;
+    buffer >> mPVT_Geodetic_2.SignalInfo;
+    buffer >> mPVT_Geodetic_2.AlertFlag;
 
     /* Version 2.1 of this packet*/
-    if (in.NrBases.has_value())
+    if (mBlockID.minorVersion() > 0)
     {
-        mBlockID.minorVersion(1);
-        mDataBuffer << in.NrBases.value();
-        mDataBuffer << in.AgeOfSeed_s.value();
-        mDataBuffer << to_int(in.LastSeed.value());
+        mPVT_Geodetic_2.NrBases = buffer.get<uint8_t>();
+        mPVT_Geodetic_2.AgeOfSeed_s = buffer.get<uint16_t>();
+        mPVT_Geodetic_2.LastSeed = to_last_seed(buffer);
     }
 
     /* Version 2.2 of this packet*/
-    if (in.Latency_s.has_value())
+    if (mBlockID.minorVersion() > 1)
     {
-        mBlockID.minorVersion(2);
-        mDataBuffer << in.Latency_s.value();
-        mDataBuffer << in.HAccuracy_m.value();
-        mDataBuffer << in.VAccuracy_m.value();
+        mPVT_Geodetic_2.Latency_s = buffer.get<float>();
+        mPVT_Geodetic_2.HAccuracy_m = buffer.get<float>();
+        mPVT_Geodetic_2.VAccuracy_m = buffer.get<float>();
     }
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cSsnxSerializer::write(const ssnx::gps::PosCovGeodetic_1_t& in)
+void cSsnxParser::processPosCovGeodetic_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::POS_COV_GEODETIC);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_int(in.Mode);
-    mDataBuffer << in.HeightComputed;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.Cov_latlat_m;
-    mDataBuffer << in.Cov_lonlon_m;
-    mDataBuffer << in.Cov_hgthgt_m;
-    mDataBuffer << in.Cov_bb_m;
-    mDataBuffer << in.Cov_latlon_m;
-    mDataBuffer << in.Cov_lathgt_m;
-    mDataBuffer << in.Cov_latb_m;
-    mDataBuffer << in.Cov_lonhgt_m;
-    mDataBuffer << in.Cov_lonb_m;
-    mDataBuffer << in.Cov_hgtb_m;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    buffer >> mPosCovGeodetic_1.dataValid;
+    buffer >> mPosCovGeodetic_1.timestamp_s;
+    mPosCovGeodetic_1.Mode = to_solution_type(buffer);
+    buffer >> mPosCovGeodetic_1.HeightComputed;
+    buffer >> mPosCovGeodetic_1.Error;
+    buffer >> mPosCovGeodetic_1.Cov_latlat_m;
+    buffer >> mPosCovGeodetic_1.Cov_lonlon_m;
+    buffer >> mPosCovGeodetic_1.Cov_hgthgt_m;
+    buffer >> mPosCovGeodetic_1.Cov_bb_m;
+    buffer >> mPosCovGeodetic_1.Cov_latlon_m;
+    buffer >> mPosCovGeodetic_1.Cov_lathgt_m;
+    buffer >> mPosCovGeodetic_1.Cov_latb_m;
+    buffer >> mPosCovGeodetic_1.Cov_lonhgt_m;
+    buffer >> mPosCovGeodetic_1.Cov_lonb_m;
+    buffer >> mPosCovGeodetic_1.Cov_hgtb_m;
 }
 
-void cSsnxSerializer::write(const ssnx::gps::VelCovGeodetic_1_t& in)
+void cSsnxParser::processVelCovGeodetic_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::VEL_COV_GEODETIC);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_int(in.Mode);
-    mDataBuffer << in.HeightComputed;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.Cov_VnVn_mps;
-    mDataBuffer << in.Cov_VeVe_mps;
-    mDataBuffer << in.Cov_VuVu_mps;
-    mDataBuffer << in.Cov_DtDt_mps;
-    mDataBuffer << in.Cov_VnVe_mps;
-    mDataBuffer << in.Cov_VnVu_mps;
-    mDataBuffer << in.Cov_VnDt_mps;
-    mDataBuffer << in.Cov_VeVu_mps;
-    mDataBuffer << in.Cov_VeDt_mps;
-    mDataBuffer << in.Cov_VuDt_mps;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    buffer >> mVelCovGeodetic_1.dataValid;
+    buffer >> mVelCovGeodetic_1.timestamp_s;
+    mVelCovGeodetic_1.Mode = to_solution_type(buffer);
+    buffer >> mVelCovGeodetic_1.HeightComputed;
+    buffer >> mVelCovGeodetic_1.Error;
+    buffer >> mVelCovGeodetic_1.Cov_VnVn_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VeVe_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VuVu_mps;
+    buffer >> mVelCovGeodetic_1.Cov_DtDt_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VnVe_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VnVu_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VnDt_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VeVu_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VeDt_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VuDt_mps;
 }
 
-void cSsnxSerializer::write(const ssnx::gps::DOP_1_t& in)
+void cSsnxParser::processDOP_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::DOP);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.NrSV;
-    mDataBuffer << in.PDOP;
-    mDataBuffer << in.TDOP;
-    mDataBuffer << in.HDOP;
-    mDataBuffer << in.VDOP;
-    mDataBuffer << in.HPL_m;
-    mDataBuffer << in.VPL_m;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    buffer >> mDOP_1.dataValid;
+    buffer >> mDOP_1.timestamp_s;
+    buffer >> mDOP_1.NrSV;
+    buffer >> mDOP_1.PDOP;
+    buffer >> mDOP_1.TDOP;
+    buffer >> mDOP_1.HDOP;
+    buffer >> mDOP_1.VDOP;
+    buffer >> mDOP_1.HPL_m;
+    buffer >> mDOP_1.VPL_m;
 }
 
-void cSsnxSerializer::write(const ssnx::gps::PVT_Residuals_1_t& in)
+void cSsnxParser::processPVT_Residuals_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
+    buffer >> mPVT_Residuals_1.dataValid;
+    buffer >> mPVT_Residuals_1.timestamp_s;
+    buffer >> mPVT_Residuals_1.N;
+    buffer >> mPVT_Residuals_1.SBSize;
 
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::PVT_RESIDUALS);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.N;
-    mDataBuffer << in.SBSize;
-
-    for (auto& satResidual: in.SatResidual)
+    for (auto& satResidual : mPVT_Residuals_1.SatResidual)
     {
-        mDataBuffer << satResidual.PRN;
-        mDataBuffer << satResidual.CACodeRes;
-        mDataBuffer << satResidual.P1CodeRes;
-        mDataBuffer << satResidual.P2CodeRes;
-        mDataBuffer << satResidual.DopplerL1Res;
-        mDataBuffer << satResidual.DopplerL2Res;
+        buffer >> satResidual.PRN;
+        buffer >> satResidual.CACodeRes;
+        buffer >> satResidual.P1CodeRes;
+        buffer >> satResidual.P2CodeRes;
+        buffer >> satResidual.DopplerL1Res;
+        buffer >> satResidual.DopplerL2Res;
     }
-        
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cSsnxSerializer::write(const ssnx::gps::RAIMStatistics_1_t& in)
+void cSsnxParser::processRAIMStatistics_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
+    buffer >> mRAIMStatistics_1.dataValid;
+    buffer >> mRAIMStatistics_1.timestamp_s;
+    buffer >> mRAIMStatistics_1.Integrity;
+    buffer >> mRAIMStatistics_1.PositionHERL;
+    buffer >> mRAIMStatistics_1.PositionVERL;
+    buffer >> mRAIMStatistics_1.VelocityHERL;
+    buffer >> mRAIMStatistics_1.VelocityVERL;
+    buffer >> mRAIMStatistics_1.UnityOverallModelP;
+    buffer >> mRAIMStatistics_1.UnityOverallModelV;
+    buffer >> mRAIMStatistics_1.N;
+    buffer >> mRAIMStatistics_1.SBSize;
 
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::RAIM_STATISTICS);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.Integrity;
-    mDataBuffer << in.PositionHERL;
-    mDataBuffer << in.PositionVERL;
-    mDataBuffer << in.VelocityHERL;
-    mDataBuffer << in.VelocityVERL;
-    mDataBuffer << in.UnityOverallModelP;
-    mDataBuffer << in.UnityOverallModelV;
-    mDataBuffer << in.N;
-    mDataBuffer << in.SBSize;
-
-    for (auto& satData: in.RAIMChannel)
+    for (auto& satData : mRAIMStatistics_1.RAIMChannel)
     {
-        mDataBuffer << satData.PRN;
-        mDataBuffer << satData.AntennaID;
-        mDataBuffer << satData.TestResults;
-        mDataBuffer << satData.UnityRangeW;
-        mDataBuffer << satData.UnityRrateW;
-        mDataBuffer << satData.RangeMDB;
-        mDataBuffer << satData.RrateMDB;
+        buffer >> satData.PRN;
+        buffer >> satData.AntennaID;
+        buffer >> satData.TestResults;
+        buffer >> satData.UnityRangeW;
+        buffer >> satData.UnityRrateW;
+        buffer >> satData.RangeMDB;
+        buffer >> satData.RrateMDB;
     }
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
-void cSsnxSerializer::write(const ssnx::gps::POS_Projected_1_t& in)
+void cSsnxParser::processPOS_Projected_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::POS_PROJECTED);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << to_int(in.Mode);
-    mDataBuffer << in.HeightComputed;
-    mDataBuffer << in.Error;
-    mDataBuffer << in.Northing_m;
-    mDataBuffer << in.Easting_m;
-    mDataBuffer << in.Alt_m;
-    mDataBuffer << in.Datum;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    buffer >> mPOS_Projected_1.dataValid;
+    buffer >> mPOS_Projected_1.timestamp_s;
+    mPOS_Projected_1.Mode = to_solution_type(buffer);
+    buffer >> mPOS_Projected_1.HeightComputed;
+    buffer >> mPOS_Projected_1.Error;
+    buffer >> mPOS_Projected_1.Northing_m;
+    buffer >> mPOS_Projected_1.Easting_m;
+    buffer >> mPOS_Projected_1.Alt_m;
+    buffer >> mPOS_Projected_1.Datum;
 }
 
-void cSsnxSerializer::write(const ssnx::gps::ReceiverTime_1_t& in)
+void cSsnxParser::processReceiverTime_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::RECEIVER_TIME);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.utcYear;
-    mDataBuffer << in.utcMonth;
-    mDataBuffer << in.utcDay;
-    mDataBuffer << in.utcHour;
-    mDataBuffer << in.utcMinute;
-    mDataBuffer << in.utcSecond;
-    mDataBuffer << in.deltaLS;
-    mDataBuffer << in.WeekNumberValid;
-    mDataBuffer << in.TimeOfWeekWithin20ms;
-    mDataBuffer << in.TimeOfWeekWithinThreshold;
-    mDataBuffer << in.TimeFromPTTI;
-    mDataBuffer << in.TimeFromNTP;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    buffer >> mReceiverTime_1.dataValid;
+    buffer >> mReceiverTime_1.timestamp_s;
+    buffer >> mReceiverTime_1.utcYear;
+    buffer >> mReceiverTime_1.utcMonth;
+    buffer >> mReceiverTime_1.utcDay;
+    buffer >> mReceiverTime_1.utcHour;
+    buffer >> mReceiverTime_1.utcMinute;
+    buffer >> mReceiverTime_1.utcSecond;
+    buffer >> mReceiverTime_1.deltaLS;
+    buffer >> mReceiverTime_1.WeekNumberValid;
+    buffer >> mReceiverTime_1.TimeOfWeekWithin20ms;
+    buffer >> mReceiverTime_1.TimeOfWeekWithinThreshold;
+    buffer >> mReceiverTime_1.TimeFromPTTI;
+    buffer >> mReceiverTime_1.TimeFromNTP;
 }
 
-void cSsnxSerializer::write(const ssnx::gps::RtcmDatum_1_t& in)
+void cSsnxParser::processRtcmDatum_1_t(cDataBuffer& buffer)
 {
-    assert(mpDataFile);
-
-    mBlockID.setVersion(1, 0);
-    mBlockID.dataID(DataID::RTCM_DATUM);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.dataValid;
-    mDataBuffer << in.timestamp_s;
-    mDataBuffer << in.sourceCRS;
-    mDataBuffer << in.targetCRS;
-    mDataBuffer << in.datum;
-    mDataBuffer << to_int(in.heightType);
-    mDataBuffer << to_int(in.horizontalQualityInd);
-    mDataBuffer << to_int(in.verticalQualityInd);
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+    mRtcmDatum_1;
+    buffer >> mRtcmDatum_1.dataValid;
+    buffer >> mRtcmDatum_1.timestamp_s;
+    buffer >> mRtcmDatum_1.sourceCRS;
+    buffer >> mRtcmDatum_1.targetCRS;
+    buffer >> mRtcmDatum_1.datum;
+    mRtcmDatum_1.heightType = to_height_type(buffer);
+    mRtcmDatum_1.horizontalQualityInd = to_quality_indicator(buffer);
+    mRtcmDatum_1.verticalQualityInd = to_quality_indicator(buffer);
 }
-#endif
+
+
 
 
 

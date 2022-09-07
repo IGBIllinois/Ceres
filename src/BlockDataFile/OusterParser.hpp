@@ -40,6 +40,7 @@ public:
 		             BLOCK_DATA_ID_t data_id, 
 		             cDataBuffer& buffer) override;
 
+protected:
 	virtual void processConfigParam_2(cDataBuffer& buffer);
 	virtual void processSensorInfo_2(cDataBuffer& buffer);
 	virtual void processTimestamp_2(cDataBuffer& buffer);
