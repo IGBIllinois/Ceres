@@ -65,11 +65,11 @@ public:
     bool isExperimentPaused() const;
 
     /**
-     * Started the loaded experiment.
+     * Is the experiment going to record any of the sensor data.
      * 
-     * Returns true if the experiment was started, false otherwise.
+     * Returns true if the experiment will save sensor data, false otherwise.
      */
-//    virtual bool startExperiment();
+	bool experimentRequiresDataFile() const;
 
     /**
      * Terminate a running experiment, otherwise just returns.

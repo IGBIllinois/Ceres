@@ -24,6 +24,7 @@ public:
 
 	virtual void configure(const nlohmann::json& stateDoc) = 0;
 
+	virtual bool needsDataFile() { return recording(); }
 	virtual bool recording() = 0;
 
 	virtual void initialize() = 0;

@@ -27,6 +27,7 @@ signals:
     void errorMessage(QString title, QString msg);
 
 public slots:
+    virtual void refresh() {};
     virtual void experimentStateChanging(experiment::eState state);
     virtual void experimentStatusUpdating(QString msg);
 
