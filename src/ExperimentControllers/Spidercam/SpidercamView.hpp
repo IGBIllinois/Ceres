@@ -33,6 +33,7 @@ public slots:
     void updateRecordingState(bool recording);
 
 protected:
+    void refresh() override;
     void experimentStateChanging(experiment::eState state) override;
     void experimentStatusUpdating(QString msg) override;
 
@@ -44,12 +45,14 @@ private:
     double mMinHeight_mm = 0;
     double mMaxHeight_mm = 0;
 
-    cSpidercamScanArea* mpScanArea;
+    std::string mLayoutFilename;
 
-    QLineEdit* mpX_m;
-    QLineEdit* mpY_m;
-    QLineEdit* mpZ_m;
+    cSpidercamScanArea* mpScanArea = nullptr;
 
-    QStatusBar* mpExperimentStatus;
+    QLineEdit* mpX_m = nullptr;
+    QLineEdit* mpY_m = nullptr;
+    QLineEdit* mpZ_m = nullptr;
+
+    QStatusBar* mpExperimentStatus = nullptr;
 };
 

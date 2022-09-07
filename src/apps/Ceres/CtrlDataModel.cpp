@@ -96,6 +96,14 @@ bool cCtrlDataModel::isExperimentLoaded() const
     return mThread.mpController->hasExperiment();
 }
 
+bool cCtrlDataModel::experimentRequiresDataFile() const
+{
+    if (!mThread.mpController)
+        return false;
+
+    return mThread.mpController->hasExperiment();
+}
+
 bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
 {
     if (isExperimentRunning())
@@ -155,6 +163,17 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
     return true;
 }
 
+bool cCtrlDataModel::unloadExperiment()
+{
+    if (isExperimentRunning())
+    {
+        return false;
+    }
+
+    mThread.mpController->clearExperiment();
+    return true;
+}
+
 void cCtrlDataModel::pauseExperiment()
 {
     if (mThread.mpController)
@@ -202,5 +221,8 @@ void cCtrlDataModel::doExperimentCleanup()
 
     mExperimentTitle.clear();
     mExperimentDoc.clear();
+	
+    if (mThread.mpController)
+        mThread.mpController->clearExperiment();
 }
 

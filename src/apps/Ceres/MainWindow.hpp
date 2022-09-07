@@ -47,6 +47,7 @@ signals:
     void experimentRunning();
     void experimentPaused();
     void experimentStopped();
+    void refreshDisplay();
 
 public slots:
     void onStatusUpdate(QString msg);

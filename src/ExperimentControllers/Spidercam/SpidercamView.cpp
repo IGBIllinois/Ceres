@@ -81,8 +81,8 @@ void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 
 		if (jsonCfg.contains("layout"))
 		{
-			std::string layout_filename = jsonCfg["layout"];
-			mpScanArea->loadLayout(layout_filename);
+			mLayoutFilename = jsonCfg["layout"];
+			mpScanArea->loadLayout(mLayoutFilename);
 		}
 	}
 	catch (const std::exception& e)
@@ -117,6 +117,12 @@ void cSpidercamView::updatePosition(spidercam::sPosition_1_t pos)
 void cSpidercamView::updateRecordingState(bool recording)
 {
 	mpScanArea->setRecording(recording);
+}
+void cSpidercamView::refresh()
+{
+	if (mLayoutFilename.empty()) return;
+
+	mpScanArea->loadLayout(mLayoutFilename);
 }
 
 void cSpidercamView::experimentStateChanging(experiment::eState state)

@@ -54,7 +54,9 @@ public:
     std::string experimentTitle() const;
 
     bool isExperimentLoaded() const;
+    bool experimentRequiresDataFile() const;
     virtual bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
+    virtual bool unloadExperiment();
 
     virtual void startExperiment() = 0;
     void pauseExperiment();

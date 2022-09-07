@@ -140,6 +140,8 @@ void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
 	{
 		auto layouts = layoutDoc["layout"];
 
+		mLayouts.clear();
+
 		for (auto layout : layouts)
 		{
 			experimentLayout_t expLayout;

@@ -239,6 +239,8 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 void cMainWindow::fileRefresh()
 {
     mpExperiments->refresh();
+
+    emit refreshDisplay();
 }
 
 //-----------------------------------------------------------------------------
@@ -770,6 +772,8 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(mpController, &cExperimentControlView::infoMessage, this, &cMainWindow::onInfoMessage);
     QObject::connect(mpController, &cExperimentControlView::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::connect(mpController, &cExperimentControlView::errorMessage, this, &cMainWindow::onErrorMessage);
+
+    QObject::connect(this, &cMainWindow::refreshDisplay, mpController, &cExperimentControlView::refresh);
 
     QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
         mpController, &cExperimentControlView::experimentStatusUpdating);
