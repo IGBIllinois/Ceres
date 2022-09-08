@@ -246,9 +246,13 @@ void cCtrlDataModelRemote::closeDataFile()
 void cCtrlDataModelRemote::dataRecordingStateChange(bool record)
 {
     if (record)
+    {
         sendStartDataRecording();
+    }
     else
+    {
         sendStopDataRecording();
+    }
 }
 
 bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
@@ -309,6 +313,7 @@ void cCtrlDataModelRemote::disconnected()
         mpView->removeAllSensors();
     }
 
+    mDataFileIsOpen = false;
     mConnected = false;
 }
 

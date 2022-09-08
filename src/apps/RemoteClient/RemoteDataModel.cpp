@@ -246,6 +246,12 @@ void cRemoteDataModel::onCloseDataFile()
 
 void cRemoteDataModel::onStartDataRecording()
 {
+    if (!mFile.isOpen())
+    {
+        sendDataFileState(false);
+        return;
+    }
+
     if (mIsRecording) return;
 
     mIsRecording = true;

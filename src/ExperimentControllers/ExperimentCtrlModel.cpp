@@ -36,12 +36,12 @@ bool cExperimentControlModel::hasExperiment() const
 
 bool cExperimentControlModel::experimentRequiresDataFile() const
 {
-	bool required = false;
 	for (auto* state : mExperiment)
 	{
-		required |= state->needsDataFile();
+        if (state->needsDataFile())
+            return true;
 	}
-	return required;
+	return false;
 }
 
 bool cExperimentControlModel::isExperimentRunning() const

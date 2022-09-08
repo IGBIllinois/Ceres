@@ -101,7 +101,7 @@ bool cCtrlDataModel::experimentRequiresDataFile() const
     if (!mThread.mpController)
         return false;
 
-    return mThread.mpController->hasExperiment();
+    return mThread.mpController->experimentRequiresDataFile();
 }
 
 bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)

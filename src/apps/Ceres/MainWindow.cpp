@@ -415,15 +415,18 @@ void cMainWindow::onExperimentRun()
         return;
     }
 
-    if (mBatchFileName.empty())
+    //if (mpModel->experimentRequiresDataFile())
     {
-        if (!mpModel->openDataFile(mDefaultDataPath))
-            return;
-    }
-    else
-    {
-        if (!mpModel->openDataFile(mDefaultDataPath, mBatchFileName))
-            return;
+        if (mBatchFileName.empty())
+        {
+            if (!mpModel->openDataFile(mDefaultDataPath))
+                return;
+        }
+        else
+        {
+            if (!mpModel->openDataFile(mDefaultDataPath, mBatchFileName))
+                return;
+        }
     }
 
     mpModel->startExperiment();
