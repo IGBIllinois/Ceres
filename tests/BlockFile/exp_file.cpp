@@ -35,6 +35,7 @@ TEST_CASE("Begin/End Marker tests", "[experiment tests]")
 			exp.setVersion(1, 0);
 
 			exp.writeBeginHeader();
+			exp.writeEndOfHeader();
 
 			wrt.close();
 		}
@@ -58,38 +59,9 @@ TEST_CASE("Begin/End Marker tests", "[experiment tests]")
 			REQUIRE(!exp.hasEndOfFooter());
 
 			result = rd.processBlock();
-			REQUIRE(!result);
-
-			rd.close();
-		}
-
-		{
-			cBlockDataFileWriter wrt;
-			wrt.open(TEST_FILENAME);
-
-			REQUIRE(wrt.isOpen());
-			cExperimentSerializer exp(1024, &wrt);
-			exp.setVersion(1, 0);
-
-			exp.writeEndOfHeader();
-
-			wrt.close();
-		}
-
-		{
-			cBlockDataFileReader rd;
-
-			rd.open(TEST_FILENAME);
-
-			REQUIRE(rd.isOpen());
-
-			cExperimentParser exp;
-			rd.attach(&exp);
-
-			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			REQUIRE(!exp.hasBeginHeader());
+			REQUIRE(exp.hasBeginHeader());
 			REQUIRE(exp.hasEndOfHeader());
 			REQUIRE(!exp.hasBeginFooter());
 			REQUIRE(!exp.hasEndOfFooter());
@@ -114,6 +86,7 @@ TEST_CASE("Begin/End Marker tests", "[experiment tests]")
 			exp.setVersion(1, 0);
 
 			exp.writeBeginFooter();
+			exp.writeEndOfFooter();
 
 			wrt.close();
 		}
@@ -137,40 +110,11 @@ TEST_CASE("Begin/End Marker tests", "[experiment tests]")
 			REQUIRE(!exp.hasEndOfFooter());
 
 			result = rd.processBlock();
-			REQUIRE(!result);
-
-			rd.close();
-		}
-
-		{
-			cBlockDataFileWriter wrt;
-			wrt.open(TEST_FILENAME);
-
-			REQUIRE(wrt.isOpen());
-			cExperimentSerializer exp(1024, &wrt);
-			exp.setVersion(1, 0);
-
-			exp.writeEndOfFooter();
-
-			wrt.close();
-		}
-
-		{
-			cBlockDataFileReader rd;
-
-			rd.open(TEST_FILENAME);
-
-			REQUIRE(rd.isOpen());
-
-			cExperimentParser exp;
-			rd.attach(&exp);
-
-			auto result = rd.processBlock();
 			REQUIRE(result);
 
 			REQUIRE(!exp.hasBeginHeader());
 			REQUIRE(!exp.hasEndOfHeader());
-			REQUIRE(!exp.hasBeginFooter());
+			REQUIRE(exp.hasBeginFooter());
 			REQUIRE(exp.hasEndOfFooter());
 
 			result = rd.processBlock();

@@ -12,7 +12,6 @@
 
 
 /*
-void write(const ssnx::gps::PVT_Cartesian_2_t& in);
 void write(const ssnx::gps::PVT_Geodetic_1_t& in);
 void write(const ssnx::gps::PVT_Geodetic_2_t& in);
 void write(const ssnx::gps::PosCovGeodetic_1_t& in);
@@ -30,7 +29,7 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 {
 	SECTION("Testing write/read of PVT_Cartesian_1_t data...")
 	{
-		const char* TEST_FILENAME = "ssnx_cartesian_test.ceres";
+		const char* TEST_FILENAME = "ssnx_cartesian_1_test.ceres";
 
 		ssnx::gps::PVT_Cartesian_1_t original_data;
 
@@ -106,7 +105,7 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 
 	SECTION("Testing write/read of PVT_Cartesian_2_t data...")
 	{
-		const char* TEST_FILENAME = "ssnx_cartesian_test.ceres";
+		const char* TEST_FILENAME = "ssnx_cartesian_2_test.ceres";
 
 		ssnx::gps::PVT_Cartesian_2_t original_data;
 
@@ -194,5 +193,175 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 		}
 	}
 }
+
+
+TEST_CASE("PVT Geodetic tests", "[ssnx tests]")
+{
+	SECTION("Testing write/read of PVT_Geodetic_1_t data...")
+	{
+		const char* TEST_FILENAME = "ssnx_geodetic_1_test.ceres";
+
+		ssnx::gps::PVT_Geodetic_1_t original_data;
+
+		original_data.dataValid = true;
+		original_data.timestamp_s = 12345.6789;
+		original_data.BaseStationID = 1;
+		original_data.Error = 0;
+		original_data.GroundTrack_deg = 45.0;
+		original_data.Info = 1;
+		original_data.MeanCorrAge_s = 19;
+		original_data.Mode = 2;
+		original_data.NrSV = 6;
+		original_data.RxClkBias_ms = 0.01;
+		original_data.RxClkDrift_ppm = 2;
+		original_data.SBASprn = 15;
+		original_data.System = 3;
+		original_data.Vn_mps = 0.0;
+		original_data.Ve_mps = 0.0;
+		original_data.Vu_mps = 0.0;
+		original_data.Lat_rad = 0.69974304;
+		original_data.Lon_rad = -1.53997544;
+		original_data.Alt_m = 228.6;
+
+		{
+			cBlockDataFileWriter wrt;
+			wrt.open(TEST_FILENAME);
+
+			REQUIRE(wrt.isOpen());
+			cSsnxSerializer ssnx(1024, &wrt);
+			ssnx.setVersion(1, 0);
+			ssnx.write(original_data);
+			wrt.close();
+		}
+
+		{
+			cBlockDataFileReader rd;
+
+			rd.open(TEST_FILENAME);
+
+			REQUIRE(rd.isOpen());
+
+			cSsnxParser ssnx;
+			rd.attach(&ssnx);
+
+			auto result = rd.processBlock();
+			REQUIRE(result);
+
+			auto info = ssnx.getPVT_Geodetic_1();
+
+			REQUIRE(info.BaseStationID == original_data.BaseStationID);
+			REQUIRE(info.dataValid == original_data.dataValid);
+			REQUIRE(info.Error == original_data.Error);
+			REQUIRE(info.GroundTrack_deg == original_data.GroundTrack_deg);
+			REQUIRE(info.Info == original_data.Info);
+			REQUIRE(info.MeanCorrAge_s == original_data.MeanCorrAge_s);
+			REQUIRE(info.Mode == original_data.Mode);
+			REQUIRE(info.NrSV == original_data.NrSV);
+			REQUIRE(info.RxClkBias_ms == original_data.RxClkBias_ms);
+			REQUIRE(info.RxClkDrift_ppm == original_data.RxClkDrift_ppm);
+			REQUIRE(info.SBASprn == original_data.SBASprn);
+			REQUIRE(info.System == original_data.System);
+			REQUIRE(info.timestamp_s == original_data.timestamp_s);
+			REQUIRE(info.Vn_mps == original_data.Vn_mps);
+			REQUIRE(info.Ve_mps == original_data.Ve_mps);
+			REQUIRE(info.Vu_mps == original_data.Vu_mps);
+			REQUIRE(info.Lat_rad == original_data.Lat_rad);
+			REQUIRE(info.Lon_rad == original_data.Lon_rad);
+			REQUIRE(info.Alt_m == original_data.Alt_m);
+
+			rd.close();
+		}
+	}
+
+	SECTION("Testing write/read of PVT_Geodetic_2_t data...")
+	{
+		const char* TEST_FILENAME = "ssnx_geodetic_2_test.ceres";
+
+		ssnx::gps::PVT_Geodetic_2_t original_data;
+
+		original_data.dataValid = true;
+		original_data.timestamp_s = 12345.6789;
+		original_data.Mode = ssnx::gps::eSolutionType::STAND_ALONE;
+		original_data.HeightComputed = true;
+		original_data.Error = 0;
+		original_data.Lat_rad = 0.69974304;
+		original_data.Lon_rad = -1.53997544;
+		original_data.Height_m = 228.6;
+		original_data.Undulation_m = 1.5;
+		original_data.Vn_mps = 0.0;
+		original_data.Ve_mps = 0.0;
+		original_data.Vu_mps = 0.0;
+		original_data.GroundTrack_deg = 279.0;
+		original_data.RxClkBias_ms = 100.0;
+		original_data.RxClkDrift_ppm = 150.0;
+		original_data.TimeSystem = ssnx::gps::eTimeSystem::GPS;
+		original_data.Datum = ssnx::gps::eDatum::NAD83;
+		original_data.NrSV = 0;
+		original_data.SatClockCorrectionUsed = false;
+		original_data.RangeCorrectionUsed = false;
+		original_data.IonosphericInfoUsed = false;
+		original_data.OrbitAccuracyInfoUsed = false;
+		original_data.PrecisionApproachModeActive = false;
+		original_data.ReferenceId = 1;
+		original_data.MeanCorrAge_s = 30.2;
+		original_data.SignalInfo = 12345;
+		original_data.AlertFlag = 0;
+
+		/* Version 2.1 of this packet*/
+		original_data.NrBases = 1;
+		original_data.AgeOfSeed_s = 5;
+		original_data.LastSeed = ssnx::gps::ePPP_LastSeed::RTK_FIXED;
+
+		/* Version 2.2 of this packet*/
+		original_data.Latency_s = 6.12f;
+		original_data.HAccuracy_m = 0.5f;
+		original_data.VAccuracy_m = 0.5f;
+
+		{
+			cBlockDataFileWriter wrt;
+			wrt.open(TEST_FILENAME);
+
+			REQUIRE(wrt.isOpen());
+			cSsnxSerializer ssnx(1024, &wrt);
+			ssnx.setVersion(1, 0);
+			ssnx.write(original_data);
+			wrt.close();
+		}
+
+		{
+			cBlockDataFileReader rd;
+
+			rd.open(TEST_FILENAME);
+
+			REQUIRE(rd.isOpen());
+
+			cSsnxParser ssnx;
+			rd.attach(&ssnx);
+
+			auto result = rd.processBlock();
+			REQUIRE(result);
+
+			auto info = ssnx.getPVT_Geodetic_2();
+
+			REQUIRE(info.dataValid == original_data.dataValid);
+			REQUIRE(info.timestamp_s == original_data.timestamp_s);
+			REQUIRE(info.Error == original_data.Error);
+			REQUIRE(info.GroundTrack_deg == original_data.GroundTrack_deg);
+			REQUIRE(info.MeanCorrAge_s == original_data.MeanCorrAge_s);
+			REQUIRE(info.NrSV == original_data.NrSV);
+			REQUIRE(info.RxClkBias_ms == original_data.RxClkBias_ms);
+			REQUIRE(info.RxClkDrift_ppm == original_data.RxClkDrift_ppm);
+			REQUIRE(info.Vn_mps == original_data.Vn_mps);
+			REQUIRE(info.Ve_mps == original_data.Ve_mps);
+			REQUIRE(info.Vu_mps == original_data.Vu_mps);
+			REQUIRE(info.Lat_rad == original_data.Lat_rad);
+			REQUIRE(info.Lon_rad == original_data.Lon_rad);
+			REQUIRE(info.Height_m == original_data.Height_m);
+
+			rd.close();
+		}
+	}
+}
+
 
 
