@@ -33,6 +33,9 @@ void cDataVerifier::run()
         return;
     }
 
+    mFileReader.attach(static_cast<cOusterParser*>(this));
+    mFileReader.attach(static_cast<cAxisCommunicationsParser*>(this));
+
     try
     {
         while (!mFileReader.eof())
@@ -161,12 +164,22 @@ void cDataVerifier::onLidarIntrinsics_2(const ouster::lidar_intrinsics_2_t& data
 }
 
 void cDataVerifier::onLidarDataFormat_2(const ouster::lidar_data_format_2_t& data)
-{}
-
-void cDataVerifier::onImuData(const ouster::imu_data_t& data)
-{}
+{
+    if (data.pixels_per_column < 32)
+    {
+        throw bdf::parse_error("Invalid lidar data format version 2!");
+    }
+}
 
 void cDataVerifier::onLidarDataFormat_2(const ouster::lidar_data_format_2_3_t& data)
+{
+    if (data.pixels_per_column < 32)
+    {
+        throw bdf::parse_error("Invalid lidar data format version 2.3!");
+    }
+}
+
+void cDataVerifier::onImuData(const ouster::imu_data_t& data)
 {}
 
 void cDataVerifier::onLidarData(const ouster::lidar_data_frame_t& data)
