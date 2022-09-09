@@ -415,7 +415,7 @@ void cMainWindow::onExperimentRun()
         return;
     }
 
-    //if (mpModel->experimentRequiresDataFile())
+    if (mpModel->experimentRequiresDataFile())
     {
         if (mBatchFileName.empty())
         {

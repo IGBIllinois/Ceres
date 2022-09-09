@@ -271,7 +271,9 @@ void cRemoteDataModel::onStopDataRecording()
     mpHeartbeatTimer->stop();
 
     emit requestDataRecordingState(false);
-    mSerializer.endRecordingTimestamp(timestamp_ns());
+
+    if (static_cast<bool>(mSerializer))
+        mSerializer.endRecordingTimestamp(timestamp_ns());
 
     emit statusMessage("Data recording stopped.");
 }
@@ -279,6 +281,12 @@ void cRemoteDataModel::onStopDataRecording()
 void cRemoteDataModel::onStartExperiment()
 {
     mIsExperimentRunning = true;
+
+    if (!static_cast<bool>(mSerializer))
+    {
+        emit statusMessage("Experiment Started: no data recording!");
+        return;
+    }
 
     mSerializer.writeBeginHeader();
     mSerializer.writeTitle(mExperimentTitle);
