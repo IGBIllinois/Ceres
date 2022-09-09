@@ -203,7 +203,7 @@ bool cOusterModel_net::initialize()
 {
     emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
 
-    mCmdStream.enableLogging();
+    //BAF mCmdStream.enableLogging();
 
     std::optional<ouster::sensor_info_2_t> sensorInfo;
     do
@@ -214,6 +214,8 @@ bool cOusterModel_net::initialize()
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Sensor Info:" << e.what();
+            sensorInfo.reset();
         }
 
     } while (!sensorInfo.has_value());
@@ -236,6 +238,8 @@ bool cOusterModel_net::initialize()
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Time Info:" << e.what();
+            timeInfo.reset();
         }
 
     } while (!timeInfo.has_value());
@@ -249,9 +253,13 @@ bool cOusterModel_net::initialize()
         try
         {
             beamIntrinsics = mCmdStream.retrieveBeamIntrinsics();
+            if (beamIntrinsics.value().azimuth_angles_deg.empty())
+                beamIntrinsics.reset();
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Beam Intrinsics:" << e.what();
+            beamIntrinsics.reset();
         }
 
     } while (!beamIntrinsics.has_value());
@@ -281,9 +289,13 @@ bool cOusterModel_net::initialize()
         try
         {
             imuIntrinsics = mCmdStream.retrieveImuIntrinsics();
+            if (imuIntrinsics.value().imu_to_sensor_transform.empty())
+                imuIntrinsics.reset();
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Imu Intrinsics:" << e.what();
+            imuIntrinsics.reset();
         }
 
     } while (!imuIntrinsics.has_value());
@@ -302,9 +314,13 @@ bool cOusterModel_net::initialize()
         try
         {
             lidarIntrinsics = mCmdStream.retrieveLidarIntrinsics();
+            if (lidarIntrinsics.value().lidar_to_sensor_transform.empty())
+                lidarIntrinsics.reset();
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Lidar Intrinsics:" << e.what();
+            lidarIntrinsics.reset();
         }
 
     } while (!lidarIntrinsics.has_value());
@@ -323,9 +339,13 @@ bool cOusterModel_net::initialize()
         try
         {
             dataFormat = mCmdStream.retrieveLidarDataFormat();
+            if ((dataFormat.value().pixels_per_column < 32))
+                dataFormat.reset();
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Data Format:" << e.what();
+            dataFormat.reset();
         }
 
     } while (!dataFormat.has_value());
