@@ -246,6 +246,17 @@ bool cBlockDataFileReader::eof() const
     return mFile.eof();
 }
 
+std::streampos cBlockDataFileReader::filePosition()
+{
+    return mFile.tellg();
+}
+
+void cBlockDataFileReader::gotoPosition(std::streampos pos)
+{
+    mFile.seekg(pos);
+}
+
+
 void cBlockDataFileReader::attach(cBlockParser* pParser)
 {
     if (!pParser) return;
