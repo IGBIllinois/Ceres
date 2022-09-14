@@ -50,6 +50,18 @@ bool cCeresDataFile::eof() const
 }
 
 //-----------------------------------------------------------------------------
+std::streampos cCeresDataFile::filePosition()
+{
+    return mFileReader.filePosition();
+}
+
+//-----------------------------------------------------------------------------
+void cCeresDataFile::gotoPosition(std::streampos pos)
+{
+    mFileReader.gotoPosition(pos);
+}
+
+//-----------------------------------------------------------------------------
 void cCeresDataFile::attach(cBlockParser* pParser)
 {
     mFileReader.attach(pParser);

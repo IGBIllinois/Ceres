@@ -196,6 +196,31 @@ void cCentralWidget::browseSourceFile()
         return;
 
     mpLoadSrcFile->setText(fileName);
+
+    mpTitle->clear();
+    mpCultivar->clear();
+    mpResearcher->clear();
+
+    mpStartTime->clear();
+    mpStartDate->clear();
+    mpEndTime->clear();
+    mpEndDate->clear();
+
+    mpDollyX_mm->clear();
+    mpDollyY_mm->clear();
+    mpDollyZ_mm->clear();
+    mpDollySpeed_mmps->clear();
+
+    mpWindSpeed_mps->clear();
+    mpWindDirection_deg->clear();
+
+    mHeaderComplete = false;
+    mStartOfData = 0;
+    mpLoadButton->setEnabled(true);
+    mpPlayButton->setText("Play");
+    mpPlayButton->setEnabled(false);
+
+    emit statusMessage("");
 }
 
 //-----------------------------------------------------------------------------
@@ -212,7 +237,12 @@ void cCentralWidget::loadSourceFile()
     }
 
     if (readHeaderData())
+    {
+        mStartOfData = mDataFile.filePosition();
+
+        mpLoadButton->setEnabled(false);
         mpPlayButton->setEnabled(true);
+    }
 }
 
 bool cCentralWidget::readHeaderData()
@@ -246,6 +276,9 @@ void cCentralWidget::updateFrame()
         if (!result)
         {
             mTimer.stop();
+            mpPlayButton->setText("Replay");
+            mpPlayButton->setEnabled(true);
+            mDataFile.gotoPosition(mStartOfData);
         }
     }
     catch (const std::runtime_error& e)
@@ -310,14 +343,6 @@ void cCentralWidget::onStartTime(sExperimentTime_t start_time)
     if (!mHasBeginHeader)
         mHeaderComplete = true;
 
-/*
-    QString date = QString::number(start_time.day);
-    date += "/";
-    date += QString::number(start_time.month);
-    date += "/";
-    date += QString::number(start_time.year);
-    mpStartDate->setText(date);
-*/
     QString date = QString::number(start_time.month);
     date += "/";
     if (start_time.day < 10)
@@ -339,7 +364,11 @@ void cCentralWidget::onStartTime(sExperimentTime_t start_time)
     if (start_time.seconds < 10)
         time += "0";
     time += QString::number(start_time.seconds);
-    mpStartTime->setText(time);
+
+    // Due to a copy/paste error, the end time was written as
+    // a second start time.  This checks for that.
+    if (mpStartTime->text().isEmpty())
+        mpStartTime->setText(time);
 }
 
 void cCentralWidget::onEndTime(sExperimentTime_t end_time)

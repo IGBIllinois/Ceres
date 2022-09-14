@@ -22,12 +22,14 @@ public:
     bool good() const;
     bool eof() const;
 
+    std::streampos filePosition();
+    void gotoPosition(std::streampos pos);
+
     void attach(cBlockParser* pParser);
     cBlockParser* detach(const cBlockParser* pParser);
     cBlockParser* detach(cBlockID id);
 
     bool updateData();
-
 
 private:
     cBlockDataFileReader mFileReader;

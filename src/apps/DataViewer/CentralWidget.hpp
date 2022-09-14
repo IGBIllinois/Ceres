@@ -90,6 +90,7 @@ private:
 
 private:
     cCeresDataFile mDataFile;
+    std::streampos mStartOfData = 0;
 
     bool mHasBeginHeader = false;
     bool mHeaderComplete = false;

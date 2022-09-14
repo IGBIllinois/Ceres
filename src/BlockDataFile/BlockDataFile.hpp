@@ -131,6 +131,7 @@ public:
 private:
 	//    FILE* mpFile;
 	std::ifstream mFile;
+	std::string mFileName;
 	bool mByteSwapNeeded;
 
 	cDataBuffer mBuffer;

@@ -213,6 +213,7 @@ bool cBlockDataFileReader::open(const std::string& filename)
         return false;
     }
 
+    mFileName = filename;
     return true;
 }
 
@@ -253,6 +254,12 @@ std::streampos cBlockDataFileReader::filePosition()
 
 void cBlockDataFileReader::gotoPosition(std::streampos pos)
 {
+    if (mFile.eof() || mFile.fail())
+    {
+        mFile.close();
+        open(mFileName);
+    }
+
     mFile.seekg(pos);
 }
 
