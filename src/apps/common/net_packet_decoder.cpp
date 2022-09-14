@@ -77,7 +77,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
             }
             case ePacketType::STOP_EXPERIMENT:
             {
-                onStartExperiment();
+                onStopExperiment();
                 break;
             }
             case ePacketType::DATA_RECORDING_STATE:
