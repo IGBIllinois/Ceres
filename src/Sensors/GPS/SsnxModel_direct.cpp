@@ -12,18 +12,12 @@ cSsnxModel_direct::cSsnxModel_direct(QObject* parent)
 :
     cSsnxModel(parent),
     mSerialPort(this),
-    mSerialBuffer(1024, '\0'),
-    mSerializer(4096)
+    mSerialBuffer(1024, '\0')
 {
 }
 
 cSsnxModel_direct::~cSsnxModel_direct()
 {
-}
-
-uint16_t cSsnxModel_direct::data_class_id() const
-{
-    return mSerializer.classID();
 }
 
 bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
@@ -93,17 +87,6 @@ void cSsnxModel_direct::update()
 {
     if (!isConnected()) return;
     runOnce();
-}
-
-void cSsnxModel_direct::enableDataRecording(cBlockDataFileWriter& file)
-{
-    mSerializer.attach(&file);
-}
-
-void cSsnxModel_direct::disableDataRecording()
-{
-    cGpsModel::disableDataRecording();
-    mSerializer.detach();
 }
 
 void cSsnxModel_direct::writeDataHeader()

@@ -6,19 +6,13 @@ using namespace ssnx;
 
 cSsnxModel_net::cSsnxModel_net(QObject* parent)
 :
-    cSsnxModel(parent),
-    mSerializer(4096)
+    cSsnxModel(parent)
 {
     mConnected = false;
 }
 
 cSsnxModel_net::~cSsnxModel_net()
 {
-}
-
-uint16_t cSsnxModel_net::data_class_id() const
-{
-    return mSerializer.classID();
 }
 
 bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
@@ -84,17 +78,6 @@ void cSsnxModel_net::update()
 {
     if (!mConnected) return;
     processOneDatagram();
-}
-
-void cSsnxModel_net::enableDataRecording(cBlockDataFileWriter& file)
-{
-    mSerializer.attach(&file);
-}
-
-void cSsnxModel_net::disableDataRecording()
-{
-    cGpsModel::disableDataRecording();
-    mSerializer.detach();
 }
 
 void cSsnxModel_net::writeDataHeader()

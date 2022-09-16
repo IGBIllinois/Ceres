@@ -3,7 +3,6 @@
 
 #include "SsnxModel.hpp"
 #include "SsnxGpsStream.hpp"
-#include "SsnxSerializer.hpp"
 
 #include <QObject>
 
@@ -18,15 +17,7 @@ public:
     explicit cSsnxModel_net(QObject* parent = nullptr);
     ~cSsnxModel_net();
 
-    /*
-     * Returns the class identifier used by the sensor's serializer
-     */
-    uint16_t data_class_id() const override;
-
     bool configure(const nlohmann::json& jsonCfg) override;
-
-    void enableDataRecording(cBlockDataFileWriter& file) override;
-    void disableDataRecording() override;
 
     void writeDataHeader() override;
 
@@ -53,7 +44,6 @@ protected slots:
     void processDatagram(const void* pBuffer, std::size_t buf_length) override;
 
 private:
-    cSsnxSerializer mSerializer;
     bool mConnected;
 };
 

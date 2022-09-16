@@ -2,7 +2,6 @@
 #pragma once
 
 #include "SsnxModel.hpp"
-#include "SsnxSerializer.hpp"
 
 #include <QObject>
 #include <QtSerialPort/QSerialPort>
@@ -18,15 +17,7 @@ public:
     explicit cSsnxModel_direct(QObject* parent = nullptr);
     ~cSsnxModel_direct();
 
-    /*
-     * Returns the class identifier used by the sensor's serializer
-     */
-    uint16_t data_class_id() const override;
-
     bool configure(const nlohmann::json& jsonCfg) override;
-
-    void enableDataRecording(cBlockDataFileWriter& file) override;
-    void disableDataRecording() override;
 
     void writeDataHeader() override;
 
@@ -102,7 +93,5 @@ private:
     };
 
     sPosPojected_t mPosPojected;
-
-    cSsnxSerializer mSerializer;
 };
 

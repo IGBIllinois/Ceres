@@ -5,7 +5,8 @@
 
 cSsnxModel::cSsnxModel(QObject* parent)
 :
-    cGpsModel("SSNX GPS", parent)
+    cGpsModel("SSNX GPS", parent),
+    mSerializer(4096)
 {
 }
 
@@ -18,6 +19,11 @@ const char* cSsnxModel::descriptor() const
     return ssnx_id;
 };
 
+uint16_t cSsnxModel::data_class_id() const
+{
+    return mSerializer.classID();
+}
+
 bool cSsnxModel::configure(const nlohmann::json& jsonCfg)
 {
     auto result = cGpsModel::configure(jsonCfg);
@@ -26,5 +32,16 @@ bool cSsnxModel::configure(const nlohmann::json& jsonCfg)
         updateName(mModel);
 
     return result;
+}
+
+void cSsnxModel::enableDataRecording(cBlockDataFileWriter& file)
+{
+    mSerializer.attach(&file);
+}
+
+void cSsnxModel::disableDataRecording()
+{
+    cGpsModel::disableDataRecording();
+    mSerializer.detach();
 }
 

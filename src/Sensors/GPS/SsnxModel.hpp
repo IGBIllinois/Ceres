@@ -2,6 +2,7 @@
 #pragma once
 
 #include "GpsModel.hpp"
+#include "SsnxSerializer.hpp"
 
 #include <QObject>
 
@@ -19,7 +20,15 @@ public:
      */
     const char* descriptor() const override;
 
+    /*
+     * Returns the class identifier used by the sensor's serializer
+     */
+    uint16_t data_class_id() const override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
+
+    void enableDataRecording(cBlockDataFileWriter& file) override;
+    void disableDataRecording() override;
 
 signals:
     void updateGeodeticPVT(double timestamp_s,
@@ -28,5 +37,9 @@ signals:
         double groundTrack_deg, ::gps::eDatum datum);
 
     void updateUTC(int hour, int min, int sec, int day, int month, int year);
+
+protected:
+    cSsnxSerializer mSerializer;
+
 };
 
