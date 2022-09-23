@@ -109,5 +109,26 @@ set_property(TARGET CeresDataViewer PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded
 
 set_target_properties(CeresDataViewer PROPERTIES FOLDER "Apps")
 
-install(TARGETS CeresDataViewer DESTINATION bin)
+set(INSTALL_DIR bin/CeresDataViewer)
+
+install(TARGETS CeresDataViewer DESTINATION ${INSTALL_DIR})
+
+set(APPS \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_DIR}/CeresDataViewer${CMAKE_EXECUTABLE_SUFFIX})
+
+#qt_generate_deploy_app_script(
+#    TARGET CeresDataViewer
+#    FILENAME_VARIABLE datat_viewer_deploy_script
+#    NO_UNSUPPORTED_PLATFORM_ERROR
+#)
+
+#install(SCRIPT ${datat_viewer_deploy_script})
+
+install(CODE 
+    "
+        include(BundleUtilities)
+        fixup_bundle(\"${APPS}\" \"\" \"\")
+    "
+    COMPONENT Runtime)
+#FIXUP_BUNDLE(CeresDataViewer)
+
 

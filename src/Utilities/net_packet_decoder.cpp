@@ -9,7 +9,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
     if (!pBuffer)
         return;
 
-    ceres::net_buffer_view buffer(reinterpret_cast<const std::byte*>(pBuffer), buf_length);
+    net_buffer_view buffer(reinterpret_cast<const std::byte*>(pBuffer), buf_length);
 
     sPacketHeader_t hdr;
 
@@ -22,6 +22,9 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
             break;
         }
 
+        processPacket(hdr, buffer);
+
+/*
         switch (hdr.id)
         {
             case ePacketType::UNKNOWN:
@@ -131,6 +134,7 @@ void cNetworkDecoder::decode(const void* pBuffer, std::size_t buf_length)
                 break;
             }
         }
+*/
 
         buffer.advance(hdr.length);
     }

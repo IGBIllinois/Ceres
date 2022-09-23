@@ -40,11 +40,8 @@ PRIVATE
     LogWidget.hpp
     LogWidget.cpp
 
-	net_buffer.hpp
-	net_buffer.cpp
-	
-	packet_utils.hpp
-	packet_utils.cpp
+	remote_client_utils.hpp
+	remote_client_utils.cpp
 
 	ceres_net_decoder.hpp
 	ceres_net_decoder.cpp
@@ -55,11 +52,6 @@ PRIVATE
 	ceres_remote_client_net_decoder.cpp
 	ceres_remote_client_net_encoder.hpp
 	ceres_remote_client_net_encoder.cpp
-
-	net_packet_decoder.hpp
-	net_packet_decoder.cpp
-	net_packet_encoder.hpp
-	net_packet_encoder.cpp
 
 	${PROTO_HDRS}
 	${PROTO_SRCS}
@@ -79,6 +71,7 @@ PRIVATE
 set_property(TARGET common PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 target_include_directories(common PRIVATE ${SENSORS_INCLUDE_DIR})
+target_include_directories(common PRIVATE ${UTILITIES_INCLUDE_DIR})
 
 target_link_libraries(common PRIVATE ${Qt}::Widgets)
 target_link_libraries(common PRIVATE nlohmann_json::nlohmann_json)

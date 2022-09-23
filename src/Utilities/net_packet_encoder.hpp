@@ -2,6 +2,7 @@
 #pragma once
 
 #include "net_buffer.hpp"
+
 #include <cstddef>
 
 
@@ -58,7 +59,7 @@ protected:
 protected:
     int sendData();
 
-    ceres::net_buffer mBuffer;
+    net_buffer mBuffer;
 };
 
 

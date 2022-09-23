@@ -33,6 +33,14 @@ PRIVATE
     DummySensorFactory.cpp
 
 #
+# Abstract Base Class for all Sensor Property Pages/Controllers
+#
+    SensorPropertyPage.hpp
+    SensorPropertyPage.cpp
+    SensorController.hpp
+    SensorController.cpp
+	
+#
 # Abstract Base Class for all Sensor Models
 #
     SensorModel.hpp

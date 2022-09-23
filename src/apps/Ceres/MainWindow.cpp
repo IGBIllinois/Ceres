@@ -19,6 +19,7 @@
 
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
+#include "SensorPropertyPage.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>
@@ -573,6 +574,7 @@ void cMainWindow::createMainMenu()
     mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
     mpExperimentMenu = mpUI->menuBar->addMenu(tr("&Experiment"));
     mpViewMenu = mpUI->menuBar->addMenu(tr("&View"));
+    mpSensorMenu = mpUI->menuBar->addMenu(tr("&Sensors"));
     mpHelpMenu = mpUI->menuBar->addMenu(tr("&Help"));
 }
 
@@ -621,7 +623,10 @@ void cMainWindow::createSubMenusAndActions()
     mpExpStop->setEnabled(false);
 
     // Build the View Menu
-    /* The view menu is built dock window system */
+    /* The view menu is built by the dock window system */
+
+    // Build the Sensor Menu
+    /* The sensor menu is built by the sensor loading system */
 
     // Build the Help Menu
     pMenuItem = new QAction(tr("&About"), this);
@@ -886,6 +891,33 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         if (widgets.pToolBar)
         {
             addToolBar(widgets.pToolBar);
+        }
+
+        if (widgets.pPropertyPage)
+        {
+            mpSensorMenu->addAction(widgets.pPropertyPage->showAction());
+        }
+    }
+
+    cSensorPropertyPage* pPage = new cSensorPropertyPage(this);
+    pPage->setTitle("test");
+    pPage->hide();
+    mpSensorMenu->addAction(pPage->showAction());
+}
+
+void cMainWindow::addSensorPropertyPage(QAction* pAction)
+{
+    mpSensorMenu->addAction(pAction);
+}
+
+void cMainWindow::removeSensorPropertyPage(QAction* pAction)
+{
+    for (auto* action : mpSensorMenu->actions())
+    {
+        if (action->text() == "")
+        {
+            mpSensorMenu->removeAction(action);
+            break;
         }
     }
 }

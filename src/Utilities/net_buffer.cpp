@@ -69,7 +69,6 @@ namespace
 
 }
 
-using namespace ceres;
 
 net_buffer::net_buffer() 
 : mpBuffer(nullptr), mReadIndex(0), mWriteIndex(0), mCapacity(0), 

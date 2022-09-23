@@ -12,11 +12,9 @@
 #include <spidercam/spidercam_types.hpp>
 #include <cstdint>
 
-namespace ceres
-{
-	class net_buffer;
-	class net_buffer_view;
-}
+class net_buffer;
+class net_buffer_view;
+
 
 
 /**********************************************************
@@ -48,19 +46,6 @@ enum class ePacketType : uint16_t
 	WEATHER_DATA	= 1100,
 };
 
-struct sPacketHeader_t 
-{
-   ePacketType id;
-   uint8_t revision;
-   uint16_t length;
-
-   struct sTimestamp
-   {
-	   uint64_t seconds;
-	   uint32_t nanos;
-   }
-   timestamp;
-};
 
 
 /**********************************************************
@@ -76,24 +61,24 @@ struct sExperimentInfo_t
 
 sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt);
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
-	const std::string& cultivar, const std::string& doc, ceres::net_buffer& buffer);
+	const std::string& cultivar, const std::string& doc, net_buffer& buffer);
 
-int encode_start_experiment(ceres::net_buffer& buffer);
-int encode_stop_experiment(ceres::net_buffer& buffer);
+int encode_start_experiment(net_buffer& buffer);
+int encode_stop_experiment(net_buffer& buffer);
 
 std::string to_filename_1(const OpenDataFile_1& pckt);
-int encode_open_data_file(const std::string& filename, ceres::net_buffer& buffer);
+int encode_open_data_file(const std::string& filename, net_buffer& buffer);
 
-int encode_close_data_file(ceres::net_buffer& buffer);
+int encode_close_data_file(net_buffer& buffer);
 
 bool to_file_open_state_1(const FileOpenState_1& pckt);
-int encode_file_open_state(bool open, ceres::net_buffer& buffer);
+int encode_file_open_state(bool open, net_buffer& buffer);
 
-int encode_start_data_recording(ceres::net_buffer& buffer);
-int encode_stop_data_recording(ceres::net_buffer& buffer);
+int encode_start_data_recording(net_buffer& buffer);
+int encode_stop_data_recording(net_buffer& buffer);
 
 std::string to_status_message_1(const StatusMessage_1& pckt);
-int encode_status_message(const std::string& message, ceres::net_buffer& buffer);
+int encode_status_message(const std::string& message, net_buffer& buffer);
 
 struct sLogMessage_t
 {
@@ -102,7 +87,7 @@ struct sLogMessage_t
 	std::string message;
 };
 sLogMessage_t to_log_message_1(const LogMessage_1& pckt);
-int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& message, ceres::net_buffer& buffer);
+int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& message, net_buffer& buffer);
 
 struct sSensorStatus_t
 {
@@ -110,7 +95,7 @@ struct sSensorStatus_t
 	std::string status;
 };
 sSensorStatus_t to_sensor_status_1(const SensorStatus_1& pckt);
-int encode_sensor_status(const std::string& device, const std::string& message, ceres::net_buffer& buffer);
+int encode_sensor_status(const std::string& device, const std::string& message, net_buffer& buffer);
 
 struct sSensorNameChange_t
 {
@@ -118,14 +103,14 @@ struct sSensorNameChange_t
 	std::string new_name;
 };
 sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt);
-int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, ceres::net_buffer& buffer);
+int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, net_buffer& buffer);
 
 
 /**********************************************************
  * Spidercam packets utilities
  **********************************************************/
 spidercam::sPosition_1_t to_spidercam_position_1(const Spidercam_Position_1& pckt);
-int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, ceres::net_buffer& buffer);
+int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer);
 
 
 /**********************************************************
@@ -139,10 +124,6 @@ struct sWeatherData_t
 };
 
 sWeatherData_t to_weather_data_1(const WeatherData_1& pckt);
-int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction_deg, ceres::net_buffer& buffer);
+int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction_deg, net_buffer& buffer);
 
-
-ceres::net_buffer& operator>>(ceres::net_buffer& buffer, sPacketHeader_t& hdr);
-ceres::net_buffer_view& operator>>(ceres::net_buffer_view& buffer, sPacketHeader_t& hdr);
-ceres::net_buffer& operator<<(ceres::net_buffer& buffer, const sPacketHeader_t& hdr);
 

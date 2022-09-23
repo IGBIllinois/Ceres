@@ -9,10 +9,18 @@ set(HYPERSPECTRAL_SOURCE_FILES
 #
 # HySpex Cameras
 #
+    HySpexVNIR_3000N_Model_net.hpp
+    HySpexVNIR_3000N_Model_net.cpp
+    HySpexVNIR_3000N_Model_direct.hpp
+    HySpexVNIR_3000N_Model_direct.cpp
     HySpexVNIR_3000N_Model.hpp
     HySpexVNIR_3000N_Model.cpp
     HySpexVNIR_3000N_View.hpp
     HySpexVNIR_3000N_View.cpp
+    HySpexSWIR_384_Model_net.hpp
+    HySpexSWIR_384_Model_net.cpp
+    HySpexSWIR_384_Model_direct.hpp
+    HySpexSWIR_384_Model_direct.cpp
     HySpexSWIR_384_Model.hpp
     HySpexSWIR_384_Model.cpp
     HySpexSWIR_384_View.hpp

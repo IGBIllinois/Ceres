@@ -8,27 +8,27 @@
 
 #include "net_packet_decoder.hpp"
 
+#include <string>
+
 class cCeresNetDecoder : public cNetworkDecoder
 {
 public:
     cCeresNetDecoder() = default;
     virtual ~cCeresNetDecoder() = default;
 
-/*
- * The Ceres application sends these packets and should never receive them!
- */
+protected:
+    /*
+     * The Ceres application sends these packets and should never receive them!
+     */
+    virtual void onDataFileState(bool is_open) = 0;
+
+    virtual void onStatusMessage(const std::string& msg) = 0;
+    virtual void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) = 0;
+    virtual void onSensorStatus(const std::string& sensor, const std::string& status) = 0;
+    virtual void onSensorNameChange(const std::string& old_name, const std::string& new_name) = 0;
+
 private:
-    void onExperimentInfo(const std::string&, const std::string&, const std::string&, const std::string&) override final {};
-    void onStartExperiment() override final {};
-    void onStopExperiment() override final {};
-
-    void onOpenDataFile(const std::string&) override final {};
-    void onCloseDataFile() override final {};
-    void onStartDataRecording() override final {};
-    void onStopDataRecording() override final {};
-
-    void onSpidercamPosition(const spidercam::sPosition_1_t& pos) override final {};
-    void onWeatherData(bool valid, double wind_speed_mph, double wind_direction_deg) override final {};
+    void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
 };
 
 

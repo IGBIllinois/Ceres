@@ -1,45 +1,9 @@
 
+#include "remote_client_utils.hpp"
 #include "packet_utils.hpp"
 #include "net_buffer.hpp"
 
-using namespace ceres;
-
 #include <string>
-
-#if defined(_WIN32)
-
-#include <WinSock2.h>
-#include <chrono>
-
-int gettimeofday(struct timeval* tp, struct timezone* tzp)
-{
-    namespace sc = std::chrono;
-    sc::system_clock::duration d = sc::system_clock::now().time_since_epoch();
-    sc::seconds s = sc::duration_cast<sc::seconds>(d);
-    tp->tv_sec = s.count();
-    tp->tv_usec = sc::duration_cast<sc::microseconds>(d - s).count();
-
-    return 0;
-}
-
-#else
-#include <sys/time.h>
-#endif // _WIN32
-
-
-namespace
-{
-    void set_timestamp(sPacketHeader_t::sTimestamp* timestamp)
-    {
-        struct timeval tv;
-
-        gettimeofday(&tv, nullptr);
-
-        timestamp->seconds = tv.tv_sec;
-        timestamp->nanos = (tv.tv_usec * 1000);
-    }
-}
-
 
 
 /*
@@ -58,7 +22,7 @@ sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt)
 }
 
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
-    const std::string& cultivar, const std::string& doc, ceres::net_buffer& buffer)
+    const std::string& cultivar, const std::string& doc, net_buffer& buffer)
 {
     ExperimentInfo_1 pckt;
 
@@ -77,7 +41,7 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::EXPERIMENT_INFO;
+    hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_INFO);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -88,10 +52,10 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int encode_start_experiment(ceres::net_buffer& buffer)
+int encode_start_experiment(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::START_EXPERIMENT;
+    hdr.id = static_cast<uint16_t>(ePacketType::START_EXPERIMENT);
     hdr.revision = 1;
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
@@ -101,10 +65,10 @@ int encode_start_experiment(ceres::net_buffer& buffer)
     return sizeof(sPacketHeader_t);
 }
 
-int encode_stop_experiment(ceres::net_buffer& buffer)
+int encode_stop_experiment(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::STOP_EXPERIMENT;
+    hdr.id = static_cast<uint16_t>(ePacketType::STOP_EXPERIMENT);
     hdr.revision = 1;
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
@@ -119,7 +83,7 @@ std::string to_filename_1(const OpenDataFile_1& pckt)
     return pckt.filename();
 }
 
-int encode_open_data_file(const std::string& filename, ceres::net_buffer& buffer)
+int encode_open_data_file(const std::string& filename, net_buffer& buffer)
 {
     OpenDataFile_1 pckt;
 
@@ -129,7 +93,7 @@ int encode_open_data_file(const std::string& filename, ceres::net_buffer& buffer
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::OPEN_DATA_FILE;
+    hdr.id = static_cast<uint16_t>(ePacketType::OPEN_DATA_FILE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -140,10 +104,10 @@ int encode_open_data_file(const std::string& filename, ceres::net_buffer& buffer
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int encode_close_data_file(ceres::net_buffer& buffer)
+int encode_close_data_file(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::CLOSE_DATA_FILE;
+    hdr.id = static_cast<uint16_t>(ePacketType::CLOSE_DATA_FILE);
     hdr.revision = 1;
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
@@ -158,7 +122,7 @@ bool to_file_open_state_1(const FileOpenState_1& pckt)
     return pckt.isopen();
 }
 
-int encode_file_open_state(bool open, ceres::net_buffer& buffer)
+int encode_file_open_state(bool open, net_buffer& buffer)
 {
     FileOpenState_1 pckt;
 
@@ -168,7 +132,7 @@ int encode_file_open_state(bool open, ceres::net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::OPEN_DATA_FILE;
+    hdr.id = static_cast<uint16_t>(ePacketType::OPEN_DATA_FILE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -179,10 +143,10 @@ int encode_file_open_state(bool open, ceres::net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int encode_start_data_recording(ceres::net_buffer& buffer)
+int encode_start_data_recording(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::START_DATA_RECORDING;
+    hdr.id = static_cast<uint16_t>(ePacketType::START_DATA_RECORDING);
     hdr.revision = 1;
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
@@ -192,10 +156,10 @@ int encode_start_data_recording(ceres::net_buffer& buffer)
     return sizeof(sPacketHeader_t);
 }
 
-int encode_stop_data_recording(ceres::net_buffer& buffer)
+int encode_stop_data_recording(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::STOP_DATA_RECORDING;
+    hdr.id = static_cast<uint16_t>(ePacketType::STOP_DATA_RECORDING);
     hdr.revision = 1;
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
@@ -211,7 +175,7 @@ std::string to_status_message_1(const StatusMessage_1& pckt)
     return pckt.message();
 }
 
-int encode_status_message(const std::string& message, ceres::net_buffer& buffer)
+int encode_status_message(const std::string& message, net_buffer& buffer)
 {
     StatusMessage_1 pckt;
 
@@ -221,7 +185,7 @@ int encode_status_message(const std::string& message, ceres::net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::STATUS_MESSAGE;
+    hdr.id = static_cast<uint16_t>(ePacketType::STATUS_MESSAGE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -243,7 +207,7 @@ sLogMessage_t to_log_message_1(const LogMessage_1& pckt)
     return data;
 }
 
-int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& message, ceres::net_buffer& buffer)
+int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& message, net_buffer& buffer)
 {
     LogMessage_1 pckt;
 
@@ -255,7 +219,7 @@ int encode_log_message(uint8_t msg_type, const std::string& device, const std::s
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::LOG_MESSAGE;
+    hdr.id = static_cast<uint16_t>(ePacketType::LOG_MESSAGE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -276,7 +240,7 @@ sSensorStatus_t to_sensor_status_1(const SensorStatus_1& pckt)
     return data;
 }
 
-int encode_sensor_status(const std::string& device, const std::string& message, ceres::net_buffer& buffer)
+int encode_sensor_status(const std::string& device, const std::string& message, net_buffer& buffer)
 {
     SensorStatus_1 pckt;
 
@@ -287,7 +251,7 @@ int encode_sensor_status(const std::string& device, const std::string& message, 
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::SENSOR_STATUS;
+    hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_STATUS);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -308,7 +272,7 @@ sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt)
     return data;
 }
 
-int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, ceres::net_buffer& buffer)
+int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, net_buffer& buffer)
 {
     SensorNameChange_1 pckt;
 
@@ -319,7 +283,7 @@ int encode_sensor_name_change(const std::string& old_name, const std::string& ne
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::SENSOR_NAME_CHANGE;
+    hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_NAME_CHANGE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -376,7 +340,7 @@ int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::SPIDER_CAM_DATA;
+    hdr.id = static_cast<uint16_t>(ePacketType::SPIDER_CAM_DATA);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -414,7 +378,7 @@ int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = ePacketType::WEATHER_DATA;
+    hdr.id = static_cast<uint16_t>(ePacketType::WEATHER_DATA);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -426,24 +390,4 @@ int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction
 }
 
 
-net_buffer& operator>>(net_buffer& buffer, sPacketHeader_t& hdr)
-{
-    uint16_t id;
-    buffer >> id >> hdr.revision >> hdr.length >> hdr.timestamp.seconds >> hdr.timestamp.nanos;
-    hdr.id = static_cast<ePacketType>(id);
-    return buffer;
-}
 
-net_buffer& operator<<(net_buffer& buffer, const sPacketHeader_t& hdr)
-{
-    buffer << static_cast<uint16_t>(hdr.id) << hdr.revision << hdr.length << hdr.timestamp.seconds << hdr.timestamp.nanos;
-    return buffer;
-}
-
-net_buffer_view& operator>>(net_buffer_view& buffer, sPacketHeader_t& hdr)
-{
-    uint16_t id;
-    buffer >> id >> hdr.revision >> hdr.length >> hdr.timestamp.seconds >> hdr.timestamp.nanos;
-    hdr.id = static_cast<ePacketType>(id);
-    return buffer;
-}

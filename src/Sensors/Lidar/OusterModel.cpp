@@ -19,6 +19,16 @@ const char* cOusterModel::descriptor() const
     return ouster_id;
 }
 
+ouster::eLIDAR_MODE cOusterModel::getLidarMode() const
+{
+    return mConfigParameters.lidar_mode;
+}
+
+ouster::azimuth_range_t cOusterModel::getAzimuthWindow() const
+{
+    return mConfigParameters.azimuth_window;
+}
+
 ouster::sensor_info_2_t cOusterModel::getSensorInfo() const
 {
     return mSensorInfo;
@@ -71,13 +81,13 @@ uint16_t cOusterModel::columnWindowMax() const
 
 uint32_t cOusterModel::minEncoderCount() const
 {
-    return mAzimuthWindow.min_deg * ouster::DEG_TO_ENCODER_TICS;
+    return mConfigParameters.azimuth_window.min_deg * ouster::DEG_TO_ENCODER_TICS;
     return 22528;
 }
 
 uint32_t cOusterModel::maxEncoderCount() const
 {
-    return mAzimuthWindow.max_deg * ouster::DEG_TO_ENCODER_TICS;
+    return mConfigParameters.azimuth_window.max_deg * ouster::DEG_TO_ENCODER_TICS;
     return 67584;
 }
 

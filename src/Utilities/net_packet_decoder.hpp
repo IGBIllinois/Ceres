@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <spidercam/spidercam_types.hpp>
-
+#include "packet_utils.hpp"
 
 #include <cstddef>
 
@@ -25,30 +24,8 @@ public:
      */
     void decode(const void* pBuffer, std::size_t buf_length);
 
-private:
-    virtual void onExperimentInfo(const std::string& title, 
-        const std::string& researcher, const std::string& cultivar, const std::string& doc)= 0;
-
-    virtual void onStartExperiment() = 0;
-    virtual void onStopExperiment() = 0;
-
-    virtual void onOpenDataFile(const std::string& fileName) = 0;
-    virtual void onCloseDataFile() = 0;
-    virtual void onDataFileState(bool is_open) = 0;
-
-    virtual void onStartDataRecording() = 0;
-    virtual void onStopDataRecording() = 0;
-
-    virtual void onStatusMessage(const std::string& msg) = 0;
-    virtual void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) = 0;
-    virtual void onSensorStatus(const std::string& sensor, const std::string& status) = 0;
-    virtual void onSensorNameChange(const std::string& old_name, const std::string& new_name) = 0;
-
-
-    virtual void onSpidercamPosition(const spidercam::sPosition_1_t& pos) = 0;
-
-    virtual void onWeatherData(bool valid, double wind_speed_mps, 
-        double wind_direction_deg) = 0;
+protected:
+    virtual void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) = 0;
 };
 
 

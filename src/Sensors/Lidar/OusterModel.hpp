@@ -25,6 +25,13 @@ public:
 
     virtual bool configure(const nlohmann::json& jsonCfg) = 0;
 
+    ouster::eLIDAR_MODE getLidarMode() const;
+    virtual bool setLidarMode(ouster::eLIDAR_MODE mode) = 0;
+
+    ouster::azimuth_range_t getAzimuthWindow() const;
+    virtual bool setAzimuthWindow(double min_deg, double max_deg) = 0;
+
+
     uint16_t columnsPerFrame() const;
     uint16_t pixelsPerColumn() const;
     uint16_t columnWindowMin() const;
@@ -33,11 +40,11 @@ public:
     uint32_t minEncoderCount() const;
     uint32_t maxEncoderCount() const;
 
-    ouster::sensor_info_2_t getSensorInfo() const;
-    ouster::time_info_2_t getTimeInfo() const;
-    ouster::beam_intrinsics_2_t getBeamIntrinsics() const;
-    ouster::imu_intrinsics_2_t getImuIntrinsics() const;
-    ouster::lidar_intrinsics_2_t getLidarIntrinsics() const;
+    ouster::sensor_info_2_t       getSensorInfo() const;
+    ouster::time_info_2_t         getTimeInfo() const;
+    ouster::beam_intrinsics_2_t   getBeamIntrinsics() const;
+    ouster::imu_intrinsics_2_t    getImuIntrinsics() const;
+    ouster::lidar_intrinsics_2_t  getLidarIntrinsics() const;
     ouster::lidar_data_format_2_t getLidarDataFormat() const;
 
     double lidar_origin_to_beam_origin_mm() const;
@@ -57,7 +64,6 @@ signals:
     void updateDataFormat();
 
     void updateAzimuthWindow();
-//    void updateEncoderCount(int min, int max);
     void updateImuData();
     void updateLidarData();
 
@@ -75,7 +81,6 @@ protected:
     ouster::imu_intrinsics_2_t	    mImuIntrinsics;
     ouster::lidar_intrinsics_2_t	mLidarIntrinsics;
     ouster::lidar_data_format_2_t   mDataFormat;
-	ouster::azimuth_range_t		    mAzimuthWindow;
 
 //    ouster::alerts_t			mAlerts;
 

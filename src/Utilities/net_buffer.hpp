@@ -5,31 +5,28 @@
 #include <vector>
 #include <string>
 
-namespace ceres
+
+class net_buffer_view;
+
+class net_buffer
 {
+public:
 
-    class net_buffer_view;
+    typedef std::size_t	size_type;
 
-    class net_buffer
-    {
-    public:
-
-        typedef std::size_t	size_type;
-
-    public:
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Construction/Destruction
-         *
+public:
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Construction/Destruction
+     *
+     */
+    //@{
+        /**
+         * \brief Default Constructor
+         * \par Description
+         *		Default Constructor for the net_buffer class.  Creates a buffer
+         *		of zero size.
          */
-         //@{
-
-             /**
-              * \brief Default Constructor
-              * \par Description
-              *		Default Constructor for the net_buffer class.  Creates a buffer
-              *		of zero size.
-              */
         explicit net_buffer();
 
         /**
@@ -43,23 +40,21 @@ namespace ceres
         explicit net_buffer(size_type capacity);
 
         /**
-        *	\brief	Copy/move constructors.
-        *
-        *	\par	Description:
-        *			Copy/move constructor. (deep copy);
-        */
+         *	\brief	Copy/move constructors.
+         *
+         *	\par	Description:
+         *			Copy/move constructor. (deep copy);
+         */
         net_buffer(const net_buffer& objToCopy);
         net_buffer(net_buffer&& objToCopy) noexcept;
 
-
         /**
-        *	\brief	Assignment operator.
-        *
-        *	\par	Description:
-        *			Assignment operator. (deep copy)
-        */
+         *	\brief	Assignment operator.
+         *
+         *	\par	Description:
+         *			Assignment operator. (deep copy)
+         */
         void operator=(const net_buffer& objToCopy);
-
 
         /**
          * \brief Destructor
@@ -67,25 +62,25 @@ namespace ceres
          *		Frees up any resources used by net_buffer.
          */
         ~net_buffer();
-        //@}
+    //@}
 
-        operator net_buffer_view();
+    operator net_buffer_view();
 
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Properties
+     *
+     */
+    //@{
+        /**
+         * \brief write_size
+         * \par Description
+         *		Returns the difference between the buffer's capacity and it current
+         *		size.
          *
-         * \name Properties
-         *
+         * The write size is the diffence between the buffer capacity and
+         * current write position
          */
-         //@{
-             /**
-              * \brief write_size
-              * \par Description
-              *		Returns the difference between the buffer's capacity and it current
-              *		size.
-              *
-              * The write size is the diffence between the buffer capacity and
-              * current write position
-              */
         size_type write_size() const;
 
         /**
@@ -146,14 +141,14 @@ namespace ceres
          * Note: data returns a const char* for use
          */
         const void* data() const;
-        //@}
+    //@}
 
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Operations
-         *
-         */
-         //@{
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Operations
+     *
+     */
+    //@{
         void attach(std::byte* buffer, size_type size);
         std::byte* detach();
 
@@ -198,22 +193,21 @@ namespace ceres
          * \return unsigned long	-- number of elements removed from control sequence.
          */
         virtual size_type erase(std::size_t pos, size_type size);
-        //@}
+    //@}
 
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Input Stream Operators
+     *
+     */
+    //@{
+        /**
+         * \brief operator>>
+         * \par Description
+         *		The input stream operator to unpack a variable from the internal buffer.
          *
-         * \name Input Stream Operators
-         *
+         * \param out	-- a reference to the parameter to read from the buffer.
          */
-         //@{
-
-             /**
-              * \brief operator>>
-              * \par Description
-              *		The input stream operator to unpack a variable from the internal buffer.
-              *
-              * \param out	-- a reference to the parameter to read from the buffer.
-              */
         net_buffer& operator>>(net_buffer& out);
         net_buffer& operator>>(net_buffer*& out);
         net_buffer& operator>>(bool& out);
@@ -231,22 +225,22 @@ namespace ceres
 
         void read(std::string& out, unsigned char len);
         void read(std::byte*& out, unsigned char len);
-        //@}
+    //@}
 
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Output Stream Operators
+     *
+     */
+    //@{
+        /**
+         * \brief operator<<
+         * \par Description
+         *		Overloaded output stream operators to handle packing the variable into
+         *		the internal buffer.
          *
-         * \name Output Stream Operators
-         *
+         * \param in	-- the parameter to write into the buffer.
          */
-         //@{
-             /**
-              * \brief operator<<
-              * \par Description
-              *		Overloaded output stream operators to handle packing the variable into
-              *		the internal buffer.
-              *
-              * \param in	-- the parameter to write into the buffer.
-              */
         net_buffer& operator<<(const net_buffer& in);
         net_buffer& operator<<(const net_buffer*& in);
         net_buffer& operator<<(const bool in);
@@ -264,20 +258,20 @@ namespace ceres
 
         void write(const std::string& in);
         void write(const std::byte* in, unsigned char len);
-        //@}
+    //@}
 
-    protected:
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Helper Methods
-         *
+protected:
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Helper Methods
+     *
+     */
+    //@{
+        /**
+         * \brief rdbuf
+         * \par Description
+         *		Returns a pointer to the current read position.
          */
-         //@{
-             /**
-              * \brief rdbuf
-              * \par Description
-              *		Returns a pointer to the current read position.
-              */
         const std::byte* rdbuf() const { return &mpBuffer[mReadIndex]; };
 
         /**
@@ -293,76 +287,76 @@ namespace ceres
          *		Returns a pointer to the end of the buffer.
          */
         const std::byte* end() const { return &mpBuffer[mCapacity]; };
-        //@}
+    //@}
 
-    private:
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Data Members
-         *
+private:
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Data Members
+     *
+     */
+    //@{
+
+        /**
+         * \var	mBuffer
+         * \brief  The internal buffer storage.
          */
-         //@{
-
-            /**
-            *  \var	mBuffer
-            *  \brief  The internal buffer storage.
-            */
         std::byte* mpBuffer;
 
         /**
-         *  \var	mReadIndex
-         *  \brief  The current read index in the internal buffer.
+         * \var	mReadIndex
+         * \brief  The current read index in the internal buffer.
          */
         size_type mReadIndex;
 
         /**
-         *  \var	mWriteIndex
-         *  \brief  The current write index in the internal buffer.
+         * \var	mWriteIndex
+         * \brief  The current write index in the internal buffer.
          */
         size_type mWriteIndex;
 
         /**
-         *  \var	mCapacity
-         *  \brief  The capacity (number of bytes) of the internal buffer storage.
+         * \var	mCapacity
+         * \brief  The capacity (number of bytes) of the internal buffer storage.
          */
         size_type mCapacity;
 
         /**
-         *  \var	mUnderrun
-         *  \brief  The read index is at the end of the internal buffer storage.
+         * \var	mUnderrun
+         * \brief  The read index is at the end of the internal buffer storage.
          */
         bool mUnderrun;
 
         /**
-         *  \var	mOverrun
-         *  \brief  The write index is at the end of the internal buffer storage.
+         * \var	mOverrun
+         * \brief  The write index is at the end of the internal buffer storage.
          */
         bool mOverrun;
-        //@}
-    };
+    //@}
+};
 
 
 
-    class net_buffer_view
-    {
-    public:
+class net_buffer_view
+{
+public:
 
-        typedef std::size_t	size_type;
+    typedef std::size_t	size_type;
 
-    public:
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Construction/Destruction
-         *
+public:
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Construction/Destruction
+     *
+     */
+    //@{
+
+        /**
+         * \brief Default Constructor
+         * \par Description
+         *		Default Constructor for the net_buffer class.  Creates a buffer
+         *		of zero size.
          */
-         //@{
-
-             /**
-              * \brief Default Constructor
-              * \par Description
-              *		Default Constructor for the net_buffer class.  Creates a buffer
-              *		of zero size.
-              */
         explicit net_buffer_view();
 
         /**
@@ -376,20 +370,20 @@ namespace ceres
         explicit net_buffer_view(const std::byte* buffer, size_type length);
 
         /**
-        *	\brief	Copy/move constructors.
-        *
-        *	\par	Description:
-        *			Copy/move constructor. (shallow copy);
-        */
+         *	\brief	Copy/move constructors.
+         *
+         *	\par	Description:
+         *			Copy/move constructor. (shallow copy);
+         */
         net_buffer_view(const net_buffer_view& objToCopy);
         net_buffer_view(net_buffer_view&& objToCopy) noexcept;
 
         /**
-        *	\brief	Assignment operator.
-        *
-        *	\par	Description:
-        *			Assignment operator. (deep copy)
-        */
+         *	\brief	Assignment operator.
+         *
+         *	\par	Description:
+         *			Assignment operator. (deep copy)
+         */
         void operator=(const net_buffer_view& objToCopy);
 
         /**
@@ -398,21 +392,21 @@ namespace ceres
          *		Frees up any resources used by net_buffer.
          */
         ~net_buffer_view() = default;
-        //@}
+    //@}
 
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Properties
+     *
+     */
+    //@{
+        /**
+         * \brief size
+         * \par Description
+         *		Returns the length of the buffer data.
          *
-         * \name Properties
-         *
+         * This is the number of bytes that can be read from the buffer.
          */
-         //@{
-            /**
-             * \brief size
-             * \par Description
-             *		Returns the length of the buffer data.
-             *
-             * This is the number of bytes that can be read from the buffer.
-             */
         size_type size() const;
 
         /**
@@ -443,20 +437,20 @@ namespace ceres
          *		Returns a pointer to the currently read position buffer.
          */
         const void* data() const;
-        //@}
+    //@}
 
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Operations
-         *
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Operations
+     *
+     */
+    //@{
+        /**
+         * \brief reset
+         * \par Description
+         *		Resets the current read position to the beginning of the
+         *		control sequence.
          */
-         //@{
-            /**
-             * \brief reset
-             * \par Description
-             *		Resets the current read position to the beginning of the
-             *		control sequence.
-             */
         void reset();
 
         /**
@@ -466,22 +460,21 @@ namespace ceres
          *		control sequence.
          */
         void advance(size_type n);
-        //@}
+    //@}
 
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
      * \name Input Stream Operators
      *
      */
-     //@{
-
-         /**
-          * \brief operator>>
-          * \par Description
-          *		The input stream operator to unpack a variable from the internal buffer.
-          *
-          * \param out	-- a reference to the parameter to read from the buffer.
-          */
+    //@{
+        /**
+         * \brief operator>>
+         * \par Description
+         *		The input stream operator to unpack a variable from the internal buffer.
+         *
+         * \param out	-- a reference to the parameter to read from the buffer.
+         */
         net_buffer_view& operator>>(net_buffer_view& out);
         net_buffer_view& operator>>(net_buffer_view*& out);
         net_buffer_view& operator>>(bool& out);
@@ -499,20 +492,20 @@ namespace ceres
 
         void read(std::string& out, unsigned char len);
         void read(std::byte*& out, unsigned char len);
-        //@}
+    //@}
 
-    protected:
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Helper Methods
-         *
+protected:
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Helper Methods
+     *
+     */
+    //@{
+        /**
+         * \brief rdbuf
+         * \par Description
+         *		Returns a pointer to the current read position.
          */
-         //@{
-             /**
-              * \brief rdbuf
-              * \par Description
-              *		Returns a pointer to the current read position.
-              */
         const std::byte* rdbuf() const { return &mpBuffer[mReadIndex]; };
 
         /**
@@ -521,20 +514,20 @@ namespace ceres
          *		Returns a pointer to the end of the buffer.
          */
         const std::byte* end() const { return &mpBuffer[mCapacity]; };
-        //@}
+    //@}
 
-    private:
-        /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * \name Data Members
-         *
+private:
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * \name Data Members
+     *
+     */
+    //@{
+
+        /**
+         *  \var	mBuffer
+         *  \brief  The internal buffer storage.
          */
-         //@{
-
-            /**
-            *  \var	mBuffer
-            *  \brief  The internal buffer storage.
-            */
         const std::byte* mpBuffer;
 
         /**
@@ -554,8 +547,8 @@ namespace ceres
          *  \brief  The read index is at the end of the internal buffer storage.
          */
         bool mUnderrun;
-        //@}
-    };
+    //@}
+};
 
-}   // end of namespace ceres
+
 

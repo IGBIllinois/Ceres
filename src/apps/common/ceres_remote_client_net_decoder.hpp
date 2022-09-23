@@ -8,6 +8,10 @@
 
 #include "net_packet_decoder.hpp"
 
+#include <spidercam/spidercam_types.hpp>
+
+#include <string>
+
 
 class cCeresRemoteClientNetDecoder : public cNetworkDecoder
 {
@@ -16,15 +20,30 @@ public:
     cCeresRemoteClientNetDecoder() = default;
     virtual ~cCeresRemoteClientNetDecoder() = default;
 
+protected:
+    virtual void onExperimentInfo(const std::string& title,
+        const std::string& researcher, const std::string& cultivar, const std::string& doc) = 0;
+
+    virtual void onStartExperiment() = 0;
+    virtual void onStopExperiment() = 0;
+
+    virtual void onOpenDataFile(const std::string& fileName) = 0;
+    virtual void onCloseDataFile() = 0;
+
+    virtual void onStartDataRecording() = 0;
+    virtual void onStopDataRecording() = 0;
+
+    virtual void onSpidercamPosition(const spidercam::sPosition_1_t& pos) = 0;
+
+    virtual void onWeatherData(bool valid, double wind_speed_mps,
+        double wind_direction_deg) = 0;
+
 /*
  * The Ceres Remote Client application sends these packets and should never receive them!
  */
 private:
-    void onDataFileState(bool is_open) override final {};
-    void onStatusMessage(const std::string& msg) override final {};
-    void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) override final {};
-    void onSensorStatus(const std::string& sensor, const std::string& status) override final {};
-    void onSensorNameChange(const std::string& old_name, const std::string& new_name) override final {};
+    void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
+
 };
 
 

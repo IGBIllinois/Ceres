@@ -50,6 +50,10 @@ signals:
     void refreshDisplay();
 
 public slots:
+    void addSensorPropertyPage(QAction* pAction);
+    void removeSensorPropertyPage(QAction* pAction);
+
+public slots:
     void onStatusUpdate(QString msg);
     void onInfoMessage(QString title, QString msg);
     void onWarningMessage(QString title, QString msg);
@@ -99,6 +103,7 @@ private:
     QAction* mpExpStop;
 
     QMenu* mpViewMenu;
+    QMenu* mpSensorMenu;
     QMenu* mpHelpMenu;
 
     QToolBar* mpFileBar;

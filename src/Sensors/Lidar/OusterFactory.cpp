@@ -30,7 +30,14 @@ sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_vi
     std::string protocol = sensorInfo["protocol"];
 
     if (protocol == "net")
+    {
         pModel = new cOusterModel_net();
+
+        if (no_visualization)
+        {
+
+        }
+    }
 
     if (!pModel)
         throw std::runtime_error("OUSTER: Unknown protocol type!");

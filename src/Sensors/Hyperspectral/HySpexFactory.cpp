@@ -2,9 +2,11 @@
  */
 
 #include "HySpexFactory.hpp"
-#include "HySpexVNIR_3000N_Model.hpp"
+#include "HySpexVNIR_3000N_Model_direct.hpp"
+#include "HySpexVNIR_3000N_Model_net.hpp"
 #include "HySpexVNIR_3000N_View.hpp"
-#include "HySpexSWIR_384_Model.hpp"
+#include "HySpexSWIR_384_Model_direct.hpp"
+#include "HySpexSWIR_384_Model_net.hpp"
 #include "HySpexSWIR_384_View.hpp"
 
 #include <QWidget>
@@ -20,11 +22,9 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
     std::string protocol = sensorInfo["protocol"];
 
     if (protocol == "direct")
-        pModel = new cHySpexVNIR_3000N_Model();
+        pModel = new cHySpexVNIR_3000N_Model_direct();
     else if (protocol == "net")
-        pModel = new cHySpexVNIR_3000N_Model();
-    else if (protocol == "file")
-        pModel = new cHySpexVNIR_3000N_Model();
+        pModel = new cHySpexVNIR_3000N_Model_net();
 
     if (!pModel)
         throw std::runtime_error("HySpex VNIR 3000N: Unknown protocol type!");
@@ -50,11 +50,9 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
     std::string protocol = sensorInfo["protocol"];
 
     if (protocol == "direct")
-        pModel = new cHySpexSWIR_384_Model();
+        pModel = new cHySpexSWIR_384_Model_direct();
     else if (protocol == "net")
-        pModel = new cHySpexSWIR_384_Model();
-    else if (protocol == "file")
-        pModel = new cHySpexSWIR_384_Model();
+        pModel = new cHySpexSWIR_384_Model_net();
 
     if (!pModel)
         throw std::runtime_error("HySpex SWIR 384: Unknown protocol type!");

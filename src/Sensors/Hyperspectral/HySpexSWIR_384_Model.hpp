@@ -31,22 +31,7 @@ public:
 
     void writeDataHeader() override;
 
-    /*
-     * Starts/Stops communication with the endpoint.
-     * These methods are called inside the QThread so that
-     * all of the communication happens within the same thread!
-     */
-    bool startCommunications() override;
-    void stopCommunications() override;
-
-signals:
-
-protected:
-    void update() override;
-
 private:
-    bool mConnected;
-
     cHySpexSWIR_384_Serializer mSerializer;
 };
 

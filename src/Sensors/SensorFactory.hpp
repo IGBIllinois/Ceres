@@ -6,6 +6,8 @@
 
 
 class cSensorModel;
+class cSensorPropertyPage;
+class cSensorController;
 
 // Qt Forward Declaration
 //QT_BEGIN_NAMESPACE
@@ -17,25 +19,30 @@ class QToolBar;
 
 struct sSensorWidgets
 {
-	cSensorModel* pModel;
-	QDockWidget* pDockableView;
-	QStatusBar* pStatusBar;
-	QToolBar* pToolBar;
+	cSensorModel*			pModel = nullptr;
+	QDockWidget*			pDockableView = nullptr;
+	QStatusBar*				pStatusBar = nullptr;
+	QToolBar*				pToolBar = nullptr;
+	cSensorPropertyPage*	pPropertyPage = nullptr;
+	cSensorController*		pController = nullptr;
 
-	// Future: property page
-
-	sSensorWidgets() : pModel(nullptr), pDockableView(nullptr), pStatusBar(nullptr),
-		pToolBar(nullptr)
-	{}
+	sSensorWidgets() = default;
 
 	sSensorWidgets(cSensorModel* model, QDockWidget* view, 
-		QStatusBar* status = nullptr, QToolBar* toolbar = nullptr)
+		QStatusBar* status = nullptr, QToolBar* toolbar = nullptr,
+		cSensorPropertyPage* properties = nullptr, 
+		cSensorController* controller = nullptr)
 	:
-		pModel(model), pDockableView(view), pStatusBar(status), pToolBar(toolbar)
+		pModel(model), pDockableView(view), pStatusBar(status), pToolBar(toolbar),
+		pPropertyPage(properties), pController(controller)
 	{}
 };
+
 
 sSensorWidgets create_sensor(const std::string& name, 
 	const nlohmann::json& sensorInfo, bool no_visualization = false);
 
 void remove_sensor(const std::string& name, sSensorWidgets widgets);
+
+cSensorPropertyPage* create_sensor_property_page(const std::string& name);
+

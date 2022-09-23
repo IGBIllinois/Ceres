@@ -13,11 +13,22 @@ PUBLIC
 	Utilities.hpp
 	ColorGradient.hpp
 	Timers.hpp
+	
+	net_buffer.hpp
+	packet_utils.hpp
+	net_packet_encoder.hpp
+	net_packet_decoder.hpp
+
 
 PRIVATE
 
 	ColorGradient.cpp
 	Timers.cpp
+	
+	net_buffer.cpp
+	packet_utils.cpp
+	net_packet_encoder.cpp
+	net_packet_decoder.cpp
 )
 
 #

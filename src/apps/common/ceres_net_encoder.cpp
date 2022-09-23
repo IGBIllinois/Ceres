@@ -1,9 +1,7 @@
 
 
 #include "ceres_net_encoder.hpp"
-#include "packet_utils.hpp"
-
-using namespace ceres;
+#include "remote_client_utils.hpp"
 
 
 cCeresNetEncoder::cCeresNetEncoder(std::size_t capacity)

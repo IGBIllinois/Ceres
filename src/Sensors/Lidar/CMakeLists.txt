@@ -1,4 +1,11 @@
 
+
+source_group("Resources" FILES ouster_properties.proto)
+
+# Generate the header/source files needed from the protobuf
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS DESCRIPTORS PROTO_DESCS ouster_properties.proto)
+
+
 # Add the public header files to use the library
 set(LIDAR_PUBLIC_HEADERS
     OusterFactory.hpp
@@ -9,8 +16,21 @@ set(LIDAR_SOURCE_FILES
 #
 # Different OUSTER Models based on data source
 #
+	
+# Ouster Controller Code
+	OusterPropertiesNetDecoder.hpp
+	OusterPropertiesNetDecoder.cpp
+	OusterPropertiesNetEncoder.hpp
+	OusterPropertiesNetEncoder.cpp
 
-#	Network stream from sensor
+	${PROTO_HDRS}
+	${PROTO_SRCS}
+	ouster_properties.proto
+	
+    OusterController.hpp
+    OusterController.cpp
+
+# Network stream from sensor
     OusterCmdStream.hpp
     OusterCmdStream.cpp
     OusterImuStream.hpp
@@ -40,6 +60,11 @@ set(LIDAR_SOURCE_FILES
 # The static library (.lib/.a) for incorporating LiDAR data in Ceres
 add_library(lidar_static STATIC)
 
+source_group("Resources" FILES ouster_properties.proto)
+
+# Generate the header/source files needed from the protobuf
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS DESCRIPTORS PROTO_DESCS ouster_properties.proto)
+
 if (MSVC)
   # Add the "lib" prefix for generated .lib outputs.
 	set_target_properties(lidar_static PROPERTIES OUTPUT_NAME "libLiDAR")
@@ -60,7 +85,7 @@ PRIVATE
     ${LIDAR_SOURCE_FILES}
 )
 
-#target_include_directories(lidar_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(lidar_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(lidar_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 target_link_libraries(lidar_static PUBLIC ${Qt}::Widgets)
@@ -69,6 +94,8 @@ target_link_libraries(lidar_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(lidar_static PRIVATE ouster::ouster_static)
 target_link_libraries(lidar_static INTERFACE ouster::OusterVisualization)
 target_link_libraries(lidar_static PUBLIC BlockDataFile)
+target_link_libraries(lidar_static PRIVATE ${Protobuf_LIBRARIES})
+
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

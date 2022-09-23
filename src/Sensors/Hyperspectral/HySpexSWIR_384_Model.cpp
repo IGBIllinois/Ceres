@@ -9,7 +9,6 @@ cHySpexSWIR_384_Model::cHySpexSWIR_384_Model(QObject* parent)
 :
     cHyperspectralModel("SWIR 384", parent)
 {
-    mConnected = false;
 }
 
 const char* cHySpexSWIR_384_Model::descriptor() const
@@ -38,24 +37,6 @@ bool cHySpexSWIR_384_Model::configure(const nlohmann::json& jsonCfg)
     }
 
     return true;
-}
-
-bool cHySpexSWIR_384_Model::startCommunications()
-{
-    mConnected = true;
-
-    return true;
-}
-
-void cHySpexSWIR_384_Model::stopCommunications()
-{
-    mConnected = false;
-}
-
-void cHySpexSWIR_384_Model::update()
-{
-    if (!mConnected) return;
-
 }
 
 void cHySpexSWIR_384_Model::enableDataRecording(cBlockDataFileWriter& file)

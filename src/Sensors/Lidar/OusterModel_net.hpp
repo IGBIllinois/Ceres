@@ -29,6 +29,9 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
     bool initialize() override;
 
+    bool setLidarMode(ouster::eLIDAR_MODE mode) override;
+    bool setAzimuthWindow(double min_deg, double max_deg) override;
+
     void enableDataRecording(cBlockDataFileWriter& file) override;
     void disableDataRecording() override;
     
@@ -49,15 +52,16 @@ protected:
 protected:
     void update() override;
 
-/*
 private:
-    bool retrieveConfigParam(cOusterCmdStream_Qt& cmdStream);
-    bool retrieveSensorInfo(cOusterCmdStream_Qt& cmdStream);
-    bool retrieveBeamIntrinsics(cOusterCmdStream_Qt& cmdStream);
-    bool retrieveImuIntrinsics(cOusterCmdStream_Qt& cmdStream);
-    bool retrieveLidarIntrinsics(cOusterCmdStream_Qt& cmdStream);
-    bool retrieveLidarDataFormat(cOusterCmdStream_Qt& cmdStream);
-*/
+    void retrieveConfigParam();
+    void retrieveSensorInfo();
+    bool retrieveBeamIntrinsics();
+    bool retrieveImuIntrinsics();
+    bool retrieveLidarIntrinsics();
+    bool retrieveLidarDataFormat();
+
+    void retrieveLidarMode();
+    void retrieveAzimuthWindow();
 
 private:
     bool mConnected;
