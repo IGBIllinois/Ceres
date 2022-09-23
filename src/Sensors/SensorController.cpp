@@ -1,0 +1,95 @@
+
+#include "SensorController.hpp"
+
+#include <QTcpServer>
+#include <QTcpSocket>
+
+
+cSensorController::cSensorController(QObject* parent)
+:
+    QObject(parent)
+{
+    mpTcpServer = new QTcpServer();
+
+    connect(mpTcpServer, &QTcpServer::acceptError, this, &cSensorController::acceptError);
+    connect(mpTcpServer, &QTcpServer::newConnection, this, &cSensorController::newConnection);
+}
+
+cSensorController::~cSensorController()
+{
+    mpTcpServer->close();
+}
+
+bool cSensorController::startTcpServer(const std::string& ip)
+{
+    QHostAddress local_endpoint(ip.c_str());
+    return mpTcpServer->listen(local_endpoint);
+}
+
+uint16_t cSensorController::serverPort() const
+{
+    return mpTcpServer->serverPort();
+}
+
+bool cSensorController::hasClient() const
+{
+    return mpClient;
+}
+
+
+/***   Signals handlers from the TCP server   ***/
+
+void cSensorController::acceptError(QAbstractSocket::SocketError socketError)
+{
+}
+
+void cSensorController::newConnection()
+{
+    QTcpSocket* client = mpTcpServer->nextPendingConnection();
+
+    if (mpClient)
+    {
+        client->close();
+        client->deleteLater();
+    }
+
+    if (client)
+    {
+        mpClient = client;
+        mpClient->setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
+
+        QObject::connect(mpClient, &QTcpSocket::readyRead, this, &cSensorController::processNewCommand);
+        QObject::connect(mpClient, &QTcpSocket::disconnected, this, &cSensorController::clientDisconnected);
+        QObject::connect(mpClient, &QTcpSocket::errorOccurred, this, &cSensorController::clientErrorOccurred);
+        QObject::connect(mpClient, &QTcpSocket::stateChanged, this, &cSensorController::clientStateChanged);
+    }
+}
+
+void cSensorController::processNewCommand()
+{
+    QByteArray buffer = mpClient->readAll();
+
+    if (buffer.isEmpty()) return;
+
+    processStream(buffer.constData(), buffer.size());
+}
+
+void cSensorController::clientDisconnected()
+{
+    QObject::disconnect(mpClient, &QTcpSocket::readyRead, this, &cSensorController::processNewCommand);
+    QObject::disconnect(mpClient, &QTcpSocket::disconnected, this, &cSensorController::clientDisconnected);
+    QObject::disconnect(mpClient, &QTcpSocket::errorOccurred, this, &cSensorController::clientErrorOccurred);
+    QObject::disconnect(mpClient, &QTcpSocket::stateChanged, this, &cSensorController::clientStateChanged);
+
+    mpClient->close();
+    mpClient->deleteLater();
+    mpClient = nullptr;
+}
+
+void cSensorController::clientErrorOccurred(QAbstractSocket::SocketError socketError)
+{}
+
+void cSensorController::clientStateChanged(QAbstractSocket::SocketState socketState)
+{}
+
+

@@ -1,0 +1,70 @@
+
+// We are using Protobuf syntax version three.
+
+syntax = "proto3";
+
+// A Timestamp represents a point in time independent of any time zone or local
+// calendar, encoded as a count of seconds and fractions of seconds at
+// nanosecond resolution. The count is relative to an epoch at UTC midnight on
+// January 1, 1970, in the proleptic Gregorian calendar which extends the
+// Gregorian calendar backwards to year one.
+//
+//import "google/protobuf/timestamp.proto";
+
+
+/******************************************************************************
+ * General Control Packets   Ceres -> Remote Client
+ *****************************************************************************/
+
+message OpenDataFile_1 
+{
+	string filename = 1;
+}
+
+message ExperimentState_1 
+{
+	bool state = 1;
+}
+
+message ExperimentInfo_1 
+{
+	string title = 1;
+	string researcher = 2;
+	string cultivar = 3;
+	string file = 4;
+}
+
+
+/******************************************************************************
+ * General Reply Packets   Remote Client -> Ceres
+ *****************************************************************************/
+
+ message FileOpenState_1 
+{
+	bool isopen = 1;
+}
+
+message StatusMessage_1 
+{
+	string message = 1;
+}
+
+message LogMessage_1 
+{
+	uint32 msg_type = 1;
+	string device = 2;
+	string message = 3;
+}
+
+message SensorStatus_1 
+{
+	string device = 1;
+	string message = 2;
+}
+
+message SensorNameChange_1 
+{
+	string old_name = 1;
+	string new_name = 2;
+}
+
