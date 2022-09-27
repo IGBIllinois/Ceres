@@ -294,6 +294,41 @@ int encode_sensor_name_change(const std::string& old_name, const std::string& ne
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPropertyConnectInfo_1& pckt)
+{
+    sSensorPropertyConnectInfo_t data;
+
+    data.sensor     = pckt.device();
+    data.version    = pckt.version();
+    data.ip_address = pckt.ip_address();
+    data.port       = pckt.port();
+
+    return data;
+}
+
+int encode_sensor_property_connect_info(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port, net_buffer& buffer)
+{
+    SensorPropertyConnectInfo_1 pckt;
+
+    pckt.set_device(sensor);
+    pckt.set_version(version);
+    pckt.set_ip_address(ip_address);
+    pckt.set_port(port);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_PROPERTY_CONNECT_INFO);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
 
 /*
  * Spidercam Packets

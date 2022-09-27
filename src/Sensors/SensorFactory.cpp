@@ -83,3 +83,9 @@ void remove_sensor(const std::string& name, sSensorWidgets widgets)
         return;
     }
 }
+
+
+cSensorPropertyPage* create_sensor_property_page(const std::string& name)
+{
+    return nullptr;
+}

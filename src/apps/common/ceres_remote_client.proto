@@ -44,6 +44,11 @@ message ExperimentInfo_1
 	bool isopen = 1;
 }
 
+
+/******************************************************************************
+ * General Packets   Remote Client -> Ceres
+ *****************************************************************************/
+
 message StatusMessage_1 
 {
 	string message = 1;
@@ -68,3 +73,10 @@ message SensorNameChange_1
 	string new_name = 2;
 }
 
+message SensorPropertyConnectInfo_1 
+{
+	string device = 1;
+	uint32 version = 2;
+	string ip_address = 3;
+	uint32 port = 4;
+}

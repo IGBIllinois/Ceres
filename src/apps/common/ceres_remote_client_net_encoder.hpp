@@ -22,7 +22,7 @@ public:
     void sendLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg);
     void sendSensorStatus(const std::string& sensor, const std::string& status);
     void sendSensorNameChange(const std::string& old_name, const std::string& new_name);
-
+    void sendSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port);
 };
 
 

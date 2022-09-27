@@ -40,6 +40,7 @@ enum class ePacketType : uint16_t
 	LOG_MESSAGE,
 	SENSOR_STATUS,
 	SENSOR_NAME_CHANGE,
+	SENSOR_PROPERTY_CONNECT_INFO,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -104,6 +105,16 @@ struct sSensorNameChange_t
 };
 sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt);
 int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, net_buffer& buffer);
+
+struct sSensorPropertyConnectInfo_t
+{
+	std::string sensor;
+	uint32_t    version;
+	std::string ip_address;
+	uint16_t	port;
+};
+sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPropertyConnectInfo_1& pckt);
+int encode_sensor_property_connect_info(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port, net_buffer& buffer);
 
 
 /**********************************************************

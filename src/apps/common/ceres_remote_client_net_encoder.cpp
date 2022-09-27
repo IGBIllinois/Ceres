@@ -45,3 +45,9 @@ void cCeresRemoteClientNetEncoder::sendSensorNameChange(const std::string& old_n
     sendData();
 }
 
+void cCeresRemoteClientNetEncoder::sendSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port)
+{
+    encode_sensor_property_connect_info(sensor, version, ip_address, port, mBuffer);
+    sendData();
+}
+

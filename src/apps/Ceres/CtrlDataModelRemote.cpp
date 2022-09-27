@@ -2,6 +2,7 @@
 #include "CtrlDataModelRemote.hpp"
 #include "RemoteClientView.hpp"
 #include "Spidercam/SpidercamModel.hpp"
+#include "SensorFactory.hpp"
 #include "SensorModel.hpp"
 #include "Weather/WeatherDataModel_Http_Wind.hpp"
 #include "TimestampProvider.hpp"
@@ -413,4 +414,9 @@ void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const
         QString::fromStdString(new_name));
 }
 
+void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port)
+{
+    cSensorPropertyPage* page = create_sensor_property_page(sensor);
+
+}
 
