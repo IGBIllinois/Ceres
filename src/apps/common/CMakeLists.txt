@@ -48,10 +48,10 @@ PRIVATE
 	ceres_net_encoder.hpp
 	ceres_net_encoder.cpp
 
-	ceres_remote_client_net_decoder.hpp
-	ceres_remote_client_net_decoder.cpp
-	ceres_remote_client_net_encoder.hpp
-	ceres_remote_client_net_encoder.cpp
+	RemoteClientNetDecoder.hpp
+	RemoteClientNetDecoder.cpp
+	RemoteClientNetEncoder.hpp
+	RemoteClientNetEncoder.cpp
 
 	${PROTO_HDRS}
 	${PROTO_SRCS}

@@ -100,8 +100,9 @@ private:
 
     cRemoteClientView* mpView;
 
+    QString      mLocalIpAddress;
     QHostAddress mRemoteEndpoint;
-    uint16_t   mPort;
+    uint16_t     mPort;
 
     QTcpSocket mSocket;
     QByteArray mReplyBuffer;

@@ -24,7 +24,7 @@ sSensorWidgets create_sensor(const std::string& name,
 
     if (name.compare(ouster_id) == 0)
     {
-        return create_ouster_sensor(sensorInfo, no_visualization);
+        return ouster::create_sensor(sensorInfo, no_visualization);
     }
 
     if (name.compare(weather_data_id) == 0)
@@ -61,7 +61,7 @@ void remove_sensor(const std::string& name, sSensorWidgets widgets)
 
     if (name.compare(ouster_id) == 0)
     {
-        remove_ouster_sensor(widgets);
+        ouster::remove_sensor(widgets);
         return;
     }
 
@@ -85,7 +85,13 @@ void remove_sensor(const std::string& name, sSensorWidgets widgets)
 }
 
 
-cSensorPropertyPage* create_sensor_property_page(const std::string& name)
+cSensorPropertyPageRemote* create_sensor_property_page(const std::string& name, uint32_t version)
 {
+    if (name.compare(ouster_id) == 0)
+    {
+        return ouster::create_sensor_property_page(version);
+    }
+
+
     return nullptr;
 }

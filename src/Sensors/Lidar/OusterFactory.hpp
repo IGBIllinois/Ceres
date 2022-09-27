@@ -6,7 +6,11 @@
 
 static char* ouster_id = "ouster";
 
-sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_visualization);
+namespace ouster
+{
+	sSensorWidgets create_sensor(const nlohmann::json& sensorInfo, bool no_visualization);
 
-void remove_ouster_sensor(sSensorWidgets widgets);
+	void remove_sensor(sSensorWidgets widgets);
 
+	cSensorPropertyPageRemote* create_sensor_property_page(uint32_t version);
+}

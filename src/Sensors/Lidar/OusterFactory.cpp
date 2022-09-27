@@ -22,7 +22,7 @@ Q_DECLARE_METATYPE(ouster::azimuth_range_t);
 Q_DECLARE_METATYPE(ouster::imu_data_t);
 
 
-sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
+sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the Ouster model and view...
     cOusterModel* pModel = nullptr;
@@ -41,7 +41,6 @@ sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_vi
 
     if (!pModel)
         throw std::runtime_error("OUSTER: Unknown protocol type!");
-
 
     if (no_visualization)
         return sSensorWidgets(pModel, nullptr);
@@ -67,7 +66,7 @@ sSensorWidgets create_ouster_sensor(const nlohmann::json& sensorInfo, bool no_vi
     return sSensorWidgets(pModel, dockWidget);
 }
 
-void remove_ouster_sensor(sSensorWidgets widgets)
+void ouster::remove_sensor(sSensorWidgets widgets)
 {
     // Ouster model and view...
     auto* pModel = static_cast<cOusterModel*>(widgets.pModel);
@@ -85,3 +84,9 @@ void remove_ouster_sensor(sSensorWidgets widgets)
     delete pModel;
     delete dockWidget;
 }
+
+cSensorPropertyPageRemote* ouster::create_sensor_property_page(uint32_t version)
+{
+    return nullptr;
+}
+

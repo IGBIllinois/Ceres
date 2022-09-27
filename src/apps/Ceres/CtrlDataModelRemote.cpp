@@ -6,6 +6,7 @@
 #include "SensorModel.hpp"
 #include "Weather/WeatherDataModel_Http_Wind.hpp"
 #include "TimestampProvider.hpp"
+#include "SensorPropertyPage.hpp"
 
 #include <QDockWidget>
 
@@ -147,6 +148,8 @@ bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port
         QHostAddress local_endpoint(local_ip);
         mSocket.bind(local_endpoint,0);
     }
+
+    mLocalIpAddress = local_ip;
 
     QHostInfo info = QHostInfo::fromName(hostname);
     if (info.error() != QHostInfo::NoError)
@@ -416,7 +419,11 @@ void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const
 
 void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port)
 {
-    cSensorPropertyPage* page = create_sensor_property_page(sensor);
+    cSensorPropertyPageRemote* page = create_sensor_property_page(sensor, version);
+
+    if (!page) return;
+
+    page->initialize(ip_address, port, false, mLocalIpAddress);
 
 }
 

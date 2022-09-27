@@ -7,6 +7,7 @@
 
 class cSensorModel;
 class cSensorPropertyPage;
+class cSensorPropertyPageRemote;
 class cSensorController;
 
 // Qt Forward Declaration
@@ -44,5 +45,5 @@ sSensorWidgets create_sensor(const std::string& name,
 
 void remove_sensor(const std::string& name, sSensorWidgets widgets);
 
-cSensorPropertyPage* create_sensor_property_page(const std::string& name);
+cSensorPropertyPageRemote* create_sensor_property_page(const std::string& name, uint32_t version);
 

@@ -2,8 +2,8 @@
 #pragma once
 
 #include "DataModel.hpp"
-#include "ceres_remote_client_net_decoder.hpp"
-#include "ceres_remote_client_net_encoder.hpp"
+#include "RemoteClientNetDecoder.hpp"
+#include "RemoteClientNetEncoder.hpp"
 #include "RemoteDataThread.hpp"
 #include "BlockDataFile.hpp"
 #include "ExperimentSerializer.hpp"

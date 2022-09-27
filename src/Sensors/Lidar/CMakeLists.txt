@@ -3,7 +3,7 @@
 source_group("Resources" FILES ouster_properties.proto)
 
 # Generate the header/source files needed from the protobuf
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS DESCRIPTORS PROTO_DESCS ouster_properties.proto)
+protobuf_generate_cpp(OUSTER_PROTO_SRCS OUSTER_PROTO_HDRS DESCRIPTORS PROTO_DESCS ouster_properties.proto)
 
 
 # Add the public header files to use the library
@@ -16,17 +16,21 @@ set(LIDAR_SOURCE_FILES
 #
 # Different OUSTER Models based on data source
 #
+	ouster_packet_utils.hpp
+	ouster_packet_utils.cpp
 	
-# Ouster Controller Code
+# Ouster Property Page Code
 	OusterPropertiesNetDecoder.hpp
 	OusterPropertiesNetDecoder.cpp
 	OusterPropertiesNetEncoder.hpp
 	OusterPropertiesNetEncoder.cpp
-
-	${PROTO_HDRS}
-	${PROTO_SRCS}
-	ouster_properties.proto
 	
+# Ouster Controller Code
+
+	OusterControllerNetDecoder.hpp
+	OusterControllerNetDecoder.cpp
+	OusterControllerNetEncoder.hpp
+	OusterControllerNetEncoder.cpp
     OusterController.hpp
     OusterController.cpp
 
@@ -60,10 +64,6 @@ set(LIDAR_SOURCE_FILES
 # The static library (.lib/.a) for incorporating LiDAR data in Ceres
 add_library(lidar_static STATIC)
 
-source_group("Resources" FILES ouster_properties.proto)
-
-# Generate the header/source files needed from the protobuf
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS DESCRIPTORS PROTO_DESCS ouster_properties.proto)
 
 if (MSVC)
   # Add the "lib" prefix for generated .lib outputs.
@@ -83,6 +83,10 @@ PUBLIC
  
 PRIVATE
     ${LIDAR_SOURCE_FILES}
+
+    ${OUSTER_PROTO_HDRS}
+	${OUSTER_PROTO_SRCS}
+	ouster_properties.proto
 )
 
 target_include_directories(lidar_static PRIVATE ${UTILITIES_INCLUDE_DIR})
