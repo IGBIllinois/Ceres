@@ -188,16 +188,40 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
 
 bool cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
 {
-    if (!mCmdStream.setLidarMode(mode)) return false;
-    if (!mCmdStream.reinitialize()) return false;
+    setStatus(sensor::eStatus::REINITIALIZING);
+    if (!mCmdStream.setLidarMode(mode))
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+
+    }
+
+    if (!mCmdStream.reinitialize())
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+    }
     retrieveLidarMode();
-    return retrieveLidarDataFormat();
+    auto result = retrieveLidarDataFormat();
+
+    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+
+    return result;
 }
 
 bool cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
 {
-    if (!mCmdStream.setAzimuthWindow(min_deg, max_deg)) return false;
-    return mCmdStream.reinitialize();
+    setStatus(sensor::eStatus::REINITIALIZING);
+    if (!mCmdStream.setAzimuthWindow(min_deg, max_deg))
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+    }
+    auto result = mCmdStream.reinitialize();
+
+    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+
+    return result;
 }
 
 bool cOusterModel_net::initialize()
@@ -271,6 +295,8 @@ bool cOusterModel_net::initialize()
 
 bool cOusterModel_net::startCommunications()
 {
+    setStatus(sensor::eStatus::CONNECTING);
+
     emit statusMessage("Trying to establishing IMU connection...");
 
     if (!cOusterImuStream_Qt::startCommunications(mDstIpAddress, mImuPort, mUseIpv6))
@@ -294,7 +320,8 @@ bool cOusterModel_net::startCommunications()
 
     mConnected = true;
 
-    setStatus(sensor::eStatus::CONNECTING);
+    setStatus(sensor::eStatus::CONNECTED);
+    emit statusMessage("LiDAR data connected");
 
     return true;
 }

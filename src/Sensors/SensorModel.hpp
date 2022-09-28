@@ -12,7 +12,9 @@ class cBlockDataFileWriter;
 
 namespace sensor
 {
-    enum class eStatus { UNKNOWN, CONFIGURED, INITIALIZED, CONNECTING, WARM_UP, RUNNING, STOPPED, FAILED };
+    enum class eStatus 
+    { UNKNOWN, CONFIGURED, INITIALIZED, CONNECTING, CONNECTED, WARM_UP, 
+        RUNNING, STOPPED, FAILED, REINITIALIZING, BUSY, WAITING };
 
     std::string to_string(eStatus status);
     eStatus to_sensor_status(const std::string& str);
@@ -69,6 +71,7 @@ public:
      * Do any sensor initialization needed before the
      * sensor model is moved to the data thread.
      */
+    virtual bool isInitialized() const;
     virtual bool initialize();
 
     /*
@@ -126,6 +129,8 @@ protected:
     QString q_name() const { return QString::fromStdString(mSensorName); }
 
 protected:
+    bool mIsInitialized = false;
+
     /**
      * A flag to signal that recording is active
      */

@@ -347,6 +347,11 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         {
             statusBar()->addPermanentWidget(widgets.pStatusBar);
         }
+
+        if (widgets.pController)
+        {
+            mMainModel.addSensorController(widgets.pController);
+        }
     }
 }
 

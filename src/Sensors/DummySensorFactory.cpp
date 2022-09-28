@@ -18,7 +18,9 @@ sSensorWidgets create_dummy_sensor(bool no_visualization)
     auto* pModel = new cDummyModel();
 
     if (no_visualization)
-        return sSensorWidgets(pModel, nullptr);
+    {
+        return sSensorWidgets(pModel);
+    }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cDummyView(dockWidget);

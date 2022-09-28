@@ -31,7 +31,9 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
 
 
     if (no_visualization)
-        return sSensorWidgets(pModel, nullptr);
+    {
+        return sSensorWidgets(pModel);
+    }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cHySpexVNIR_3000N_View(dockWidget);
@@ -59,7 +61,9 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
 
 
     if (no_visualization)
-        return sSensorWidgets(pModel, nullptr);
+    {
+        return sSensorWidgets(pModel);
+    }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cHySpexSWIR_384_View(dockWidget);

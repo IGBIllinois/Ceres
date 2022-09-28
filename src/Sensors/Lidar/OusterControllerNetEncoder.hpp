@@ -2,27 +2,23 @@
 #pragma once
 
 #include "net_packet_encoder.hpp"
-#include <cstddef>
+
+#include <ouster/ouster_defs.h>
 
 
-class cCeresRemoteClientNetEncoder : public cNetworkEncoder
+class cOusterControllerNetEncoder : public cNetworkEncoder
 {
 
 public:
-    cCeresRemoteClientNetEncoder(std::size_t capacity);
-    ~cCeresRemoteClientNetEncoder() = default;
+    cOusterControllerNetEncoder(std::size_t capacity);
+    ~cOusterControllerNetEncoder() = default;
 
-    void encodeSensorStatus(const std::string& sensor, const std::string& status);
-
+public:
     /*
-     * Ceres Remote Client ----> Ceres
+     * Controller ----> Property Page
      */
-    void sendDataFileState(bool is_open);
-    void sendStatusMessage(const std::string& msg);
-    void sendLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg);
-    void sendSensorStatus(const std::string& sensor, const std::string& status);
-    void sendSensorNameChange(const std::string& old_name, const std::string& new_name);
-
+    void sendCurrentState(bool valid, ouster::eLIDAR_MODE mode,
+        double min_deg, double max_deg);
 };
 
 

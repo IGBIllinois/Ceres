@@ -14,8 +14,16 @@ public:
 	virtual ~cSensorController();
 
 public:
+    /*
+     * Returns a string used as a descriptor of the sensor.
+     */
+    virtual const char* descriptor() const = 0;
+    virtual uint32_t version() const = 0;
+
+public:
     bool startTcpServer(const std::string& ip);
 
+    std::string serverIpAddress() const;
     uint16_t serverPort() const;
 
     bool hasClient() const;
@@ -28,7 +36,11 @@ protected:
      */
     virtual void processStream(const void* pBuffer, std::size_t buf_length) = 0;
 
-public slots:
+    /**
+     * @brief sendOutgoingData
+     * Sends any outgoing to the property page.
+     */
+    virtual int sendOutgoingData(const char* data, std::size_t len);
 
 /*
  * Signals handlers from the TCP server

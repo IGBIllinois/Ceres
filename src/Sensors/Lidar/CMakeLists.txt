@@ -1,4 +1,5 @@
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 source_group("Resources" FILES ouster_properties.proto)
 

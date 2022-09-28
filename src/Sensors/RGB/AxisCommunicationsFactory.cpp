@@ -31,7 +31,9 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
 
 
     if (no_visualization)
-        return sSensorWidgets(pModel, nullptr);
+    {
+        return sSensorWidgets(pModel);
+    }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cAxisCommunicationsView_F44(pModel, dockWidget);

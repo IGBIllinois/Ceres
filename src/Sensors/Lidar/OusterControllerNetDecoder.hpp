@@ -1,6 +1,6 @@
 /*
- * The SpidercamNetDecoder is used to decode Spidercam based TCP packets 
- * from the main Ceres application.
+ * The OusterControllerNetDecoder is used to decode TCP packets
+ * from the OusterPropertiesNetEncoder.
  * You will need to override various virtual methods!
  */
 
@@ -8,6 +8,8 @@
 
 #include "Utilities.hpp"
 #include "net_packet_decoder.hpp"
+
+#include <ouster/ouster_defs.h>
 
 #include <string>
 
@@ -20,11 +22,14 @@ public:
     virtual ~cOusterControllerNetDecoder() = default;
 
 protected:
+    /*
+     * Property Page ----> Controller
+     */
     virtual void onQueryState() = 0;
     virtual void onSetAzimuthWindow(double min_deg, double max_deg) = 0;
-    virtual void onSetMode(const std::string& mode) = 0;
+    virtual void onSetMode(ouster::eLIDAR_MODE mode) = 0;
 
-private:
+protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
 };
 

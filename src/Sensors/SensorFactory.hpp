@@ -29,6 +29,12 @@ struct sSensorWidgets
 
 	sSensorWidgets() = default;
 
+	sSensorWidgets(cSensorModel* model)
+		:
+		pModel(model), pDockableView(nullptr), pStatusBar(nullptr), pToolBar(nullptr),
+		pPropertyPage(nullptr), pController(nullptr)
+	{}
+
 	sSensorWidgets(cSensorModel* model, QDockWidget* view, 
 		QStatusBar* status = nullptr, QToolBar* toolbar = nullptr,
 		cSensorPropertyPage* properties = nullptr, 
@@ -36,6 +42,12 @@ struct sSensorWidgets
 	:
 		pModel(model), pDockableView(view), pStatusBar(status), pToolBar(toolbar),
 		pPropertyPage(properties), pController(controller)
+	{}
+
+	sSensorWidgets(cSensorModel* model, cSensorController* controller)
+		:
+		pModel(model), pDockableView(nullptr), pStatusBar(nullptr), pToolBar(nullptr),
+		pPropertyPage(nullptr), pController(controller)
 	{}
 };
 

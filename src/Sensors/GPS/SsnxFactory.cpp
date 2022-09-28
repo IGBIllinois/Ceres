@@ -28,7 +28,9 @@ sSensorWidgets create_ssnx_sensor(const nlohmann::json& sensorInfo, bool no_visu
         throw std::runtime_error("SSNX: Unknown protocol type!");
 
     if (no_visualization)
-        return sSensorWidgets(pModel, nullptr);
+    {
+        return sSensorWidgets(pModel);
+    }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cSsnxView(dockWidget);

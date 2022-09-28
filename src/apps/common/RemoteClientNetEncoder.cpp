@@ -13,6 +13,13 @@ void cCeresRemoteClientNetEncoder::encodeSensorStatus(const std::string& sensor,
     encode_sensor_status(sensor, status, mBuffer);
 }
 
+void cCeresRemoteClientNetEncoder::encodeSensorPropertyConnectInfo(const std::string& sensor,
+    uint32_t version, const std::string& ip_address, uint16_t port)
+{
+    encode_sensor_property_connect_info(sensor, version, ip_address, port, mBuffer);
+}
+
+
 void cCeresRemoteClientNetEncoder::sendDataFileState(bool is_open)
 {
     encode_file_open_state(is_open, mBuffer);

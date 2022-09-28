@@ -5,6 +5,8 @@
 #include "ouster_packet_utils.hpp"
 #include "net_buffer.hpp"
 
+#include <ouster/ouster_utils.h>
+
 void cOusterControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
     switch (static_cast<ePacketType>(hdr.id))
@@ -32,7 +34,7 @@ void cOusterControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, cons
         SetLidarMode_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto data = to_lidar_mode_1(packet);
-        onSetMode(data);
+        onSetMode(to_lidar_mode(data));
         break;
     }
     }

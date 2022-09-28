@@ -26,6 +26,12 @@ bool cSensorController::startTcpServer(const std::string& ip)
     return mpTcpServer->listen(local_endpoint);
 }
 
+std::string cSensorController::serverIpAddress() const
+{
+    auto str = mpTcpServer->serverAddress().toString();
+    return str.toStdString();
+}
+
 uint16_t cSensorController::serverPort() const
 {
     return mpTcpServer->serverPort();
@@ -34,6 +40,21 @@ uint16_t cSensorController::serverPort() const
 bool cSensorController::hasClient() const
 {
     return mpClient;
+}
+
+int cSensorController::sendOutgoingData(const char* data, std::size_t len)
+{
+    if (!mpClient)
+        return 0;
+
+    if (!data || (len == 0))
+        return 0;
+
+    auto n = mpClient->write(data, len);
+
+    mpClient->flush();
+
+    return n;
 }
 
 

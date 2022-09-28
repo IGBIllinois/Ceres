@@ -5,6 +5,7 @@
 
 // Forward Declarations
 class cRemoteDataModel;
+class cSensorController;
 
 
 class cRemoteDataThread : public cDataThread

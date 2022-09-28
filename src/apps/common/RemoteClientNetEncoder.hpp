@@ -13,6 +13,8 @@ public:
     ~cCeresRemoteClientNetEncoder() = default;
 
     void encodeSensorStatus(const std::string& sensor, const std::string& status);
+    void encodeSensorPropertyConnectInfo(const std::string& sensor, uint32_t version,
+        const std::string& ip_address, uint16_t port);
 
     /*
      * Ceres Remote Client ----> Ceres

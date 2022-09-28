@@ -83,6 +83,8 @@ void cRemoteDataModel::setDefaultDataPath(const std::string& data_path)
 
 bool cRemoteDataModel::startTcpServer(const std::string& ip, uint16_t port)
 {
+    mLocalIpAddress = ip;
+
     QHostAddress local_endpoint(ip.c_str());
 
     return mpTcpServer->listen(local_endpoint, port);
@@ -103,6 +105,16 @@ void cRemoteDataModel::addSensor(cSensorModel* pSensor)
 
         pSensor->moveToThread(&mThread);
         mThread.mSensors.push_back(pSensor);
+    }
+}
+
+void cRemoteDataModel::addSensorController(cSensorController* pController)
+{
+    if (pController)
+    {
+        pController->startTcpServer(mLocalIpAddress);
+//        pController->moveToThread(&mThread);
+        mSensorControllers.push_back(pController);
     }
 }
 
@@ -448,6 +460,17 @@ void cRemoteDataModel::newConnection()
             encodeSensorStatus(sensor->name(), to_string(sensor->status()));
         }
         cNetworkEncoder::sendData();
+
+        for (auto& controller : mSensorControllers)
+        {
+            std::string sensor = controller->descriptor();
+            auto version = controller->version();
+            auto ip_address = controller->serverIpAddress();
+            auto port = controller->serverPort();
+            encodeSensorPropertyConnectInfo(sensor, version, ip_address, port);
+        }
+        cNetworkEncoder::sendData();
+
         emit statusMessage("Sent sensor status.");
     }
 }

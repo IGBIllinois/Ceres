@@ -10,6 +10,7 @@
 #include "SpidercamSerializer.hpp"
 #include "WeatherSerializer.hpp"
 #include "SensorModel.hpp"
+#include "SensorController.hpp"
 
 #include <string>
 #include <filesystem>
@@ -38,6 +39,7 @@ public:
     bool startTcpServer(const std::string& ip, uint16_t port);
 
     void addSensor(cSensorModel* pSensor) override;
+    void addSensorController(cSensorController* pController);
 
     void startDataThread() override;
     void stopDataThread() override;
@@ -114,10 +116,13 @@ protected:
 
     cRemoteDataThread mThread;
 
+    std::string mLocalIpAddress;
     QTcpServer* mpTcpServer;
     QTcpSocket* mpClient;
 
     QTimer* mpHeartbeatTimer;
+
+    std::vector<cSensorController*> mSensorControllers;
 
 private:
     // Experiment Info

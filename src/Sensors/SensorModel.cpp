@@ -15,6 +15,8 @@ namespace sensor
             return "INITIALIZED";
         case eStatus::CONNECTING:
             return "CONNECTING";
+        case eStatus::CONNECTED:
+            return "CONNECTED";
         case eStatus::WARM_UP:
             return "WARM UP";
         case eStatus::RUNNING:
@@ -23,6 +25,12 @@ namespace sensor
             return "STOPPED";
         case eStatus::FAILED:
             return "FAILED";
+        case eStatus::REINITIALIZING:
+            return "REINITIALIZING";
+        case eStatus::BUSY:
+            return "BUSY";
+        case eStatus::WAITING:
+            return "WAITING";
         }
 
         return "UNKNOWN";
@@ -36,6 +44,8 @@ namespace sensor
             return eStatus::INITIALIZED;
         if (str == "CONNECTING" || str == "connecting")
             return eStatus::CONNECTING;
+        if (str == "CONNECTED" || str == "connected")
+            return eStatus::CONNECTED;
         if (str == "WARM UP" || str == "warm up")
             return eStatus::WARM_UP;
         if (str == "RUNNING" || str == "running")
@@ -44,6 +54,12 @@ namespace sensor
             return eStatus::STOPPED;
         if (str == "FAILED" || str == "failed")
             return eStatus::FAILED;
+        if (str == "REINITIALIZING" || str == "reinitializing")
+            return eStatus::REINITIALIZING;
+        if (str == "BUSY" || str == "busy")
+            return eStatus::BUSY;
+        if (str == "WAITING" || str == "waiting")
+            return eStatus::WAITING;
 
         return eStatus::UNKNOWN;
     }
@@ -80,8 +96,14 @@ bool cSensorModel::configure(const nlohmann::json& jsonCfg)
     return true;
 }
 
+bool cSensorModel::isInitialized() const
+{
+    return mIsInitialized;
+}
+
 bool cSensorModel::initialize()
 {
+    mIsInitialized = true;
     setStatus(sensor::eStatus::INITIALIZED);
     return true;
 };

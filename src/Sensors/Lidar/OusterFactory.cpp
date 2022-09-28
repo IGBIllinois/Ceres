@@ -5,6 +5,7 @@
 
 #include "OusterModel_net.hpp"
 #include "OusterView.hpp"
+#include "OusterController.hpp"
 #include <ouster/ouster_defs.h>
 
 #include <QWidget>
@@ -32,18 +33,16 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
     if (protocol == "net")
     {
         pModel = new cOusterModel_net();
-
-        if (no_visualization)
-        {
-
-        }
     }
 
     if (!pModel)
         throw std::runtime_error("OUSTER: Unknown protocol type!");
 
     if (no_visualization)
-        return sSensorWidgets(pModel, nullptr);
+    {
+        auto* pController = new cOusterController(pModel);
+        return sSensorWidgets(pModel, pController);
+    }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cOusterView(pModel, dockWidget);
