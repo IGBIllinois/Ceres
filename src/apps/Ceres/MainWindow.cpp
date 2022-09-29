@@ -898,11 +898,6 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
             mpSensorMenu->addAction(widgets.pPropertyPage->showAction());
         }
     }
-
-    cSensorPropertyPage* pPage = new cSensorPropertyPage(this);
-    pPage->setTitle("test");
-    pPage->hide();
-    mpSensorMenu->addAction(pPage->showAction());
 }
 
 void cMainWindow::addSensorPropertyPage(QAction* pAction)

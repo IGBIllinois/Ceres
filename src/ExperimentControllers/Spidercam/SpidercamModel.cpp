@@ -1,7 +1,7 @@
 
 #include "SpidercamModel.hpp"
 #include "../../Utilities/Constants.hpp"
-#include "../ExperimentTypes.hpp"
+#include "ExperimentTypes.hpp"
 
 namespace
 {

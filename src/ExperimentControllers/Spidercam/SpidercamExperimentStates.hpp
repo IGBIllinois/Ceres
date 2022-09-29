@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../ExperimentStates.hpp"
+#include "ExperimentState.hpp"
 
 #include <spidercam/spidercam_types.hpp>
 

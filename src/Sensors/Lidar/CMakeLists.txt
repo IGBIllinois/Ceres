@@ -25,6 +25,10 @@ set(LIDAR_SOURCE_FILES
 	OusterPropertiesNetDecoder.cpp
 	OusterPropertiesNetEncoder.hpp
 	OusterPropertiesNetEncoder.cpp
+	OusterPropertyPage_Remote.hpp
+	OusterPropertyPage_Remote.cpp
+	OusterPropertyPage.hpp
+	OusterPropertyPage.cpp
 	
 # Ouster Controller Code
 

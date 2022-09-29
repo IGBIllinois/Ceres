@@ -1,7 +1,7 @@
 
 #include "SpidercamView.hpp"
 #include "../../Utilities/Constants.hpp"
-#include "../ExperimentTypes.hpp"
+#include "ExperimentTypes.hpp"
 
 #include <QLayout>
 #include <QLineEdit>

@@ -10,8 +10,6 @@ target_compile_features(ExperimentControllers PRIVATE cxx_std_17)
 
 target_sources(ExperimentControllers
 PUBLIC
-    ExperimentTypes.hpp
-
 #
 # Base Headers for all Experiment Controller classes
 #
@@ -36,14 +34,6 @@ PRIVATE
     ExperimentCtrlModel.cpp
 
 #
-# Base Classes for the experiment state machine
-#
-    PauseExperimentStateDlg.hpp
-    PauseExperimentStateDlg.cpp
-    ExperimentStates.hpp
-    ExperimentStates.cpp
-	
-#
 # Factory for creating the different experiment control models/views
 #
     ExperimentCtrlFactory.hpp
@@ -62,11 +52,13 @@ set_property(SOURCE ExperimentCtrlModel.hpp PROPERTY SKIP_AUTOMOC ON)
 set_property(TARGET ExperimentControllers PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 target_include_directories(ExperimentControllers PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(ExperimentControllers PUBLIC ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
 target_link_libraries(ExperimentControllers PRIVATE ${Qt}::Widgets)
 target_link_libraries(ExperimentControllers PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(ExperimentControllers PRIVATE BlockDataFile)
 target_link_libraries(ExperimentControllers PRIVATE SpidercamCtrl_static)
+target_link_libraries(ExperimentControllers PRIVATE ExperimentStateMachine)
 
 set_target_properties(ExperimentControllers PROPERTIES FOLDER "ExperimentControllers")
 

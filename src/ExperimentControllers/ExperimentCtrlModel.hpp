@@ -1,8 +1,8 @@
 
 #pragma once
 
+#include "ExperimentStateMachine.hpp"
 #include "ExperimentTypes.hpp"
-#include "../Utilities/Utilities.hpp"
 
 #include <QObject>
 #include <nlohmann/json.hpp>
@@ -13,7 +13,7 @@ class cExperimentState;
 class cBlockDataFileWriter;
 
 
-class cExperimentControlModel : public QObject
+class cExperimentControlModel : public cExperimentStateMachine
 {
     Q_OBJECT
 
@@ -38,45 +38,6 @@ public:
     virtual bool systemReady() const = 0;
 
     /*
-     * Load an experiment from JSON file.
-     */
-    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
-
-    /*
-     * Is there an experiment (state machine) loaded in the experiment
-     * controller.
-     */
-    bool hasExperiment() const;
-
-    /*
-     * Clear the experiment (state machine) from the experiment
-     * controller.
-     */
-    void clearExperiment();
-
-    /*
-     * Is the experiment (state machine) running?
-    */
-    bool isExperimentRunning() const;
-
-    /*
-     * Is the experiment (state machine) paused?
-    */
-    bool isExperimentPaused() const;
-
-    /**
-     * Is the experiment going to record any of the sensor data.
-     * 
-     * Returns true if the experiment will save sensor data, false otherwise.
-     */
-	bool experimentRequiresDataFile() const;
-
-    /**
-     * Terminate a running experiment, otherwise just returns.
-     */
-//    virtual void terminateExperiment();
-
-    /*
      * Attach/Detach the serializer to the data file.
      */
     virtual void enableDataRecording(cBlockDataFileWriter& file) = 0;
@@ -97,11 +58,6 @@ public:
     virtual void stopDataRecording() = 0;
 
     /*
-     * Returns true if sensor data is being recorded
-     */
-    bool isRecording();
-
-    /*
      * Starts/Stops communication with the endpoint.
      * These methods are called inside the QThread so that
      * all of the communication happens within the same thread!
@@ -115,43 +71,11 @@ signals:
     void warningMessage(QString title, QString msg) const;
     void errorMessage(QString title, QString msg) const;
 
-signals:
-    void experimentStatus(QString msg);
-    void experimentStateChanged(experiment::eState state);
-    void requestDataRecordingState(bool record);
-
- /**
-  * Slots for controlling experiment state machine.
-  */
-public slots:
-    virtual void startExperiment();
-    virtual void terminateExperiment();
-    virtual void pauseExperiment();
-
-
 public:
     virtual void update() = 0;
 
 protected:
     cExperimentControlModel(QObject* parent = nullptr);
 
-    virtual cExperimentState* createState(const std::string& type);
-
-    void recordingStateChanged(bool recording);
-
-    void updateExperimentStateMachine();
-
-    /**
-     * A flag to signal that an experiment is active
-     */
-    bool mRunning;
-    bool mPaused;
-
-    edge_detect<bool>	mRecording;
-
-    std::string mExperimentName;
-    std::vector<cExperimentState*> mExperiment;
-    std::size_t mActiveStateNumber;
-    cExperimentState* mpActiveState;
-
+    void emitStatusMessage(const QString& msg) override;
 };
