@@ -186,44 +186,6 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
     return cLidarModel::configure(jsonCfg);
 }
 
-bool cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
-{
-    setStatus(sensor::eStatus::REINITIALIZING);
-    if (!mCmdStream.setLidarMode(mode))
-    {
-        setStatus(sensor::eStatus::FAILED);
-        return false;
-
-    }
-
-    if (!mCmdStream.reinitialize())
-    {
-        setStatus(sensor::eStatus::FAILED);
-        return false;
-    }
-    retrieveLidarMode();
-    auto result = retrieveLidarDataFormat();
-
-    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
-
-    return result;
-}
-
-bool cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
-{
-    setStatus(sensor::eStatus::REINITIALIZING);
-    if (!mCmdStream.setAzimuthWindow(min_deg, max_deg))
-    {
-        setStatus(sensor::eStatus::FAILED);
-        return false;
-    }
-    auto result = mCmdStream.reinitialize();
-
-    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
-
-    return result;
-}
-
 bool cOusterModel_net::initialize()
 {
     emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
@@ -291,6 +253,51 @@ bool cOusterModel_net::initialize()
     }
 
     return cOusterModel::initialize();
+}
+
+bool cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
+{
+    if (mConfigParameters.lidar_mode == mode)
+        return true;
+
+    setStatus(sensor::eStatus::REINITIALIZING);
+    if (!mCmdStream.setLidarMode(mode))
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+
+    }
+
+    if (!mCmdStream.reinitialize())
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+    }
+    retrieveLidarMode();
+    auto result = retrieveLidarDataFormat();
+
+    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+
+    return result;
+}
+
+bool cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
+{
+    if ((mConfigParameters.azimuth_window.min_deg == min_deg)
+        && (mConfigParameters.azimuth_window.max_deg == max_deg))
+        return true;
+
+    setStatus(sensor::eStatus::REINITIALIZING);
+    if (!mCmdStream.setAzimuthWindow(min_deg, max_deg))
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+    }
+    auto result = mCmdStream.reinitialize();
+
+    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+
+    return result;
 }
 
 bool cOusterModel_net::startCommunications()
