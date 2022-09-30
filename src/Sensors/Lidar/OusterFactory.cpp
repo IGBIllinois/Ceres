@@ -92,6 +92,6 @@ cSensorPropertyPage* ouster::create_sensor_property_page(uint32_t version,
     cOusterPropertyPage_Remote* page = new cOusterPropertyPage_Remote();
     page->initialize(remote_ip_address, port, false, local_ip_address);
 
-    return nullptr;
+    return page;
 }
 

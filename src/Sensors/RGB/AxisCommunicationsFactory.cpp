@@ -101,5 +101,5 @@ cSensorPropertyPage* axis_communications::create_sensor_property_page(uint32_t v
     cAxisCommunicationsPropertyPage_Remote* page = new cAxisCommunicationsPropertyPage_Remote();
     page->initialize(remote_ip_address, port, false, local_ip_address);
 
-    return nullptr;
+    return page;
 }

@@ -50,6 +50,14 @@ cCtrlDataModelRemote::~cCtrlDataModelRemote()
         
     stopDataThread();
 
+    mStateCreators.clear();
+
+    for (auto* page : mPropertyPages)
+    {
+        page->deleteLater();
+    }
+    mPropertyPages.clear();
+
     if (mSocket.isOpen())
     {
         mConnected = false;
