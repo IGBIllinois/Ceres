@@ -7,7 +7,6 @@
 
 class cSensorModel;
 class cSensorPropertyPage;
-class cSensorPropertyPageRemote;
 class cSensorController;
 
 // Qt Forward Declaration
@@ -49,6 +48,8 @@ struct sSensorWidgets
 		pModel(model), pDockableView(nullptr), pStatusBar(nullptr), pToolBar(nullptr),
 		pPropertyPage(nullptr), pController(controller)
 	{}
+
+	operator bool() const { return static_cast<bool>(pModel); }
 };
 
 
@@ -57,5 +58,6 @@ sSensorWidgets create_sensor(const std::string& name,
 
 void remove_sensor(const std::string& name, sSensorWidgets widgets);
 
-cSensorPropertyPageRemote* create_sensor_property_page(const std::string& name, uint32_t version);
+cSensorPropertyPage* create_sensor_property_page(const std::string& name, uint32_t version,
+	const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address);
 

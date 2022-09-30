@@ -12,7 +12,7 @@
 #include <QDockWidget>
 
 
-sSensorWidgets create_ssnx_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
+sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the SSNX model and view...
     cSsnxModel* pModel = nullptr;
@@ -47,7 +47,7 @@ sSensorWidgets create_ssnx_sensor(const nlohmann::json& sensorInfo, bool no_visu
 }
 
 
-void remove_ssnx_sensor(sSensorWidgets widgets)
+void ssnx::remove_sensor(sSensorWidgets widgets)
 {
     // SSNX model and view...
     auto* pModel = static_cast<cSsnxModel*>(widgets.pModel);

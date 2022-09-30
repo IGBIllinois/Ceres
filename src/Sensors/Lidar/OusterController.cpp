@@ -17,6 +17,11 @@ const char* cOusterController::descriptor() const
     return mpModel->descriptor();
 }
 
+const std::string& cOusterController::name() const
+{
+    return mpModel->name();
+}
+
 void cOusterController::processStream(const void* pBuffer, std::size_t buf_length)
 {
     if (!pBuffer)

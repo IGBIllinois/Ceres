@@ -732,6 +732,11 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         QObject::connect(pModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
         QObject::connect(pModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
+        QObject::connect(pModel, &cCtrlDataModelRemote::addSensorPropertyPage,
+                        this, &cMainWindow::addSensorPropertyPage);
+        QObject::connect(pModel, &cCtrlDataModelRemote::removeSensorPropertyPage,
+                        this, &cMainWindow::removeSensorPropertyPage);
+
         auto* dockWidget = new QDockWidget();
         pModel->createView(dockWidget);
 
@@ -907,12 +912,5 @@ void cMainWindow::addSensorPropertyPage(QAction* pAction)
 
 void cMainWindow::removeSensorPropertyPage(QAction* pAction)
 {
-    for (auto* action : mpSensorMenu->actions())
-    {
-        if (action->text() == "")
-        {
-            mpSensorMenu->removeAction(action);
-            break;
-        }
-    }
+    mpSensorMenu->removeAction(pAction);
 }

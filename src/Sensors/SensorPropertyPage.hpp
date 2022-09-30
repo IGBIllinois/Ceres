@@ -40,31 +40,18 @@ private:
 
 
 /*******************************************************************/
-/***            Base Class for Sensor Property Pages             ***/
+/** Interface for Remote Sensor Property Pages for Remote Sensor  **/
 /*******************************************************************/
-class cSensorPropertyPageLocal : public cSensorPropertyPage
+class cSensorPropertyPageRemoteInterface : public QObject
 {
 	Q_OBJECT
 
 public:
-	cSensorPropertyPageLocal(QWidget* parent = nullptr);
-	virtual ~cSensorPropertyPageLocal() = default;
-};
-
-
-/*******************************************************************/
-/***          Sensor Property Pages for Remote Sensor            ***/
-/*******************************************************************/
-class cSensorPropertyPageRemote : public cSensorPropertyPage
-{
-	Q_OBJECT
-
-public:
-	cSensorPropertyPageRemote(QWidget* parent = nullptr);
-	virtual ~cSensorPropertyPageRemote();
+	cSensorPropertyPageRemoteInterface(QObject* parent = nullptr);
+	virtual ~cSensorPropertyPageRemoteInterface();
 
 	bool initialize(const std::string& hostname, uint16_t port,
-		bool use_ipv6, const QString& local_ip);
+		bool use_ipv6, const std::string& local_ip);
 
 	/*
 	 * Signals handlers from the TCP socket
@@ -80,7 +67,7 @@ private slots:
 	/*
 	 * Send data over the TCP socket
 	 */
-private:
+protected:
 	int sendOutgoingData(const char* data, std::size_t len);
 
 protected:

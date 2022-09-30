@@ -5,6 +5,9 @@
 
 #include "AxisCommunicationsModel_F44.hpp"
 #include "AxisCommunicationsView_F44.hpp"
+#include "AxisCommunicationsController.hpp"
+#include "AxisCommunicationsPropertyPage.hpp"
+#include "AxisCommunicationsPropertyPage_Remote.hpp"
 
 #include <QWidget>
 #include <QString>
@@ -32,6 +35,12 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
 
     if (no_visualization)
     {
+        if (protocol == "net")
+        {
+            auto* pController = new cAxisCommunicationsController_F44(pModel);
+            return sSensorWidgets(pModel, pController);
+        }
+
         return sSensorWidgets(pModel);
     }
 
@@ -52,7 +61,7 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
     return sSensorWidgets(pModel, dockWidget);
 }
 
-sSensorWidgets create_axis_communications_sensor(const nlohmann::json& sensorInfo,
+sSensorWidgets axis_communications::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
     std::string sensor = sensorInfo["sensor"];
@@ -63,7 +72,7 @@ sSensorWidgets create_axis_communications_sensor(const nlohmann::json& sensorInf
     return sSensorWidgets();
 }
 
-void remove_axis_communications_sensor(sSensorWidgets widgets)
+void axis_communications::remove_sensor(sSensorWidgets widgets)
 {
 /*
     // Ouster model and view...
@@ -83,4 +92,14 @@ void remove_axis_communications_sensor(sSensorWidgets widgets)
     delete pModel;
     delete dockWidget;
 */
+}
+
+
+cSensorPropertyPage* axis_communications::create_sensor_property_page(uint32_t version,
+    const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
+{
+    cAxisCommunicationsPropertyPage_Remote* page = new cAxisCommunicationsPropertyPage_Remote();
+    page->initialize(remote_ip_address, port, false, local_ip_address);
+
+    return nullptr;
 }

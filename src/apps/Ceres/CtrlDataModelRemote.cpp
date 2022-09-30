@@ -7,6 +7,7 @@
 #include "Weather/WeatherDataModel_Http_Wind.hpp"
 #include "TimestampProvider.hpp"
 #include "SensorPropertyPage.hpp"
+#include "ExperimentStateCreator.hpp"
 
 #include <QDockWidget>
 
@@ -149,7 +150,7 @@ bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port
         mSocket.bind(local_endpoint,0);
     }
 
-    mLocalIpAddress = local_ip;
+    mLocalIpAddress = local_ip.toStdString();
 
     QHostInfo info = QHostInfo::fromName(hostname);
     if (info.error() != QHostInfo::NoError)
@@ -317,6 +318,19 @@ void cCtrlDataModelRemote::disconnected()
         mpView->removeAllSensors();
     }
 
+    for (auto* creator : mStateCreators)
+    {
+        mThread.mpController->removeStateCreator(creator);
+    }
+    mStateCreators.clear();
+
+    for (auto* page : mPropertyPages)
+    {
+        emit removeSensorPropertyPage(page->showAction());
+        page->deleteLater();
+    }
+    mPropertyPages.clear();
+
     mDataFileIsOpen = false;
     mConnected = false;
 }
@@ -413,17 +427,39 @@ void cCtrlDataModelRemote::onSensorStatus(const std::string& sensor, const std::
 
 void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const std::string& new_name)
 {
-    mpView->sensorNameChange(QString::fromStdString(old_name),
-        QString::fromStdString(new_name));
+    auto name = QString::fromStdString(old_name);
+    mpView->sensorNameChange(name, QString::fromStdString(new_name));
+
+    for (auto* page : mPropertyPages)
+    {
+        if (page->windowTitle() == name)
+        {
+            page->setTitle(QString::fromStdString(new_name));
+            break;
+        }
+    }
+
 }
 
-void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port)
+void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version,
+    const std::string& name, const std::string& ip_address, uint16_t port)
 {
-    cSensorPropertyPageRemote* page = create_sensor_property_page(sensor, version);
+    cSensorPropertyPage* page = create_sensor_property_page(sensor, version, ip_address, port, mLocalIpAddress);
 
     if (!page) return;
 
-    page->initialize(ip_address, port, false, mLocalIpAddress);
+    page->setTitle(QString::fromStdString(name));
 
+    mPropertyPages.push_back(page);
+
+    emit addSensorPropertyPage(page->showAction());
+
+    cExperimentStateCreator* creator = dynamic_cast<cExperimentStateCreator*>(page);
+
+    if (creator)
+    {
+        mThread.mpController->addStateCreator(creator);
+        mStateCreators.push_back(creator);
+    }
 }
 

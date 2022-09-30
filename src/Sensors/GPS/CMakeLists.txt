@@ -1,7 +1,7 @@
 
 # Add the public header files to use the library
 set(GPS_PUBLIC_HEADERS
-    SsnxFactory.hpp
+    GpsFactory.hpp
 )
 
 # Add the source files used in the library
@@ -28,6 +28,7 @@ set(GPS_SOURCE_FILES
     SsnxView.hpp
     SsnxView.cpp
 
+    SsnxFactory.hpp
     SsnxFactory.cpp
 
 #
@@ -38,6 +39,7 @@ set(GPS_SOURCE_FILES
     GpsView.cpp
     GpsModel.hpp
     GpsModel.cpp
+    GpsFactory.cpp
 )
 
 

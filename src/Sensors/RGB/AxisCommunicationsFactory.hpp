@@ -6,8 +6,14 @@
 
 static char* axis_communications_id = "axis_communications";
 
-sSensorWidgets create_axis_communications_sensor(const nlohmann::json& sensorInfo,
-	bool no_visualization);
+namespace axis_communications
+{
+	sSensorWidgets create_sensor(const nlohmann::json& sensorInfo,
+		bool no_visualization);
 
-void remove_axis_communications_sensor(sSensorWidgets widgets);
+	void remove_sensor(sSensorWidgets widgets);
+
+	cSensorPropertyPage* create_sensor_property_page(uint32_t version,
+		const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address);
+}
 

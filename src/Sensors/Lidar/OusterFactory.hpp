@@ -12,5 +12,6 @@ namespace ouster
 
 	void remove_sensor(sSensorWidgets widgets);
 
-	cSensorPropertyPageRemote* create_sensor_property_page(uint32_t version);
+	cSensorPropertyPage* create_sensor_property_page(uint32_t version,
+		const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address);
 }

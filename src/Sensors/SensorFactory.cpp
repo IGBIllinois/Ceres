@@ -2,11 +2,11 @@
 #include "SensorFactory.hpp"
 
 #include "DummySensorFactory.hpp"
-#include "Lidar/OusterFactory.hpp"
-#include "GPS/SsnxFactory.hpp"
+#include "Lidar/LidarFactory.hpp"
+#include "GPS/GpsFactory.hpp"
 #include "Weather/WeatherDataFactory.hpp"
 #include "Hyperspectral/HySpexFactory.hpp"
-#include "RGB/AxisCommunicationsFactory.hpp"
+#include "RGB/RgbCameraFactory.hpp"
 
 
 sSensorWidgets create_sensor(const std::string& name, 
@@ -15,16 +15,6 @@ sSensorWidgets create_sensor(const std::string& name,
     if (name.compare(dummy_id) == 0)
     {
         return create_dummy_sensor(no_visualization);
-    }
-
-    if (name.compare(ssnx_id) == 0)
-    {
-        return create_ssnx_sensor(sensorInfo, no_visualization);
-    }
-
-    if (name.compare(ouster_id) == 0)
-    {
-        return ouster::create_sensor(sensorInfo, no_visualization);
     }
 
     if (name.compare(weather_data_id) == 0)
@@ -37,10 +27,22 @@ sSensorWidgets create_sensor(const std::string& name,
         return create_hyspex_sensor(sensorInfo, no_visualization);
     }
 
-    if (name.compare(axis_communications_id) == 0)
-    {
-        return create_axis_communications_sensor(sensorInfo, no_visualization);
-    }
+    sSensorWidgets result;
+
+    result = gps::create_sensor(name, sensorInfo, no_visualization);
+
+    if (result)
+        return result;
+
+    result = lidar::create_sensor(name, sensorInfo, no_visualization);
+
+    if (result)
+        return result;
+
+    result = rgb::create_sensor(name, sensorInfo, no_visualization);
+
+    if (result)
+        return result;
 
     return sSensorWidgets();
 }
@@ -50,18 +52,6 @@ void remove_sensor(const std::string& name, sSensorWidgets widgets)
     if (name.compare(dummy_id) == 0)
     {
         remove_dummy_sensor(widgets);
-        return;
-    }
-
-    if (name.compare(ssnx_id) == 0)
-    {
-        remove_ssnx_sensor(widgets);
-        return;
-    }
-
-    if (name.compare(ouster_id) == 0)
-    {
-        ouster::remove_sensor(widgets);
         return;
     }
 
@@ -77,21 +67,30 @@ void remove_sensor(const std::string& name, sSensorWidgets widgets)
         return;
     }
 
-    if (name.compare(axis_communications_id) == 0)
-    {
-        remove_axis_communications_sensor(widgets);
+    if (gps::remove_sensor(name, widgets))
         return;
-    }
+
+    if (lidar::remove_sensor(name, widgets))
+        return;
+
+    if (rgb::remove_sensor(name, widgets))
+        return;
 }
 
 
-cSensorPropertyPageRemote* create_sensor_property_page(const std::string& name, uint32_t version)
+cSensorPropertyPage* create_sensor_property_page(const std::string& name, uint32_t version,
+    const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
-    if (name.compare(ouster_id) == 0)
-    {
-        return ouster::create_sensor_property_page(version);
-    }
+    cSensorPropertyPage* result = nullptr;
 
+    result = gps::create_sensor_property_page(name, version, remote_ip_address, port, local_ip_address);
+    if (result) return result;
+
+    result = lidar::create_sensor_property_page(name, version, remote_ip_address, port, local_ip_address);
+    if (result) return result;
+
+    result = rgb::create_sensor_property_page(name, version, remote_ip_address, port, local_ip_address);
+    if (result) return result;
 
     return nullptr;
 }

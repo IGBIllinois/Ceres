@@ -11,13 +11,18 @@
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QHostInfo>
 
+#include <vector>
+
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
+class QAction;
 class QDockWidget;
 QT_END_NAMESPACE
 
 class cRemoteClientView;
-
+class cSensorPropertyPage;
+class cExperimentStateCreator;
 
 
 class cCtrlDataModelRemote : public cCtrlDataModel, 
@@ -54,6 +59,10 @@ protected:
     void dataRecordingStateChange(bool record) override;
     void endDataRecording() override;
 
+signals:
+    void addSensorPropertyPage(QAction* pAction);
+    void removeSensorPropertyPage(QAction* pAction);
+
 public slots:
     void updatePosition(spidercam::sPosition_1_t pos);
     void updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
@@ -84,7 +93,8 @@ private:
     void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) override;
     void onSensorStatus(const std::string& sensor, const std::string& status) override;
     void onSensorNameChange(const std::string& old_name, const std::string& new_name) override;
-    void onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, const std::string& ip_address, uint16_t port) override;
+    void onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, 
+        const std::string& name, const std::string& ip_address, uint16_t port) override;
 
 /*
  *
@@ -100,11 +110,14 @@ private:
 
     cRemoteClientView* mpView;
 
-    QString      mLocalIpAddress;
+    std::string  mLocalIpAddress;
     QHostAddress mRemoteEndpoint;
     uint16_t     mPort;
 
     QTcpSocket mSocket;
     QByteArray mReplyBuffer;
+
+    std::vector<cSensorPropertyPage*>     mPropertyPages;
+    std::vector<cExperimentStateCreator*> mStateCreators;
 };
 

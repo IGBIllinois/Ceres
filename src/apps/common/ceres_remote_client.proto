@@ -77,6 +77,7 @@ message SensorPropertyConnectInfo_1
 {
 	string device = 1;
 	uint32 version = 2;
-	string ip_address = 3;
-	uint32 port = 4;
+	string name = 3;
+	string ip_address = 4;
+	uint32 port = 5;
 }

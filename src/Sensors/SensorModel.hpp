@@ -55,7 +55,7 @@ public:
     virtual uint16_t data_class_id() const = 0;
 
     /*
-     * Returns a QString used as the name of the sensor.
+     * Returns a string used as the name of the sensor.
      */
     const std::string& name() const { return mSensorName; };
 

@@ -6,6 +6,8 @@
 #include "OusterModel_net.hpp"
 #include "OusterView.hpp"
 #include "OusterController.hpp"
+#include "OusterPropertyPage.hpp"
+#include "OusterPropertyPage_Remote.hpp"
 #include <ouster/ouster_defs.h>
 
 #include <QWidget>
@@ -84,8 +86,12 @@ void ouster::remove_sensor(sSensorWidgets widgets)
     delete dockWidget;
 }
 
-cSensorPropertyPageRemote* ouster::create_sensor_property_page(uint32_t version)
+cSensorPropertyPage* ouster::create_sensor_property_page(uint32_t version,
+    const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
+    cOusterPropertyPage_Remote* page = new cOusterPropertyPage_Remote();
+    page->initialize(remote_ip_address, port, false, local_ip_address);
+
     return nullptr;
 }
 

@@ -30,7 +30,6 @@ void cSensorPropertyPage::setTitle(const QString& text)
 
 void cSensorPropertyPage::showPage()
 {
-    setTitle("again");
 }
 
 QAction* cSensorPropertyPage::showAction() const
@@ -40,20 +39,10 @@ QAction* cSensorPropertyPage::showAction() const
 
 
 /*******************************************************************/
-/***          Sensor Property Pages for Local Sensor             ***/
+/** Interface for Remote Sensor Property Pages for Remote Sensor  **/
 /*******************************************************************/
-cSensorPropertyPageLocal::cSensorPropertyPageLocal(QWidget* parent)
-    : cSensorPropertyPage(parent)
-{}
-
-
-/*******************************************************************/
-/***          Sensor Property Pages for Remote Sensor            ***/
-/*******************************************************************/
-
-cSensorPropertyPageRemote::cSensorPropertyPageRemote(QWidget* parent)
-    :
-    mConnected(false), mSocket(parent), mPort(0)
+cSensorPropertyPageRemoteInterface::cSensorPropertyPageRemoteInterface(QObject* parent)
+    : QObject(parent), mConnected(false), mSocket(parent), mPort(0)
 {
     mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
     mSocket.setSocketOption(QAbstractSocket::SocketOption::KeepAliveOption, 1);
@@ -61,15 +50,15 @@ cSensorPropertyPageRemote::cSensorPropertyPageRemote(QWidget* parent)
     qRegisterMetaType<QAbstractSocket::SocketError>();
     qRegisterMetaType<QAbstractSocket::SocketState>();
 
-    QObject::connect(&mSocket, &QTcpSocket::connected, this, &cSensorPropertyPageRemote::connected);
-    QObject::connect(&mSocket, &QTcpSocket::disconnected, this, &cSensorPropertyPageRemote::disconnected);
-    QObject::connect(&mSocket, &QTcpSocket::errorOccurred, this, &cSensorPropertyPageRemote::errorOccurred);
-    QObject::connect(&mSocket, &QTcpSocket::hostFound, this, &cSensorPropertyPageRemote::hostFound);
-    QObject::connect(&mSocket, &QTcpSocket::stateChanged, this, &cSensorPropertyPageRemote::stateChanged);
-    QObject::connect(&mSocket, &QTcpSocket::readyRead, this, &cSensorPropertyPageRemote::processNewCommand);
+    QObject::connect(&mSocket, &QTcpSocket::connected, this, &cSensorPropertyPageRemoteInterface::connected);
+    QObject::connect(&mSocket, &QTcpSocket::disconnected, this, &cSensorPropertyPageRemoteInterface::disconnected);
+    QObject::connect(&mSocket, &QTcpSocket::errorOccurred, this, &cSensorPropertyPageRemoteInterface::errorOccurred);
+    QObject::connect(&mSocket, &QTcpSocket::hostFound, this, &cSensorPropertyPageRemoteInterface::hostFound);
+    QObject::connect(&mSocket, &QTcpSocket::stateChanged, this, &cSensorPropertyPageRemoteInterface::stateChanged);
+    QObject::connect(&mSocket, &QTcpSocket::readyRead, this, &cSensorPropertyPageRemoteInterface::processNewCommand);
 }
 
-cSensorPropertyPageRemote::~cSensorPropertyPageRemote()
+cSensorPropertyPageRemoteInterface::~cSensorPropertyPageRemoteInterface()
 {
     if (mSocket.isOpen())
     {
@@ -79,12 +68,12 @@ cSensorPropertyPageRemote::~cSensorPropertyPageRemote()
     }
 }
 
-bool cSensorPropertyPageRemote::initialize(const std::string& hostname, uint16_t port,
-    bool use_ipv6, const QString& local_ip)
+bool cSensorPropertyPageRemoteInterface::initialize(const std::string& hostname, uint16_t port,
+    bool use_ipv6, const std::string& local_ip)
 {
-    if (!local_ip.isEmpty())
+    if (!local_ip.empty())
     {
-        mLocalEndpoint = QHostAddress(local_ip);
+        mLocalEndpoint = QHostAddress(QString::fromStdString(local_ip));
         mSocket.bind(mLocalEndpoint, 0);
     }
 
@@ -129,30 +118,30 @@ bool cSensorPropertyPageRemote::initialize(const std::string& hostname, uint16_t
  * TCP Socket Methods
  *********************************************************/
 
-void cSensorPropertyPageRemote::connected()
+void cSensorPropertyPageRemoteInterface::connected()
 {
     mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
 
     mConnected = true;
 }
 
-void cSensorPropertyPageRemote::disconnected()
+void cSensorPropertyPageRemoteInterface::disconnected()
 {
     mConnected = false;
 }
 
-void cSensorPropertyPageRemote::errorOccurred(QAbstractSocket::SocketError socketError)
+void cSensorPropertyPageRemoteInterface::errorOccurred(QAbstractSocket::SocketError socketError)
 {
 }
 
-void cSensorPropertyPageRemote::hostFound()
+void cSensorPropertyPageRemoteInterface::hostFound()
 {}
 
-void cSensorPropertyPageRemote::stateChanged(QAbstractSocket::SocketState socketState)
+void cSensorPropertyPageRemoteInterface::stateChanged(QAbstractSocket::SocketState socketState)
 {
 }
 
-void cSensorPropertyPageRemote::processNewCommand()
+void cSensorPropertyPageRemoteInterface::processNewCommand()
 {
     QByteArray buffer = mSocket.readAll();
 
@@ -161,7 +150,7 @@ void cSensorPropertyPageRemote::processNewCommand()
 //    decode(buffer.constData(), buffer.size());
 }
 
-int cSensorPropertyPageRemote::sendOutgoingData(const char* data, std::size_t len)
+int cSensorPropertyPageRemoteInterface::sendOutgoingData(const char* data, std::size_t len)
 {
     if (!mConnected)
         return 0;

@@ -20,6 +20,8 @@ public:
     virtual const char* descriptor() const = 0;
     virtual uint32_t version() const = 0;
 
+    virtual const std::string& name() const = 0;
+
 public:
     bool startTcpServer(const std::string& ip);
 

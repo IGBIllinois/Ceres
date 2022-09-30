@@ -9,13 +9,13 @@ protobuf_generate_cpp(OUSTER_PROTO_SRCS OUSTER_PROTO_HDRS DESCRIPTORS PROTO_DESC
 
 # Add the public header files to use the library
 set(LIDAR_PUBLIC_HEADERS
-    OusterFactory.hpp
+    LidarFactory.hpp
 )
 
 # Add the source files used in the library
 set(LIDAR_SOURCE_FILES
 #
-# Different OUSTER Models based on data source
+# OUSTER packet utilities
 #
 	ouster_packet_utils.hpp
 	ouster_packet_utils.cpp
@@ -56,6 +56,7 @@ set(LIDAR_SOURCE_FILES
     OusterView.cpp
     OusterModel.hpp
     OusterModel.cpp
+    OusterFactory.hpp
     OusterFactory.cpp
 
 #
@@ -63,6 +64,7 @@ set(LIDAR_SOURCE_FILES
 #
     LidarModel.hpp
     LidarModel.cpp
+    LidarFactory.cpp
 )
 
 
@@ -96,6 +98,7 @@ PRIVATE
 
 target_include_directories(lidar_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(lidar_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+target_include_directories(lidar_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
 target_link_libraries(lidar_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(lidar_static PUBLIC ${Qt}::Network)

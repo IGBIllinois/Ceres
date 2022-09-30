@@ -64,7 +64,8 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
         SensorPropertyConnectInfo_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         sSensorPropertyConnectInfo_t data = to_sensor_property_connect_info_1(packet);
-        onSensorPropertyConnectInfo(data.sensor, data.version, data.ip_address, data.port);
+        onSensorPropertyConnectInfo(data.sensor, data.version, 
+            data.name, data.ip_address, data.port);
         break;
     }
     }
