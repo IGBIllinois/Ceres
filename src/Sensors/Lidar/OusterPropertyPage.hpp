@@ -9,10 +9,12 @@
 
  // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
+class QLabel;
 class QListWidget;
 class QTextEdit;
 class QLineEdit;
 class QComboBox;
+class QGroupBox;
 QT_END_NAMESPACE
 
 
@@ -22,13 +24,20 @@ public:
     cOusterPropertyPage(QWidget* parent = nullptr);
     ~cOusterPropertyPage() = default;
 
+    void doLayout() override;
+
 public:
     cExperimentState* createState(const std::string& type) override;
 
 protected:
-    QComboBox* mpModes = nullptr;
-    QTextEdit* mpMinAzimuthAngle_deg = nullptr;
-    QTextEdit* mpMaxAzimuthAngle_deg = nullptr;
+    QLabel*     mpModeLabel = nullptr;
+    QComboBox*  mpModes = nullptr;
+
+    QGroupBox*  mpAzimuthWindow = nullptr;
+    QLabel*     mpMinAzimuthAngleLabel = nullptr;
+    QLineEdit*  mpMinAzimuthAngle_deg = nullptr;
+    QLabel*     mpMaxAzimuthAngleLabel = nullptr;
+    QLineEdit*  mpMaxAzimuthAngle_deg = nullptr;
 };
 
 

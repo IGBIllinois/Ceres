@@ -20,6 +20,10 @@ message QueryState_1
 {
 }
 
+message QueryLidarModes_1 
+{
+}
+
 message SetAzimuthWindow_1
 {
     double min_deg = 1;
@@ -44,3 +48,7 @@ message SetLidarMode_1
     double azimuth_max_deg = 4;
 }
 
+message LidarModes_1
+{
+    repeated string mode = 1;
+}

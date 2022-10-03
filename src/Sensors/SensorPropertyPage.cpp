@@ -7,12 +7,11 @@
 
 cSensorPropertyPage::cSensorPropertyPage(QWidget* parent)
 :
-    QWidget(parent)
+    QDialog(parent)
 {
     mpShowAction = new QAction(this);
 
     connect(mpShowAction, &QAction::triggered, this, &cSensorPropertyPage::showPage);
-
 
     mpButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
         QDialogButtonBox::Cancel | QDialogButtonBox::Apply, Qt::Horizontal, this);
@@ -30,6 +29,7 @@ void cSensorPropertyPage::setTitle(const QString& text)
 
 void cSensorPropertyPage::showPage()
 {
+    show();
 }
 
 QAction* cSensorPropertyPage::showAction() const
@@ -55,7 +55,7 @@ cSensorPropertyPageRemoteInterface::cSensorPropertyPageRemoteInterface(QObject* 
     QObject::connect(&mSocket, &QTcpSocket::errorOccurred, this, &cSensorPropertyPageRemoteInterface::errorOccurred);
     QObject::connect(&mSocket, &QTcpSocket::hostFound, this, &cSensorPropertyPageRemoteInterface::hostFound);
     QObject::connect(&mSocket, &QTcpSocket::stateChanged, this, &cSensorPropertyPageRemoteInterface::stateChanged);
-    QObject::connect(&mSocket, &QTcpSocket::readyRead, this, &cSensorPropertyPageRemoteInterface::processNewCommand);
+    QObject::connect(&mSocket, &QTcpSocket::readyRead, this, &cSensorPropertyPageRemoteInterface::processIncomingData);
 }
 
 cSensorPropertyPageRemoteInterface::~cSensorPropertyPageRemoteInterface()
@@ -121,8 +121,8 @@ bool cSensorPropertyPageRemoteInterface::initialize(const std::string& hostname,
 void cSensorPropertyPageRemoteInterface::connected()
 {
     mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
-
     mConnected = true;
+    queryState();
 }
 
 void cSensorPropertyPageRemoteInterface::disconnected()
@@ -141,13 +141,13 @@ void cSensorPropertyPageRemoteInterface::stateChanged(QAbstractSocket::SocketSta
 {
 }
 
-void cSensorPropertyPageRemoteInterface::processNewCommand()
+void cSensorPropertyPageRemoteInterface::processIncomingData()
 {
     QByteArray buffer = mSocket.readAll();
 
     if (buffer.isEmpty()) return;
 
-//    decode(buffer.constData(), buffer.size());
+    decodeIncomingData(buffer.constData(), buffer.size());
 }
 
 int cSensorPropertyPageRemoteInterface::sendOutgoingData(const char* data, std::size_t len)

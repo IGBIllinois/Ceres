@@ -125,6 +125,20 @@ int encode_current_state(bool valid, const std::string& mode,
 }
 
 
+int encode_query_lidar_modes(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::QUERY_LIDAR_MODES);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t);
+}
+
+
 
 
 

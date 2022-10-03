@@ -2,6 +2,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QDialog>
 #include <QByteArray>
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QHostInfo>
@@ -17,7 +18,7 @@ QT_END_NAMESPACE
 /*******************************************************************/
 /***            Base Class for Sensor Property Pages             ***/
 /*******************************************************************/
-class cSensorPropertyPage : public QWidget
+class cSensorPropertyPage : public QDialog
 {
 	Q_OBJECT
 
@@ -30,12 +31,16 @@ public:
 
 	void setTitle(const QString& text);
 
+	virtual void doLayout() = 0;
+
 public slots:
 	void showPage();
 
+protected:
+	QDialogButtonBox* mpButtons;
+
 private:
 	QAction* mpShowAction;
-	QDialogButtonBox* mpButtons;
 };
 
 
@@ -53,6 +58,8 @@ public:
 	bool initialize(const std::string& hostname, uint16_t port,
 		bool use_ipv6, const std::string& local_ip);
 
+	virtual bool queryState() = 0;
+
 	/*
 	 * Signals handlers from the TCP socket
 	 */
@@ -62,13 +69,20 @@ private slots:
 	void errorOccurred(QAbstractSocket::SocketError socketError);
 	void hostFound();
 	void stateChanged(QAbstractSocket::SocketState socketState);
-	void processNewCommand();
+	void processIncomingData();
 
+protected:
 	/*
 	 * Send data over the TCP socket
 	 */
-protected:
 	int sendOutgoingData(const char* data, std::size_t len);
+
+	/**
+	 * @brief The decode method convert the byte stream from a TCP receiver port.
+	 * The decode the various packets and call the various pure virtual
+	 * methods.
+	 */
+	virtual void decodeIncomingData(const void* pBuffer, std::size_t buf_length) = 0;
 
 protected:
 	bool mConnected;

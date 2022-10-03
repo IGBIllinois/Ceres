@@ -26,7 +26,10 @@ enum class ePacketType : uint16_t
 	SET_AZIMUTH_WINDOW,
 	SET_LIDAR_MODE,
 
-	CURRENT_STATE
+	CURRENT_STATE,
+
+	QUERY_LIDAR_MODES,
+	LIDAR_MODES,
 };
 
 
@@ -59,5 +62,6 @@ sCurrentState_t to_current_state_1(const CurrentState_1& pckt);
 int encode_current_state(bool valid, const std::string& mode,
 	double azimuth_min_deg, double azimuth_max_deg, net_buffer& buffer);
 
+int encode_query_lidar_modes(net_buffer& buffer);
 
 

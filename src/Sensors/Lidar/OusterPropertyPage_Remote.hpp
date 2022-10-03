@@ -19,9 +19,11 @@ public:
     ~cOusterPropertyPage_Remote() = default;
 
 public:
+    bool queryState() override;
     void onCurrentState(bool valid, const std::string& mode, double min_deg, double max_deg) override;
 
 protected:
+    void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
 
 };

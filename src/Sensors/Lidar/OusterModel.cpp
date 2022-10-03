@@ -19,6 +19,11 @@ const char* cOusterModel::descriptor() const
     return ouster_id;
 }
 
+std::vector<std::string> cOusterModel::getLidarModes() const
+{
+    return {"512x10", "512x20", "1024x10", "1024x20", "2048x10"};
+}
+
 ouster::eLIDAR_MODE cOusterModel::getLidarMode() const
 {
     return mConfigParameters.lidar_mode;

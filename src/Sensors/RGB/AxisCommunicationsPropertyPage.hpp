@@ -14,6 +14,8 @@ public:
     cAxisCommunicationsPropertyPage(QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage() = default;
 
+    void doLayout() override;
+
 public:
     cExperimentState* createState(const std::string& type) override;
 

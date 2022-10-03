@@ -457,6 +457,7 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     if (!page) return;
 
     page->setTitle(QString::fromStdString(name));
+    page->doLayout();
 
     mPropertyPages.push_back(page);
 

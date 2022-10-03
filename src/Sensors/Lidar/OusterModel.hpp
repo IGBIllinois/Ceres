@@ -25,6 +25,8 @@ public:
 
     virtual bool configure(const nlohmann::json& jsonCfg) = 0;
 
+    std::vector<std::string> getLidarModes() const;
+
     ouster::eLIDAR_MODE getLidarMode() const;
     virtual bool setLidarMode(ouster::eLIDAR_MODE mode) = 0;
 

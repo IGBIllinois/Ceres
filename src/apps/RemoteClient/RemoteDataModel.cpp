@@ -85,6 +85,12 @@ bool cRemoteDataModel::startTcpServer(const std::string& ip, uint16_t port)
 {
     mLocalIpAddress = ip;
 
+    for( auto* pController : mSensorControllers)
+    {
+        pController->startTcpServer(mLocalIpAddress);
+        //          pController->moveToThread(&mThread);
+    }
+
     QHostAddress local_endpoint(ip.c_str());
 
     return mpTcpServer->listen(local_endpoint, port);
@@ -112,8 +118,11 @@ void cRemoteDataModel::addSensorController(cSensorController* pController)
 {
     if (pController)
     {
-        pController->startTcpServer(mLocalIpAddress);
-//        pController->moveToThread(&mThread);
+        if (!mLocalIpAddress.empty())
+        {
+            pController->startTcpServer(mLocalIpAddress);
+            //          pController->moveToThread(&mThread);
+        }
         mSensorControllers.push_back(pController);
     }
 }
