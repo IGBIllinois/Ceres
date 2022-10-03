@@ -154,7 +154,7 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
         try
         {
-            in >> configDoc;
+            configDoc = nlohmann::json::parse(in, nullptr, true, true);
         }
         catch (const nlohmann::json::parse_error& e)
         {

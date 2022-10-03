@@ -21,8 +21,7 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const std::filesys
         throw std::invalid_argument("Could not open file.");
     }
 
-    nlohmann::json jsonDoc;
-    in >> jsonDoc;
+    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
 
     if (!jsonDoc.contains("experiment_name"))
     {
@@ -62,8 +61,7 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const std::fil
         throw std::invalid_argument("Could not open file.");
     }
 
-    nlohmann::json jsonDoc;
-    in >> jsonDoc;
+    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
 
     QString name = static_cast<std::string>(jsonDoc["experiment_name"]).c_str();
     setText(0, name);
@@ -111,8 +109,7 @@ nlohmann::json cExperimentTreeItem::getExperimentDocument() const
         throw std::invalid_argument("Could not open file.");
     }
 
-    nlohmann::json jsonDoc;
-    in >> jsonDoc;
+    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
 
     return jsonDoc;
 }
