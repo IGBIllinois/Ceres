@@ -52,7 +52,7 @@
 				  Zero is a valid length. Although encoders and decoders should treat the length
 				  as unsigned, its value shall not exceed 2^31-1 bytes.
 
-	Block Type	: A four-byte unsigned integer defining the block type.  See the enumerations in DataFileBlockIdentifiers.hpp.
+	Block Type	: A six-byte unsigned integer defining the block type.  See BlockId.hpp.
 
 	Block Data	: The data bytes appropriate to the block type, if any. This field can be of zero length.
 

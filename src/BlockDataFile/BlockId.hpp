@@ -13,7 +13,7 @@ enum class ClassIDs: uint16_t;
 	as a signal on how the data in the block should be decoded.
 
     Block Type Layout
-    Each block consists of three or four fields:
+    Each block type consists of four fields:
 
     +------------------------------------------------------------+
     |                          Block Type                        |
