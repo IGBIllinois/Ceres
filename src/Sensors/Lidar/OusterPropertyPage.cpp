@@ -29,6 +29,9 @@ cOusterPropertyPage::cOusterPropertyPage(QWidget* parent)
 	azWindowLayout->addRow(mpMinAzimuthAngleLabel, mpMinAzimuthAngle_deg);
 	azWindowLayout->addRow(mpMaxAzimuthAngleLabel, mpMaxAzimuthAngle_deg);
 	mpAzimuthWindow->setLayout(azWindowLayout);
+
+	mMinAzimuthAngleDefault_deg = 0.0;
+	mMaxAzimuthAngleDefault_deg = 0.0;
 }
 
 void cOusterPropertyPage::doLayout()

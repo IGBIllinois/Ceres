@@ -38,6 +38,10 @@ protected:
     QLineEdit*  mpMinAzimuthAngle_deg = nullptr;
     QLabel*     mpMaxAzimuthAngleLabel = nullptr;
     QLineEdit*  mpMaxAzimuthAngle_deg = nullptr;
+
+    QString mModeDefault;
+    double  mMinAzimuthAngleDefault_deg;
+    double  mMaxAzimuthAngleDefault_deg;
 };
 
 

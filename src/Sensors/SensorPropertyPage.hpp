@@ -12,6 +12,7 @@
 QT_BEGIN_NAMESPACE
 class QAction;
 class QDialogButtonBox;
+class QAbstractButton;
 QT_END_NAMESPACE
 
 
@@ -33,8 +34,18 @@ public:
 
 	virtual void doLayout() = 0;
 
+	virtual void doOK();
+	virtual void doCancel();
+	virtual void doApply();
+
+signals:
+	void statusMessage(QString msg);
+
 public slots:
-	void showPage();
+	virtual void showPage();
+
+protected slots:
+	void buttonClicked(QAbstractButton* button);
 
 protected:
 	QDialogButtonBox* mpButtons;
@@ -58,7 +69,12 @@ public:
 	bool initialize(const std::string& hostname, uint16_t port,
 		bool use_ipv6, const std::string& local_ip);
 
-	virtual bool queryState() = 0;
+
+	bool openConnection();
+	void closeConnection();
+
+	virtual void onConnect() = 0;
+	virtual void onDisconnect() {};
 
 	/*
 	 * Signals handlers from the TCP socket

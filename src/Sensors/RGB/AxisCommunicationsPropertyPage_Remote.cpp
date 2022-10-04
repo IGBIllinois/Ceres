@@ -8,9 +8,8 @@ cAxisCommunicationsPropertyPage_Remote::cAxisCommunicationsPropertyPage_Remote(Q
 		cAxisPropertiesNetEncoder(255)
 {}
 
-bool cAxisCommunicationsPropertyPage_Remote::queryState()
+void cAxisCommunicationsPropertyPage_Remote::onConnect()
 {
-	return true;
 }
 
 void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, const std::string& mode,

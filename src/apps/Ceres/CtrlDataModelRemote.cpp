@@ -459,6 +459,7 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     page->setTitle(QString::fromStdString(name));
     page->doLayout();
 
+    connect(page, &cSensorPropertyPage::statusMessage, this, &cDataModel::statusMessage);
     mPropertyPages.push_back(page);
 
     emit addSensorPropertyPage(page->showAction());

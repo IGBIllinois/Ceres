@@ -3,6 +3,7 @@
 
 #include <QAction>
 #include <QDialogButtonBox>
+#include <QAbstractButton>
 
 
 cSensorPropertyPage::cSensorPropertyPage(QWidget* parent)
@@ -15,6 +16,8 @@ cSensorPropertyPage::cSensorPropertyPage(QWidget* parent)
 
     mpButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
         QDialogButtonBox::Cancel | QDialogButtonBox::Apply, Qt::Horizontal, this);
+
+    connect(mpButtons, &QDialogButtonBox::clicked, this, &cSensorPropertyPage::buttonClicked);
 }
 
 cSensorPropertyPage::~cSensorPropertyPage()
@@ -37,6 +40,40 @@ QAction* cSensorPropertyPage::showAction() const
     return mpShowAction;
 }
 
+void cSensorPropertyPage::doOK()
+{
+    hide();
+}
+
+void cSensorPropertyPage::doCancel()
+{
+    hide();
+}
+
+void cSensorPropertyPage::doApply()
+{
+
+}
+
+void cSensorPropertyPage::buttonClicked(QAbstractButton* button)
+{
+    auto text = button->text().toStdString();
+    if (text == "OK")
+    {
+        doOK();
+        return;
+    }
+    if (text == "Apply")
+    {
+        doApply();
+        return;
+    }
+    if (text == "Cancel")
+    {
+        doCancel();
+        return;
+    }
+}
 
 /*******************************************************************/
 /** Interface for Remote Sensor Property Pages for Remote Sensor  **/
@@ -108,9 +145,19 @@ bool cSensorPropertyPageRemoteInterface::initialize(const std::string& hostname,
     }
 
     mPort = port;
-    mSocket.connectToHost(mRemoteEndpoint, port);
 
     return true;
+}
+
+bool cSensorPropertyPageRemoteInterface::openConnection()
+{
+    mSocket.connectToHost(mRemoteEndpoint, mPort);
+    return true;
+}
+
+void cSensorPropertyPageRemoteInterface::closeConnection()
+{
+    mSocket.close();
 }
 
 
@@ -122,11 +169,13 @@ void cSensorPropertyPageRemoteInterface::connected()
 {
     mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
     mConnected = true;
-    queryState();
+
+    onConnect();
 }
 
 void cSensorPropertyPageRemoteInterface::disconnected()
 {
+    onDisconnect();
     mConnected = false;
 }
 
