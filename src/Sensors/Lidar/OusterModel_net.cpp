@@ -261,24 +261,35 @@ bool cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
         return true;
 
     setStatus(sensor::eStatus::REINITIALIZING);
-    if (!mCmdStream.setLidarMode(mode))
-    {
-        setStatus(sensor::eStatus::FAILED);
-        return false;
 
+    try
+    {
+        if (!mCmdStream.setLidarMode(mode))
+        {
+            setStatus(sensor::eStatus::FAILED);
+            return false;
+
+        }
+
+        if (!mCmdStream.reinitialize())
+        {
+            setStatus(sensor::eStatus::FAILED);
+            return false;
+        }
+        retrieveLidarMode();
+        auto result = retrieveLidarDataFormat();
+
+        setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+
+        return result;
+    }
+    catch (const std::exception& e)
+    {
+        qCritical() << "Exception Set Lidar Mode:" << e.what();
+        setStatus(sensor::eStatus::FAILED);
     }
 
-    if (!mCmdStream.reinitialize())
-    {
-        setStatus(sensor::eStatus::FAILED);
-        return false;
-    }
-    retrieveLidarMode();
-    auto result = retrieveLidarDataFormat();
-
-    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
-
-    return result;
+    return false;
 }
 
 bool cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
@@ -288,16 +299,26 @@ bool cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
         return true;
 
     setStatus(sensor::eStatus::REINITIALIZING);
-    if (!mCmdStream.setAzimuthWindow(min_deg, max_deg))
+
+    try
     {
-        setStatus(sensor::eStatus::FAILED);
-        return false;
+        if (!mCmdStream.setAzimuthWindow(min_deg, max_deg))
+        {
+            setStatus(sensor::eStatus::FAILED);
+            return false;
+        }
+        auto result = mCmdStream.reinitialize();
+
+        setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+
+        return result;
     }
-    auto result = mCmdStream.reinitialize();
-
-    setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
-
-    return result;
+    catch (const std::exception& e)
+    {
+        qCritical() << "Exception Set Azimuth Window:" << e.what();
+        setStatus(sensor::eStatus::FAILED);
+    }
+    return false;
 }
 
 bool cOusterModel_net::startCommunications()
@@ -604,6 +625,8 @@ void cOusterModel_net::retrieveLidarMode()
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Lidar Mode:" << e.what();
+            lidarMode.reset();
         }
 
     } while (!lidarMode.has_value());
@@ -622,6 +645,8 @@ void cOusterModel_net::retrieveAzimuthWindow()
         }
         catch (const std::exception& e)
         {
+            qCritical() << "Exception Azimuth Window:" << e.what();
+            azimuthWindow.reset();
         }
 
     } while (!azimuthWindow.has_value());

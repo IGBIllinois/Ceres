@@ -93,7 +93,7 @@ private:
     void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) override;
     void onSensorStatus(const std::string& sensor, const std::string& status) override;
     void onSensorNameChange(const std::string& old_name, const std::string& new_name) override;
-    void onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version, 
+    void onSensorPropertyConnectInfo(const std::string& sensor, const std::string& model, uint32_t version,
         const std::string& name, const std::string& ip_address, uint16_t port) override;
 
 /*

@@ -449,10 +449,12 @@ void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const
 
 }
 
-void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, uint32_t version,
-    const std::string& name, const std::string& ip_address, uint16_t port)
+void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, 
+    const std::string& model, uint32_t version, const std::string& name,
+    const std::string& ip_address, uint16_t port)
 {
-    cSensorPropertyPage* page = create_sensor_property_page(sensor, version, ip_address, port, mLocalIpAddress);
+    cSensorPropertyPage* page = create_sensor_property_page(sensor, 
+        model, version, ip_address, port, mLocalIpAddress);
 
     if (!page) return;
 

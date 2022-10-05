@@ -473,11 +473,12 @@ void cRemoteDataModel::newConnection()
         for (auto& controller : mSensorControllers)
         {
             std::string sensor = controller->descriptor();
+            std::string model = controller->model();
             auto version = controller->version();
             std::string name = controller->name();
             auto ip_address = controller->serverIpAddress();
             auto port = controller->serverPort();
-            encodeSensorPropertyConnectInfo(sensor, version, name, ip_address, port);
+            encodeSensorPropertyConnectInfo(sensor, model, version, name, ip_address, port);
         }
         cNetworkEncoder::sendData();
 

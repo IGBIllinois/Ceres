@@ -109,13 +109,15 @@ int encode_sensor_name_change(const std::string& old_name, const std::string& ne
 struct sSensorPropertyConnectInfo_t
 {
 	std::string sensor;
+	std::string model;
 	uint32_t    version;
 	std::string name;
 	std::string ip_address;
 	uint16_t	port;
 };
 sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPropertyConnectInfo_1& pckt);
-int encode_sensor_property_connect_info(const std::string& sensor, uint32_t version, 
+int encode_sensor_property_connect_info(const std::string& sensor, 
+	const std::string& model, uint32_t version,
 	const std::string& name, const std::string& ip_address, uint16_t port, net_buffer& buffer);
 
 

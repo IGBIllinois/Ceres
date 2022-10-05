@@ -299,6 +299,7 @@ sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPrope
     sSensorPropertyConnectInfo_t data;
 
     data.sensor     = pckt.device();
+    data.model      = pckt.model();
     data.version    = pckt.version();
     data.name       = pckt.name();
     data.ip_address = pckt.ip_address();
@@ -307,12 +308,13 @@ sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPrope
     return data;
 }
 
-int encode_sensor_property_connect_info(const std::string& sensor, uint32_t version, 
+int encode_sensor_property_connect_info(const std::string& sensor, const std::string& model, uint32_t version,
     const std::string& name, const std::string& ip_address, uint16_t port, net_buffer& buffer)
 {
     SensorPropertyConnectInfo_1 pckt;
 
     pckt.set_device(sensor);
+    pckt.set_model(model);
     pckt.set_version(version);
     pckt.set_name(name);
     pckt.set_ip_address(ip_address);

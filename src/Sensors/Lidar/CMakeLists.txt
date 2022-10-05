@@ -19,7 +19,7 @@ set(LIDAR_SOURCE_FILES
 #
 	ouster_packet_utils.hpp
 	ouster_packet_utils.cpp
-	
+
 # Ouster Property Page Code
 	OusterPropertiesNetDecoder.hpp
 	OusterPropertiesNetDecoder.cpp
@@ -29,7 +29,7 @@ set(LIDAR_SOURCE_FILES
 	OusterPropertyPage_Remote.cpp
 	OusterPropertyPage.hpp
 	OusterPropertyPage.cpp
-	
+
 # Ouster Controller Code
 
 	OusterControllerNetDecoder.hpp

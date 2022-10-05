@@ -49,7 +49,10 @@ void cOusterController::onQueryState()
     auto window = mpModel->getAzimuthWindow();
     auto mode = mpModel->getLidarMode();
 
-    sendCurrentState(true, mode, window.min_deg, window.max_deg);
+    if (mpClient)
+    {
+        sendCurrentState(true, mode, window.min_deg, window.max_deg);
+    }
 }
 
 void cOusterController::onSetAzimuthWindow(double min_deg, double max_deg)
