@@ -17,6 +17,21 @@ const char* cHySpexSWIR_384_Controller::descriptor() const
     return mpModel->descriptor();
 }
 
+const std::string& cHySpexSWIR_384_Controller::manufacturer() const
+{
+    return mpModel->manufacturer();
+}
+
+const std::string& cHySpexSWIR_384_Controller::model() const
+{
+    return mpModel->model();
+}
+
+const std::string& cHySpexSWIR_384_Controller::serial_number() const
+{
+    return mpModel->serial_number();
+}
+
 const std::string& cHySpexSWIR_384_Controller::name() const
 {
     return mpModel->name();

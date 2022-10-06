@@ -80,17 +80,26 @@ cSensorModel::cSensorModel(const std::string& name, QObject* parent)
 
 bool cSensorModel::configure(const nlohmann::json& jsonCfg)
 {
-    if (!jsonCfg.contains("Manufacturer"))
-        throw std::logic_error("Missing \"Manufacturer\" entry.");
-    mManufacturer = jsonCfg["Manufacturer"];
+    if (mManufacturer.empty())
+    {
+        if (!jsonCfg.contains("Manufacturer"))
+            throw std::logic_error("Missing \"Manufacturer\" entry.");
+        mManufacturer = jsonCfg["Manufacturer"];
+    }
 
-    if (!jsonCfg.contains("Model"))
-        throw std::logic_error("Missing \"Model\" entry.");
-    mModel = jsonCfg["Model"];
+    if (mModel.empty())
+    {
+        if (!jsonCfg.contains("Model"))
+            throw std::logic_error("Missing \"Model\" entry.");
+        mModel = jsonCfg["Model"];
+    }
 
-    if (!jsonCfg.contains("Serial Number"))
-        throw std::logic_error("Missing \"Serial Number\" entry.");
-    mSerialNumber = jsonCfg["Serial Number"];
+    if (mSerialNumber.empty())
+    {
+        if (!jsonCfg.contains("Serial Number"))
+            throw std::logic_error("Missing \"Serial Number\" entry.");
+        mSerialNumber = jsonCfg["Serial Number"];
+    }
 
     setStatus(sensor::eStatus::CONFIGURED);
     return true;

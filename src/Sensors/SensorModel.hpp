@@ -59,6 +59,24 @@ public:
      */
     const std::string& name() const { return mSensorName; };
 
+    /*
+     * Returns the manufacturer of the sensor as a string.
+     */
+    virtual const std::string& manufacturer() const { return mManufacturer; };
+
+    /*
+     * Returns the model of the sensor as a string.
+     */
+    virtual const std::string& model() const { return mModel; };
+
+    /*
+     * Returns the serial number of the sensor as a string.
+     */
+    virtual const std::string& serial_number() const { return mSerialNumber; };
+
+    /*
+     * Returns an enumeration of the current sensor status.
+     */
     sensor::eStatus status() const { return mStatus; };
 
     /*

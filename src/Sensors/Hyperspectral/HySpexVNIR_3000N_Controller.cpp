@@ -17,6 +17,21 @@ const char* cHySpexVNIR_3000N_Controller::descriptor() const
     return mpModel->descriptor();
 }
 
+const std::string& cHySpexVNIR_3000N_Controller::manufacturer() const
+{
+    return mpModel->manufacturer();
+}
+
+const std::string& cHySpexVNIR_3000N_Controller::model() const
+{
+    return mpModel->model();
+}
+
+const std::string& cHySpexVNIR_3000N_Controller::serial_number() const
+{
+    return mpModel->serial_number();
+}
+
 const std::string& cHySpexVNIR_3000N_Controller::name() const
 {
     return mpModel->name();

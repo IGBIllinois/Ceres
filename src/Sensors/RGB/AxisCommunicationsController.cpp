@@ -18,6 +18,21 @@ const char* cAxisCommunicationsController::descriptor() const
     return mpModel->descriptor();
 }
 
+const std::string& cAxisCommunicationsController::manufacturer() const
+{
+    return mpModel->manufacturer();
+}
+
+const std::string& cAxisCommunicationsController::model() const
+{
+    return mpModel->model();
+}
+
+const std::string& cAxisCommunicationsController::serial_number() const
+{
+    return mpModel->serial_number();
+}
+
 const std::string& cAxisCommunicationsController::name() const
 {
     return mpModel->name();
@@ -79,6 +94,21 @@ cAxisCommunicationsController_F44::cAxisCommunicationsController_F44(cAxisCommun
 const char* cAxisCommunicationsController_F44::descriptor() const
 {
     return mpModel->descriptor();
+}
+
+const std::string& cAxisCommunicationsController_F44::manufacturer() const
+{
+    return mpModel->manufacturer();
+}
+
+const std::string& cAxisCommunicationsController_F44::model() const
+{
+    return mpModel->model();
+}
+
+const std::string& cAxisCommunicationsController_F44::serial_number() const
+{
+    return mpModel->serial_number();
 }
 
 const std::string& cAxisCommunicationsController_F44::name() const

@@ -17,6 +17,21 @@ const char* cOusterController::descriptor() const
     return mpModel->descriptor();
 }
 
+const std::string& cOusterController::manufacturer() const
+{
+    return mpModel->manufacturer();
+}
+
+const std::string& cOusterController::model() const
+{
+    return mpModel->model();
+}
+
+const std::string& cOusterController::serial_number() const
+{
+    return mpModel->serial_number();
+}
+
 const std::string& cOusterController::name() const
 {
     return mpModel->name();

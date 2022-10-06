@@ -22,6 +22,8 @@ cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
     mImageBuffer(&mImageData),
     mpActiveCamera(nullptr)
 {
+    mModel = "AXIS F44 DUAL AUDO INPUT";
+
     mImageBuffer.open(QIODevice::ReadWrite);
 
     mCameras = {nullptr, nullptr, nullptr, nullptr};

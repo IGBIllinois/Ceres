@@ -9,6 +9,8 @@ cHySpexSWIR_384_Model::cHySpexSWIR_384_Model(QObject* parent)
 :
     cHyperspectralModel("SWIR 384", parent)
 {
+    mManufacturer = "HySpex";
+    mModel = "SWIR 384";
 }
 
 const char* cHySpexSWIR_384_Model::descriptor() const

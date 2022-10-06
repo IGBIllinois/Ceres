@@ -20,6 +20,9 @@ public:
 public:
     const char* descriptor() const override;
     uint32_t version() const override { return 1; };
+    const std::string& manufacturer() const override;
+    const std::string& model() const override;
+    const std::string& serial_number() const override;
     const std::string& name() const override;
 
 protected:
@@ -60,6 +63,9 @@ public:
 public:
     const char* descriptor() const override;
     uint32_t version() const override { return 1; };
+    const std::string& manufacturer() const override;
+    const std::string& model() const override;
+    const std::string& serial_number() const override;
     const std::string& name() const override;
 
 protected:

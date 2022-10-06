@@ -10,6 +10,8 @@ cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
     cHyperspectralModel("VNIR 3000N", parent)
 {
     mConnected = false;
+    mManufacturer = "HySpex";
+    mModel = "VNIR 3000N";
 }
 
 const char* cHySpexVNIR_3000N_Model::descriptor() const

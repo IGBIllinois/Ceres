@@ -22,6 +22,8 @@ cAxisCommunicationsModel::cAxisCommunicationsModel(const std::string& name, QObj
     mpHttpManager(nullptr),
     mVapixVersion(0)
 {
+    mManufacturer = "Axis Communications";
+
     mConnected = false;
     mpHttpManager = new QNetworkAccessManager(this);
 }
