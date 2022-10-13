@@ -123,9 +123,9 @@ namespace
             for (uint16_t chn = 0; chn < pixels_per_column; ++chn)
             {
                 buffer >> pixel.range_mm;
-                buffer >> pixel.intensity;
+                buffer >> pixel.signal;
                 buffer >> pixel.reflectivity;
-                buffer >> pixel.ambient_noise;
+                buffer >> pixel.nir;
                 data.channel(col, chn, pixel);
             }
         }
@@ -146,7 +146,7 @@ namespace
             {
                 auto& pixel = data.channels[col].pixels[p];
                 buffer >> pixel.range_mm;
-                buffer >> pixel.intensity;
+                buffer >> pixel.signal;
                 buffer >> pixel.reflectivity;
                 buffer >> pixel.ambient_noise;
             }

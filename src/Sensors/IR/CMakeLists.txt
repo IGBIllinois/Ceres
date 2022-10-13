@@ -44,7 +44,7 @@ target_include_directories(ir_camera_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DI
 target_link_libraries(ir_camera_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(ir_camera_static PUBLIC ${Qt}::Network)
 target_link_libraries(ir_camera_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(ir_camera_static PUBLIC BlockDataFile)
+target_link_libraries(ir_camera_static PUBLIC block_data_file_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

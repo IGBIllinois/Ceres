@@ -83,6 +83,9 @@ void cAxisCommunicationsController::onSetMode(ouster::eLIDAR_MODE mode)
 }
 */
 
+/******************************************************************************
+ * Axis Communications Controller F44
+ ******************************************************************************/
 
 cAxisCommunicationsController_F44::cAxisCommunicationsController_F44(cAxisCommunicationsModel_F44* model, QObject* parent)
     :
@@ -140,24 +143,49 @@ void cAxisCommunicationsController_F44::processStream(const void* pBuffer, std::
 
 void cAxisCommunicationsController_F44::onQueryState()
 {
-    //    auto window = mpModel->getAzimuthWindow();
-    //    auto mode = mpModel->getLidarMode();
+    auto id = mpModel->getActiveCameraID();
+    auto image_size = mpModel->getActiveImageSize();
+    auto fps = mpModel->getActiveFramesRate_fps();
 
-    //    sendCurrentState(true, mode, window.min_deg, window.max_deg);
+    bool valid = (id >= 0) && (fps > 0);
+
+    sendCurrentState(valid, id, image_size.width, image_size.height, fps);
 }
 
-/*
-void cAxisCommunicationsController::onSetAzimuthWindow(double min_deg, double max_deg)
+void cAxisCommunicationsController_F44::onQueryCameraId()
 {
-    if (max_deg < min_deg)
-        std::swap(min_deg, max_deg);
-
-    mpModel->setAzimuthWindow(min_deg, max_deg);
+    sendActiveCameraId(mpModel->getActiveCameraID());
 }
 
-void cAxisCommunicationsController::onSetMode(ouster::eLIDAR_MODE mode)
+void cAxisCommunicationsController_F44::onQueryImageSize()
 {
-    mpModel->setLidarMode(mode);
+    auto image_size = mpModel->getActiveImageSize();
+    sendImageSize(image_size.width, image_size.height);
 }
-*/
+
+void cAxisCommunicationsController_F44::onQueryFrameRate()
+{
+    sendFrameRate(mpModel->getActiveFramesRate_fps());
+}
+
+void cAxisCommunicationsController_F44::setCameraId(uint8_t id)
+{
+    mpModel->setActiveCamera(id);
+    sendActiveCameraId(mpModel->getActiveCameraID());
+}
+
+void cAxisCommunicationsController_F44::setImageSize(uint16_t width, uint16_t height)
+{
+    axis::sImageSize_t image_size = {width, height};
+
+    mpModel->setActiveImageSize(image_size);
+    sendImageSize(image_size.width, image_size.height);
+}
+
+void cAxisCommunicationsController_F44::setFrameRate(uint8_t fps)
+{
+    mpModel->setActiveFramesRate_fps(fps);
+    sendFrameRate(mpModel->getActiveFramesRate_fps());
+}
+
 

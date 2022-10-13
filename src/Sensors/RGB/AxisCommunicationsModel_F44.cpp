@@ -189,6 +189,14 @@ void cAxisCommunicationsModel_F44::requestReceived(QNetworkReply* pReply)
     }
 }
 
+int cAxisCommunicationsModel_F44::getActiveCameraID() const
+{
+    if (mpActiveCamera)
+        return mpActiveCamera->cameraID();
+
+    return -1;
+}
+
 void cAxisCommunicationsModel_F44::setActiveCamera(int id)
 {
     cAxisCamera* pCamera = nullptr;
@@ -228,6 +236,54 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
     {
         mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
         mSerializer.write(mpActiveCamera->getImageSize());
+    }
+}
+
+axis::sImageSize_t cAxisCommunicationsModel_F44::getActiveImageSize() const
+{
+    if (mpActiveCamera)
+        return mpActiveCamera->getImageSize();
+
+    return axis::sImageSize_t{0,0};
+}
+
+void cAxisCommunicationsModel_F44::setActiveImageSize(axis::sImageSize_t image_size)
+{
+    if (!mpActiveCamera)
+        return;
+
+    if ((image_size.width > 1920) || (image_size.height > 1080))
+        return;
+
+    mpActiveCamera->setImageSize(image_size);
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(mpActiveCamera->getImageSize());
+    }
+}
+
+int cAxisCommunicationsModel_F44::getActiveFramesRate_fps() const
+{
+    if (mpActiveCamera)
+        return mpActiveCamera->getFramesPerSeconds();
+
+    return -1;
+}
+
+void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
+{
+    if (!mpActiveCamera)
+        return;
+
+    if ((fps < 1) || (fps > 250))
+        return;
+
+    mpActiveCamera->setFramesPerSeconds(fps);
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
     }
 }
 

@@ -73,7 +73,7 @@ target_link_libraries(gps_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(gps_static PUBLIC ${Qt}::Network)
 target_link_libraries(gps_static PUBLIC ${Qt}::SerialPort)
 target_link_libraries(gps_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(gps_static PUBLIC BlockDataFile)
+target_link_libraries(gps_static PUBLIC block_data_file_static)
 target_link_libraries(gps_static PUBLIC ssnx2net::ssnx2net_static)
 target_link_libraries(gps_static PUBLIC ssnx::ssnx_static)
 

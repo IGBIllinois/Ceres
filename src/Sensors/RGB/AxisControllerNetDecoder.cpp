@@ -17,19 +17,45 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     }
     case ePacketType::QUERY_STATE:
     {
-        onQueryState();
-        break;
-    }
-/*
-    case ePacketType::SET_AZIMUTH_WINDOW:
-    {
-        SetAzimuthWindow_1 packet;
+        QueryMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
-        auto data = to_azimuth_window_t(packet);
-        onSetAzimuthWindow(data.min_deg, data.max_deg);
+        switch (packet.query())
+        {
+        case eQUERY_STATE:
+            return onQueryState();
+        case eQUERY_ACTIVE_CAMERA_ID:
+            return onQueryCameraId();
+        case eQUERY_IMAGE_SIZE:
+            return onQueryImageSize();
+        case eQUERY_FRAME_RATE:
+            return onQueryFrameRate();
+        }
         break;
     }
-*/
+    case ePacketType::ACTIVE_CAMERA_ID:
+    {
+        ActiveCameraIdMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto id = to_active_camera_id_t(packet);
+        setCameraId(id);
+        break;
+    }
+    case ePacketType::IMAGE_SIZE:
+    {
+        ImageSizeMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto data = to_image_size_t(packet);
+        setImageSize(data.width, data.height);
+        break;
+    }
+    case ePacketType::FRAMES_PER_SECOND:
+    {
+        FrameRateMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto fps = to_frame_rate_t(packet);
+        setFrameRate(fps);
+        break;
+    }
     }
 }
 

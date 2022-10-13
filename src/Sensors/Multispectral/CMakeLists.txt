@@ -45,7 +45,7 @@ target_include_directories(multispectral_static PRIVATE ${BLOCK_DATA_FILE_INCLUD
 target_link_libraries(multispectral_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(multispectral_static PUBLIC ${Qt}::Network)
 target_link_libraries(multispectral_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(multispectral_static PUBLIC BlockDataFile)
+target_link_libraries(multispectral_static PUBLIC block_data_file_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

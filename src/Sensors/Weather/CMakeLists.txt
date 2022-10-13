@@ -56,7 +56,7 @@ target_include_directories(weather_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR}
 target_link_libraries(weather_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(weather_static PUBLIC ${Qt}::Network)
 target_link_libraries(weather_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(weather_static PUBLIC BlockDataFile)
+target_link_libraries(weather_static PUBLIC block_data_file_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

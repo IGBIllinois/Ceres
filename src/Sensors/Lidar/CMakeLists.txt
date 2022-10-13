@@ -105,7 +105,7 @@ target_link_libraries(lidar_static PUBLIC ${Qt}::Network)
 target_link_libraries(lidar_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(lidar_static PRIVATE ouster::ouster_static)
 target_link_libraries(lidar_static INTERFACE ouster::OusterVisualization)
-target_link_libraries(lidar_static PUBLIC BlockDataFile)
+target_link_libraries(lidar_static PUBLIC block_data_file_static)
 target_link_libraries(lidar_static PRIVATE ${Protobuf_LIBRARIES})
 
 

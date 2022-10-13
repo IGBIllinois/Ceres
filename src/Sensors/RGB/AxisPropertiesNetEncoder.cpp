@@ -10,7 +10,7 @@ cAxisPropertiesNetEncoder::cAxisPropertiesNetEncoder(std::size_t capacity)
 
 void cAxisPropertiesNetEncoder::sendQueryState()
 {
-    encode_query_state(mBuffer);
+    encode_query_current_state(mBuffer);
     sendData();
 }
 

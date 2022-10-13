@@ -52,6 +52,10 @@ private:
 };
 
 
+/******************************************************************************
+ * Axis Communications Controller F44
+ ******************************************************************************/
+
 class cAxisCommunicationsController_F44 : public cSensorController,
     private cAxisControllerNetDecoder, private cAxisControllerNetEncoder
 {
@@ -70,8 +74,14 @@ public:
 
 protected:
     void onQueryState() override;
-    //    void onSetAzimuthWindow(double min_deg, double max_deg) override;
-    //    void onSetMode(ouster::eLIDAR_MODE mode) override;
+    void onQueryCameraId() override;
+    void onQueryImageSize() override;
+    void onQueryFrameRate() override;
+
+    void setCameraId(uint8_t id) override;
+    void setImageSize(uint16_t width, uint16_t height) override;
+    void setFrameRate(uint8_t fps) override;
+
 
 protected:
     /**

@@ -448,9 +448,9 @@ TEST_CASE("Lidar IMU/LiDAR Data tests", "[stream data]")
 		for (uint16_t c = 0; c < columns_per_frame; ++c)
 		{
 			pixel.range_mm = c + 1;
-			pixel.intensity = c + 1;
+			pixel.signal = c + 1;
 			pixel.reflectivity = c + 1;
-			pixel.ambient_noise = c + 1;
+			pixel.nir = c + 1;
 
 			for (uint16_t r = 0; r < pixels_per_column; ++r)
 			{
@@ -498,8 +498,8 @@ TEST_CASE("Lidar IMU/LiDAR Data tests", "[stream data]")
 					original_pixel = original_data.channel(col, chn);
 					pixel = lidarData.channel(col, chn);
 
-					REQUIRE(original_pixel.ambient_noise == pixel.ambient_noise);
-					REQUIRE(original_pixel.intensity == pixel.intensity);
+					REQUIRE(original_pixel.nir == pixel.nir);
+					REQUIRE(original_pixel.signal == pixel.signal);
 					REQUIRE(original_pixel.range_mm == pixel.range_mm);
 					REQUIRE(original_pixel.reflectivity == pixel.reflectivity);
 				}

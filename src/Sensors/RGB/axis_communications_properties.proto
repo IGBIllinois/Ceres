@@ -13,33 +13,45 @@ syntax = "proto3";
 
 
 /******************************************************************************
- * Property Page -> Sensor Controller
+ * Property Page <-> Sensor Controller
  *****************************************************************************/
 
-message QueryState_1 
+enum eQuery 
 {
+  eQUERY_UNSPECIFIED = 0;
+  eQUERY_STATE = 1;
+  eQUERY_ACTIVE_CAMERA_ID = 2;
+  eQUERY_IMAGE_SIZE = 3;
+  eQUERY_FRAME_RATE = 4;
 }
 
-message SetActiveCameraId_1
+message QueryMessage_1 
+{
+	eQuery query = 1;
+}
+
+message ActiveCameraIdMessage_1
 {
     uint32 camera_id = 1;
 }
 
-message SetLidarMode_1 
+message ImageSizeMessage_1 
 {
-	string mode = 1;
+	uint32 width = 1;
+	uint32 height = 2;
 }
 
-
-/******************************************************************************
- * Sensor Controller -> Property Page
- *****************************************************************************/
-
- message CurrentState_1 
+message FrameRateMessage_1 
 {
-	bool valid = 1;
+	uint32 frames_per_second = 1;
+}
+
+ message StateMessage_1 
+{
+	bool   valid = 1;
 	uint32 camera_id = 2;
-    string resolution = 3;
-    uint32 frames_per_second = 4;
+	uint32 width = 3;
+	uint32 height = 4;
+    uint32 frames_per_second = 5;
 }
 

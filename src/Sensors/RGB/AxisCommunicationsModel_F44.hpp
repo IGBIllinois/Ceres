@@ -49,11 +49,17 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
+    int getActiveCameraID() const;
+    int getActiveFramesRate_fps() const;
+    axis::sImageSize_t getActiveImageSize() const;
+
 signals:
     void enableCamera(int id);
 
 public slots:
     void setActiveCamera(int id);
+    void setActiveImageSize(axis::sImageSize_t image_size);
+    void setActiveFramesRate_fps(int fps);
 
 protected slots:
     void frameGrabbed(int id, QImage* img);

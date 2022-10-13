@@ -1,4 +1,7 @@
 
+project(CeresDataVerification VERSION 1.0.0.0)
+
+
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.
 #-------------------------------------------------------------------------------
@@ -76,7 +79,7 @@ target_link_libraries(CeresDataVerification PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataVerification PRIVATE ${Qt}::Core)
 
 target_link_libraries(CeresDataVerification PRIVATE Utilities)
-target_link_libraries(CeresDataVerification PRIVATE BlockDataFile)
+target_link_libraries(CeresDataVerification PRIVATE block_data_file_static)
 
 
 #
@@ -87,5 +90,62 @@ set_property(TARGET CeresDataVerification PROPERTY MSVC_RUNTIME_LIBRARY "MultiTh
 
 set_target_properties(CeresDataVerification PROPERTIES FOLDER "Apps")
 
-install(TARGETS CeresDataVerification DESTINATION bin)
+
+#******************************************************************************
+# Installer
+#******************************************************************************
+
+
+#install(TARGETS CeresDataVerification DESTINATION bin)
+
+set(INSTALL_DIR bin/CeresDataVerification)
+install(TARGETS CeresDataVerification DESTINATION ${INSTALL_DIR})
+
+set(APPS \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_DIR}/CeresDataVerification${CMAKE_EXECUTABLE_SUFFIX})
+
+#qt_generate_deploy_app_script(
+#    TARGET CeresDataVerification
+#    FILENAME_VARIABLE datat_viewer_deploy_script
+#    NO_UNSUPPORTED_PLATFORM_ERROR
+#)
+
+#install(SCRIPT ${datat_viewer_deploy_script})
+
+install(CODE 
+    "
+        include(BundleUtilities)
+        fixup_bundle(\"${APPS}\" \"\" \"\")
+    "
+    COMPONENT Runtime)
+#FIXUP_BUNDLE(CeresDataVerification)
+
+# Define generic setup for all generator types...
+set(CPACK_PACKAGE_NAME CeresDataVerification)
+set(CPACK_PACKAGE_VENDOR "University of Illinois")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Install Ceres Data Verification")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_VERBATIM_VARIABLES YES)
+
+if(WIN32)
+	set(CPACK_GENERATOR NSIS)
+elseif(APPLE)
+	set(CPACK_GENERATOR TGZ productbuild)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	set(CPACK_GENERATOR TGZ RPM)
+else()
+	set(CPACK_GENERATOR TGZ)
+endif()
+
+# NSIS-specific configuration
+#set(CPACK_NSIS_MUI_ICON ${CMAKE_CURRENT_LIST_DIR}/InstallerIcon.ico)
+#set(CPACK_NSIS_MUI_UNIICON ${CMAKE_CURRENT_LIST_DIR}/UninstallerIcon.ico)
+set(CPACK_NSIS_INSTALLED_ICON_NAME bin/MainApp.exe)
+set(CPACK_NSIS_DISPLAY_NAME "CeresDataVerification")
+set(CPACK_NSIS_PACKAGE_NAME "CeresDataVerification")
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL YES)
+
+include(CPack)
 

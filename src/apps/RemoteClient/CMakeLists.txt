@@ -1,4 +1,6 @@
 
+project(CeresRemoteClient VERSION 1.0.0.0)
+
 
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.
@@ -92,7 +94,7 @@ target_include_directories(CeresRemoteClient PRIVATE ${UTILITIES_INCLUDE_DIR})
 
 target_link_libraries(CeresRemoteClient PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresRemoteClient PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(CeresRemoteClient PRIVATE BlockDataFile)
+target_link_libraries(CeresRemoteClient PRIVATE block_data_file_static)
 target_link_libraries(CeresRemoteClient PRIVATE Sensors)
 target_link_libraries(CeresRemoteClient PRIVATE Utilities)
 target_link_libraries(CeresRemoteClient PRIVATE common)

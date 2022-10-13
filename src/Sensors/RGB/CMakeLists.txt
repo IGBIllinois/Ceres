@@ -4,7 +4,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 source_group("Resources" FILES axis_communications_properties.proto)
 
 # Generate the header/source files needed from the protobuf
-protobuf_generate_cpp(AXIS_PROTO_SRCS AXIS_PROTO_HDRS DESCRIPTORS PROTO_DESCS axis_communications_properties.proto)
+protobuf_generate_cpp(AXIS_COMM_PROTO_SRCS AXIS_COMM_PROTO_HDRS DESCRIPTORS PROTO_DESCS axis_communications_properties.proto)
 
 # Add the public header files to use the library
 set(RGB_CAMERA_PUBLIC_HEADERS
@@ -92,8 +92,8 @@ PUBLIC
 PRIVATE
     ${RGB_CAMERA_SOURCE_FILES}
 
-    ${AXIS_PROTO_HDRS}
-	${AXISS_PROTO_SRCS}
+    ${AXIS_COMM_PROTO_HDRS}
+	${AXIS_COMM_PROTO_SRCS}
 	axis_communications_properties.proto
 )
 
@@ -106,7 +106,7 @@ target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Network)
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Multimedia)
 target_link_libraries(rgb_camera_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(rgb_camera_static PUBLIC BlockDataFile)
+target_link_libraries(rgb_camera_static PUBLIC block_data_file_static)
 target_link_libraries(rgb_camera_static PRIVATE ${Protobuf_LIBRARIES})
 
 #

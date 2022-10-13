@@ -140,7 +140,7 @@ target_include_directories(hyperspectral_static PRIVATE ${EXPERIMENT_STATE_MACHI
 target_link_libraries(hyperspectral_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(hyperspectral_static PUBLIC ${Qt}::Network)
 target_link_libraries(hyperspectral_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(hyperspectral_static PUBLIC BlockDataFile)
+target_link_libraries(hyperspectral_static PUBLIC block_data_file_static)
 target_link_libraries(hyperspectral_static PRIVATE ${Protobuf_LIBRARIES})
 
 #

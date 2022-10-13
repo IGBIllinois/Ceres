@@ -12,7 +12,6 @@ class net_buffer;
 class net_buffer_view;
 
 
-
 /**********************************************************
    WARNING: DO NOT CHANGE THE ORDER OF THESE ENUMS!!!!
 
@@ -22,38 +21,51 @@ enum class ePacketType : uint16_t
 {
 	UNKNOWN = 0,
 
-	QUERY_STATE = 1,
-	SET_ACTIVE_CAMERA_ID,
-	SET_RESOLUTION,
-	SET_FRAMES_PER_SECOND,
+	QUERY_STATE,
+	ACTIVE_CAMERA_ID,
+	IMAGE_SIZE,
+	FRAMES_PER_SECOND,
 
 	CURRENT_STATE
 };
-
 
 
 /**********************************************************
  * Property Page/Controller packets utilities
  **********************************************************/
 
-int encode_query_state(net_buffer& buffer);
+int encode_query_current_state(net_buffer& buffer);
+int encode_query_active_camera_id(net_buffer& buffer);
+int encode_query_image_size(net_buffer& buffer);
+int encode_query_frame_rate(net_buffer& buffer);
 
-uint8_t to_active_camera_id_t(const SetActiveCameraId_1& pckt);
+uint8_t to_active_camera_id_t(const ActiveCameraIdMessage_1& pckt);
 int encode_active_camera_id(uint8_t id, net_buffer& buffer);
 
 
-
-/*
-struct sCurrentState_t
+struct sImageSize
 {
-	bool valid;
-	std::string mode;
-	double azimuth_min_deg;
-	double azimuth_max_deg;
+	uint16_t width;
+	uint16_t height;
 };
-sCurrentState_t to_current_state_1(const CurrentState_1& pckt);
-int encode_current_state(bool valid, const std::string& mode,
-	double azimuth_min_deg, double azimuth_max_deg, net_buffer& buffer);
-*/
+sImageSize to_image_size_t(const ImageSizeMessage_1& pckt);
+int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer);
+
+
+uint8_t to_frame_rate_t(const FrameRateMessage_1& pckt);
+int encode_frame_rate(uint8_t fps, net_buffer& buffer);
+
+
+struct sCurrentState
+{
+	bool     valid;
+	uint8_t  camera_id;
+	uint16_t width;
+	uint16_t height;
+	uint8_t  frames_per_second;
+};
+sCurrentState to_current_state_t(const StateMessage_1& pckt);
+int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
+	uint16_t height, uint8_t fps, net_buffer& buffer);
 
 

@@ -1,4 +1,7 @@
 
+project(CeresDataViewer VERSION 1.0.0.0)
+
+
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.
 #-------------------------------------------------------------------------------
@@ -97,7 +100,7 @@ target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)
 
 target_link_libraries(CeresDataViewer PRIVATE Utilities)
-target_link_libraries(CeresDataViewer PRIVATE BlockDataFile)
+target_link_libraries(CeresDataViewer PRIVATE block_data_file_static)
 target_link_libraries(CeresDataViewer PRIVATE Sensors)
 
 

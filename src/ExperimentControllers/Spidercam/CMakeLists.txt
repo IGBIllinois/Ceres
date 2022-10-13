@@ -61,7 +61,7 @@ target_include_directories(SpidercamCtrl_static PRIVATE ${EXPERIMENT_STATE_MACHI
 target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Network)
 target_link_libraries(SpidercamCtrl_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(SpidercamCtrl_static PUBLIC BlockDataFile)
+target_link_libraries(SpidercamCtrl_static PUBLIC block_data_file_static)
 target_link_libraries(SpidercamCtrl_static PRIVATE spidercam::scConnect_static)
 
 #

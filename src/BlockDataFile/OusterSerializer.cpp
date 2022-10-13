@@ -411,9 +411,9 @@ void cOusterSerializer::write(uint16_t frameID, const cOusterLidarData& lidar_da
         {
             auto& pixel = pixels[r];
             mDataBuffer << pixel.range_mm;
-            mDataBuffer << pixel.intensity;
+            mDataBuffer << pixel.signal;
             mDataBuffer << pixel.reflectivity;
-            mDataBuffer << pixel.ambient_noise;
+            mDataBuffer << pixel.nir;
         }
     }
 

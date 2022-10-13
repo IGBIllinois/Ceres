@@ -422,9 +422,9 @@ void cOusterParser::processLidarData(cDataBuffer& buffer)
         for (uint16_t chn = 0; chn < pixels_per_column; ++chn)
         {
             buffer >> pixel.range_mm;
-            buffer >> pixel.intensity;
+            buffer >> pixel.signal;
             buffer >> pixel.reflectivity;
-            buffer >> pixel.ambient_noise;
+            buffer >> pixel.nir;
             mLidarData.channel(col, chn, pixel);
         }
     }
