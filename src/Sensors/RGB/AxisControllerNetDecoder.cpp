@@ -17,7 +17,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     }
     case ePacketType::QUERY_STATE:
     {
-        QueryMessage_1 packet;
+        axis_QueryMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         switch (packet.query())
         {
@@ -34,7 +34,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     }
     case ePacketType::ACTIVE_CAMERA_ID:
     {
-        ActiveCameraIdMessage_1 packet;
+        axis_ActiveCameraIdMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto id = to_active_camera_id_t(packet);
         setCameraId(id);
@@ -42,7 +42,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     }
     case ePacketType::IMAGE_SIZE:
     {
-        ImageSizeMessage_1 packet;
+        axis_ImageSizeMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto data = to_image_size_t(packet);
         setImageSize(data.width, data.height);
@@ -50,7 +50,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     }
     case ePacketType::FRAMES_PER_SECOND:
     {
-        FrameRateMessage_1 packet;
+        axis_FrameRateMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto fps = to_frame_rate_t(packet);
         setFrameRate(fps);

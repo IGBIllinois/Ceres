@@ -22,8 +22,11 @@ protected:
     /*
      * Controller ----> Property Page
      */
-    virtual void onCurrentState(bool valid, const std::string& mode,
-        double min_deg, double max_deg) = 0;
+    virtual void onCameraId(uint8_t id) = 0;
+    virtual void onImageSize(uint16_t width, uint16_t height) = 0;
+    virtual void onFrameRate(uint8_t fps) = 0;
+    virtual void onCurrentState(bool valid, uint8_t id,
+        uint16_t width, uint16_t height, uint8_t fps) = 0;
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;

@@ -157,6 +157,7 @@ void cAxisCommunicationsModel_F44::stopCommunications()
 {
     if (!mConnected) return;
     mpActiveCamera->stopGrabbing();
+    setStatus(sensor::eStatus::STOPPED);
 }
 
 void cAxisCommunicationsModel_F44::requestReceived(QNetworkReply* pReply)
@@ -257,6 +258,15 @@ void cAxisCommunicationsModel_F44::setActiveImageSize(axis::sImageSize_t image_s
 
     mpActiveCamera->setImageSize(image_size);
 
+    QString msg = "Camera ";
+    msg += QString::number(mpActiveCamera->cameraID());
+    msg += " image size set to ";
+    msg += QString::number(image_size.width);
+    msg += "x";
+    msg += QString::number(image_size.height);
+
+    emit statusMessage(msg);
+
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mSerializer.write(mpActiveCamera->getImageSize());
@@ -280,6 +290,13 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
         return;
 
     mpActiveCamera->setFramesPerSeconds(fps);
+
+    QString msg = "Camera ";
+    msg += QString::number(mpActiveCamera->cameraID());
+    msg += " frame per second set to ";
+    msg += QString::number(fps);
+
+    emit statusMessage(msg);
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {

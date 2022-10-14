@@ -22,8 +22,9 @@ public:
      */
 
     void sendQueryState();
-    void sendSetAzimuthWindow(double min_deg, double max_deg);
-    void sendSetMode(const std::string& mode);
+    void sendSetCameraId(uint8_t id);
+    void sendSetImageSize(uint16_t width, uint16_t height);
+    void sendSetFrameRate_fps(uint8_t fps);
 };
 
 

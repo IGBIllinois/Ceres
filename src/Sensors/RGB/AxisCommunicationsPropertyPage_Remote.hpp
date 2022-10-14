@@ -19,10 +19,20 @@ public:
     ~cAxisCommunicationsPropertyPage_Remote() = default;
 
 public:
-    void onCurrentState(bool valid, const std::string& mode, double min_deg, double max_deg) override;
+    void onCameraId(uint8_t id) override;
+    void onImageSize(uint16_t width, uint16_t height) override;
+    void onFrameRate(uint8_t fps) override;
+    void onCurrentState(bool valid, uint8_t id,
+        uint16_t width, uint16_t height, uint8_t fps) override;
 
 protected:
     void onConnect() override;
+
+protected:
+    void showPage() override;
+    void doOK() override;
+    void doCancel() override;
+    void doApply() override;
 
 protected:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;

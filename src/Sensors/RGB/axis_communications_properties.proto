@@ -3,20 +3,15 @@
 
 syntax = "proto3";
 
-// A Timestamp represents a point in time independent of any time zone or local
-// calendar, encoded as a count of seconds and fractions of seconds at
-// nanosecond resolution. The count is relative to an epoch at UTC midnight on
-// January 1, 1970, in the proleptic Gregorian calendar which extends the
-// Gregorian calendar backwards to year one.
-//
-//import "google/protobuf/timestamp.proto";
+// Google protobuf does not support namespaces.  To avoid linker name conficts 
+// all messages must start with "namespace" name
 
 
 /******************************************************************************
  * Property Page <-> Sensor Controller
  *****************************************************************************/
 
-enum eQuery 
+enum axis_eQuery 
 {
   eQUERY_UNSPECIFIED = 0;
   eQUERY_STATE = 1;
@@ -25,28 +20,28 @@ enum eQuery
   eQUERY_FRAME_RATE = 4;
 }
 
-message QueryMessage_1 
+message axis_QueryMessage_1 
 {
-	eQuery query = 1;
+	axis_eQuery query = 1;
 }
 
-message ActiveCameraIdMessage_1
+message axis_ActiveCameraIdMessage_1
 {
     uint32 camera_id = 1;
 }
 
-message ImageSizeMessage_1 
+message axis_ImageSizeMessage_1 
 {
 	uint32 width = 1;
 	uint32 height = 2;
 }
 
-message FrameRateMessage_1 
+message axis_FrameRateMessage_1 
 {
 	uint32 frames_per_second = 1;
 }
 
- message StateMessage_1 
+ message axis_StateMessage_1 
 {
 	bool   valid = 1;
 	uint32 camera_id = 2;

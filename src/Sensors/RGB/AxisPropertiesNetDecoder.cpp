@@ -14,14 +14,37 @@ void cAxisPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     {
         break;
     }
+    case ePacketType::ACTIVE_CAMERA_ID:
+    {
+        axis_ActiveCameraIdMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto id = to_active_camera_id_t(packet);
+        onCameraId(id);
+        break;
+    }
+    case ePacketType::IMAGE_SIZE:
+    {
+        axis_ImageSizeMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto data = to_image_size_t(packet);
+        onImageSize(data.width, data.height);
+        break;
+    }
+    case ePacketType::FRAMES_PER_SECOND:
+    {
+        axis_FrameRateMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto fps = to_frame_rate_t(packet);
+        onFrameRate(fps);
+        break;
+    }
     case ePacketType::CURRENT_STATE:
     {
-/*
-        CurrentState_1 packet;
+        axis_StateMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
-        onCurrentState(packet.valid(), packet.mode(),
-            packet.azimuth_min_deg(), packet.azimuth_max_deg());
-*/
+        auto state = to_current_state_t(packet);
+        onCurrentState(state.valid, state.camera_id, state.width,
+            state.height, state.frames_per_second);
         break;
     }
     }

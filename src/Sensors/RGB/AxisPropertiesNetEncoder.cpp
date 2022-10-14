@@ -14,15 +14,21 @@ void cAxisPropertiesNetEncoder::sendQueryState()
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendSetAzimuthWindow(double min_deg, double max_deg)
+void cAxisPropertiesNetEncoder::sendSetCameraId(uint8_t id)
 {
-//    encode_azimuth_window(min_deg, max_deg, mBuffer);
-//    sendData();
+    encode_active_camera_id(id, mBuffer);
+    sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendSetMode(const std::string& mode)
+void cAxisPropertiesNetEncoder::sendSetImageSize(uint16_t width, uint16_t height)
 {
-//    encode_lidar_mode(mode, mBuffer);
-//    sendData();
+    encode_image_size(width, height, mBuffer);
+    sendData();
+}
+
+void cAxisPropertiesNetEncoder::sendSetFrameRate_fps(uint8_t fps)
+{
+    encode_frame_rate(fps, mBuffer);
+    sendData();
 }
 

@@ -39,7 +39,7 @@ int encode_query_active_camera_id(net_buffer& buffer);
 int encode_query_image_size(net_buffer& buffer);
 int encode_query_frame_rate(net_buffer& buffer);
 
-uint8_t to_active_camera_id_t(const ActiveCameraIdMessage_1& pckt);
+uint8_t to_active_camera_id_t(const axis_ActiveCameraIdMessage_1& pckt);
 int encode_active_camera_id(uint8_t id, net_buffer& buffer);
 
 
@@ -48,11 +48,11 @@ struct sImageSize
 	uint16_t width;
 	uint16_t height;
 };
-sImageSize to_image_size_t(const ImageSizeMessage_1& pckt);
+sImageSize to_image_size_t(const axis_ImageSizeMessage_1& pckt);
 int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer);
 
 
-uint8_t to_frame_rate_t(const FrameRateMessage_1& pckt);
+uint8_t to_frame_rate_t(const axis_FrameRateMessage_1& pckt);
 int encode_frame_rate(uint8_t fps, net_buffer& buffer);
 
 
@@ -64,7 +64,7 @@ struct sCurrentState
 	uint16_t height;
 	uint8_t  frames_per_second;
 };
-sCurrentState to_current_state_t(const StateMessage_1& pckt);
+sCurrentState to_current_state_t(const axis_StateMessage_1& pckt);
 int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
 	uint16_t height, uint8_t fps, net_buffer& buffer);
 
