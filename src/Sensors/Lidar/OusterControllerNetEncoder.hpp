@@ -17,6 +17,8 @@ public:
     /*
      * Controller ----> Property Page
      */
+    void sendLidarMode(ouster::eLIDAR_MODE mode);
+    void sendAzimuthWindow(double min_deg, double max_deg);
     void sendCurrentState(bool valid, ouster::eLIDAR_MODE mode,
         double min_deg, double max_deg);
 };

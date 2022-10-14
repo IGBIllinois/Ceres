@@ -64,23 +64,39 @@ void cOusterController::onQueryState()
     auto window = mpModel->getAzimuthWindow();
     auto mode = mpModel->getLidarMode();
 
-    if (mpClient)
-    {
-        sendCurrentState(true, mode, window.min_deg, window.max_deg);
-    }
+    sendCurrentState(true, mode, window.min_deg, window.max_deg);
 }
 
-void cOusterController::onSetAzimuthWindow(double min_deg, double max_deg)
+void cOusterController::onQueryLidarMode()
+{
+    auto mode = mpModel->getLidarMode();
+
+    sendLidarMode(mode);
+}
+
+void cOusterController::onQueryAzimuthWindow()
+{
+    auto window = mpModel->getAzimuthWindow();
+
+    sendAzimuthWindow(window.min_deg, window.max_deg);
+}
+
+void cOusterController::setAzimuthWindow(double min_deg, double max_deg)
 {
     if (max_deg < min_deg)
         std::swap(min_deg, max_deg);
 
     mpModel->setAzimuthWindow(min_deg, max_deg);
+
+    auto window = mpModel->getAzimuthWindow();
+    sendAzimuthWindow(window.min_deg, window.max_deg);
 }
 
-void cOusterController::onSetMode(ouster::eLIDAR_MODE mode)
+void cOusterController::setLidarMode(ouster::eLIDAR_MODE mode)
 {
     mpModel->setLidarMode(mode);
+
+    sendLidarMode(mpModel->getLidarMode());
 }
 
 

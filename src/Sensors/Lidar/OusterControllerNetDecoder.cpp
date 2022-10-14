@@ -18,23 +18,33 @@ void cOusterControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, cons
     }
     case ePacketType::QUERY_STATE:
     {
-        onQueryState();
+        ouster_QueryMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        switch (packet.query())
+        {
+        case eQUERY_STATE:
+            return onQueryState();
+        case eQUERY_LIDAR_MODE:
+            return onQueryLidarMode();
+        case eQUERY_AZIMUTH_WINDOW:
+            return onQueryAzimuthWindow();
+        }
         break;
     }
-    case ePacketType::SET_AZIMUTH_WINDOW:
+    case ePacketType::AZIMUTH_WINDOW:
     {
-        SetAzimuthWindow_1 packet;
+        ouster_AzimuthWindowMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto data = to_azimuth_window_t(packet);
-        onSetAzimuthWindow(data.min_deg, data.max_deg);
+        setAzimuthWindow(data.min_deg, data.max_deg);
         break;
     }
-    case ePacketType::SET_LIDAR_MODE:
+    case ePacketType::LIDAR_MODE:
     {
-        SetLidarMode_1 packet;
+        ouster_LidarModeMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto data = to_lidar_mode_1(packet);
-        onSetMode(to_lidar_mode(data));
+        setLidarMode(to_lidar_mode(data));
         break;
     }
     }

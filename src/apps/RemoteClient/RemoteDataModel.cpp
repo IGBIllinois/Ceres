@@ -421,7 +421,7 @@ void cRemoteDataModel::updateSensorStatus(QString name, sensor::eStatus status)
         sendSensorStatus(name.toStdString(),
             to_string(status));
 
-        emit statusMessage("updateSensorStatus");
+        emit statusMessage("Sent Sensor Status.");
     }
 }
 
@@ -432,7 +432,7 @@ void cRemoteDataModel::updateSensorName(QString old_name, QString new_name)
         sendSensorNameChange(old_name.toStdString(),
             new_name.toStdString());
 
-        emit statusMessage("updateSensorName");
+        emit statusMessage("Sent Sensor Name Change.");
     }
 }
 

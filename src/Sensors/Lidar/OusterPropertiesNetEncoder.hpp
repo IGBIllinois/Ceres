@@ -22,8 +22,10 @@ public:
      */
 
     void sendQueryState();
+    void sendQueryLidarMode();
+    void sendQueryAzimuthWindow();
     void sendSetAzimuthWindow(double min_deg, double max_deg);
-    void sendSetMode(const std::string& mode);
+    void sendSetLidarMode(const std::string& mode);
 };
 
 

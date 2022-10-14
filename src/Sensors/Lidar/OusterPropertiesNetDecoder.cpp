@@ -14,9 +14,25 @@ void cOusterPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, cons
     {
         break;
     }
+    case ePacketType::AZIMUTH_WINDOW:
+    {
+        ouster_AzimuthWindowMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto data = to_azimuth_window_t(packet);
+        onAzimuthWindow(data.min_deg, data.max_deg);
+        break;
+    }
+    case ePacketType::LIDAR_MODE:
+    {
+        ouster_LidarModeMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto mode = to_lidar_mode_1(packet);
+        onLidarMode(mode);
+        break;
+    }
     case ePacketType::CURRENT_STATE:
     {
-        CurrentState_1 packet;
+        ouster_StateMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         onCurrentState(packet.valid(), packet.mode(),
             packet.azimuth_min_deg(), packet.azimuth_max_deg());

@@ -2,7 +2,9 @@
 #include "OusterModel_net.hpp"
 #include "../../Utilities/Constants.hpp"
 
+#include <ouster/ouster_utils.h>
 #include <optional>
+#include <string>
 
 cOusterModel_net::cOusterModel_net(QObject* parent)
 :
@@ -262,11 +264,21 @@ bool cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
 
     setStatus(sensor::eStatus::REINITIALIZING);
 
+    {
+        QString msg = "Setting lidar mode to ";
+        msg += QString::fromStdString(to_string(mode));
+        emit statusMessage(msg);
+    }
+
     try
     {
         if (!mCmdStream.setLidarMode(mode))
         {
             setStatus(sensor::eStatus::FAILED);
+
+            QString msg = "Failed to set the lidar mode to ";
+            msg += QString::fromStdString(to_string(mode));
+            emit statusMessage(msg);
             return false;
 
         }
@@ -274,12 +286,18 @@ bool cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
         if (!mCmdStream.reinitialize())
         {
             setStatus(sensor::eStatus::FAILED);
+            QString msg = "OUSTER failed to reinitialize.";
+            emit statusMessage(msg);
             return false;
         }
         retrieveLidarMode();
         auto result = retrieveLidarDataFormat();
 
         setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+
+        QString msg = "Lidar mode set to ";
+        msg += QString::fromStdString(to_string(mode));
+        emit statusMessage(msg);
 
         return result;
     }

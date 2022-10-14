@@ -23,13 +23,10 @@ enum class ePacketType : uint16_t
 	UNKNOWN = 0,
 
 	QUERY_STATE = 1,
-	SET_AZIMUTH_WINDOW,
-	SET_LIDAR_MODE,
+	LIDAR_MODE,
+	AZIMUTH_WINDOW,
 
 	CURRENT_STATE,
-
-	QUERY_LIDAR_MODES,
-	LIDAR_MODES,
 };
 
 
@@ -39,16 +36,18 @@ enum class ePacketType : uint16_t
  **********************************************************/
 
 int encode_query_state(net_buffer& buffer);
+int encode_query_lidar_mode(net_buffer& buffer);
+int encode_query_azimuth_window(net_buffer& buffer);
 
 struct sAzimuthWindow_t
 {
 	double min_deg;
 	double max_deg;
 };
-sAzimuthWindow_t to_azimuth_window_t(const SetAzimuthWindow_1& pckt);
+sAzimuthWindow_t to_azimuth_window_t(const ouster_AzimuthWindowMessage_1& pckt);
 int encode_azimuth_window(double min_deg, double max_deg, net_buffer& buffer);
 
-std::string to_lidar_mode_1(const SetLidarMode_1& pckt);
+std::string to_lidar_mode_1(const ouster_LidarModeMessage_1& pckt);
 int encode_lidar_mode(const std::string& mode, net_buffer& buffer);
 
 struct sCurrentState_t
@@ -58,10 +57,10 @@ struct sCurrentState_t
 	double azimuth_min_deg;
 	double azimuth_max_deg;
 };
-sCurrentState_t to_current_state_1(const CurrentState_1& pckt);
+sCurrentState_t to_current_state_1(const ouster_StateMessage_1& pckt);
 int encode_current_state(bool valid, const std::string& mode,
 	double azimuth_min_deg, double azimuth_max_deg, net_buffer& buffer);
 
-int encode_query_lidar_modes(net_buffer& buffer);
+//int encode_query_lidar_modes(net_buffer& buffer);
 
 

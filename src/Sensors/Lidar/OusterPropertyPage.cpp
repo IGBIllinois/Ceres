@@ -10,13 +10,13 @@
 cOusterPropertyPage::cOusterPropertyPage(QWidget* parent)
 	: cSensorPropertyPage(parent)
 {
-	mpModeLabel = new QLabel("Lidar Mode:", this);
-	mpModes = new QComboBox(this);
-	mpModes->addItem("512x10");
-	mpModes->addItem("512x20");
-	mpModes->addItem("1024x10");
-	mpModes->addItem("1024x20");
-	mpModes->addItem("2048x10");
+	mpLidarModeLabel = new QLabel("Lidar Mode:", this);
+	mpLidarModes = new QComboBox(this);
+	mpLidarModes->addItem("512x10");
+	mpLidarModes->addItem("512x20");
+	mpLidarModes->addItem("1024x10");
+	mpLidarModes->addItem("1024x20");
+	mpLidarModes->addItem("2048x10");
 
 	mpMinAzimuthAngleLabel = new QLabel("Min (deg):", this);
 	mpMinAzimuthAngle_deg = new QLineEdit(this);
@@ -30,8 +30,8 @@ cOusterPropertyPage::cOusterPropertyPage(QWidget* parent)
 	azWindowLayout->addRow(mpMaxAzimuthAngleLabel, mpMaxAzimuthAngle_deg);
 	mpAzimuthWindow->setLayout(azWindowLayout);
 
-	mMinAzimuthAngleDefault_deg = 0.0;
-	mMaxAzimuthAngleDefault_deg = 0.0;
+	mDefaultMinAzimuthAngle_deg = 0.0;
+	mDefaultMaxAzimuthAngle_deg = 360.0;
 }
 
 void cOusterPropertyPage::doLayout()
@@ -40,8 +40,8 @@ void cOusterPropertyPage::doLayout()
 
 	auto* modeLayout = new QHBoxLayout();
 
-	modeLayout->addWidget(mpModeLabel);
-	modeLayout->addWidget(mpModes);
+	modeLayout->addWidget(mpLidarModeLabel);
+	modeLayout->addWidget(mpLidarModes);
 
 	pMainLayout->addLayout(modeLayout);
 

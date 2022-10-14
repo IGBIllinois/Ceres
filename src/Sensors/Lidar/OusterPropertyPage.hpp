@@ -30,8 +30,8 @@ public:
     cExperimentState* createState(const std::string& type) override;
 
 protected:
-    QLabel*     mpModeLabel = nullptr;
-    QComboBox*  mpModes = nullptr;
+    QLabel*     mpLidarModeLabel = nullptr;
+    QComboBox*  mpLidarModes = nullptr;
 
     QGroupBox*  mpAzimuthWindow = nullptr;
     QLabel*     mpMinAzimuthAngleLabel = nullptr;
@@ -39,9 +39,9 @@ protected:
     QLabel*     mpMaxAzimuthAngleLabel = nullptr;
     QLineEdit*  mpMaxAzimuthAngle_deg = nullptr;
 
-    QString mModeDefault;
-    double  mMinAzimuthAngleDefault_deg;
-    double  mMaxAzimuthAngleDefault_deg;
+    QString mDefaultLidarMode;
+    double  mDefaultMinAzimuthAngle_deg;
+    double  mDefaultMaxAzimuthAngle_deg;
 };
 
 

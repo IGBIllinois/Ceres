@@ -3,44 +3,39 @@
 
 syntax = "proto3";
 
-// A Timestamp represents a point in time independent of any time zone or local
-// calendar, encoded as a count of seconds and fractions of seconds at
-// nanosecond resolution. The count is relative to an epoch at UTC midnight on
-// January 1, 1970, in the proleptic Gregorian calendar which extends the
-// Gregorian calendar backwards to year one.
-//
-//import "google/protobuf/timestamp.proto";
+// Google protobuf does not support namespaces.  To avoid linker name conficts 
+// all messages must start with "namespace" name
 
 
 /******************************************************************************
- * Property Page -> Sensor Controller
+ * Property Page <-> Sensor Controller
  *****************************************************************************/
 
-message QueryState_1 
+ enum ouster_eQuery 
 {
+  eQUERY_UNSPECIFIED = 0;
+  eQUERY_STATE = 1;
+  eQUERY_LIDAR_MODE = 2;
+  eQUERY_AZIMUTH_WINDOW = 3;
 }
 
-message QueryLidarModes_1 
+message ouster_QueryMessage_1 
 {
+	ouster_eQuery query = 1;
 }
 
-message SetAzimuthWindow_1
+message ouster_AzimuthWindowMessage_1
 {
     double min_deg = 1;
     double max_deg = 2;
 }
 
-message SetLidarMode_1 
+message ouster_LidarModeMessage_1 
 {
 	string mode = 1;
 }
 
-
-/******************************************************************************
- * Sensor Controller -> Property Page
- *****************************************************************************/
-
- message CurrentState_1 
+ message ouster_StateMessage_1 
 {
 	bool valid = 1;
 	string mode = 2;
@@ -48,7 +43,3 @@ message SetLidarMode_1
     double azimuth_max_deg = 4;
 }
 
-message LidarModes_1
-{
-    repeated string mode = 1;
-}

@@ -19,6 +19,8 @@ public:
     ~cOusterPropertyPage_Remote() = default;
 
 public:
+    void onAzimuthWindow(double min_deg, double max_deg) override;
+    void onLidarMode(const std::string& mode) override;
     void onCurrentState(bool valid, const std::string& mode, double min_deg, double max_deg) override;
 
 protected:
