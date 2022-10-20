@@ -4,10 +4,14 @@
 # Usage:
 # cmake -G <generator> -D CMAKE_INSTALL_PREFIX=<path to support libraries>
 
-cmake_minimum_required(VERSION 3.18)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.18)
+MESSAGE(STATUS "Found CMake ${CMAKE_VERSION}")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+#
+# print_all_variables is a debug macro to list all of the CMAKE variables
+#
 macro(print_all_variables)
     message(STATUS "print_all_variables------------------------------------------{")
     get_cmake_property(_variableNames VARIABLES)
@@ -16,6 +20,20 @@ macro(print_all_variables)
     endforeach()
     message(STATUS "print_all_variables------------------------------------------}")
 endmacro()
+
+# Fix behavior of CMAKE_CXX_STANDARD and CMAKE_C_STANDARD when targeting macOS.
+IF(POLICY CMP0025)
+     CMAKE_POLICY(SET CMP0025 NEW)
+ENDIF()
+
+# Potential dangerous comparison of variables. Details: https://cmake.org/cmake/help/v3.1/policy/CMP0054.html
+IF(POLICY CMP0054)
+     CMAKE_POLICY(SET CMP0054 NEW)
+ENDIF()
+
+IF(POLICY CMP0071)
+     CMAKE_POLICY(SET CMP0071 NEW)
+ENDIF()
 
 #
 # Setting this policy to NEW allows us to use the MSVC_RUNTIME_LIBRARY 
@@ -30,6 +48,10 @@ endmacro()
 
 cmake_policy(SET CMP0091 NEW)
 
+# warn about deprecated stuff so that we may try fixing it
+SET(CMAKE_WARN_DEPRECATED 1)
+
+
 #******************************************************************************
 # PROJECT OPTIONS
 #******************************************************************************
@@ -39,6 +61,27 @@ option(CERES_USE_EXTERNAL_JSON "Use an external JSON library" ON)
 if (MSVC)
     option(MSVC_STATIC_RUNTIME "Link static runtime libraries" OFF)
 endif()
+
+# Use integer versions instead of strings for easier handling if required
+SET(CERES_MAJOR 1)
+SET(CERES_MINOR 0)
+SET(CERES_PATCH 0)
+ADD_DEFINITIONS(
+     -DCERES_MAJOR=${CERES_MAJOR}
+     -DCERES_MINOR=${CERES_MINOR}
+     -DCERES_PATCH=${CERES_PATCH}
+)
+SET(VERSION "${CERES_MAJOR}.${CERES_MINOR}.${CERES_PATCH}")
+# Public version has format YY.V, where:
+# -- YY - two last digits of the year of release
+# -- V  - version of the release
+# Example: first release in year 2023 has version 1.23.0 and public version 23.1
+MATH(EXPR CERES "${CERES_PATCH} + 1" OUTPUT_FORMAT DECIMAL)
+SET(CERES_PUBLIC_VERSION "1.0")
+SET(PACKAGE ceres)
+STRING(TIMESTAMP CURRENTYEAR "%Y")
+SET(COPYRIGHT_YEARS "2000-${CURRENTYEAR}")
+
 
 
 #******************************************************************************
@@ -99,7 +142,7 @@ add_install_rpath_support(BIN_DIRS "${CMAKE_INSTALL_FULL_BINDIR}"
                           USE_LINK_PATH)
 
 # Set the path to the public library headers
-set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+SET(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #******************************************************************************
 # PROJECT DEPENDENCIES
@@ -107,24 +150,35 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Find all the packages needed by this code
 
-find_package(Catch2 QUIET)
+FIND_PACKAGE(Catch2 QUIET)
 
 
 # Find and include Qt
-set(Qt Qt5)
+SET(Qt Qt5)
 
-find_package(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort REQUIRED)
+FIND_PACKAGE(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort REQUIRED)
+GET_TARGET_PROPERTY(QMAKE_LOCATION Qt5::qmake LOCATION)
+
+IF(WIN32)
+     GET_FILENAME_COMPONENT(_qt_bin_dir "${QMAKE_LOCATION}" DIRECTORY)
+     FIND_PROGRAM(WINDEPLOYQT_COMMAND windeployqt HINTS "${_qt_bin_dir}")
+     IF(WINDEPLOYQT_COMMAND)
+	  MESSAGE(STATUS "Found windeployqt: ${WINDEPLOYQT_COMMAND}")
+     ELSE()
+	  MESSAGE(STATUS "Could NOT find windeployqt")
+     ENDIF()
+ENDIF(WIN32)
 
 # Find and include my libraries for data collection
-find_package(Ouster REQUIRED)
-find_package(ssnx REQUIRED)
-find_package(ssnx2net REQUIRED)
-find_package(spidercam REQUIRED)
-find_package(nlohmann_json REQUIRED)
-find_package(Protobuf REQUIRED)
+FIND_PACKAGE(Ouster REQUIRED)
+FIND_PACKAGE(ssnx REQUIRED)
+FIND_PACKAGE(ssnx2net REQUIRED)
+FIND_PACKAGE(spidercam REQUIRED)
+FIND_PACKAGE(nlohmann_json REQUIRED)
+FIND_PACKAGE(Protobuf REQUIRED)
 
 
-#find_package(PkgConfig REQUIRED)
+#FIND_PACKAGE(PkgConfig REQUIRED)
 
 #print_all_variables()
 
@@ -133,19 +187,19 @@ find_package(Protobuf REQUIRED)
 #******************************************************************************
 
 # to distinguish between debug and release lib
-set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Add postfix to target for Release build.")
-set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add postfix to target for Debug build.")
-set(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "Add postfix to target for RelWithDebInfo build.")
-set(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "Add postfix to target for MinSizeRel build")
+SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Add postfix to target for Release build.")
+SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add postfix to target for Debug build.")
+SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "Add postfix to target for RelWithDebInfo build.")
+SET(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "Add postfix to target for MinSizeRel build")
 
 
 # To build shared libraries in Windows, we set CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS to TRUE.
 # See https://cmake.org/cmake/help/v3.4/variable/CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS.html
 # See https://blog.kitware.com/create-dlls-on-windows-without-declspec-using-new-cmake-export-all-feature/
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+  SET(CMAKE_BUILD_TYPE "Release" CACHE STRING
       "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
 endif()
@@ -159,7 +213,7 @@ if (MSVC)
 endif()
 
 if (APPLE)
-  set(CMAKE_INSTALL_NAME_DIR "@executable_path/../Libraries")
+  SET(CMAKE_INSTALL_NAME_DIR "@executable_path/../Libraries")
 endif()
 
 
