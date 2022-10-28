@@ -14,6 +14,7 @@
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QLineEdit;
+class QStackedLayout;
 class QPushButton;
 class QGroupBox;
 QT_END_NAMESPACE
@@ -43,6 +44,7 @@ private slots:
     void browseSourceFile();
     void loadSourceFile();
     void playSourceFile();
+    void pauseSourceFile();
     void updateFrame();
 
 private:
@@ -100,7 +102,10 @@ private:
     QLineEdit*   mpLoadSrcFile = nullptr;
     QPushButton* mpLoadSrcButton = nullptr;
     QPushButton* mpLoadButton = nullptr;
+
+    QStackedLayout* mpPlayPauseLayout = nullptr;
     QPushButton* mpPlayButton = nullptr;
+    QPushButton* mpPauseButton = nullptr;
 
 
     QGroupBox* mpExperimentInfo = nullptr;

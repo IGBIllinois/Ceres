@@ -42,9 +42,14 @@ void cCentralWidget::initialize()
     mpLoadButton->setEnabled(true);
     connect(mpLoadButton, &QPushButton::pressed, this, &cCentralWidget::loadSourceFile);
 
+    mpPauseButton = new QPushButton(this);
+    mpPauseButton->setText("Pause");
+    mpPauseButton->setEnabled(true);
+    connect(mpPauseButton, &QPushButton::pressed, this, &cCentralWidget::pauseSourceFile);
+
     mpPlayButton = new QPushButton(this);
     mpPlayButton->setText("Play");
-    mpPlayButton->setEnabled(false);
+    mpPlayButton->setEnabled(true);
     connect(mpPlayButton, &QPushButton::pressed, this, &cCentralWidget::playSourceFile);
 
     mpTitleLabel = new QLabel("Title:");
@@ -172,7 +177,12 @@ void cCentralWidget::initialize()
     pMainLayout->addWidget(mpSpidercamInfo);
     pMainLayout->addWidget(mpWeatherInfo);
     
-    pMainLayout->addWidget(mpPlayButton);
+    mpPlayPauseLayout = new QStackedLayout;
+    mpPlayPauseLayout->addWidget(mpPlayButton);
+    mpPlayPauseLayout->addWidget(mpPauseButton);
+    mpPlayPauseLayout->setEnabled(false);
+    mpPlayPauseLayout->setCurrentWidget(mpPlayButton);
+    pMainLayout->addLayout(mpPlayPauseLayout);
 
     setLayout(pMainLayout);
 
@@ -218,7 +228,7 @@ void cCentralWidget::browseSourceFile()
     mStartOfData = 0;
     mpLoadButton->setEnabled(true);
     mpPlayButton->setText("Play");
-    mpPlayButton->setEnabled(false);
+    mpPlayPauseLayout->setEnabled(false);
 
     emit statusMessage("");
 }
@@ -241,7 +251,7 @@ void cCentralWidget::loadSourceFile()
         mStartOfData = mDataFile.filePosition();
 
         mpLoadButton->setEnabled(false);
-        mpPlayButton->setEnabled(true);
+        mpPlayPauseLayout->setEnabled(true);
     }
 }
 
@@ -262,8 +272,15 @@ bool cCentralWidget::readHeaderData()
 //-----------------------------------------------------------------------------
 void cCentralWidget::playSourceFile()
 {
-    mpPlayButton->setEnabled(false);
+    mpPlayPauseLayout->setCurrentWidget(mpPauseButton);
     mTimer.start(10);
+}
+
+//-----------------------------------------------------------------------------
+void cCentralWidget::pauseSourceFile()
+{
+    mTimer.stop();
+    mpPlayPauseLayout->setCurrentWidget(mpPlayButton);
 }
 
 //-----------------------------------------------------------------------------
