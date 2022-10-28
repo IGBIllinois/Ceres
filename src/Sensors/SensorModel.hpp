@@ -20,10 +20,10 @@ namespace sensor
     eStatus to_sensor_status(const std::string& str);
 }
 
-const uint8_t   logSTATUS  = 0;
-const uint8_t   logINFO    = 1;
-const uint8_t   logWARNING = 2;
-const uint8_t   logERROR   = 3;
+const quint8   logSTATUS  = 0;
+const quint8   logINFO    = 1;
+const quint8   logWARNING = 2;
+const quint8   logERROR   = 3;
 
 /**
  * Abstract Base Class for all Sensor Based Models
@@ -127,10 +127,12 @@ public slots:
 
 signals:
     void statusMessage(QString msg);
+
 //    void infoMessage(QString title, QString msg);
 //    void warningMessage(QString title, QString msg);
 //    void errorMessage(QString title, QString msg);
-    void logMessage(uint8_t type, QString device, QString msg);
+
+    void logMessage(quint8 type, QString device, QString msg);
 
     void sensorStatusChanging(QString name, sensor::eStatus status);
     void sensorNameChanging(QString old_name, QString new_name);

@@ -22,6 +22,9 @@ void cOusterPropertyPage_Remote::onAzimuthWindow(double min_deg, double max_deg)
 
 	mDefaultMinAzimuthAngle_deg = min_deg;
 	mDefaultMaxAzimuthAngle_deg = max_deg;
+
+	setEnabled(true);
+	update();
 }
 
 void cOusterPropertyPage_Remote::onLidarMode(const std::string& mode)
@@ -36,6 +39,8 @@ void cOusterPropertyPage_Remote::onLidarMode(const std::string& mode)
 		{
 			mDefaultLidarMode = qMode;
 			mpLidarModes->setCurrentIndex(i);
+			setEnabled(true);
+			update();
 			break;
 		}
 	}
@@ -81,15 +86,14 @@ void cOusterPropertyPage_Remote::doApply()
 		(mDefaultMaxAzimuthAngle_deg != max_deg))
 	{
 		sendSetAzimuthWindow(min_deg, max_deg);
-//		mDefaultMinAzimuthAngle_deg = min_deg;
-//		mDefaultMaxAzimuthAngle_deg = max_deg;
+		setEnabled(false);
 	}
 
 	auto mode = mpLidarModes->currentText();
 	if (mode.compare(mDefaultLidarMode) != 0)
 	{
 		sendSetLidarMode(mode.toStdString());
-//		mDefaultLidarMode = mode;
+		setEnabled(false);
 	}
 }
 

@@ -7,7 +7,6 @@
 
 class cOusterModel;
 
-
 class cOusterController : public cSensorController, 
     private cOusterControllerNetDecoder, private cOusterControllerNetEncoder
 {
@@ -30,6 +29,15 @@ protected:
     void onQueryAzimuthWindow() override;
     void setAzimuthWindow(double min_deg, double max_deg) override;
     void setLidarMode(ouster::eLIDAR_MODE mode) override;
+
+signals:
+    void requestNewAzimuthWindow(double min_deg, double max_deg);
+//    void requestNewLidarMode(ouster::eLIDAR_MODE mode);
+    void requestNewLidarMode(QString mode);
+
+public slots:
+    void azimuthWindowChanged();
+    void dataFormatChanged();
 
 protected:
     /**

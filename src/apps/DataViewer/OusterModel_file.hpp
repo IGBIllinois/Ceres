@@ -44,8 +44,5 @@ private:
 	bool startCommunications() override { return true; }
 	void stopCommunications() override {}
 	void update() override {}
-	bool setLidarMode(ouster::eLIDAR_MODE mode) override { return false; }
-	bool setAzimuthWindow(double min_deg, double max_deg) override { return false; }
-
 };
 

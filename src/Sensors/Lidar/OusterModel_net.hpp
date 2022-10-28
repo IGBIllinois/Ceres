@@ -29,9 +29,6 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
     bool initialize() override;
 
-    bool setLidarMode(ouster::eLIDAR_MODE mode) override;
-    bool setAzimuthWindow(double min_deg, double max_deg) override;
-
     void enableDataRecording(cBlockDataFileWriter& file) override;
     void disableDataRecording() override;
     
@@ -44,6 +41,11 @@ public:
      */
     bool startCommunications() override;
     void stopCommunications() override;
+
+public slots:
+    void setAzimuthWindow(double min_deg, double max_deg);
+    //bool setLidarMode(ouster::eLIDAR_MODE mode);
+    void setLidarMode(QString mode_str);
 
 protected:
     void onNewData(const ouster::imu_data_t& new_data) override;

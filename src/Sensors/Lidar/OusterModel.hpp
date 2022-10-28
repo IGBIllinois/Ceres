@@ -28,10 +28,8 @@ public:
     std::vector<std::string> getLidarModes() const;
 
     ouster::eLIDAR_MODE getLidarMode() const;
-    virtual bool setLidarMode(ouster::eLIDAR_MODE mode) = 0;
 
     ouster::azimuth_range_t getAzimuthWindow() const;
-    virtual bool setAzimuthWindow(double min_deg, double max_deg) = 0;
 
 
     uint16_t columnsPerFrame() const;

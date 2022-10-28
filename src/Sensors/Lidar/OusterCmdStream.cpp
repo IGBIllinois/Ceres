@@ -85,6 +85,8 @@ std::string cOusterCmdStream_Qt::recv_reply()
 
     mReplyBuffer = mSocket.readAll();
 
+    //qInfo() << "Reply Buffer: " << mReplyBuffer;
+
     std::string reply(mReplyBuffer.constData(), mReplyBuffer.size());
     reply.erase(reply.find_last_not_of(" \r\n\t") + 1);
 

@@ -2,6 +2,8 @@
 #include "OusterController.hpp"
 #include "OusterModel.hpp"
 
+#include <ouster/ouster_utils.h>
+
 #include <cassert>
 
 
@@ -86,16 +88,31 @@ void cOusterController::setAzimuthWindow(double min_deg, double max_deg)
     if (max_deg < min_deg)
         std::swap(min_deg, max_deg);
 
-    mpModel->setAzimuthWindow(min_deg, max_deg);
+    auto azWin = mpModel->getAzimuthWindow();
 
+    if ((azWin.min_deg == min_deg) && (azWin.max_deg == max_deg))
+    {
+        sendAzimuthWindow(azWin.min_deg, azWin.max_deg);
+        return;
+    }
+
+    emit requestNewAzimuthWindow(min_deg, max_deg);
+}
+
+void cOusterController::azimuthWindowChanged()
+{
     auto window = mpModel->getAzimuthWindow();
     sendAzimuthWindow(window.min_deg, window.max_deg);
 }
 
 void cOusterController::setLidarMode(ouster::eLIDAR_MODE mode)
 {
-    mpModel->setLidarMode(mode);
+//    emit requestNewLidarMode(mode);
+    emit requestNewLidarMode(QString::fromStdString(to_string(mode)));
+}
 
+void cOusterController::dataFormatChanged()
+{
     sendLidarMode(mpModel->getLidarMode());
 }
 
