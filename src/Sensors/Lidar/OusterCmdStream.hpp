@@ -21,6 +21,8 @@ private:
 	std::string recv_reply() override;
 	std::string recv_json_reply() override;
 
+	void flush();
+
 	void errorHandler(QAbstractSocket::SocketError socketError);
 
 	const size_t MAX_REPLY_LENGTH = 16 * 1024;

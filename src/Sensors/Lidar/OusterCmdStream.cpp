@@ -71,7 +71,7 @@ bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t por
 int cOusterCmdStream_Qt::send_cmd(const std::string_view msg)
 {
     auto len = mSocket.write(msg.data(), msg.size());
-//    mSocket.flush();
+    mSocket.flush();
     mSocket.waitForBytesWritten();
     return len;
 }
@@ -123,6 +123,17 @@ std::string cOusterCmdStream_Qt::recv_json_reply()
 
     return reply;
 }
+
+void cOusterCmdStream_Qt::flush()
+{
+    while (mSocket.bytesAvailable() > 0)
+    {
+        mReplyBuffer = mSocket.readAll();
+    }
+
+    mReplyBuffer.clear();
+}
+
 
 void cOusterCmdStream_Qt::errorHandler(QAbstractSocket::SocketError socketError)
 {
