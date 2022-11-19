@@ -46,6 +46,8 @@ set(LIDAR_SOURCE_FILES
     OusterImuStream.cpp
     OusterDataStream.hpp
     OusterDataStream.cpp
+    OusterAsyncCommands.hpp
+    OusterAsyncCommands.cpp
     OusterModel_net.hpp
     OusterModel_net.cpp
 
