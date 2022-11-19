@@ -76,6 +76,11 @@ int cOusterCmdStream_Qt::send_cmd(const std::string_view msg)
     return len;
 }
 
+bool cOusterCmdStream_Qt::recv_data_available()
+{
+    return (mSocket.bytesAvailable() > 0);
+}
+
 std::string cOusterCmdStream_Qt::recv_reply()
 {
     if (!mSocket.waitForReadyRead())

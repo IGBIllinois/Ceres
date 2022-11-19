@@ -12,6 +12,11 @@
 #include <ouster/OusterSensorDiscovery.h>
 
 #include <QObject>
+#include <QTimer>
+
+#include <queue>
+
+class cOusterAsyncCmd;
 
 class cOusterModel_net : public cOusterModel, private cOusterImuStream_Qt, private cOusterLidarStream_Qt
 {
@@ -19,7 +24,7 @@ class cOusterModel_net : public cOusterModel, private cOusterImuStream_Qt, priva
 
 public:
     cOusterModel_net(QObject* parent = nullptr);
-    virtual ~cOusterModel_net() = default;
+    virtual ~cOusterModel_net();
 
     /*
      * Returns the class identifier used by the sensor's serializer
@@ -43,9 +48,8 @@ public:
     void stopCommunications() override;
 
 public slots:
-    void setAzimuthWindow(double min_deg, double max_deg);
-    //bool setLidarMode(ouster::eLIDAR_MODE mode);
-    void setLidarMode(QString mode_str);
+    void changeAzimuthWindow(double min_deg, double max_deg);
+    void changeLidarMode(QString mode_str);
 
 protected:
     void onNewData(const ouster::imu_data_t& new_data) override;
@@ -66,6 +70,14 @@ private:
     void retrieveAzimuthWindow();
 
 private:
+    void emitStatusMessage(QString& msg);
+    void emitLogMessage(quint8 type, QString msg);
+
+private slots:
+    void startCmdQueue();
+    void checkCmdQueue();
+
+private:
     bool mConnected;
 
     uint16_t mImuPort;
@@ -79,5 +91,10 @@ private:
     ouster::sensor_network_info_t mActiveSensor;
 
     cOusterSerializer mSerializer;
+
+    QTimer mQueueTimer;
+    std::queue<cOusterAsyncCmd*> mCmdQueue;
+
+    friend class cOusterAsyncCmd;
 };
 

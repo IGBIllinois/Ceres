@@ -45,13 +45,13 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
         auto* pController = new cOusterController(pModel);
 
         QObject::connect(pController, &cOusterController::requestNewLidarMode,
-            static_cast<cOusterModel_net*>(pModel), &cOusterModel_net::setLidarMode);
+            static_cast<cOusterModel_net*>(pModel), &cOusterModel_net::changeLidarMode);
 
         QObject::connect(pModel, &cOusterModel::updateDataFormat,
             pController, &cOusterController::dataFormatChanged);
 
         QObject::connect(pController, &cOusterController::requestNewAzimuthWindow,
-            static_cast<cOusterModel_net*>(pModel), &cOusterModel_net::setAzimuthWindow);
+            static_cast<cOusterModel_net*>(pModel), &cOusterModel_net::changeAzimuthWindow);
 
         QObject::connect(pModel, &cOusterModel::updateAzimuthWindow,
             pController, &cOusterController::azimuthWindowChanged);

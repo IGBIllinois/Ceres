@@ -127,3 +127,21 @@ ouster::imu_data_t cOusterModel::imuData() const
 {
     return mLastImuData;
 }
+
+void cOusterModel::setLidarDataFormat(const ouster::lidar_data_format_2_t& format)
+{
+    mDataFormat = format;
+    emit updateDataFormat();
+}
+
+void cOusterModel::setLidarMode(ouster::eLIDAR_MODE mode)
+{
+    mConfigParameters.lidar_mode = mode;
+}
+
+void cOusterModel::setAzimuthWindow(ouster::azimuth_range_t range)
+{
+    mConfigParameters.azimuth_window = range;
+    emit updateAzimuthWindow();
+}
+

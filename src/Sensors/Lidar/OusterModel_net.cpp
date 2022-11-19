@@ -1,24 +1,48 @@
 
 #include "OusterModel_net.hpp"
+#include "OusterAsyncCommands.hpp"
 #include "../../Utilities/Constants.hpp"
 
 #include <ouster/ouster_utils.h>
 #include <optional>
 #include <string>
 
+
+///////////////////////////////////////////////////////////////////////////////
+// The OUSTER model class
+///////////////////////////////////////////////////////////////////////////////
+
 cOusterModel_net::cOusterModel_net(QObject* parent)
 :
     cOusterModel(parent),
     cOusterImuStream_Qt(this),
     cOusterLidarStream_Qt(this),
-    mCmdStream(this)
+    mCmdStream(this),
+    mQueueTimer(this)
 {
     mConnected = false;
     mFrameCounter = 0;
     mImuPort = 0;
     mLidarPort = 0;
     mUseIpv6 = false;
+
+    mQueueTimer.setInterval(10);
+
+    QObject::connect(&mQueueTimer, &QTimer::timeout,
+        this, &cOusterModel_net::checkCmdQueue);
 }
+
+cOusterModel_net::~cOusterModel_net()
+{
+    mQueueTimer.stop();
+    while (!mCmdQueue.empty())
+    {
+        auto cmd = mCmdQueue.front();
+        mCmdQueue.pop();
+        delete cmd;
+    }
+}
+
 
 uint16_t cOusterModel_net::data_class_id() const
 {
@@ -192,7 +216,7 @@ bool cOusterModel_net::initialize()
 {
     emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
 
-    //BAF mCmdStream.enableLogging();
+    mCmdStream.enableLogging();
 
     retrieveSensorInfo();
 
@@ -257,16 +281,16 @@ bool cOusterModel_net::initialize()
     return cOusterModel::initialize();
 }
 
-//bool cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
-void cOusterModel_net::setLidarMode(QString mode_str)
+void cOusterModel_net::changeLidarMode(QString mode_str)
 {
-    ouster::eLIDAR_MODE mode = to_lidar_mode(mode_str.toStdString());
+    qInfo() << "Change Lidar Mode called: " << mode_str;
 
-    qInfo() << "Set Lidar Mode called: " << mode_str;
+    ouster::eLIDAR_MODE mode = to_lidar_mode(mode_str.toStdString());
 
     if (mConfigParameters.lidar_mode == mode)
         return;
 
+#if 0
     setStatus(sensor::eStatus::REINITIALIZING);
 
     {
@@ -274,7 +298,16 @@ void cOusterModel_net::setLidarMode(QString mode_str)
         msg += mode_str;
         emit statusMessage(msg);
     }
+#endif
 
+    mCmdQueue.push(new cOusterAsyncCmd_SetLidarMode(this, mode));
+    mCmdQueue.push(new cOusterAsyncCmd_Reinitialize(this));
+    mCmdQueue.push(new cOusterAsyncCmd_GetLidarDataFormat(this));
+    mCmdQueue.push(new cOusterAsyncCmd_GetLidarMode(this, mode));
+
+    startCmdQueue();
+
+#if 0
     try
     {
         if (!mCmdStream.setLidarMode(mode))
@@ -313,19 +346,20 @@ void cOusterModel_net::setLidarMode(QString mode_str)
         qCritical() << "Exception Set Lidar Mode:" << e.what();
         setStatus(sensor::eStatus::FAILED);
     }
+#endif
 
     return;
 }
 
-void cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
+void cOusterModel_net::changeAzimuthWindow(double min_deg, double max_deg)
 {
+    qInfo() << "Change Azimuth Window called.";
+
     if ((mConfigParameters.azimuth_window.min_deg == min_deg)
         && (mConfigParameters.azimuth_window.max_deg == max_deg))
         return;
 
 #if 0
-    qInfo() << "Set Azimuth Window called.";
-
     {
         QString msg = "Setting azimuth window set to (";
         msg += QString::number(min_deg);
@@ -339,8 +373,13 @@ void cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
     }
 #endif
 
-    setStatus(sensor::eStatus::REINITIALIZING);
+    mCmdQueue.push(new cOusterAsyncCmd_SetAzimuthWindow(this, min_deg, max_deg));
+    mCmdQueue.push(new cOusterAsyncCmd_Reinitialize(this));
+    mCmdQueue.push(new cOusterAsyncCmd_GetAzimuthWindow(this, min_deg, max_deg));
 
+    startCmdQueue();
+
+#if 0
     try
     {
         // qInfo() << "Sending set azimuth window...";
@@ -372,6 +411,7 @@ void cOusterModel_net::setAzimuthWindow(double min_deg, double max_deg)
     }
 
     retrieveAzimuthWindow();
+#endif
 
     return;
 }
@@ -728,4 +768,77 @@ void cOusterModel_net::retrieveAzimuthWindow()
     emit updateAzimuthWindow();
 }
 
+void cOusterModel_net::emitStatusMessage(QString& msg)
+{
+    emit statusMessage(msg);
+}
+
+void cOusterModel_net::emitLogMessage(quint8 type, QString msg)
+{
+    emit logMessage(type, q_name(), msg);
+}
+
+void cOusterModel_net::startCmdQueue()
+{
+    QString msg = "Starting command queue...";
+    emit statusMessage(msg);
+    emit logMessage(logINFO, q_name(), msg);
+
+    if (mQueueTimer.isActive()) return;
+
+    while (!mCmdQueue.empty())
+    {
+        auto cmd = mCmdQueue.front();
+        if (cmd->postCmd())
+            break;
+
+        // Command failed!
+        mCmdQueue.pop();
+        delete cmd;
+    }
+
+    mQueueTimer.start(10);
+}
+
+void cOusterModel_net::checkCmdQueue()
+{
+    QString msg = "Checking command queue...";
+    emit statusMessage(msg);
+    emit logMessage(logINFO, q_name(), msg);
+
+    if (mCmdQueue.empty())
+    {
+        QString msg = "Command queue complete";
+        emit statusMessage(msg);
+        emit logMessage(logINFO, q_name(), msg);
+
+        mQueueTimer.stop();
+        return;
+    }
+
+    auto cmd = mCmdQueue.front();
+
+    if (!cmd->complete())
+        return;
+
+    mCmdQueue.pop();
+    delete cmd;
+
+    while (!mCmdQueue.empty())
+    {
+        cmd = mCmdQueue.front();
+        if (cmd->postCmd())
+            break;
+
+        // Command failed!
+        mCmdQueue.pop();
+        delete cmd;
+    }
+
+    if (mCmdQueue.empty())
+    {
+        mQueueTimer.stop();
+        return;
+    }
+}
 
