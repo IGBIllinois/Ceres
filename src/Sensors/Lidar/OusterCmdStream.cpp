@@ -19,6 +19,30 @@ cOusterCmdStream_Qt::~cOusterCmdStream_Qt()
     }
 }
 
+void cOusterCmdStream_Qt::enableSocketLogging()
+{
+    if (mSocketLog.is_open())
+    {
+        mSocketLogging = true;
+        return;
+    }
+        
+    mSocketLog.open("OusterCmdStream_Qt.txt");
+    if (!mSocketLog.is_open())
+    {
+        mSocketLogging = false;
+        return;
+    }
+
+    mSocketLogging = true;
+}
+
+void cOusterCmdStream_Qt::disableSocketLogging()
+{
+    mSocketLog.close();
+    mSocketLogging = false;
+}
+
 bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t port, 
                                         bool use_ipv6, std::string_view local_ip)
 {
@@ -62,14 +86,22 @@ bool cOusterCmdStream_Qt::try_to_connect(std::string_view hostname, uint16_t por
     mSocket.connectToHost(remote_endpoint, port);
     mSocket.waitForConnected();
 
-    auto buf_size = mSocket.readBufferSize();
-    qInfo() << "Read Buffer Size: " << buf_size;
+    if (mSocketLogging)
+    {
+        auto buf_size = mSocket.readBufferSize();
+        mSocketLog << "Ouster Cmd Stream Qt Read Buffer Size: " << buf_size << std::endl;
+    }
 
     return true;
 }
 
 int cOusterCmdStream_Qt::send_cmd(const std::string_view msg)
 {
+    if (mSocketLogging)
+    {
+        mSocketLog << "Tx: " << msg << std::endl;
+    }
+
     auto len = mSocket.write(msg.data(), msg.size());
     mSocket.flush();
     mSocket.waitForBytesWritten();
@@ -96,6 +128,11 @@ std::string cOusterCmdStream_Qt::recv_reply()
     reply.erase(reply.find_last_not_of(" \r\n\t") + 1);
 
     mReplyBuffer.clear();
+
+    if (mSocketLogging)
+    {
+        mSocketLog << "Rx: " << reply << std::endl;
+    }
 
     return reply;
 }
@@ -126,6 +163,11 @@ std::string cOusterCmdStream_Qt::recv_json_reply()
 
     } while (reply.back() != '}');
 
+    if (mSocketLogging)
+    {
+        mSocketLog << "Json Rx: " << reply << std::endl;
+    }
+
     return reply;
 }
 
@@ -134,6 +176,14 @@ void cOusterCmdStream_Qt::flush()
     while (mSocket.bytesAvailable() > 0)
     {
         mReplyBuffer = mSocket.readAll();
+
+        if (mSocketLogging)
+        {
+            std::string reply;
+            reply.append(mReplyBuffer.constData(), mReplyBuffer.size());
+
+            mSocketLog << "Flush: " << reply << std::endl;
+        }
     }
 
     mReplyBuffer.clear();

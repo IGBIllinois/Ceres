@@ -3,6 +3,8 @@
 
 #include "ouster/OusterCommandStream.h"
 
+#include <fstream>
+
 #include <QByteArray>
 #include <QtNetwork/QTcpSocket>
 
@@ -12,6 +14,9 @@ class cOusterCmdStream_Qt : public cOusterCommandStream
 public:
 	cOusterCmdStream_Qt(QObject* parent = nullptr);
 	~cOusterCmdStream_Qt();
+
+	void enableSocketLogging();
+	void disableSocketLogging();
 
 private:
 	bool try_to_connect(std::string_view hostname, uint16_t port, 
@@ -30,4 +35,7 @@ private:
 
 	QTcpSocket mSocket;
 	QByteArray mReplyBuffer;
+
+	std::ofstream mSocketLog;
+	bool mSocketLogging = false;
 };

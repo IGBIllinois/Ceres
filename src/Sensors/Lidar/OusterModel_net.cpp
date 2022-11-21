@@ -26,6 +26,8 @@ cOusterModel_net::cOusterModel_net(QObject* parent)
     mLidarPort = 0;
     mUseIpv6 = false;
 
+    mCmdStream.enableSocketLogging();
+
     mQueueTimer.setInterval(10);
 
     QObject::connect(&mQueueTimer, &QTimer::timeout,
@@ -797,7 +799,7 @@ void cOusterModel_net::startCmdQueue()
         delete cmd;
     }
 
-    mQueueTimer.start(10);
+    mQueueTimer.start();
 }
 
 void cOusterModel_net::checkCmdQueue()

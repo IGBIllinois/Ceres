@@ -295,6 +295,7 @@ void cCentralWidget::updateFrame()
             mTimer.stop();
             mpPlayButton->setText("Replay");
             mpPlayButton->setEnabled(true);
+            mpPlayPauseLayout->setCurrentWidget(mpPlayButton);
             mDataFile.gotoPosition(mStartOfData);
         }
     }
