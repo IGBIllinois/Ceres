@@ -85,7 +85,9 @@ bool cOusterAsyncCmd_SetLidarMode::complete()
 {
     try
     {
-        return cmdStream().postConfigParamComplete();
+        std::string reply;
+        auto result = cmdStream().postSetConfigParamComplete(reply);
+        return result;
     }
     catch (const std::exception& e)
     {
@@ -173,11 +175,15 @@ bool cOusterAsyncCmd_SetAzimuthWindow::complete()
 {
     try
     {
-        return cmdStream().postConfigParamComplete();
+        std::string reply;
+        auto result = cmdStream().postSetConfigParamComplete(reply);
+        qInfo() << "Reply: " << reply.c_str();
+        return result;
     }
     catch (const std::exception& e)
     {
-        qCritical() << "Exception Set Azimuth Window:" << e.what();
+        auto l = strlen(e.what());
+        qCritical() << "Exception Set Azimuth Window (" << l << "): " << e.what();
         setStatus(sensor::eStatus::FAILED);
     }
 
