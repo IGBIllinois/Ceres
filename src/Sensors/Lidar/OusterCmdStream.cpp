@@ -24,8 +24,14 @@ namespace
 
 cOusterCmdStream_Qt::cOusterCmdStream_Qt(QObject* parent)
     :
-        mSocket(parent)
+        QObject(parent), mSocket(this)
 {
+    QObject::connect(&mSocket, &QTcpSocket::readyRead, this, &cOusterCmdStream_Qt::dataPending);
+    QObject::connect(&mSocket, &QTcpSocket::connected, this, &cOusterCmdStream_Qt::connected);
+    QObject::connect(&mSocket, &QTcpSocket::disconnected, this, &cOusterCmdStream_Qt::disconnected);
+    QObject::connect(&mSocket, &QTcpSocket::errorOccurred, this, &cOusterCmdStream_Qt::errorHandler);
+
+    mDataPending = false;
 }
 
 cOusterCmdStream_Qt::~cOusterCmdStream_Qt()
@@ -128,12 +134,12 @@ int cOusterCmdStream_Qt::send_cmd(const std::string_view msg)
 
 bool cOusterCmdStream_Qt::recv_data_available()
 {
-    return mSocket.waitForReadyRead(10);
+    return mDataPending;
 }
 
 std::string cOusterCmdStream_Qt::recv_reply()
 {
-    if (!mSocket.waitForReadyRead())
+    if (!mDataPending && !mSocket.waitForReadyRead())
     {
         return std::string();
     }
@@ -150,15 +156,15 @@ std::string cOusterCmdStream_Qt::recv_reply()
         mSocketLog << "Rx: " << reply << std::endl;
     }
 
+    mDataPending = false;
     return reply;
 }
 
 std::string cOusterCmdStream_Qt::recv_json_reply()
 {
-
     std::string reply;
 
-    while (mSocket.waitForReadyRead())
+    while (mDataPending || mSocket.waitForReadyRead())
     {
         mReplyBuffer = mSocket.readAll();
 
@@ -176,6 +182,7 @@ std::string cOusterCmdStream_Qt::recv_json_reply()
         mSocketLog << "Json Rx: " << reply << std::endl;
     }
 
+    mDataPending = false;
     return reply;
 }
 
@@ -194,9 +201,20 @@ void cOusterCmdStream_Qt::flush()
         }
     }
 
+    mDataPending = false;
     mReplyBuffer.clear();
 }
 
+void cOusterCmdStream_Qt::dataPending()
+{
+    mDataPending = true;
+}
+
+void cOusterCmdStream_Qt::connected()
+{}
+
+void cOusterCmdStream_Qt::disconnected()
+{}
 
 void cOusterCmdStream_Qt::errorHandler(QAbstractSocket::SocketError socketError)
 {

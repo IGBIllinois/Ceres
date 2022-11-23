@@ -116,3 +116,37 @@ public:
     bool postCmd() override;
     bool complete() override;
 };
+
+// Check LiDAR Status for RUNNING
+
+class cOusterAsyncCmd_WaitForRunning : public cOusterAsyncCmd
+{
+public:
+    cOusterAsyncCmd_WaitForRunning(cOusterModel_net* pModel);
+
+    bool postCmd() override;
+    bool complete() override;
+
+private:
+    bool mWaitingForReply;
+};
+
+// Data Collection
+
+class cOusterAsyncCmd_StopDataCollection : public cOusterAsyncCmd
+{
+public:
+    cOusterAsyncCmd_StopDataCollection(cOusterModel_net* pModel);
+
+    bool postCmd() override;
+    bool complete() override;
+};
+
+class cOusterAsyncCmd_StartDataCollection : public cOusterAsyncCmd
+{
+public:
+    cOusterAsyncCmd_StartDataCollection(cOusterModel_net* pModel);
+
+    bool postCmd() override;
+    bool complete() override;
+};

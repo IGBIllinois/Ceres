@@ -9,6 +9,7 @@ cOusterLidarStream_Qt::cOusterLidarStream_Qt(QObject* parent)
     cOusterLidarStream(),
     mpSocket(nullptr)
 {
+    mDataActive = false;
 }
 
 cOusterLidarStream_Qt::~cOusterLidarStream_Qt()
@@ -80,11 +81,17 @@ void cOusterLidarStream_Qt::stopCommunications()
     }
 
     delete mpSocket; mpSocket = nullptr;
+    mDataActive = false;
 }
 
 bool cOusterLidarStream_Qt::try_to_connect(std::string_view host, uint16_t port, bool use_ipv6)
 {
     return mpSocket->bind(mLocalEndpoint, port);
+}
+
+bool cOusterLidarStream_Qt::receivingData() const
+{
+    return mDataActive;
 }
 
 void cOusterLidarStream_Qt::clear()
@@ -110,6 +117,7 @@ void cOusterLidarStream_Qt::processOneDatagram()
     mSender = mDatagram.senderAddress();
     mDataBuffer = mDatagram.data();
     process_packet(mDataBuffer.data(), mDataBuffer.size());
+    mDataActive = true;
 }
 
 void cOusterLidarStream_Qt::processDatagrams()
@@ -124,5 +132,6 @@ void cOusterLidarStream_Qt::processDatagrams()
         mDataBuffer = mDatagram.data();
         process_packet(mDataBuffer.data(), mDataBuffer.size());
     }
+    mDataActive = true;
 }
 

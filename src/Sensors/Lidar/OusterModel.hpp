@@ -55,8 +55,6 @@ public:
     ouster::imu_data_t    imuData() const;
 
 public:
-    void setLidarDataFormat(const ouster::lidar_data_format_2_t& format);
-    void setLidarMode(ouster::eLIDAR_MODE mode);
     void setAzimuthWindow(ouster::azimuth_range_t range);
 
 signals:

@@ -39,6 +39,10 @@ public:
     
     void writeDataHeader() override;
 
+public:
+    void setLidarDataFormat(const ouster::lidar_data_format_2_t& format);
+    void setLidarMode(ouster::eLIDAR_MODE mode);
+
     /*
      * Starts/Stops communication with the endpoint.
      * These methods are called inside the QThread so that

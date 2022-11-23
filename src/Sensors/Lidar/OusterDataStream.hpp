@@ -29,12 +29,17 @@ public:
 	void stopCommunications();
 
 	/**
+	 * Are we receiving datagrams from the UDP socket?  True is yes.
+	 */
+	bool receivingData() const;
+
+	/**
 	 * Clear will remove all input datagrams from the UDP socket
 	 */
 	void clear();
 
 	/**
-	 * receive_data will retrieve and process  datagrams from the UDP socket.
+	 * receive_data will retrieve and process datagrams from the UDP socket.
 	 * Note: call this method in a non-threaded non-GUI console application
 	 */
 	void receive_data();
@@ -55,6 +60,8 @@ private:
 	 * OS0-128, OS1-128, OS2-128	= 24,896
 	 */
 	static const size_t MAX_DATA_LENGTH = 24896;
+
+	bool mDataActive;
 
 	QUdpSocket* mpSocket;
 	QHostAddress mLocalEndpoint;

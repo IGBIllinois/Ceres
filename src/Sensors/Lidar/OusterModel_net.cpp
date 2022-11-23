@@ -26,7 +26,7 @@ cOusterModel_net::cOusterModel_net(QObject* parent)
     mLidarPort = 0;
     mUseIpv6 = false;
 
-    mCmdStream.enableSocketLogging();
+ //   mCmdStream.enableSocketLogging();
 
     mQueueTimer.setInterval(10);
 
@@ -218,7 +218,7 @@ bool cOusterModel_net::initialize()
 {
     emit statusMessage("Retrieving OUSTER lidar sensor configuration...");
 
-    mCmdStream.enableLogging();
+//    mCmdStream.enableLogging();
 
     retrieveSensorInfo();
 
@@ -283,137 +283,86 @@ bool cOusterModel_net::initialize()
     return cOusterModel::initialize();
 }
 
+void cOusterModel_net::setLidarDataFormat(const ouster::lidar_data_format_2_t& format)
+{
+    mDataFormat = format;
+
+    cOusterLidarStream_Qt::setDataFormat(mDataFormat);
+
+    emit updateDataFormat();
+
+    mSerializer.setBufferCapacity(static_cast<std::size_t>(mDataFormat.pixels_per_column) *
+        static_cast<std::size_t>(mDataFormat.columns_per_frame) *
+        sizeof(ouster::lidar_data_block_t) + 32);
+
+    if (mSerializer)
+    {
+        mSerializer.write(mDataFormat);
+    }
+}
+
+void cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
+{
+    mConfigParameters.lidar_mode = mode;
+
+    switch (mode)
+    {
+    case ouster::eLIDAR_MODE::MODE_512x10:
+    case ouster::eLIDAR_MODE::MODE_512x20:
+        mDataFormat.columns_per_frame = 512;
+        break;
+    case ouster::eLIDAR_MODE::MODE_1024x10:
+    case ouster::eLIDAR_MODE::MODE_1024x20:
+        mDataFormat.columns_per_frame = 1024;
+        break;
+    case ouster::eLIDAR_MODE::MODE_2048x10:
+        mDataFormat.columns_per_frame = 2048;
+        break;
+    }
+
+    cOusterLidarStream_Qt::setDataFormat(mDataFormat);
+
+    emit updateDataFormat();
+
+    mSerializer.setBufferCapacity(static_cast<std::size_t>(mDataFormat.pixels_per_column) *
+        static_cast<std::size_t>(mDataFormat.columns_per_frame) *
+        sizeof(ouster::lidar_data_block_t) + 32);
+}
+
+
 void cOusterModel_net::changeLidarMode(QString mode_str)
 {
-    qInfo() << "Change Lidar Mode called: " << mode_str;
-
     ouster::eLIDAR_MODE mode = to_lidar_mode(mode_str.toStdString());
 
     if (mConfigParameters.lidar_mode == mode)
         return;
 
-#if 0
-    setStatus(sensor::eStatus::REINITIALIZING);
-
-    {
-        QString msg = "Setting lidar mode to ";
-        msg += mode_str;
-        emit statusMessage(msg);
-    }
-#endif
-
     mCmdQueue.push(new cOusterAsyncCmd_SetLidarMode(this, mode));
     mCmdQueue.push(new cOusterAsyncCmd_Reinitialize(this));
+    mCmdQueue.push(new cOusterAsyncCmd_StopDataCollection(this));
+    mCmdQueue.push(new cOusterAsyncCmd_WaitForRunning(this));
     mCmdQueue.push(new cOusterAsyncCmd_GetLidarDataFormat(this));
     mCmdQueue.push(new cOusterAsyncCmd_GetLidarMode(this, mode));
+    mCmdQueue.push(new cOusterAsyncCmd_StartDataCollection(this));
 
     startCmdQueue();
-
-#if 0
-    try
-    {
-        if (!mCmdStream.setLidarMode(mode))
-        {
-            setStatus(sensor::eStatus::FAILED);
-
-            QString msg = "Failed to set the lidar mode to ";
-            msg += mode_str;
-            emit statusMessage(msg);
-            return;
-
-        }
-
-        if (!mCmdStream.reinitialize())
-        {
-            setStatus(sensor::eStatus::FAILED);
-            QString msg = "OUSTER failed to reinitialize.";
-            emit statusMessage(msg);
-            return;
-        }
-        retrieveLidarMode();
-        auto result = retrieveLidarDataFormat();
-
-        setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
-
-        QString msg = "Lidar mode set to ";
-        msg += mode_str;
-        emit statusMessage(msg);
-
-        emit logMessage(logINFO, q_name(), msg);
-
-        return;
-    }
-    catch (const std::exception& e)
-    {
-        qCritical() << "Exception Set Lidar Mode:" << e.what();
-        setStatus(sensor::eStatus::FAILED);
-    }
-#endif
 
     return;
 }
 
 void cOusterModel_net::changeAzimuthWindow(double min_deg, double max_deg)
 {
-    qInfo() << "Change Azimuth Window called.";
-
     if ((mConfigParameters.azimuth_window.min_deg == min_deg)
         && (mConfigParameters.azimuth_window.max_deg == max_deg))
         return;
 
-#if 0
-    {
-        QString msg = "Setting azimuth window set to (";
-        msg += QString::number(min_deg);
-        msg += ", ";
-        msg += QString::number(max_deg);
-        msg += ")";
-
-        emit statusMessage(msg);
-
-        emit logMessage(logINFO, q_name(), msg);
-    }
-#endif
-
     mCmdQueue.push(new cOusterAsyncCmd_SetAzimuthWindow(this, min_deg, max_deg));
     mCmdQueue.push(new cOusterAsyncCmd_Reinitialize(this));
+    mCmdQueue.push(new cOusterAsyncCmd_WaitForRunning(this));
     mCmdQueue.push(new cOusterAsyncCmd_GetAzimuthWindow(this, min_deg, max_deg));
+    mCmdQueue.push(new cOusterAsyncCmd_GetLidarDataFormat(this));
 
     startCmdQueue();
-
-#if 0
-    try
-    {
-        // qInfo() << "Sending set azimuth window...";
-        if (!mCmdStream.setAzimuthWindow(min_deg, max_deg))
-        {
-            setStatus(sensor::eStatus::FAILED);
-            qCritical() << "Set azimuth window failed!";
-            return;
-        }
-        // qInfo() << "Reinitializing LiDAR...";
-        auto result = mCmdStream.reinitialize();
-
-        setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
-
-        QString msg = "Azimuth window set to (";
-        msg += QString::number(min_deg);
-        msg += ", ";
-        msg += QString::number(max_deg);
-        msg += ")";
-
-        emit statusMessage(msg);
-
-        emit logMessage(logINFO, q_name(), msg);
-    }
-    catch (const std::exception& e)
-    {
-        qCritical() << "Exception Set Azimuth Window:" << e.what();
-        setStatus(sensor::eStatus::FAILED);
-    }
-
-    retrieveAzimuthWindow();
-#endif
 
     return;
 }
@@ -457,6 +406,8 @@ void cOusterModel_net::stopCommunications()
     cOusterLidarStream_Qt::stopCommunications();
 
     setStatus(sensor::eStatus::STOPPED);
+
+    mConnected = false;
 }
 
 void cOusterModel_net::update()
@@ -733,12 +684,6 @@ void cOusterModel_net::retrieveLidarMode()
 
 void cOusterModel_net::retrieveAzimuthWindow()
 {
-#if 0
-    QString msg = "Retrieving azimuth window...";
-    emit statusMessage(msg);
-    emit logMessage(logINFO, q_name(), msg);
-#endif
-
     std::optional<ouster::azimuth_range_t> azimuthWindow;
     do
     {
@@ -756,17 +701,6 @@ void cOusterModel_net::retrieveAzimuthWindow()
 
     mConfigParameters.azimuth_window = azimuthWindow.value();
 
-#if 0
-    msg = "Azimuth window is now (";
-    msg += QString::number(mConfigParameters.azimuth_window.min_deg);
-    msg += ", ";
-    msg += QString::number(mConfigParameters.azimuth_window.max_deg);
-    msg += ")";
-
-    emit statusMessage(msg);
-    emit logMessage(logINFO, q_name(), msg);
-#endif
-
     emit updateAzimuthWindow();
 }
 
@@ -782,9 +716,11 @@ void cOusterModel_net::emitLogMessage(quint8 type, QString msg)
 
 void cOusterModel_net::startCmdQueue()
 {
+/*
     QString msg = "Starting command queue...";
     emit statusMessage(msg);
-//    emit logMessage(logINFO, q_name(), msg);
+    emit logMessage(logINFO, q_name(), msg);
+*/
 
     if (mQueueTimer.isActive()) return;
 
@@ -804,15 +740,13 @@ void cOusterModel_net::startCmdQueue()
 
 void cOusterModel_net::checkCmdQueue()
 {
-    QString msg = "Checking command queue...";
-    emit statusMessage(msg);
-//    emit logMessage(logINFO, q_name(), msg);
-
     if (mCmdQueue.empty())
     {
+/*
         QString msg = "Command queue complete";
         emit statusMessage(msg);
         emit logMessage(logINFO, q_name(), msg);
+*/
 
         mQueueTimer.stop();
         return;

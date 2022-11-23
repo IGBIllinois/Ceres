@@ -15,39 +15,6 @@ cOusterPropertyPage_Local::cOusterPropertyPage_Local(cOusterModel* model, QWidge
 	assert(mpModel);
 }
 
-/*
-void cOusterPropertyPage_Local::onAzimuthWindow(double min_deg, double max_deg)
-{
-	mpMinAzimuthAngle_deg->setText(QString::number(min_deg));
-	mpMaxAzimuthAngle_deg->setText(QString::number(max_deg));
-
-	mDefaultMinAzimuthAngle_deg = min_deg;
-	mDefaultMaxAzimuthAngle_deg = max_deg;
-
-	setEnabled(true);
-	update();
-}
-
-void cOusterPropertyPage_Local::onLidarMode(const std::string& mode)
-{
-	QString qMode = QString::fromStdString(mode);
-
-	auto n = mpLidarModes->count();
-	for (int i = 0; i < n; ++i)
-	{
-		auto data = mpLidarModes->itemText(i);
-		if (0 == data.compare(qMode))
-		{
-			mDefaultLidarMode = qMode;
-			mpLidarModes->setCurrentIndex(i);
-			setEnabled(true);
-			update();
-			break;
-		}
-	}
-}
-*/
-
 void cOusterPropertyPage_Local::doLayout()
 {
 	setTitle(QString::fromStdString(mpModel->name()));

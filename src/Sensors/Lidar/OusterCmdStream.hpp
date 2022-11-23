@@ -5,12 +5,15 @@
 
 #include <fstream>
 
+#include <QObject>
 #include <QByteArray>
 #include <QtNetwork/QTcpSocket>
 
 
-class cOusterCmdStream_Qt : public cOusterCommandStream
+class cOusterCmdStream_Qt : public QObject, public cOusterCommandStream
 {
+	Q_OBJECT
+
 public:
 	cOusterCmdStream_Qt(QObject* parent = nullptr);
 	~cOusterCmdStream_Qt();
@@ -29,9 +32,15 @@ private:
 
 	void flush();
 
+private slots:
+	void dataPending();
+	void connected();
+	void disconnected();
 	void errorHandler(QAbstractSocket::SocketError socketError);
 
+private:
 	const size_t MAX_REPLY_LENGTH = 16 * 1024;
+	bool mDataPending;
 
 	QTcpSocket mSocket;
 	QByteArray mReplyBuffer;

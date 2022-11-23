@@ -5,6 +5,7 @@
 #include "../../Utilities/Constants.hpp"
 
 #include <ouster/ouster_utils.h>
+#include <ouster/ouster_defs.h>
 #include <optional>
 #include <string>
 
@@ -85,9 +86,7 @@ bool cOusterAsyncCmd_SetLidarMode::complete()
 {
     try
     {
-        std::string reply;
-        auto result = cmdStream().postSetConfigParamComplete(reply);
-        return result;
+        return cmdStream().postSetConfigParamComplete();
     }
     catch (const std::exception& e)
     {
@@ -128,11 +127,11 @@ bool cOusterAsyncCmd_GetLidarMode::complete()
 
         setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
 
+        mpModel->setLidarMode(mode);
+
         QString msg = "Lidar mode set to ";
         msg += QString::fromStdString(to_string(mode));
         statusMessage(msg);
-
-        mpModel->setLidarMode(mode);
     }
     catch (const std::exception& e)
     {
@@ -175,10 +174,7 @@ bool cOusterAsyncCmd_SetAzimuthWindow::complete()
 {
     try
     {
-        std::string reply;
-        auto result = cmdStream().postSetConfigParamComplete(reply);
-        qInfo() << "Reply: " << reply.c_str();
-        return result;
+        return cmdStream().postSetConfigParamComplete();
     }
     catch (const std::exception& e)
     {
@@ -221,6 +217,8 @@ bool cOusterAsyncCmd_GetAzimuthWindow::complete()
 
         setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
 
+        mpModel->setAzimuthWindow(range);
+
         QString msg = "Azimuth window is set to (";
         msg += QString::number(range.min_deg);
         msg += ", ";
@@ -228,8 +226,6 @@ bool cOusterAsyncCmd_GetAzimuthWindow::complete()
         msg += ")";
 
         statusMessage(msg);
-
-        mpModel->setAzimuthWindow(range);
     }
     catch (const std::exception& e)
     {
@@ -280,6 +276,92 @@ bool cOusterAsyncCmd_GetLidarDataFormat::complete()
     return true;
 }
 
+
+// LiDAR Status
+
+cOusterAsyncCmd_WaitForRunning::cOusterAsyncCmd_WaitForRunning(cOusterModel_net* pModel)
+    : cOusterAsyncCmd(pModel)
+{
+    mWaitingForReply = false;
+}
+
+bool cOusterAsyncCmd_WaitForRunning::postCmd()
+{
+    if (!cmdStream().querySensorInfo())
+    {
+        setStatus(sensor::eStatus::FAILED);
+        qCritical() << "Query sensor info failed!";
+        return false;
+    }
+
+    mWaitingForReply = true;
+    return true;
+}
+
+bool cOusterAsyncCmd_WaitForRunning::complete()
+{
+    if (!mWaitingForReply)
+    {
+        postCmd();
+        return false;
+    }
+
+    try
+    {
+        auto info = cmdStream().sensorInfoComplete();
+        if (!info.has_value())
+        {
+            return false;
+        }
+
+        if (info.value().status != ouster::eSENSOR_STATUS::RUNNING)
+        {
+            mWaitingForReply = false;
+            return false;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        qCritical() << "Exception Get Status:" << e.what();
+        setStatus(sensor::eStatus::FAILED);
+    }
+
+    return true;
+}
+
+
+cOusterAsyncCmd_StopDataCollection::cOusterAsyncCmd_StopDataCollection(cOusterModel_net* pModel)
+    : cOusterAsyncCmd(pModel)
+{
+}
+
+bool cOusterAsyncCmd_StopDataCollection::postCmd()
+{
+    mpModel->stopCommunications();
+    return true;
+}
+
+bool cOusterAsyncCmd_StopDataCollection::complete()
+{
+    return true;
+};
+
+
+cOusterAsyncCmd_StartDataCollection::cOusterAsyncCmd_StartDataCollection(cOusterModel_net* pModel)
+    : cOusterAsyncCmd(pModel)
+{
+}
+
+bool cOusterAsyncCmd_StartDataCollection::postCmd()
+{
+    mpModel->startCommunications();
+    return true;
+}
+
+bool cOusterAsyncCmd_StartDataCollection::complete()
+{
+    return true;
+};
 
 
 
