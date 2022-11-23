@@ -5,7 +5,7 @@
 
 namespace
 {
-    std::pair<int, int> test_json(const std::string& buffer)
+    std::pair<int, int> count_braces(const std::string& buffer)
     {
         int open = 0;
         int close = 0;
@@ -128,7 +128,7 @@ int cOusterCmdStream_Qt::send_cmd(const std::string_view msg)
 
 bool cOusterCmdStream_Qt::recv_data_available()
 {
-    return (mSocket.bytesAvailable() > 0);
+    return mSocket.waitForReadyRead(10);
 }
 
 std::string cOusterCmdStream_Qt::recv_reply()
@@ -139,8 +139,6 @@ std::string cOusterCmdStream_Qt::recv_reply()
     }
 
     mReplyBuffer = mSocket.readAll();
-
-    //qInfo() << "Reply Buffer: " << mReplyBuffer;
 
     std::string reply(mReplyBuffer.constData(), mReplyBuffer.size());
     reply.erase(reply.find_last_not_of(" \r\n\t") + 1);
@@ -157,29 +155,21 @@ std::string cOusterCmdStream_Qt::recv_reply()
 
 std::string cOusterCmdStream_Qt::recv_json_reply()
 {
-    if (!mSocket.waitForReadyRead())
-    {
-        return std::string();
-    }
 
     std::string reply;
 
-    do
+    while (mSocket.waitForReadyRead())
     {
         mReplyBuffer = mSocket.readAll();
 
         reply.append(mReplyBuffer.constData(), mReplyBuffer.size());
 
-        auto pos = reply.find_last_not_of(" \r\n\t");
-        if (pos != std::string::npos)
-            reply.erase(pos + 1);
-
         mReplyBuffer.clear();
 
-        if (0 == mSocket.bytesAvailable())
+        auto braces = count_braces(reply);
+        if (braces.first <= braces.second)
             break;
-
-    } while (reply.back() != '}');
+    }
 
     if (mSocketLogging)
     {
