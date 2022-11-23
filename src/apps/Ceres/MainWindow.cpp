@@ -900,6 +900,7 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
 
         if (widgets.pPropertyPage)
         {
+            widgets.pPropertyPage->doLayout();
             mpSensorMenu->addAction(widgets.pPropertyPage->showAction());
         }
     }

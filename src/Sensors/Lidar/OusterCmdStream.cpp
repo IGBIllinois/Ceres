@@ -3,6 +3,24 @@
 
 #include <QtNetwork/QHostInfo>
 
+namespace
+{
+    std::pair<int, int> test_json(const std::string& buffer)
+    {
+        int open = 0;
+        int close = 0;
+
+        for (auto c : buffer)
+        {
+            if (c == '{')
+                ++open;
+            else if (c == '}')
+                ++close;
+        }
+
+        return { open, close };
+    }
+}
 
 cOusterCmdStream_Qt::cOusterCmdStream_Qt(QObject* parent)
     :

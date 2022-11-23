@@ -85,7 +85,8 @@ bool cOusterAsyncCmd_SetLidarMode::complete()
 {
     try
     {
-        return cmdStream().postConfigParamComplete();
+        std::string reply;
+        return cmdStream().postSetConfigParamComplete(reply);
     }
     catch (const std::exception& e)
     {
@@ -173,7 +174,8 @@ bool cOusterAsyncCmd_SetAzimuthWindow::complete()
 {
     try
     {
-        return cmdStream().postConfigParamComplete();
+        std::string reply;
+        return cmdStream().postSetConfigParamComplete(reply);
     }
     catch (const std::exception& e)
     {

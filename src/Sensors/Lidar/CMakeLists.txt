@@ -27,6 +27,8 @@ set(LIDAR_SOURCE_FILES
 	OusterPropertiesNetEncoder.cpp
 	OusterPropertyPage_Remote.hpp
 	OusterPropertyPage_Remote.cpp
+    OusterPropertyPage_Local.hpp
+    OusterPropertyPage_Local.cpp
 	OusterPropertyPage.hpp
 	OusterPropertyPage.cpp
 

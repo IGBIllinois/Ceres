@@ -47,9 +47,9 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
-public slots:
-    void changeAzimuthWindow(double min_deg, double max_deg);
-    void changeLidarMode(QString mode_str);
+// Override of the virtual public slots in cOusterModel
+    void changeAzimuthWindow(double min_deg, double max_deg) override;
+    void changeLidarMode(QString mode_str) override;
 
 protected:
     void onNewData(const ouster::imu_data_t& new_data) override;

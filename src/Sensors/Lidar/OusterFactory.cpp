@@ -7,6 +7,7 @@
 #include "OusterView.hpp"
 #include "OusterController.hpp"
 #include "OusterPropertyPage.hpp"
+#include "OusterPropertyPage_Local.hpp"
 #include "OusterPropertyPage_Remote.hpp"
 #include <ouster/ouster_defs.h>
 
@@ -45,13 +46,13 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
         auto* pController = new cOusterController(pModel);
 
         QObject::connect(pController, &cOusterController::requestNewLidarMode,
-            static_cast<cOusterModel_net*>(pModel), &cOusterModel_net::changeLidarMode);
+            pModel, &cOusterModel::changeLidarMode);
 
         QObject::connect(pModel, &cOusterModel::updateDataFormat,
             pController, &cOusterController::dataFormatChanged);
 
         QObject::connect(pController, &cOusterController::requestNewAzimuthWindow,
-            static_cast<cOusterModel_net*>(pModel), &cOusterModel_net::changeAzimuthWindow);
+            pModel, &cOusterModel::changeAzimuthWindow);
 
         QObject::connect(pModel, &cOusterModel::updateAzimuthWindow,
             pController, &cOusterController::azimuthWindowChanged);
@@ -77,7 +78,15 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
     QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged, Qt::QueuedConnection);
     QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData, Qt::QueuedConnection);
 
-    return sSensorWidgets(pModel, dockWidget);
+    auto* page = new cOusterPropertyPage_Local(pModel);
+
+    QObject::connect(page, &cOusterPropertyPage_Local::requestNewLidarMode, pModel, &cOusterModel::changeLidarMode);
+    QObject::connect(pModel, &cOusterModel::updateDataFormat, page, &cOusterPropertyPage_Local::dataFormatChanged);
+    QObject::connect(page, &cOusterPropertyPage_Local::requestNewAzimuthWindow, pModel, &cOusterModel::changeAzimuthWindow);
+    QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, page, &cOusterPropertyPage_Local::azimuthWindowChanged);
+
+
+    return sSensorWidgets(pModel, dockWidget, page);
 }
 
 void ouster::remove_sensor(sSensorWidgets widgets)

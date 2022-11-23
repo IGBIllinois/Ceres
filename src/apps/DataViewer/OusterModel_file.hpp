@@ -35,6 +35,11 @@ protected:
 	void onNewData(const ouster::imu_data_t& new_data) override;
 	void onNewData(uint16_t frameID, const cOusterLidarData& data) override;
 
+
+	// Override of the virtual public slots in cOusterModel
+	void changeAzimuthWindow(double min_deg, double max_deg) override {};
+	void changeLidarMode(QString mode_str) override {};
+
 private:
 	uint16_t data_class_id() const override { return 0; }
 	bool configure(const nlohmann::json&) override { return true; }

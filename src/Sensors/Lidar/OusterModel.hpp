@@ -71,6 +71,12 @@ signals:
     void updateImuData();
     void updateLidarData();
 
+
+public slots:
+    virtual void changeAzimuthWindow(double min_deg, double max_deg) = 0;
+    virtual void changeLidarMode(QString mode_str) = 0;
+
+
 protected:
     virtual void onNewData(const ouster::imu_data_t& new_data) = 0;
     virtual void onNewData(uint16_t frameID, const cOusterLidarData& data) = 0;

@@ -784,7 +784,7 @@ void cOusterModel_net::startCmdQueue()
 {
     QString msg = "Starting command queue...";
     emit statusMessage(msg);
-    emit logMessage(logINFO, q_name(), msg);
+//    emit logMessage(logINFO, q_name(), msg);
 
     if (mQueueTimer.isActive()) return;
 
@@ -806,7 +806,7 @@ void cOusterModel_net::checkCmdQueue()
 {
     QString msg = "Checking command queue...";
     emit statusMessage(msg);
-    emit logMessage(logINFO, q_name(), msg);
+//    emit logMessage(logINFO, q_name(), msg);
 
     if (mCmdQueue.empty())
     {
