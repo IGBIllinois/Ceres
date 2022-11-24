@@ -51,6 +51,10 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
+    void pauseCommunications();
+    void restoreCommunications();
+    bool isCommunicationsPaused() const;
+
 // Override of the virtual public slots in cOusterModel
     void changeAzimuthWindow(double min_deg, double max_deg) override;
     void changeLidarMode(QString mode_str) override;
@@ -83,6 +87,7 @@ private slots:
 
 private:
     bool mConnected;
+    bool mPauseCommunications;
 
     uint16_t mImuPort;
     uint16_t mLidarPort;

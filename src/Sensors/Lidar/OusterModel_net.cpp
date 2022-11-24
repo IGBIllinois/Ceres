@@ -21,6 +21,7 @@ cOusterModel_net::cOusterModel_net(QObject* parent)
     mQueueTimer(this)
 {
     mConnected = false;
+    mPauseCommunications = false;
     mFrameCounter = 0;
     mImuPort = 0;
     mLidarPort = 0;
@@ -410,9 +411,31 @@ void cOusterModel_net::stopCommunications()
     mConnected = false;
 }
 
+void cOusterModel_net::pauseCommunications()
+{
+    mPauseCommunications = true;
+}
+
+void cOusterModel_net::restoreCommunications()
+{
+    mPauseCommunications = false;
+}
+
+bool cOusterModel_net::isCommunicationsPaused() const
+{
+    return mPauseCommunications;
+}
+
 void cOusterModel_net::update()
 {
     if (!mConnected) return;
+
+    if (mPauseCommunications)
+    {
+        cOusterImuStream_Qt::clear();
+        cOusterLidarStream_Qt::clear();
+        return;
+    }
 
     cOusterImuStream_Qt::processOneDatagram();
     cOusterLidarStream_Qt::processOneDatagram();
