@@ -125,13 +125,16 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
     mpSplashScreen = nullptr;
 
-    QTimer::singleShot(1000, this, &cRemoteClientWindow::startDataAcquitionSystem);
+    qInfo() << "Single shot timer to start data acquisition.";
+    QTimer::singleShot(1000, this, &cRemoteClientWindow::startDataAcquisitionSystem);
 }
 
-void cRemoteClientWindow::startDataAcquitionSystem()
+void cRemoteClientWindow::startDataAcquisitionSystem()
 {
     std::string cfgFileName = getCfgFilePath();
     nlohmann::json configDoc;
+
+    qInfo() << "Loading configuration file " << cfgFileName.c_str() << "...";
 
     if (!cfgFileName.empty())
     {
@@ -193,8 +196,12 @@ void cRemoteClientWindow::startDataAcquitionSystem()
 
     try
     {
+        qInfo() << "Initializing sensors...";
+
         onStatusUpdate("Initializing sensors...");
         createSensorModelsAndViews(configDoc);
+
+        qInfo() << "Initializing TCP server...";
 
         onStatusUpdate("Initializing TCP server...");
         if (!initializeServer(configDoc))
@@ -218,6 +225,7 @@ void cRemoteClientWindow::startDataAcquitionSystem()
         exit(EXIT_FAILURE);
     }
 
+    qInfo() << "Starting data acquisition thread....";
     mMainModel.startDataThread();
 }
 
@@ -312,6 +320,8 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
     for (auto sensor : sensors)
     {
         std::string type = sensor["type"];
+        qInfo() << "Creating sensor: " << type.c_str();
+
         auto widgets = create_sensor(type, sensor, true);
 
         if (widgets.pModel == nullptr)

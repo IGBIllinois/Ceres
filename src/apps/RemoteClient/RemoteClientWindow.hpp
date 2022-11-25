@@ -41,7 +41,7 @@ public:
 
     void initialize(cCeresSplashScreen* pSplashScreen = nullptr);
 
-    void startDataAcquitionSystem();
+    void startDataAcquisitionSystem();
 
 public slots:
     void onStatusUpdate(QString msg);
