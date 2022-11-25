@@ -39,6 +39,8 @@ cOusterAsyncCmd_Reinitialize::cOusterAsyncCmd_Reinitialize(cOusterModel_net* pMo
 
 bool cOusterAsyncCmd_Reinitialize::postCmd()
 {
+    setStatus(sensor::eStatus::REINITIALIZING);
+
     if (!cmdStream().postReinitialize())
     {
         setStatus(sensor::eStatus::FAILED);
@@ -46,6 +48,9 @@ bool cOusterAsyncCmd_Reinitialize::postCmd()
         statusMessage(msg);
         return false;
     }
+
+    QString msg = "OUSTER sensor reinitializing...";
+    statusMessage(msg);
 
     return true;
 }
@@ -63,8 +68,6 @@ cOusterAsyncCmd_SetLidarMode::cOusterAsyncCmd_SetLidarMode(cOusterModel_net* pMo
 
 bool cOusterAsyncCmd_SetLidarMode::postCmd()
 {
-    setStatus(sensor::eStatus::REINITIALIZING);
-
     QString msg = "Setting lidar mode to ";
     msg += QString::fromStdString(to_string(mMode));
     statusMessage(msg);
@@ -125,7 +128,8 @@ bool cOusterAsyncCmd_GetLidarMode::complete()
 
         bool result = (mode == mMode);
 
-        setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+        if (!result)
+            setStatus(sensor::eStatus::FAILED);
 
         mpModel->setLidarMode(mode);
 
@@ -150,13 +154,11 @@ cOusterAsyncCmd_SetAzimuthWindow::cOusterAsyncCmd_SetAzimuthWindow(cOusterModel_
 
 bool cOusterAsyncCmd_SetAzimuthWindow::postCmd()
 {
-    setStatus(sensor::eStatus::REINITIALIZING);
-
-    QString msg = "Setting azimuth window set to (";
+    QString msg = "Setting azimuth window to (";
     msg += QString::number(mMin_deg);
     msg += ", ";
     msg += QString::number(mMax_deg);
-    msg += ")";
+    msg += ")...";
 
     statusMessage(msg);
 
@@ -178,8 +180,7 @@ bool cOusterAsyncCmd_SetAzimuthWindow::complete()
     }
     catch (const std::exception& e)
     {
-        auto l = strlen(e.what());
-        qCritical() << "Exception Set Azimuth Window (" << l << "): " << e.what();
+        qCritical() << "Exception Set Azimuth Window: " << e.what();
         setStatus(sensor::eStatus::FAILED);
     }
 
@@ -215,7 +216,8 @@ bool cOusterAsyncCmd_GetAzimuthWindow::complete()
 
         bool result = (range.min_deg == mMin_deg) && (range.max_deg == mMax_deg);
 
-        setStatus(result ? sensor::eStatus::RUNNING : sensor::eStatus::FAILED);
+        if (!result)
+            setStatus(sensor::eStatus::FAILED);
 
         mpModel->setAzimuthWindow(range);
 
@@ -252,6 +254,9 @@ bool cOusterAsyncCmd_GetLidarDataFormat::postCmd()
         return false;
     }
 
+    QString msg = "Query lidar data format...";
+    statusMessage(msg);
+
     return true;
 }
 
@@ -273,6 +278,9 @@ bool cOusterAsyncCmd_GetLidarDataFormat::complete()
         setStatus(sensor::eStatus::FAILED);
     }
 
+    QString msg;
+    statusMessage(msg);
+
     return true;
 }
 
@@ -285,7 +293,7 @@ cOusterAsyncCmd_WaitForRunning::cOusterAsyncCmd_WaitForRunning(cOusterModel_net*
     mWaitingForReply = false;
 }
 
-bool cOusterAsyncCmd_WaitForRunning::postCmd()
+bool cOusterAsyncCmd_WaitForRunning::sendCommand()
 {
     if (!cmdStream().querySensorInfo())
     {
@@ -298,11 +306,24 @@ bool cOusterAsyncCmd_WaitForRunning::postCmd()
     return true;
 }
 
+bool cOusterAsyncCmd_WaitForRunning::postCmd()
+{
+    if (!sendCommand())
+    {
+        return false;
+    }
+
+    QString msg = "Waiting for lidar status to return to RUNNING...";
+    statusMessage(msg);
+
+    return true;
+}
+
 bool cOusterAsyncCmd_WaitForRunning::complete()
 {
     if (!mWaitingForReply)
     {
-        postCmd();
+        sendCommand();
         return false;
     }
 
@@ -359,6 +380,40 @@ bool cOusterAsyncCmd_StartDataCollection::postCmd()
 }
 
 bool cOusterAsyncCmd_StartDataCollection::complete()
+{
+    return true;
+};
+
+
+cOusterAsyncCmd_PauseDataCollection::cOusterAsyncCmd_PauseDataCollection(cOusterModel_net* pModel)
+    : cOusterAsyncCmd(pModel)
+{
+}
+
+bool cOusterAsyncCmd_PauseDataCollection::postCmd()
+{
+    mpModel->pauseCommunications();
+    return true;
+}
+
+bool cOusterAsyncCmd_PauseDataCollection::complete()
+{
+    return true;
+};
+
+
+cOusterAsyncCmd_RestoreDataCollection::cOusterAsyncCmd_RestoreDataCollection(cOusterModel_net* pModel)
+    : cOusterAsyncCmd(pModel)
+{
+}
+
+bool cOusterAsyncCmd_RestoreDataCollection::postCmd()
+{
+    mpModel->restoreCommunications();
+    return true;
+}
+
+bool cOusterAsyncCmd_RestoreDataCollection::complete()
 {
     return true;
 };

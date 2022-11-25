@@ -33,7 +33,6 @@ protected:
     cOusterCmdStream_Qt& cmdStream();
 
     void setStatus(const sensor::eStatus status);
-
     void statusMessage(QString& msg);
 
 protected:
@@ -119,13 +118,16 @@ public:
 
 // Check LiDAR Status for RUNNING
 
-class cOusterAsyncCmd_WaitForRunning : public cOusterAsyncCmd
+class cOusterAsyncCmd_WaitForRunning final : public cOusterAsyncCmd
 {
 public:
     cOusterAsyncCmd_WaitForRunning(cOusterModel_net* pModel);
 
     bool postCmd() override;
     bool complete() override;
+
+private:
+    bool sendCommand();
 
 private:
     bool mWaitingForReply;
@@ -146,6 +148,24 @@ class cOusterAsyncCmd_StartDataCollection : public cOusterAsyncCmd
 {
 public:
     cOusterAsyncCmd_StartDataCollection(cOusterModel_net* pModel);
+
+    bool postCmd() override;
+    bool complete() override;
+};
+
+class cOusterAsyncCmd_PauseDataCollection : public cOusterAsyncCmd
+{
+public:
+    cOusterAsyncCmd_PauseDataCollection(cOusterModel_net* pModel);
+
+    bool postCmd() override;
+    bool complete() override;
+};
+
+class cOusterAsyncCmd_RestoreDataCollection : public cOusterAsyncCmd
+{
+public:
+    cOusterAsyncCmd_RestoreDataCollection(cOusterModel_net* pModel);
 
     bool postCmd() override;
     bool complete() override;

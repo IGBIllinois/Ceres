@@ -132,5 +132,13 @@ void cOusterModel::setAzimuthWindow(ouster::azimuth_range_t range)
 {
     mConfigParameters.azimuth_window = range;
     emit updateAzimuthWindow();
+
+    QString msg = "Azimuth window is set to (";
+    msg += QString::number(range.min_deg);
+    msg += ", ";
+    msg += QString::number(range.max_deg);
+    msg += ")";
+
+    emit logMessage(logINFO, q_name(), msg);
 }
 

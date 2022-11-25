@@ -27,7 +27,7 @@ cOusterModel_net::cOusterModel_net(QObject* parent)
     mLidarPort = 0;
     mUseIpv6 = false;
 
- //   mCmdStream.enableSocketLogging();
+//BAF    mCmdStream.enableSocketLogging();
 
     mQueueTimer.setInterval(10);
 
@@ -134,12 +134,14 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
+    qInfo() << "Searching for OUSTER LiDARs...";
     emit logMessage(logSTATUS, q_name(), "Searching for OUSTER LiDARs...");
 
     auto sensors = ouster::find_sensors(false, true, false);
 
     if (sensors.empty())
     {
+        qCritical() << "No Ouster sensors were detected on the network!";
         emit logMessage(logERROR, q_name(), "No Ouster sensors were detected on the network!");
         return false;
     }
@@ -169,6 +171,8 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
     msg.append(" at ");
     msg.append(sensor_ip.c_str());
     msg.append("...");
+
+    qInfo() << msg;
 
     emit statusMessage(msg);
 
@@ -306,6 +310,7 @@ void cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
 {
     mConfigParameters.lidar_mode = mode;
 
+/*
     switch (mode)
     {
     case ouster::eLIDAR_MODE::MODE_512x10:
@@ -328,6 +333,12 @@ void cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
     mSerializer.setBufferCapacity(static_cast<std::size_t>(mDataFormat.pixels_per_column) *
         static_cast<std::size_t>(mDataFormat.columns_per_frame) *
         sizeof(ouster::lidar_data_block_t) + 32);
+*/
+
+    QString msg = "Lidar mode set to ";
+    msg += QString::fromStdString(to_string(mode));
+
+    emit logMessage(logINFO, q_name(), msg);
 }
 
 
@@ -338,13 +349,13 @@ void cOusterModel_net::changeLidarMode(QString mode_str)
     if (mConfigParameters.lidar_mode == mode)
         return;
 
+    mCmdQueue.push(new cOusterAsyncCmd_PauseDataCollection(this));
     mCmdQueue.push(new cOusterAsyncCmd_SetLidarMode(this, mode));
     mCmdQueue.push(new cOusterAsyncCmd_Reinitialize(this));
-    mCmdQueue.push(new cOusterAsyncCmd_StopDataCollection(this));
     mCmdQueue.push(new cOusterAsyncCmd_WaitForRunning(this));
-    mCmdQueue.push(new cOusterAsyncCmd_GetLidarDataFormat(this));
     mCmdQueue.push(new cOusterAsyncCmd_GetLidarMode(this, mode));
-    mCmdQueue.push(new cOusterAsyncCmd_StartDataCollection(this));
+    mCmdQueue.push(new cOusterAsyncCmd_GetLidarDataFormat(this));
+    mCmdQueue.push(new cOusterAsyncCmd_RestoreDataCollection(this));
 
     startCmdQueue();
 
@@ -357,11 +368,13 @@ void cOusterModel_net::changeAzimuthWindow(double min_deg, double max_deg)
         && (mConfigParameters.azimuth_window.max_deg == max_deg))
         return;
 
+    mCmdQueue.push(new cOusterAsyncCmd_PauseDataCollection(this));
     mCmdQueue.push(new cOusterAsyncCmd_SetAzimuthWindow(this, min_deg, max_deg));
     mCmdQueue.push(new cOusterAsyncCmd_Reinitialize(this));
     mCmdQueue.push(new cOusterAsyncCmd_WaitForRunning(this));
     mCmdQueue.push(new cOusterAsyncCmd_GetAzimuthWindow(this, min_deg, max_deg));
     mCmdQueue.push(new cOusterAsyncCmd_GetLidarDataFormat(this));
+    mCmdQueue.push(new cOusterAsyncCmd_RestoreDataCollection(this));
 
     startCmdQueue();
 

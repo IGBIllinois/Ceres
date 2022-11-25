@@ -164,6 +164,8 @@ std::string cOusterCmdStream_Qt::recv_json_reply()
 {
     std::string reply;
 
+    int count = 0;
+
     while (mDataPending || mSocket.waitForReadyRead())
     {
         mReplyBuffer = mSocket.readAll();
@@ -175,6 +177,8 @@ std::string cOusterCmdStream_Qt::recv_json_reply()
         auto braces = count_braces(reply);
         if (braces.first <= braces.second)
             break;
+
+        if (++count > 3) break;
     }
 
     if (mSocketLogging)
