@@ -10,7 +10,7 @@
 #include "AxisCommunicationsView_file.hpp"
 
 #include "OusterModel_file.hpp"
-#include "Lidar/OusterView.hpp"
+#include "Lidar/Ouster/OusterView.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>

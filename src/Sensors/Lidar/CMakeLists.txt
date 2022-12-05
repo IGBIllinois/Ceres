@@ -1,11 +1,6 @@
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-source_group("Resources" FILES ouster_properties.proto)
-
-# Generate the header/source files needed from the protobuf
-protobuf_generate_cpp(OUSTER_PROTO_SRCS OUSTER_PROTO_HDRS DESCRIPTORS PROTO_DESCS ouster_properties.proto)
-
 
 # Add the public header files to use the library
 set(LIDAR_PUBLIC_HEADERS
@@ -14,54 +9,6 @@ set(LIDAR_PUBLIC_HEADERS
 
 # Add the source files used in the library
 set(LIDAR_SOURCE_FILES
-#
-# OUSTER packet utilities
-#
-	ouster_packet_utils.hpp
-	ouster_packet_utils.cpp
-
-# Ouster Property Page Code
-	OusterPropertiesNetDecoder.hpp
-	OusterPropertiesNetDecoder.cpp
-	OusterPropertiesNetEncoder.hpp
-	OusterPropertiesNetEncoder.cpp
-	OusterPropertyPage_Remote.hpp
-	OusterPropertyPage_Remote.cpp
-    OusterPropertyPage_Local.hpp
-    OusterPropertyPage_Local.cpp
-	OusterPropertyPage.hpp
-	OusterPropertyPage.cpp
-
-# Ouster Controller Code
-
-	OusterControllerNetDecoder.hpp
-	OusterControllerNetDecoder.cpp
-	OusterControllerNetEncoder.hpp
-	OusterControllerNetEncoder.cpp
-    OusterController.hpp
-    OusterController.cpp
-
-# Network stream from sensor
-    OusterCmdStream.hpp
-    OusterCmdStream.cpp
-    OusterImuStream.hpp
-    OusterImuStream.cpp
-    OusterDataStream.hpp
-    OusterDataStream.cpp
-    OusterAsyncCommands.hpp
-    OusterAsyncCommands.cpp
-    OusterModel_net.hpp
-    OusterModel_net.cpp
-
-#
-# Base OUSTER LiDAR files
-#
-    OusterView.hpp
-    OusterView.cpp
-    OusterModel.hpp
-    OusterModel.cpp
-    OusterFactory.hpp
-    OusterFactory.cpp
 
 #
 # General LiDAR View-Model-Controller files
@@ -94,23 +41,13 @@ PUBLIC
  
 PRIVATE
     ${LIDAR_SOURCE_FILES}
-
-    ${OUSTER_PROTO_HDRS}
-	${OUSTER_PROTO_SRCS}
-	ouster_properties.proto
 )
 
 target_include_directories(lidar_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(lidar_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 target_include_directories(lidar_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-target_link_libraries(lidar_static PUBLIC ${Qt}::Widgets)
-target_link_libraries(lidar_static PUBLIC ${Qt}::Network)
-target_link_libraries(lidar_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(lidar_static PRIVATE ouster::ouster_static)
-target_link_libraries(lidar_static INTERFACE ouster::OusterVisualization)
-target_link_libraries(lidar_static PUBLIC block_data_file_static)
-target_link_libraries(lidar_static PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(lidar_static PRIVATE ouster_sensor_static)
 
 
 #
@@ -119,3 +56,8 @@ target_link_libraries(lidar_static PRIVATE ${Protobuf_LIBRARIES})
 set_property(TARGET lidar_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 set_target_properties(lidar_static PROPERTIES FOLDER "Sensors/Lidar")
+
+
+# Add the Ouster LiDAR library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Ouster)
+

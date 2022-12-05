@@ -2,7 +2,7 @@
  */
 
 #include "LidarFactory.hpp"
-#include "OusterFactory.hpp"
+#include "Ouster/OusterFactory.hpp"
 
 
 sSensorWidgets lidar::create_sensor(const std::string& sensor_id,

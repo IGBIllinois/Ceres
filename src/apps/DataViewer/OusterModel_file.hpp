@@ -2,7 +2,7 @@
 #pragma once
 
 #include "OusterParser.hpp"
-#include "Lidar/OusterModel.hpp"
+#include "Lidar/Ouster/OusterModel.hpp"
 
 #include <ouster/ouster_defs.h>
 
