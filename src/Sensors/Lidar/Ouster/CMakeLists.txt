@@ -32,6 +32,9 @@ set(OUSTER_SOURCE_FILES
 	OusterPropertyPage.hpp
 	OusterPropertyPage.cpp
 
+    OusterExperimentStates.hpp
+    OusterExperimentStates.cpp
+
 # Ouster Controller Code
 
 	OusterControllerNetDecoder.hpp
