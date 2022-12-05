@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../SensorController.hpp"
+#include "../../SensorController.hpp"
 #include "OusterControllerNetDecoder.hpp"
 #include "OusterControllerNetEncoder.hpp"
 

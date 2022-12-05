@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../../Utilities/ColorGradient.hpp"
+#include "ColorGradient.hpp"
 
 #include <ouster/OusterVizWidget.hpp>
 

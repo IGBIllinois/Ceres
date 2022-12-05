@@ -1,6 +1,6 @@
 
 #include "OusterView.hpp"
-#include "../../Utilities/Constants.hpp"
+#include "Constants.hpp"
 #include "OusterModel.hpp"
 
 #include <ouster/ouster_utils.h>

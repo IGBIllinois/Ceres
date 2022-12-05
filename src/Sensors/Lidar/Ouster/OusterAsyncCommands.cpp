@@ -2,7 +2,7 @@
 #include "OusterAsyncCommands.hpp"
 
 #include "OusterModel_net.hpp"
-#include "../../Utilities/Constants.hpp"
+#include "Constants.hpp"
 
 #include <ouster/ouster_utils.h>
 #include <ouster/ouster_defs.h>

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "LidarModel.hpp"
+#include "../LidarModel.hpp"
 
 #include <ouster/ouster_defs.h>
 #include <ouster/OusterLidarData.h>
