@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "RGB/AxisCommunicationsView.hpp"
+#include "RGB/AxisCommunications/AxisCommunicationsView.hpp"
 
 
 // Qt Forward Declaration

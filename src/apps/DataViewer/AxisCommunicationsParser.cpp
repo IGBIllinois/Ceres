@@ -2,7 +2,7 @@
 #include "AxisCommunicationsParser.hpp"
 #include "AxisDataIdentifiers.hpp"
 #include "BlockDataFile.hpp"
-#include "../Sensors/RGB/AxisCommunicationsUtils.hpp"
+#include "../Sensors/RGB/AxisCommunications/AxisCommunicationsUtils.hpp"
 
 #include <QBitmap>
 #include <QImage>

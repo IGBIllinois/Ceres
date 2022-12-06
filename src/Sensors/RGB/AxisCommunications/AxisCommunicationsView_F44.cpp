@@ -1,6 +1,6 @@
 
 #include "AxisCommunicationsView_F44.hpp"
-#include "../../Utilities/Constants.hpp"
+#include "Constants.hpp"
 #include "AxisCommunicationsModel_F44.hpp"
 
 #include <QToolBar>

@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "RgbCameraModel.hpp"
+#include "../RgbCameraModel.hpp"
 #include "AxisCommunicationsUtils.hpp"
-#include "../../BlockDataFile/AxisCommunicationsSerializer.hpp"
+#include "AxisCommunicationsSerializer.hpp"
 
 #include <QNetworkReply>
 #include <QUrl>

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../SensorPropertyPage.hpp"
+#include "../../SensorPropertyPage.hpp"
 #include "ExperimentStateCreator.hpp"
 
 

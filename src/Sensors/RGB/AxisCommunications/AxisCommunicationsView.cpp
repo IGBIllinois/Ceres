@@ -1,6 +1,6 @@
 
 #include "AxisCommunicationsView.hpp"
-#include "../../Utilities/Constants.hpp"
+#include "Constants.hpp"
 #include "AxisCommunicationsModel.hpp"
 
 #include <QPaintEvent>

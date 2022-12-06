@@ -2,7 +2,7 @@
 #pragma once
 
 #include "AxisCommunicationsModel.hpp"
-#include "../../Utilities/Timers.hpp"
+#include "Timers.hpp"
 #include "AxisCamera.hpp"
 
 //#include <QNetworkReply>

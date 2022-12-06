@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "RgbCameraView.hpp"
+#include "../RgbCameraView.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
