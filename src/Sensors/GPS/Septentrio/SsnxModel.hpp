@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "GpsModel.hpp"
+#include "../GpsModel.hpp"
 #include "SsnxSerializer.hpp"
 
 #include <QObject>

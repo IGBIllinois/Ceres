@@ -4,7 +4,7 @@
 #include "CentralWidget.hpp"
 
 #include "SsnxModel_file.hpp"
-#include "GPS/SsnxView.hpp"
+#include "GPS/Septentrio/SsnxView.hpp"
 
 #include "AxisCommunicationsModel_file.hpp"
 #include "AxisCommunicationsView_file.hpp"

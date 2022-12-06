@@ -7,31 +7,6 @@ set(GPS_PUBLIC_HEADERS
 # Add the source files used in the library
 set(GPS_SOURCE_FILES
 #
-# Different Septertino GPS Models based on data source
-#
-
-#	Network stream from relay program on dolly
-    SsnxGpsStream.hpp
-    SsnxGpsStream.cpp
-    SsnxModel_net.hpp
-    SsnxModel_net.cpp
-
-#	Directly connected to GPS receiver's com port
-    SsnxModel_direct.hpp
-    SsnxModel_direct.cpp
-
-#
-# Septertino GPS receiver files
-#
-    SsnxModel.hpp
-    SsnxModel.cpp
-    SsnxView.hpp
-    SsnxView.cpp
-
-    SsnxFactory.hpp
-    SsnxFactory.cpp
-
-#
 # General GPS View-Model-Controller files
 #
 	GpsTypes.hpp
@@ -67,15 +42,14 @@ PRIVATE
 )
 
 target_include_directories(gps_static PRIVATE ${COMMON_INCLUDE_DIR})
-target_include_directories(gps_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+#target_include_directories(gps_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
-target_link_libraries(gps_static PUBLIC ${Qt}::Widgets)
-target_link_libraries(gps_static PUBLIC ${Qt}::Network)
-target_link_libraries(gps_static PUBLIC ${Qt}::SerialPort)
-target_link_libraries(gps_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(gps_static PUBLIC block_data_file_static)
-target_link_libraries(gps_static PUBLIC ssnx2net::ssnx2net_static)
-target_link_libraries(gps_static PUBLIC ssnx::ssnx_static)
+#target_link_libraries(gps_static PUBLIC ${Qt}::Widgets)
+#target_link_libraries(gps_static PUBLIC ${Qt}::Network)
+#target_link_libraries(gps_static PUBLIC ${Qt}::SerialPort)
+#target_link_libraries(gps_static PRIVATE nlohmann_json::nlohmann_json)
+#target_link_libraries(gps_static PUBLIC block_data_file_static)
+target_link_libraries(gps_static PUBLIC septentrio_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
@@ -83,3 +57,7 @@ target_link_libraries(gps_static PUBLIC ssnx::ssnx_static)
 set_property(TARGET gps_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 set_target_properties(gps_static PROPERTIES FOLDER "Sensors/GPS")
+
+
+# Add the Septentrio GPS library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Septentrio)

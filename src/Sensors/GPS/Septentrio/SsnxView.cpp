@@ -1,6 +1,6 @@
 
 #include "SsnxView.hpp"
-#include "../../Utilities/Constants.hpp"
+#include "Constants.hpp"
 
 #include <QLineEdit>
 #include <QLabel>

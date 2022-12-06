@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "GpsView.hpp"
-#include "GpsTypes.hpp"
+#include "../GpsView.hpp"
+#include "../GpsTypes.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE

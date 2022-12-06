@@ -2,7 +2,7 @@
  */
 
 #include "GpsFactory.hpp"
-#include "SsnxFactory.hpp"
+#include "Septentrio/SsnxFactory.hpp"
 
 sSensorWidgets gps::create_sensor(const std::string& sensor_id, 
     const nlohmann::json& sensorInfo, bool no_visualization)
