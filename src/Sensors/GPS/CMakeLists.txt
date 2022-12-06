@@ -42,13 +42,7 @@ PRIVATE
 )
 
 target_include_directories(gps_static PRIVATE ${COMMON_INCLUDE_DIR})
-#target_include_directories(gps_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
-#target_link_libraries(gps_static PUBLIC ${Qt}::Widgets)
-#target_link_libraries(gps_static PUBLIC ${Qt}::Network)
-#target_link_libraries(gps_static PUBLIC ${Qt}::SerialPort)
-#target_link_libraries(gps_static PRIVATE nlohmann_json::nlohmann_json)
-#target_link_libraries(gps_static PUBLIC block_data_file_static)
 target_link_libraries(gps_static PUBLIC septentrio_static)
 
 #

@@ -1,10 +1,10 @@
 /*
- * The HySpexSWIR_384_PropertyPage to control the HySpex SWIR 384.
+ * The HySpexVNIR_3000N_PropertyPage to control the HySpex VNIR 3000N.
  */
 
 #pragma once
 
-#include "../SensorPropertyPage.hpp"
+#include "../../SensorPropertyPage.hpp"
 #include "ExperimentStateCreator.hpp"
 
  // Qt Forward Declaration
@@ -18,11 +18,11 @@ class QGroupBox;
 QT_END_NAMESPACE
 
 
-class cHySpexSWIR_384_PropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
+class cHySpexVNIR_3000N_PropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
 {
 public:
-    cHySpexSWIR_384_PropertyPage(QWidget* parent = nullptr);
-    ~cHySpexSWIR_384_PropertyPage() = default;
+    cHySpexVNIR_3000N_PropertyPage(QWidget* parent = nullptr);
+    ~cHySpexVNIR_3000N_PropertyPage() = default;
 
     void doLayout() override;
 

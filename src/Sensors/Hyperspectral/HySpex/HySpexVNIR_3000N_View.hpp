@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "HyperspectralView.hpp"
+#include "../HyperspectralView.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE

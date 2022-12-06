@@ -1,6 +1,5 @@
 
 #include "HySpexSWIR_384_View.hpp"
-#include "../../Utilities/Constants.hpp"
 #include "HySpexSWIR_384_Model.hpp"
 
 #include <string>

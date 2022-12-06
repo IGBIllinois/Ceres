@@ -1,7 +1,6 @@
 
 #include "HySpexVNIR_3000N_View.hpp"
 #include "HySpexVNIR_3000N_Model.hpp"
-#include "../../Utilities/Constants.hpp"
 
 #include <string>
 

@@ -1,7 +1,7 @@
 
 #include "HySpexSWIR_384_Model_direct.hpp"
 #include "HySpexFactory.hpp"
-#include "../../Utilities/Constants.hpp"
+#include "Constants.hpp"
 
 #include <optional>
 

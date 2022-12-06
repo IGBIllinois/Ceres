@@ -2,7 +2,7 @@
 #pragma once
 
 #include "HySpexSWIR_384_Model.hpp"
-#include "../../BlockDataFile/HySpexSWIR_384_Serializer.hpp"
+#include "HySpexSWIR_384_Serializer.hpp"
 
 #include <QObject>
 

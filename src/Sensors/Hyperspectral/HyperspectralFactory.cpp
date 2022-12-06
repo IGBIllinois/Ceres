@@ -2,7 +2,7 @@
  */
 
 #include "HyperspectralFactory.hpp"
-#include "HySpexFactory.hpp"
+#include "./HySpex/HySpexFactory.hpp"
 
 
 sSensorWidgets hyperspectral::create_sensor(const std::string& sensor_id,

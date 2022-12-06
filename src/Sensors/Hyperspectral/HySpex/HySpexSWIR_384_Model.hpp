@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "HyperspectralModel.hpp"
-#include "../../BlockDataFile/HySpexSWIR_384_Serializer.hpp"
+#include "../HyperspectralModel.hpp"
+#include "HySpexSWIR_384_Serializer.hpp"
 
 #include <QObject>
 

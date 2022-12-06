@@ -90,21 +90,21 @@ set(HYSPEX_SOURCE_FILES
 )
 
 
-# The static library (.lib/.a) for communicating with Hyperspectral Cameras
-add_library(hyperspectral_static STATIC)
+# The static library (.lib/.a) for communicating with HySpex Cameras
+add_library(hyspex_static STATIC)
 
 if (MSVC)
   # Add the "lib" prefix for generated .lib outputs.
-	set_target_properties(hyperspectral_static PROPERTIES OUTPUT_NAME "libHyperspectral")
+	set_target_properties(hyspex_static PROPERTIES OUTPUT_NAME "libHySpex")
 else ()
-	set_target_properties(hyperspectral_static PROPERTIES OUTPUT_NAME "Hyperspectral")
+	set_target_properties(hyspex_static PROPERTIES OUTPUT_NAME "HySpex")
 endif (MSVC)
 
-set_target_properties(hyperspectral_static PROPERTIES LANGUAGE CXX)
+set_target_properties(hyspex_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(hyperspectral_static PRIVATE cxx_std_17)
+target_compile_features(hyspex_static PRIVATE cxx_std_17)
 
-target_sources(hyperspectral_static
+target_sources(hyspex_static
 PUBLIC
     ${HYSPEX_PUBLIC_HEADERS}
  
@@ -120,20 +120,20 @@ PRIVATE
 	hyspex_vnir_3000N_properties.proto
 )
 
-target_include_directories(hyperspectral_static PRIVATE ${COMMON_INCLUDE_DIR})
-target_include_directories(hyperspectral_static PRIVATE ${UTILITIES_INCLUDE_DIR})
-target_include_directories(hyperspectral_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
-target_include_directories(hyperspectral_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
+target_include_directories(hyspex_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(hyspex_static PRIVATE ${UTILITIES_INCLUDE_DIR})
+target_include_directories(hyspex_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+target_include_directories(hyspex_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-target_link_libraries(hyperspectral_static PUBLIC ${Qt}::Widgets)
-target_link_libraries(hyperspectral_static PUBLIC ${Qt}::Network)
-target_link_libraries(hyperspectral_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(hyperspectral_static PUBLIC BlockDataFile)
-target_link_libraries(hyperspectral_static PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(hyspex_static PUBLIC ${Qt}::Widgets)
+target_link_libraries(hyspex_static PUBLIC ${Qt}::Network)
+target_link_libraries(hyspex_static PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(hyspex_static PUBLIC block_data_file_static)
+target_link_libraries(hyspex_static PRIVATE ${Protobuf_LIBRARIES})
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
 # Force use MultiThreadedDLL (-MD) and MultiThreadedDebugDLL (-MDd)
-set_property(TARGET hyperspectral_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+set_property(TARGET hyspex_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
-set_target_properties(hyperspectral_static PROPERTIES FOLDER "Sensors/Hyperspectral")
+set_target_properties(hyspex_static PROPERTIES FOLDER "Sensors/Hyperspectral/HySpex")

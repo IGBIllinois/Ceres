@@ -1,6 +1,6 @@
 
 #include "HySpexVNIR_3000N_Model_net.hpp"
-#include "../../Utilities/Constants.hpp"
+#include "Constants.hpp"
 
 #include <optional>
 

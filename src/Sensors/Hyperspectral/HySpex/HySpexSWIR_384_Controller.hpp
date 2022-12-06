@@ -1,21 +1,21 @@
 
 #pragma once
 
-#include "../SensorController.hpp"
-#include "HySpexVNIR_3000N_ControllerNetDecoder.hpp"
-#include "HySpexVNIR_3000N_ControllerNetEncoder.hpp"
+#include "../../SensorController.hpp"
+#include "HySpexSWIR_384_ControllerNetDecoder.hpp"
+#include "HySpexSWIR_384_ControllerNetEncoder.hpp"
 
-class cHySpexVNIR_3000N_Model;
+class cHySpexSWIR_384_Model;
 
 
-class cHySpexVNIR_3000N_Controller : public cSensorController,
-    private cHySpexVNIR_3000N_ControllerNetDecoder,
-    private cHySpexVNIR_3000N_ControllerNetEncoder
+class cHySpexSWIR_384_Controller : public cSensorController,
+    private cHySpexSWIR_384_ControllerNetDecoder, 
+    private cHySpexSWIR_384_ControllerNetEncoder
 {
 	Q_OBJECT
 
 public:
-    cHySpexVNIR_3000N_Controller(cHySpexVNIR_3000N_Model* model, QObject* parent = nullptr);
+    cHySpexSWIR_384_Controller(cHySpexSWIR_384_Model* model, QObject* parent = nullptr);
 
 public:
     const char* descriptor() const override;
@@ -26,7 +26,7 @@ public:
     const std::string& name() const override;
 
 protected:
-//    void onQueryState() override;
+    void onQueryState() override;
 
 protected:
     /**
@@ -46,7 +46,7 @@ protected:
     }
 
 private:
-    cHySpexVNIR_3000N_Model* mpModel = nullptr;
+    cHySpexSWIR_384_Model* mpModel = nullptr;
 };
 
 
