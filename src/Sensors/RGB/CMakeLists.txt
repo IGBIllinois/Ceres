@@ -45,17 +45,8 @@ PRIVATE
     ${RGB_CAMERA_SOURCE_FILES}
 )
 
-#target_include_directories(rgb_camera_static PRIVATE ${COMMON_INCLUDE_DIR})
-#target_include_directories(rgb_camera_static PRIVATE ${UTILITIES_INCLUDE_DIR})
-#target_include_directories(rgb_camera_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
-#target_include_directories(rgb_camera_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
-
-#target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Widgets)
-#target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Network)
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Multimedia)
 target_link_libraries(rgb_camera_static PRIVATE nlohmann_json::nlohmann_json)
-#target_link_libraries(rgb_camera_static PUBLIC block_data_file_static)
-#target_link_libraries(rgb_camera_static PRIVATE ${Protobuf_LIBRARIES})
 target_link_libraries(rgb_camera_static PUBLIC axis_communications_static)
 
 #
