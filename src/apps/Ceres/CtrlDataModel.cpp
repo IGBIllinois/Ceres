@@ -43,6 +43,16 @@ void cCtrlDataModel::addSensor(cSensorModel* pSensor)
     }
 }
 
+void cCtrlDataModel::addSensorPropertyPage(cSensorPropertyPage* pPage)
+{
+    //TODO
+}
+
+void cCtrlDataModel::removeSensorPropertyPage(cSensorPropertyPage* pPage)
+{
+    //TODO
+}
+
 void cCtrlDataModel::startDataThread()
 {
     mThread.start();
@@ -122,9 +132,9 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         return false;
     }
 
-/*
     auto required_sensors = expDoc["sensors"];
 
+/*
     for (auto required_sensor : required_sensors)
     {
         bool found = false;

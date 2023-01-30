@@ -14,6 +14,7 @@
 // Forward Declarations
 class cExperimentControlModel;
 class cSensorModel;
+class cSensorPropertyPage;
 
 namespace experiment
 {
@@ -36,6 +37,9 @@ public:
 
     virtual void addExperimentControlModel(cExperimentControlModel* pModel);
     void addSensor(cSensorModel* pSensor) override;
+
+    void addSensorPropertyPage(cSensorPropertyPage* pPage);
+    void removeSensorPropertyPage(cSensorPropertyPage* pPage);
 
     void startDataThread() override;
     void stopDataThread() override;
@@ -85,6 +89,8 @@ protected:
     std::string  mExperimentDoc;
 
     cCtrlDataThread mThread;
+
+    std::vector<cSensorPropertyPage*> mPropertyPages;
 
 private:
     void doExperimentCleanup();

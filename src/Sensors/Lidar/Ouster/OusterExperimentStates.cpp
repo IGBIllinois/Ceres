@@ -5,17 +5,6 @@
 
 #include <thread>
 
-namespace
-{
-	template <typename T>
-	T abs_difference(T v1, T v2)
-	{
-		return (v2 > v1) ? v2 - v1 : v1 - v2;
-	}
-}
-
-
-
 cOusterExperimentState_State::cOusterExperimentState_State(cOusterPropertyPage& propertyPage)
 {
 }
