@@ -10,7 +10,7 @@
  * Delay Step
  *******************************************************************/
 cExperimentState_Delay::cExperimentState_Delay()
-	: mElapsedTime_sec(0), mWaitTime_sec(0)
+	: mElapsedTime_sec(0), mWaitTime_sec(0), mRecording(false)
 {
 }
 
@@ -27,6 +27,9 @@ void cExperimentState_Delay::configure(const nlohmann::json& stateDoc)
 
 	if (stateDoc.contains("wait (hr)"))
 		mWaitTime_sec += 3600.0 * stateDoc["wait (hr)"];
+
+	if (stateDoc.contains("record"))
+		mRecording = stateDoc["record"];
 }
 
 QString cExperimentState_Delay::getStatusStr()
@@ -39,7 +42,7 @@ QString cExperimentState_Delay::getStatusStr()
 
 bool cExperimentState_Delay::recording()
 {
-	return false;
+	return mRecording;
 }
 
 void cExperimentState_Delay::initialize()

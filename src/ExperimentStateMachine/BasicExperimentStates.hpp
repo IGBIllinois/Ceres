@@ -59,6 +59,7 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock>	mStart;
 	double mElapsedTime_sec;
 	double mWaitTime_sec;
+	bool mRecording;
 };
 
 
