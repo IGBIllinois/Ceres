@@ -504,6 +504,12 @@ void cOusterModel_net::onNewData(uint16_t frameID, const cOusterLidarData& data)
         mFrameCounter = 3;
         emit updateLidarData();
     }
+
+    if (!data.rangeDataIsValid())
+    {
+        QString msg("Lidar range data is zero.");
+        emit statusMessage(msg);
+    }
 }
 
 void cOusterModel_net::retrieveConfigParam()
