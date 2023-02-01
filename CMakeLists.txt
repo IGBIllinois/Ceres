@@ -57,6 +57,7 @@ SET(CMAKE_WARN_DEPRECATED 1)
 #******************************************************************************
 
 option(CERES_USE_EXTERNAL_JSON "Use an external JSON library" ON)
+option(USE_INTERNAL_CBDF_LIB "Use internal CBDF library" ON)
 
 if (MSVC)
     option(MSVC_STATIC_RUNTIME "Link static runtime libraries" OFF)
@@ -142,7 +143,7 @@ add_install_rpath_support(BIN_DIRS "${CMAKE_INSTALL_FULL_BINDIR}"
                           USE_LINK_PATH)
 
 # Set the path to the public library headers
-SET(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #******************************************************************************
 # PROJECT DEPENDENCIES
@@ -154,20 +155,25 @@ FIND_PACKAGE(Catch2 QUIET)
 
 
 # Find and include Qt
-SET(Qt Qt5)
+set(Qt Qt5)
 
 FIND_PACKAGE(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort REQUIRED)
 GET_TARGET_PROPERTY(QMAKE_LOCATION Qt5::qmake LOCATION)
 
-IF(WIN32)
-     GET_FILENAME_COMPONENT(_qt_bin_dir "${QMAKE_LOCATION}" DIRECTORY)
-     FIND_PROGRAM(WINDEPLOYQT_COMMAND windeployqt HINTS "${_qt_bin_dir}")
-     IF(WINDEPLOYQT_COMMAND)
-	  MESSAGE(STATUS "Found windeployqt: ${WINDEPLOYQT_COMMAND}")
-     ELSE()
-	  MESSAGE(STATUS "Could NOT find windeployqt")
-     ENDIF()
-ENDIF(WIN32)
+if(WIN32)
+    GET_FILENAME_COMPONENT(_qt_bin_dir "${QMAKE_LOCATION}" DIRECTORY)
+    FIND_PROGRAM(WINDEPLOYQT_COMMAND windeployqt HINTS "${_qt_bin_dir}")
+    if(WINDEPLOYQT_COMMAND)
+		MESSAGE(STATUS "Found windeployqt: ${WINDEPLOYQT_COMMAND}")
+    else()
+		MESSAGE(STATUS "Could NOT find windeployqt")
+    endif()
+endif(WIN32)
+
+if(NOT USE_INTERNAL_CBDF_LIB)
+	# Find and include my libraries for data collection
+	FIND_PACKAGE(CBDF REQUIRED cbdf ctrl info sensors weather)
+endif()
 
 # Find and include my libraries for data collection
 FIND_PACKAGE(Ouster REQUIRED)
@@ -187,19 +193,19 @@ FIND_PACKAGE(Protobuf REQUIRED)
 #******************************************************************************
 
 # to distinguish between debug and release lib
-SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Add postfix to target for Release build.")
-SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add postfix to target for Debug build.")
-SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "Add postfix to target for RelWithDebInfo build.")
-SET(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "Add postfix to target for MinSizeRel build")
+set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Add postfix to target for Release build.")
+set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add postfix to target for Debug build.")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "Add postfix to target for RelWithDebInfo build.")
+set(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "Add postfix to target for MinSizeRel build")
 
 
 # To build shared libraries in Windows, we set CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS to TRUE.
 # See https://cmake.org/cmake/help/v3.4/variable/CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS.html
 # See https://blog.kitware.com/create-dlls-on-windows-without-declspec-using-new-cmake-export-all-feature/
-SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE "Release" CACHE STRING
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
       "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
 endif()
@@ -213,7 +219,7 @@ if (MSVC)
 endif()
 
 if (APPLE)
-  SET(CMAKE_INSTALL_NAME_DIR "@executable_path/../Libraries")
+  set(CMAKE_INSTALL_NAME_DIR "@executable_path/../Libraries")
 endif()
 
 

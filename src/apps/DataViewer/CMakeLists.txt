@@ -90,17 +90,23 @@ PRIVATE
 
 
 target_include_directories(CeresDataViewer PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
-target_include_directories(CeresDataViewer PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 target_include_directories(CeresDataViewer PRIVATE ${UTILITIES_INCLUDE_DIR})
 #target_include_directories(CeresDataViewer PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
 target_include_directories(CeresDataViewer PRIVATE ${SENSORS_INCLUDE_DIR})
 
+if(USE_INTERNAL_CBDF_LIB)
+	target_include_directories(CeresDataViewer PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+	
+	target_link_libraries(CeresDataViewer PRIVATE block_data_file_static)
+else()
+	target_link_libraries(CeresDataViewer PRIVATE cbdf::cbdf)
+#	target_link_libraries(CeresDataViewer PRIVATE cbdf::sensors)
+endif()
 
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)
 
 target_link_libraries(CeresDataViewer PRIVATE Utilities)
-target_link_libraries(CeresDataViewer PRIVATE block_data_file_static)
 target_link_libraries(CeresDataViewer PRIVATE Sensors)
 
 

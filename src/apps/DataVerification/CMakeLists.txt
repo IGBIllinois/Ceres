@@ -71,15 +71,21 @@ PRIVATE
 
 
 target_include_directories(CeresDataVerification PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
-target_include_directories(CeresDataVerification PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 target_include_directories(CeresDataVerification PRIVATE ${UTILITIES_INCLUDE_DIR})
 
+if(USE_INTERNAL_CBDF_LIB)
+	target_include_directories(CeresDataVerification PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+	
+	target_link_libraries(CeresDataVerification PRIVATE block_data_file_static)
+else()
+	target_link_libraries(CeresDataVerification PRIVATE cbdf::cbdf)
+
+endif()
 
 target_link_libraries(CeresDataVerification PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataVerification PRIVATE ${Qt}::Core)
 
 target_link_libraries(CeresDataVerification PRIVATE Utilities)
-target_link_libraries(CeresDataVerification PRIVATE block_data_file_static)
 
 
 #

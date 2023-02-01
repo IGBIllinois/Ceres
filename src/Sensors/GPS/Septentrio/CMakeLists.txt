@@ -58,13 +58,18 @@ PRIVATE
 
 target_include_directories(septentrio_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(septentrio_static PRIVATE ${UTILITIES_INCLUDE_DIR})
-target_include_directories(septentrio_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+
+if(USE_INTERNAL_CBDF_LIB)
+	target_include_directories(septentrio_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+	target_link_libraries(septentrio_static PUBLIC block_data_file_static)
+else()
+	target_link_libraries(septentrio_static PRIVATE cbdf::sensors)
+endif()
 
 target_link_libraries(septentrio_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(septentrio_static PUBLIC ${Qt}::Network)
 target_link_libraries(septentrio_static PUBLIC ${Qt}::SerialPort)
 target_link_libraries(septentrio_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(septentrio_static PUBLIC block_data_file_static)
 target_link_libraries(septentrio_static PUBLIC ssnx2net::ssnx2net_static)
 target_link_libraries(septentrio_static PUBLIC ssnx::ssnx_static)
 

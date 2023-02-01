@@ -40,7 +40,7 @@ PRIVATE
 
 
 target_include_directories(multispectral_static PRIVATE ${COMMON_INCLUDE_DIR})
-target_include_directories(multispectral_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
+#target_include_directories(multispectral_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 
 target_link_libraries(multispectral_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(multispectral_static PUBLIC ${Qt}::Network)
