@@ -22,5 +22,5 @@ public slots:
 
 private:
     QLineEdit* mpWindSpeed_mph;
-    QLineEdit* myWindDirection_deg;
+    QLineEdit* mpWindDirection_deg;
 };

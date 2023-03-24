@@ -7,7 +7,7 @@
 
 cWindSpeedAndDirection::cWindSpeedAndDirection(QWidget* parent)
 	:
-	QStatusBar(parent), mpWindSpeed_mph(nullptr), myWindDirection_deg(nullptr)
+	QStatusBar(parent), mpWindSpeed_mph(nullptr), mpWindDirection_deg(nullptr)
 {
 	setSizeGripEnabled(false);
 
@@ -21,14 +21,14 @@ cWindSpeedAndDirection::cWindSpeedAndDirection(QWidget* parent)
 	mpWindSpeed_mph->setToolTip(tr("Wind Speed in mph"));
 
 	pixelsWide = fm.horizontalAdvance("Dir: XXX.X ");
-	myWindDirection_deg = new QLineEdit(this);
-	myWindDirection_deg->setReadOnly(true);
-	myWindDirection_deg->setFixedWidth(pixelsWide);
-	myWindDirection_deg->setAlignment(Qt::AlignCenter);
-	myWindDirection_deg->setToolTip(tr("Wind Direction in degrees"));
+	mpWindDirection_deg = new QLineEdit(this);
+	mpWindDirection_deg->setReadOnly(true);
+	mpWindDirection_deg->setFixedWidth(pixelsWide);
+	mpWindDirection_deg->setAlignment(Qt::AlignCenter);
+	mpWindDirection_deg->setToolTip(tr("Wind Direction in degrees"));
 
 	addPermanentWidget(mpWindSpeed_mph);
-	addPermanentWidget(myWindDirection_deg);
+	addPermanentWidget(mpWindDirection_deg);
 
 	setWindowTitle("Wind Speed and Direction");
 
@@ -59,5 +59,5 @@ void cWindSpeedAndDirection::updateWindData(bool valid_wind_speed, double wind_s
 
 	s += dir;
 
-	myWindDirection_deg->setText(s);
+	mpWindDirection_deg->setText(s);
 }
