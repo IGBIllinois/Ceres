@@ -48,6 +48,10 @@ int main(int argc, char** argv)
     qInstallMessageHandler(myMessageOutput);
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QCoreApplication::setOrganizationName("University of Illinois");
+    QCoreApplication::setOrganizationDomain("rapp.ripe.illinois.edu");
+    QCoreApplication::setApplicationName("Ceres");
+
     QApplication app(argc, argv);
 
     cCeresSplashScreen* pSplash = new cCeresSplashScreen();
