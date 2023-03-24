@@ -75,6 +75,7 @@ set(BLOCK_DATA_FILE_PUBLIC_HEADERS
 	AxisCommunicationsBlockId.hpp
 	AxisDataIdentifiers.hpp
 	AxisCommunicationsParser.hpp
+	ImageBuffers.hpp
 
 #
 # Headers for parsing Weather data
@@ -158,6 +159,7 @@ PRIVATE
 	AxisCommunicationsBlockId.cpp
 	AxisCommunicationsSerializer.cpp
 	AxisCommunicationsParser.cpp
+	ImageBuffers.cpp
 
     OusterBlockId.cpp
     OusterSerializer.cpp

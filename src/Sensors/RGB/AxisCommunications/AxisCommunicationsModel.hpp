@@ -1,8 +1,10 @@
 
 #pragma once
 
+#include "../RgbTypes.hpp"
 #include "../RgbCameraModel.hpp"
 #include "AxisCommunicationsUtils.hpp"
+#include "ImageBuffers.hpp"
 #include "AxisCommunicationsSerializer.hpp"
 
 #include <QNetworkReply>
@@ -51,8 +53,8 @@ public:
     QUrl url() const { return mUrl; }
 
     int getVapixVersion() const;
-    const std::vector<axis::sImageSize_t>& getImageSizes() const;
-    const std::vector<axis::eIMAGE_FORMAT>& getImageFormats() const;
+    const std::vector<rgb::sImageSize_t>& getImageSizes() const;
+    const std::vector<rgb::eIMAGE_FORMAT>& getImageFormats() const;
 
 
     bool configure(const nlohmann::json& jsonCfg) override;
@@ -80,10 +82,10 @@ protected:
     bool queryVapixSupport();
     bool querySupportedResolutions();
     bool querySupportedImageFormats();
-    axis::sImageSize_t queryImageResolution(uint8_t camera);
+    rgb::sImageSize_t queryImageResolution(uint8_t camera);
 
-    QBitmap getBitmap(int cameraId, axis::sImageSize_t resolution = axis::sImageSize_t());
-    QImage getJPEG(int cameraId, axis::sImageSize_t resolution = axis::sImageSize_t());
+    QBitmap getBitmap(int cameraId, rgb::sImageSize_t resolution = rgb::sImageSize_t());
+    QImage getJPEG(int cameraId, rgb::sImageSize_t resolution = rgb::sImageSize_t());
 
 //    void getRequest();
 
@@ -96,10 +98,14 @@ protected:
     QUrl mUrl;
 
     int mVapixVersion;
-    std::vector<axis::sImageSize_t>  mSupportedImageSizes;
-    std::vector<axis::eIMAGE_FORMAT> mSupportedImageFormats;
+    std::vector<rgb::sImageSize_t>  mSupportedImageSizes;
+    std::vector<rgb::eIMAGE_FORMAT> mSupportedImageFormats;
 
     QImage mCurrentImage;
+
+    cBitmapBuffer    mBitmapBuffer;
+    cJpegBuffer      mJpegBuffer;
+    cMpegFrameBuffer mMpegFrameBuffer;
 
     cAxisCommunicationsSerializer mSerializer;
 };

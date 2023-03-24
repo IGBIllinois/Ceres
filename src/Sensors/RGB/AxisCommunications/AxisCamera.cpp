@@ -1,5 +1,6 @@
 
 #include "AxisCamera.hpp"
+#include "AxisCommunicationsUtils.hpp"
 
 #include <QNetworkAccessManager>
 #include <QMessageBox>
@@ -71,12 +72,12 @@ void cAxisCamera::setFramesPerSeconds(uint8_t fps)
     mFramesPerSeconds = fps;
 }
 
-axis::sImageSize_t cAxisCamera::getImageSize() const
+rgb::sImageSize_t cAxisCamera::getImageSize() const
 {
     return mImageSize;
 }
 
-void cAxisCamera::setImageSize(axis::sImageSize_t image_size)
+void cAxisCamera::setImageSize(rgb::sImageSize_t image_size)
 {
     mImageSize = image_size;
     if ((mpCurrentImage->width() != mImageSize.width) ||
@@ -102,7 +103,7 @@ bool cAxisCamera::startGrabbing()
     if (mFramesPerSeconds > 0)
         query.addQueryItem("fps", QString::number(mFramesPerSeconds));
 
-    if (mImageSize != axis::sImageSize_t())
+    if (mImageSize != rgb::sImageSize_t())
         query.addQueryItem("resolution", QString::fromStdString(axis::to_string(mImageSize)));
 
     mCurrentUrl.setQuery(query);

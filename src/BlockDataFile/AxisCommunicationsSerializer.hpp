@@ -7,17 +7,22 @@
 #include "BlockSerializer.hpp"
 #include "AxisCommunicationsBlockId.hpp"
 
-#include <QImageWriter>
-#include <QBuffer>
-#include <QByteArray>
+//#include <QImageWriter>
+//#include <QBuffer>
+//#include <QByteArray>
 
- // Qt Forward Declaration
-QT_BEGIN_NAMESPACE
-class QBitmap;
-class QImage;
-QT_END_NAMESPACE
+// Forward Declaration
+class cBitmapBuffer;
+class cJpegBuffer;
+class cMpegFrameBuffer;
 
-namespace axis
+// Qt Forward Declaration
+//QT_BEGIN_NAMESPACE
+//class QBitmap;
+//class QImage;
+//QT_END_NAMESPACE
+
+namespace rgb
 {
 	enum class eIMAGE_FORMAT;
 	struct sImageSize_t;
@@ -32,19 +37,22 @@ public:
 
 	void writeActiveCameraId(int in);
 	void writeFramesPerSecond(int frames_per_sec);
-	void writeBitmap(const QBitmap& img);
-	void writeJPEG(const QImage& img);
-	void writeMpegFrame(const QImage& img);
+//	void writeBitmap(const QBitmap& img);
+//	void writeJPEG(const QImage& img);
+//	void writeMpegFrame(const QImage& img);
 
-	void write(const axis::sImageSize_t&  in);
+	void write(const cBitmapBuffer& in);
+	void write(const cJpegBuffer& in);
+	void write(const cMpegFrameBuffer& in);
+	void write(const rgb::sImageSize_t&  in);
 
 protected:
 	cBlockID& blockID() override;
 
 private:
-	QByteArray		mImageData;
-	QBuffer			mImageBuffer;
-	QImageWriter	mImageWriter;
+//	QByteArray		mImageData;
+//	QBuffer			mImageBuffer;
+//	QImageWriter	mImageWriter;
 
 	cAxisCommunicationsID    mBlockID;
 };

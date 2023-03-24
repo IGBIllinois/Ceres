@@ -248,7 +248,7 @@ public:
 
     void read(std::string& out);
     void read(std::string& out, uint16_t len);
-    void read(std::byte*& out, uint16_t len);
+    void read(std::byte* out, uint16_t len);
     void read(char* out, std::size_t len);
 //@}
 
@@ -290,6 +290,7 @@ public:
 
     void write(const std::string& in);
     void write(const std::byte* in, uint16_t len);
+    void write(const std::byte* in, std::size_t len);
     void write(const char* in, std::size_t len);
 //@}
 

@@ -1,9 +1,12 @@
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(RGB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 
 # Add the public header files to use the library
 set(RGB_CAMERA_PUBLIC_HEADERS
+    RgbTypes.hpp
 	RgbCameraFactory.hpp
 )
 

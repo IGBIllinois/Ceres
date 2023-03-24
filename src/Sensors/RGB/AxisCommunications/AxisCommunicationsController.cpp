@@ -176,7 +176,7 @@ void cAxisCommunicationsController_F44::setCameraId(uint8_t id)
 
 void cAxisCommunicationsController_F44::setImageSize(uint16_t width, uint16_t height)
 {
-    axis::sImageSize_t image_size = {width, height};
+    rgb::sImageSize_t image_size = {width, height};
 
     mpModel->setActiveImageSize(image_size);
     sendImageSize(image_size.width, image_size.height);

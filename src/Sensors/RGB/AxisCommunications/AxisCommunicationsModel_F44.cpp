@@ -2,6 +2,7 @@
 #include "AxisCommunicationsModel_F44.hpp"
 #include "AxisCommunicationsFactory.hpp"
 
+#include <QDebug>
 #include <QNetworkAccessManager>
 #include <QMessageBox>
 
@@ -9,7 +10,7 @@ const std::size_t MAX_CAMERAS = 4;
 
 namespace
 {
-    bool operator>(const axis::sImageSize_t& lhs, const axis::sImageSize_t& rhs)
+    bool operator>(const rgb::sImageSize_t& lhs, const rgb::sImageSize_t& rhs)
     {
         return ((lhs.height * lhs.width) > (rhs.height * rhs.width));
     }
@@ -42,7 +43,7 @@ cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
 
 bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 {
-    axis::sImageSize_t max_image_size;
+    rgb::sImageSize_t max_image_size;
 
     try
     {
@@ -73,7 +74,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
             int id = camera["id"];
             mCameras[i] = new cAxisCamera(id, this);
 
-            axis::sImageSize_t image_size = axis::to_image_size(camera["resolution"]);
+            rgb::sImageSize_t image_size = axis::to_image_size(camera["resolution"]);
             if (image_size > max_image_size)
                 max_image_size = image_size;
 
@@ -240,15 +241,15 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
     }
 }
 
-axis::sImageSize_t cAxisCommunicationsModel_F44::getActiveImageSize() const
+rgb::sImageSize_t cAxisCommunicationsModel_F44::getActiveImageSize() const
 {
     if (mpActiveCamera)
         return mpActiveCamera->getImageSize();
 
-    return axis::sImageSize_t{0,0};
+    return rgb::sImageSize_t{0,0};
 }
 
-void cAxisCommunicationsModel_F44::setActiveImageSize(axis::sImageSize_t image_size)
+void cAxisCommunicationsModel_F44::setActiveImageSize(rgb::sImageSize_t image_size)
 {
     if (!mpActiveCamera)
         return;
@@ -313,7 +314,10 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
     {
         try
         {
-            mSerializer.writeMpegFrame(mCurrentImage);
+            axis::to_buffer(mCurrentImage, mMpegFrameBuffer);
+            mSerializer.write(mMpegFrameBuffer);
+
+//Remove            mSerializer.writeMpegFrame(mCurrentImage);
         }
         catch (const std::exception& e)
         {
@@ -334,7 +338,10 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
     {
         try
         {
-            mSerializer.writeJPEG(mCurrentImage);
+            axis::to_buffer(mCurrentImage, mJpegBuffer);
+            mSerializer.write(mJpegBuffer);
+
+//Remove            mSerializer.writeJPEG(mCurrentImage);
         }
         catch (const std::exception& e)
         {

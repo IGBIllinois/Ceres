@@ -2,10 +2,11 @@
 #include "AxisCommunicationsSerializer.hpp"
 #include "AxisDataIdentifiers.hpp"
 #include "BlockDataFile.hpp"
-#include "../Sensors/RGB/AxisCommunications/AxisCommunicationsUtils.hpp"
+#include "ImageBuffers.hpp"
+#include "../Sensors/RGB/RgbTypes.hpp"
 
-#include <QBitmap>
-#include <QImage>
+//#include <QBitmap>
+//#include <QImage>
 
 #include <cassert>
 
@@ -13,14 +14,15 @@ using namespace axis;
 
 cAxisCommunicationsSerializer::cAxisCommunicationsSerializer()
 :
-    cBlockSerializer(),
-    mImageData(),
-    mImageBuffer(&mImageData)
+    cBlockSerializer()
+//    ,
+//    mImageData(),
+//    mImageBuffer(&mImageData)
 {
-    mImageBuffer.open(QIODevice::ReadWrite);
-    mImageWriter.setDevice(&mImageBuffer);
+//    mImageBuffer.open(QIODevice::ReadWrite);
+    //mImageWriter.setDevice(&mImageBuffer);
 
-    auto list = QImageWriter::supportedImageFormats();
+//    auto list = QImageWriter::supportedImageFormats();
 }
 
 cAxisCommunicationsSerializer::cAxisCommunicationsSerializer(std::size_t n, cBlockDataFileWriter* pDataFile)
@@ -70,6 +72,7 @@ void cAxisCommunicationsSerializer::writeFramesPerSecond(int frames_per_sec)
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }
 
+/*
 void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& img)
 {
     assert(mpDataFile);
@@ -165,8 +168,65 @@ void cAxisCommunicationsSerializer::writeMpegFrame(const QImage& img)
     mImageData.clear();
     mImageBuffer.seek(0);
 }
+*/
 
-void cAxisCommunicationsSerializer::write(const axis::sImageSize_t& in)
+void cAxisCommunicationsSerializer::write(const cBitmapBuffer& in)
+{
+    mBlockID.setVersion(1, 0);
+    mBlockID.dataID(DataID::BITMAP);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.size();
+    mDataBuffer.write(in.data(), in.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing cBitmapBuffer data.");
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cAxisCommunicationsSerializer::write(const cJpegBuffer& in)
+{
+    mBlockID.setVersion(1, 0);
+    mBlockID.dataID(DataID::JPEG);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.size();
+    mDataBuffer.write(in.data(), in.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing cJpegBuffer data.");
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cAxisCommunicationsSerializer::write(const cMpegFrameBuffer& in)
+{
+    mBlockID.setVersion(1, 0);
+    mBlockID.dataID(DataID::MPEG_FRAME);
+
+    mDataBuffer.clear();
+    mDataBuffer.put<uint64_t>(in.size());
+    mDataBuffer.write(in.data(), in.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+    {
+        std::string msg = "ERROR, Buffer Overrun in writing cMpegFrameBuffer data.  ";
+        msg += "Image size = ";
+        msg += std::to_string(in.size());
+        throw std::runtime_error(msg);
+    }
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cAxisCommunicationsSerializer::write(const rgb::sImageSize_t& in)
 {
     assert(mpDataFile);
 

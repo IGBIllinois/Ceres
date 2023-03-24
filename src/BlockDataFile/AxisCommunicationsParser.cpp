@@ -13,15 +13,8 @@ using namespace axis;
 
 cAxisCommunicationsParser::cAxisCommunicationsParser()
 :
-    cBlockParser(),
-    mImageData(),
-    mImageBuffer(&mImageData)
-{
-    mImageBuffer.open(QIODevice::ReadWrite);
-    mImageWriter.setDevice(&mImageBuffer);
-
-    auto list = QImageWriter::supportedImageFormats();
-}
+    cBlockParser()
+{}
 
 cBlockID& cAxisCommunicationsParser::blockID()
 {
@@ -33,32 +26,112 @@ void cAxisCommunicationsParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     BLOCK_DATA_ID_t data_id,
     cDataBuffer& buffer)
 {
+    mBlockID.setVersion(major_version, minor_version);
+    mBlockID.dataID(static_cast<axis::DataID>(data_id));
+
     switch (static_cast<axis::DataID>(data_id))
     {
+    case DataID::CAMERA_ID:
+        processActiveCameraId(buffer);
+        break;
+    case DataID::FRAMES_PER_SECOND:
+        processFramesPerSecond(buffer);
+        break;
+    case DataID::BITMAP:
+        processBitmap(buffer);
+        break;
+    case DataID::JPEG:
+        processJPEG(buffer);
+        break;
+    case DataID::MPEG_FRAME:
+        processMpegFrame(buffer);
+        break;
+    case DataID::RESOLUTION:
+        processImageSize(buffer);
+        break;
     }
 }
 
-void cAxisCommunicationsParser::process_DataField(cDataBuffer& buffer)
+
+void cAxisCommunicationsParser::processActiveCameraId(cDataBuffer& buffer)
 {
-    uint8_t u;
-    buffer >> u;
-    //    mPositionUnit = static_cast<pvt::ePOSTION_UNITS>(u);
+    int id = buffer.get<int32_t>();
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processActiveCameraId.");
+
+    onActiveCameraId(id);
 }
 
+void cAxisCommunicationsParser::processFramesPerSecond(cDataBuffer& buffer)
+{
+    int frames_per_sec = buffer.get<int32_t>();
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processFramesPerSecond.");
+
+    onFramesPerSecond(frames_per_sec);
+}
+
+void cAxisCommunicationsParser::processBitmap(cDataBuffer& buffer)
+{
+    mBitmapBuffer.clear();
+
+    auto n = buffer.get<uint64_t>();
+    mBitmapBuffer.resize(n);
+
+    buffer.read(mBitmapBuffer.data(), n);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processBitmap.");
+
+    onBitmap(mBitmapBuffer);
+}
+
+void cAxisCommunicationsParser::processJPEG(cDataBuffer& buffer)
+{
+    mJpegBuffer.clear();
+
+    auto n = buffer.get<uint64_t>();
+    mJpegBuffer.resize(n);
+
+    buffer.read(mJpegBuffer.data(), n);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processJPEG.");
+
+    onJPEG(mJpegBuffer);
+}
+
+void cAxisCommunicationsParser::processMpegFrame(cDataBuffer& buffer)
+{
+    mMpegFrameBuffer.clear();
+
+    auto n = buffer.get<uint64_t>();
+    mMpegFrameBuffer.resize(n);
+
+    buffer.read(mMpegFrameBuffer.data(), n);
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processMpegFrame.");
+
+    onMpegFrame(mMpegFrameBuffer);
+}
+
+void cAxisCommunicationsParser::processImageSize(cDataBuffer& buffer)
+{
+    rgb::sImageSize_t image_size;
+
+    image_size.width  = buffer.get<uint16_t>();
+    image_size.height = buffer.get<uint16_t>();
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processImageSize.");
+
+    onImageSize(image_size);
+}
 
 #if 0
-void cAxisCommunicationsSerializer::writeActiveCameraId(int in)
-{
-    assert(mpDataFile);
-
-    mBlockID.dataID(DataID::CAMERA_ID);
-
-    mDataBuffer.clear();
-    mDataBuffer << in;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
-}
-
 void cAxisCommunicationsSerializer::writeBitmap(const QBitmap& in)
 {
     assert(mpDataFile);
@@ -93,18 +166,6 @@ void cAxisCommunicationsSerializer::writeJPEG(const QImage& in)
     mImageData.clear();
 }
 
-void cAxisCommunicationsSerializer::write(const axis::sImageSize_t& in)
-{
-    assert(mpDataFile);
-
-    mBlockID.dataID(DataID::RESOLUTION);
-
-    mDataBuffer.clear();
-    mDataBuffer << in.width;
-    mDataBuffer << in.height;
-
-    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
-}
 #endif
 
 

@@ -96,7 +96,7 @@ void cAxisCommunicationsParser::processMpegFrame(cDataBuffer& buffer)
     mImageReader.setDevice(&mImageBuffer);
     mImageReader.setFormat("jpeg");
 
-    uint32_t size;
+    uint64_t size;
     buffer >> size;
 
     mImageData.resize(size+16);

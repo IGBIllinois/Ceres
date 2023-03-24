@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "AxisCommunicationsUtils.hpp"
+#include "../RgbTypes.hpp"
 
 #include <QNetworkReply>
 #include <QUrl>
@@ -47,8 +47,8 @@ public:
     uint8_t getFramesPerSeconds() const;
     void setFramesPerSeconds(uint8_t fps);
 
-    axis::sImageSize_t getImageSize() const;
-    void setImageSize(axis::sImageSize_t image_size);
+    rgb::sImageSize_t getImageSize() const;
+    void setImageSize(rgb::sImageSize_t image_size);
 
     QImage* currentImage() const;
 
@@ -93,6 +93,6 @@ private:
     int mCurrentImageSize;
 
     uint8_t mFramesPerSeconds;
-    axis::sImageSize_t mImageSize;
+    rgb::sImageSize_t mImageSize;
 };
 

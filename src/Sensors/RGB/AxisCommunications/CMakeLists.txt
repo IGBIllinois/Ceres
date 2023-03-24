@@ -86,6 +86,7 @@ PRIVATE
 )
 
 target_include_directories(axis_communications_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(axis_communications_static PRIVATE ${RGB_INCLUDE_DIR})
 target_include_directories(axis_communications_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(axis_communications_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 

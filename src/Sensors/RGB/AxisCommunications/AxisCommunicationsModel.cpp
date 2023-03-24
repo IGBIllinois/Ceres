@@ -53,12 +53,12 @@ int cAxisCommunicationsModel::getVapixVersion() const
     return mVapixVersion;
 }
 
-const std::vector<axis::sImageSize_t>& cAxisCommunicationsModel::getImageSizes() const
+const std::vector<rgb::sImageSize_t>& cAxisCommunicationsModel::getImageSizes() const
 {
     return mSupportedImageSizes;
 }
 
-const std::vector<axis::eIMAGE_FORMAT>& cAxisCommunicationsModel::getImageFormats() const
+const std::vector<rgb::eIMAGE_FORMAT>& cAxisCommunicationsModel::getImageFormats() const
 {
     return mSupportedImageFormats;
 }
@@ -255,7 +255,7 @@ bool cAxisCommunicationsModel::querySupportedImageFormats()
     return false;
 }
 
-axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera)
+rgb::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera)
 {
     QUrl url(mUrl);
 
@@ -272,7 +272,7 @@ axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera
 
     if (!replyText.isEmpty())
     {
-        axis::sImageSize_t image_size;
+        rgb::sImageSize_t image_size;
 
         auto dimensions = replyText.split('\n');
         int n = dimensions[0].lastIndexOf('=') + 1;
@@ -286,7 +286,7 @@ axis::sImageSize_t cAxisCommunicationsModel::queryImageResolution(uint8_t camera
         return image_size;
     }
 
-    return axis::sImageSize_t();
+    return rgb::sImageSize_t();
 }
 
 QString cAxisCommunicationsModel::queryServer(const QNetworkRequest& request)
@@ -323,15 +323,15 @@ QString cAxisCommunicationsModel::queryServer(const QNetworkRequest& request)
     return replyText;
 }
 
-QBitmap cAxisCommunicationsModel::getBitmap(int cameraId, axis::sImageSize_t resolution)
+QBitmap cAxisCommunicationsModel::getBitmap(int cameraId, rgb::sImageSize_t resolution)
 {
-    if (std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), axis::eIMAGE_FORMAT::BITMAP)
+    if (std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), rgb::eIMAGE_FORMAT::BITMAP)
         == mSupportedImageFormats.end())
     {
         return QBitmap();
     }
 
-    if (resolution != axis::sImageSize_t())
+    if (resolution != rgb::sImageSize_t())
     {
         auto it = std::find(mSupportedImageSizes.begin(), mSupportedImageSizes.end(), resolution);
         if (it == mSupportedImageSizes.end())
@@ -375,15 +375,15 @@ QBitmap cAxisCommunicationsModel::getBitmap(int cameraId, axis::sImageSize_t res
     return QBitmap::fromImage(image);
 }
 
-QImage cAxisCommunicationsModel::getJPEG(int cameraId, axis::sImageSize_t resolution)
+QImage cAxisCommunicationsModel::getJPEG(int cameraId, rgb::sImageSize_t resolution)
 {
-    if (std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), axis::eIMAGE_FORMAT::JPEG)
+    if (std::find(mSupportedImageFormats.begin(), mSupportedImageFormats.end(), rgb::eIMAGE_FORMAT::JPEG)
         == mSupportedImageFormats.end())
     {
         return QImage();
     }
 
-    if (resolution != axis::sImageSize_t())
+    if (resolution != rgb::sImageSize_t())
     {
         auto it = std::find(mSupportedImageSizes.begin(), mSupportedImageSizes.end(), resolution);
         if (it == mSupportedImageSizes.end())
