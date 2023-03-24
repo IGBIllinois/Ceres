@@ -66,6 +66,8 @@ public:
     virtual void stopCommunications() = 0;
 
 signals:
+    void updateControllerConnection(bool connected);
+
     void statusMessage(QString msg) const;
     void infoMessage(QString title, QString msg) const;
     void warningMessage(QString title, QString msg) const;

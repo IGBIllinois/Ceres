@@ -17,6 +17,9 @@ cSpidercamModel::cSpidercamModel(QObject* parent)
     mController(this)
 
 {
+    QObject::connect(&mController, &cSpidercamController::connectionStateChange,
+                this, &cSpidercamModel::onConnectionStateChange);
+
     mPositionTolerance_mm = TOLERANCE_MM;
 }
 
@@ -72,6 +75,8 @@ bool cSpidercamModel::startCommunications()
         updateObstacleDistance();
 
         emit statusMessage("Ready");
+
+        emit updateControllerConnection(true);
     }
 
     return result;
@@ -79,6 +84,7 @@ bool cSpidercamModel::startCommunications()
 
 void cSpidercamModel::stopCommunications()
 {
+    emit updateControllerConnection(false);
     mController.stopCommunications();
 }
 
@@ -220,6 +226,10 @@ void cSpidercamModel::writeDataHeader()
 void cSpidercamModel::stopDataRecording()
 {}
 
+void cSpidercamModel::onConnectionStateChange(bool connected)
+{
+    emit updateControllerConnection(connected);
+}
 
 void cSpidercamModel::update()
 {

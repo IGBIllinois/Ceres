@@ -90,6 +90,9 @@ signals:
 	bool mAtCorrectionPosition;
 */
 
+protected slots:
+	void onConnectionStateChange(bool connected);
+
 protected:
 	void update() override;
 

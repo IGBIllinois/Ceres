@@ -2,10 +2,12 @@
 #include "SpidercamCtrl.hpp"
 
 
+//Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
+//Q_DECLARE_METATYPE(QAbstractSocket::SocketState)
+
 cSpidercamController::cSpidercamController(QObject* parent)
-    :
+    : QObject(parent),
         mpSocket(nullptr)
-//    mSocket()
 {
     mPort = 0;
 }
@@ -102,6 +104,10 @@ bool cSpidercamController::startCommunications()
 
     mpSocket = new QTcpSocket();
 
+    QObject::connect(mpSocket, &QTcpSocket::connected, this, &cSpidercamController::onConnect);
+    QObject::connect(mpSocket, &QTcpSocket::disconnected, this, &cSpidercamController::onDisconnect);
+    QObject::connect(mpSocket, &QTcpSocket::errorOccurred, this, &cSpidercamController::errorHandler);
+
     if (!mLocalEndpoint.isNull())
     {
         mpSocket->bind(mLocalEndpoint);
@@ -116,6 +122,10 @@ void cSpidercamController::stopCommunications()
 {
     if (mpSocket && mpSocket->isOpen())
     {
+        QObject::disconnect(mpSocket, &QTcpSocket::connected, this, &cSpidercamController::onConnect);
+        QObject::disconnect(mpSocket, &QTcpSocket::disconnected, this, &cSpidercamController::onDisconnect);
+        QObject::disconnect(mpSocket, &QTcpSocket::errorOccurred, this, &cSpidercamController::errorHandler);
+
         mpSocket->disconnectFromHost();
         mpSocket->close();
     }
@@ -168,6 +178,16 @@ std::string cSpidercamController::recv_reply()
     }
     
     return reply;
+}
+
+void cSpidercamController::onConnect()
+{
+    emit connectionStateChange(true);
+}
+
+void cSpidercamController::onDisconnect()
+{
+    emit connectionStateChange(false);
 }
 
 void cSpidercamController::errorHandler(QAbstractSocket::SocketError socketError)
