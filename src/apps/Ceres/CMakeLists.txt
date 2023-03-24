@@ -80,6 +80,9 @@ PRIVATE
     CtrlDataModel.hpp
     CtrlDataModel.cpp
 	
+    HobbsMeter.hpp
+    HobbsMeter.cpp
+
     MainWindow.hpp
     MainWindow.cpp
 

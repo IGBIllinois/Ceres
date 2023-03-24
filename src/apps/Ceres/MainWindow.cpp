@@ -1,6 +1,7 @@
 
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
+#include "HobbsMeter.hpp"
 
 #include "CeresSplashScreen.hpp"
 
@@ -101,6 +102,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
     mpViewMenu(nullptr),
     mpHelpMenu(nullptr),
     mpFileBar(nullptr),
+    mpHobbsMeter(nullptr),
     mpUI(new Ui::MainWindow),
     mpModel(nullptr),
     mpController(nullptr)
@@ -232,6 +234,8 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     }
 
     mpSplashScreen = nullptr;
+
+    statusBar()->addPermanentWidget(mpHobbsMeter);
 
     QTimer::singleShot(1000, mpModel, &cDataModel::startDataThread);
 }
@@ -662,6 +666,8 @@ void cMainWindow::createToolBars()
 void cMainWindow::createStatusBar()
 {
     statusBar();
+
+    mpHobbsMeter = new cHobbsMeter(statusBar());
 }
 
 //-----------------------------------------------------------------------------
@@ -776,6 +782,9 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
         //continue;
     }
 
+    QObject::connect(pModel, &cExperimentControlModel::updateControllerConnection,
+        mpHobbsMeter, &cHobbsMeter::updateControllerConnection);
+
     QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
     QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
     QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
@@ -870,13 +879,13 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
             validSensor = false;
         }
 
-/*BAF
+//*BAF
         if (!validSensor)
         {
             remove_sensor(type, widgets);
             continue;
         }
-*/
+//*/
 
         mpModel->addSensor(widgets.pModel);
 

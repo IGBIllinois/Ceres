@@ -27,6 +27,7 @@ class cCtrlDataModel;
 class cExperimentControlView;
 class cExperimentManager;
 class cExperimentTreeItem;
+class cHobbsMeter;
 
 namespace Ui 
 {
@@ -107,6 +108,8 @@ private:
     QMenu* mpHelpMenu;
 
     QToolBar* mpFileBar;
+
+    cHobbsMeter* mpHobbsMeter;
 
     Ui::MainWindow* mpUI;
     QString mCurrentFile;
