@@ -785,6 +785,9 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(pModel, &cExperimentControlModel::updateControllerConnection,
         mpHobbsMeter, &cHobbsMeter::updateControllerConnection);
 
+    QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
+        mpHobbsMeter, &cHobbsMeter::onExperimentStateChange);
+
     QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
     QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
     QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
