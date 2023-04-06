@@ -102,6 +102,9 @@ void cSsnxParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     case DataID::RAIM_STATISTICS:
         processRAIMStatistics_1_t(buffer);
         break;
+    case DataID::POS_LOCAL:
+        processPOS_Local_1_t(buffer);
+        break;
     case DataID::POS_PROJECTED:
         processPOS_Projected_1_t(buffer);
         break;
@@ -265,16 +268,16 @@ void cSsnxParser::processPosCovGeodetic_1_t(cDataBuffer& buffer)
     mPosCovGeodetic_1.Mode = to_solution_type(buffer);
     buffer >> mPosCovGeodetic_1.HeightComputed;
     buffer >> mPosCovGeodetic_1.Error;
-    buffer >> mPosCovGeodetic_1.Cov_latlat_m;
-    buffer >> mPosCovGeodetic_1.Cov_lonlon_m;
-    buffer >> mPosCovGeodetic_1.Cov_hgthgt_m;
-    buffer >> mPosCovGeodetic_1.Cov_bb_m;
-    buffer >> mPosCovGeodetic_1.Cov_latlon_m;
-    buffer >> mPosCovGeodetic_1.Cov_lathgt_m;
-    buffer >> mPosCovGeodetic_1.Cov_latb_m;
-    buffer >> mPosCovGeodetic_1.Cov_lonhgt_m;
-    buffer >> mPosCovGeodetic_1.Cov_lonb_m;
-    buffer >> mPosCovGeodetic_1.Cov_hgtb_m;
+    buffer >> mPosCovGeodetic_1.Cov_latlat_m2;
+    buffer >> mPosCovGeodetic_1.Cov_lonlon_m2;
+    buffer >> mPosCovGeodetic_1.Cov_hgthgt_m2;
+    buffer >> mPosCovGeodetic_1.Cov_bb_m2;
+    buffer >> mPosCovGeodetic_1.Cov_latlon_m2;
+    buffer >> mPosCovGeodetic_1.Cov_lathgt_m2;
+    buffer >> mPosCovGeodetic_1.Cov_latb_m2;
+    buffer >> mPosCovGeodetic_1.Cov_lonhgt_m2;
+    buffer >> mPosCovGeodetic_1.Cov_lonb_m2;
+    buffer >> mPosCovGeodetic_1.Cov_hgtb_m2;
 }
 
 void cSsnxParser::processVelCovGeodetic_1_t(cDataBuffer& buffer)
@@ -284,16 +287,16 @@ void cSsnxParser::processVelCovGeodetic_1_t(cDataBuffer& buffer)
     mVelCovGeodetic_1.Mode = to_solution_type(buffer);
     buffer >> mVelCovGeodetic_1.HeightComputed;
     buffer >> mVelCovGeodetic_1.Error;
-    buffer >> mVelCovGeodetic_1.Cov_VnVn_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VeVe_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VuVu_mps;
-    buffer >> mVelCovGeodetic_1.Cov_DtDt_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VnVe_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VnVu_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VnDt_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VeVu_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VeDt_mps;
-    buffer >> mVelCovGeodetic_1.Cov_VuDt_mps;
+    buffer >> mVelCovGeodetic_1.Cov_VnVn_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VeVe_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VuVu_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_DtDt_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VnVe_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VnVu_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VnDt_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VeVu_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VeDt_m2ps2;
+    buffer >> mVelCovGeodetic_1.Cov_VuDt_m2ps2;
 }
 
 void cSsnxParser::processDOP_1_t(cDataBuffer& buffer)
@@ -351,6 +354,19 @@ void cSsnxParser::processRAIMStatistics_1_t(cDataBuffer& buffer)
         buffer >> satData.RangeMDB;
         buffer >> satData.RrateMDB;
     }
+}
+
+void cSsnxParser::processPOS_Local_1_t(cDataBuffer& buffer)
+{
+    buffer >> mPOS_Local_1.dataValid;
+    buffer >> mPOS_Local_1.timestamp_s;
+    mPOS_Local_1.Mode = to_solution_type(buffer);
+    buffer >> mPOS_Local_1.HeightComputed;
+    buffer >> mPOS_Local_1.Error;
+    buffer >> mPOS_Local_1.Lat_rad;
+    buffer >> mPOS_Local_1.Lon_rad;
+    buffer >> mPOS_Local_1.Alt_m;
+    buffer >> mPOS_Local_1.Datum;
 }
 
 void cSsnxParser::processPOS_Projected_1_t(cDataBuffer& buffer)

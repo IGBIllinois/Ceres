@@ -9,7 +9,7 @@
 #include <ssnx/ssn_com.hpp>
 
 
-class cSsnxModel_direct : public cSsnxModel, public SsnCom
+class cSsnxModel_direct : public cSsnxModel, public cSsnCom
 {
     Q_OBJECT
 

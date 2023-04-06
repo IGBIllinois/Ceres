@@ -27,6 +27,7 @@ public:
 	ssnx::gps::DOP_1_t				getDOP_1() { return mDOP_1; };
 	ssnx::gps::PVT_Residuals_1_t	getPVT_Residuals_1() { return mPVT_Residuals_1; };
 	ssnx::gps::RAIMStatistics_1_t	getRAIMStatistics_1() { return mRAIMStatistics_1; };
+	ssnx::gps::POS_Local_1_t		getPOS_Local_1() { return mPOS_Local_1; };
 	ssnx::gps::POS_Projected_1_t	getPOS_Projected_1() { return mPOS_Projected_1; };
 	ssnx::gps::ReceiverTime_1_t		getReceiverTime_1() { return mReceiverTime_1; };
 	ssnx::gps::RtcmDatum_1_t		getRtcmDatum_1() { return mRtcmDatum_1; };
@@ -46,6 +47,7 @@ protected:
 	virtual void processDOP_1_t(cDataBuffer& buffer);
 	virtual void processPVT_Residuals_1_t(cDataBuffer& buffer);
 	virtual void processRAIMStatistics_1_t(cDataBuffer& buffer);
+	virtual void processPOS_Local_1_t(cDataBuffer& buffer);
 	virtual void processPOS_Projected_1_t(cDataBuffer& buffer);
 	virtual void processReceiverTime_1_t(cDataBuffer& buffer);
 	virtual void processRtcmDatum_1_t(cDataBuffer& buffer);
@@ -60,6 +62,7 @@ protected:
 	ssnx::gps::DOP_1_t				mDOP_1;
 	ssnx::gps::PVT_Residuals_1_t	mPVT_Residuals_1;
 	ssnx::gps::RAIMStatistics_1_t	mRAIMStatistics_1;
+	ssnx::gps::POS_Local_1_t		mPOS_Local_1;
 	ssnx::gps::POS_Projected_1_t	mPOS_Projected_1;
 	ssnx::gps::ReceiverTime_1_t		mReceiverTime_1;
 	ssnx::gps::RtcmDatum_1_t		mRtcmDatum_1;

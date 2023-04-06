@@ -21,6 +21,7 @@ namespace ssnx
         POS_PROJECTED,
         RECEIVER_TIME,
         RTCM_DATUM,
+        POS_LOCAL,
     };
 }
 

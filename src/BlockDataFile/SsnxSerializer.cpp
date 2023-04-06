@@ -238,16 +238,16 @@ void cSsnxSerializer::write(const ssnx::gps::PosCovGeodetic_1_t& in)
     mDataBuffer << to_uint8(in.Mode);
     mDataBuffer << in.HeightComputed;
     mDataBuffer << in.Error;
-    mDataBuffer << in.Cov_latlat_m;
-    mDataBuffer << in.Cov_lonlon_m;
-    mDataBuffer << in.Cov_hgthgt_m;
-    mDataBuffer << in.Cov_bb_m;
-    mDataBuffer << in.Cov_latlon_m;
-    mDataBuffer << in.Cov_lathgt_m;
-    mDataBuffer << in.Cov_latb_m;
-    mDataBuffer << in.Cov_lonhgt_m;
-    mDataBuffer << in.Cov_lonb_m;
-    mDataBuffer << in.Cov_hgtb_m;
+    mDataBuffer << in.Cov_latlat_m2;
+    mDataBuffer << in.Cov_lonlon_m2;
+    mDataBuffer << in.Cov_hgthgt_m2;
+    mDataBuffer << in.Cov_bb_m2;
+    mDataBuffer << in.Cov_latlon_m2;
+    mDataBuffer << in.Cov_lathgt_m2;
+    mDataBuffer << in.Cov_latb_m2;
+    mDataBuffer << in.Cov_lonhgt_m2;
+    mDataBuffer << in.Cov_lonb_m2;
+    mDataBuffer << in.Cov_hgtb_m2;
 
     assert(!mDataBuffer.overrun());
 
@@ -270,16 +270,16 @@ void cSsnxSerializer::write(const ssnx::gps::VelCovGeodetic_1_t& in)
     mDataBuffer << to_uint8(in.Mode);
     mDataBuffer << in.HeightComputed;
     mDataBuffer << in.Error;
-    mDataBuffer << in.Cov_VnVn_mps;
-    mDataBuffer << in.Cov_VeVe_mps;
-    mDataBuffer << in.Cov_VuVu_mps;
-    mDataBuffer << in.Cov_DtDt_mps;
-    mDataBuffer << in.Cov_VnVe_mps;
-    mDataBuffer << in.Cov_VnVu_mps;
-    mDataBuffer << in.Cov_VnDt_mps;
-    mDataBuffer << in.Cov_VeVu_mps;
-    mDataBuffer << in.Cov_VeDt_mps;
-    mDataBuffer << in.Cov_VuDt_mps;
+    mDataBuffer << in.Cov_VnVn_m2ps2;
+    mDataBuffer << in.Cov_VeVe_m2ps2;
+    mDataBuffer << in.Cov_VuVu_m2ps2;
+    mDataBuffer << in.Cov_DtDt_m2ps2;
+    mDataBuffer << in.Cov_VnVe_m2ps2;
+    mDataBuffer << in.Cov_VnVu_m2ps2;
+    mDataBuffer << in.Cov_VnDt_m2ps2;
+    mDataBuffer << in.Cov_VeVu_m2ps2;
+    mDataBuffer << in.Cov_VeDt_m2ps2;
+    mDataBuffer << in.Cov_VuDt_m2ps2;
 
     assert(!mDataBuffer.overrun());
 
@@ -381,6 +381,32 @@ void cSsnxSerializer::write(const ssnx::gps::RAIMStatistics_1_t& in)
 
     if (mDataBuffer.overrun())
         throw std::runtime_error("ERROR, Buffer Overrun in writing RAIMStatistics_1_t data.");
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+}
+
+void cSsnxSerializer::write(const ssnx::gps::POS_Local_1_t& in)
+{
+    assert(mpDataFile);
+
+    mBlockID.setVersion(1, 0);
+    mBlockID.dataID(DataID::POS_LOCAL);
+
+    mDataBuffer.clear();
+    mDataBuffer << in.dataValid;
+    mDataBuffer << in.timestamp_s;
+    mDataBuffer << to_uint8(in.Mode);
+    mDataBuffer << in.HeightComputed;
+    mDataBuffer << in.Error;
+    mDataBuffer << in.Lat_rad;
+    mDataBuffer << in.Lon_rad;
+    mDataBuffer << in.Alt_m;
+    mDataBuffer << in.Datum;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing POS_Local_1_t data.");
 
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 }

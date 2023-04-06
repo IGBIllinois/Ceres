@@ -21,6 +21,7 @@ namespace ssnx
 		struct DOP_1_t;
 		struct PVT_Residuals_1_t;
 		struct RAIMStatistics_1_t;
+		struct POS_Local_1_t;
 		struct POS_Projected_1_t;
 		struct ReceiverTime_1_t;
 		struct RtcmDatum_1_t;
@@ -43,6 +44,7 @@ public:
 	void write(const ssnx::gps::DOP_1_t& in);
 	void write(const ssnx::gps::PVT_Residuals_1_t& in);
 	void write(const ssnx::gps::RAIMStatistics_1_t& in);
+	void write(const ssnx::gps::POS_Local_1_t& in);
 	void write(const ssnx::gps::POS_Projected_1_t& in);
 	void write(const ssnx::gps::ReceiverTime_1_t& in);
 	void write(const ssnx::gps::RtcmDatum_1_t& in);
