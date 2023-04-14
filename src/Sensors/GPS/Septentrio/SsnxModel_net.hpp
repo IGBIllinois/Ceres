@@ -9,7 +9,7 @@
 #include <ssnx/ssn_net_decoder.hpp>
 
 
-class cSsnxModel_net : public cSsnxModel, public SsnNetDecoder, private cSsnxGpsStream
+class cSsnxModel_net : public cSsnxModel, public cSsnNetDecoder, private cSsnxGpsStream
 {
     Q_OBJECT
 
@@ -36,7 +36,8 @@ protected:
     void pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt) override;
     void posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov) override;
     void velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov) override;
-    void posProjected(const ssnx::gps::POS_Projected_1_t pvt) override;
+    void posLocal(const ssnx::gps::POS_Local_1_t pos) override;
+    void posProjected(const ssnx::gps::POS_Projected_1_t pos) override;
     void receiverTime(const ssnx::gps::ReceiverTime_1_t pvt) override;
     void rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm) override;
 

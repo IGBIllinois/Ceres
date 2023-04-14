@@ -153,13 +153,23 @@ void cSsnxModel_net::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
     }
 }
 
-void cSsnxModel_net::posProjected(const ssnx::gps::POS_Projected_1_t pvt)
+void cSsnxModel_net::posLocal(const ssnx::gps::POS_Local_1_t pos)
 {
-    if (!pvt.dataValid) return;
+    if (!pos.dataValid) return;
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(pvt);
+        mSerializer.write(pos);
+    }
+}
+
+void cSsnxModel_net::posProjected(const ssnx::gps::POS_Projected_1_t pos)
+{
+    if (!pos.dataValid) return;
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.write(pos);
     }
 }
 
