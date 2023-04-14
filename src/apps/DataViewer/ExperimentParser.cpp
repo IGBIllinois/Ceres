@@ -162,35 +162,35 @@ void cExperimentParser::processEndTime(cDataBuffer& buffer)
 
 void cExperimentParser::processStartRecordingTimestamp(cDataBuffer& buffer)
 {
-    uint64_t timestamp = 0;
-    buffer >> timestamp;
+    uint64_t timestamp_ns = 0;
+    buffer >> timestamp_ns;
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processStartRecordingTimestamp.");
 
-    onStartRecordingTimestamp(timestamp);
+    onStartRecordingTimestamp(timestamp_ns);
 }
 
 void cExperimentParser::processEndRecordingTimestamp(cDataBuffer& buffer)
 {
-    uint64_t timestamp = 0;
-    buffer >> timestamp;
+    uint64_t timestamp_ns = 0;
+    buffer >> timestamp_ns;
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processEndRecordingTimestamp.");
 
-    onEndRecordingTimestamp(timestamp);
+    onEndRecordingTimestamp(timestamp_ns);
 }
 
 void cExperimentParser::processHeartbeatTimestamp(cDataBuffer& buffer)
 {
-    uint64_t timestamp = 0;
-    buffer >> timestamp;
+    uint64_t timestamp_ns = 0;
+    buffer >> timestamp_ns;
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processHeartbeatTimestamp.");
 
-    onHeartbeatTimestamp(timestamp);
+    onHeartbeatTimestamp(timestamp_ns);
 }
 
 void cExperimentParser::processSensorBlockInfo(cDataBuffer& buffer)

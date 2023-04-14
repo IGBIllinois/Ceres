@@ -68,9 +68,9 @@ private:
     void onStartTime(sExperimentTime_t start_time) override;
     void onEndTime(sExperimentTime_t end_time) override;
 
-    void onStartRecordingTimestamp(uint64_t timestamp) override;
-    void onEndRecordingTimestamp(uint64_t timestamp) override;
-    void onHeartbeatTimestamp(uint64_t timestamp) override;
+    void onStartRecordingTimestamp(uint64_t timestamp_ns) override;
+    void onEndRecordingTimestamp(uint64_t timestamp_ns) override;
+    void onHeartbeatTimestamp(uint64_t timestamp_ns) override;
 
     void onBeginSensorList() override;
     void onEndOfSensorList() override;

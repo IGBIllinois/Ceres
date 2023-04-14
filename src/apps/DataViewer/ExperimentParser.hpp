@@ -51,9 +51,9 @@ protected:
 	virtual void onStartTime(sExperimentTime_t start_time) = 0;
 	virtual void onEndTime(sExperimentTime_t end_time) = 0;
 
-	virtual void onStartRecordingTimestamp(uint64_t timestamp) = 0;
-	virtual void onEndRecordingTimestamp(uint64_t timestamp) = 0;
-	virtual void onHeartbeatTimestamp(uint64_t timestamp) = 0;
+	virtual void onStartRecordingTimestamp(uint64_t timestamp_ns) = 0;
+	virtual void onEndRecordingTimestamp(uint64_t timestamp_ns) = 0;
+	virtual void onHeartbeatTimestamp(uint64_t timestamp_ns) = 0;
 
 	virtual void onUnknownDataID(BLOCK_DATA_ID_t data_id) {};
 

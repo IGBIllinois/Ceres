@@ -415,14 +415,14 @@ void cCentralWidget::onEndTime(sExperimentTime_t end_time)
     mpEndTime->setText(time);
 }
 
-void cCentralWidget::onStartRecordingTimestamp(uint64_t timestamp)
+void cCentralWidget::onStartRecordingTimestamp(uint64_t timestamp_ns)
 {
-    mRecordingStartTime_ns = timestamp;
+    mRecordingStartTime_ns = timestamp_ns;
 }
 
-void cCentralWidget::onEndRecordingTimestamp(uint64_t timestamp)
+void cCentralWidget::onEndRecordingTimestamp(uint64_t timestamp_ns)
 {
-    std::uint64_t diffTime_ns = timestamp - mRecordingStartTime_ns;
+    std::uint64_t diffTime_ns = timestamp_ns - mRecordingStartTime_ns;
     double diffTime_sec = static_cast<double>(diffTime_ns) / 1000000000.0;
 
     QString msg = "Total recording time: ";
@@ -430,9 +430,9 @@ void cCentralWidget::onEndRecordingTimestamp(uint64_t timestamp)
     emit statusMessage(msg);
 }
 
-void cCentralWidget::onHeartbeatTimestamp(uint64_t timestamp)
+void cCentralWidget::onHeartbeatTimestamp(uint64_t timestamp_ns)
 {
-    std::uint64_t diffTime_ns = timestamp - mRecordingStartTime_ns;
+    std::uint64_t diffTime_ns = timestamp_ns - mRecordingStartTime_ns;
     double diffTime_sec = static_cast<double>(diffTime_ns) / 1000000000.0;
 
     QString msg = "Record time: ";
