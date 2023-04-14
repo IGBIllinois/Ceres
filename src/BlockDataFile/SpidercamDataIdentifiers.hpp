@@ -10,7 +10,8 @@ namespace spidercam
     **********************************************************/
     enum class DataID : uint16_t
     {
-        DOLLY_POSITION,
+        DOLLY_POSITION = 0,
+        EXPERIMENT_START_DOLLY_INFO,
     };
 }
 

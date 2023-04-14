@@ -15,8 +15,16 @@ class cSpidercamController : public QObject, public cSpiderCamCom
 
 public:
 	cSpidercamController(QObject* parent = nullptr);
-	~cSpidercamController();
+	virtual ~cSpidercamController();
 
+	double getComputedVx_mmps() const;
+	double getComputedVy_mmps() const;
+	double getComputedVz_mmps() const;
+
+	bool sendRequestNewPosition(double x_mm, double y_mm, double z_mm, double height_mm,
+		uint32_t speed_mmps, float pan_deg, float tilt_deg, float roll_deg) override;
+
+public:
 	bool hasRemoteEndpoint() const;
 	QString remoteEndpoint() const;
 	uint16_t remotePort() const;
@@ -39,6 +47,11 @@ private slots:
 	void onDisconnect();
 	void errorHandler(QAbstractSocket::SocketError socketError);
 
+protected:
+	double mVx_mmps = 0.0;
+	double mVy_mmps = 0.0;
+	double mVz_mmps = 0.0;
+
 private:
 	int send_cmd(const std::string_view msg) override;
 	std::string recv_reply() override;
@@ -47,8 +60,13 @@ private:
 
 	QHostAddress mLocalEndpoint;
 	QHostAddress mRemoteEndpoint;
-	uint16_t mPort;
+	uint16_t mPort = 0;
 
 	QTcpSocket* mpSocket;
 	QByteArray mReplyBuffer;
 };
+
+
+inline double cSpidercamController::getComputedVx_mmps() const { return mVx_mmps; }
+inline double cSpidercamController::getComputedVy_mmps() const { return mVy_mmps; }
+inline double cSpidercamController::getComputedVz_mmps() const { return mVz_mmps; }

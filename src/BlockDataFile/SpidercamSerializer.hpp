@@ -20,7 +20,20 @@ public:
 	explicit cSpidercamSerializer(std::size_t n, cBlockDataFileWriter* pDataFile = nullptr);
 	~cSpidercamSerializer() = default;
 
+	/**
+	 * Saves the current position information.  The information is stored at
+	 * regular intervals when an experiment is running.
+	 */
 	void write(const spidercam::sPosition_1_t& pos);
+
+	/**
+	 * Saves the dolly information.  The information is stored at
+	 * the beginning of the "save phase" experiment.
+	 */
+	void write(const double x_mm, const double y_mm, const double z_mm,
+        const double vx_mmps, const double vy_mmps, const double vz_mmps,
+        const double yaw_deg, const double pitch_deg, const double roll_deg);
+
 
 protected:
 	cBlockID& blockID() override;

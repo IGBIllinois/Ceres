@@ -57,3 +57,32 @@ void cSpidercamSerializer::write(const spidercam::sPosition_1_t& pos)
 
 }
 
+void cSpidercamSerializer::write(const double x_mm, const double y_mm, const double z_mm,
+    const double vx_mmps, const double vy_mmps, const double vz_mmps,
+    const double yaw_deg, const double pitch_deg, const double roll_deg)
+{
+    assert(mpDataFile);
+
+    setVersion(1, 0);
+
+    mBlockID.dataID(DataID::EXPERIMENT_START_DOLLY_INFO);
+
+    mDataBuffer.clear();
+    mDataBuffer << x_mm;
+    mDataBuffer << y_mm;
+    mDataBuffer << z_mm;
+    mDataBuffer << vx_mmps;
+    mDataBuffer << vy_mmps;
+    mDataBuffer << vz_mmps;
+    mDataBuffer << yaw_deg;
+    mDataBuffer << pitch_deg;
+    mDataBuffer << roll_deg;
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing spidercam target data.");
+
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+}

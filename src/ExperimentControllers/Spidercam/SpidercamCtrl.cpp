@@ -17,6 +17,37 @@ cSpidercamController::~cSpidercamController()
     stopCommunications();
 }
 
+bool cSpidercamController::sendRequestNewPosition(
+    double x_mm, double y_mm, double z_mm, double height_mm,
+    uint32_t speed_mmps, float pan_deg, float tilt_deg, float roll_deg)
+{
+    if (speed_mmps == 0)
+    {
+        mVx_mmps = 0.0;
+        mVy_mmps = 0.0;
+        mVz_mmps = 0.0;
+    }
+    else
+    {
+        auto pos = getLastKnownPosition();
+
+        double dx = x_mm - pos.X_mm;
+        double dy = y_mm - pos.Y_mm;
+        double dz = z_mm - pos.Z_mm;
+
+        double d = sqrt(dx * dx + dy * dy + dz * dz);
+        double t_sec = d / static_cast<double>(speed_mmps);
+
+        mVx_mmps = dx / t_sec;
+        mVy_mmps = dx / t_sec;
+        mVz_mmps = dx / t_sec;
+    }
+
+    return cSpiderCamCom::sendRequestNewPosition(
+        x_mm, y_mm, z_mm, height_mm,
+        speed_mmps, pan_deg, tilt_deg, roll_deg);
+}
+
 bool cSpidercamController::hasRemoteEndpoint() const
 {
     return !mRemoteEndpoint.isNull();
