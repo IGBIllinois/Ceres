@@ -172,11 +172,11 @@ void cAxisCommunicationsSerializer::writeMpegFrame(const QImage& img)
 
 void cAxisCommunicationsSerializer::write(const cBitmapBuffer& in)
 {
-    mBlockID.setVersion(1, 0);
+    mBlockID.setVersion(2, 0);
     mBlockID.dataID(DataID::BITMAP);
 
     mDataBuffer.clear();
-    mDataBuffer << in.size();
+    mDataBuffer.put<uint64_t>(in.size());
     mDataBuffer.write(in.data(), in.size());
 
     assert(!mDataBuffer.overrun());
@@ -189,11 +189,11 @@ void cAxisCommunicationsSerializer::write(const cBitmapBuffer& in)
 
 void cAxisCommunicationsSerializer::write(const cJpegBuffer& in)
 {
-    mBlockID.setVersion(1, 0);
+    mBlockID.setVersion(2, 0);
     mBlockID.dataID(DataID::JPEG);
 
     mDataBuffer.clear();
-    mDataBuffer << in.size();
+    mDataBuffer.put<uint64_t>(in.size());
     mDataBuffer.write(in.data(), in.size());
 
     assert(!mDataBuffer.overrun());
@@ -206,7 +206,7 @@ void cAxisCommunicationsSerializer::write(const cJpegBuffer& in)
 
 void cAxisCommunicationsSerializer::write(const cMpegFrameBuffer& in)
 {
-    mBlockID.setVersion(1, 0);
+    mBlockID.setVersion(2, 0);
     mBlockID.dataID(DataID::MPEG_FRAME);
 
     mDataBuffer.clear();
