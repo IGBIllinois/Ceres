@@ -30,6 +30,10 @@ public:
 	void writeCultivar(const std::string& cultivar);
 	void writeExperimentDoc(const std::string& doc);
 
+	void writeDate(std::uint16_t year, std::uint8_t month, std::uint8_t day);
+	void writeDayOfYear(std::uint16_t doy);
+	void writeTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds);
+
 	void writeBeginSensorList();
 	void writeEndOfSensorList();
 	void writeSensorBlockInfo(uint16_t class_id, const std::string& name);
@@ -37,9 +41,9 @@ public:
 	void startTime(time_t time);
 	void endTime(time_t time);
 
-	void startRecordingTimestamp(uint64_t timestamp);
-	void endRecordingTimestamp(uint64_t timestamp);
-	void heartbeatTimestamp(uint64_t timestamp);
+	void startRecordingTimestamp(uint64_t timestamp_ns);
+	void endRecordingTimestamp(uint64_t timestamp_ns);
+	void heartbeatTimestamp(uint64_t timestamp_ns);
 
 protected:
 	cBlockID& blockID() override;

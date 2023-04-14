@@ -10,7 +10,17 @@ using namespace experiment;
 cExperimentParser::cExperimentParser()
 :
     cBlockParser()
-{}
+{
+    mYear = 0;
+    mMonth = 0;
+    mDay = 0;
+
+    mDayOfYear = 0;
+
+    mHour = 0;
+    mMinute = 0;
+    mSeconds = 0;
+}
 
 cBlockID& cExperimentParser::blockID()
 {
@@ -64,6 +74,15 @@ void cExperimentParser::processData(BLOCK_MAJOR_VERSION_t major_version,
     case DataID::END_OF_SENSOR_LIST:
         break;
     case DataID::SENSOR_DATA_BLOCK_INFO:
+        break;
+    case DataID::EXPERIMENT_DATE:
+        processDate(buffer);
+        break;
+    case DataID::EXPERIMENT_DAY_OF_YEAR:
+        processDayOfYear(buffer);
+        break;
+    case DataID::EXPERIMENT_TIME:
+        processTime(buffer);
         break;
     }
 }
@@ -122,6 +141,34 @@ void cExperimentParser::processExperimentDoc(cDataBuffer& buffer)
 
     if (buffer.underrun())
         throw std::runtime_error("ERROR, Buffer under run in processExperimentDoc.");
+}
+
+void cExperimentParser::processDate(cDataBuffer& buffer)
+{
+    buffer >> mYear;
+    buffer >> mMonth;
+    buffer >> mDay;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processDate.");
+}
+
+void cExperimentParser::processDayOfYear(cDataBuffer& buffer)
+{
+    buffer >> mDayOfYear;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processDayOfYear.");
+}
+
+void cExperimentParser::processTime(cDataBuffer& buffer)
+{
+    buffer >> mHour;
+    buffer >> mMinute;
+    buffer >> mSeconds;
+
+    if (buffer.underrun())
+        throw std::runtime_error("ERROR, Buffer under run in processTime.");
 }
 
 

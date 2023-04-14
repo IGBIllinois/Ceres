@@ -10,7 +10,7 @@ namespace experiment
     **********************************************************/
     enum class DataID : uint16_t
     {
-        EXPERIMENT,
+        EXPERIMENT = 0,
         START_TIME,
         END_TIME,
         START_RECORDING_TIMESTAMP,
@@ -26,6 +26,9 @@ namespace experiment
         END_OF_SENSOR_LIST,
         SENSOR_DATA_BLOCK_INFO,
         RECORDING_HEARTBEAT_TIMESTAMP,
+        EXPERIMENT_DATE,
+        EXPERIMENT_DAY_OF_YEAR,
+        EXPERIMENT_TIME,
     };
 }
 

@@ -144,6 +144,61 @@ void cExperimentSerializer::writeExperimentDoc(const std::string& doc)
         throw std::runtime_error("ERROR, Buffer Overrun in writing writeExperimentDoc data.");
 }
 
+void cExperimentSerializer::writeDate(std::uint16_t year, std::uint8_t month, std::uint8_t day)
+{
+    assert(mpDataFile);
+
+    setVersion(1, 0);
+    mBlockID.dataID(DataID::EXPERIMENT_DATE);
+
+    mDataBuffer.clear();
+    mDataBuffer << year;
+    mDataBuffer << month;
+    mDataBuffer << day;
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeDate data.");
+}
+
+void cExperimentSerializer::writeDayOfYear(std::uint16_t doy)
+{
+    assert(mpDataFile);
+
+    setVersion(1, 0);
+    mBlockID.dataID(DataID::EXPERIMENT_DAY_OF_YEAR);
+
+    mDataBuffer.clear();
+    mDataBuffer << doy;
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeDayOfYear data.");
+}
+
+void cExperimentSerializer::writeTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds)
+{
+    assert(mpDataFile);
+
+    setVersion(1, 0);
+    mBlockID.dataID(DataID::EXPERIMENT_TIME);
+
+    mDataBuffer.clear();
+    mDataBuffer << hour;
+    mDataBuffer << minute;
+    mDataBuffer << seconds;
+    mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
+
+    assert(!mDataBuffer.overrun());
+
+    if (mDataBuffer.overrun())
+        throw std::runtime_error("ERROR, Buffer Overrun in writing writeTime data.");
+}
+
 void cExperimentSerializer::writeBeginSensorList()
 {
     assert(mpDataFile);
@@ -243,7 +298,7 @@ void cExperimentSerializer::endTime(time_t time)
         throw std::runtime_error("ERROR, Buffer Overrun in writing endTime data.");
 }
 
-void cExperimentSerializer::startRecordingTimestamp(uint64_t timestamp)
+void cExperimentSerializer::startRecordingTimestamp(uint64_t timestamp_ns)
 {
     assert(mpDataFile);
 
@@ -251,7 +306,7 @@ void cExperimentSerializer::startRecordingTimestamp(uint64_t timestamp)
     mBlockID.dataID(DataID::START_RECORDING_TIMESTAMP);
 
     mDataBuffer.clear();
-    mDataBuffer << timestamp;
+    mDataBuffer << timestamp_ns;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 
     assert(!mDataBuffer.overrun());
@@ -260,7 +315,7 @@ void cExperimentSerializer::startRecordingTimestamp(uint64_t timestamp)
         throw std::runtime_error("ERROR, Buffer Overrun in writing startRecordingTimestamp data.");
 }
 
-void cExperimentSerializer::endRecordingTimestamp(uint64_t timestamp)
+void cExperimentSerializer::endRecordingTimestamp(uint64_t timestamp_ns)
 {
     assert(mpDataFile);
 
@@ -268,7 +323,7 @@ void cExperimentSerializer::endRecordingTimestamp(uint64_t timestamp)
     mBlockID.dataID(DataID::END_RECORDING_TIMESTAMP);
 
     mDataBuffer.clear();
-    mDataBuffer << timestamp;
+    mDataBuffer << timestamp_ns;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 
     assert(!mDataBuffer.overrun());
@@ -277,7 +332,7 @@ void cExperimentSerializer::endRecordingTimestamp(uint64_t timestamp)
         throw std::runtime_error("ERROR, Buffer Overrun in writing endRecordingTimestamp data.");
 }
 
-void cExperimentSerializer::heartbeatTimestamp(uint64_t timestamp)
+void cExperimentSerializer::heartbeatTimestamp(uint64_t timestamp_ns)
 {
     assert(mpDataFile);
 
@@ -285,7 +340,7 @@ void cExperimentSerializer::heartbeatTimestamp(uint64_t timestamp)
     mBlockID.dataID(DataID::RECORDING_HEARTBEAT_TIMESTAMP);
 
     mDataBuffer.clear();
-    mDataBuffer << timestamp;
+    mDataBuffer << timestamp_ns;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 
     assert(!mDataBuffer.overrun());

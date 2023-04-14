@@ -8,6 +8,7 @@
 #include <QTimer>
 
 #include <sstream>
+#include <ctime>
 
 
 namespace
@@ -317,6 +318,22 @@ void cRemoteDataModel::onStartExperiment()
 
     if (!mCultivar.empty())
         mSerializer.writeCultivar(mCultivar);
+
+    time_t t = time(nullptr);
+    auto tm = localtime(&t);
+    std::uint16_t year = tm->tm_year + 1900;
+    std::uint8_t month = tm->tm_mon + 1;
+    std::uint8_t day = tm->tm_mday;
+
+    std::uint16_t doy = tm->tm_yday;
+
+    std::uint8_t hour = tm->tm_hour;
+    std::uint8_t minute = tm->tm_min;
+    std::uint8_t sec = tm->tm_sec;
+
+    mSerializer.writeDate(year, month, day);
+    mSerializer.writeDayOfYear(doy);
+    mSerializer.writeTime(hour, minute, sec);
 
     mSerializer.writeExperimentDoc(mExperimentDoc);
 

@@ -31,6 +31,16 @@ public:
 	const std::string& cultivar() const { return mCultivar; }
 	const std::string& experimentDoc() const { return mExperimentDoc; }
 
+	std::uint16_t year() const { return mYear; }
+	std::uint8_t  month() const { return mMonth; }
+	std::uint8_t  day() const { return mDay; }
+
+	std::uint16_t dayOfYear() const { return mDayOfYear; }
+
+	std::uint8_t hour() const { return mHour; }
+	std::uint8_t minute() const { return mMinute; }
+	std::uint8_t seconds() const { return mSeconds; }
+
 	/*
 	void writeBeginSensorList();
 	void writeEndOfSensorList();
@@ -60,6 +70,10 @@ public:
 	virtual void processCultivar(cDataBuffer& buffer);
 	virtual void processExperimentDoc(cDataBuffer& buffer);
 
+	virtual void processDate(cDataBuffer& buffer);
+	virtual void processDayOfYear(cDataBuffer& buffer);
+	virtual void processTime(cDataBuffer& buffer);
+
 private:
     cExperimentID         mBlockID;
 
@@ -77,5 +91,14 @@ private:
 	std::string mCultivar;
 	std::string mExperimentDoc;
 
+	std::uint16_t mYear;
+	std::uint8_t  mMonth;
+	std::uint8_t  mDay;
+
+	std::uint16_t mDayOfYear;
+
+	std::uint8_t mHour;
+	std::uint8_t mMinute;
+	std::uint8_t mSeconds;
 };
 
