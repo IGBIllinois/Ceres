@@ -135,6 +135,14 @@ void cExperimentSerializer::writeExperimentDoc(const std::string& doc)
     mBlockID.dataID(DataID::EXPERIMENT);
 
     mDataBuffer.clear();
+
+    if (mDataBuffer.capacity() < doc.size())
+    {
+        uint16_t n = doc.size() / 1024;
+        ++n;
+        mDataBuffer.capacity(n * 1024);
+    }
+
     mDataBuffer << doc;
     mpDataFile->writeBlock(mBlockID, mDataBuffer.data(), mDataBuffer.size());
 

@@ -156,14 +156,17 @@ void cCtrlDataModelLocal::endDataRecording()
 {
     mThread.mpController->stopDataRecording();
 
-    mSerializer.writeBeginFooter();
-    mThread.mpController->writeDataFooter();
-
-    for (auto& sensor : mThread.mActiveSensors)
+    if (isDataFileOpen())
     {
-        sensor->writeDataFooter();
+        mSerializer.writeBeginFooter();
+        mThread.mpController->writeDataFooter();
+
+        for (auto& sensor : mThread.mActiveSensors)
+        {
+            sensor->writeDataFooter();
+        }
+        mSerializer.writeEndOfFooter();
     }
-    mSerializer.writeEndOfFooter();
 }
 
 void cCtrlDataModelLocal::dataRecordingStateChange(bool record)
@@ -189,49 +192,52 @@ void cCtrlDataModelLocal::startExperiment()
         return;
     }
 
-    mSerializer.writeBeginHeader();
-    mSerializer.writeTitle(mExperimentTitle);
-
-    if (!mResearcher.empty())
-        mSerializer.writeResearcher(mResearcher);
-
-    if (!mCultivar.empty())
-        mSerializer.writeCultivar(mCultivar);
-
-    time_t t = time(nullptr);
-    auto tm = localtime(&t);
-    std::uint16_t year = tm->tm_year + 1900;
-    std::uint8_t month = tm->tm_mon + 1;
-    std::uint8_t day   = tm->tm_mday;
-
-    std::uint16_t doy = tm->tm_yday;
-
-    std::uint8_t hour = tm->tm_hour;
-    std::uint8_t minute = tm->tm_min;
-    std::uint8_t sec = tm->tm_sec;
-
-    mSerializer.writeDate(year, month, day);
-    mSerializer.writeDayOfYear(doy);
-    mSerializer.writeTime(hour, minute, sec);
-
-    mSerializer.writeExperimentDoc(mExperimentDoc);
-
-    mThread.mpController->writeDataHeader();
-
-    mSerializer.writeBeginSensorList();
-    for (auto& sensor : mThread.mActiveSensors)
+    if (isDataFileOpen())
     {
-        mSerializer.writeSensorBlockInfo(sensor->data_class_id(), sensor->name());
-    }
-    mSerializer.writeEndOfSensorList();
+        mSerializer.writeBeginHeader();
+        mSerializer.writeTitle(mExperimentTitle);
 
-    for (auto& sensor : mThread.mActiveSensors)
-    {
-        sensor->writeDataHeader();
-    }
+        if (!mResearcher.empty())
+            mSerializer.writeResearcher(mResearcher);
 
-    mSerializer.startTime(time(nullptr));
-    mSerializer.writeEndOfHeader();
+        if (!mCultivar.empty())
+            mSerializer.writeCultivar(mCultivar);
+
+        time_t t = time(nullptr);
+        auto tm = localtime(&t);
+        std::uint16_t year = tm->tm_year + 1900;
+        std::uint8_t month = tm->tm_mon + 1;
+        std::uint8_t day = tm->tm_mday;
+
+        std::uint16_t doy = tm->tm_yday;
+
+        std::uint8_t hour = tm->tm_hour;
+        std::uint8_t minute = tm->tm_min;
+        std::uint8_t sec = tm->tm_sec;
+
+        mSerializer.writeDate(year, month, day);
+        mSerializer.writeDayOfYear(doy);
+        mSerializer.writeTime(hour, minute, sec);
+
+        mSerializer.writeExperimentDoc(mExperimentDoc);
+
+        mThread.mpController->writeDataHeader();
+
+        mSerializer.writeBeginSensorList();
+        for (auto& sensor : mThread.mActiveSensors)
+        {
+            mSerializer.writeSensorBlockInfo(sensor->data_class_id(), sensor->name());
+        }
+        mSerializer.writeEndOfSensorList();
+
+        for (auto& sensor : mThread.mActiveSensors)
+        {
+            sensor->writeDataHeader();
+        }
+
+        mSerializer.startTime(time(nullptr));
+        mSerializer.writeEndOfHeader();
+    }
 
     mThread.mpController->startExperiment();
 }
