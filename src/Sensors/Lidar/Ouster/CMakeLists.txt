@@ -99,12 +99,7 @@ PRIVATE
 target_include_directories(ouster_sensor_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(ouster_sensor_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-if(USE_INTERNAL_CBDF_LIB)
-	target_include_directories(ouster_sensor_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
-	target_link_libraries(ouster_sensor_static PUBLIC block_data_file_static)
-else()
-	target_link_libraries(ouster_sensor_static PRIVATE cbdf::sensors)
-endif()
+target_link_libraries(ouster_sensor_static PRIVATE cbdf::sensors)
 
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Network)

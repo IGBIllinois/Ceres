@@ -4,65 +4,57 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "BlockDataFile.hpp"
-#include "SsnxSerializer.hpp"
-#include "SsnxParser.hpp"
+#include <cbdf/BlockDataFile.hpp>
+#include <cbdf/SpidercamSerializer.hpp>
+#include <cbdf/SpidercamParser.hpp>
 
 #include <ssnx/gps_data.hpp>
 
 
-/*
-void write(const ssnx::gps::PVT_Cartesian_1_t& in);
-void write(const ssnx::gps::PVT_Cartesian_2_t& in);
-void write(const ssnx::gps::PVT_Geodetic_1_t& in);
-void write(const ssnx::gps::PVT_Geodetic_2_t& in);
-void write(const ssnx::gps::PosCovGeodetic_1_t& in);
-void write(const ssnx::gps::VelCovGeodetic_1_t& in);
-void write(const ssnx::gps::DOP_1_t& in);
-void write(const ssnx::gps::PVT_Residuals_1_t& in);
-void write(const ssnx::gps::RAIMStatistics_1_t& in);
-void write(const ssnx::gps::POS_Projected_1_t& in);
-void write(const ssnx::gps::ReceiverTime_1_t& in);
-void write(const ssnx::gps::RtcmDatum_1_t& in);
-*/
-
-#if 0
-
-TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
+class cSpidercamTestParser : public cSpidercamParser
 {
-	SECTION("Testing write/read of PVT_Cartesian_1_t data...")
+public:
+	spidercam::sPosition_1_t mPosition;
+
+protected:
+	void onPosition(spidercam::sPosition_1_t position) override { mPosition = position; }
+};
+
+
+TEST_CASE("Spidercam tests", "[spidercam tests]")
+{
+	SECTION("Testing write/read of spidercam position data...")
 	{
 		const char* TEST_FILENAME = "spidercam_test.ceres";
 
-		ssnx::gps::PVT_Cartesian_1_t original_data;
+		spidercam::sPosition_1_t original_data;
 
-		original_data.BaseStationID = 1;
-		original_data.dataValid = true;
-		original_data.Error = 0;
-		original_data.GroundTrack_deg = 45.0;
-		original_data.Info = 1;
-		original_data.MeanCorrAge_s = 19;
-		original_data.Mode = 2;
-		original_data.NrSV = 6;
-		original_data.RxClkBias_ms = 0.01;
-		original_data.RxClkDrift_ppm = 2;
-		original_data.SBASprn = 15;
-		original_data.System = 3;
-		original_data.timestamp_s = 12345.6789;
-		original_data.Vx_mps = 0.0;
-		original_data.Vy_mps = 0.0;
-		original_data.Vz_mps = 0.0;
-		original_data.X_m = 1000000;
-		original_data.Y_m = 1500000;
-		original_data.Z_m = 2000000;
+		original_data.X_mm = 1000000;
+		original_data.Y_mm = 1500000;
+		original_data.Z_mm = 2000000;
+		original_data.height_mm = 5000;
+		original_data.speed_mmps = 490;
+		original_data.pan_deg = 23.0;
+		original_data.pan_speed_dps = 0.0;
+		original_data.tilt_deg = 33.0;
+		original_data.tilt_speed_dps = 0.0;
+		original_data.roll_gimbal_deg = -67;
+		original_data.zoom = 0;
+		original_data.focus = 0;
+		original_data.iris = 0;
+		original_data.pitch_deg = 78.7654321;
+		original_data.roll_deg = 32.987654321;
+		original_data.timestamp = 1234567890;
 
 		{
 			cBlockDataFileWriter wrt;
 			wrt.open(TEST_FILENAME);
 
 			REQUIRE(wrt.isOpen());
-			cSsnxSerializer ssnx(1024, &wrt);
-			ssnx.setVersion(1, 0);
+			cSpidercamSerializer spidercam(1024, &wrt);
+			spidercam.setVersion(1, 0);
+
+			spidercam.write(original_data);
 
 			wrt.close();
 		}
@@ -74,19 +66,35 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 
 			REQUIRE(rd.isOpen());
 
-			cSsnxParser ssnx;
-			rd.attach(&ssnx);
+			cSpidercamTestParser spidercam;
+			rd.attach(&spidercam);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-//			REQUIRE(pvt.timeUnit() == pvt::eTIME_UNITS::NANOSECONDS);
+			REQUIRE(spidercam.mPosition.X_mm == original_data.X_mm);
+			REQUIRE(spidercam.mPosition.Y_mm == original_data.Y_mm);
+			REQUIRE(spidercam.mPosition.Z_mm == original_data.Z_mm);
+			REQUIRE(spidercam.mPosition.height_mm == original_data.height_mm);
+			REQUIRE(spidercam.mPosition.speed_mmps == original_data.speed_mmps);
+			REQUIRE(spidercam.mPosition.pan_deg == original_data.pan_deg);
+			REQUIRE(spidercam.mPosition.pan_speed_dps == original_data.pan_speed_dps);
+			REQUIRE(spidercam.mPosition.tilt_deg == original_data.tilt_deg);
+			REQUIRE(spidercam.mPosition.tilt_speed_dps == original_data.tilt_speed_dps);
+			REQUIRE(spidercam.mPosition.roll_gimbal_deg == original_data.roll_gimbal_deg);
+			REQUIRE(spidercam.mPosition.zoom == original_data.zoom);
+			REQUIRE(spidercam.mPosition.focus == original_data.focus);
+			REQUIRE(spidercam.mPosition.iris == original_data.iris);
+			REQUIRE(spidercam.mPosition.pitch_deg == original_data.pitch_deg);
+			REQUIRE(spidercam.mPosition.roll_deg == original_data.roll_deg);
+			REQUIRE(spidercam.mPosition.timestamp == original_data.timestamp);
+
+			result = rd.processBlock();
+			REQUIRE(!result);
 
 			rd.close();
 		}
 	}
 }
-
-#endif
 
 

@@ -1,7 +1,8 @@
 
 #include "HySpexVNIR_3000N_Serializer.hpp"
 #include "HySpexDataIdentifiers.hpp"
-#include "BlockDataFile.hpp"
+
+#include <cbdf/BlockDataFile.hpp>
 
 
 #include <cassert>

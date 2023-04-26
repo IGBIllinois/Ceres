@@ -2,14 +2,19 @@
 #include "BlockDataFile.hpp"
 #include "BlockId.hpp"
 #include "BlockDataFileExceptions.hpp"
-#include "../BlockDataFile/ClassIdentifiers.hpp"
-#include "../BlockDataFile/ExperimentDataIdentifiers.hpp"
-#include "../BlockDataFile/PvtDataIdentifiers.hpp"
-#include "../BlockDataFile/AxisDataIdentifiers.hpp"
-#include "../BlockDataFile/SpidercamDataIdentifiers.hpp"
-#include "../BlockDataFile/SsnxDataIdentifiers.hpp"
-#include "../BlockDataFile/OusterDataIdentifiers.hpp"
-#include "../BlockDataFile/WeatherDataIdentifiers.hpp"
+
+//#include <cbdf/ClassIdentifiers.hpp>
+#include <cbdf/extra/ExpInfoClassIdentifiers.hpp>
+#include <cbdf/extra/ExpCtrlClassIdentifiers.hpp>
+#include <cbdf/extra/SensorClassIdentifiers.hpp>
+#include <cbdf/extra/WeatherClassIdentifiers.hpp>
+#include <cbdf/extra/ExperimentDataIdentifiers.hpp>
+#include <cbdf/extra/PvtDataIdentifiers.hpp>
+#include <cbdf/extra/AxisCommunicationsDataIdentifiers.hpp>
+#include <cbdf/extra/SpidercamDataIdentifiers.hpp>
+#include <cbdf/extra/SsnxDataIdentifiers.hpp>
+#include <cbdf/extra/OusterDataIdentifiers.hpp>
+#include <cbdf/extra/WeatherDataIdentifiers.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -621,7 +626,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
 {
     switch (static_cast<ClassIDs>(blockID.classID()))
     {
-    case ClassIDs::EXPERIMENT_INFO:
+    case static_cast<ClassIDs>(ExperimentInfoClassIDs::EXPERIMENT_INFO):
     {
         if (blockID.majorVersion() != 1)
             return eBlockStatus::BAD_MAJOR_VERSION;
@@ -631,7 +636,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
 
         return checkExperimentBlock(blockID, len);
     }
-    case ClassIDs::PVT:
+    case static_cast<ClassIDs>(ExperimentCtrlClassIDs::PVT):
     {
         if (blockID.majorVersion() != 1)
             return eBlockStatus::BAD_MAJOR_VERSION;
@@ -641,7 +646,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
 
         return checkPvtBlock(blockID, len);
     }
-    case ClassIDs::SPIDERCAM:
+    case static_cast<ClassIDs>(ExperimentCtrlClassIDs::SPIDERCAM):
     {
         if (blockID.majorVersion() != 1)
             return eBlockStatus::BAD_MAJOR_VERSION;
@@ -651,11 +656,11 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
 
         return checkSpidercamBlock(blockID, len);
     }
-    case ClassIDs::OUSTER:
+    case static_cast<ClassIDs>(SensorClassIDs::OUSTER):
     {
         return eBlockStatus::BAD_CLASS_ID;
     }
-    case ClassIDs::OUSTER_LIDAR:
+    case static_cast<ClassIDs>(SensorClassIDs::OUSTER_LIDAR):
     {
         if (blockID.majorVersion() != 2)
             return eBlockStatus::BAD_MAJOR_VERSION;
@@ -665,31 +670,31 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
 
         return checkOusterLidarBlock(blockID, len);
     }
-    case ClassIDs::SEPTENTRIO:
+    case static_cast<ClassIDs>(SensorClassIDs::SEPTENTRIO):
     {
         return eBlockStatus::BAD_CLASS_ID;
     }
-    case ClassIDs::SSNX:
+    case static_cast<ClassIDs>(SensorClassIDs::SSNX):
     {
         return checkSsnxBlock(blockID, len);
     }
-    case ClassIDs::HYSPEX:
+    case static_cast<ClassIDs>(SensorClassIDs::HYSPEX):
     {
         return eBlockStatus::BAD_CLASS_ID;
     }
-    case ClassIDs::HYSPEX_SWIR_384:
+    case static_cast<ClassIDs>(SensorClassIDs::HYSPEX_SWIR_384):
     {
         return eBlockStatus::BAD_CLASS_ID;
     }
-    case ClassIDs::HYSPEX_VNIR_3000N:
+    case static_cast<ClassIDs>(SensorClassIDs::HYSPEX_VNIR_3000N):
     {
         return eBlockStatus::BAD_CLASS_ID;
     }
-    case ClassIDs::AXIS_COMMUNICATIONS:
+    case static_cast<ClassIDs>(SensorClassIDs::AXIS_COMMUNICATIONS):
     {
         return eBlockStatus::BAD_CLASS_ID;
     }
-    case ClassIDs::AXIS_COMMUNICATIONS_CAMERA:
+    case static_cast<ClassIDs>(SensorClassIDs::AXIS_COMMUNICATIONS_CAMERA):
     {
         if (blockID.majorVersion() != 1)
             return eBlockStatus::BAD_MAJOR_VERSION;
@@ -699,7 +704,7 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkBlockId(const cBlo
 
         return checkAxisCommunicationBlock(blockID, len);
     }
-    case ClassIDs::WEATHER:
+    case static_cast<ClassIDs>(WeatherClassIDs::WEATHER):
     {
         if (blockID.majorVersion() != 1)
             return eBlockStatus::BAD_MAJOR_VERSION;
@@ -1388,10 +1393,10 @@ cBlockDataFileReader::eBlockStatus cBlockDataFileReader::checkExperimentBlock(co
     {
     case experiment::DataID::EXPERIMENT:
         break;
-    case experiment::DataID::START_TIME:
+    case experiment::DataID::EXPERIMENT_START_TIME:
         if (len != 24) return eBlockStatus::BAD_PAYLOAD;
         break;
-    case experiment::DataID::END_TIME:
+    case experiment::DataID::EXPERIMENT_END_TIME:
         if (len != 24) return eBlockStatus::BAD_PAYLOAD;
         break;
     case experiment::DataID::START_RECORDING_TIMESTAMP:

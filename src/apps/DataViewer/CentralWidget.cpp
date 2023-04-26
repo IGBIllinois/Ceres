@@ -336,25 +336,26 @@ void cCentralWidget::onEndOfFooter()
     mFooterComplete = true;
 }
 
-void cCentralWidget::onExperimentTitle(const std::string& title)
+void cCentralWidget::onTitle(const std::string& title)
 {
     mpTitle->setText(QString::fromStdString(title));
 }
 
-void cCentralWidget::onExperimentCultivar(const std::string& cultivar)
+void cCentralWidget::onCultivar(const std::string& cultivar)
 {
     mpCultivar->setText(QString::fromStdString(cultivar));
 }
 
-void cCentralWidget::onExperimentResearcher(const std::string& researcher)
+void cCentralWidget::onResearcher(const std::string& researcher)
 {
     mpResearcher->setText(QString::fromStdString(researcher));
 }
 
-void cCentralWidget::onExperimentDoc(const std::string& doc)
-{
+void cCentralWidget::onExperimentDoc(const std::string& doc) {}
 
-}
+void cCentralWidget::onFileDate(std::uint16_t year, std::uint8_t month, std::uint8_t day) {};
+void cCentralWidget::onFileTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds) {};
+void cCentralWidget::onDayOfYear(std::uint16_t day_of_year) {};
 
 void cCentralWidget::onStartTime(sExperimentTime_t start_time)
 {
@@ -446,19 +447,15 @@ void cCentralWidget::onBeginSensorList()
 void cCentralWidget::onEndOfSensorList()
 {}
 
-void cCentralWidget::onSensorBlockInfo(unsigned int class_id, const std::string& name)
+void cCentralWidget::onSensorBlockInfo(uint16_t class_id, const std::string& name)
 {}
 
-void cCentralWidget::onUnknownDataID(BLOCK_DATA_ID_t data_id)
-{
-    qWarning() << data_id;
-}
 
 //-----------------------------------------------------------------------------
 // Spidercam Parser Data
 //-----------------------------------------------------------------------------
 
-void cCentralWidget::onPosition(const spidercam::sPosition_1_t& pos)
+void cCentralWidget::onPosition(spidercam::sPosition_1_t pos)
 {
     mpDollyX_mm->setText(QString::number(pos.X_mm));
     mpDollyY_mm->setText(QString::number(pos.Y_mm));
@@ -470,21 +467,14 @@ void cCentralWidget::onPosition(const spidercam::sPosition_1_t& pos)
 // Weather Parser Data
 //-----------------------------------------------------------------------------
 
-void cCentralWidget::onWindSpeed_mps(bool valid, double speed_mps)
-{
-    if (valid)
-        mpWindSpeed_mps->setText(QString::number(speed_mps, 'g', 1));
-    else
-        mpWindSpeed_mps->setText("Calm");
-}
+void cCentralWidget::onConfigInfo(const std::string& info) {}
 
-void cCentralWidget::onWindSpeed_knots(bool valid, double speed_knots)
-{}
-
-void cCentralWidget::onWindDirection_deg(bool valid, double dir_deg)
+void cCentralWidget::onWindData_mps(bool valid, double speed_mps, double dir_deg)
 {
     if (valid)
     {
+        mpWindSpeed_mps->setText(QString::number(speed_mps, 'g', 1));
+
         QString dir = QString::number(static_cast<int>(dir_deg));
 
         if (dir_deg < 10.0)
@@ -495,5 +485,31 @@ void cCentralWidget::onWindDirection_deg(bool valid, double dir_deg)
         mpWindDirection_deg->setText(dir);
     }
     else
+    {
+        mpWindSpeed_mps->setText("Calm");
         mpWindDirection_deg->setText("");
+    }
 }
+
+void cCentralWidget::onWindData_knots(bool valid, double speed_knots, double dir_deg)
+{
+    if (valid)
+    {
+        mpWindSpeed_mps->setText(QString::number(speed_knots, 'g', 1));
+
+        QString dir = QString::number(static_cast<int>(dir_deg));
+
+        if (dir_deg < 10.0)
+            dir.insert(0, "00");
+        else if (dir_deg < 100.0)
+            dir.insert(0, "0");
+
+        mpWindDirection_deg->setText(dir);
+    }
+    else
+    {
+        mpWindSpeed_mps->setText("Calm");
+        mpWindDirection_deg->setText("");
+    }
+}
+

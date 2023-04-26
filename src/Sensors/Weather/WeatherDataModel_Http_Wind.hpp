@@ -2,7 +2,8 @@
 #pragma once
 
 #include "WeatherDataModel_Http.hpp"
-#include "../../BlockDataFile/WeatherSerializer.hpp"
+
+#include <cbdf/WeatherSerializer.hpp>
 
 #include <string>
 

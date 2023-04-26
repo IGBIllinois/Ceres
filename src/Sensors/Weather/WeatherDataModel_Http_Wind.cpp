@@ -3,6 +3,7 @@
 #include "../../Utilities/Constants.hpp"
 
 #include <QEventLoop>
+#include <QNetworkReply>
 
 
 cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind(QObject* parent)

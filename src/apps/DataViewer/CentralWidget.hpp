@@ -3,9 +3,9 @@
 
 #include "CeresDataFile.hpp"
 
-#include "ExperimentParser.hpp"
-#include "SpidercamParser.hpp"
-#include "WeatherParser.hpp"
+#include <cbdf/ExperimentParser.hpp>
+#include <cbdf/SpidercamParser.hpp>
+#include <cbdf/WeatherParser.hpp>
 
 #include <QWidget>
 #include <QTimer>
@@ -60,10 +60,19 @@ private:
     void onBeginFooter() override;
     void onEndOfFooter() override;
 
-    void onExperimentTitle(const std::string& title) override;
-    void onExperimentCultivar(const std::string& cultivar) override;
-    void onExperimentResearcher(const std::string& researcher) override;
+    void onTitle(const std::string& title) override;
+    void onCultivar(const std::string& cultivar) override;
+    void onResearcher(const std::string& researcher) override;
     void onExperimentDoc(const std::string& doc) override;
+
+    void onFileDate(std::uint16_t year, std::uint8_t month, std::uint8_t day) override;
+    void onFileTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds) override;
+
+    void onDayOfYear(std::uint16_t day_of_year) override;
+
+    void onBeginSensorList() override;
+    void onEndOfSensorList() override;
+    void onSensorBlockInfo(uint16_t class_id, const std::string& name) override;
 
     void onStartTime(sExperimentTime_t start_time) override;
     void onEndTime(sExperimentTime_t end_time) override;
@@ -72,23 +81,18 @@ private:
     void onEndRecordingTimestamp(uint64_t timestamp_ns) override;
     void onHeartbeatTimestamp(uint64_t timestamp_ns) override;
 
-    void onBeginSensorList() override;
-    void onEndOfSensorList() override;
-    void onSensorBlockInfo(unsigned int class_id, const std::string& name) override;
-
-    void onUnknownDataID(BLOCK_DATA_ID_t data_id) override;
 
     //-----------------------------------------------------
     // Spidercam Data
     //-----------------------------------------------------
-    void onPosition(const spidercam::sPosition_1_t& pos) override;
+    void onPosition(spidercam::sPosition_1_t position) override;
 
     //-----------------------------------------------------
     // Weather Data
     //-----------------------------------------------------
-    void onWindSpeed_mps(bool valid, double speed_mps) override;
-    void onWindSpeed_knots(bool valid, double speed_knots) override;
-    void onWindDirection_deg(bool valid, double dir_deg) override;
+    void onConfigInfo(const std::string& info) override;
+    void onWindData_mps(bool valid, double speed_mps, double dir_deg) override;
+    void onWindData_knots(bool valid, double speed_knots, double dir_deg) override;
 
 private:
     cCeresDataFile mDataFile;

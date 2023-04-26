@@ -2,7 +2,8 @@
 #pragma once
 
 #include "../GpsModel.hpp"
-#include "SsnxSerializer.hpp"
+
+#include <cbdf/SsnxSerializer.hpp>
 
 #include <QObject>
 

@@ -42,7 +42,8 @@ endif()
 
 target_include_directories(BlockFileTests PRIVATE ../../src/BlockDataFile)
 
-target_link_libraries(BlockFileTests PRIVATE block_data_file_static)
+#target_link_libraries(BlockFileTests PRIVATE block_data_file_static)
+target_link_libraries(BlockFileTests PRIVATE cbdf::cbdf cbdf::info cbdf::ctrl cbdf::sensors cbdf::weather)
 target_link_libraries(BlockFileTests PRIVATE Catch2::Catch2WithMain)
 
 # For OUSTER serializer/parsing tests

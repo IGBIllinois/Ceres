@@ -4,12 +4,12 @@
 #include "WeatherDataModel.hpp"
 #include "../../Utilities/Timers.hpp"
 
-#include <QNetworkReply>
 #include <QUrl>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QNetworkAccessManager;
+class QNetworkReply;
 QT_END_NAMESPACE
 
 

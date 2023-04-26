@@ -1,7 +1,8 @@
 
 #include "DataVerifier.hpp"
-#include "BlockDataFileExceptions.hpp"
 #include "ParserExceptions.hpp"
+
+#include <cbdf/BlockDataFileExceptions.hpp>
 
 #include <QDir>
 #include <QFileInfo>
@@ -112,34 +113,33 @@ void cDataVerifier::moveFileToFailed()
 }
 
 //-----------------------------------------------------------------------------
-void cDataVerifier::onConfigParam_2(const ouster::config_param_2_t& data)
+void cDataVerifier::onConfigParam(ouster::config_param_2_t data)
 {
 }
 
-void cDataVerifier::onSensorInfo_2(const ouster::sensor_info_2_t& data)
+void cDataVerifier::onSensorInfo(ouster::sensor_info_2_t data)
 {
-
 }
 
-void cDataVerifier::onTimestamp_2(const ouster::timestamp_2_t& data)
+void cDataVerifier::onTimestamp(ouster::timestamp_2_t data)
 {}
 
-void cDataVerifier::onSyncPulseIn_2(const ouster::sync_pulse_in_2_t& data)
+void cDataVerifier::onSyncPulseIn(ouster::sync_pulse_in_2_t data)
 {}
 
-void cDataVerifier::onSyncPulseOut_2(const ouster::sync_pulse_out_2_t& data)
+void cDataVerifier::onSyncPulseOut(ouster::sync_pulse_out_2_t data)
 {}
 
-void cDataVerifier::onMultipurposeIo_2(const ouster::multipurpose_io_2_t& data)
+void cDataVerifier::onMultipurposeIo(ouster::multipurpose_io_2_t data)
 {}
 
-void cDataVerifier::onNmea_2(const ouster::nmea_2_t& data)
+void cDataVerifier::onNmea(ouster::nmea_2_t data)
 {}
 
-void cDataVerifier::onTimeInfo_2(const ouster::time_info_2_t& data)
+void cDataVerifier::onTimeInfo(ouster::time_info_2_t data)
 {}
 
-void cDataVerifier::onBeamIntrinsics_2(const ouster::beam_intrinsics_2_t& data)
+void cDataVerifier::onBeamIntrinsics(ouster::beam_intrinsics_2_t data)
 {
     if (data.altitude_angles_deg.empty() || data.azimuth_angles_deg.empty())
     {
@@ -147,7 +147,7 @@ void cDataVerifier::onBeamIntrinsics_2(const ouster::beam_intrinsics_2_t& data)
     }
 }
 
-void cDataVerifier::onImuIntrinsics_2(const ouster::imu_intrinsics_2_t& data)
+void cDataVerifier::onImuIntrinsics(ouster::imu_intrinsics_2_t data)
 {
     if (data.imu_to_sensor_transform.empty())
     {
@@ -155,7 +155,7 @@ void cDataVerifier::onImuIntrinsics_2(const ouster::imu_intrinsics_2_t& data)
     }
 }
 
-void cDataVerifier::onLidarIntrinsics_2(const ouster::lidar_intrinsics_2_t& data)
+void cDataVerifier::onLidarIntrinsics(ouster::lidar_intrinsics_2_t data)
 {
     if (data.lidar_to_sensor_transform.empty())
     {
@@ -163,7 +163,7 @@ void cDataVerifier::onLidarIntrinsics_2(const ouster::lidar_intrinsics_2_t& data
     }
 }
 
-void cDataVerifier::onLidarDataFormat_2(const ouster::lidar_data_format_2_t& data)
+void cDataVerifier::onLidarDataFormat(ouster::lidar_data_format_2_t data)
 {
     if (data.pixels_per_column < 32)
     {
@@ -171,18 +171,10 @@ void cDataVerifier::onLidarDataFormat_2(const ouster::lidar_data_format_2_t& dat
     }
 }
 
-void cDataVerifier::onLidarDataFormat_2(const ouster::lidar_data_format_2_3_t& data)
-{
-    if (data.pixels_per_column < 32)
-    {
-        throw bdf::parse_error("Invalid lidar data format version 2.3!");
-    }
-}
-
-void cDataVerifier::onImuData(const ouster::imu_data_t& data)
+void cDataVerifier::onImuData(ouster::imu_data_t data)
 {}
 
-void cDataVerifier::onLidarData(const ouster::lidar_data_frame_t& data)
+void cDataVerifier::onLidarData(cOusterLidarData data)
 {}
 
 void cDataVerifier::onActiveCameraId(int id)
@@ -201,13 +193,13 @@ void cDataVerifier::onFramesPerSecond(int frames_per_sec)
     }
 }
 
-void cDataVerifier::onBitmap(const QBitmap& in)
+void cDataVerifier::onBitmap(const cBitmapBuffer& buffer)
 {}
 
-void cDataVerifier::onJPEG(const QImage& image)
+void cDataVerifier::onJPEG(const cJpegBuffer& buffer)
 {}
 
-void cDataVerifier::onMpegFrame(const QImage& image)
+void cDataVerifier::onMpegFrame(const cMpegFrameBuffer& buffer)
 {}
 
 void cDataVerifier::onImageSize(int width, int height)

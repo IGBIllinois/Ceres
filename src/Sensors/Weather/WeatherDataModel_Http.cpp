@@ -2,6 +2,7 @@
 #include "WeatherDataModel_Http.hpp"
 
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QMessageBox>
 
 

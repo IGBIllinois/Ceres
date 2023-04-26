@@ -57,14 +57,8 @@ PRIVATE
 target_include_directories(SpidercamCtrl_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(SpidercamCtrl_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-if(USE_INTERNAL_CBDF_LIB)
-	target_include_directories(SpidercamCtrl_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
-	target_link_libraries(SpidercamCtrl_static PUBLIC block_data_file_static)
-else()
-	target_link_libraries(SpidercamCtrl_static PRIVATE cbdf::ctrl)
-	target_link_libraries(SpidercamCtrl_static PRIVATE cbdf::info)
-endif()
-
+target_link_libraries(SpidercamCtrl_static PUBLIC cbdf::ctrl)
+target_link_libraries(SpidercamCtrl_static PRIVATE cbdf::info)
 target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Network)
 target_link_libraries(SpidercamCtrl_static PRIVATE nlohmann_json::nlohmann_json)

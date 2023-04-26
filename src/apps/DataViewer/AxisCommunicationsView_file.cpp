@@ -47,6 +47,9 @@ void cAxisCommunicationsView_file::initialize()
     mainLayout->addWidget(mpImage);
 
     setLayout(mainLayout);
+
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setFixedSize(600, 500);
 }
 
 void cAxisCommunicationsView_file::activeCameraIdUpdated(int id)

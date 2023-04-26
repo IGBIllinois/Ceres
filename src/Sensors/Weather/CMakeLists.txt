@@ -52,12 +52,7 @@ PRIVATE
 
 target_include_directories(weather_static PRIVATE ${COMMON_INCLUDE_DIR})
 
-if(USE_INTERNAL_CBDF_LIB)
-	target_include_directories(weather_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
-	target_link_libraries(weather_static PUBLIC block_data_file_static)
-else()
-	target_link_libraries(axis_communications_static PRIVATE cbdf::weather)
-endif()
+target_link_libraries(weather_static PRIVATE cbdf::weather)
 
 target_link_libraries(weather_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(weather_static PUBLIC ${Qt}::Network)

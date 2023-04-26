@@ -4,8 +4,9 @@
 #include "../RgbTypes.hpp"
 #include "../RgbCameraModel.hpp"
 #include "AxisCommunicationsUtils.hpp"
-#include "ImageBuffers.hpp"
-#include "AxisCommunicationsSerializer.hpp"
+
+#include <cbdf/ImageBuffers.hpp>
+#include <cbdf/AxisCommunicationsSerializer.hpp>
 
 #include <QNetworkReply>
 #include <QUrl>

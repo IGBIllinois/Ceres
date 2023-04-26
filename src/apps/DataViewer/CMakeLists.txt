@@ -51,31 +51,18 @@ PRIVATE
     ${UI_RESOURCES}
     ${platform_resource_files}
 
-    AxisCommunicationsParser.hpp
-    AxisCommunicationsParser.cpp
     AxisCommunicationsModel_file.hpp
     AxisCommunicationsModel_file.cpp
     AxisCommunicationsView_file.hpp
     AxisCommunicationsView_file.cpp
 
     OusterTypes.hpp
-    OusterParser.hpp
-    OusterParser.cpp
     OusterModel_file.hpp
     OusterModel_file.cpp
 	
     SsnxTypes.hpp
-    SsnxParser.hpp
-    SsnxParser.cpp
     SsnxModel_file.hpp
     SsnxModel_file.cpp
-
-	WeatherParser.hpp
-	WeatherParser.cpp
-	SpidercamParser.hpp
-	SpidercamParser.cpp
-	ExperimentParser.hpp
-	ExperimentParser.cpp
 
 	CeresDataFile.hpp
 	CeresDataFile.cpp
@@ -94,17 +81,13 @@ target_include_directories(CeresDataViewer PRIVATE ${UTILITIES_INCLUDE_DIR})
 #target_include_directories(CeresDataViewer PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
 target_include_directories(CeresDataViewer PRIVATE ${SENSORS_INCLUDE_DIR})
 
-if(USE_INTERNAL_CBDF_LIB)
-	target_include_directories(CeresDataViewer PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
-	
-	target_link_libraries(CeresDataViewer PRIVATE block_data_file_static)
-else()
-	target_link_libraries(CeresDataViewer PRIVATE cbdf::cbdf)
-#	target_link_libraries(CeresDataViewer PRIVATE cbdf::sensors)
-endif()
+target_link_libraries(CeresDataViewer PRIVATE cbdf::cbdf)
+target_link_libraries(CeresDataViewer PRIVATE cbdf::info cbdf::ctrl)
+target_link_libraries(CeresDataViewer PRIVATE cbdf::sensors cbdf::weather)
 
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)
+target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Multimedia)
 
 target_link_libraries(CeresDataViewer PRIVATE Utilities)
 target_link_libraries(CeresDataViewer PRIVATE Sensors)

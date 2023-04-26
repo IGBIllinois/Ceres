@@ -2,7 +2,8 @@
 #pragma once
 
 #include "../RgbTypes.hpp"
-#include "ImageBuffers.hpp"
+
+#include <cbdf/ImageBuffers.hpp>
 
 #include <string>
 

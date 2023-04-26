@@ -1,7 +1,8 @@
 
 #include "HySpexSWIR_384_Serializer.hpp"
 #include "HySpexDataIdentifiers.hpp"
-#include "BlockDataFile.hpp"
+
+#include <cbdf/BlockDataFile.hpp>
 
 #include <cassert>
 

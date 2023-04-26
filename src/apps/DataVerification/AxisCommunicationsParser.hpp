@@ -4,8 +4,8 @@
  */
 #pragma once
 
-#include "BlockParser.hpp"
-#include "AxisCommunicationsBlockId.hpp"
+#include <cbdf/BlockParser.hpp>
+#include <cbdf/extra/AxisCommunicationsDataIdentifiers.hpp>
 
 #include <QImageReader>
 #include <QBuffer>

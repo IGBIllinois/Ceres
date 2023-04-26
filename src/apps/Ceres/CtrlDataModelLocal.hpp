@@ -2,8 +2,8 @@
 #pragma once
 
 #include "CtrlDataModel.hpp"
-#include "BlockDataFile.hpp"
-#include "ExperimentSerializer.hpp"
+#include <cbdf/BlockDataFile.hpp>
+#include <cbdf/ExperimentSerializer.hpp>
 
 #include <QTimer>
 

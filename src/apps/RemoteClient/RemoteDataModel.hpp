@@ -5,12 +5,13 @@
 #include "RemoteClientNetDecoder.hpp"
 #include "RemoteClientNetEncoder.hpp"
 #include "RemoteDataThread.hpp"
-#include "BlockDataFile.hpp"
-#include "ExperimentSerializer.hpp"
-#include "SpidercamSerializer.hpp"
-#include "WeatherSerializer.hpp"
 #include "SensorModel.hpp"
 #include "SensorController.hpp"
+
+#include <cbdf/BlockDataFile.hpp>
+#include <cbdf/ExperimentSerializer.hpp>
+#include <cbdf/SpidercamSerializer.hpp>
+#include <cbdf/WeatherSerializer.hpp>
 
 #include <string>
 #include <filesystem>

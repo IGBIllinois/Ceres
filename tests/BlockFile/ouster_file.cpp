@@ -2,13 +2,49 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "BlockDataFile.hpp"
-#include "OusterSerializer.hpp"
-#include "OusterParser.hpp"
+#include <cbdf/BlockDataFile.hpp>
+#include <cbdf/OusterSerializer.hpp>
+#include <cbdf/OusterParser.hpp>
 
 #include <ouster/ouster_defs.h>
 #include <ouster/ouster_utils.h>
 #include <ouster/OusterLidarData.h>
+
+
+class cOusterTestParser : public cOusterParser
+{
+public:
+	ouster::config_param_2_t		mConfigParams;
+	ouster::sensor_info_2_t			mSensorInfo;
+	ouster::timestamp_2_t			mTimestamp;
+	ouster::sync_pulse_in_2_t		mSyncPulseIn;
+	ouster::sync_pulse_out_2_t		mSyncPulseOut;
+	ouster::multipurpose_io_2_t		mMultipurposeIo;
+	ouster::nmea_2_t				mNmea;
+	ouster::time_info_2_t			mTimeInfo;
+	ouster::beam_intrinsics_2_t		mBeamIntrinsics;
+	ouster::imu_intrinsics_2_t		mImuIntrinsics;
+	ouster::lidar_intrinsics_2_t	mLidarIntrinsics;
+	ouster::lidar_data_format_2_t	mLidarDataFormat;
+	ouster::imu_data_t				mImuData;
+	cOusterLidarData				mLidarData;
+
+protected:
+	void onConfigParam(ouster::config_param_2_t config_param) override { mConfigParams = config_param; };
+	void onSensorInfo(ouster::sensor_info_2_t sensor_info) override { mSensorInfo = sensor_info; };
+	void onTimestamp(ouster::timestamp_2_t timestamp) override { mTimestamp = timestamp; };
+	void onSyncPulseIn(ouster::sync_pulse_in_2_t pulse_info) override { mSyncPulseIn = pulse_info; };
+	void onSyncPulseOut(ouster::sync_pulse_out_2_t pulse_info) override { mSyncPulseOut = pulse_info; };
+	void onMultipurposeIo(ouster::multipurpose_io_2_t io) override { mMultipurposeIo = io; };
+	void onNmea(ouster::nmea_2_t nmea) override { mNmea = nmea; };
+	void onTimeInfo(ouster::time_info_2_t time_info) override { mTimeInfo = time_info; };
+	void onBeamIntrinsics(ouster::beam_intrinsics_2_t intrinsics) override { mBeamIntrinsics = intrinsics; };
+	void onImuIntrinsics(ouster::imu_intrinsics_2_t intrinsics) override { mImuIntrinsics = intrinsics; };
+	void onLidarIntrinsics(ouster::lidar_intrinsics_2_t intrinsics) override { mLidarIntrinsics = intrinsics; };
+	void onLidarDataFormat(ouster::lidar_data_format_2_t format) override { mLidarDataFormat = format; };
+	void onImuData(ouster::imu_data_t data) override { mImuData = data; };
+	void onLidarData(cOusterLidarData data) override { mLidarData = data; };
+};
 
 
 TEST_CASE("Lidar Sensor Info tests", "[initialization]")
@@ -52,13 +88,13 @@ TEST_CASE("Lidar Sensor Info tests", "[initialization]")
 
 			REQUIRE(rd.isOpen());
 
-			cOusterParser ouster;
+			cOusterTestParser ouster;
 			rd.attach(&ouster);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto sensorInfo = ouster.getSensorInfo_2();
+			auto sensorInfo = ouster.mSensorInfo;
 
 			REQUIRE(sensorInfo.product_line == original_data.product_line);
 			REQUIRE(sensorInfo.product_part_number == original_data.product_part_number);
@@ -119,13 +155,13 @@ TEST_CASE("Lidar Sensor Info tests", "[initialization]")
 
 			REQUIRE(rd.isOpen());
 
-			cOusterParser ouster;
+			cOusterTestParser ouster;
 			rd.attach(&ouster);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto imuInfo = ouster.getImuIntrinsics_2();
+			auto imuInfo = ouster.mImuIntrinsics;
 
 			REQUIRE(imuInfo.imu_to_sensor_transform.size() == original_data.imu_to_sensor_transform.size());
 
@@ -199,13 +235,13 @@ TEST_CASE("Lidar Sensor Info tests", "[initialization]")
 
 			REQUIRE(rd.isOpen());
 
-			cOusterParser ouster;
+			cOusterTestParser ouster;
 			rd.attach(&ouster);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto beamInfo = ouster.getBeamIntrinsics_2();
+			auto beamInfo = ouster.mBeamIntrinsics;
 
 			REQUIRE(beamInfo.altitude_angles_deg == original_data.altitude_angles_deg);
 			REQUIRE(beamInfo.azimuth_angles_deg == original_data.azimuth_angles_deg);
@@ -245,13 +281,13 @@ TEST_CASE("Lidar Sensor Info tests", "[initialization]")
 
 			REQUIRE(rd.isOpen());
 
-			cOusterParser ouster;
+			cOusterTestParser ouster;
 			rd.attach(&ouster);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto lidarInfo = ouster.getLidarIntrinsics_2();
+			auto lidarInfo = ouster.mLidarIntrinsics;
 
 			REQUIRE(lidarInfo.lidar_to_sensor_transform == original_data.lidar_to_sensor_transform);
 
@@ -318,13 +354,13 @@ TEST_CASE("Lidar Sensor Info tests", "[initialization]")
 
 			REQUIRE(rd.isOpen());
 
-			cOusterParser ouster;
+			cOusterTestParser ouster;
 			rd.attach(&ouster);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto timeInfo = ouster.getTimeInfo_2();
+			auto timeInfo = ouster.mTimeInfo;
 
 			REQUIRE(timeInfo.timestamp_info.time == original_data.timestamp_info.time);
 			REQUIRE(timeInfo.timestamp_info.mode == original_data.timestamp_info.mode);
@@ -406,13 +442,13 @@ TEST_CASE("Lidar Sensor Info tests", "[initialization]")
 
 			REQUIRE(rd.isOpen());
 
-			cOusterParser ouster;
+			cOusterTestParser ouster;
 			rd.attach(&ouster);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto formatInfo = ouster.getLidarDataFormat_2();
+			auto formatInfo = ouster.mLidarDataFormat;
 
 			REQUIRE(formatInfo.pixels_per_column == original_data.pixels_per_column);
 			REQUIRE(formatInfo.columns_per_packet == original_data.columns_per_packet);
@@ -478,13 +514,13 @@ TEST_CASE("Lidar IMU/LiDAR Data tests", "[stream data]")
 
 			REQUIRE(rd.isOpen());
 
-			cOusterParser ouster;
+			cOusterTestParser ouster;
 			rd.attach(&ouster);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto lidarData = ouster.getLidarData();
+			auto lidarData = ouster.mLidarData;
 			REQUIRE(lidarData.columnsPerFrame() == columns_per_frame);
 			REQUIRE(lidarData.pixelsPerColumn() == pixels_per_column);
 

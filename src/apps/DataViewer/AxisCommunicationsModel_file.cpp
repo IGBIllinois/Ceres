@@ -1,5 +1,6 @@
 
 #include "AxisCommunicationsModel_file.hpp"
+#include "RGB/AxisCommunications/AxisCommunicationsUtils.hpp"
 
 
 cAxisCommunicationsModel_file::cAxisCommunicationsModel_file(QObject* parent)
@@ -24,15 +25,15 @@ void cAxisCommunicationsModel_file::onFramesPerSecond(int frames_per_sec)
     emit updateFramesRate(mFramesPerSec);
 }
 
-void cAxisCommunicationsModel_file::onBitmap(const QBitmap& in)
+void cAxisCommunicationsModel_file::onBitmap(const cBitmapBuffer& buffer)
 {}
 
-void cAxisCommunicationsModel_file::onJPEG(const QImage& in)
+void cAxisCommunicationsModel_file::onJPEG(const cJpegBuffer& buffer)
 {}
 
-void cAxisCommunicationsModel_file::onMpegFrame(const QImage& image)
+void cAxisCommunicationsModel_file::onMpegFrame(const cMpegFrameBuffer& buffer)
 {
-    mImage = image;
+    axis::to_image(buffer, mImage);
     emit onNewImage(mImage);
     ++numImages;
 }

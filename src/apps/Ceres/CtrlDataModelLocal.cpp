@@ -215,9 +215,9 @@ void cCtrlDataModelLocal::startExperiment()
         std::uint8_t minute = tm->tm_min;
         std::uint8_t sec = tm->tm_sec;
 
-        mSerializer.writeDate(year, month, day);
+        mSerializer.writeFileDate(year, month, day);
+        mSerializer.writeFileTime(hour, minute, sec);
         mSerializer.writeDayOfYear(doy);
-        mSerializer.writeTime(hour, minute, sec);
 
         mSerializer.writeExperimentDoc(mExperimentDoc);
 

@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "BlockParser.hpp"
+#include <cbdf/BlockParser.hpp>
 #include "HySpexBlockId.hpp"
 
 // Forward Declarations

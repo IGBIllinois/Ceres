@@ -6,9 +6,11 @@
 #include "SpidercamCtrl.hpp"
 #include "SpidercamUtils.hpp"
 #include "SpidercamExperimentStates.hpp"
-#include "SpidercamSerializer.hpp"
 #include "../../Utilities/Timers.hpp"
 #include "../../Utilities/Utilities.hpp"
+
+#include <cbdf/SpidercamSerializer.hpp>
+
 
 class cSpidercamModel : public cExperimentControlModel
 {

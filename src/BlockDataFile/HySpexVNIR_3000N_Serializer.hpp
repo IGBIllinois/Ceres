@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "BlockSerializer.hpp"
+#include <cbdf/BlockSerializer.hpp>
 #include "HySpexBlockId.hpp"
 
 // Forward Declarations

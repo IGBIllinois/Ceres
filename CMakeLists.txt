@@ -57,7 +57,6 @@ SET(CMAKE_WARN_DEPRECATED 1)
 #******************************************************************************
 
 option(CERES_USE_EXTERNAL_JSON "Use an external JSON library" ON)
-option(USE_INTERNAL_CBDF_LIB "Use internal CBDF library" ON)
 
 if (MSVC)
     option(MSVC_STATIC_RUNTIME "Link static runtime libraries" OFF)
@@ -151,13 +150,13 @@ set(LIBSPIDERCAM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Find all the packages needed by this code
 
-FIND_PACKAGE(Catch2 QUIET)
+find_package(Catch2 QUIET)
 
 
 # Find and include Qt
 set(Qt Qt5)
 
-FIND_PACKAGE(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort REQUIRED)
+find_package(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort REQUIRED)
 GET_TARGET_PROPERTY(QMAKE_LOCATION Qt5::qmake LOCATION)
 
 if(WIN32)
@@ -170,18 +169,15 @@ if(WIN32)
     endif()
 endif(WIN32)
 
-if(NOT USE_INTERNAL_CBDF_LIB)
-	# Find and include my libraries for data collection
-	FIND_PACKAGE(CBDF REQUIRED cbdf ctrl info sensors weather)
-endif()
 
 # Find and include my libraries for data collection
-FIND_PACKAGE(Ouster REQUIRED)
-FIND_PACKAGE(ssnx REQUIRED)
-FIND_PACKAGE(ssnx2net REQUIRED)
-FIND_PACKAGE(spidercam REQUIRED)
-FIND_PACKAGE(nlohmann_json REQUIRED)
-FIND_PACKAGE(Protobuf REQUIRED)
+find_package(Ouster REQUIRED)
+find_package(ssnx REQUIRED)
+find_package(ssnx2net REQUIRED)
+find_package(spidercam REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(Protobuf REQUIRED)
+find_package(CBDF REQUIRED cbdf info ctrl sensors weather)
 
 
 #FIND_PACKAGE(PkgConfig REQUIRED)

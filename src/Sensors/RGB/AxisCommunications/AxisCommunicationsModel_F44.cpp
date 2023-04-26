@@ -1,6 +1,7 @@
 
 #include "AxisCommunicationsModel_F44.hpp"
 #include "AxisCommunicationsFactory.hpp"
+#include "AxisCommunicationsUtils.hpp"
 
 #include <QDebug>
 #include <QNetworkAccessManager>
@@ -138,7 +139,8 @@ void cAxisCommunicationsModel_F44::writeDataHeader()
     if (!mpActiveCamera) return;
 
     mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
-    mSerializer.write(mpActiveCamera->getImageSize());
+    auto size = mpActiveCamera->getImageSize();
+    mSerializer.writeImageSize(size.width, size.height);
     mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
 
 }
@@ -237,7 +239,8 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
-        mSerializer.write(mpActiveCamera->getImageSize());
+        auto size = mpActiveCamera->getImageSize();
+        mSerializer.writeImageSize(size.width, size.height);
     }
 }
 
@@ -270,7 +273,8 @@ void cAxisCommunicationsModel_F44::setActiveImageSize(rgb::sImageSize_t image_si
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(mpActiveCamera->getImageSize());
+        auto size = mpActiveCamera->getImageSize();
+        mSerializer.writeImageSize(size.width, size.height);
     }
 }
 
@@ -316,8 +320,6 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
         {
             axis::to_buffer(mCurrentImage, mMpegFrameBuffer);
             mSerializer.write(mMpegFrameBuffer);
-
-//Remove            mSerializer.writeMpegFrame(mCurrentImage);
         }
         catch (const std::exception& e)
         {
@@ -340,8 +342,6 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
         {
             axis::to_buffer(mCurrentImage, mJpegBuffer);
             mSerializer.write(mJpegBuffer);
-
-//Remove            mSerializer.writeJPEG(mCurrentImage);
         }
         catch (const std::exception& e)
         {

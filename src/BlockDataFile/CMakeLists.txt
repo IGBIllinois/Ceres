@@ -23,35 +23,35 @@ set(BLOCK_DATA_FILE_PUBLIC_HEADERS
 # Base Headers for the parsing block data files
 #
 
-	BlockDataFileExceptions.hpp
-    BlockDataFile.hpp
-	BlockId.hpp
-    Crc.hpp
-	ClassIdentifiers.hpp
-    DataBuffer.hpp
-	RawDataBuffer.hpp
-	BlockParser.hpp
+#	 BlockDataFileExceptions.hpp
+#    BlockDataFile.hpp
+#	 BlockId.hpp
+#    Crc.hpp
+#	 ClassIdentifiers.hpp
+#    DataBuffer.hpp
+#	 RawDataBuffer.hpp
+#	 BlockParser.hpp
 
 #
 # Headers for parsing experiment data
 #
-    ExperimentBlockId.hpp
-    ExperimentDataIdentifiers.hpp
-    ExperimentParser.hpp
+#    ExperimentBlockId.hpp
+#    ExperimentDataIdentifiers.hpp
+#    ExperimentParser.hpp
 
 #
 # Headers for parsing Spidercam data
 #
-    SpidercamBlockId.hpp
-    SpidercamDataIdentifiers.hpp
-    SpidercamParser.hpp
+#    SpidercamBlockId.hpp
+#    SpidercamDataIdentifiers.hpp
+#    SpidercamParser.hpp
 
 #
 # Headers for parsing Ssnx GPS data
 #
-    SsnxBlockId.hpp
-    SsnxDataIdentifiers.hpp
-    SsnxParser.hpp
+#    SsnxBlockId.hpp
+#    SsnxDataIdentifiers.hpp
+#    SsnxParser.hpp
 
 #
 # Headers for parsing HySpex data
@@ -64,32 +64,32 @@ set(BLOCK_DATA_FILE_PUBLIC_HEADERS
 #
 # Headers for parsing OUSTER LiDAR data
 #
-    OusterBlockId.hpp
-    OusterDataIdentifiers.hpp
-    OusterParser.hpp
+#    OusterBlockId.hpp
+#    OusterDataIdentifiers.hpp
+#    OusterParser.hpp
 
 #
 # Headers for parsing Axis Communications
 # webcam data
 #
-	AxisCommunicationsBlockId.hpp
-	AxisDataIdentifiers.hpp
-	AxisCommunicationsParser.hpp
-	ImageBuffers.hpp
+#	AxisCommunicationsBlockId.hpp
+#	AxisDataIdentifiers.hpp
+#	AxisCommunicationsParser.hpp
+#	ImageBuffers.hpp
 
 #
 # Headers for parsing Weather data
 #
-    WeatherBlockId.hpp
-    WeatherDataIdentifiers.hpp
-    WeatherParser.hpp
+#    WeatherBlockId.hpp
+#    WeatherDataIdentifiers.hpp
+#    WeatherParser.hpp
 
 #
 # Headers for parsing Position/Velocity/Time data
 #
-    PvtBlockId.hpp
-    PvtDataIdentifiers.hpp
-    PvtParser.hpp
+#    PvtBlockId.hpp
+#    PvtDataIdentifiers.hpp
+#    PvtParser.hpp
 )
 
 
@@ -102,22 +102,22 @@ PRIVATE
 #
 # Base Headers for the serializing block data files
 #
-	BlockSerializer.hpp
+#	BlockSerializer.hpp
 
 #
 # Headers for serializing experiment data
 #
-    ExperimentSerializer.hpp
+#    ExperimentSerializer.hpp
 
 #
 # Headers for serializing Spidercam data
 #
-    SpidercamSerializer.hpp
+#    SpidercamSerializer.hpp
 
 #
 # Headers for serializing Ssnx GPS data
 #
-    SsnxSerializer.hpp
+#    SsnxSerializer.hpp
 
 #
 # Headers for serializing HySpex data
@@ -128,42 +128,42 @@ PRIVATE
 #
 # Headers for serializing OUSTER LiDAR data
 #
-    OusterSerializer.hpp
+#    OusterSerializer.hpp
 
 #
 # Headers for serializing Axis Communications
 # webcam data
 #
-	AxisCommunicationsSerializer.hpp
+#	AxisCommunicationsSerializer.hpp
 
 #
 # Headers for serializing Weather data
 #
-    WeatherSerializer.hpp
+#    WeatherSerializer.hpp
 
 #
 # Headers for serializing Position/Velocity/Time data
 #
-    PvtSerializer.hpp
+#    PvtSerializer.hpp
 
 PRIVATE
 
-    PvtBlockId.cpp
-    PvtSerializer.cpp
-    PvtParser.cpp
+#    PvtBlockId.cpp
+#    PvtSerializer.cpp
+#    PvtParser.cpp
 
-    WeatherBlockId.cpp
-    WeatherSerializer.cpp
-    WeatherParser.cpp
+#    WeatherBlockId.cpp
+#    WeatherSerializer.cpp
+#    WeatherParser.cpp
 
-	AxisCommunicationsBlockId.cpp
-	AxisCommunicationsSerializer.cpp
-	AxisCommunicationsParser.cpp
-	ImageBuffers.cpp
+#	AxisCommunicationsBlockId.cpp
+#	AxisCommunicationsSerializer.cpp
+#	AxisCommunicationsParser.cpp
+#	ImageBuffers.cpp
 
-    OusterBlockId.cpp
-    OusterSerializer.cpp
-    OusterParser.cpp
+#    OusterBlockId.cpp
+#    OusterSerializer.cpp
+#    OusterParser.cpp
 
     HySpexBlockId.cpp
     HySpexVNIR_3000N_Serializer.cpp
@@ -171,24 +171,24 @@ PRIVATE
     HySpexSWIR_384_Serializer.cpp
     HySpexSWIR_384_Parser.cpp
 
-    SsnxBlockId.cpp
-    SsnxSerializer.cpp
-    SsnxParser.cpp
+#    SsnxBlockId.cpp
+#    SsnxSerializer.cpp
+#    SsnxParser.cpp
 
-    SpidercamBlockId.cpp
-    SpidercamSerializer.cpp
-    SpidercamParser.cpp
+#    SpidercamBlockId.cpp
+#    SpidercamSerializer.cpp
+#    SpidercamParser.cpp
 
-    ExperimentBlockId.cpp
-    ExperimentSerializer.cpp
-    ExperimentParser.cpp
+#    ExperimentBlockId.cpp
+#    ExperimentSerializer.cpp
+#    ExperimentParser.cpp
 
-	BlockDataFile.cpp
-	Crc.cpp
-    DataBuffer.cpp
-    RawDataBuffer.cpp
-	BlockSerializer.cpp
-	BlockParser.cpp
+#	BlockDataFile.cpp
+#	Crc.cpp
+#    DataBuffer.cpp
+#    RawDataBuffer.cpp
+#	BlockSerializer.cpp
+#	BlockParser.cpp
 )
 
 #
@@ -199,6 +199,10 @@ set_property(TARGET block_data_file_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiT
 target_include_directories(block_data_file_static PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
 
 target_link_libraries(block_data_file_static PUBLIC ${Qt}::Multimedia)
+target_link_libraries(block_data_file_static PRIVATE cbdf::cbdf)
+#target_link_libraries(block_data_file_static PRIVATE cbdf::info)
+target_link_libraries(block_data_file_static PRIVATE cbdf::sensors)
+#target_link_libraries(block_data_file_static PRIVATE cbdf::weather)
 
 set_target_properties(block_data_file_static PROPERTIES FOLDER "BlockDataFile")
 

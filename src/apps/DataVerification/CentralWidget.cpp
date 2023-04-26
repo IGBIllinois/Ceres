@@ -2,8 +2,7 @@
 
 #include "CentralWidget.hpp"
 
-#include "BlockDataFile.hpp"
-
+#include <cbdf/BlockDataFile.hpp>
 
 #include <QtWidgets>
 #include <QLayout>

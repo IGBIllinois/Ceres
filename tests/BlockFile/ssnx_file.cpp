@@ -4,25 +4,45 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "BlockDataFile.hpp"
-#include "SsnxSerializer.hpp"
-#include "SsnxParser.hpp"
+#include <cbdf/BlockDataFile.hpp>
+#include <cbdf/SsnxSerializer.hpp>
+#include <cbdf/SsnxParser.hpp>
 
 #include <ssnx/gps_data.hpp>
 
 
-/*
-void write(const ssnx::gps::PVT_Geodetic_1_t& in);
-void write(const ssnx::gps::PVT_Geodetic_2_t& in);
-void write(const ssnx::gps::PosCovGeodetic_1_t& in);
-void write(const ssnx::gps::VelCovGeodetic_1_t& in);
-void write(const ssnx::gps::DOP_1_t& in);
-void write(const ssnx::gps::PVT_Residuals_1_t& in);
-void write(const ssnx::gps::RAIMStatistics_1_t& in);
-void write(const ssnx::gps::POS_Projected_1_t& in);
-void write(const ssnx::gps::ReceiverTime_1_t& in);
-void write(const ssnx::gps::RtcmDatum_1_t& in);
-*/
+class cSsnxTestParser : public cSsnxParser
+{
+public:
+	ssnx::gps::PVT_Cartesian_1_t	mPVT_Cartesian_1;
+	ssnx::gps::PVT_Cartesian_2_t	mPVT_Cartesian_2;
+	ssnx::gps::PVT_Geodetic_1_t		mPVT_Geodetic_1;
+	ssnx::gps::PVT_Geodetic_2_t		mPVT_Geodetic_2;
+	ssnx::gps::PosCovGeodetic_1_t	mPosCovGeodetic_1;
+	ssnx::gps::VelCovGeodetic_1_t	mVelCovGeodetic_1;
+	ssnx::gps::DOP_1_t				mDOP_1;
+	ssnx::gps::PVT_Residuals_1_t	mPVT_Residuals_1;
+	ssnx::gps::RAIMStatistics_1_t	mRAIMStatistics_1;
+	ssnx::gps::POS_Local_1_t		mPOS_Local_1;
+	ssnx::gps::POS_Projected_1_t	mPOS_Projected_1;
+	ssnx::gps::ReceiverTime_1_t		mReceiverTime_1;
+	ssnx::gps::RtcmDatum_1_t		mRtcmDatum_1;
+
+protected:
+	void onPVT_Cartesian(ssnx::gps::PVT_Cartesian_1_t pos) override { mPVT_Cartesian_1 = pos; };
+	void onPVT_Cartesian(ssnx::gps::PVT_Cartesian_2_t pos) override { mPVT_Cartesian_2 = pos; };
+	void onPVT_Geodetic(ssnx::gps::PVT_Geodetic_1_t pos) override { mPVT_Geodetic_1 = pos; };
+	void onPVT_Geodetic(ssnx::gps::PVT_Geodetic_2_t pos) override { mPVT_Geodetic_2 = pos; };
+	void onPosCovGeodetic(ssnx::gps::PosCovGeodetic_1_t cov) override { mPosCovGeodetic_1 = cov; };
+	void onVelCovGeodetic(ssnx::gps::VelCovGeodetic_1_t cov) override { mVelCovGeodetic_1 = cov; };
+	void onDOP(ssnx::gps::DOP_1_t dop) override { mDOP_1 = dop; };
+	void onPVT_Residuals(ssnx::gps::PVT_Residuals_1_t residuals) override { mPVT_Residuals_1 = residuals; };
+	void onRAIMStatistics(ssnx::gps::RAIMStatistics_1_t raim) override { mRAIMStatistics_1 = raim; };
+	void onPOS_Local(ssnx::gps::POS_Local_1_t pos) override { mPOS_Local_1 = pos; };
+	void onPOS_Projected(ssnx::gps::POS_Projected_1_t pos) override { mPOS_Projected_1 = pos; };
+	void onReceiverTime(ssnx::gps::ReceiverTime_1_t time) override { mReceiverTime_1 = time; };
+	void onRtcmDatum(ssnx::gps::RtcmDatum_1_t datum) override { mRtcmDatum_1 = datum; };
+};
 
 
 TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
@@ -71,13 +91,13 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 
 			REQUIRE(rd.isOpen());
 
-			cSsnxParser ssnx;
+			cSsnxTestParser ssnx;
 			rd.attach(&ssnx);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto info = ssnx.getPVT_Cartesian_1();
+			auto info = ssnx.mPVT_Cartesian_1;
 
 			REQUIRE(info.BaseStationID == original_data.BaseStationID);
 			REQUIRE(info.dataValid == original_data.dataValid);
@@ -166,13 +186,13 @@ TEST_CASE("PVT Cartesian tests", "[ssnx tests]")
 
 			REQUIRE(rd.isOpen());
 
-			cSsnxParser ssnx;
+			cSsnxTestParser ssnx;
 			rd.attach(&ssnx);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto info = ssnx.getPVT_Cartesian_2();
+			auto info = ssnx.mPVT_Cartesian_2;
 
 			REQUIRE(info.dataValid == original_data.dataValid);
 			REQUIRE(info.timestamp_s == original_data.timestamp_s);
@@ -241,13 +261,13 @@ TEST_CASE("PVT Geodetic tests", "[ssnx tests]")
 
 			REQUIRE(rd.isOpen());
 
-			cSsnxParser ssnx;
+			cSsnxTestParser ssnx;
 			rd.attach(&ssnx);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto info = ssnx.getPVT_Geodetic_1();
+			auto info = ssnx.mPVT_Geodetic_1;
 
 			REQUIRE(info.BaseStationID == original_data.BaseStationID);
 			REQUIRE(info.dataValid == original_data.dataValid);
@@ -335,13 +355,13 @@ TEST_CASE("PVT Geodetic tests", "[ssnx tests]")
 
 			REQUIRE(rd.isOpen());
 
-			cSsnxParser ssnx;
+			cSsnxTestParser ssnx;
 			rd.attach(&ssnx);
 
 			auto result = rd.processBlock();
 			REQUIRE(result);
 
-			auto info = ssnx.getPVT_Geodetic_2();
+			auto info = ssnx.mPVT_Geodetic_2;
 
 			REQUIRE(info.dataValid == original_data.dataValid);
 			REQUIRE(info.timestamp_s == original_data.timestamp_s);

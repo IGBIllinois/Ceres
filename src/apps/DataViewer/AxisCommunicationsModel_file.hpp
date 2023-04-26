@@ -2,7 +2,7 @@
 #pragma once
 
 
-#include "AxisCommunicationsParser.hpp"
+#include <cbdf/AxisCommunicationsParser.hpp>
 
 #include <QOBject>
 #include <QBitmap>
@@ -25,9 +25,12 @@ signals:
 protected:
 	void onActiveCameraId(int id) override;
 	void onFramesPerSecond(int frames_per_sec) override;
-	void onBitmap(const QBitmap& in) override;
-	void onJPEG(const QImage& in) override;
-	void onMpegFrame(const QImage& image) override;
+	void onBitmap(const cBitmapBuffer& buffer) override;
+	void onJPEG(const cJpegBuffer& buffer) override;
+	void onMpegFrame(const cMpegFrameBuffer& buffer) override;
+//	void onBitmap(const QBitmap& in) override;
+//	void onJPEG(const QImage& in) override;
+//	void onMpegFrame(const QImage& image) override;
 	void onImageSize(int width, int height) override;
 
 private:

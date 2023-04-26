@@ -284,4 +284,12 @@ void axis::to_image(const cJpegBuffer& in, QImage& out)
 }
 
 void axis::to_image(const cMpegFrameBuffer& img, QImage& out)
-{}
+{
+    cImageReadAdapter imageBuffer(&img);
+
+    QImageReader  imageReader(&imageBuffer, "jpeg");
+
+    imageBuffer.seek(0);
+
+    imageReader.read(&out);
+}

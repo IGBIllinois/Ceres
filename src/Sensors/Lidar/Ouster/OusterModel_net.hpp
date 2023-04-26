@@ -6,7 +6,8 @@
 #include "OusterDataStream.hpp"
 #include "OusterCmdStream.hpp"
 #include "OusterImuStream.hpp"
-#include "OusterSerializer.hpp"
+
+#include <cbdf/OusterSerializer.hpp>
 
 #include <ouster/ouster_defs.h>
 #include <ouster/OusterSensorDiscovery.h>
