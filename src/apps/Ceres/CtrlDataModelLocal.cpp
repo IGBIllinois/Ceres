@@ -150,6 +150,7 @@ void cCtrlDataModelLocal::closeDataFile()
     mResearcher.clear();
     mCultivar.clear();
     mExperimentDoc.clear();
+    mTreatments.clear();
 }
 
 void cCtrlDataModelLocal::endDataRecording()
@@ -220,6 +221,8 @@ void cCtrlDataModelLocal::startExperiment()
         mSerializer.writeDayOfYear(doy);
 
         mSerializer.writeExperimentDoc(mExperimentDoc);
+
+        mSerializer.writeTreatment(mTreatments);
 
         mThread.mpController->writeDataHeader();
 

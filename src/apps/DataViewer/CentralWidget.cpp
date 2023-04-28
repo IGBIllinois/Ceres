@@ -353,6 +353,10 @@ void cCentralWidget::onResearcher(const std::string& researcher)
 
 void cCentralWidget::onExperimentDoc(const std::string& doc) {}
 
+void cCentralWidget::onBeginTreatmentList() {}
+void cCentralWidget::onEndOfTreatmentList() {}
+void cCentralWidget::onTreatment(const std::string& treatment) {}
+
 void cCentralWidget::onFileDate(std::uint16_t year, std::uint8_t month, std::uint8_t day) {};
 void cCentralWidget::onFileTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds) {};
 void cCentralWidget::onDayOfYear(std::uint16_t day_of_year) {};

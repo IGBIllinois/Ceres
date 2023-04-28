@@ -167,6 +167,20 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
             mCultivar = expDoc["cultivar"];
         }
 
+        if (expDoc.contains("treatments"))
+        {
+            auto treatments = expDoc["treatments"];
+            if (treatments.is_string())
+            {
+                mTreatments.push_back(treatments);
+            }
+            else if (treatments.is_array())
+            {
+                for (auto it = treatments.begin(); it != treatments.end(); ++it)
+                    mTreatments.push_back(*it);
+            }
+        }
+
         mExperimentDoc = to_string(expDoc);
     }
 

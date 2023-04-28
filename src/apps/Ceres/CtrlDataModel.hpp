@@ -87,6 +87,7 @@ protected:
     std::string  mResearcher;
     std::string  mCultivar;
     std::string  mExperimentDoc;
+    std::vector<std::string> mTreatments;
 
     cCtrlDataThread mThread;
 

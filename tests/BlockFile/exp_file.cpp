@@ -38,6 +38,10 @@ protected:
 	void onCultivar(const std::string& cultivar) override {};
 	void onExperimentDoc(const std::string& doc) override {};
 
+	void onBeginTreatmentList() override {};
+	void onEndOfTreatmentList() override {};
+	void onTreatment(const std::string& treatment) override {};
+
 	void onFileDate(std::uint16_t year, std::uint8_t month, std::uint8_t day) override {};
 	void onFileTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds) override {};
 
