@@ -47,7 +47,8 @@ public:
     void addSensor(cSensorModel* pSensor) override;
 
     bool openDataFile(const QString& defaultPath, 
-                      const std::string& defaultFilename = std::string()) override;
+                      const std::string& defaultFilename,
+                      bool autoSave) override;
 
     bool isDataFileOpen() const override;
     void closeDataFile();

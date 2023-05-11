@@ -44,14 +44,15 @@ void cCtrlDataModelLocal::stopDataThread()
     }
 }
 
-bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, const std::string& defaultFileName)
+bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, 
+    const std::string& defaultFileName, bool autoSave)
 {
     QString fileName;
 
     std::time_t t = std::time(nullptr);
     tm* ltm = localtime(&t);
 
-    if (!defaultFileName.empty())
+    if (autoSave)
     {
         using namespace std::filesystem;
 
@@ -84,7 +85,22 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, const std::st
     }
     else
     {
-        fileName = QFileDialog::getSaveFileName(nullptr, tr("New File"), defaultPath, tr("Ceres data (*.ceres);;All Files (*.*)"));
+        if (defaultFileName.empty())
+        {
+            fileName = defaultPath;
+        }
+        else
+        {
+            using namespace std::filesystem;
+
+            path testPath = defaultPath.toStdString();
+            testPath /= defaultFileName;
+            fileName = QString::fromStdString(testPath.string());
+            fileName += ".ceres";
+        }
+
+        fileName = QFileDialog::getSaveFileName(nullptr,
+            tr("New File"), fileName, tr("Ceres data (*.ceres);;All Files (*.*)"));
 
         if (fileName.isEmpty())
             return false;
@@ -92,7 +108,6 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, const std::st
 
     if (mFile.isOpen())
         return false;
-
 
     auto ext = fileName.lastIndexOf('.');
 

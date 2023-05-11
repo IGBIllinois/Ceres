@@ -424,12 +424,13 @@ void cMainWindow::onExperimentRun()
     {
         if (mBatchFileName.empty())
         {
-            if (!mpModel->openDataFile(mDefaultDataPath))
+            std::string fileName = mpModel->experimentTitle();
+            if (!mpModel->openDataFile(mDefaultDataPath, fileName, false))
                 return;
         }
         else
         {
-            if (!mpModel->openDataFile(mDefaultDataPath, mBatchFileName))
+            if (!mpModel->openDataFile(mDefaultDataPath, mBatchFileName, true))
                 return;
         }
     }

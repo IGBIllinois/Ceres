@@ -210,7 +210,7 @@ void cCtrlDataModelRemote::try_reconnection()
     mSocket.connectToHost(mRemoteEndpoint, mPort);
 }
 
-bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::string&)
+bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::string&, bool autoSave)
 {
     std::time_t t = std::time(nullptr);
     tm* ltm = localtime(&t);

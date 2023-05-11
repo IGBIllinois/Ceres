@@ -45,7 +45,8 @@ public:
     void stopDataThread() override;
 
     virtual bool openDataFile(const QString& defaultPath, 
-                              const std::string& defaultFileName = std::string()) = 0;
+                              const std::string& defaultFileName,
+                              bool autoSave) = 0;
 
     virtual bool isDataFileOpen() const = 0;
     virtual void closeDataFile() = 0;
