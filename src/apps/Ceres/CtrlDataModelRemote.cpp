@@ -275,7 +275,16 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
 
     bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
 
-    sendExperimentInfo(mExperimentTitle, mResearcher, mCultivar, mExperimentDoc);
+    if (mSpecies.empty())
+        sendExperimentInfo(mExperimentTitle, mResearcher, mCultivar, mExperimentDoc);
+    else
+        sendExperimentInfo(mExperimentTitle, mResearcher, mSpecies, mCultivar, mExperimentDoc);
+
+    if (!mTreatments.empty())
+    {
+        for (const auto& treatment : mTreatments)
+            sendTreatment(treatment);
+    }
 
     return result;
 }

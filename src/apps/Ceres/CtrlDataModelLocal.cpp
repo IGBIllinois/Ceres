@@ -163,6 +163,7 @@ void cCtrlDataModelLocal::closeDataFile()
 
     mExperimentTitle.clear();
     mResearcher.clear();
+    mSpecies.clear();
     mCultivar.clear();
     mExperimentDoc.clear();
     mTreatments.clear();
@@ -215,6 +216,9 @@ void cCtrlDataModelLocal::startExperiment()
 
         if (!mResearcher.empty())
             mSerializer.writeResearcher(mResearcher);
+
+        if (!mSpecies.empty())
+            mSerializer.writeSpecies(mSpecies);
 
         if (!mCultivar.empty())
             mSerializer.writeCultivar(mCultivar);

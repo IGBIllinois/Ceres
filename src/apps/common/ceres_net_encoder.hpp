@@ -24,6 +24,11 @@ public:
     void sendExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc);
 
+    void sendExperimentInfo(const std::string& title, const std::string& researcher,
+        const std::string& species, const std::string& cultivar, const std::string& doc);
+
+    void sendTreatment(const std::string& treatment);
+
     void sendStartExperiment();
     void sendStopExperiment();
 

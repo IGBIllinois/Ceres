@@ -61,6 +61,7 @@ private:
     void onEndOfFooter() override;
 
     void onTitle(const std::string& title) override;
+    void onSpecies(const std::string& species) override;
     void onCultivar(const std::string& cultivar) override;
     void onResearcher(const std::string& researcher) override;
     void onExperimentDoc(const std::string& doc) override;
@@ -119,6 +120,8 @@ private:
     QGroupBox* mpExperimentInfo = nullptr;
     QLabel*    mpTitleLabel = nullptr;
     QLineEdit* mpTitle = nullptr;
+    QLabel*    mpSpeciesLabel = nullptr;
+    QLineEdit* mpSpecies = nullptr;
     QLabel*    mpCultivarLabel = nullptr;
     QLineEdit* mpCultivar = nullptr;
     QLabel*    mpResearcherLabel = nullptr;
@@ -137,19 +140,19 @@ private:
     QLineEdit* mpEndDate = nullptr;
 
     QGroupBox* mpSpidercamInfo = nullptr;
-    QLabel* mpDollyXLabel = nullptr;
+    QLabel*    mpDollyXLabel = nullptr;
     QLineEdit* mpDollyX_mm = nullptr;
-    QLabel* mpDollyYLabel = nullptr;
+    QLabel*    mpDollyYLabel = nullptr;
     QLineEdit* mpDollyY_mm = nullptr;
-    QLabel* mpDollyZLabel = nullptr;
+    QLabel*    mpDollyZLabel = nullptr;
     QLineEdit* mpDollyZ_mm = nullptr;
-    QLabel* mpDollySpeedLabel = nullptr;
+    QLabel*    mpDollySpeedLabel = nullptr;
     QLineEdit* mpDollySpeed_mmps = nullptr;
 
     QGroupBox* mpWeatherInfo = nullptr;
-    QLabel* mpWindSpeedLabel = nullptr;
+    QLabel*    mpWindSpeedLabel = nullptr;
     QLineEdit* mpWindSpeed_mps = nullptr;
-    QLabel* mpWindDirectionLabel = nullptr;
+    QLabel*    mpWindDirectionLabel = nullptr;
     QLineEdit* mpWindDirection_deg = nullptr;
 
     QTimer mTimer;

@@ -41,6 +41,7 @@ enum class ePacketType : uint16_t
 	SENSOR_STATUS,
 	SENSOR_NAME_CHANGE,
 	SENSOR_PROPERTY_CONNECT_INFO,
+	TREATMENT,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -56,13 +57,21 @@ struct sExperimentInfo_t
 {
 	std::string title;
 	std::string researcher;
+	std::string species;
 	std::string cultivar;
 	std::string doc;
 };
 
 sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt);
+sExperimentInfo_t to_experiment_info_2(const ExperimentInfo_2& pckt);
+
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
 	const std::string& cultivar, const std::string& doc, net_buffer& buffer);
+int encode_exp_info_data(const std::string& title, const std::string& researcher,
+	const std::string& species, const std::string& cultivar, const std::string& doc, net_buffer& buffer);
+
+std::string to_treatment_1(const ExperimentTreatment_1& pckt);
+int encode_treatment(const std::string& treatment, net_buffer& buffer);
 
 int encode_start_experiment(net_buffer& buffer);
 int encode_stop_experiment(net_buffer& buffer);

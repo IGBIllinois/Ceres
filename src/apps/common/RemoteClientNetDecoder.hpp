@@ -22,7 +22,14 @@ public:
 
 protected:
     virtual void onExperimentInfo(const std::string& title,
-        const std::string& researcher, const std::string& cultivar, const std::string& doc) = 0;
+        const std::string& researcher, const std::string& cultivar, 
+        const std::string& doc) = 0;
+
+    virtual void onExperimentInfo(const std::string& title,
+        const std::string& researcher, const std::string& species, 
+        const std::string& cultivar, const std::string& doc) = 0;
+
+    virtual void onTreatment(const std::string& treatment) = 0;
 
     virtual void onStartExperiment() = 0;
     virtual void onStopExperiment() = 0;

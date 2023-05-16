@@ -86,6 +86,7 @@ protected:
 protected:
     std::string  mExperimentTitle;
     std::string  mResearcher;
+    std::string  mSpecies;
     std::string  mCultivar;
     std::string  mExperimentDoc;
     std::vector<std::string> mTreatments;

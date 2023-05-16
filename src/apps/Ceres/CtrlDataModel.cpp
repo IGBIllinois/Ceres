@@ -153,6 +153,7 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
     if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
     {
         mResearcher.clear();
+        mSpecies.clear();
         mCultivar.clear();
 
         mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
@@ -160,6 +161,11 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         if (expDoc.contains("researcher"))
         {
             mResearcher = expDoc["researcher"];
+        }
+
+        if (expDoc.contains("cpecies"))
+        {
+            mSpecies = expDoc["species"];
         }
 
         if (expDoc.contains("cultivar"))

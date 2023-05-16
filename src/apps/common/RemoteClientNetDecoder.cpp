@@ -16,10 +16,33 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     }
     case ePacketType::EXPERIMENT_INFO:
     {
-        ExperimentInfo_1 packet;
+        switch (hdr.revision)
+        {
+        case 1:
+        {
+            ExperimentInfo_1 packet;
+            packet.ParseFromArray(buffer.data(), hdr.length);
+            sExperimentInfo_t data = to_experiment_info_1(packet);
+            onExperimentInfo(data.title, data.researcher, data.cultivar, data.doc);
+            break;
+        }
+        case 2:
+        {
+            ExperimentInfo_2 packet;
+            packet.ParseFromArray(buffer.data(), hdr.length);
+            sExperimentInfo_t data = to_experiment_info_2(packet);
+            onExperimentInfo(data.title, data.researcher, data.species, data.cultivar, data.doc);
+            break;
+        }
+        }
+
+        break;
+    }
+    case ePacketType::TREATMENT:
+    {
+        ExperimentTreatment_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
-        sExperimentInfo_t data = to_experiment_info_1(packet);
-        onExperimentInfo(data.title, data.researcher, data.cultivar, data.doc);
+        onTreatment(to_treatment_1(packet));
         break;
     }
     case ePacketType::EXPERIMENT_INFO_REPLY:

@@ -18,6 +18,21 @@ sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt)
     data.cultivar   = pckt.cultivar();
     data.doc        = pckt.file();
 
+    data.species.clear();
+
+    return data;
+}
+
+sExperimentInfo_t to_experiment_info_2(const ExperimentInfo_2& pckt)
+{
+    sExperimentInfo_t data;
+
+    data.title = pckt.title();
+    data.researcher = pckt.researcher();
+    data.species = pckt.species();
+    data.cultivar = pckt.cultivar();
+    data.doc = pckt.file();
+
     return data;
 }
 
@@ -32,16 +47,74 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
         pckt.set_researcher(researcher);
 
     if (!cultivar.empty())
-        pckt.set_researcher(cultivar);
+        pckt.set_cultivar(cultivar);
 
     pckt.set_file(doc);
-
 
     std::string str;
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_INFO);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+int encode_exp_info_data(const std::string& title, const std::string& researcher,
+    const std::string& species, const std::string& cultivar, const std::string& doc, net_buffer& buffer)
+{
+    ExperimentInfo_2 pckt;
+
+    pckt.set_title(title);
+
+    if (!researcher.empty())
+        pckt.set_researcher(researcher);
+
+    if (!species.empty())
+        pckt.set_species(species);
+
+    if (!cultivar.empty())
+        pckt.set_cultivar(cultivar);
+
+    pckt.set_file(doc);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_INFO);
+    hdr.revision = 2;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::string to_treatment_1(const ExperimentTreatment_1& pckt)
+{
+    return pckt.treatment();
+}
+
+int encode_treatment(const std::string& treatment, net_buffer& buffer)
+{
+    ExperimentTreatment_1 pckt;
+
+    pckt.set_treatment(treatment);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::TREATMENT);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);

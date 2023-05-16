@@ -316,8 +316,14 @@ void cRemoteDataModel::onStartExperiment()
     if (!mResearcher.empty())
         mSerializer.writeResearcher(mResearcher);
 
+    if (!mSpecies.empty())
+        mSerializer.writeSpecies(mSpecies);
+
     if (!mCultivar.empty())
         mSerializer.writeCultivar(mCultivar);
+
+    if (!mTreatments.empty())
+        mSerializer.writeTreatment(mTreatments);
 
     time_t t = time(nullptr);
     auto tm = localtime(&t);
@@ -376,10 +382,7 @@ void cRemoteDataModel::onStopExperiment()
         mSerializer.writeEndOfFooter();
     }
 
-    mExperimentTitle.clear();
-    mResearcher.clear();
-    mCultivar.clear();
-    mExperimentDoc.clear();
+    clearExperimentInfo();
 
     mIsExperimentRunning = false;
 
@@ -391,6 +394,7 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
 {
     mExperimentTitle = title;
     mResearcher = researcher;
+    mSpecies.clear();
     mCultivar = cultivar;
     mExperimentDoc = doc;
 
@@ -398,6 +402,24 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
         mSerializer.setBufferCapacity(mExperimentDoc.size() + 32);
 }
 
+void cRemoteDataModel::onExperimentInfo(const std::string& title,
+    const std::string& researcher, const std::string& species,
+    const std::string& cultivar, const std::string& doc)
+{
+    mExperimentTitle = title;
+    mResearcher = researcher;
+    mSpecies = species;
+    mCultivar = cultivar;
+    mExperimentDoc = doc;
+
+    if (mSerializer.bufferCapacity() < mExperimentDoc.size())
+        mSerializer.setBufferCapacity(mExperimentDoc.size() + 32);
+}
+
+void cRemoteDataModel::onTreatment(const std::string& treatment)
+{
+    mTreatments.push_back(treatment);
+}
 
 void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
 {
@@ -543,6 +565,8 @@ void cRemoteDataModel::clientDisconnected()
 
     qInfo() << "Client is disconnected!";
 
+    clearExperimentInfo();
+
     emit statusMessage("Client is disconnected!");
 }
 
@@ -569,4 +593,13 @@ int cRemoteDataModel::sendOutgoingData(const char* data, std::size_t len)
     return n;
 }
 
+void cRemoteDataModel::clearExperimentInfo()
+{
+    mExperimentTitle.clear();
+    mResearcher.clear();
+    mSpecies.clear();
+    mCultivar.clear();
+    mExperimentDoc.clear();
+    mTreatments.clear();
+}
 

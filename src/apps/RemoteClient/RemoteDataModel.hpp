@@ -90,6 +90,11 @@ private slots:
     void onExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc) override;
 
+    void onExperimentInfo(const std::string& title, const std::string& researcher,
+        const std::string& species, const std::string& cultivar, const std::string& doc) override;
+
+    void onTreatment(const std::string& treatment);
+
     void onStartExperiment() override;
     void onStopExperiment() override;
 
@@ -102,6 +107,8 @@ private slots:
     void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
 
 private:
+    void clearExperimentInfo();
+
     int sendOutgoingData(const char* data, std::size_t len) override;
 
 protected:
@@ -129,8 +136,11 @@ private:
     // Experiment Info
     std::string  mExperimentTitle;
     std::string  mResearcher;
+    std::string  mSpecies;
     std::string  mCultivar;
     std::string  mExperimentDoc;
+
+    std::vector<std::string>  mTreatments;
 
     // Spidercam Info
     spidercam::sPosition_1_t mDollyPosition;

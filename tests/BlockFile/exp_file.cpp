@@ -23,6 +23,7 @@ public:
 
 	std::string mTitle;
 	std::string mResearcher;
+	std::string mSpecies;
 	std::string mCultivar;
 	std::string mExperimentDoc;
 
@@ -35,6 +36,7 @@ protected:
 
 	void onTitle(const std::string& title) override {};
 	void onResearcher(const std::string& researcher) override {};
+	void onSpecies(const std::string& species) override {};
 	void onCultivar(const std::string& cultivar) override {};
 	void onExperimentDoc(const std::string& doc) override {};
 

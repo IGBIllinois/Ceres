@@ -16,6 +16,19 @@ void cCeresNetEncoder::sendExperimentInfo(const std::string& title, const std::s
     sendData();
 }
 
+void cCeresNetEncoder::sendExperimentInfo(const std::string& title, const std::string& researcher,
+    const std::string& species, const std::string& cultivar, const std::string& doc)
+{
+    encode_exp_info_data(title, researcher, species, cultivar, doc, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendTreatment(const std::string& treatment)
+{
+    encode_treatment(treatment, mBuffer);
+    sendData();
+}
+
 void cCeresNetEncoder::sendStartExperiment()
 {
     encode_start_experiment(mBuffer);

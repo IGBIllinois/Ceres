@@ -56,6 +56,10 @@ void cCentralWidget::initialize()
     mpTitle = new QLineEdit();
     mpTitle->setReadOnly(true);
 
+    mpSpeciesLabel = new QLabel("Species:");
+    mpSpecies = new QLineEdit();
+    mpSpecies->setReadOnly(true);
+
     mpCultivarLabel = new QLabel("Cultivar:");
     mpCultivar = new QLineEdit();
     mpCultivar->setReadOnly(true);
@@ -67,6 +71,7 @@ void cCentralWidget::initialize()
     mpExperimentInfo = new QGroupBox("Experiment Info");
     auto* expInfoLayout = new QFormLayout();
     expInfoLayout->addRow(mpTitleLabel, mpTitle);
+    expInfoLayout->addRow(mpSpeciesLabel, mpSpecies);
     expInfoLayout->addRow(mpCultivarLabel, mpCultivar);
     expInfoLayout->addRow(mpResearcherLabel, mpResearcher);
     mpExperimentInfo->setLayout(expInfoLayout);
@@ -339,6 +344,11 @@ void cCentralWidget::onEndOfFooter()
 void cCentralWidget::onTitle(const std::string& title)
 {
     mpTitle->setText(QString::fromStdString(title));
+}
+
+void cCentralWidget::onSpecies(const std::string& species)
+{
+    mpSpecies->setText(QString::fromStdString(species));
 }
 
 void cCentralWidget::onCultivar(const std::string& cultivar)

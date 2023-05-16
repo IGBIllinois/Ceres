@@ -34,6 +34,20 @@ message ExperimentInfo_1
 	string file = 4;
 }
 
+message ExperimentInfo_2 
+{
+	string title = 1;
+	string researcher = 2;
+	string cultivar = 3;
+	string file = 4;
+	string species = 5;
+}
+
+message ExperimentTreatment_1
+{
+	string treatment = 1;
+}
+
 
 /******************************************************************************
  * General Reply Packets   Remote Client -> Ceres
