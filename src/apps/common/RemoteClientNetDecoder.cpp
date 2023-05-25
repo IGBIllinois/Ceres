@@ -45,6 +45,55 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onTreatment(to_treatment_1(packet));
         break;
     }
+    case ePacketType::PRINCIPAL_INVESTIGATOR:
+    {
+        PrincipalInvestigator_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onPrincipalInvestigator(to_principal_investigator_1(packet));
+        break;
+    }
+    case ePacketType::CONSTRUCT_NAME:
+    {
+        ConstructName_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onConstructName(to_construct_name_1(packet));
+        break;
+    }
+    case ePacketType::EVENT_NUMBER:
+    {
+        EventNumber_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onEventNumber(to_event_number_1(packet));
+        break;
+    }
+    case ePacketType::FIELD_DESIGN:
+    {
+        FieldDesign_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onFieldDesign(to_field_design_1(packet));
+        break;
+    }
+    case ePacketType::PLANTING_DATE:
+    {
+        PlantingDate_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onPlantingDate(to_planting_date_1(packet));
+        break;
+    }
+    case ePacketType::HARVEST_DATE:
+    {
+        HarvestDate_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onHarvestDate(to_harvest_date_1(packet));
+        break;
+    }
+    case ePacketType::COMMENT:
+    {
+        ExperimentComment_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onComment(to_comment_1(packet));
+        break;
+    }
     case ePacketType::EXPERIMENT_INFO_REPLY:
     {
         break;

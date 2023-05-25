@@ -11,6 +11,7 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
     case ePacketType::UNKNOWN:
     default:
     {
+        onUnknownID(hdr.id);
         break;
     }
     case ePacketType::EXPERIMENT_INFO_REPLY:

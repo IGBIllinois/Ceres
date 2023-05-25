@@ -3,6 +3,7 @@
 
 #include "net_packet_encoder.hpp"
 #include <cstddef>
+#include <ctime>
 
 // Forward Declarations
 namespace spidercam
@@ -27,7 +28,14 @@ public:
     void sendExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& species, const std::string& cultivar, const std::string& doc);
 
+    void sendPrincipalInvestigator(const std::string& pi);
+    void sendConstructName(const std::string& name);
+    void sendEventNumber(const std::string& event_num);
+    void sendFieldDesign(const std::string& design);
+    void sendPlantingDate(std::time_t date);
+    void sendHarvestDate(std::time_t date);
     void sendTreatment(const std::string& treatment);
+    void sendComment(const std::string& comment);
 
     void sendStartExperiment();
     void sendStopExperiment();

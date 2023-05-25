@@ -35,6 +35,7 @@ protected:
 	void onEndOfFooter() override { mHasEndOfFooter = true; }
 
 	void onTitle(const std::string& title) override {};
+	void onPrincipalInvestigator(const std::string& investigator) override {};
 	void onResearcher(const std::string& researcher) override {};
 	void onSpecies(const std::string& species) override {};
 	void onCultivar(const std::string& cultivar) override {};
@@ -43,6 +44,16 @@ protected:
 	void onBeginTreatmentList() override {};
 	void onEndOfTreatmentList() override {};
 	void onTreatment(const std::string& treatment) override {};
+
+	void onConstructName(const std::string& name) override {};
+	void onEventNumber(const std::string& event) override {};
+	void onFieldDesign(const std::string& design) override {};
+	void onPlantingDate(std::uint16_t year, std::uint8_t month, std::uint8_t day, std::uint16_t doy) override {};
+	void onHarvestDate(std::uint16_t year, std::uint8_t month, std::uint8_t day, std::uint16_t doy) override {};
+
+	void onBeginCommentList() override {};
+	void onEndOfCommentList() override {};
+	void onComment(const std::string& comments) override {};
 
 	void onFileDate(std::uint16_t year, std::uint8_t month, std::uint8_t day) override {};
 	void onFileTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds) override {};

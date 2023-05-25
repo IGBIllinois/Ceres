@@ -10,6 +10,9 @@ cCtrlDataModel::cCtrlDataModel(QObject* parent)
     cDataModel(parent)
 {
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cCtrlDataModel::onStatusUpdate);
+
+    mPlantingDate = 0;
+    mHarvestDate = 0;
 }
 
 cCtrlDataModel::~cCtrlDataModel()
@@ -152,18 +155,31 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
 
     if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
     {
+        mPrincipalInvestigator.clear();
         mResearcher.clear();
         mSpecies.clear();
         mCultivar.clear();
+        mTreatments.clear();
+        mConstructName.clear();
+        mEventNumber.clear();
+        mFieldDesign.clear();
+        mComments.clear();
+        mPlantingDate = 0;
+        mHarvestDate = 0;
 
         mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
+
+        if (expDoc.contains("principal investigator"))
+        {
+            mPrincipalInvestigator = expDoc["principal investigator"];
+        }
 
         if (expDoc.contains("researcher"))
         {
             mResearcher = expDoc["researcher"];
         }
 
-        if (expDoc.contains("cpecies"))
+        if (expDoc.contains("species"))
         {
             mSpecies = expDoc["species"];
         }
@@ -171,6 +187,21 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         if (expDoc.contains("cultivar"))
         {
             mCultivar = expDoc["cultivar"];
+        }
+
+        if (expDoc.contains("construct"))
+        {
+            mConstructName = expDoc["construct"];
+        }
+
+        if (expDoc.contains("event number"))
+        {
+            mEventNumber = expDoc["event number"];
+        }
+
+        if (expDoc.contains("field design"))
+        {
+            mFieldDesign = expDoc["field design"];
         }
 
         if (expDoc.contains("treatments"))
@@ -185,6 +216,28 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
                 for (auto it = treatments.begin(); it != treatments.end(); ++it)
                     mTreatments.push_back(*it);
             }
+        }
+
+        if (expDoc.contains("comments"))
+        {
+            auto comments = expDoc["comments"];
+            if (comments.is_string())
+            {
+                mComments.push_back(comments);
+            }
+            else if (comments.is_array())
+            {
+                for (auto it = comments.begin(); it != comments.end(); ++it)
+                    mComments.push_back(*it);
+            }
+        }
+
+        if (expDoc.contains("planting date"))
+        { 
+        }
+
+        if (expDoc.contains("target harvest date"))
+        {
         }
 
         mExperimentDoc = to_string(expDoc);

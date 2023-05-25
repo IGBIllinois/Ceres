@@ -162,11 +162,19 @@ void cCtrlDataModelLocal::closeDataFile()
     mFile.close();
 
     mExperimentTitle.clear();
+    mPrincipalInvestigator.clear();
     mResearcher.clear();
     mSpecies.clear();
     mCultivar.clear();
     mExperimentDoc.clear();
     mTreatments.clear();
+    mConstructName.clear();
+    mEventNumber.clear();
+    mFieldDesign.clear();
+    mComments.clear();
+
+    mPlantingDate = 0;
+    mHarvestDate = 0;
 }
 
 void cCtrlDataModelLocal::endDataRecording()
@@ -214,6 +222,9 @@ void cCtrlDataModelLocal::startExperiment()
         mSerializer.writeBeginHeader();
         mSerializer.writeTitle(mExperimentTitle);
 
+        if (!mPrincipalInvestigator.empty())
+            mSerializer.writePrincipalInvestigator(mPrincipalInvestigator);
+
         if (!mResearcher.empty())
             mSerializer.writeResearcher(mResearcher);
 
@@ -222,6 +233,37 @@ void cCtrlDataModelLocal::startExperiment()
 
         if (!mCultivar.empty())
             mSerializer.writeCultivar(mCultivar);
+
+        if (!mConstructName.empty())
+            mSerializer.writeConstructName(mConstructName);
+
+        if (!mEventNumber.empty())
+            mSerializer.writeEventNumber(mEventNumber);
+
+        if (!mFieldDesign.empty())
+            mSerializer.writeFieldDesign(mFieldDesign);
+
+        if (mPlantingDate > 0)
+        {
+            auto tm = localtime(&mPlantingDate);
+            std::uint16_t year = tm->tm_year + 1900;
+            std::uint8_t month = tm->tm_mon + 1;
+            std::uint8_t day = tm->tm_mday;
+            std::uint16_t doy = tm->tm_yday;
+
+            mSerializer.writePlantingDate(year, month, day, doy);
+        }
+
+        if (mHarvestDate > 0)
+        {
+            auto tm = localtime(&mHarvestDate);
+            std::uint16_t year = tm->tm_year + 1900;
+            std::uint8_t month = tm->tm_mon + 1;
+            std::uint8_t day = tm->tm_mday;
+            std::uint16_t doy = tm->tm_yday;
+
+            mSerializer.writeHarvestDate(year, month, day, doy);
+        }
 
         time_t t = time(nullptr);
         auto tm = localtime(&t);
@@ -242,6 +284,7 @@ void cCtrlDataModelLocal::startExperiment()
         mSerializer.writeExperimentDoc(mExperimentDoc);
 
         mSerializer.writeTreatment(mTreatments);
+        mSerializer.writeComment(mComments);
 
         mThread.mpController->writeDataHeader();
 

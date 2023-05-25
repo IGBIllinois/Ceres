@@ -8,7 +8,10 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+
 #include <vector>
+#include <ctime>
+
 #include <nlohmann/json.hpp>
 
 // Forward Declarations
@@ -85,11 +88,21 @@ protected:
 
 protected:
     std::string  mExperimentTitle;
+    std::string  mPrincipalInvestigator;
     std::string  mResearcher;
     std::string  mSpecies;
     std::string  mCultivar;
     std::string  mExperimentDoc;
     std::vector<std::string> mTreatments;
+
+    std::string mConstructName;
+    std::string mEventNumber;
+    std::string mFieldDesign;
+
+    std::time_t mPlantingDate;
+    std::time_t mHarvestDate;
+
+    std::vector<std::string> mComments;
 
     cCtrlDataThread mThread;
 

@@ -169,13 +169,14 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 
     if (mFile.isOpen())
     {
-        return; // false;
+        sendDataFileState(true);
+        return;
     }
 
     if (fileName.empty() && mExperimentTitle.empty())
     {
         sendDataFileState(false);
-        return; // false;
+        return;
     }
 
     std::string qualifiedFileName = fileName;
@@ -220,6 +221,7 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
         msg.append(mFullyQualifiedFileName.c_str());
         sendLogMessage(logERROR, "Remote Client", msg);
         emit statusMessage(msg);
+        sendDataFileState(false);
         return;
     }
 
@@ -322,9 +324,46 @@ void cRemoteDataModel::onStartExperiment()
     if (!mCultivar.empty())
         mSerializer.writeCultivar(mCultivar);
 
+    if (!mPrincipalInvestigator.empty())
+        mSerializer.writePrincipalInvestigator(mPrincipalInvestigator);
+
+    if (!mConstructName.empty())
+        mSerializer.writeConstructName(mConstructName);
+
+    if (!mEventNumber.empty())
+        mSerializer.writeEventNumber(mEventNumber);
+
+    if (!mFieldDesign.empty())
+        mSerializer.writeFieldDesign(mFieldDesign);
+
+    if (mPlantingDate > 0)
+    {
+        auto tm = localtime(&mPlantingDate);
+        std::uint16_t year = tm->tm_year + 1900;
+        std::uint8_t month = tm->tm_mon + 1;
+        std::uint8_t day = tm->tm_mday;
+        std::uint16_t doy = tm->tm_yday;
+
+        mSerializer.writePlantingDate(year, month, day, doy);
+    }
+
+    if (mHarvestDate > 0)
+    {
+        auto tm = localtime(&mHarvestDate);
+        std::uint16_t year = tm->tm_year + 1900;
+        std::uint8_t month = tm->tm_mon + 1;
+        std::uint8_t day = tm->tm_mday;
+        std::uint16_t doy = tm->tm_yday;
+
+        mSerializer.writePlantingDate(year, month, day, doy);
+    }
+
     if (!mTreatments.empty())
         mSerializer.writeTreatment(mTreatments);
 
+    if (!mComments.empty())
+        mSerializer.writeComment(mComments);
+    
     time_t t = time(nullptr);
     auto tm = localtime(&t);
     std::uint16_t year = tm->tm_year + 1900;
@@ -416,9 +455,45 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
         mSerializer.setBufferCapacity(mExperimentDoc.size() + 32);
 }
 
+void cRemoteDataModel::onPrincipalInvestigator(const std::string& pi)
+{
+    mPrincipalInvestigator = pi;
+
+}
+
+void cRemoteDataModel::onConstructName(const std::string& name)
+{
+    mConstructName = name;
+}
+
+void cRemoteDataModel::onEventNumber(const std::string& event_num)
+{
+    mEventNumber = event_num;
+}
+
+void cRemoteDataModel::onFieldDesign(const std::string& design)
+{
+    mFieldDesign = design;
+}
+
+void cRemoteDataModel::onPlantingDate(std::time_t date)
+{
+    mPlantingDate = date;
+}
+
+void cRemoteDataModel::onHarvestDate(std::time_t date)
+{
+    mHarvestDate = date;
+}
+
 void cRemoteDataModel::onTreatment(const std::string& treatment)
 {
     mTreatments.push_back(treatment);
+}
+
+void cRemoteDataModel::onComment(const std::string& comment)
+{
+    mComments.push_back(comment);
 }
 
 void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
@@ -596,10 +671,18 @@ int cRemoteDataModel::sendOutgoingData(const char* data, std::size_t len)
 void cRemoteDataModel::clearExperimentInfo()
 {
     mExperimentTitle.clear();
+    mPrincipalInvestigator.clear();
     mResearcher.clear();
     mSpecies.clear();
     mCultivar.clear();
+    mConstructName.clear();
+    mEventNumber.clear();
+    mFieldDesign.clear();
     mExperimentDoc.clear();
+    mPlantingDate = 0;
+    mHarvestDate = 0;
     mTreatments.clear();
+    mComments.clear();
+
 }
 

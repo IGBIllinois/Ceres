@@ -184,6 +184,7 @@ void cExperimentStateMachine::terminateExperiment()
     if (!mRunning)
     {
         mPaused = false;
+        emit experimentStateChanged(eState::TERMINATED);
         return;
     }
 

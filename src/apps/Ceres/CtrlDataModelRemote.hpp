@@ -97,6 +97,8 @@ private:
     void onSensorPropertyConnectInfo(const std::string& sensor, const std::string& model, uint32_t version,
         const std::string& name, const std::string& ip_address, uint16_t port) override;
 
+    void onUnknownID(uint16_t id) override;
+
 /*
  *
  */

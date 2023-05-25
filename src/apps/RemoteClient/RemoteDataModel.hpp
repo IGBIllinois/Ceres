@@ -93,7 +93,14 @@ private slots:
     void onExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& species, const std::string& cultivar, const std::string& doc) override;
 
-    void onTreatment(const std::string& treatment);
+    void onPrincipalInvestigator(const std::string& pi) override;
+    void onConstructName(const std::string& name) override;
+    void onEventNumber(const std::string& event_num) override;
+    void onFieldDesign(const std::string& design) override;
+    void onPlantingDate(std::time_t date) override;
+    void onHarvestDate(std::time_t date) override;
+    void onTreatment(const std::string& treatment) override;
+    void onComment(const std::string& comment) override;
 
     void onStartExperiment() override;
     void onStopExperiment() override;
@@ -135,12 +142,20 @@ protected:
 private:
     // Experiment Info
     std::string  mExperimentTitle;
+    std::string  mPrincipalInvestigator;
     std::string  mResearcher;
     std::string  mSpecies;
     std::string  mCultivar;
+    std::string  mConstructName;
+    std::string  mEventNumber;
+    std::string  mFieldDesign;
     std::string  mExperimentDoc;
 
+    std::time_t mPlantingDate;
+    std::time_t mHarvestDate;
+
     std::vector<std::string>  mTreatments;
+    std::vector<std::string>  mComments;
 
     // Spidercam Info
     spidercam::sPosition_1_t mDollyPosition;

@@ -356,6 +356,9 @@ void cCentralWidget::onCultivar(const std::string& cultivar)
     mpCultivar->setText(QString::fromStdString(cultivar));
 }
 
+void cCentralWidget::onPrincipalInvestigator(const std::string& investigator)
+{}
+
 void cCentralWidget::onResearcher(const std::string& researcher)
 {
     mpResearcher->setText(QString::fromStdString(researcher));
@@ -366,6 +369,16 @@ void cCentralWidget::onExperimentDoc(const std::string& doc) {}
 void cCentralWidget::onBeginTreatmentList() {}
 void cCentralWidget::onEndOfTreatmentList() {}
 void cCentralWidget::onTreatment(const std::string& treatment) {}
+
+void cCentralWidget::onConstructName(const std::string& name) {}
+void cCentralWidget::onEventNumber(const std::string& event) {}
+void cCentralWidget::onFieldDesign(const std::string& design) {}
+void cCentralWidget::onPlantingDate(std::uint16_t year, std::uint8_t month, std::uint8_t day, std::uint16_t doy) {}
+void cCentralWidget::onHarvestDate(std::uint16_t year, std::uint8_t month, std::uint8_t day, std::uint16_t doy) {}
+
+void cCentralWidget::onBeginCommentList() {}
+void cCentralWidget::onEndOfCommentList() {}
+void cCentralWidget::onComment(const std::string& comments) {}
 
 void cCentralWidget::onFileDate(std::uint16_t year, std::uint8_t month, std::uint8_t day) {};
 void cCentralWidget::onFileTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds) {};

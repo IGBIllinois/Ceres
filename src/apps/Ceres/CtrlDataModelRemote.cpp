@@ -10,6 +10,8 @@
 #include "ExperimentStateCreator.hpp"
 
 #include <QDockWidget>
+#include <QTime>
+#include <QCoreApplication>
 
 //Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
 //Q_DECLARE_METATYPE(QAbstractSocket::SocketState)
@@ -236,9 +238,22 @@ bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::s
     filename += "/";
     filename += mExperimentTitle;
 
-    sendOpenDataFile(filename);
+    // We are going to try an open a data file on the remote computer
+    // three times.
+    for (int i = 0; i < 3; ++i)
+    {
+        sendOpenDataFile(filename);
 
-    return true;
+        QTime delayTime = QTime::currentTime().addSecs(3);
+        while (QTime::currentTime() < delayTime)
+        {
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            if (mDataFileIsOpen)
+                return true;
+        }
+    }
+
+    return mDataFileIsOpen;
 }
 
 bool cCtrlDataModelRemote::isDataFileOpen() const
@@ -280,10 +295,34 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
     else
         sendExperimentInfo(mExperimentTitle, mResearcher, mSpecies, mCultivar, mExperimentDoc);
 
+    if (!mPrincipalInvestigator.empty())
+        sendPrincipalInvestigator(mPrincipalInvestigator);
+
+    if (!mConstructName.empty())
+        sendConstructName(mConstructName);
+    
+    if (!mEventNumber.empty())
+        sendEventNumber(mEventNumber);
+    
+    if (!mFieldDesign.empty())
+        sendFieldDesign(mFieldDesign);
+
+    if (mPlantingDate > 0)
+        sendPlantingDate(mPlantingDate);
+
+    if (mHarvestDate > 0)
+        sendHarvestDate(mHarvestDate);
+
     if (!mTreatments.empty())
     {
         for (const auto& treatment : mTreatments)
             sendTreatment(treatment);
+    }
+
+    if (!mComments.empty())
+    {
+        for (const auto& comment : mComments)
+            sendComment(comment);
     }
 
     return result;
@@ -484,3 +523,9 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     }
 }
 
+void cCtrlDataModelRemote::onUnknownID(uint16_t id)
+{
+    QString msg("Received unknown packet id from remote computer: ");
+    msg += QString::number(id);
+    emit statusMessage(msg);
+}

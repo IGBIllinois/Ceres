@@ -42,6 +42,13 @@ enum class ePacketType : uint16_t
 	SENSOR_NAME_CHANGE,
 	SENSOR_PROPERTY_CONNECT_INFO,
 	TREATMENT,
+	PRINCIPAL_INVESTIGATOR,
+	CONSTRUCT_NAME,
+	EVENT_NUMBER,
+	FIELD_DESIGN,
+	PLANTING_DATE,
+	HARVEST_DATE,
+	COMMENT,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -70,8 +77,30 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
 	const std::string& species, const std::string& cultivar, const std::string& doc, net_buffer& buffer);
 
+std::string to_principal_investigator_1(const PrincipalInvestigator_1& pckt);
+int encode_principal_investigator(const std::string& pi, net_buffer& buffer);
+
+std::string to_construct_name_1(const ConstructName_1& pckt);
+int encode_construct_name(const std::string& name, net_buffer& buffer);
+
+std::string to_event_number_1(const EventNumber_1& pckt);
+int encode_event_number(const std::string& number, net_buffer& buffer);
+
+std::string to_field_design_1(const FieldDesign_1& pckt);
+int encode_field_design(const std::string& design, net_buffer& buffer);
+
+std::time_t to_planting_date_1(const PlantingDate_1& pckt);
+int encode_planting_date(std::time_t date, net_buffer& buffer);
+
+std::time_t to_harvest_date_1(const HarvestDate_1& pckt);
+int encode_harvest_date(std::time_t date, net_buffer& buffer);
+
 std::string to_treatment_1(const ExperimentTreatment_1& pckt);
 int encode_treatment(const std::string& treatment, net_buffer& buffer);
+
+std::string to_comment_1(const ExperimentComment_1& pckt);
+int encode_comment(const std::string& comment, net_buffer& buffer);
+
 
 int encode_start_experiment(net_buffer& buffer);
 int encode_stop_experiment(net_buffer& buffer);

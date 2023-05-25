@@ -43,9 +43,44 @@ message ExperimentInfo_2
 	string species = 5;
 }
 
+message PrincipalInvestigator_1
+{
+	string pi = 1;
+}
+
+message ConstructName_1
+{
+	string construct_name = 1;
+}
+
+message EventNumber_1
+{
+	string event_number = 1;
+}
+
+message FieldDesign_1
+{
+	string field_design = 1;
+}
+
+message PlantingDate_1
+{
+	uint64 planting_date = 1;
+}
+
+message HarvestDate_1
+{
+	uint64 harvest_date = 1;
+}
+
 message ExperimentTreatment_1
 {
 	string treatment = 1;
+}
+
+message ExperimentComment_1
+{
+	string comment = 1;
 }
 
 

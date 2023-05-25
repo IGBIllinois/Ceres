@@ -99,6 +99,162 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+std::string to_principal_investigator_1(const PrincipalInvestigator_1& pckt)
+{
+    return pckt.pi();
+}
+
+int encode_principal_investigator(const std::string& pi, net_buffer& buffer)
+{
+    PrincipalInvestigator_1 pckt;
+
+    pckt.set_pi(pi);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::PRINCIPAL_INVESTIGATOR);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::string to_construct_name_1(const ConstructName_1& pckt)
+{
+    return pckt.construct_name();
+}
+
+int encode_construct_name(const std::string& name, net_buffer& buffer)
+{
+    ConstructName_1 pckt;
+
+    pckt.set_construct_name(name);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::CONSTRUCT_NAME);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::string to_event_number_1(const EventNumber_1& pckt)
+{
+    return pckt.event_number();
+}
+
+int encode_event_number(const std::string& number, net_buffer& buffer)
+{
+    EventNumber_1 pckt;
+
+    pckt.set_event_number(number);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::EVENT_NUMBER);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::string to_field_design_1(const FieldDesign_1& pckt)
+{
+    return pckt.field_design();
+}
+
+int encode_field_design(const std::string& design, net_buffer& buffer)
+{
+    FieldDesign_1 pckt;
+
+    pckt.set_field_design(design);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::FIELD_DESIGN);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::time_t to_planting_date_1(const PlantingDate_1& pckt)
+{
+    return static_cast<std::time_t>(pckt.planting_date());
+}
+
+int encode_planting_date(std::time_t date, net_buffer& buffer)
+{
+    PlantingDate_1 pckt;
+
+    pckt.set_planting_date(static_cast<uint64_t>(date));
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::PLANTING_DATE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::time_t to_harvest_date_1(const HarvestDate_1& pckt)
+{
+    return static_cast<std::time_t>(pckt.harvest_date());
+}
+
+int encode_harvest_date(std::time_t date, net_buffer& buffer)
+{
+    HarvestDate_1 pckt;
+
+    pckt.set_harvest_date(static_cast<uint64_t>(date));
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::HARVEST_DATE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
 std::string to_treatment_1(const ExperimentTreatment_1& pckt)
 {
     return pckt.treatment();
@@ -115,6 +271,32 @@ int encode_treatment(const std::string& treatment, net_buffer& buffer)
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::TREATMENT);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+std::string to_comment_1(const ExperimentComment_1& pckt)
+{
+    return pckt.comment();
+}
+
+int encode_comment(const std::string& comment, net_buffer& buffer)
+{
+    ExperimentComment_1 pckt;
+
+    pckt.set_comment(comment);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::COMMENT);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -205,7 +387,7 @@ int encode_file_open_state(bool open, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::OPEN_DATA_FILE);
+    hdr.id = static_cast<uint16_t>(ePacketType::DATA_FILE_STATE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);

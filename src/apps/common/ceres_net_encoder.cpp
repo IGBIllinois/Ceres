@@ -23,9 +23,51 @@ void cCeresNetEncoder::sendExperimentInfo(const std::string& title, const std::s
     sendData();
 }
 
+void cCeresNetEncoder::sendPrincipalInvestigator(const std::string& pi)
+{
+    encode_principal_investigator(pi, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendConstructName(const std::string& name)
+{
+    encode_construct_name(name, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendEventNumber(const std::string& event_num)
+{
+    encode_event_number(event_num, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendFieldDesign(const std::string& design)
+{
+    encode_field_design(design, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendPlantingDate(std::time_t date)
+{
+    encode_planting_date(date, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendHarvestDate(std::time_t date)
+{
+    encode_harvest_date(date, mBuffer);
+    sendData();
+}
+
 void cCeresNetEncoder::sendTreatment(const std::string& treatment)
 {
     encode_treatment(treatment, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendComment(const std::string& comment)
+{
+    encode_comment(comment, mBuffer);
     sendData();
 }
 

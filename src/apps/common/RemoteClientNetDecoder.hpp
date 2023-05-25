@@ -11,6 +11,7 @@
 #include <spidercam/spidercam_types.hpp>
 
 #include <string>
+#include <ctime>
 
 
 class cCeresRemoteClientNetDecoder : public cNetworkDecoder
@@ -29,7 +30,14 @@ protected:
         const std::string& researcher, const std::string& species, 
         const std::string& cultivar, const std::string& doc) = 0;
 
+    virtual void onPrincipalInvestigator(const std::string& comment) = 0;
+    virtual void onConstructName(const std::string& name) = 0;
+    virtual void onEventNumber(const std::string& event_num) = 0;
+    virtual void onFieldDesign(const std::string& comment) = 0;
+    virtual void onPlantingDate(std::time_t date) = 0;
+    virtual void onHarvestDate(std::time_t date) = 0;
     virtual void onTreatment(const std::string& treatment) = 0;
+    virtual void onComment(const std::string& comment) = 0;
 
     virtual void onStartExperiment() = 0;
     virtual void onStopExperiment() = 0;
