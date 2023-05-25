@@ -426,12 +426,18 @@ void cMainWindow::onExperimentRun()
         {
             std::string fileName = mpModel->experimentTitle();
             if (!mpModel->openDataFile(mDefaultDataPath, fileName, false))
+            {
+                mpModel->terminateExperiment();
                 return;
+            }
         }
         else
         {
             if (!mpModel->openDataFile(mDefaultDataPath, mBatchFileName, true))
+            {
+                mpModel->terminateExperiment();
                 return;
+            }
         }
     }
 
