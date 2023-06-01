@@ -40,22 +40,22 @@ protected:
 	void onRtcmDatum(ssnx::gps::RtcmDatum_1_t data) override {};
 
 private:
-	double mX_m;
-	double mY_m;
-	double mZ_m;
-	double mVx_mps;
-	double mVy_mps;
-	double mVz_mps;
-	double mCartGroundTrack_deg;
+	double mX_m = 0.0;
+	double mY_m = 0.0;
+	double mZ_m = 0.0;
+	double mVx_mps = 0.0;
+	double mVy_mps = 0.0;
+	double mVz_mps = 0.0;
+	double mDollyGroundTrack_deg = 0.0;
 
-	double mTimestamp_s;
-	double mLatitude_rad;
-	double mLongitude_rad;
-	double mHeight_m;
-	double mNorthSpeed_mps;
-	double mEastSpeed_mps;
-	double mVertSpeed_mps;
-	double mGroundTrack_deg;
-	gps::eDatum mDatum;
+	double mTimestamp_s = 0.0;
+	double mLatitude_rad = 0.0;
+	double mLongitude_rad = 0.0;
+	double mHeight_m = 0.0;
+	double mNorthSpeed_mps = 0.0;
+	double mEastSpeed_mps = 0.0;
+	double mVertSpeed_mps = 0.0;
+	double mGroundTrack_deg = 0.0;
+	::gps::eDatum mDatum = ::gps::eDatum::WGS84;
 };
 

@@ -23,7 +23,7 @@ void cSsnxModel_file::onPVT_Cartesian(ssnx::gps::PVT_Cartesian_2_t data)
 	mVx_mps = data.Vx_mps;
 	mVy_mps = data.Vy_mps;
 	mVz_mps = data.Vz_mps;
-	mCartGroundTrack_deg = data.GroundTrack_deg;
+	mDollyGroundTrack_deg = data.GroundTrack_deg;
 }
 
 void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_1_t data)

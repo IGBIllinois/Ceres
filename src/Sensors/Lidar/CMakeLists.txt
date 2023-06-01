@@ -47,6 +47,7 @@ PRIVATE
 #target_include_directories(lidar_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 #target_include_directories(lidar_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
+target_link_libraries(lidar_static PRIVATE hokuyo_sensor_static)
 target_link_libraries(lidar_static PRIVATE ouster_sensor_static)
 target_link_libraries(lidar_static PRIVATE nlohmann_json::nlohmann_json)
 
@@ -60,5 +61,6 @@ set_target_properties(lidar_static PROPERTIES FOLDER "Sensors/Lidar")
 
 
 # Add the Ouster LiDAR library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Hokuyo)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Ouster)
 
