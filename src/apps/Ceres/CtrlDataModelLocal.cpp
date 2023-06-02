@@ -283,8 +283,8 @@ void cCtrlDataModelLocal::startExperiment()
 
         mSerializer.writeExperimentDoc(mExperimentDoc);
 
-        mSerializer.writeTreatment(mTreatments);
-        mSerializer.writeComment(mComments);
+        mSerializer.writeTreatments(mTreatments);
+        mSerializer.writeComments(mComments);
 
         mThread.mpController->writeDataHeader();
 

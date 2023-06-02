@@ -359,10 +359,10 @@ void cRemoteDataModel::onStartExperiment()
     }
 
     if (!mTreatments.empty())
-        mSerializer.writeTreatment(mTreatments);
+        mSerializer.writeTreatments(mTreatments);
 
     if (!mComments.empty())
-        mSerializer.writeComment(mComments);
+        mSerializer.writeComments(mComments);
     
     time_t t = time(nullptr);
     auto tm = localtime(&t);
