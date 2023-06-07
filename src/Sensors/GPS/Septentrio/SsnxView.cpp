@@ -48,8 +48,8 @@ void cSsnxView::updatePVT(double timestamp_s,
 	double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,
 	double groundTrack_deg, gps::eDatum datum)
 {
-	mpLatitude_deg->setText(QString::number(lat_rad * nConstants::RAD_TO_DEG));
-	mpLongitude_deg->setText(QString::number(lng_rad * nConstants::RAD_TO_DEG));
+	mpLatitude_deg->setText(QString::number(lat_rad * nConstants::RAD_TO_DEG, 'f', 10));
+	mpLongitude_deg->setText(QString::number(lng_rad * nConstants::RAD_TO_DEG, 'f', 10));
 	mpHeight_m->setText(QString::number(height_m));
 	mpNorthVelocity_mps->setText(QString::number(northSpeed_mps));
 	mpEastVelocity_mps->setText(QString::number(eastSpeed_mps));
