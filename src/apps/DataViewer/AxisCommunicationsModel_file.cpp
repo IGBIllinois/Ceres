@@ -2,6 +2,7 @@
 #include "AxisCommunicationsModel_file.hpp"
 #include "RGB/AxisCommunications/AxisCommunicationsUtils.hpp"
 
+#include <QMessageBox>
 
 cAxisCommunicationsModel_file::cAxisCommunicationsModel_file(QObject* parent)
 :
@@ -33,8 +34,20 @@ void cAxisCommunicationsModel_file::onJPEG(const cJpegBuffer& buffer)
 
 void cAxisCommunicationsModel_file::onMpegFrame(const cMpegFrameBuffer& buffer)
 {
-    axis::to_image(buffer, mImage);
+    try
+    {
+        axis::to_image(buffer, mImage);
+    }
+    catch (const std::runtime_error& e)
+    {
+        QMessageBox msgBox;
+        msgBox.setText(e.what());
+        msgBox.exec();
+        return;
+    }
+
     emit onNewImage(mImage);
+
     ++numImages;
 }
 

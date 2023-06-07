@@ -26,6 +26,9 @@ void cAxisCommunicationsView_file::initialize()
     mpCameraIdLabel = new QLabel("Camera ID:");
     mpCameraId = new QLineEdit();
     mpCameraId->setEnabled(false);
+    mpFrameNumberLabel = new QLabel("Frame Number:");
+    mpFrameNumber = new QLineEdit();
+    mpFrameNumber->setEnabled(false);
     mpFrameRateLabel = new QLabel("Frame Rate:");
     mpFrameRate = new QLineEdit();
     mpFrameRate->setEnabled(false);
@@ -38,6 +41,8 @@ void cAxisCommunicationsView_file::initialize()
     auto* infoLayout = new QHBoxLayout();
     infoLayout->addWidget(mpCameraIdLabel);
     infoLayout->addWidget(mpCameraId);
+    infoLayout->addWidget(mpFrameNumberLabel);
+    infoLayout->addWidget(mpFrameNumber);
     infoLayout->addWidget(mpFrameRateLabel);
     infoLayout->addWidget(mpFrameRate);
     infoLayout->addWidget(mpImageSizeLabel);
@@ -54,20 +59,28 @@ void cAxisCommunicationsView_file::initialize()
 
 void cAxisCommunicationsView_file::activeCameraIdUpdated(int id)
 {
+    mFrameNumber = 0;
     mpCameraId->setText(QString::number(id));
 }
 
 void cAxisCommunicationsView_file::framesRateUpdated(int frames_per_sec)
 {
+    mFrameNumber = 0;
     mpFrameRate->setText(QString::number(frames_per_sec));
 }
 
 void cAxisCommunicationsView_file::imageSizeUpdated(int width, int height)
 {
+    mFrameNumber = 0;
     QString image_size = QString::number(width);
     image_size += "x";
     image_size += QString::number(height);
     mpImageSize->setText(image_size);
 }
 
+void cAxisCommunicationsView_file::imageUpdated(const QImage& image)
+{
+    mpFrameNumber->setText(QString::number(++mFrameNumber));
 
+    cAxisCommunicationsView::imageUpdated(image);
+}

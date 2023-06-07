@@ -28,12 +28,18 @@ public slots:
 	void imageSizeUpdated(int width, int height);
 //	void imageUpdated(const QImage& image);
 
+protected:
+	virtual void imageUpdated(const QImage& image);
 
 private:
 	QLabel*		mpCameraIdLabel = nullptr;
 	QLineEdit*	mpCameraId = nullptr;
 	QLabel*		mpFrameRateLabel = nullptr;
 	QLineEdit*	mpFrameRate = nullptr;
+	QLabel*		mpFrameNumberLabel = nullptr;
+	QLineEdit*  mpFrameNumber = nullptr;
 	QLabel*		mpImageSizeLabel = nullptr;
 	QLineEdit*  mpImageSize = nullptr;
+
+	unsigned int mFrameNumber = 0;
 };

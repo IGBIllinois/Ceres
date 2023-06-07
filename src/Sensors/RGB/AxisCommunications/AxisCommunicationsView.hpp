@@ -19,7 +19,7 @@ public:
 	virtual ~cAxisCommunicationsView();
 
 public slots:
-	void imageUpdated(const QImage& image);
+	virtual void imageUpdated(const QImage& image);
 
 protected:
 	const cAxisCommunicationsModel* mpModel;

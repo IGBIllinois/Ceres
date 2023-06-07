@@ -5,6 +5,8 @@
 #include <QImageReader>
 #include <QIODevice>
 
+//#define CHECK_Q_IMAGE_READER
+
 namespace
 {
     class cImageWriteAdapter : public QIODevice
@@ -95,10 +97,21 @@ namespace
     class cImageReadAdapter : public QIODevice
     {
     public:
-        cImageReadAdapter(const cImageBuffer* byteArray)
-            : mpData(byteArray)
+        cImageReadAdapter()
+            : mpData(nullptr)
         {
             QIODevice::open(QIODevice::ReadOnly | QIODevice::Unbuffered);
+        }
+
+        cImageReadAdapter(const cImageBuffer* byteArray)
+            : mpData( const_cast<cImageBuffer*>(byteArray) )
+        {
+            QIODevice::open(QIODevice::ReadOnly | QIODevice::Unbuffered);
+        }
+
+        void setImageBuffer(const cImageBuffer* byteArray)
+        {
+            mpData = const_cast<cImageBuffer*>(byteArray);
         }
 
         bool open(OpenMode flags) override
@@ -159,7 +172,7 @@ namespace
         }
 
     private:
-        const cImageBuffer* mpData;
+        cImageBuffer* mpData;
     };
 }
 
@@ -268,7 +281,17 @@ void axis::to_image(const cBitmapBuffer& in, QBitmap& out)
     imageBuffer.seek(0);
 
     QImage image;
+
+#ifdef CHECK_Q_IMAGE_READER
+    if (imageReader.read(&image))
+        return;
+
+    auto msg = imageReader.errorString().toStdString();
+    throw std::runtime_error(msg);
+#else
     imageReader.read(&image);
+#endif
+
     out.fromImage(image);
 }
 
@@ -280,7 +303,15 @@ void axis::to_image(const cJpegBuffer& in, QImage& out)
 
     imageBuffer.seek(0);
 
+#ifdef CHECK_Q_IMAGE_READER
+    if (imageReader.read(&out))
+        return;
+
+    auto msg = imageReader.errorString().toStdString();
+    throw std::runtime_error(msg);
+#else
     imageReader.read(&out);
+#endif
 }
 
 void axis::to_image(const cMpegFrameBuffer& img, QImage& out)
@@ -291,5 +322,13 @@ void axis::to_image(const cMpegFrameBuffer& img, QImage& out)
 
     imageBuffer.seek(0);
 
+#ifdef CHECK_Q_IMAGE_READER
+    if (imageReader.read(&out))
+        return;
+
+    auto msg = imageReader.errorString().toStdString();
+    throw std::runtime_error(msg);
+#else
     imageReader.read(&out);
+#endif
 }
