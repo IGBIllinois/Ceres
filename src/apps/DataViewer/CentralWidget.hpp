@@ -66,6 +66,7 @@ private:
     void onPrincipalInvestigator(const std::string& investigator) override;
     void onResearcher(const std::string& researcher) override;
     void onExperimentDoc(const std::string& doc) override;
+    void onPermitInfo(const std::string& permit) override;
 
     void onBeginTreatmentList() override;
     void onEndOfTreatmentList() override;
