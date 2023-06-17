@@ -49,6 +49,7 @@ enum class ePacketType : uint16_t
 	PLANTING_DATE,
 	HARVEST_DATE,
 	COMMENT,
+	PERMIT_INFO,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -100,6 +101,9 @@ int encode_treatment(const std::string& treatment, net_buffer& buffer);
 
 std::string to_comment_1(const ExperimentComment_1& pckt);
 int encode_comment(const std::string& comment, net_buffer& buffer);
+
+std::string to_permit_info_1(const ExperimentPermitInfo_1& pckt);
+int encode_permit_info(const std::string& permit, net_buffer& buffer);
 
 
 int encode_start_experiment(net_buffer& buffer);

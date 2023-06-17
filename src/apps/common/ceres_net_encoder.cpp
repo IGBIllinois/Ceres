@@ -71,6 +71,12 @@ void cCeresNetEncoder::sendComment(const std::string& comment)
     sendData();
 }
 
+void cCeresNetEncoder::sendPermitInfo(const std::string& permit)
+{
+    encode_permit_info(permit, mBuffer);
+    sendData();
+}
+
 void cCeresNetEncoder::sendStartExperiment()
 {
     encode_start_experiment(mBuffer);

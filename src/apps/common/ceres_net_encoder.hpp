@@ -36,6 +36,7 @@ public:
     void sendHarvestDate(std::time_t date);
     void sendTreatment(const std::string& treatment);
     void sendComment(const std::string& comment);
+    void sendPermitInfo(const std::string& permit);
 
     void sendStartExperiment();
     void sendStopExperiment();

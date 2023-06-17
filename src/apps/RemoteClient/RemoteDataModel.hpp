@@ -101,6 +101,7 @@ private slots:
     void onHarvestDate(std::time_t date) override;
     void onTreatment(const std::string& treatment) override;
     void onComment(const std::string& comment) override;
+    void onPermitInfo(const std::string& permit) override;
 
     void onStartExperiment() override;
     void onStopExperiment() override;
@@ -146,6 +147,7 @@ private:
     std::string  mResearcher;
     std::string  mSpecies;
     std::string  mCultivar;
+    std::string  mPermitInfo;
     std::string  mConstructName;
     std::string  mEventNumber;
     std::string  mFieldDesign;

@@ -307,6 +307,9 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
     if (!mFieldDesign.empty())
         sendFieldDesign(mFieldDesign);
 
+    if (!mPermitInfo.empty())
+        sendPermitInfo(mPermitInfo);
+
     if (mPlantingDate > 0)
         sendPlantingDate(mPlantingDate);
 

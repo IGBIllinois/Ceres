@@ -307,6 +307,33 @@ int encode_comment(const std::string& comment, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+std::string to_permit_info_1(const ExperimentPermitInfo_1& pckt)
+{
+    return pckt.permit();
+}
+
+int encode_permit_info(const std::string& permit, net_buffer& buffer)
+{
+    ExperimentPermitInfo_1 pckt;
+
+    pckt.set_permit(permit);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::PERMIT_INFO);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+
 int encode_start_experiment(net_buffer& buffer)
 {
     sPacketHeader_t hdr;

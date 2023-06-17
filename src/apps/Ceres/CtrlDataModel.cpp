@@ -159,6 +159,7 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         mResearcher.clear();
         mSpecies.clear();
         mCultivar.clear();
+        mPermitInfo.clear();
         mTreatments.clear();
         mConstructName.clear();
         mEventNumber.clear();
@@ -187,6 +188,11 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         if (expDoc.contains("cultivar"))
         {
             mCultivar = expDoc["cultivar"];
+        }
+
+        if (expDoc.contains("permit info"))
+        {
+            mPermitInfo = expDoc["permit info"];
         }
 
         if (expDoc.contains("construct"))

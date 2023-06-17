@@ -94,6 +94,13 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onComment(to_comment_1(packet));
         break;
     }
+    case ePacketType::PERMIT_INFO:
+    {
+        ExperimentPermitInfo_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onPermitInfo(to_permit_info_1(packet));
+        break;
+    }
     case ePacketType::EXPERIMENT_INFO_REPLY:
     {
         break;

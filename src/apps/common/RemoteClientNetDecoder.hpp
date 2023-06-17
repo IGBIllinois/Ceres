@@ -38,6 +38,7 @@ protected:
     virtual void onHarvestDate(std::time_t date) = 0;
     virtual void onTreatment(const std::string& treatment) = 0;
     virtual void onComment(const std::string& comment) = 0;
+    virtual void onPermitInfo(const std::string& permit) = 0;
 
     virtual void onStartExperiment() = 0;
     virtual void onStopExperiment() = 0;

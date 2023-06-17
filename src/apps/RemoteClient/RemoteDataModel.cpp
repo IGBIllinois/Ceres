@@ -324,6 +324,9 @@ void cRemoteDataModel::onStartExperiment()
     if (!mCultivar.empty())
         mSerializer.writeCultivar(mCultivar);
 
+    if (!mPermitInfo.empty())
+        mSerializer.writePermitInfo(mPermitInfo);
+
     if (!mPrincipalInvestigator.empty())
         mSerializer.writePrincipalInvestigator(mPrincipalInvestigator);
 
@@ -495,6 +498,12 @@ void cRemoteDataModel::onComment(const std::string& comment)
 {
     mComments.push_back(comment);
 }
+
+void cRemoteDataModel::onPermitInfo(const std::string& permit)
+{
+    mPermitInfo = permit;
+}
+
 
 void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
 {
@@ -675,6 +684,7 @@ void cRemoteDataModel::clearExperimentInfo()
     mResearcher.clear();
     mSpecies.clear();
     mCultivar.clear();
+    mPermitInfo.clear();
     mConstructName.clear();
     mEventNumber.clear();
     mFieldDesign.clear();
