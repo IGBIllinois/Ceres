@@ -56,7 +56,7 @@ target_include_directories(ExperimentControllers PUBLIC ${EXPERIMENT_STATE_MACHI
 
 target_link_libraries(ExperimentControllers PRIVATE ${Qt}::Widgets)
 target_link_libraries(ExperimentControllers PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(ExperimentControllers PRIVATE block_data_file_static)
+target_link_libraries(ExperimentControllers PRIVATE cbdf::ctrl)
 target_link_libraries(ExperimentControllers PRIVATE SpidercamCtrl_static)
 target_link_libraries(ExperimentControllers PRIVATE ExperimentStateMachine)
 

@@ -6,12 +6,12 @@ set(EXPERIMENT_CONTROLLERS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ExperimentCon
 set(EXPERIMENT_STATE_MACHINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ExperimentStateMachine)
 set(SENSORS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Sensors)
 
-if(USE_INTERNAL_CBDF_LIB)
-	set(BLOCK_DATA_FILE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BlockDataFile)
-
-	# Add the "block data file" directory
-	add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/BlockDataFile)
-endif()
+#if(USE_INTERNAL_CBDF_LIB)
+#	set(BLOCK_DATA_FILE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/BlockDataFile)
+#
+#	# Add the "block data file" directory
+#	add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/BlockDataFile)
+#endif()
 
 # Add some basic utilities
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Utilities)

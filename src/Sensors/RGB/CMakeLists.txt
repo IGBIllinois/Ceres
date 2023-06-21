@@ -48,6 +48,7 @@ PRIVATE
     ${RGB_CAMERA_SOURCE_FILES}
 )
 
+target_link_libraries(rgb_camera_static PRIVATE cbdf::rgb)
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Multimedia)
 target_link_libraries(rgb_camera_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(rgb_camera_static PUBLIC axis_communications_static)

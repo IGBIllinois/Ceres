@@ -59,7 +59,7 @@ PRIVATE
 target_include_directories(septentrio_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(septentrio_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 
-target_link_libraries(septentrio_static PRIVATE cbdf::sensors)
+#target_link_libraries(septentrio_static PRIVATE cbdf::gps)
 
 target_link_libraries(septentrio_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(septentrio_static PUBLIC ${Qt}::Network)

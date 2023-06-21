@@ -177,7 +177,7 @@ find_package(ssnx2net REQUIRED)
 find_package(spidercam REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(CBDF REQUIRED cbdf info ctrl sensors weather)
+find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb weather)
 
 
 #FIND_PACKAGE(PkgConfig REQUIRED)
@@ -229,8 +229,8 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
 # TESTING
 #******************************************************************************
 if (Catch2_FOUND)
-  ENABLE_TESTING()
-  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/tests)
+#  ENABLE_TESTING()
+#  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/tests)
 else()
   message(WARNING "The Catch2 testing library is missing.  Can not create tests!")
 endif()

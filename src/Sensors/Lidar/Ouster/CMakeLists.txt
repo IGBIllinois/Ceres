@@ -99,8 +99,6 @@ PRIVATE
 target_include_directories(ouster_sensor_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(ouster_sensor_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-target_link_libraries(ouster_sensor_static PRIVATE cbdf::sensors)
-
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Network)
 target_link_libraries(ouster_sensor_static PRIVATE nlohmann_json::nlohmann_json)

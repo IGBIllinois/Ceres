@@ -44,8 +44,9 @@ PRIVATE
 )
 
 #target_include_directories(lidar_static PRIVATE ${UTILITIES_INCLUDE_DIR})
-#target_include_directories(lidar_static PRIVATE ${BLOCK_DATA_FILE_INCLUDE_DIR})
 #target_include_directories(lidar_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
+
+target_link_libraries(lidar_static PRIVATE cbdf::lidar)
 
 target_link_libraries(lidar_static PRIVATE hokuyo_sensor_static)
 target_link_libraries(lidar_static PRIVATE ouster_sensor_static)

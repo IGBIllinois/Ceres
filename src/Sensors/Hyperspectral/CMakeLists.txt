@@ -43,6 +43,8 @@ PRIVATE
     ${HYPERSPECTRAL_SOURCE_FILES}
 )
 
+target_link_libraries(hyperspectral_static PRIVATE cbdf::hyperspectral)
+
 target_link_libraries(hyperspectral_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(hyperspectral_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(hyperspectral_static PUBLIC hyspex_static)

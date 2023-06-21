@@ -90,7 +90,7 @@ target_include_directories(axis_communications_static PRIVATE ${RGB_INCLUDE_DIR}
 target_include_directories(axis_communications_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(axis_communications_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-target_link_libraries(axis_communications_static PRIVATE cbdf::sensors)
+#target_link_libraries(axis_communications_static PRIVATE cbdf::rgb)
 
 target_link_libraries(axis_communications_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(axis_communications_static PUBLIC ${Qt}::Network)

@@ -93,7 +93,7 @@ target_include_directories(CeresRemoteClient PRIVATE ${UTILITIES_INCLUDE_DIR})
 
 target_link_libraries(CeresRemoteClient PRIVATE cbdf::cbdf)
 target_link_libraries(CeresRemoteClient PRIVATE cbdf::info cbdf::ctrl)
-target_link_libraries(CeresRemoteClient PRIVATE cbdf::sensors)
+target_link_libraries(CeresRemoteClient PRIVATE cbdf::gps cbdf::lidar cbdf::rgb cbdf::weather)
 
 target_link_libraries(CeresRemoteClient PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresRemoteClient PRIVATE ${Qt}::Network)

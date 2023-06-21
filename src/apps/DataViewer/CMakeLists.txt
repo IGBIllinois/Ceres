@@ -83,14 +83,14 @@ target_include_directories(CeresDataViewer PRIVATE ${SENSORS_INCLUDE_DIR})
 
 target_link_libraries(CeresDataViewer PRIVATE cbdf::cbdf)
 target_link_libraries(CeresDataViewer PRIVATE cbdf::info cbdf::ctrl)
-target_link_libraries(CeresDataViewer PRIVATE cbdf::sensors cbdf::weather)
+target_link_libraries(CeresDataViewer PRIVATE cbdf::gps cbdf::lidar cbdf::rgb cbdf::weather)
 
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Multimedia)
 
-target_link_libraries(CeresDataViewer PRIVATE Utilities)
 target_link_libraries(CeresDataViewer PRIVATE Sensors)
+target_link_libraries(CeresDataViewer PRIVATE Utilities)
 
 
 #

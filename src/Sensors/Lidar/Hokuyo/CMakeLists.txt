@@ -97,7 +97,7 @@ PRIVATE
 target_include_directories(hokuyo_sensor_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(hokuyo_sensor_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-target_link_libraries(hokuyo_sensor_static PRIVATE cbdf::sensors)
+#target_link_libraries(hokuyo_sensor_static PRIVATE cbdf::lidar)
 
 target_link_libraries(hokuyo_sensor_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(hokuyo_sensor_static PUBLIC ${Qt}::Network)
