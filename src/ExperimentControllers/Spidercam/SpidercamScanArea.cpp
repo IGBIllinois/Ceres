@@ -22,7 +22,60 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mBorderColor.setRgb(0, 0, 255);
 	mBorderPen.setColor(mBorderColor);
 	mBorderPen.setStyle(Qt::SolidLine);
-	mBorderPen.setWidth(5);
+	mBorderPen.setCapStyle(Qt::RoundCap);
+	mBorderPen.setJoinStyle(Qt::RoundJoin);
+	mBorderPen.setWidth(1);
+	mBorderBrush.setColor(mBorderColor);
+	mBorderBrush.setStyle(Qt::NoBrush);
+
+	mGreenwayColor.setRgb(59, 122, 87);	// Amazon Green
+	mGreenwayColor.setRgb(176, 191, 26);	// Acid Green
+	mGreenwayPen.setColor(mGreenwayColor);;
+	mGreenwayPen.setStyle(Qt::DotLine);
+
+/*
+	Different Qt pen style to try
+	SolidLine,
+	DashLine,
+	DotLine,
+	DashDotLine,
+	DashDotDotLine,
+*/
+
+	mGreenwayPen.setCapStyle(Qt::RoundCap);
+	mGreenwayPen.setJoinStyle(Qt::RoundJoin);
+	mGreenwayPen.setWidth(1);
+	mGreenwayBrush.setColor(mGreenwayColor);;
+	mGreenwayBrush.setStyle(Qt::Dense7Pattern);
+
+/*
+	Different Qt brush style to try:
+
+	SolidPattern,
+	Dense1Pattern,
+	Dense2Pattern,
+	Dense3Pattern,
+	Dense4Pattern,
+	Dense5Pattern,
+	Dense6Pattern,
+	Dense7Pattern,
+	HorPattern,
+	VerPattern,
+	CrossPattern,
+	BDiagPattern,
+	FDiagPattern,
+	DiagCrossPattern,
+*/
+
+	mGreenway[0] = QPoint(88748, 0);
+	mGreenway[1] = QPoint(88748, 94606);
+	mGreenway[2] = QPoint(0, 94606);
+	mGreenway[3] = QPoint(0, 102642);
+	mGreenway[4] = QPoint(200000, 102642);
+	mGreenway[5] = QPoint(200000, 94606);
+	mGreenway[6] = QPoint(98405, 94606);
+	mGreenway[7] = QPoint(98405, 0);
+	mGreenway[8] = mGreenway[0];
 
 	mDollyMarkerRadius = 3;
 	mDollyColor.setRgb(0,0,255);
@@ -110,6 +163,16 @@ void cSpidercamScanArea::updateBounds(double minX, double maxX, double minY, dou
 	mMaxY = maxY;
 
 	mAspectRatio = (mMaxX - mMinX) / (mMaxY - mMinY);
+
+	mGreenway[0] = QPoint(88748, mMinY);
+	mGreenway[1] = QPoint(88748, 94606);
+	mGreenway[2] = QPoint(mMinX, 94606);
+	mGreenway[3] = QPoint(mMinX, 102642);
+	mGreenway[4] = QPoint(mMaxX, 102642);
+	mGreenway[5] = QPoint(mMaxX, 94606);
+	mGreenway[6] = QPoint(98405, 94606);
+	mGreenway[7] = QPoint(98405, mMinY);
+	mGreenway[8] = mGreenway[0];
 }
 
 void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
@@ -241,7 +304,7 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	painter.setPen(QPen(mBorderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+//	painter.setPen(QPen(mBorderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
 	QFont font = painter.font();
 	QFontMetrics metrics(font);
@@ -264,6 +327,24 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		mX_Scale = window_height / (mMaxX - mMinX);
 		mY_Scale = window_height / (mMaxY - mMinY);
 
+		// Draw the greenway first so the border remains a solid color
+		std::array<QPoint, 9> greenway;
+
+		for (int i = 0; i < mGreenway.size(); ++i)
+		{
+			QPoint& point = mGreenway[i];
+			int x = mX_Scale * (point.x() - mMinX) + mX_Offset;
+			int y = mY_Scale * (point.y() - mMinY) + mY_Offset;
+			greenway[i] = QPoint(x, window_height-y);
+		}
+
+		painter.setPen(mGreenwayPen);
+		painter.setBrush(mGreenwayBrush);
+		painter.drawPolygon(greenway.data(), 8);
+
+		// Draw the spidercam border and tower markings
+		painter.setPen(mBorderPen);
+		painter.setBrush(mBorderBrush);
 		painter.drawRect(mX_Offset, mY_Offset, window_height, window_height);
 
 		auto xBounds = metrics.tightBoundingRect("X");
@@ -287,6 +368,24 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		mX_Scale = l / (mMaxX - mMinX);
 		mY_Scale = l / (mMaxY - mMinY);
 
+		// Draw the greenway first so the border remains a solid color
+		std::array<QPoint, 9> greenway;
+
+		for (int i = 0; i < mGreenway.size(); ++i)
+		{
+			QPoint& point = mGreenway[i];
+			int x = mX_Scale * (point.x() - mMinX) + mX_Offset;
+			int y = mY_Scale * (point.y() - mMinY) + mY_Offset;
+			greenway[i] = QPoint(x, window_height - y);
+		}
+
+		painter.setPen(mGreenwayPen);
+		painter.setBrush(mGreenwayBrush);
+		painter.drawPolygon(greenway.data(), 8);
+
+		// Draw the spidercam border and tower markings
+		painter.setPen(mBorderPen);
+		painter.setBrush(mBorderBrush);
 		painter.drawRect(mX_Offset, mY_Offset, l, l);
 
 		double y = mY_Offset + l + w1Bounds.height() + 3;

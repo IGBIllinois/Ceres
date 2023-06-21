@@ -10,6 +10,8 @@
 #include <Qpicture>
 #include <vector>
 #include <string>
+#include <array>
+
 
 class cSpidercamScanArea : public QWidget
 {
@@ -72,10 +74,10 @@ private:
     {
         QColor  color;
         QString label;
-        uint8_t font_size;
-        eHorizontalAlignment horizontal_align;
-        eVerticalAlignment   vertical_align;
-        float orientation_deg;
+        uint8_t font_size = 12;
+        eHorizontalAlignment horizontal_align = eHorizontalAlignment::CENTER;
+        eVerticalAlignment   vertical_align = eVerticalAlignment::CENTER;
+        float orientation_deg = 0;
     };
 
     struct experimentLayout_t
@@ -83,10 +85,10 @@ private:
         captionLayout_t caption;
 
         QColor  color;
-        uint32_t x_mm;
-        uint32_t y_mm;
-        uint32_t height_mm;
-        uint32_t width_mm;
+        uint32_t x_mm = 0;
+        uint32_t y_mm = 0;
+        uint32_t height_mm = 0;
+        uint32_t width_mm = 0;
     };
 
     std::vector<experimentLayout_t> mLayouts;
@@ -97,9 +99,18 @@ private:
     QPen   mMeasurementPen;
     QColor mMeasurementColor;
 
+    // For drawing the Spidercam border area
     QPen   mBorderPen;
     QColor mBorderColor;
+    QBrush mBorderBrush;
 
+    // For drawing the greenway inside the Spidercam area
+    QPen   mGreenwayPen;
+    QColor mGreenwayColor;
+    QBrush mGreenwayBrush;
+    std::array<QPoint, 9> mGreenway;
+
+    // For drawing the dolly position
     QPoint mDollyPosition;
     QPen   mDollyPen;
     QBrush mDollyBrush;
