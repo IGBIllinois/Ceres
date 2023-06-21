@@ -2,7 +2,6 @@
 #pragma once
 
 #include "HySpexSWIR_384_Model.hpp"
-#include "HySpexSWIR_384_Serializer.hpp"
 
 #include <QObject>
 
@@ -30,8 +29,5 @@ signals:
 
 protected:
     void update() override;
-
-private:
-    cHySpexSWIR_384_Serializer mSerializer;
 };
 

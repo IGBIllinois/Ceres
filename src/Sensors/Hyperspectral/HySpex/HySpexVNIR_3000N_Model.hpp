@@ -2,7 +2,8 @@
 #pragma once
 
 #include "../HyperspectralModel.hpp"
-#include "HySpexVNIR_3000N_Serializer.hpp"
+
+#include <cbdf/HySpexVNIR_3000N_Serializer.hpp>
 
 #include <QObject>
 

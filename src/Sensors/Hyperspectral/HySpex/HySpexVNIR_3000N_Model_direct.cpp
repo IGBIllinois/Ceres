@@ -2,6 +2,8 @@
 #include "HySpexVNIR_3000N_Model_direct.hpp"
 #include "Constants.hpp"
 
+#include <QDebug>
+
 #include <optional>
 
 cHySpexVNIR_3000N_Model_direct::cHySpexVNIR_3000N_Model_direct(QObject* parent)

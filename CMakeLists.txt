@@ -172,9 +172,16 @@ endif(WIN32)
 
 # Find and include my libraries for data collection
 find_package(Ouster REQUIRED)
+
 find_package(ssnx REQUIRED)
 find_package(ssnx2net REQUIRED)
+
 find_package(spidercam REQUIRED)
+
+find_package(HySpexConnect REQUIRED)
+find_package(HySpex REQUIRED)
+find_package(Spinnaker REQUIRED)
+
 find_package(nlohmann_json REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb weather)

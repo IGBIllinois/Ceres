@@ -9,10 +9,37 @@
 #include "HySpexSWIR_384_Model_net.hpp"
 #include "HySpexSWIR_384_View.hpp"
 
+#include <HySpexConnect/HySpexCameraFactory.hpp>
+
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
 #include <QMetaType>
+#include <QDebug>
+
+namespace
+{
+    bool detect_cameras(const nlohmann::json& sensorInfo)
+    {
+        static cHySpexCameraFactory mgr;
+
+        if (mgr.numOfCameras() <= 0)
+        {
+            std::string settings = sensorInfo["settings"];
+
+            qInfo() << "Searching for HySpex Cameras...";
+
+            if (!mgr.detectCameras(settings))
+            {
+                qCritical() << "No HySpex cameras were detected!";
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
 
 sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
@@ -80,7 +107,10 @@ sSensorWidgets hyspex::create_sensor(const nlohmann::json& sensorInfo,
     std::string sensor = sensorInfo["sensor"];
 
     if (sensor == "VNIR-3000N")
+    {
+        mgr.getVNIR_3000N();
         return create_vnir_3000N_sensor(sensorInfo, no_visualization);
+    }
 
     if (sensor == "SWIR-384")
         return create_swir_384_sensor(sensorInfo, no_visualization);

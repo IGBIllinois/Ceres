@@ -129,6 +129,9 @@ target_link_libraries(hyspex_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(hyspex_static PUBLIC ${Qt}::Network)
 target_link_libraries(hyspex_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(hyspex_static PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(hyspex_static PRIVATE HySpexConnect::hyspex_connect_static)
+target_link_libraries(hyspex_static PRIVATE HySpex::HySpex)
+target_link_libraries(hyspex_static PRIVATE Spinnaker::Spinnaker)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
