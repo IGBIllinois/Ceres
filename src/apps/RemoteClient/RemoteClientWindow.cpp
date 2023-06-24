@@ -328,7 +328,15 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         {
             std::string msg = "Unknown sensor type \"";
             msg += type;
-            msg += "\".";
+            msg += "\"";
+
+            if (sensor.contains("sensor"))
+            {
+                msg += ", sensor name: ";
+                msg += sensor["sensor"];
+            }
+            else
+                msg += ".";
 
             QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
             mb.exec();

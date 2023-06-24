@@ -3,13 +3,17 @@
 #include "HySpexFactory.hpp"
 #include "Constants.hpp"
 
+#include <HySpexConnect/SWIR384.hpp>
+
 #include <optional>
 
-cHySpexSWIR_384_Model_direct::cHySpexSWIR_384_Model_direct(QObject* parent)
+cHySpexSWIR_384_Model_direct::cHySpexSWIR_384_Model_direct(std::unique_ptr<hyspex::cSWIR384> camera, QObject* parent)
 :
-    cHySpexSWIR_384_Model(parent)
+    cHySpexSWIR_384_Model(parent), mCamera(std::move(camera))
 {
 }
+
+cHySpexSWIR_384_Model_direct::~cHySpexSWIR_384_Model_direct() {}
 
 bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
 {

@@ -3,9 +3,12 @@
 
 #include "../HyperspectralModel.hpp"
 
+#include <hyspex/datatypes.h>
+
 #include <cbdf/HySpexVNIR_3000N_Serializer.hpp>
 
 #include <QObject>
+
 
 class cHySpexVNIR_3000N_Model : public cHyperspectralModel
 {
@@ -45,8 +48,25 @@ signals:
 protected:
     void update() override;
 
-private:
+protected:
     bool mConnected;
+
+    unsigned int mNumBuffersRaw = 1024;
+    unsigned int mNumBufferPreProcessing = 128;
+
+    // Basic Camera Information...
+    std::string mID;
+    std::string mSerialNumber;
+    hyspex::WavelengthRangeId mWavelengthRangeId = hyspex::WavelengthRangeId::HYSPEX_WRID_UNDEFINED;
+    std::size_t mSpatialSize = 0;
+    std::size_t mSpectralSize = 0;
+
+    // This will be identical to SpatialSize/SpectralSize if no Spatial ROI is in effect.
+    std::size_t mMaxSpatialSize = 0;
+    std::size_t mMaxSpectralSize = 0;
+
+    // Max pixel value, 2 ^ bpp - 1 (bits per pixel).
+    unsigned short mMaxPixelValue = 0;
 
     cHySpexVNIR_3000N_Serializer mSerializer;
 };

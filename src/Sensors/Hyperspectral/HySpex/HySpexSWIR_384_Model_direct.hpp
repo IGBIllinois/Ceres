@@ -5,13 +5,22 @@
 
 #include <QObject>
 
+#include <memory>
+
+
+// Forward Declarations
+namespace hyspex
+{
+    class cSWIR384;
+}
+
 class cHySpexSWIR_384_Model_direct : public cHySpexSWIR_384_Model
 {
     Q_OBJECT
 
 public:
-    cHySpexSWIR_384_Model_direct(QObject* parent = nullptr);
-    virtual ~cHySpexSWIR_384_Model_direct() = default;
+    cHySpexSWIR_384_Model_direct(std::unique_ptr<hyspex::cSWIR384> camera, QObject* parent = nullptr);
+    virtual ~cHySpexSWIR_384_Model_direct();
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
@@ -29,5 +38,8 @@ signals:
 
 protected:
     void update() override;
+
+private:
+    std::unique_ptr<hyspex::cSWIR384> mCamera;
 };
 

@@ -21,7 +21,7 @@ namespace
 {
     bool detect_cameras(const nlohmann::json& sensorInfo)
     {
-        static cHySpexCameraFactory mgr;
+        cHySpexCameraFactory mgr;
 
         if (mgr.numOfCameras() <= 0)
         {
@@ -49,7 +49,21 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
     std::string protocol = sensorInfo["protocol"];
 
     if (protocol == "direct")
-        pModel = new cHySpexVNIR_3000N_Model_direct();
+    {
+        if (!detect_cameras(sensorInfo))
+            return sSensorWidgets();
+
+        cHySpexCameraFactory mgr;
+        auto camera = mgr.getVNIR_3000N();
+
+        if (!camera)
+        {
+            qCritical() << "No HySpex VNIR-3000N cameras were detected!";
+            return sSensorWidgets();
+        }
+
+        pModel = new cHySpexVNIR_3000N_Model_direct(std::move(camera));
+    }
     else if (protocol == "net")
         pModel = new cHySpexVNIR_3000N_Model_net();
 
@@ -79,7 +93,21 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
     std::string protocol = sensorInfo["protocol"];
 
     if (protocol == "direct")
-        pModel = new cHySpexSWIR_384_Model_direct();
+    {
+        if (!detect_cameras(sensorInfo))
+            return sSensorWidgets();
+
+        cHySpexCameraFactory mgr;
+        auto camera = mgr.getSWIR_384();
+
+        if (!camera)
+        {
+            qCritical() << "No HySpex SWIR-384 cameras were detected!";
+            return sSensorWidgets();
+        }
+
+        pModel = new cHySpexSWIR_384_Model_direct(std::move(camera));
+    }
     else if (protocol == "net")
         pModel = new cHySpexSWIR_384_Model_net();
 
@@ -107,10 +135,7 @@ sSensorWidgets hyspex::create_sensor(const nlohmann::json& sensorInfo,
     std::string sensor = sensorInfo["sensor"];
 
     if (sensor == "VNIR-3000N")
-    {
-        mgr.getVNIR_3000N();
         return create_vnir_3000N_sensor(sensorInfo, no_visualization);
-    }
 
     if (sensor == "SWIR-384")
         return create_swir_384_sensor(sensorInfo, no_visualization);
