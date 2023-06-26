@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../HyperspectralModel.hpp"
+#include "../HyperspectralData.hpp"
 
 #include <hyspex/datatypes.h>
 

@@ -171,7 +171,7 @@ namespace hyperspectral
 	 * a given point.
 	 */
 	template<typename T>
-	class data_spectal_major
+	class spectral_major_data
 	{
 	public:
 		using value_type = T;
@@ -180,12 +180,10 @@ namespace hyperspectral
 		using reference = T&;
 		using const_reference = const T&;
 
-		data_spectal_major();
-		data_spectal_major(std::size_t num_of_pixels, std::size_t num_of_wavelengths);
-		data_spectal_major(const data_spectal_major& m);
+		spectral_major_data();
+		spectral_major_data(std::size_t num_of_pixels, std::size_t num_of_wavelengths);
+		spectral_major_data(const spectral_major_data& m);
 
-		float min_wavelength_nm() const;
-		float max_wavelength_nm() const;
 		std::size_t num_wavelengths() const;
 		std::size_t num_pixels() const;
 
@@ -193,11 +191,11 @@ namespace hyperspectral
 		void resize(std::size_t num_of_pixels, std::size_t num_of_wavelengths);
 		void clear();
 
-		view<T> row(std::size_t r) const;
-		span<T> row(std::size_t r);
+		view<T> pixels(std::size_t wavelength_index) const;
+		span<T> pixels(std::size_t wavelength_index);
 
-		view<T> column(std::size_t c) const;
-		span<T> column(std::size_t c);
+		view<T> wavelengths(std::size_t pixel_index) const;
+		span<T> wavelengths(std::size_t pixel_index);
 
 		const value_type& get(std::size_t pixel_index, std::size_t wavelength_index) const;
 		void set(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v);
@@ -210,8 +208,6 @@ namespace hyperspectral
 		std::vector<T> mData;
 		std::size_t mNumPixels;
 		std::size_t mNumWavelengths;
-		float mMinWavelength_nm;
-		float mMaxWavelength_nm;
 	};
 
 
@@ -229,7 +225,7 @@ namespace hyperspectral
 	 * The HySpex cameras use this format.
 	 */
 	template<typename T>
-	class matrix_col_major
+	class spatial_major_data
 	{
 	public:
 		using value_type = T;
@@ -238,25 +234,25 @@ namespace hyperspectral
 		using reference = T&;
 		using const_reference = const T&;
 
-		matrix_col_major();
-		matrix_col_major(std::size_t num_of_rows, std::size_t num_of_cols);
-		matrix_col_major(const matrix_col_major& m);
+		spatial_major_data();
+		spatial_major_data(std::size_t num_of_pixels, std::size_t num_of_wavelengths);
+		spatial_major_data(const spatial_major_data& m);
 
 		bool empty() const;
-		std::size_t num_columns() const;
-		std::size_t num_rows() const;
+		std::size_t num_wavelengths() const;
+		std::size_t num_pixels() const;
 
-		void resize(std::size_t num_of_rows, std::size_t num_of_cols);
+		void resize(std::size_t num_of_pixels, std::size_t num_of_wavelengths);
 		void clear();
 
-		view<T> row(std::size_t r) const;
-		span<T> row(std::size_t r);
+		view<T> pixels(std::size_t wavelength_index) const;
+		span<T> pixels(std::size_t wavelength_index);
 
-		view<T> column(std::size_t c) const;
-		span<T> column(std::size_t c);
+		view<T> wavelengths(std::size_t pixel_index) const;
+		span<T> wavelengths(std::size_t pixel_index);
 
-		const value_type& get(std::size_t row, std::size_t col) const;
-		void set(std::size_t row, std::size_t col, const value_type& v);
+		const value_type& get(std::size_t pixel_index, std::size_t wavelength_index) const;
+		void set(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v);
 
 		std::size_t size() const;
 		const std::vector<T>& data() const;
@@ -264,14 +260,24 @@ namespace hyperspectral
 
 	protected:
 		std::vector<T> mData;
-		std::size_t mNumOfRows;
-		std::size_t mNumOfCols;
+		std::size_t mNumPixels;
+		std::size_t mNumWavelengths;
 	};
 
 
-	/** Row Major Fixed Sized Matrix */
-	template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-	class matrix_row_major_fixed
+	/** Spectral Major Fixed Sized Hyperspectral Data */
+	/*
+	 * For spectral major data means that the wavelength data
+	 * is stored sequentially for a given spatial point.
+	 *
+	 * [S0: λ0...λn], [S1: λ0...λn] ..., [SM: λ0...λn]
+	 *
+	 * Since the wavelength data is stored close to together,
+	 * use this type for fast access to the spectral data for
+	 * a given point.
+	 */
+	template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+	class spectral_major_data_fixed
 	{
 	public:
 		using value_type = T;
@@ -280,37 +286,49 @@ namespace hyperspectral
 		using reference = T&;
 		using const_reference = const T&;
 
-		matrix_row_major_fixed();
-		matrix_row_major_fixed(const matrix_row_major_fixed& m);
-		matrix_row_major_fixed& operator=(const matrix_row_major_fixed&) = default;
+		spectral_major_data_fixed();
+		spectral_major_data_fixed(const spectral_major_data_fixed& m);
+		spectral_major_data_fixed& operator=(const spectral_major_data_fixed&) = default;
 
-		std::size_t num_columns() const;
-		std::size_t num_rows() const;
+		std::size_t num_wavelengths() const;
+		std::size_t num_pixels() const;
 
 		void zero();
 		void identity();
 
-		view<T> row(std::size_t r) const;
-		span<T> row(std::size_t r);
+		view<T> pixels(std::size_t wavelength_index) const;
+		span<T> pixels(std::size_t wavelength_index);
 
-		view<T> column(std::size_t c) const;
-		span<T> column(std::size_t c);
+		view<T> wavelengths(std::size_t pixel_index) const;
+		span<T> wavelengths(std::size_t pixel_index);
 
-		const value_type& get(std::size_t row, std::size_t col) const;
-		void set(std::size_t row, std::size_t col, const value_type& v);
+		const value_type& get(std::size_t pixel_index, std::size_t wavelength_index) const;
+		void set(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v);
 
 		std::size_t size() const;
-		const std::array<T, num_of_rows* num_of_cols>& data() const;
-		std::array<T, num_of_rows* num_of_cols>& data();
+		const std::array<T, NUM_PIXELS * NUM_WAVELENGTHS>& data() const;
+		std::array<T, NUM_PIXELS * NUM_WAVELENGTHS>& data();
 
 	protected:
-		std::array<T, num_of_rows * num_of_cols> mData;
+		std::array<T, NUM_PIXELS * NUM_WAVELENGTHS> mData;
 	};
 
 
-	/** Column Major Fixed Sized Matrix */
-	template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-	class matrix_col_major_fixed
+	/** Spatial Major Fixed Sized Hyperspectral Data */
+	/*
+	 * For spatial major data means that the spatial data
+	 * is stored sequentially for a given spectral point.
+	 *
+	 * [λ0: S0...Sn], [λ1: S0...Sn] ..., [λm: S0...Sn]
+	 *
+	 * Since the spatial data is stored close to together,
+	 * use this type for fast access to the spatial data for
+	 * a given wavelength.
+	 *
+	 * The HySpex cameras use this format.
+	 */
+	template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+	class spatial_major_data_fixed
 	{
 	public:
 		using value_type = T;
@@ -319,35 +337,35 @@ namespace hyperspectral
 		using reference = T&;
 		using const_reference = const T&;
 
-		matrix_col_major_fixed();
-		matrix_col_major_fixed(const matrix_col_major_fixed& m);
-		matrix_col_major_fixed& operator=(const matrix_col_major_fixed&) = default;
+		spatial_major_data_fixed();
+		spatial_major_data_fixed(const spatial_major_data_fixed& m);
+		spatial_major_data_fixed& operator=(const spatial_major_data_fixed&) = default;
 
-		std::size_t num_columns() const;
-		std::size_t num_rows() const;
+		std::size_t num_wavelengths() const;
+		std::size_t num_pixels() const;
 
 		void zero();
 		void identity();
 
-		view<T> row(std::size_t r) const;
-		span<T> row(std::size_t r);
+		view<T> pixels(std::size_t wavelength_index) const;
+		span<T> pixels(std::size_t wavelength_index);
 
-		view<T> column(std::size_t c) const;
-		span<T> column(std::size_t c);
+		view<T> wavelengths(std::size_t pixel_index) const;
+		span<T> wavelengths(std::size_t pixel_index);
 
 		void setColumn(std::size_t c, view<T> data);
 		void setColumn(std::size_t c, const std::vector<T>& data);
-		void setColumn(std::size_t c, const std::array<T, num_of_rows>& data);
+		void setColumn(std::size_t c, const std::array<T, NUM_PIXELS>& data);
 
-		const value_type& get(std::size_t row, std::size_t col) const;
-		void set(std::size_t row, std::size_t col, const value_type& v);
+		const value_type& get(std::size_t pixel_index, std::size_t wavelength_index) const;
+		void set(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v);
 
 		std::size_t size() const;
-		const std::array<T, num_of_rows* num_of_cols>& data() const;
-		std::array<T, num_of_rows* num_of_cols>& data();
+		const std::array<T, NUM_PIXELS * NUM_WAVELENGTHS>& data() const;
+		std::array<T, NUM_PIXELS * NUM_WAVELENGTHS>& data();
 
 	protected:
-		std::array<T, num_of_rows* num_of_cols> mData;
+		std::array<T, NUM_PIXELS * NUM_WAVELENGTHS> mData;
 	};
 
 
@@ -355,16 +373,18 @@ namespace hyperspectral
 	 * Helper functions 
 	 */
 	template<typename T>
-	matrix_row_major<T> to_matrix_row_major(const matrix_col_major<T>& m);
+	spectral_major_data<T> to_spectral_major_data(const spatial_major_data<T>& m);
 
 	template<typename T>
-	matrix_col_major<T> to_matrix_col_major(const matrix_row_major<T>& m);
+	spatial_major_data<T> to_spatial_major_data(const spectral_major_data<T>& m);
 
-	template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-	matrix_row_major_fixed<T, num_of_rows, num_of_cols> to_matrix_row_major(const matrix_col_major_fixed<T, num_of_rows, num_of_cols>& m);
+	template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+	spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>
+		to_spectral_major_data(const spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>& m);
 
-	template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-	matrix_col_major_fixed<T, num_of_rows, num_of_cols> to_matrix_col_major(const matrix_row_major_fixed<T, num_of_rows, num_of_cols>& m);
+	template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+	spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>
+		to_spatial_major_data(const spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>& m);
 
 	template<typename T>
 	std::vector<T> to_vector(const span<T>& s);
@@ -380,76 +400,25 @@ namespace hyperspectral
  // View
  /////////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline ouster::view<T>::view(const T* start, const T* last, std::size_t stride)
+inline hyperspectral::view<T>::view(const T* start, const T* last, std::size_t stride)
 	: mpStart(start), mpLast(last), mStride(stride)
 {}
 
 template<typename T>
-inline bool ouster::view<T>::empty() const
+inline bool hyperspectral::view<T>::empty() const
 {
 	return mpLast == mpStart;
 }
 
 template<typename T>
-inline std::size_t ouster::view<T>::size() const
+inline std::size_t hyperspectral::view<T>::size() const
 {
 	if (mpLast == mpStart) return 0;
 	return (std::distance(mpStart, mpLast) / mStride) + 1;
 }
 
-/*
 template<typename T>
-typename ouster::view<T>::iterator ouster::view<T>::begin() const
-{
-	return Iterator<T>(mpStart, mStride);
-}
-
-template<typename T>
-typename ouster::view<T>::iterator ouster::view<T>::end() const
-{
-	return Iterator<T>(mpLast + 1, 0);
-}
-
-template<typename T>
-typename ouster::view<T>::const_iterator ouster::view<T>::cbegin() const
-{
-	return const_iterator(mpStart, mStride);
-}
-
-template<typename T>
-typename ouster::view<T>::const_iterator ouster::view<T>::cend() const
-{
-	return const_iterator(mpLast + 1, 0);
-}
-
-
-template<typename T>
-typename ouster::view<T>::reverse_iterator ouster::view<T>::rbegin() const
-{
-	return reverse_iterator(mpLast, mStride);
-}
-
-template<typename T>
-typename ouster::view<T>::reverse_iterator ouster::view<T>::rend() const
-{
-	return reverse_iterator(mpStart - 1, 0);
-}
-
-template<typename T>
-typename ouster::view<T>::const_reverse_iterator ouster::view<T>::crbegin() const
-{
-	return const_reverse_iterator(mpLast, mStride);
-}
-
-template<typename T>
-typename ouster::view<T>::const_reverse_iterator ouster::view<T>::crend() const
-{
-	return const_reverse_iterator(mpStart - 1, 0);
-}
-*/
-
-template<typename T>
-inline const T& ouster::view<T>::operator[](std::size_t i) const
+inline const T& hyperspectral::view<T>::operator[](std::size_t i) const
 {
 	return *(mpStart + i * mStride);
 }
@@ -459,596 +428,555 @@ inline const T& ouster::view<T>::operator[](std::size_t i) const
 // Span
 /////////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline ouster::span<T>::span(T* start, T* last, std::size_t stride)
+inline hyperspectral::span<T>::span(T* start, T* last, std::size_t stride)
 	: mpStart(start), mpLast(last), mStride(stride)
 {}
 
 template<typename T>
-inline bool ouster::span<T>::empty() const
+inline bool hyperspectral::span<T>::empty() const
 {
 	return mpLast == mpStart;
 }
 
 template<typename T>
-inline std::size_t ouster::span<T>::size() const
+inline std::size_t hyperspectral::span<T>::size() const
 {
 	if (mpLast == mpStart) return 0;
 	return (std::distance(mpStart, mpLast) / mStride) + 1;
 }
 
-/*
 template<typename T>
-typename ouster::span<T>::iterator ouster::span<T>::begin()
-{
-	return iterator(mpStart, mStride);
-}
-
-template<typename T>
-typename ouster::span<T>::iterator ouster::span<T>::end()
-{
-	return iterator(mpLast + 1, 0);
-}
-
-template<typename T>
-typename ouster::span<T>::const_iterator ouster::span<T>::begin() const
-{
-	return const_iterator(mpStart, mStride);
-}
-
-template<typename T>
-typename ouster::span<T>::const_iterator ouster::span<T>::end() const
-{
-	return const_iterator(mpLast + 1, 0);
-}
-
-template<typename T>
-typename ouster::span<T>::const_iterator ouster::span<T>::cbegin() const
-{
-	return const_iterator(mpStart, mStride);
-}
-
-template<typename T>
-typename ouster::span<T>::const_iterator ouster::span<T>::cend() const
-{
-	return const_iterator(mpLast + 1, 0);
-}
-
-
-template<typename T>
-typename ouster::span<T>::reverse_iterator ouster::span<T>::rbegin()
-{
-	return reverse_iterator(mpLast, mStride);
-}
-
-template<typename T>
-typename ouster::span<T>::reverse_iterator ouster::span<T>::rend()
-{
-	return reverse_iterator(mpStart - 1, 0);
-}
-
-template<typename T>
-typename ouster::span<T>::const_reverse_iterator ouster::span<T>::rbegin() const
-{
-	return reverse_iterator(mpLast, mStride);
-}
-
-template<typename T>
-typename ouster::span<T>::const_reverse_iterator ouster::span<T>::rend() const
-{
-	return reverse_iterator(mpStart - 1, 0);
-}
-
-template<typename T>
-typename ouster::span<T>::const_reverse_iterator ouster::span<T>::crbegin() const
-{
-	return const_reverse_iterator(mpLast, mStride);
-}
-
-template<typename T>
-typename ouster::span<T>::const_reverse_iterator ouster::span<T>::crend() const
-{
-	return const_reverse_iterator(mpStart - 1, 0);
-}
-*/
-
-
-template<typename T>
-inline const T& ouster::span<T>::operator[](std::size_t i) const
+inline const T& hyperspectral::span<T>::operator[](std::size_t i) const
 {
 	return *(mpStart + i * mStride);
 }
 
 template<typename T>
-inline T& ouster::span<T>::operator[](std::size_t i)
+inline T& hyperspectral::span<T>::operator[](std::size_t i)
 {
 	return *(mpStart + i * mStride);
 }
 
 template<typename T>
-inline ouster::span<T>::operator ouster::view<T>() const
+inline hyperspectral::span<T>::operator hyperspectral::view<T>() const
 {
 	return view<T>(mpStart, mpLast, mStride);
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-// Row Major Dynamically Sized Matrix
+// Spectral Major Dynamically Sized Hyperspectral Data
 /////////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline ouster::matrix_row_major<T>::matrix_row_major()
-	: mNumOfRows(0), mNumOfCols(0)
+inline hyperspectral::spectral_major_data<T>::spectral_major_data()
+	: mNumPixels(0), mNumWavelengths(0)
 {
 	mData.clear();
 }
 
 template<typename T>
-inline ouster::matrix_row_major<T>::matrix_row_major(std::size_t num_of_rows, std::size_t num_of_cols)
-	: mNumOfRows(num_of_rows), mNumOfCols(num_of_cols)
+inline hyperspectral::spectral_major_data<T>::spectral_major_data(std::size_t num_pixels, std::size_t num_wavelengths)
+	: mNumPixels(num_pixels), mNumWavelengths(num_wavelengths)
 {
-	mData.resize(num_of_rows * num_of_cols);
+	mData.resize(num_pixels * num_wavelengths);
 }
 
 template<typename T>
-inline ouster::matrix_row_major<T>::matrix_row_major(const matrix_row_major<T>& m)
-	: mData(m.mData), mNumOfRows(m.mNumOfRows), mNumOfCols(m.mNumOfCols)
+inline hyperspectral::spectral_major_data<T>::spectral_major_data(const spectral_major_data<T>& m)
+	: mData(m.mData), mNumPixels(m.mNumPixels), mNumWavelengths(m.mNumWavelengths)
 {
 }
 
 template<typename T>
-inline bool ouster::matrix_row_major<T>::empty() const
+inline bool hyperspectral::spectral_major_data<T>::empty() const
 {
 	return mData.empty();
 }
 
 template<typename T>
-inline std::size_t ouster::matrix_row_major<T>::num_columns() const
+inline std::size_t hyperspectral::spectral_major_data<T>::num_wavelengths() const
 {
-	return mNumOfCols;
+	return mNumWavelengths;
 }
 
 template<typename T>
-inline std::size_t ouster::matrix_row_major<T>::num_rows() const
+inline std::size_t hyperspectral::spectral_major_data<T>::num_pixels() const
 {
-	return mNumOfRows;
+	return mNumPixels;
 }
 
 template<typename T>
-inline void ouster::matrix_row_major<T>::resize(std::size_t num_of_rows, std::size_t num_of_cols)
+inline void hyperspectral::spectral_major_data<T>::resize(std::size_t num_pixels, std::size_t num_wavelengths)
 {
-	mNumOfRows = num_of_rows;
-	mNumOfCols = num_of_cols;
-	mData.resize(mNumOfRows * mNumOfCols);
+	mNumPixels = num_pixels;
+	mNumWavelengths = num_wavelengths;
+	mData.resize(mNumPixels * mNumWavelengths);
 }
 
 template<typename T>
-inline void ouster::matrix_row_major<T>::clear()
+inline void hyperspectral::spectral_major_data<T>::clear()
 {
 	mData.clear();
 }
 
 template<typename T>
-inline ouster::view<T> ouster::matrix_row_major<T>::row(std::size_t r) const
+inline hyperspectral::view<T> hyperspectral::spectral_major_data<T>::pixels(std::size_t wavelength_index) const
 {
-	return view<T>(&mData[r * mNumOfCols], &mData[(r + 1) * mNumOfCols - 1], 1);
+	assert(wavelength_index < mNumWavelengths);
+	return view<T>(&mData[wavelength_index], &mData[(mNumPixels - 1) * mNumWavelengths + wavelength_index], mNumWavelengths);
+//	return view<T>(&mData[wavelength_index * mNumWavelengths], &mData[(wavelength_index + 1) * mNumWavelengths - 1], 1);
 }
 
 template<typename T>
-inline ouster::span<T> ouster::matrix_row_major<T>::row(std::size_t r)
+inline hyperspectral::span<T> hyperspectral::spectral_major_data<T>::pixels(std::size_t wavelength_index)
 {
-	return span<T>(&mData[r * mNumOfCols], &mData[(r + 1) * mNumOfCols - 1], 1);
+	assert(wavelength_index < mNumWavelengths);
+	return span<T>(&mData[wavelength_index], &mData[(mNumPixels - 1) * mNumWavelengths + wavelength_index], mNumWavelengths);
+//	return span<T>(&mData[wavelength_index * mNumWavelengths], &mData[(wavelength_index + 1) * mNumWavelengths - 1], 1);
 }
 
 template<typename T>
-inline ouster::view<T> ouster::matrix_row_major<T>::column(std::size_t c) const
+inline hyperspectral::view<T> hyperspectral::spectral_major_data<T>::wavelengths(std::size_t pixel_index) const
 {
-	return view<T>(&mData[c], &mData[(mNumOfRows - 1) * mNumOfCols + c], mNumOfCols);
+	assert(pixel_index < mNumPixels);
+	return view<T>(&mData[pixel_index * mNumWavelengths], &mData[(pixel_index + 1) * mNumWavelengths - 1], 1);
+//	return view<T>(&mData[pixel_index], &mData[(mNumPixels - 1) * mNumWavelengths + pixel_index], mNumWavelengths);
 }
 
 template<typename T>
-inline ouster::span<T> ouster::matrix_row_major<T>::column(std::size_t c)
+inline hyperspectral::span<T> hyperspectral::spectral_major_data<T>::wavelengths(std::size_t pixel_index)
 {
-	return span<T>(&mData[c], &mData[(mNumOfRows - 1) * mNumOfCols + c], mNumOfCols);
+	assert(pixel_index < mNumPixels);
+	return span<T>(&mData[pixel_index * mNumWavelengths], &mData[(pixel_index + 1) * mNumWavelengths - 1], 1);
+	//	return span<T>(&mData[pixel_index], &mData[(mNumPixels - 1) * mNumWavelengths + pixel_index], mNumWavelengths);
 }
 
 template<typename T>
-inline const typename ouster::matrix_row_major<T>::value_type& ouster::matrix_row_major<T>::get(std::size_t row, std::size_t col) const
+inline const typename hyperspectral::spectral_major_data<T>::value_type& 
+	hyperspectral::spectral_major_data<T>::get(std::size_t pixel_index, std::size_t wavelength_index) const
 {
-	return mData[row * mNumOfCols + col];
+	assert((pixel_index < mNumPixels) && (wavelength_index < mNumWavelengths));
+	return mData[pixel_index * mNumWavelengths + wavelength_index];
 }
 
 template<typename T>
-void ouster::matrix_row_major<T>::set(std::size_t row, std::size_t col, const value_type& v)
+void hyperspectral::spectral_major_data<T>::set(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v)
 {
-	mData[row * mNumOfCols + col] = v;
+	assert((pixel_index < mNumPixels) && (wavelength_index < mNumWavelengths));
+	mData[pixel_index * mNumWavelengths + wavelength_index] = v;
 }
 
 template<typename T>
-std::size_t ouster::matrix_row_major<T>::size() const
+std::size_t hyperspectral::spectral_major_data<T>::size() const
 {
-	return mNumOfRows * mNumOfCols;
+	return mNumPixels * mNumWavelengths;
 }
 
 template<typename T>
-const std::vector<T>& ouster::matrix_row_major<T>::data() const
+const std::vector<T>& hyperspectral::spectral_major_data<T>::data() const
 {
 	return mData;
 }
 
 template<typename T>
-std::vector<T>& ouster::matrix_row_major<T>::data()
+std::vector<T>& hyperspectral::spectral_major_data<T>::data()
 {
 	return mData;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-// Column Major Dynamically Sized Matrix
+// Spatial Major Dynamically Sized Hyperspectral Data
 /////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
-inline ouster::matrix_col_major<T>::matrix_col_major()
-	: mNumOfRows(0), mNumOfCols(0)
+inline hyperspectral::spatial_major_data<T>::spatial_major_data()
+	: mNumPixels(0), mNumWavelengths(0)
 {
 	mData.clear();
 }
 
 template<typename T>
-inline ouster::matrix_col_major<T>::matrix_col_major(std::size_t num_of_rows, std::size_t num_of_cols)
-	: mNumOfRows(num_of_rows), mNumOfCols(num_of_cols)
+inline hyperspectral::spatial_major_data<T>::spatial_major_data(std::size_t num_of_pixels, std::size_t num_of_wavelengths)
+	: mNumPixels(num_of_pixels), mNumWavelengths(num_of_wavelengths)
 {
-	mData.resize(num_of_rows * num_of_cols);
+	mData.resize(num_of_pixels * num_of_wavelengths);
 }
 
 template<typename T>
-inline ouster::matrix_col_major<T>::matrix_col_major(const matrix_col_major<T>& m)
-	: mData(m.mData), mNumOfRows(m.mNumOfRows), mNumOfCols(m.mNumOfCols)
+inline hyperspectral::spatial_major_data<T>::spatial_major_data(const spatial_major_data<T>& m)
+	: mData(m.mData), mNumPixels(m.mNumPixels), mNumWavelengths(m.mNumWavelengths)
 {
 }
 
 template<typename T>
-inline bool ouster::matrix_col_major<T>::empty() const
+inline bool hyperspectral::spatial_major_data<T>::empty() const
 {
 	return mData.empty();
 }
 
 template<typename T>
-inline std::size_t ouster::matrix_col_major<T>::num_columns() const
+inline std::size_t hyperspectral::spatial_major_data<T>::num_wavelengths() const
 {
-	return mNumOfCols;
+	return mNumWavelengths;
 }
 
 template<typename T>
-inline std::size_t ouster::matrix_col_major<T>::num_rows() const
+inline std::size_t hyperspectral::spatial_major_data<T>::num_pixels() const
 {
-	return mNumOfRows;
+	return mNumPixels;
 }
 
 template<typename T>
-inline void ouster::matrix_col_major<T>::resize(std::size_t num_of_rows, std::size_t num_of_cols)
+inline void hyperspectral::spatial_major_data<T>::resize(std::size_t num_of_pixels, std::size_t num_of_wavelengths)
 {
-	mNumOfRows = num_of_rows;
-	mNumOfCols = num_of_cols;
-	mData.resize(mNumOfRows * mNumOfCols);
+	mNumPixels = num_of_pixels;
+	mNumWavelengths = num_of_wavelengths;
+	mData.resize(mNumPixels * mNumWavelengths);
 }
 
 template<typename T>
-inline void ouster::matrix_col_major<T>::clear()
+inline void hyperspectral::spatial_major_data<T>::clear()
 {
 	mData.clear();
 }
 
 template<typename T>
-inline ouster::view<T> ouster::matrix_col_major<T>::row(std::size_t r) const
+inline hyperspectral::view<T> hyperspectral::spatial_major_data<T>::pixels(std::size_t wavelength_index) const
 {
-	return view<T>(&mData[r], &mData[(mNumOfCols - 1) * mNumOfRows + r], mNumOfRows);
+	assert(wavelength_index < mNumWavelengths);
+	return view<T>(&mData[wavelength_index * mNumPixels], &mData[(wavelength_index + 1) * mNumPixels - 1], 1);
+//	return view<T>(&mData[wavelength_index], &mData[(mNumWavelengths - 1) * mNumPixels + wavelength_index], mNumPixels);
 }
 
 template<typename T>
-inline ouster::span<T> ouster::matrix_col_major<T>::row(std::size_t r)
+inline hyperspectral::span<T> hyperspectral::spatial_major_data<T>::pixels(std::size_t wavelength_index)
 {
-	return span<T>(&mData[r], &mData[(mNumOfCols - 1) * mNumOfRows + r], mNumOfRows);
+	assert(wavelength_index < mNumWavelengths);
+	return span<T>(&mData[wavelength_index * mNumPixels], &mData[(wavelength_index + 1) * mNumPixels - 1], 1);
+//	return span<T>(&mData[wavelength_index], &mData[(mNumWavelengths - 1) * mNumPixels + wavelength_index], mNumPixels);
 }
 
 template<typename T>
-inline ouster::view<T> ouster::matrix_col_major<T>::column(std::size_t c) const
+inline hyperspectral::view<T> hyperspectral::spatial_major_data<T>::wavelengths(std::size_t pixel_index) const
 {
-	return view<T>(&mData[c * mNumOfRows], &mData[(c + 1) * mNumOfRows - 1], 1);
+	assert(pixel_index < mNumPixels);
+	return view<T>(&mData[pixel_index], &mData[(mNumWavelengths - 1) * mNumPixels + pixel_index], mNumPixels);
+//	return view<T>(&mData[pixel_index * mNumPixels], &mData[(pixel_index + 1) * mNumPixels - 1], 1);
 }
 
 template<typename T>
-inline ouster::span<T> ouster::matrix_col_major<T>::column(std::size_t c)
+inline hyperspectral::span<T> hyperspectral::spatial_major_data<T>::wavelengths(std::size_t pixel_index)
 {
-	return span<T>(&mData[c * mNumOfRows], &mData[(c + 1) * mNumOfRows - 1], 1);
+	assert(pixel_index < mNumPixels);
+	return span<T>(&mData[pixel_index], &mData[(mNumWavelengths - 1) * mNumPixels + pixel_index], mNumPixels);
+//	return span<T>(&mData[pixel_index * mNumPixels], &mData[(pixel_index + 1) * mNumPixels - 1], 1);
 }
 
 template<typename T>
-inline const typename ouster::matrix_col_major<T>::value_type& ouster::matrix_col_major<T>::get(std::size_t row, std::size_t col) const
+inline const typename hyperspectral::spatial_major_data<T>::value_type&
+	hyperspectral::spatial_major_data<T>::get(std::size_t pixel_index, std::size_t wavelength_index) const
 {
-	return mData[row + col * mNumOfRows];
+	return mData[pixel_index + wavelength_index * mNumPixels];
 }
 
 template<typename T>
-void ouster::matrix_col_major<T>::set(std::size_t row, std::size_t col, const value_type& v)
+void hyperspectral::spatial_major_data<T>::set(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v)
 {
-	mData[row + col * mNumOfRows] = v;
+	mData[pixel_index + wavelength_index * mNumPixels] = v;
 }
 
 template<typename T>
-std::size_t ouster::matrix_col_major<T>::size() const
+std::size_t hyperspectral::spatial_major_data<T>::size() const
 {
-	return mNumOfRows * mNumOfCols;
+	return mNumPixels * mNumWavelengths;
 }
 
 template<typename T>
-const std::vector<T>& ouster::matrix_col_major<T>::data() const
+const std::vector<T>& hyperspectral::spatial_major_data<T>::data() const
 {
 	return mData;
 }
 
 template<typename T>
-std::vector<T>& ouster::matrix_col_major<T>::data()
+std::vector<T>& hyperspectral::spatial_major_data<T>::data()
 {
 	return mData;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-// Row Major Fixed Sized Matrix
+// Spectral Major Fixed Sized Hyperspectral Data
 /////////////////////////////////////////////////////////////////////////////////////
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::matrix_row_major_fixed()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::spectral_major_data_fixed()
 {
 	zero();
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::matrix_row_major_fixed(const matrix_row_major_fixed<T, num_of_rows, num_of_cols>& m)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::spectral_major_data_fixed
+		(const spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>& m)
 	: mData(m.mData)
 {
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline std::size_t ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::num_columns() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline std::size_t hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::num_wavelengths() const
 {
-	return num_of_cols;
+	return NUM_WAVELENGTHS;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline std::size_t ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::num_rows() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline std::size_t hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::num_pixels() const
 {
-	return num_of_rows;
+	return NUM_PIXELS;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline void ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::zero()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline void hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::zero()
 {
 	std::fill(mData.begin(), mData.end(), zero_value<T>);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline void ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::identity()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline void hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::identity()
 {
-	assert(num_of_rows == num_of_cols);
+	assert(NUM_PIXELS == NUM_WAVELENGTHS);
 
 	zero();
 
-	for (std::size_t r = 0; r < num_of_rows; ++r)
+	for (std::size_t x = 0; x < NUM_PIXELS; ++x)
 	{
-		set(r, r, identity_value<T>);
+		set(x, x, identity_value<T>);
 	}
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::view<T>
-		ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::row(std::size_t r) const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::view<T>
+	hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::pixels(std::size_t wavelength_index) const
 {
-	assert(r < num_of_rows);
-	return view(&mData[r * num_of_cols], &mData[(r + 1) * num_of_cols - 1], 1);
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	return view<T>(&mData[wavelength_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + wavelength_index], NUM_WAVELENGTHS);
+//	return view(&mData[wavelength_index * NUM_WAVELENGTHS], &mData[(wavelength_index + 1) * NUM_WAVELENGTHS - 1], 1);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::span<T>
-		ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::row(std::size_t r)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::span<T>
+	hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::pixels(std::size_t wavelength_index)
 {
-	assert(r < num_of_rows);
-	return span<T>(&mData[r * num_of_cols], &mData[(r + 1) * num_of_cols - 1], 1);;
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	return span<T>(&mData[wavelength_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + wavelength_index], NUM_WAVELENGTHS);
+//	return span<T>(&mData[wavelength_index * NUM_WAVELENGTHS], &mData[(wavelength_index + 1) * NUM_WAVELENGTHS - 1], 1);;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::view<T>
-	ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::column(std::size_t c) const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::view<T>
+hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::wavelengths(std::size_t pixel_index) const
 {
-	return view<T>(&mData[c], &mData[(num_of_rows - 1) * num_of_cols + c], num_of_cols);
+	assert(pixel_index < NUM_PIXELS);
+	return view<T>(&mData[pixel_index * NUM_WAVELENGTHS], &mData[(pixel_index + 1) * NUM_WAVELENGTHS - 1], 1);
+//	return view<T>(&mData[pixel_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + pixel_index], NUM_WAVELENGTHS);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::span<T> 
-	ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::column(std::size_t c)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::span<T>
+	hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::wavelengths(std::size_t pixel_index)
 {
-	return span<T>(&mData[c], &mData[(num_of_rows - 1) * num_of_cols + c], num_of_cols);
+	assert(pixel_index < NUM_PIXELS);
+	return span<T>(&mData[pixel_index * NUM_WAVELENGTHS], &mData[(pixel_index + 1) * NUM_WAVELENGTHS - 1], 1);
+//	return span<T>(&mData[pixel_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + pixel_index], NUM_WAVELENGTHS);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline const typename ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::value_type&
-		ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::get(std::size_t row, std::size_t col) const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline const typename hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::value_type&
+	hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::get
+		(std::size_t pixel_index, std::size_t wavelength_index) const
 {
-	assert(col < num_of_cols);
-	assert(row < num_of_rows);
-	return mData[row * num_of_cols + col];
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	assert(pixel_index < NUM_PIXELS);
+	return mData[pixel_index * NUM_WAVELENGTHS + wavelength_index];
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline void ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::set(std::size_t row, std::size_t col, const value_type& v)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline void hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::set
+	(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v)
 {
-	assert(col < num_of_cols);
-	assert(row < num_of_rows);
-	mData[row * num_of_cols + col] = v;
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	assert(pixel_index < NUM_PIXELS);
+	mData[pixel_index * NUM_WAVELENGTHS + wavelength_index] = v;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-std::size_t ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::size() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+std::size_t hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::size() const
 {
-	return num_of_rows * num_of_cols;
+	return NUM_PIXELS * NUM_WAVELENGTHS;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-const std::array<T, num_of_rows* num_of_cols>& ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::data() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+const std::array<T, NUM_PIXELS* NUM_WAVELENGTHS>&
+	hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::data() const
 {
 	return mData;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-std::array<T, num_of_rows* num_of_cols>& ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols>::data()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+std::array<T, NUM_PIXELS* NUM_WAVELENGTHS>&
+	hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::data()
 {
 	return mData;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-// Column Major Fixed Sized Matrix
+// Spatial Major Fixed Sized Hyperspectral Data
 /////////////////////////////////////////////////////////////////////////////////////
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::matrix_col_major_fixed()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::spatial_major_data_fixed()
 {
 	zero();
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::matrix_col_major_fixed(const matrix_col_major_fixed<T, num_of_rows, num_of_cols>& m)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::spatial_major_data_fixed
+	(const spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>& m)
 	: mData(m.mData)
 {
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline std::size_t ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::num_columns() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline std::size_t hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::num_wavelengths() const
 {
-	return num_of_cols;
+	return NUM_WAVELENGTHS;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline std::size_t ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::num_rows() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline std::size_t hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::num_pixels() const
 {
-	return num_of_rows;
+	return NUM_PIXELS;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline void ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::zero()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::zero()
 {
 	std::fill(mData.begin(), mData.end(), zero_value<T>);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline void ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::identity()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::identity()
 {
-	assert(num_of_rows == num_of_cols);
+	assert(NUM_PIXELS == NUM_WAVELENGTHS);
 
 	zero();
 
-	for (std::size_t c = 0; c < num_of_cols; ++c)
+	for (std::size_t c = 0; c < NUM_WAVELENGTHS; ++c)
 	{
 		set(c, c, identity_value<T>);
 	}
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::view<T> 
-	ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::row(std::size_t r) const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::view<T>
+	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::pixels(std::size_t wavelength_index) const
 {
-	return view<T>(&mData[r], &mData[(num_of_cols - 1) * num_of_rows + r], num_of_rows);
+	return view<T>(&mData[wavelength_index], &mData[(NUM_WAVELENGTHS - 1) * NUM_PIXELS + wavelength_index], NUM_PIXELS);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::span<T>
-	ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::row(std::size_t r)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::span<T>
+	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::pixels(std::size_t wavelength_index)
 {
-	return span<T>(&mData[r], &mData[(num_of_cols - 1) * num_of_rows + r], num_of_rows);
+	return span<T>(&mData[wavelength_index], &mData[(NUM_WAVELENGTHS - 1) * NUM_PIXELS + wavelength_index], NUM_PIXELS);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::view<T>
-		ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::column(std::size_t c) const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::view<T>
+	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::wavelengths(std::size_t pixel_index) const
 {
-	assert(c < num_of_cols);
-	return view<T>(&mData[c * num_of_rows], &mData[(c + 1) * num_of_rows - 1], 1);
+	assert(pixel_index < NUM_PIXELS);
+	return view<T>(&mData[pixel_index * NUM_PIXELS], &mData[(pixel_index + 1) * NUM_PIXELS - 1], 1);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline ouster::span<T> ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::column(std::size_t c)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline hyperspectral::span<T> 
+	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::wavelengths(std::size_t pixel_index)
 {
-	assert(c < num_of_cols);
-	return span<T>(&mData[c * num_of_rows], &mData[(c + 1) * num_of_rows - 1], 1);
+	assert(pixel_index < NUM_PIXELS);
+	return span<T>(&mData[pixel_index * NUM_PIXELS], &mData[(pixel_index + 1) * NUM_PIXELS - 1], 1);
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-void ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::setColumn(std::size_t c, view<T> data)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::setColumn(std::size_t c, view<T> data)
 {
-	assert(c < num_of_cols);
-	assert(data.size() == num_of_rows);
+	assert(c < NUM_WAVELENGTHS);
+	assert(data.size() == NUM_PIXELS);
 
-	std::size_t n = c * num_of_rows;
-	for (std::size_t r = 0; r < num_of_rows; ++r)
+	std::size_t n = c * NUM_PIXELS;
+	for (std::size_t r = 0; r < NUM_PIXELS; ++r)
 	{
 		mData[n++] = data[r];
 	}
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-void ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::setColumn(std::size_t c, const std::vector<T>& data)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::setColumn(std::size_t c, const std::vector<T>& data)
 {
-	assert(c < num_of_cols);
-	assert(data.size() == num_of_rows);
+	assert(c < NUM_WAVELENGTHS);
+	assert(data.size() == NUM_PIXELS);
 
-	std::size_t n = c * num_of_rows;
-	for (std::size_t r = 0; r < num_of_rows; ++r)
+	std::size_t n = c * NUM_PIXELS;
+	for (std::size_t r = 0; r < NUM_PIXELS; ++r)
 	{
 		mData[n++] = data[r];
 	}
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-void ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::setColumn(std::size_t c, const std::array<T, num_of_rows>& data)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::setColumn(std::size_t c, const std::array<T, NUM_PIXELS>& data)
 {
-	assert(c < num_of_cols);
-	assert(data.size() == num_of_rows);
+	assert(c < NUM_WAVELENGTHS);
+	assert(data.size() == NUM_PIXELS);
 
-	std::size_t n = c * num_of_rows;
-	for (std::size_t r = 0; r < num_of_rows; ++r)
+	std::size_t n = c * NUM_PIXELS;
+	for (std::size_t r = 0; r < NUM_PIXELS; ++r)
 	{
 		mData[n++] = data[r];
 	}
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline const typename ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::value_type&
-	ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::get(std::size_t row, std::size_t col) const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline const typename hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::value_type&
+	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::get
+		(std::size_t pixel_index, std::size_t wavelength_index) const
 {
-	assert(col < num_of_cols);
-	assert(row < num_of_rows);
-	return mData[row + col * num_of_rows];
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	assert(pixel_index < NUM_PIXELS);
+	return mData[pixel_index + wavelength_index * NUM_PIXELS];
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-inline void ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::set(std::size_t row, std::size_t col, const value_type& v)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+inline void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::set
+	(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v)
 {
-	assert(col < num_of_cols);
-	assert(row < num_of_rows);
-	mData[row + col * num_of_rows] = v;
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	assert(pixel_index < NUM_PIXELS);
+	mData[pixel_index + wavelength_index * NUM_WAVELENGTHS] = v;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-std::size_t ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::size() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+std::size_t hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::size() const
 {
-	return num_of_rows * num_of_cols;
+	return NUM_PIXELS * NUM_WAVELENGTHS;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-const std::array<T, num_of_rows* num_of_cols>& ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::data() const
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+const std::array<T, NUM_PIXELS* NUM_WAVELENGTHS>& hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::data() const
 {
 	return mData;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-std::array<T, num_of_rows* num_of_cols>& ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols>::data()
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+std::array<T, NUM_PIXELS* NUM_WAVELENGTHS>& hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::data()
 {
 	return mData;
 }
@@ -1059,11 +987,11 @@ std::array<T, num_of_rows* num_of_cols>& ouster::matrix_col_major_fixed<T, num_o
 ******************************************************************************/
 
 template<typename T>
-ouster::matrix_row_major<T> ouster::to_matrix_row_major(const ouster::matrix_col_major<T>& m)
+hyperspectral::spectral_major_data<T> hyperspectral::to_spectral_major_data(const hyperspectral::spatial_major_data<T>& m)
 {
-	if (m.empty()) return matrix_row_major<T>();
+	if (m.empty()) return spectral_major_data<T>();
 
-	matrix_row_major<T> result(m.num_rows(), m.num_columns());
+	spectral_major_data<T> result(m.num_rows(), m.num_columns());
 
 	for (std::size_t col = 0; col < m.num_columns(); ++col)
 	{
@@ -1077,11 +1005,11 @@ ouster::matrix_row_major<T> ouster::to_matrix_row_major(const ouster::matrix_col
 }
 
 template<typename T>
-ouster::matrix_col_major<T> ouster::to_matrix_col_major(const ouster::matrix_row_major<T>& m)
+hyperspectral::spatial_major_data<T> hyperspectral::to_spatial_major_data(const hyperspectral::spectral_major_data<T>& m)
 {
-	if (m.empty()) return matrix_col_major<T>();
+	if (m.empty()) return spatial_major_data<T>();
 
-	matrix_col_major<T> result(m.num_rows(), m.num_columns());
+	spatial_major_data<T> result(m.num_rows(), m.num_columns());
 
 	for (std::size_t row = 0; row < m.num_rows(); ++row)
 	{
@@ -1094,16 +1022,17 @@ ouster::matrix_col_major<T> ouster::to_matrix_col_major(const ouster::matrix_row
 	return result;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols> ouster::to_matrix_row_major(const matrix_col_major_fixed<T, num_of_rows, num_of_cols>& m)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>
+	hyperspectral::to_spectral_major_data(const spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>& m)
 {
-	if (m.empty()) return matrix_row_major_fixed<T, num_of_rows, num_of_cols>();
+	if (m.empty()) return spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>();
 
-	matrix_row_major_fixed<T, num_of_rows, num_of_cols> result;
+	spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS> result;
 
 	for (std::size_t col = 0; col < m.num_columns(); ++col)
 	{
-		for (std::size_t row = 0; row < m.num_rows(); ++row)
+		for (std::size_t row = 0; row < m.num_pixels(); ++row)
 		{
 			result.set(row, col, m.get(row, col));
 		}
@@ -1112,14 +1041,15 @@ ouster::matrix_row_major_fixed<T, num_of_rows, num_of_cols> ouster::to_matrix_ro
 	return result;
 }
 
-template<typename T, std::size_t num_of_rows, std::size_t num_of_cols>
-ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols> ouster::to_matrix_col_major(const matrix_row_major_fixed<T, num_of_rows, num_of_cols>& m)
+template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
+hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>
+	hyperspectral::to_spatial_major_data(const spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>& m)
 {
-	if (m.empty()) return matrix_col_major_fixed<T, num_of_rows, num_of_cols>();
+	if (m.empty()) return spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>();
 
-	matrix_col_major_fixed<T, num_of_rows, num_of_cols> result;
+	spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS> result;
 
-	for (std::size_t row = 0; row < m.num_rows(); ++row)
+	for (std::size_t row = 0; row < m.num_pixels(); ++row)
 	{
 		for (std::size_t col = 0; col < m.num_columns(); ++col)
 		{
@@ -1131,7 +1061,7 @@ ouster::matrix_col_major_fixed<T, num_of_rows, num_of_cols> ouster::to_matrix_co
 }
 
 template<typename T>
-inline std::vector<T> to_vector(const ouster::span<T>& s)
+inline std::vector<T> to_vector(const hyperspectral::span<T>& s)
 {
 	std::size_t n = s.size();
 	std::vector<T> result(n);
