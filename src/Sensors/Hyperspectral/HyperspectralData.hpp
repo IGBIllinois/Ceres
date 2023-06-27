@@ -83,7 +83,7 @@ namespace hyperspectral
 		using reference = T&;
 		using const_reference = const T&;
 		using difference_type = std::ptrdiff_t;
-		using iterator = const Iterator<T>;
+		using iterator = Iterator<const T>;
 		using const_iterator = iterator;
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
@@ -97,13 +97,13 @@ namespace hyperspectral
 
 		iterator begin() const { return cbegin(); };
 		iterator end() const   { return cend(); };
-		const_iterator cbegin() const { return Iterator<T>(mpStart, mStride); };
-		const_iterator cend() const   { return Iterator<T>(mpLast + mStride, mStride); };
+		const_iterator cbegin() const { return Iterator<const T>(mpStart, mStride); };
+		const_iterator cend() const   { return Iterator<const T>(mpLast + mStride, mStride); };
 
 		reverse_iterator rbegin() const { return crbegin(); };
 		reverse_iterator rend() const   { return crend(); };
-		const_reverse_iterator crbegin() const { return reverse_iterator(Iterator<T>(mpLast + mStride, mStride)); };
-		const_reverse_iterator crend() const   { return reverse_iterator(Iterator<T>(mpStart, mStride)); };
+		const_reverse_iterator crbegin() const { return reverse_iterator(Iterator<const T>(mpLast + mStride, mStride)); };
+		const_reverse_iterator crend() const   { return reverse_iterator(Iterator<const T>(mpStart, mStride)); };
 
 		const T& operator[](std::size_t i) const;
 
@@ -124,7 +124,7 @@ namespace hyperspectral
 		using const_reference = const T&;
 		using difference_type = std::ptrdiff_t;
 		using iterator = Iterator<T>;
-		using const_iterator = const iterator;
+		using const_iterator = Iterator<const T>;
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 		using iterator_category = typename iterator::iterator_category;
@@ -138,15 +138,15 @@ namespace hyperspectral
 		iterator end()   { return Iterator<T>(mpLast + mStride, mStride); };
 		const_iterator begin() const   { return cbegin(); };
 		const_iterator end() const     { return cend(); };
-		const_iterator cbegin() const  { return Iterator<T>(mpStart, mStride); };
-		const_iterator cend() const    { return Iterator<T>(mpLast + mStride, mStride); };
+		const_iterator cbegin() const  { return Iterator<const T>(mpStart, mStride); };
+		const_iterator cend() const    { return Iterator<const T>(mpLast + mStride, mStride); };
 
 		reverse_iterator rbegin() { return reverse_iterator(Iterator<T>(mpLast + mStride, mStride)); };
 		reverse_iterator rend()   { return reverse_iterator(Iterator<T>(mpStart, mStride)); };
 		const_reverse_iterator rbegin() const { return crbegin(); };
 		const_reverse_iterator rend() const   { return crend(); };
-		const_reverse_iterator crbegin() const { return reverse_iterator(Iterator<T>(mpLast + mStride, mStride)); };
-		const_reverse_iterator crend() const { return reverse_iterator(Iterator<T>(mpStart, mStride)); };
+		const_reverse_iterator crbegin() const { return const_reverse_iterator(Iterator<const T>(mpLast + mStride, mStride)); };
+		const_reverse_iterator crend() const { return const_reverse_iterator(Iterator<const T>(mpStart, mStride)); };
 
 		const T& operator[](std::size_t i) const;
 		T& operator[](std::size_t i);
@@ -516,6 +516,8 @@ inline void hyperspectral::spectral_major_data<T>::resize(std::size_t num_pixels
 template<typename T>
 inline void hyperspectral::spectral_major_data<T>::clear()
 {
+	mNumPixels = 0;
+	mNumWavelengths = 0;
 	mData.clear();
 }
 
@@ -638,6 +640,8 @@ inline void hyperspectral::spatial_major_data<T>::resize(std::size_t num_of_pixe
 template<typename T>
 inline void hyperspectral::spatial_major_data<T>::clear()
 {
+	mNumPixels = 0;
+	mNumWavelengths = 0;
 	mData.clear();
 }
 
