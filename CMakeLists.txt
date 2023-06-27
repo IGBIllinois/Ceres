@@ -236,8 +236,8 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
 # TESTING
 #******************************************************************************
 if (Catch2_FOUND)
-#  ENABLE_TESTING()
-#  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/tests)
+  ENABLE_TESTING()
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/tests)
 else()
   message(WARNING "The Catch2 testing library is missing.  Can not create tests!")
 endif()
