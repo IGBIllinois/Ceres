@@ -145,12 +145,12 @@ private:
     // Experiment Info
     std::string  mExperimentTitle;
     std::string  mPrincipalInvestigator;
-    std::vector<std::string>  mResearchers;
+    std::vector<std::string> mResearchers;
     std::string  mSpecies;
     std::string  mCultivar;
     std::string  mPermitInfo;
     std::string  mConstructName;
-    std::string  mEventNumber;
+    std::vector<std::string> mEventNumbers;
     std::string  mFieldDesign;
     std::string  mExperimentDoc;
 

@@ -338,8 +338,13 @@ void cRemoteDataModel::onStartExperiment()
     if (!mConstructName.empty())
         mSerializer.writeConstructName(mConstructName);
 
-    if (!mEventNumber.empty())
-        mSerializer.writeEventNumber(mEventNumber);
+    if (!mEventNumbers.empty())
+    {
+        if (mEventNumbers.size() == 1)
+            mSerializer.writeEventNumber(mEventNumbers[0]);
+        else
+            mSerializer.writeEventNumbers(mEventNumbers);
+    }
 
     if (!mFieldDesign.empty())
         mSerializer.writeFieldDesign(mFieldDesign);
@@ -488,7 +493,7 @@ void cRemoteDataModel::onConstructName(const std::string& name)
 
 void cRemoteDataModel::onEventNumber(const std::string& event_num)
 {
-    mEventNumber = event_num;
+    mEventNumbers.push_back(event_num);
 }
 
 void cRemoteDataModel::onFieldDesign(const std::string& design)
@@ -703,7 +708,7 @@ void cRemoteDataModel::clearExperimentInfo()
     mCultivar.clear();
     mPermitInfo.clear();
     mConstructName.clear();
-    mEventNumber.clear();
+    mEventNumbers.clear();
     mFieldDesign.clear();
     mExperimentDoc.clear();
     mPlantingDate = 0;

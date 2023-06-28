@@ -375,7 +375,11 @@ void cCentralWidget::onEndOfTreatmentList() {}
 void cCentralWidget::onTreatment(const std::string& treatment) {}
 
 void cCentralWidget::onConstructName(const std::string& name) {}
+
+void cCentralWidget::onBeginEventNumberList() {}
+void cCentralWidget::onEndOfEventNumberList() {}
 void cCentralWidget::onEventNumber(const std::string& event) {}
+
 void cCentralWidget::onFieldDesign(const std::string& design) {}
 void cCentralWidget::onPlantingDate(std::uint16_t year, std::uint8_t month, std::uint8_t day, std::uint16_t doy) {}
 void cCentralWidget::onHarvestDate(std::uint16_t year, std::uint8_t month, std::uint8_t day, std::uint16_t doy) {}

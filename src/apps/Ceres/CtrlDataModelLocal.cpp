@@ -171,7 +171,7 @@ void cCtrlDataModelLocal::closeDataFile()
     mExperimentDoc.clear();
     mTreatments.clear();
     mConstructName.clear();
-    mEventNumber.clear();
+    mEventNumbers.clear();
     mFieldDesign.clear();
     mComments.clear();
 
@@ -247,8 +247,13 @@ void cCtrlDataModelLocal::startExperiment()
         if (!mConstructName.empty())
             mSerializer.writeConstructName(mConstructName);
 
-        if (!mEventNumber.empty())
-            mSerializer.writeEventNumber(mEventNumber);
+        if (!mEventNumbers.empty())
+        {
+            if (mEventNumbers.size() == 1)
+                mSerializer.writeEventNumber(mEventNumbers[0]);
+            else
+                mSerializer.writeEventNumbers(mEventNumbers);
+        }
 
         if (!mFieldDesign.empty())
             mSerializer.writeFieldDesign(mFieldDesign);

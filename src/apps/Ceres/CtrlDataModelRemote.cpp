@@ -317,8 +317,11 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
     if (!mConstructName.empty())
         sendConstructName(mConstructName);
     
-    if (!mEventNumber.empty())
-        sendEventNumber(mEventNumber);
+    if (!mEventNumbers.empty())
+    {
+        for (const auto& event_num : mEventNumbers)
+            sendEventNumber(event_num);
+    }
     
     if (!mFieldDesign.empty())
         sendFieldDesign(mFieldDesign);

@@ -204,7 +204,7 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         mPermitInfo.clear();
         mTreatments.clear();
         mConstructName.clear();
-        mEventNumber.clear();
+        mEventNumbers.clear();
         mFieldDesign.clear();
         mComments.clear();
         mPlantingDate = 0;
@@ -251,7 +251,14 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
 
         if (expDoc.contains("event number"))
         {
-            mEventNumber = expDoc["event number"];
+            mEventNumbers.push_back( expDoc["event number"] );
+        }
+
+        if (expDoc.contains("event numbers"))
+        {
+            auto event_numbers = expDoc["event numbers"];
+            for (auto it = event_numbers.begin(); it != event_numbers.end(); ++it)
+                mEventNumbers.push_back(*it);
         }
 
         if (expDoc.contains("field design"))
