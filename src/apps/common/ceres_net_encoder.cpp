@@ -29,6 +29,12 @@ void cCeresNetEncoder::sendPrincipalInvestigator(const std::string& pi)
     sendData();
 }
 
+void cCeresNetEncoder::sendResearcher(const std::string& researcher)
+{
+    encode_researcher(researcher, mBuffer);
+    sendData();
+}
+
 void cCeresNetEncoder::sendConstructName(const std::string& name)
 {
     encode_construct_name(name, mBuffer);

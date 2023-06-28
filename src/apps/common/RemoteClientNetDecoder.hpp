@@ -30,7 +30,8 @@ protected:
         const std::string& researcher, const std::string& species, 
         const std::string& cultivar, const std::string& doc) = 0;
 
-    virtual void onPrincipalInvestigator(const std::string& comment) = 0;
+    virtual void onPrincipalInvestigator(const std::string& pi) = 0;
+    virtual void onResearcher(const std::string& researcher) = 0;
     virtual void onConstructName(const std::string& name) = 0;
     virtual void onEventNumber(const std::string& event_num) = 0;
     virtual void onFieldDesign(const std::string& comment) = 0;

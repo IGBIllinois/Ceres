@@ -4,6 +4,48 @@
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
+#include <tuple>
+
+namespace
+{
+    std::tuple<std::string, std::string, std::string> date_split(const std::string& date)
+    {
+        std::array<std::string, 3> results;
+        int slot = 0;
+        std::size_t startPos = 0;
+        std::size_t lastPos = date.find('/');
+        while ((lastPos != std::string::npos) && (slot < 2))
+        {
+            results[slot++] = date.substr(startPos, lastPos - startPos);
+            startPos = lastPos + 1;
+            lastPos = date.find('/', startPos);
+        }
+
+        results[slot++] = date.substr(startPos, date.size() - startPos);
+
+        return { results[0], results[1], results[2] };
+    }
+
+    std::time_t to_time_t(const std::string& month, const std::string& day, const std::string& year)
+    {
+        if (month.empty() || day.empty() || year.empty())
+            return { 0 };
+
+        int mm = std::stoi(month, nullptr, 10);
+        int dd = std::stoi(day, nullptr, 10);
+        int yy = std::stoi(year, nullptr, 10);
+
+        if (yy < 100) yy += 2000;
+
+        struct tm date = { 0 };
+        date.tm_year = yy - 1900;
+        date.tm_mon = mm - 1;
+        date.tm_mday = dd;
+        date.tm_isdst = -1;
+
+        return mktime(&date);
+    }
+}
 
 cCtrlDataModel::cCtrlDataModel(QObject* parent)
 :
@@ -156,7 +198,7 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
     if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
     {
         mPrincipalInvestigator.clear();
-        mResearcher.clear();
+        mResearchers.clear();
         mSpecies.clear();
         mCultivar.clear();
         mPermitInfo.clear();
@@ -177,7 +219,14 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
 
         if (expDoc.contains("researcher"))
         {
-            mResearcher = expDoc["researcher"];
+            mResearchers.push_back( expDoc["researcher"] );
+        }
+
+        if (expDoc.contains("researchers"))
+        {
+            auto researchers = expDoc["researchers"];
+            for (auto it = researchers.begin(); it != researchers.end(); ++it)
+                mResearchers.push_back(*it);
         }
 
         if (expDoc.contains("species"))
@@ -210,6 +259,11 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
             mFieldDesign = expDoc["field design"];
         }
 
+        if (expDoc.contains("treatment"))
+        {
+            mTreatments.push_back(expDoc["treatment"]);
+        }
+
         if (expDoc.contains("treatments"))
         {
             auto treatments = expDoc["treatments"];
@@ -222,6 +276,11 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
                 for (auto it = treatments.begin(); it != treatments.end(); ++it)
                     mTreatments.push_back(*it);
             }
+        }
+
+        if (expDoc.contains("comment"))
+        {
+            mComments.push_back(expDoc["comment"]);
         }
 
         if (expDoc.contains("comments"))
@@ -238,13 +297,53 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
             }
         }
 
-        if (expDoc.contains("planting date"))
-        { 
+        std::string month;
+        std::string day;
+        std::string year;
+
+        if (expDoc.contains("planting date (m/d/y)"))
+        {
+            std::string date = expDoc["planting date (m/d/y)"];
+            std::tie(month, day, year) = date_split(date);
         }
 
-        if (expDoc.contains("target harvest date"))
+        if (expDoc.contains("planting date (d/m/y)"))
         {
+            std::string date = expDoc["planting date (d/m/y)"];
+            std::tie(day, month, year) = date_split(date);
         }
+
+        if (expDoc.contains("planting date (y/m/d)"))
+        {
+            std::string date = expDoc["planting date (y/m/d)"];
+            std::tie(year, month, day) = date_split(date);
+        }
+
+        mPlantingDate = to_time_t(month, day, year);
+
+        month.clear();
+        day.clear();
+        year.clear();
+
+        if (expDoc.contains("target harvest date (m/d/y)"))
+        {
+            std::string date = expDoc["target harvest date (m/d/y)"];
+            std::tie(month, day, year) = date_split(date);
+        }
+
+        if (expDoc.contains("target harvest date (d/m/y)"))
+        {
+            std::string date = expDoc["target harvest date (d/m/y)"];
+            std::tie(day, month, year) = date_split(date);
+        }
+
+        if (expDoc.contains("target harvest date (y/m/d)"))
+        {
+            std::string date = expDoc["target harvest date (y/m/d)"];
+            std::tie(year, month, day) = date_split(date);
+        }
+        
+        mHarvestDate = to_time_t(month, day, year);
 
         mExperimentDoc = to_string(expDoc);
     }

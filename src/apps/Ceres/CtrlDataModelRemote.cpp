@@ -291,12 +291,28 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
     bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
 
     if (mSpecies.empty())
-        sendExperimentInfo(mExperimentTitle, mResearcher, mCultivar, mExperimentDoc);
+    {
+        if (mResearchers.empty())
+            sendExperimentInfo(mExperimentTitle, "", mCultivar, mExperimentDoc);
+        else
+            sendExperimentInfo(mExperimentTitle, mResearchers[0], mCultivar, mExperimentDoc);
+    }
     else
-        sendExperimentInfo(mExperimentTitle, mResearcher, mSpecies, mCultivar, mExperimentDoc);
+    {
+        if (mResearchers.empty())
+            sendExperimentInfo(mExperimentTitle, "", mSpecies, mCultivar, mExperimentDoc);
+        else
+            sendExperimentInfo(mExperimentTitle, mResearchers[0], mSpecies, mCultivar, mExperimentDoc);
+    }
 
     if (!mPrincipalInvestigator.empty())
         sendPrincipalInvestigator(mPrincipalInvestigator);
+
+    if (mResearchers.size() > 1)
+    {
+        for (int i = 1; i < mResearchers.size(); ++i)
+            sendResearcher(mResearchers[i]);
+    }
 
     if (!mConstructName.empty())
         sendConstructName(mConstructName);

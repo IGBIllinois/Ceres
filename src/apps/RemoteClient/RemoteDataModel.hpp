@@ -94,6 +94,7 @@ private slots:
         const std::string& species, const std::string& cultivar, const std::string& doc) override;
 
     void onPrincipalInvestigator(const std::string& pi) override;
+    void onResearcher(const std::string& researcher) override;
     void onConstructName(const std::string& name) override;
     void onEventNumber(const std::string& event_num) override;
     void onFieldDesign(const std::string& design) override;
@@ -144,7 +145,7 @@ private:
     // Experiment Info
     std::string  mExperimentTitle;
     std::string  mPrincipalInvestigator;
-    std::string  mResearcher;
+    std::vector<std::string>  mResearchers;
     std::string  mSpecies;
     std::string  mCultivar;
     std::string  mPermitInfo;

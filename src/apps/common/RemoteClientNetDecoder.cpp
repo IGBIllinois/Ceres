@@ -52,6 +52,13 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onPrincipalInvestigator(to_principal_investigator_1(packet));
         break;
     }
+    case ePacketType::RESEARCHER:
+    {
+        Researcher_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onResearcher(to_researcher_1(packet));
+        break;
+    }
     case ePacketType::CONSTRUCT_NAME:
     {
         ConstructName_1 packet;

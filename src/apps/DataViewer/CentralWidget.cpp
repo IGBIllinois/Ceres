@@ -359,6 +359,8 @@ void cCentralWidget::onCultivar(const std::string& cultivar)
 void cCentralWidget::onPrincipalInvestigator(const std::string& investigator)
 {}
 
+void cCentralWidget::onBeginResearcherList() {}
+void cCentralWidget::onEndOfResearcherList() {}
 void cCentralWidget::onResearcher(const std::string& researcher)
 {
     mpResearcher->setText(QString::fromStdString(researcher));

@@ -157,13 +157,14 @@ void cCtrlDataModelLocal::closeDataFile()
 
     mThread.mpController->disableDataRecording();
 
-    mSerializer.endTime(time(nullptr));
+    if (mSerializer)
+        mSerializer.endTime(time(nullptr));
     mSerializer.detach();
     mFile.close();
 
     mExperimentTitle.clear();
     mPrincipalInvestigator.clear();
-    mResearcher.clear();
+    mResearchers.clear();
     mSpecies.clear();
     mCultivar.clear();
     mPermitInfo.clear();
@@ -226,8 +227,13 @@ void cCtrlDataModelLocal::startExperiment()
         if (!mPrincipalInvestigator.empty())
             mSerializer.writePrincipalInvestigator(mPrincipalInvestigator);
 
-        if (!mResearcher.empty())
-            mSerializer.writeResearcher(mResearcher);
+        if (!mResearchers.empty())
+        {
+            if (mResearchers.size() == 1)
+                mSerializer.writeResearcher(mResearchers[0]);
+            else
+                mSerializer.writeResearchers(mResearchers);
+        }
 
         if (!mSpecies.empty())
             mSerializer.writeSpecies(mSpecies);

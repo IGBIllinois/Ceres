@@ -125,6 +125,32 @@ int encode_principal_investigator(const std::string& pi, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+std::string to_researcher_1(const Researcher_1& pckt)
+{
+    return pckt.researcher();
+}
+
+int encode_researcher(const std::string& researcher, net_buffer& buffer)
+{
+    Researcher_1 pckt;
+
+    pckt.set_researcher(researcher);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::RESEARCHER);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
 std::string to_construct_name_1(const ConstructName_1& pckt)
 {
     return pckt.construct_name();

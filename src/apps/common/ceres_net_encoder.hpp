@@ -29,6 +29,7 @@ public:
         const std::string& species, const std::string& cultivar, const std::string& doc);
 
     void sendPrincipalInvestigator(const std::string& pi);
+    void sendResearcher(const std::string& researcher);
     void sendConstructName(const std::string& name);
     void sendEventNumber(const std::string& event_num);
     void sendFieldDesign(const std::string& design);

@@ -50,6 +50,7 @@ enum class ePacketType : uint16_t
 	HARVEST_DATE,
 	COMMENT,
 	PERMIT_INFO,
+	RESEARCHER,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -80,6 +81,9 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
 
 std::string to_principal_investigator_1(const PrincipalInvestigator_1& pckt);
 int encode_principal_investigator(const std::string& pi, net_buffer& buffer);
+
+std::string to_researcher_1(const Researcher_1& pckt);
+int encode_researcher(const std::string& researcher, net_buffer& buffer);
 
 std::string to_construct_name_1(const ConstructName_1& pckt);
 int encode_construct_name(const std::string& name, net_buffer& buffer);

@@ -48,6 +48,11 @@ message PrincipalInvestigator_1
 	string pi = 1;
 }
 
+message Researcher_1
+{
+	string researcher = 1;
+}
+
 message ConstructName_1
 {
 	string construct_name = 1;

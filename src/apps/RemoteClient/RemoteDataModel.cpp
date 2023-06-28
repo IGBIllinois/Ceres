@@ -315,8 +315,13 @@ void cRemoteDataModel::onStartExperiment()
     mSerializer.writeBeginHeader();
     mSerializer.writeTitle(mExperimentTitle);
 
-    if (!mResearcher.empty())
-        mSerializer.writeResearcher(mResearcher);
+    if (!mResearchers.empty())
+    {
+        if (mResearchers.size() == 1)
+            mSerializer.writeResearcher(mResearchers[0]);
+        else
+            mSerializer.writeResearchers(mResearchers);
+    }
 
     if (!mSpecies.empty())
         mSerializer.writeSpecies(mSpecies);
@@ -435,7 +440,10 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
     const std::string& researcher, const std::string& cultivar, const std::string& doc)
 {
     mExperimentTitle = title;
-    mResearcher = researcher;
+
+    if (!researcher.empty())
+        mResearchers.push_back(researcher);
+
     mSpecies.clear();
     mCultivar = cultivar;
     mExperimentDoc = doc;
@@ -449,7 +457,10 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
     const std::string& cultivar, const std::string& doc)
 {
     mExperimentTitle = title;
-    mResearcher = researcher;
+
+    if (!researcher.empty())
+        mResearchers.push_back(researcher);
+
     mSpecies = species;
     mCultivar = cultivar;
     mExperimentDoc = doc;
@@ -461,6 +472,12 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
 void cRemoteDataModel::onPrincipalInvestigator(const std::string& pi)
 {
     mPrincipalInvestigator = pi;
+
+}
+
+void cRemoteDataModel::onResearcher(const std::string& researcher)
+{
+    mResearchers.push_back(researcher);
 
 }
 
@@ -681,7 +698,7 @@ void cRemoteDataModel::clearExperimentInfo()
 {
     mExperimentTitle.clear();
     mPrincipalInvestigator.clear();
-    mResearcher.clear();
+    mResearchers.clear();
     mSpecies.clear();
     mCultivar.clear();
     mPermitInfo.clear();
