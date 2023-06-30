@@ -43,6 +43,8 @@ signals:
 protected:
     void update() override;
 
+    hyperspectral::spatial_major_data<float> mBackground;
+
 private:
     std::unique_ptr<hyspex::cVNIR3000N> mCamera;
 

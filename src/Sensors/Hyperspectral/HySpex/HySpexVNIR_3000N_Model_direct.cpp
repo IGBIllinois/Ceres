@@ -74,6 +74,8 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
 
     mSpectralSize = mCamera->getSpectralSize();
     mSpatialSize = mCamera->getSpatialSize();
+    mBackground.resize(mSpatialSize, mSpectralSize);
+    mBackground = mCamera->getBackgroundMatrix();
 
     mMaxSpatialSize = mCamera->getMaxSpatialSize();
     mMaxSpectralSize = mCamera->getMaxSpectralSize();
@@ -86,6 +88,7 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
 
 bool cHySpexVNIR_3000N_Model_direct::startCommunications()
 {
+    mCamera->initAcquisition();
     return true;
 }
 

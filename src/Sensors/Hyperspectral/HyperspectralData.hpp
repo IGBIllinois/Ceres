@@ -353,10 +353,6 @@ namespace hyperspectral
 		view<T> wavelengths(std::size_t pixel_index) const;
 		span<T> wavelengths(std::size_t pixel_index);
 
-		void setColumn(std::size_t c, view<T> data);
-		void setColumn(std::size_t c, const std::vector<T>& data);
-		void setColumn(std::size_t c, const std::array<T, NUM_PIXELS>& data);
-
 		const value_type& get(std::size_t pixel_index, std::size_t wavelength_index) const;
 		void set(std::size_t pixel_index, std::size_t wavelength_index, const value_type& v);
 
@@ -389,7 +385,7 @@ namespace hyperspectral
 	template<typename T>
 	std::vector<T> to_vector(const span<T>& s);
 
-} // End namespace ouster
+} // End namespace hyperspectral
 
 
 /******************************************************************************
@@ -526,7 +522,6 @@ inline hyperspectral::view<T> hyperspectral::spectral_major_data<T>::pixels(std:
 {
 	assert(wavelength_index < mNumWavelengths);
 	return view<T>(&mData[wavelength_index], &mData[(mNumPixels - 1) * mNumWavelengths + wavelength_index], mNumWavelengths);
-//	return view<T>(&mData[wavelength_index * mNumWavelengths], &mData[(wavelength_index + 1) * mNumWavelengths - 1], 1);
 }
 
 template<typename T>
@@ -534,7 +529,6 @@ inline hyperspectral::span<T> hyperspectral::spectral_major_data<T>::pixels(std:
 {
 	assert(wavelength_index < mNumWavelengths);
 	return span<T>(&mData[wavelength_index], &mData[(mNumPixels - 1) * mNumWavelengths + wavelength_index], mNumWavelengths);
-//	return span<T>(&mData[wavelength_index * mNumWavelengths], &mData[(wavelength_index + 1) * mNumWavelengths - 1], 1);
 }
 
 template<typename T>
@@ -542,7 +536,6 @@ inline hyperspectral::view<T> hyperspectral::spectral_major_data<T>::wavelengths
 {
 	assert(pixel_index < mNumPixels);
 	return view<T>(&mData[pixel_index * mNumWavelengths], &mData[(pixel_index + 1) * mNumWavelengths - 1], 1);
-//	return view<T>(&mData[pixel_index], &mData[(mNumPixels - 1) * mNumWavelengths + pixel_index], mNumWavelengths);
 }
 
 template<typename T>
@@ -550,7 +543,6 @@ inline hyperspectral::span<T> hyperspectral::spectral_major_data<T>::wavelengths
 {
 	assert(pixel_index < mNumPixels);
 	return span<T>(&mData[pixel_index * mNumWavelengths], &mData[(pixel_index + 1) * mNumWavelengths - 1], 1);
-	//	return span<T>(&mData[pixel_index], &mData[(mNumPixels - 1) * mNumWavelengths + pixel_index], mNumWavelengths);
 }
 
 template<typename T>
@@ -650,7 +642,6 @@ inline hyperspectral::view<T> hyperspectral::spatial_major_data<T>::pixels(std::
 {
 	assert(wavelength_index < mNumWavelengths);
 	return view<T>(&mData[wavelength_index * mNumPixels], &mData[(wavelength_index + 1) * mNumPixels - 1], 1);
-//	return view<T>(&mData[wavelength_index], &mData[(mNumWavelengths - 1) * mNumPixels + wavelength_index], mNumPixels);
 }
 
 template<typename T>
@@ -658,7 +649,6 @@ inline hyperspectral::span<T> hyperspectral::spatial_major_data<T>::pixels(std::
 {
 	assert(wavelength_index < mNumWavelengths);
 	return span<T>(&mData[wavelength_index * mNumPixels], &mData[(wavelength_index + 1) * mNumPixels - 1], 1);
-//	return span<T>(&mData[wavelength_index], &mData[(mNumWavelengths - 1) * mNumPixels + wavelength_index], mNumPixels);
 }
 
 template<typename T>
@@ -666,7 +656,6 @@ inline hyperspectral::view<T> hyperspectral::spatial_major_data<T>::wavelengths(
 {
 	assert(pixel_index < mNumPixels);
 	return view<T>(&mData[pixel_index], &mData[(mNumWavelengths - 1) * mNumPixels + pixel_index], mNumPixels);
-//	return view<T>(&mData[pixel_index * mNumPixels], &mData[(pixel_index + 1) * mNumPixels - 1], 1);
 }
 
 template<typename T>
@@ -674,7 +663,6 @@ inline hyperspectral::span<T> hyperspectral::spatial_major_data<T>::wavelengths(
 {
 	assert(pixel_index < mNumPixels);
 	return span<T>(&mData[pixel_index], &mData[(mNumWavelengths - 1) * mNumPixels + pixel_index], mNumPixels);
-//	return span<T>(&mData[pixel_index * mNumPixels], &mData[(pixel_index + 1) * mNumPixels - 1], 1);
 }
 
 template<typename T>
@@ -762,7 +750,6 @@ inline hyperspectral::view<T>
 {
 	assert(wavelength_index < NUM_WAVELENGTHS);
 	return view<T>(&mData[wavelength_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + wavelength_index], NUM_WAVELENGTHS);
-//	return view(&mData[wavelength_index * NUM_WAVELENGTHS], &mData[(wavelength_index + 1) * NUM_WAVELENGTHS - 1], 1);
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
@@ -771,7 +758,6 @@ inline hyperspectral::span<T>
 {
 	assert(wavelength_index < NUM_WAVELENGTHS);
 	return span<T>(&mData[wavelength_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + wavelength_index], NUM_WAVELENGTHS);
-//	return span<T>(&mData[wavelength_index * NUM_WAVELENGTHS], &mData[(wavelength_index + 1) * NUM_WAVELENGTHS - 1], 1);;
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
@@ -780,7 +766,6 @@ hyperspectral::spectral_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::wavele
 {
 	assert(pixel_index < NUM_PIXELS);
 	return view<T>(&mData[pixel_index * NUM_WAVELENGTHS], &mData[(pixel_index + 1) * NUM_WAVELENGTHS - 1], 1);
-//	return view<T>(&mData[pixel_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + pixel_index], NUM_WAVELENGTHS);
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
@@ -789,7 +774,6 @@ inline hyperspectral::span<T>
 {
 	assert(pixel_index < NUM_PIXELS);
 	return span<T>(&mData[pixel_index * NUM_WAVELENGTHS], &mData[(pixel_index + 1) * NUM_WAVELENGTHS - 1], 1);
-//	return span<T>(&mData[pixel_index], &mData[(NUM_PIXELS - 1) * NUM_WAVELENGTHS + pixel_index], NUM_WAVELENGTHS);
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
@@ -883,14 +867,16 @@ template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
 inline hyperspectral::view<T>
 	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::pixels(std::size_t wavelength_index) const
 {
-	return view<T>(&mData[wavelength_index], &mData[(NUM_WAVELENGTHS - 1) * NUM_PIXELS + wavelength_index], NUM_PIXELS);
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	return view<T>(&mData[wavelength_index * NUM_PIXELS], &mData[(wavelength_index + 1) * NUM_PIXELS - 1], 1);
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
 inline hyperspectral::span<T>
 	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::pixels(std::size_t wavelength_index)
 {
-	return span<T>(&mData[wavelength_index], &mData[(NUM_WAVELENGTHS - 1) * NUM_PIXELS + wavelength_index], NUM_PIXELS);
+	assert(wavelength_index < NUM_WAVELENGTHS);
+	return span<T>(&mData[wavelength_index * NUM_PIXELS], &mData[(wavelength_index + 1) * NUM_PIXELS - 1], 1);
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
@@ -898,7 +884,7 @@ inline hyperspectral::view<T>
 	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::wavelengths(std::size_t pixel_index) const
 {
 	assert(pixel_index < NUM_PIXELS);
-	return view<T>(&mData[pixel_index * NUM_PIXELS], &mData[(pixel_index + 1) * NUM_PIXELS - 1], 1);
+	return view<T>(&mData[pixel_index], &mData[(NUM_WAVELENGTHS - 1) * NUM_PIXELS + pixel_index], NUM_PIXELS);
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
@@ -906,46 +892,7 @@ inline hyperspectral::span<T>
 	hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::wavelengths(std::size_t pixel_index)
 {
 	assert(pixel_index < NUM_PIXELS);
-	return span<T>(&mData[pixel_index * NUM_PIXELS], &mData[(pixel_index + 1) * NUM_PIXELS - 1], 1);
-}
-
-template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
-void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::setColumn(std::size_t c, view<T> data)
-{
-	assert(c < NUM_WAVELENGTHS);
-	assert(data.size() == NUM_PIXELS);
-
-	std::size_t n = c * NUM_PIXELS;
-	for (std::size_t r = 0; r < NUM_PIXELS; ++r)
-	{
-		mData[n++] = data[r];
-	}
-}
-
-template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
-void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::setColumn(std::size_t c, const std::vector<T>& data)
-{
-	assert(c < NUM_WAVELENGTHS);
-	assert(data.size() == NUM_PIXELS);
-
-	std::size_t n = c * NUM_PIXELS;
-	for (std::size_t r = 0; r < NUM_PIXELS; ++r)
-	{
-		mData[n++] = data[r];
-	}
-}
-
-template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
-void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGTHS>::setColumn(std::size_t c, const std::array<T, NUM_PIXELS>& data)
-{
-	assert(c < NUM_WAVELENGTHS);
-	assert(data.size() == NUM_PIXELS);
-
-	std::size_t n = c * NUM_PIXELS;
-	for (std::size_t r = 0; r < NUM_PIXELS; ++r)
-	{
-		mData[n++] = data[r];
-	}
+	return span<T>(&mData[pixel_index], &mData[(NUM_WAVELENGTHS - 1) * NUM_PIXELS + pixel_index], NUM_PIXELS);
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
@@ -964,7 +911,7 @@ inline void hyperspectral::spatial_major_data_fixed<T, NUM_PIXELS, NUM_WAVELENGT
 {
 	assert(wavelength_index < NUM_WAVELENGTHS);
 	assert(pixel_index < NUM_PIXELS);
-	mData[pixel_index + wavelength_index * NUM_WAVELENGTHS] = v;
+	mData[pixel_index + wavelength_index * NUM_PIXELS] = v;
 }
 
 template<typename T, std::size_t NUM_PIXELS, std::size_t NUM_WAVELENGTHS>
