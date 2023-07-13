@@ -23,7 +23,7 @@ QT_END_NAMESPACE
 
 // Forward Declarations
 class cCeresSplashScreen;
-class cLogWidget;
+class cRemoteClientCentalWindow;
 
 
 namespace Ui 
@@ -64,7 +64,7 @@ private:
 
     cCeresSplashScreen* mpSplashScreen;
 
-    cLogWidget* mpLogWindow;
+    cRemoteClientCentalWindow* mpCentralWindow;
 
     QMenu* mpFileMenu;
 

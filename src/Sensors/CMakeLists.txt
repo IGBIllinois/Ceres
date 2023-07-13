@@ -39,12 +39,19 @@ PRIVATE
     SensorPropertyPage.cpp
     SensorController.hpp
     SensorController.cpp
-	
+
 #
 # Abstract Base Class for all Sensor Models
 #
     SensorModel.hpp
     SensorModel.cpp
+
+#
+# Base Class for all Sensor Status Views
+# A status view is a tab in the Remote Client
+#
+    SensorStatusView.hpp
+    SensorStatusView.cpp
 	
 #
 # Factory for creating the different sensor models/views

@@ -11,6 +11,7 @@ class cSensorController;
 
 // Qt Forward Declaration
 //QT_BEGIN_NAMESPACE
+class QWidget;
 class QDockWidget;
 class QStatusBar;
 class QToolBar;
@@ -25,34 +26,35 @@ struct sSensorWidgets
 	QToolBar*				pToolBar = nullptr;
 	cSensorPropertyPage*	pPropertyPage = nullptr;
 	cSensorController*		pController = nullptr;
+	QWidget*				pRemoteStatusView = nullptr;
 
 	sSensorWidgets() = default;
 
 	sSensorWidgets(cSensorModel* model)
 		:
 		pModel(model), pDockableView(nullptr), pStatusBar(nullptr), pToolBar(nullptr),
-		pPropertyPage(nullptr), pController(nullptr)
+		pPropertyPage(nullptr), pController(nullptr), pRemoteStatusView(nullptr)
 	{}
 
 	sSensorWidgets(cSensorModel* model, QDockWidget* view, cSensorPropertyPage* properties)
 		:
 		pModel(model), pDockableView(view), pStatusBar(nullptr), pToolBar(nullptr),
-		pPropertyPage(properties), pController(nullptr)
+		pPropertyPage(properties), pController(nullptr), pRemoteStatusView(nullptr)
 	{}
 
 	sSensorWidgets(cSensorModel* model, QDockWidget* view, 
 		QStatusBar* status = nullptr, QToolBar* toolbar = nullptr,
 		cSensorPropertyPage* properties = nullptr, 
-		cSensorController* controller = nullptr)
+		cSensorController* controller = nullptr, QWidget* remoteStatusView = nullptr)
 	:
 		pModel(model), pDockableView(view), pStatusBar(status), pToolBar(toolbar),
-		pPropertyPage(properties), pController(controller)
+		pPropertyPage(properties), pController(controller), pRemoteStatusView(remoteStatusView)
 	{}
 
 	sSensorWidgets(cSensorModel* model, cSensorController* controller)
 		:
 		pModel(model), pDockableView(nullptr), pStatusBar(nullptr), pToolBar(nullptr),
-		pPropertyPage(nullptr), pController(controller)
+		pPropertyPage(nullptr), pController(controller), pRemoteStatusView(nullptr)
 	{}
 
 	operator bool() const { return static_cast<bool>(pModel); }

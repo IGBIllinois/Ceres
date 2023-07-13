@@ -4,6 +4,7 @@
 #include "SsnxModel_net.hpp"
 #include "SsnxModel_direct.hpp"
 #include "SsnxView.hpp"
+#include "SsnxStatusView.hpp"
 
 #include <stdexcept>
 
@@ -29,7 +30,25 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
 
     if (no_visualization)
     {
-        return sSensorWidgets(pModel);
+        auto widgets = sSensorWidgets(pModel);
+        if (protocol == "direct")
+        {
+            auto* pView = new cSsnxStatusView();
+            pView->createWidgets();
+            pView->doLayout();
+
+            QObject::connect(pModel, &cSsnxModel::sensorStatusChanging, pView, &cSsnxStatusView::onSensorStatusChange);
+            QObject::connect(pModel, &cSsnxModel::pvtCartesianStateChanged, pView, &cSsnxStatusView::onPvtCartesianStateChange);
+            QObject::connect(pModel, &cSsnxModel::pvtGeodeticStateChanged, pView, &cSsnxStatusView::onPvtGeodeticStateChange);
+            QObject::connect(pModel, &cSsnxModel::posCovGeodeticStateChanged, pView, &cSsnxStatusView::onPosCovGeodeticStateChange);
+            QObject::connect(pModel, &cSsnxModel::velCovGeodeticStateChanged, pView, &cSsnxStatusView::onVelCovGeodeticStateChange);
+            QObject::connect(pModel, &cSsnxModel::posProjectedStateChanged, pView, &cSsnxStatusView::onPosProjectedStateChange);
+            QObject::connect(pModel, &cSsnxModel::receiverTimeStateChanged, pView, &cSsnxStatusView::onReceiverTimeStateChange);
+            QObject::connect(pModel, &cSsnxModel::rtcmDatumStateChanged, pView, &cSsnxStatusView::onRtcmDatumStateChange);
+
+            widgets.pRemoteStatusView = pView;
+        }
+        return widgets;
     }
 
     auto* dockWidget = new QDockWidget();

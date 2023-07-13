@@ -27,6 +27,8 @@ set(SEPTENTRIO_SOURCE_FILES
     SsnxModel.cpp
     SsnxView.hpp
     SsnxView.cpp
+    SsnxStatusView.hpp
+    SsnxStatusView.cpp
 
     SsnxFactory.hpp
     SsnxFactory.cpp

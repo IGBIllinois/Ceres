@@ -3,7 +3,7 @@
 #include "ui_MainWindow.h"
 
 #include "CeresSplashScreen.hpp"
-#include "LogWidget.hpp"
+#include "RemoteClientCentralWindow.hpp"
 
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
@@ -79,7 +79,7 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     mpFileMenu(nullptr),
     mpHelpMenu(nullptr),
     mpUI(new Ui::MainWindow),
-    mpLogWindow(nullptr)
+    mpCentralWindow(nullptr)
 {
     mpUI->setupUi(this);
 
@@ -91,14 +91,14 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     auto data_path = cwd / "Data";
     mMainModel.setDefaultDataPath(data_path.string());
 
-    mpLogWindow = new cLogWidget(this);
+    mpCentralWindow = new cRemoteClientCentalWindow(this);
 
     QObject::connect(&mMainModel, &cDataModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
     QObject::connect(&mMainModel, &cDataModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
     QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
     QObject::connect(&mMainModel, &cDataModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
 
-    setCentralWidget(mpLogWindow);
+    setCentralWidget(mpCentralWindow);
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
     mpSplashScreen = nullptr;
 
     qInfo() << "Single shot timer to start data acquisition.";
-    QTimer::singleShot(1000, this, &cRemoteClientWindow::startDataAcquisitionSystem);
+    QTimer::singleShot(100, this, &cRemoteClientWindow::startDataAcquisitionSystem);
 }
 
 void cRemoteClientWindow::startDataAcquisitionSystem()
@@ -369,6 +369,12 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         if (widgets.pController)
         {
             mMainModel.addSensorController(widgets.pController);
+        }
+
+        if (widgets.pRemoteStatusView)
+        {
+            mpCentralWindow->addTab(widgets.pRemoteStatusView, widgets.pRemoteStatusView->windowTitle());
+            QObject::connect(widgets.pModel, &cSensorModel::sensorNameChanging, mpCentralWindow, &cRemoteClientCentalWindow::updateSensorName);
         }
     }
 }

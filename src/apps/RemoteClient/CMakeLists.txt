@@ -67,6 +67,8 @@ PRIVATE
 
     RemoteClientWindow.hpp
     RemoteClientWindow.cpp
+    RemoteClientCentralWindow.hpp
+    RemoteClientCentralWindow.cpp
 
     CeresRemoteClient.cpp
 )

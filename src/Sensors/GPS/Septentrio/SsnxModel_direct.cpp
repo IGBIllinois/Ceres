@@ -75,6 +75,8 @@ bool cSsnxModel_direct::startCommunications()
     forcePromptRequest();
 //    sendPromptRequest();
 
+    setStatus(sensor::eStatus::CONNECTING);
+
     return true;
 }
 
@@ -120,7 +122,7 @@ void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDes
     msg += QString::fromStdString(connectionDescriptor);
     emit statusMessage(msg);
 
-    setStatus(sensor::eStatus::CONNECTING);
+    setStatus(sensor::eStatus::CONNECTED);
 }
 
 void cSsnxModel_direct::newCommandReply(const std::string& reply, bool error)
@@ -187,6 +189,10 @@ int cSsnxModel_direct::sendOutgoingData(const std::string& data)
 
 void cSsnxModel_direct::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t& pvt)
 {
+    mPvtCartesianValid = pvt.dataValid;
+    if (mPvtCartesianValid.HasChanged())
+        emit pvtCartesianStateChanged(mPvtCartesianValid);
+
     mCartesianPVT.dataValid = pvt.dataValid;
     mCartesianPVT.timestamp_s = pvt.timestamp_s;
 
@@ -256,6 +262,10 @@ void cSsnxModel_direct::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t& pvt)
 
 void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
 {
+    mPvtGeodeticValid = pvt.dataValid;
+    if (mPvtGeodeticValid.HasChanged())
+        emit pvtGeodeticStateChanged(mPvtGeodeticValid);
+
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
 
@@ -298,6 +308,10 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
 
 void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 {
+    mPosCovGeodeticValid = cov.dataValid;
+    if (mPosCovGeodeticValid.HasChanged())
+        emit posCovGeodeticStateChanged(mPosCovGeodeticValid);
+
     if (!cov.dataValid) return;
 
     if (mIsRecording && static_cast<bool>(mSerializer))
@@ -308,6 +322,10 @@ void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 
 void cSsnxModel_direct::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 {
+    mVelCovGeodeticValid = cov.dataValid;
+    if (mVelCovGeodeticValid.HasChanged())
+        emit velCovGeodeticStateChanged(mVelCovGeodeticValid);
+
     if (!cov.dataValid) return;
 
     if (mIsRecording && static_cast<bool>(mSerializer))
@@ -318,6 +336,10 @@ void cSsnxModel_direct::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 
 void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t& pvt)
 {
+    mPosProjectedValid = pvt.dataValid;
+    if (mPosProjectedValid.HasChanged())
+        emit posProjectedStateChanged(mPosProjectedValid);
+
     mPosPojected.dataValid = pvt.dataValid;
     mPosPojected.timestamp_s = pvt.timestamp_s;
 
@@ -349,6 +371,10 @@ void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t& pvt)
 
 void cSsnxModel_direct::receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt)
 {
+    mReceiverTimeValid = pvt.dataValid;
+    if (mReceiverTimeValid.HasChanged())
+        emit receiverTimeStateChanged(mReceiverTimeValid);
+
     mTimeValid = pvt.dataValid;
     mRxTimestamp_s = pvt.timestamp_s;
 
@@ -372,6 +398,10 @@ void cSsnxModel_direct::receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt)
 
 void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
 {
+    mRtcmDatumValid = rtcm.dataValid;
+    if (mRtcmDatumValid.HasChanged())
+        emit rtcmDatumStateChanged(mRtcmDatumValid);
+
     if (!rtcm.dataValid) return;
 
     if (mIsRecording && static_cast<bool>(mSerializer))

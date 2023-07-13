@@ -32,6 +32,15 @@ public:
     void disableDataRecording() override;
 
 signals:
+    void pvtCartesianStateChanged(bool valid);
+    void pvtGeodeticStateChanged(bool valid);
+    void posCovGeodeticStateChanged(bool valid);
+    void velCovGeodeticStateChanged(bool valid);
+    void posProjectedStateChanged(bool valid);
+    void receiverTimeStateChanged(bool valid);
+    void rtcmDatumStateChanged(bool valid);
+
+signals:
     void updateGeodeticPVT(double timestamp_s,
         double lat_rad, double lng_rad, double height_m,
         double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,

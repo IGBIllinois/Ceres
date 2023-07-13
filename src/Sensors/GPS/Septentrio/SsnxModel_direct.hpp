@@ -2,6 +2,7 @@
 #pragma once
 
 #include "SsnxModel.hpp"
+#include "Utilities.hpp"
 
 #include <QObject>
 #include <QtSerialPort/QSerialPort>
@@ -93,5 +94,13 @@ private:
     };
 
     sPosPojected_t mPosPojected;
+
+    edge_detect<bool> mPvtCartesianValid;
+    edge_detect<bool> mPvtGeodeticValid;
+    edge_detect<bool> mPosCovGeodeticValid;
+    edge_detect<bool> mVelCovGeodeticValid;
+    edge_detect<bool> mPosProjectedValid;
+    edge_detect<bool> mReceiverTimeValid;
+    edge_detect<bool> mRtcmDatumValid;
 };
 
