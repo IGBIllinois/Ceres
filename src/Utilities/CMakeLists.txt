@@ -13,6 +13,7 @@ PUBLIC
 	Utilities.hpp
 	ColorGradient.hpp
 	Timers.hpp
+	QIndicator.hpp
 	
 	net_buffer.hpp
 	packet_utils.hpp
@@ -24,12 +25,15 @@ PRIVATE
 
 	ColorGradient.cpp
 	Timers.cpp
+	QIndicator.cpp
 	
 	net_buffer.cpp
 	packet_utils.cpp
 	net_packet_encoder.cpp
 	net_packet_decoder.cpp
 )
+
+target_link_libraries(Utilities PRIVATE ${Qt}::Widgets)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
