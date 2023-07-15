@@ -42,6 +42,11 @@ cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
     }
 }
 
+void cAxisCommunicationsModel_F44::updateViews()
+{
+
+}
+
 bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 {
     rgb::sImageSize_t max_image_size;

@@ -48,8 +48,6 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
 
     std::string protocol = sensorInfo["protocol"];
 
-    cHySpexVNIR_3000N_Model m;
-
     if (protocol == "direct")
     {
         if (!detect_cameras(sensorInfo))

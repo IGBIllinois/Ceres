@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../Sensors/SensorStatusView.hpp"
+#include "QIndicator.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -32,11 +33,11 @@ public slots:
 	void onRtcmDatumStateChange(bool valid);
 
 private:
-	QCheckBox* mpPvtCartesianValid = nullptr;
-	QCheckBox* mpPvtGeodeticValid = nullptr;
-	QCheckBox* mpPosCovGeodeticValid = nullptr;
-	QCheckBox* mpVelCovGeodeticValid = nullptr;
-	QCheckBox* mpPosProjectedValid = nullptr;
-	QCheckBox* mpReceiverTimeValid = nullptr;
-	QCheckBox* mpRtcmDatumValid = nullptr;
+	QIndicator* mpPvtCartesianValid = nullptr;
+	QIndicator* mpPvtGeodeticValid = nullptr;
+	QIndicator* mpPosCovGeodeticValid = nullptr;
+	QIndicator* mpVelCovGeodeticValid = nullptr;
+	QIndicator* mpPosProjectedValid = nullptr;
+	QIndicator* mpReceiverTimeValid = nullptr;
+	QIndicator* mpRtcmDatumValid = nullptr;
 };

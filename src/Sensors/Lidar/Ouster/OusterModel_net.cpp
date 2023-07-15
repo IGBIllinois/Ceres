@@ -22,7 +22,8 @@ cOusterModel_net::cOusterModel_net(QObject* parent)
 {
     mConnected = false;
     mPauseCommunications = false;
-    mFrameCounter = 0;
+    mImuDataCounter = 0;
+    mLidarDataCounter = 0;
     mImuPort = 0;
     mLidarPort = 0;
     mUseIpv6 = false;
@@ -50,6 +51,11 @@ cOusterModel_net::~cOusterModel_net()
 uint16_t cOusterModel_net::data_class_id() const
 {
     return mSerializer.classID();
+}
+
+void cOusterModel_net::updateViews()
+{
+
 }
 
 bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
@@ -486,7 +492,12 @@ void cOusterModel_net::onNewData(const ouster::imu_data_t& data)
     }
 
     mLastImuData = data;
-    emit updateImuData();
+
+    if (--mImuDataCounter < 1)
+    {
+        mImuDataCounter = 50;
+        emit updateImuData();
+    }
 }
 
 void cOusterModel_net::onNewData(uint16_t frameID, const cOusterLidarData& data)
@@ -499,9 +510,9 @@ void cOusterModel_net::onNewData(uint16_t frameID, const cOusterLidarData& data)
     mLastFrameID = frameID;
     mLastLidarData = data;
 
-    if (--mFrameCounter < 1)
+    if (--mLidarDataCounter < 1)
     {
-        mFrameCounter = 3;
+        mLidarDataCounter = 3;
         emit updateLidarData();
     }
 }
@@ -522,6 +533,9 @@ void cOusterModel_net::retrieveConfigParam()
     } while (!configParameters.has_value());
 
     mConfigParameters = configParameters.value();
+
+    emit updateLidarMode();
+    emit updateAzimuthWindow();
 }
 
 void cOusterModel_net::retrieveSensorInfo()
@@ -716,6 +730,8 @@ void cOusterModel_net::retrieveLidarMode()
     } while (!lidarMode.has_value());
 
     mConfigParameters.lidar_mode = lidarMode.value();
+
+    emit updateLidarMode();
 }
 
 void cOusterModel_net::retrieveAzimuthWindow()

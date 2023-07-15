@@ -23,6 +23,11 @@ uint16_t cWeatherDataModel_Http_Wind::data_class_id() const
 	return mSerializer.classID();
 }
 
+void cWeatherDataModel_Http_Wind::updateViews()
+{
+
+}
+
 bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 {
 	bool valid_cfg = false;

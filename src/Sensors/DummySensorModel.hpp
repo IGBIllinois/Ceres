@@ -27,6 +27,11 @@ public:
      */
     const char* descriptor() const override;
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     void enableDataRecording(cBlockDataFileWriter& file) override;

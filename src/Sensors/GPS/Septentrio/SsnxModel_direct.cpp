@@ -20,6 +20,19 @@ cSsnxModel_direct::~cSsnxModel_direct()
 {
 }
 
+void cSsnxModel_direct::updateViews()
+{
+    emit sensorStatusChanging(q_name(), status());
+
+    emit pvtCartesianStateChanged(mPvtCartesianValid);
+    emit pvtGeodeticStateChanged(mPvtGeodeticValid);
+    emit posCovGeodeticStateChanged(mPosCovGeodeticValid);
+    emit velCovGeodeticStateChanged(mVelCovGeodeticValid);
+    emit posProjectedStateChanged(mPosProjectedValid);
+    emit receiverTimeStateChanged(mReceiverTimeValid);
+    emit rtcmDatumStateChanged(mRtcmDatumValid);
+}
+
 bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
 {
     emit statusMessage("Connecting to SSNX GPS receiver...");

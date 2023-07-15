@@ -61,6 +61,8 @@ set(OUSTER_SOURCE_FILES
 #
     OusterView.hpp
     OusterView.cpp
+    OusterStatusView.hpp
+    OusterStatusView.cpp
     OusterModel.hpp
     OusterModel.cpp
     OusterFactory.cpp

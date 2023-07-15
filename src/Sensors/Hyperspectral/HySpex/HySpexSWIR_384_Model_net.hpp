@@ -13,6 +13,11 @@ public:
     cHySpexSWIR_384_Model_net(QObject* parent = nullptr);
     virtual ~cHySpexSWIR_384_Model_net() = default;
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     void writeDataHeader() override;

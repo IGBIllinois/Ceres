@@ -18,6 +18,11 @@ public:
     explicit cSsnxModel_direct(QObject* parent = nullptr);
     ~cSsnxModel_direct();
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     void writeDataHeader() override;

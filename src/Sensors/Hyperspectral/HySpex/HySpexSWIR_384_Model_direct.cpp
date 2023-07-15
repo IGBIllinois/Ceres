@@ -15,6 +15,10 @@ cHySpexSWIR_384_Model_direct::cHySpexSWIR_384_Model_direct(std::unique_ptr<hyspe
 
 cHySpexSWIR_384_Model_direct::~cHySpexSWIR_384_Model_direct() {}
 
+void cHySpexSWIR_384_Model_direct::updateViews()
+{
+}
+
 bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
 {
     try

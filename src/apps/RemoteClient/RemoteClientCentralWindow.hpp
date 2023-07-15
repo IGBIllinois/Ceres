@@ -21,6 +21,7 @@ public:
  */
 public slots:
     void updateSensorName(QString old_name, QString new_name);
+    void logMessage(uint8_t type, QString device, QString msg);
 
 private:
     cLogWidget* mpLogWindow;

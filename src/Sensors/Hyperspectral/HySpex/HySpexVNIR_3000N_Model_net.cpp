@@ -11,6 +11,11 @@ cHySpexVNIR_3000N_Model_net::cHySpexVNIR_3000N_Model_net(QObject* parent)
     mConnected = false;
 }
 
+void cHySpexVNIR_3000N_Model_net::updateViews()
+{
+
+}
+
 bool cHySpexVNIR_3000N_Model_net::configure(const nlohmann::json& jsonCfg)
 {
     try

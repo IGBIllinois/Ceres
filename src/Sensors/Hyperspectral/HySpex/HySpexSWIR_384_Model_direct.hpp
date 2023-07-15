@@ -22,6 +22,11 @@ public:
     cHySpexSWIR_384_Model_direct(std::unique_ptr<hyspex::cSWIR384> camera, QObject* parent = nullptr);
     virtual ~cHySpexSWIR_384_Model_direct();
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     void writeDataHeader() override;

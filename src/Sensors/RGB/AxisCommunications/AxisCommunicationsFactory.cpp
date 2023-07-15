@@ -5,6 +5,7 @@
 
 #include "AxisCommunicationsModel_F44.hpp"
 #include "AxisCommunicationsView_F44.hpp"
+#include "AxisCommunicationsStatusView.hpp"
 #include "AxisCommunicationsController.hpp"
 #include "AxisCommunicationsPropertyPage.hpp"
 #include "AxisCommunicationsPropertyPage_Remote.hpp"
@@ -37,8 +38,12 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
     {
         if (protocol == "net")
         {
+            auto* pView = new cAxisCommunicationsStatusView();
+            pView->createWidgets();
+            pView->doLayout();
+
             auto* pController = new cAxisCommunicationsController_F44(pModel);
-            return sSensorWidgets(pModel, pController);
+            return sSensorWidgets(pModel, pController, pView);
         }
 
         return sSensorWidgets(pModel);

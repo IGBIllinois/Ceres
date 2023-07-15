@@ -6,6 +6,7 @@
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QLabel>
+#include <QGroupBox>
 #include <QGridLayout>
 #include <QFormLayout>
 
@@ -52,87 +53,76 @@ void cSsnxStatusView::createWidgets()
 {
 	cSensorStatusView::createWidgets();
 
-	mpPvtCartesianValid = new QCheckBox(this);
-	mpPvtCartesianValid->setCheckable(false);
-	mpPvtCartesianValid->setText("Cartesian Position/Velocity/Time Valid");
+	mpPvtCartesianValid = new QIndicator("Cartesian Position/Velocity/Time Valid", this);
+	mpPvtGeodeticValid  = new QIndicator("Geodetic Position/Velocity/Time Valid", this);
 
-	mpPvtGeodeticValid = new QCheckBox(this);
-	mpPvtGeodeticValid->setCheckable(false);
-	mpPvtGeodeticValid->setText("Geodetic Position/Velocity/Time Valid");
+	mpPosCovGeodeticValid = new QIndicator("Geodetic Position Covariance Matrix Valid", this);
+	mpVelCovGeodeticValid = new QIndicator("Geodetic Velocity Covariance Matrix Valid", this);
 
-	mpPosCovGeodeticValid = new QCheckBox(this);
-	mpPosCovGeodeticValid->setCheckable(false);
-	mpPosCovGeodeticValid->setText("Geodetic Position Covariance Matrix Valid");
+	mpPosProjectedValid = new QIndicator("Projected Position Valid", this);
+	mpReceiverTimeValid = new QIndicator("Receiver Time Valid", this);
 
-	mpVelCovGeodeticValid = new QCheckBox(this);
-	mpVelCovGeodeticValid->setCheckable(false);
-	mpVelCovGeodeticValid->setText("Geodetic Velocity Covariance Matrix Valid");
-
-	mpPosProjectedValid = new QCheckBox(this);
-	mpPosProjectedValid->setCheckable(false);
-	mpPosProjectedValid->setText("Projected Position Valid");
-
-	mpReceiverTimeValid = new QCheckBox(this);
-	mpReceiverTimeValid->setCheckable(false);
-	mpReceiverTimeValid->setText("Receiver Time Valid");
-
-	mpRtcmDatumValid = new QCheckBox(this);
-	mpRtcmDatumValid->setCheckable(false);
-	mpRtcmDatumValid->setText("RTCM Datum Valid");
+	mpRtcmDatumValid = new QIndicator("RTCM Datum Valid", this);
 }
 
 void cSsnxStatusView::doLayout()
 {
 	auto* mainLayout = new QVBoxLayout(this);
 
-	auto* statusLayout = new QHBoxLayout(this);
-	statusLayout->addWidget(mpSensorLabel);
-	statusLayout->addWidget(mpSensorStatus);
-	mainLayout->addLayout(statusLayout);
+	mainLayout->addWidget(getSensorStatusBox());
 
-	mainLayout->addWidget(mpPvtCartesianValid);
-	mainLayout->addWidget(mpPvtGeodeticValid);
-	mainLayout->addWidget(mpPosCovGeodeticValid);
-	mainLayout->addWidget(mpVelCovGeodeticValid);
-	mainLayout->addWidget(mpPosProjectedValid);
-	mainLayout->addWidget(mpReceiverTimeValid);
-	mainLayout->addWidget(mpRtcmDatumValid);
+	QGroupBox* packetBox = new QGroupBox("Received Packets");
+
+	auto* packetInfoLayout = new QGridLayout();
+	packetInfoLayout->addWidget(mpPvtCartesianValid, 0, 0);
+	packetInfoLayout->addWidget(mpPvtGeodeticValid, 0, 1);
+	packetInfoLayout->addWidget(mpPosCovGeodeticValid, 0, 2);
+	packetInfoLayout->addWidget(mpVelCovGeodeticValid, 0, 3);
+	packetInfoLayout->addWidget(mpPosProjectedValid, 1, 0);
+	packetInfoLayout->addWidget(mpReceiverTimeValid, 1, 1);
+	packetInfoLayout->addWidget(mpRtcmDatumValid, 1, 2);
+
+	packetBox->setLayout(packetInfoLayout);
+
+	mainLayout->addWidget(packetBox);
+
+	mainLayout->addStretch();
 
 	setLayout(mainLayout);
 }
 
 void cSsnxStatusView::onPvtCartesianStateChange(bool valid)
 {
-	mpPvtCartesianValid->setChecked(valid);
+	mpPvtCartesianValid->setState(valid);
 }
 
 void cSsnxStatusView::onPvtGeodeticStateChange(bool valid)
 {
-	mpPvtGeodeticValid->setChecked(valid);
+	mpPvtGeodeticValid->setState(valid);
 }
 
 void cSsnxStatusView::onPosCovGeodeticStateChange(bool valid)
 {
-	mpPosCovGeodeticValid->setChecked(valid);
+	mpPosCovGeodeticValid->setState(valid);
 }
 
 void cSsnxStatusView::onVelCovGeodeticStateChange(bool valid)
 {
-	mpVelCovGeodeticValid->setChecked(valid);
+	mpVelCovGeodeticValid->setState(valid);
 }
 
 void cSsnxStatusView::onPosProjectedStateChange(bool valid)
 {
-	mpPosProjectedValid->setChecked(valid);
+	mpPosProjectedValid->setState(valid);
 }
 
 void cSsnxStatusView::onReceiverTimeStateChange(bool valid)
 {
-	mpReceiverTimeValid->setChecked(valid);
+	mpReceiverTimeValid->setState(valid);
 }
 
 void cSsnxStatusView::onRtcmDatumStateChange(bool valid)
 {
-	mpRtcmDatumValid->setChecked(valid);
+	mpRtcmDatumValid->setState(valid);
 }
 

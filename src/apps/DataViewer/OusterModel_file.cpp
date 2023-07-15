@@ -10,6 +10,11 @@ cOusterModel_file::cOusterModel_file(QObject* parent)
 {
 }
 
+void cOusterModel_file::updateViews()
+{
+
+}
+
 void cOusterModel_file::onConfigParam(ouster::config_param_2_t data)
 {
     mConfigParameters = data;

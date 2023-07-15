@@ -7,6 +7,7 @@
 
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
+#include "SensorStatusView.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>
@@ -115,6 +116,72 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 {
     mpSplashScreen = pSplashScreen;
 
+/* Comment out for short/no splash screen! */
+    std::string cfgFileName = getCfgFilePath();
+    nlohmann::json configDoc;
+
+    qInfo() << "Loading configuration file " << cfgFileName.c_str() << "...";
+
+    if (!cfgFileName.empty())
+    {
+        std::ifstream in;
+        in.open(cfgFileName);
+
+        if (!in.is_open())
+        {
+            QString msg = "Could not open ";
+            msg += cfgFileName.c_str();
+            msg += " for reading!";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+
+        try
+        {
+            configDoc = nlohmann::json::parse(in, nullptr, true, true);
+        }
+        catch (const nlohmann::json::parse_error& e)
+        {
+            QString msg = "Parsing error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+        catch (const std::exception& e)
+        {
+            QString msg = "Unknown error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if (configDoc.contains("default data folder"))
+    {
+        auto folders = configDoc["default data folder"];
+#ifdef WIN32
+        if (folders.contains("windows"))
+        {
+            mMainModel.setDefaultDataPath(folders["windows"].get<std::string>());
+        }
+#endif
+    }
+/* Comment out for short/no splash screen! */
+
+
     createMainMenu();
     createSubMenusAndActions();
     createActions();
@@ -123,14 +190,49 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
     createStatusBar();
 
+/* Comment out for short/no splash screen! */
+    try
+    {
+        qInfo() << "Initializing sensors...";
+
+        onStatusUpdate("Initializing sensors...");
+        createSensorModelsAndViews(configDoc);
+
+        qInfo() << "Initializing TCP server...";
+
+        onStatusUpdate("Initializing TCP server...");
+        if (!initializeServer(configDoc))
+        {
+            QMessageBox mb(QMessageBox::Critical, "TCP Server Error", "Could not start the TCP server!");
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::string msg = "Error in ";
+        msg += cfgFileName;
+        msg += ": ";
+        msg += e.what();
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+        mb.exec();
+
+        exit(EXIT_FAILURE);
+    }
+    /* Comment out for short/no splash screen! */
+
     mpSplashScreen = nullptr;
 
     qInfo() << "Single shot timer to start data acquisition.";
-    QTimer::singleShot(100, this, &cRemoteClientWindow::startDataAcquisitionSystem);
+    QTimer::singleShot(1000, this, &cRemoteClientWindow::startDataAcquisitionSystem);
 }
 
 void cRemoteClientWindow::startDataAcquisitionSystem()
 {
+/* Uncomment for short/no splash screen! */
+/*
     std::string cfgFileName = getCfgFilePath();
     nlohmann::json configDoc;
 
@@ -224,6 +326,8 @@ void cRemoteClientWindow::startDataAcquisitionSystem()
 
         exit(EXIT_FAILURE);
     }
+*/
+/* Uncomment for short/no splash screen! */
 
     qInfo() << "Starting data acquisition thread....";
     mMainModel.startDataThread();
@@ -268,6 +372,9 @@ void cRemoteClientWindow::onErrorMessage(QString title, QString msg)
 void cRemoteClientWindow::onLogMessage(uint8_t type, QString device, QString msg)
 {
     mMainModel.sendLogMessage(type, device, msg);
+
+    if (mpCentralWindow)
+        mpCentralWindow->logMessage(type, device, msg);
 }
 
 //-----------------------------------------------------------------------------
@@ -375,6 +482,8 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         {
             mpCentralWindow->addTab(widgets.pRemoteStatusView, widgets.pRemoteStatusView->windowTitle());
             QObject::connect(widgets.pModel, &cSensorModel::sensorNameChanging, mpCentralWindow, &cRemoteClientCentalWindow::updateSensorName);
+
+            widgets.pModel->updateViews();
         }
     }
 }

@@ -49,6 +49,8 @@ set(AXIS_COMM_SOURCE_FILES
 	AxisCommunicationsModel_F44.cpp
 	AxisCommunicationsView.hpp
 	AxisCommunicationsView.cpp
+	AxisCommunicationsStatusView.hpp
+	AxisCommunicationsStatusView.cpp
 	AxisCommunicationsModel.hpp
 	AxisCommunicationsModel.cpp
 	AxisCamera.hpp

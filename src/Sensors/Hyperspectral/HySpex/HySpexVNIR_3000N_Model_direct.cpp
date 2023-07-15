@@ -16,6 +16,12 @@ cHySpexVNIR_3000N_Model_direct::cHySpexVNIR_3000N_Model_direct(std::unique_ptr<h
 
 cHySpexVNIR_3000N_Model_direct::~cHySpexVNIR_3000N_Model_direct() {}
 
+
+void cHySpexVNIR_3000N_Model_direct::updateViews()
+{
+
+}
+
 bool cHySpexVNIR_3000N_Model_direct::configure(const nlohmann::json& jsonCfg)
 {
     try

@@ -30,3 +30,9 @@ void cRemoteClientCentalWindow::updateSensorName(QString old_name, QString new_n
         }
     }
 }
+
+//-----------------------------------------------------------------------------
+void cRemoteClientCentalWindow::logMessage(uint8_t type, QString device, QString msg)
+{
+
+}

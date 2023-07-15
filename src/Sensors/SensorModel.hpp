@@ -80,6 +80,11 @@ public:
     sensor::eStatus status() const { return mStatus; };
 
     /*
+     * Emit all status messages to update all views
+     */
+    virtual void updateViews() = 0;
+
+    /*
      * Apply any configuration parameters to the sensor
      * model.
      */
@@ -138,6 +143,9 @@ signals:
     void sensorNameChanging(QString old_name, QString new_name);
 
 public:
+    /*
+     * Call by the data thread to process an incoming data
+     */
     virtual void update() = 0;
 
 protected:

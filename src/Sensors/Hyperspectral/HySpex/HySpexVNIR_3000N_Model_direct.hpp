@@ -25,6 +25,11 @@ public:
     cHySpexVNIR_3000N_Model_direct(std::unique_ptr<hyspex::cVNIR3000N> camera, QObject* parent = nullptr);
     virtual ~cHySpexVNIR_3000N_Model_direct();
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
     bool initialize() override;
 

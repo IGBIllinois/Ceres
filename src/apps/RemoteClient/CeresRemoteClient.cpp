@@ -2,6 +2,7 @@
 
 #include <QApplication>
 
+#include "CeresSplashScreen.hpp"
 #include "RemoteClientWindow.hpp"
 
 #include <fstream>
@@ -81,11 +82,17 @@ int main(int argc, char** argv)
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication app(argc, argv);
 
-    cCeresSplashScreen* pSplash = nullptr;
+    cCeresSplashScreen* pSplash = new cCeresSplashScreen();
+    pSplash->show();
 
     cRemoteClientWindow mainWin;
     mainWin.initialize(pSplash);
     mainWin.show();
+
+    pSplash->finish(&mainWin);
+
+    delete pSplash;
+    pSplash = nullptr;
 
     try
     {

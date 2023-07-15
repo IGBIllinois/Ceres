@@ -13,6 +13,11 @@ public:
     cHySpexVNIR_3000N_Model_net(QObject* parent = nullptr);
     virtual ~cHySpexVNIR_3000N_Model_net() = default;
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     void writeDataHeader() override;

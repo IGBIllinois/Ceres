@@ -3,10 +3,13 @@
 
 #include <QWidget>
 
+#include <memory>
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QLineEdit;
+class QGroupBox;
 QT_END_NAMESPACE
 
 // Forward Declaration
@@ -36,6 +39,10 @@ public slots:
 	void onSensorStatusChange(QString name, sensor::eStatus status);
 
 protected:
-	QLabel*		mpSensorLabel = nullptr;
-	QLineEdit*	mpSensorStatus = nullptr;
+	QGroupBox* getSensorStatusBox() const;
+
+private:
+	QLabel*	   mpSensorLabel = nullptr;
+	QLineEdit* mpSensorStatus = nullptr;
+	QGroupBox* mpSensorStatusBox = nullptr;
 };

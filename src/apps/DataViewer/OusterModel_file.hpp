@@ -17,6 +17,11 @@ public:
     cOusterModel_file(QObject* parent = nullptr);
     virtual ~cOusterModel_file() = default;
 
+	/*
+	 * Emit all status messages to update all views
+	 */
+	void updateViews() override;
+
 protected:
 	void onConfigParam(ouster::config_param_2_t config_param) override;
 	void onSensorInfo(ouster::sensor_info_2_t sensor_info) override;

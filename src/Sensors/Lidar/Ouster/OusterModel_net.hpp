@@ -32,6 +32,11 @@ public:
      */
     uint16_t data_class_id() const override;
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
     bool initialize() override;
 

@@ -32,6 +32,11 @@ uint16_t cHokuyoModel_UST10LX::data_class_id() const
     return mSerializer.classID();
 }
 
+void cHokuyoModel_UST10LX::updateViews()
+{
+
+}
+
 bool cHokuyoModel_UST10LX::configure(const nlohmann::json& jsonCfg)
 {
 /*

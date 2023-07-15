@@ -25,6 +25,11 @@ public:
     cWeatherDataModel_Http_Wind(QObject* parent = nullptr);
     virtual ~cWeatherDataModel_Http_Wind() = default;
 
+    /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     bool windDataValid() const;

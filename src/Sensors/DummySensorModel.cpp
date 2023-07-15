@@ -19,9 +19,12 @@ uint16_t cDummyModel::data_class_id() const
     return 0;
 }
 
+void cDummyModel::updateViews()
+{
+}
+
 bool cDummyModel::configure(const nlohmann::json& jsonCfg)
 {
-
     return true;
 }
 

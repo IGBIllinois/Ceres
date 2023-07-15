@@ -60,6 +60,7 @@ public:
 signals:
     void updateSensorInfo();
     void updateTimeInfo();
+    void updateLidarMode();
     void updateBeamIntrinsics();
     void updateImuIntrinsics();
     void updateLidarIntrinsics();
@@ -80,7 +81,8 @@ protected:
     virtual void onNewData(uint16_t frameID, const cOusterLidarData& data) = 0;
 
 protected:
-    int mFrameCounter;
+    int mImuDataCounter;
+    int mLidarDataCounter;
 
     ouster::config_param_2_t		mConfigParameters;
     ouster::sensor_info_2_t		    mSensorInfo;

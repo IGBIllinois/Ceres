@@ -4,7 +4,8 @@
 
 #include <QLineEdit>
 #include <QLabel>
-#include <QGridLayout>
+#include <QLabel>
+#include <QGroupBox>
 #include <QFormLayout>
 
 #include <string>
@@ -22,9 +23,16 @@ cSensorStatusView::~cSensorStatusView()
 void cSensorStatusView::createWidgets()
 {
 	mpSensorLabel = new QLabel();
-	mpSensorLabel->setText("Sensor Status:");
+	mpSensorLabel->setText("Status:");
 	mpSensorStatus = new QLineEdit();
 	mpSensorStatus->setReadOnly(true);
+
+	mpSensorStatusBox = new QGroupBox("Sensor Status");
+
+	auto* sensorInfoLayout = new QFormLayout();
+	sensorInfoLayout->addRow(mpSensorLabel, mpSensorStatus);
+
+	mpSensorStatusBox->setLayout(sensorInfoLayout);
 }
 
 void cSensorStatusView::onSensorStatusChange(QString name, sensor::eStatus status)
@@ -32,3 +40,9 @@ void cSensorStatusView::onSensorStatusChange(QString name, sensor::eStatus statu
 	QString str = QString::fromStdString(sensor::to_string(status));
 	mpSensorStatus->setText(str);
 }
+
+QGroupBox* cSensorStatusView::getSensorStatusBox() const
+{
+	return mpSensorStatusBox;
+}
+

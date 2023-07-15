@@ -5,6 +5,7 @@
 
 #include "OusterModel_net.hpp"
 #include "OusterView.hpp"
+#include "OusterStatusView.hpp"
 #include "OusterController.hpp"
 #include "OusterPropertyPage.hpp"
 #include "OusterPropertyPage_Local.hpp"
@@ -43,6 +44,20 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
 
     if (no_visualization)
     {
+        auto* pView = new cOusterStatusView(pModel);
+        pView->createWidgets();
+        pView->doLayout();
+
+        QObject::connect(pModel, &cOusterModel::sensorStatusChanging, pView, &cOusterStatusView::onSensorStatusChange);
+        QObject::connect(pModel, &cOusterModel::updateSensorInfo, pView, &cOusterStatusView::onSensorInfoUpdated);
+        QObject::connect(pModel, &cOusterModel::updateTimeInfo, pView, &cOusterStatusView::onTimeInfoUpdated);
+        QObject::connect(pModel, &cOusterModel::updateLidarMode, pView, &cOusterStatusView::onLidarModeUpdated);
+        QObject::connect(pModel, &cOusterModel::updateBeamIntrinsics, pView, &cOusterStatusView::onBeamIntrinsicsUpdated);
+        QObject::connect(pModel, &cOusterModel::updateImuIntrinsics, pView, &cOusterStatusView::onImuIntrinsicsUpdated);
+        QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterStatusView::onLidarIntrinsicsUpdated);
+        QObject::connect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterStatusView::onDataFormatUpdated);
+        QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterStatusView::onAzimuthWindowUpdated);
+
         auto* pController = new cOusterController(pModel);
 
         QObject::connect(pController, &cOusterController::requestNewLidarMode,
@@ -57,7 +72,7 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
         QObject::connect(pModel, &cOusterModel::updateAzimuthWindow,
             pController, &cOusterController::azimuthWindowChanged);
 
-        return sSensorWidgets(pModel, pController);
+        return sSensorWidgets(pModel, pController, pView);
     }
 
     auto* dockWidget = new QDockWidget();

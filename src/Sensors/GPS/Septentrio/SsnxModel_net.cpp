@@ -15,6 +15,11 @@ cSsnxModel_net::~cSsnxModel_net()
 {
 }
 
+void cSsnxModel_net::updateViews()
+{
+
+}
+
 bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
 {
     std::string ip;

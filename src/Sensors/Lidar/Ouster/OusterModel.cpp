@@ -12,7 +12,8 @@ cOusterModel::cOusterModel(QObject* parent)
     mLidarOriginToBeamOrigin_mm(0)
 {
     mManufacturer = "OUSTER";
-    mFrameCounter = 0;
+    mImuDataCounter = 0;
+    mLidarDataCounter = 0;
 }
 
 const char* cOusterModel::descriptor() const

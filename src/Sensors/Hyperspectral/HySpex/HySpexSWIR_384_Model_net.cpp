@@ -12,6 +12,11 @@ cHySpexSWIR_384_Model_net::cHySpexSWIR_384_Model_net(QObject* parent)
     mConnected = false;
 }
 
+void cHySpexSWIR_384_Model_net::updateViews()
+{
+
+}
+
 bool cHySpexSWIR_384_Model_net::configure(const nlohmann::json& jsonCfg)
 {
     try
