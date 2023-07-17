@@ -3,7 +3,7 @@
 
 #include "HySpexVNIR_3000N_Model.hpp"
 
-#include <cbdf/HySpexBuffers.hpp>
+#include <cbdf/HyperspectralBuffers.hpp>
 #include <cbdf/HySpexVNIR_3000N_Serializer.hpp>
 
 #include <QObject>
@@ -48,7 +48,6 @@ signals:
 protected:
     void update() override;
 
-    hyperspectral::spatial_major_data<float> mBackground;
 
 private:
     std::unique_ptr<hyspex::cVNIR3000N> mCamera;

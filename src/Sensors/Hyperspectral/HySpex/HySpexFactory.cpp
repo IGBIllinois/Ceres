@@ -4,10 +4,14 @@
 #include "HySpexFactory.hpp"
 #include "HySpexVNIR_3000N_Model_direct.hpp"
 #include "HySpexVNIR_3000N_Model_net.hpp"
+#include "HySpexVNIR_3000N_Controller.hpp"
 #include "HySpexVNIR_3000N_View.hpp"
+#include "HySpexVNIR_3000N_StatusView.hpp"
 #include "HySpexSWIR_384_Model_direct.hpp"
 #include "HySpexSWIR_384_Model_net.hpp"
+#include "HySpexSWIR_384_Controller.hpp"
 #include "HySpexSWIR_384_View.hpp"
+#include "HySpexSWIR_384_StatusView.hpp"
 
 #include <HySpexConnect/HySpexCameraFactory.hpp>
 
@@ -16,6 +20,16 @@
 #include <QDockWidget>
 #include <QMetaType>
 #include <QDebug>
+#include <QMetaType>
+
+Q_DECLARE_METATYPE(hyspex::AcquisitionStatus);
+Q_DECLARE_METATYPE(hyspex::BackgroundStatus);
+Q_DECLARE_METATYPE(hyspex::CommunicationStatus);
+Q_DECLARE_METATYPE(hyspex::CoolingStatus);
+Q_DECLARE_METATYPE(hyspex::InitStatus);
+Q_DECLARE_METATYPE(hyspex::RecordingStatus);
+Q_DECLARE_METATYPE(hyspex::ShutterStatus);
+
 
 namespace
 {
@@ -73,7 +87,24 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
 
     if (no_visualization)
     {
-        return sSensorWidgets(pModel);
+        auto* pView = new cHySpexVNIR_3000N_StatusView(pModel);
+        pView->createWidgets();
+        pView->doLayout();
+
+        QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::avgFramesChanged, pView, &cHySpexVNIR_3000N_StatusView::onAvgFramesChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::framePeriodChanged, pView, &cHySpexVNIR_3000N_StatusView::onFramePeriodChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::minFramePeriodChanged, pView, &cHySpexVNIR_3000N_StatusView::onMinFramePeriodChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::integrationTimeChanged, pView, &cHySpexVNIR_3000N_StatusView::onIntegrationTimeChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::maxIntegrationTimeChanged, pView, &cHySpexVNIR_3000N_StatusView::onMaxIntegrationTimeChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::ambientTempChanged, pView, &cHySpexVNIR_3000N_StatusView::onAmbientTempChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::sensorTempChanged, pView, &cHySpexVNIR_3000N_StatusView::onSensorTempChange);
+
+
+        auto* pController = new cHySpexVNIR_3000N_Controller(pModel);
+
+
+        return sSensorWidgets(pModel, pController, pView);
     }
 
     auto* dockWidget = new QDockWidget();
@@ -117,7 +148,16 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
 
     if (no_visualization)
     {
-        return sSensorWidgets(pModel);
+        auto* pView = new cHySpexSWIR_384_StatusView(pModel);
+        pView->createWidgets();
+        pView->doLayout();
+
+        QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
+
+        auto* pController = new cHySpexSWIR_384_Controller(pModel);
+
+
+        return sSensorWidgets(pModel, pController, pView);
     }
 
     auto* dockWidget = new QDockWidget();

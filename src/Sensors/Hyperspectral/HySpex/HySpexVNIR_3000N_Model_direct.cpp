@@ -2,11 +2,14 @@
 #include "HySpexVNIR_3000N_Model_direct.hpp"
 #include "Constants.hpp"
 
+#include <HySpexConnect/hyspex_utils.hpp>
 #include <HySpexConnect/VNIR3000N.hpp>
 
 #include <QDebug>
 
 #include <optional>
+
+using namespace hyspex;
 
 cHySpexVNIR_3000N_Model_direct::cHySpexVNIR_3000N_Model_direct(std::unique_ptr<hyspex::cVNIR3000N> camera, QObject* parent)
 :
@@ -36,6 +39,7 @@ bool cHySpexVNIR_3000N_Model_direct::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
+    emit 
     return true;
 }
 
@@ -65,28 +69,81 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_SENSOR:
             break;
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_DETECTION:
-            break;
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_ELECTRONICS:
-            break;
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_SENSOR:
-            break;
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_TRANSPORT:
-            break;
+        {
+            QString msg = "VNIR-3000N: ";
+            msg += to_string(status).c_str();
+            emit logMessage(logERROR, q_name(), msg);
+
+            qCritical() << msg;
+
+            setStatus(sensor::eStatus::FAILED);
+            return false;
+        }
     }
 
-    mID = mCamera->getId();
+	//	auto commStatus = vnir->getCommunicationStatus();
+	//	std::cout << "COMM STATUS = " << hyspex::to_string(commStatus) << std::endl;
+
+	mID = mCamera->getId();
     mSerialNumber = mCamera->getSerialNumber();
     mWavelengthRangeId = mCamera->getWavelengthRangeId();
 
     mSpectralSize = mCamera->getSpectralSize();
     mSpatialSize = mCamera->getSpatialSize();
-    mBackground.resize(mSpatialSize, mSpectralSize);
-//    mBackground = mCamera->getBackgroundMatrix();
 
     mMaxSpatialSize = mCamera->getMaxSpatialSize();
     mMaxSpectralSize = mCamera->getMaxSpectralSize();
 
     mMaxPixelValue = mCamera->getMaxPixelValue();
+
+	mCoolingStatus = mCamera->getCoolingStatus();
+
+	mAvgerageFrames = mCamera->getAverageFrames();
+    emit avgFramesChanged(mAvgerageFrames);
+
+	mFramePeriod_us = mCamera->getFramePeriod_us();
+    emit framePeriodChanged(mFramePeriod_us);
+
+    mMinFramePeriod_us = mCamera->getMinimumFramePeriod_us();
+    emit minFramePeriodChanged(mMinFramePeriod_us);
+	
+    mIntegrationTime_us = mCamera->getIntegrationTime_us();
+    emit integrationTimeChanged(mIntegrationTime_us);
+	
+    mMaxIntegrationTime_us = mCamera->getMaxIntegrationTime_us(mFramePeriod_us);
+    emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
+	
+    mAmbientTemp_C = mCamera->getAmbientTemperature_C();
+    emit ambientTempChanged(mAmbientTemp_C);
+	
+    mSensorTemp_C = mCamera->getSensorTemperature_C();
+    emit sensorTempChanged(mSensorTemp_C);
+
+	mBackgroundStatus = mCamera->getBackgroundStatus();
+	mAcquisitionStatus = mCamera->getAcquisitionStatus();
+
+/*
+	auto badPixels = vnir->getBadPixels();
+	std::cout << "Num Bad Pixels = " << badPixels.size << std::endl;
+
+	auto badCorrPixels = vnir->getBadPixelsWithCalculatedCorrections();
+	std::cout << "Bad Pixels With Calculated Corrections = " << badCorrPixels.size << std::endl;
+
+	auto badPixelsMatrix = vnir->getBadPixelsMatrix();
+	std::cout << "Bad Pixels Matrix = " << badPixelsMatrix.size() << std::endl;
+*/
+
+	auto reMatrix = mCamera->getResponsivityMatrix();
+	auto qeMatrix = mCamera->getQuantumEfficiencyMatrix();
+
+	auto spectralCal = mCamera->getSpectralCalibrationPerBand();
+	auto fullSpectralCal = mCamera->getFullSpectralCalibrationPerBand();
+
+    //    mBackground.resize(mSpatialSize, mSpectralSize);
+    //    mBackground = mCamera->getBackgroundMatrix();
 
     return cHySpexVNIR_3000N_Model::initialize();
 }

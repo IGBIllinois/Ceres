@@ -59,9 +59,7 @@ void cHySpexVNIR_3000N_Controller::processStream(const void* pBuffer, std::size_
     }
 }
 
-/*
 void cHySpexVNIR_3000N_Controller::onQueryState()
 {
 }
-*/
 

@@ -33,6 +33,8 @@ set(HYSPEX_SOURCE_FILES
     HySpexVNIR_3000N_Model.cpp
     HySpexVNIR_3000N_View.hpp
     HySpexVNIR_3000N_View.cpp
+    HySpexVNIR_3000N_StatusView.hpp
+    HySpexVNIR_3000N_StatusView.cpp
 
 # HySpex VNIR 3000N Controller Code
 
@@ -65,6 +67,8 @@ set(HYSPEX_SOURCE_FILES
     HySpexSWIR_384_Model.cpp
     HySpexSWIR_384_View.hpp
     HySpexSWIR_384_View.cpp
+    HySpexSWIR_384_StatusView.hpp
+    HySpexSWIR_384_StatusView.cpp
 
 # HySpex SWIR 384 Controller Code
 
@@ -86,6 +90,8 @@ set(HYSPEX_SOURCE_FILES
 	HySpexSWIR_384_PropertyPage.cpp
 
 
+	hyspex_utils.hpp
+	hyspex_utils.cpp
     HySpexFactory.cpp
 )
 

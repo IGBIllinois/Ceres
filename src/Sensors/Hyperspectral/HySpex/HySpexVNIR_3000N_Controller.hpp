@@ -26,7 +26,7 @@ public:
     const std::string& name() const override;
 
 protected:
-//    void onQueryState() override;
+    void onQueryState() override;
 
 protected:
     /**
