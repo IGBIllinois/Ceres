@@ -10,6 +10,7 @@ QT_BEGIN_NAMESPACE
 QT_END_NAMESPACE
 
 // Forward Declaration
+class cSsnxModel;
 
 
 class cSsnxStatusView : public cSensorStatusView
@@ -17,7 +18,7 @@ class cSsnxStatusView : public cSensorStatusView
 	Q_OBJECT
 
 public:
-    cSsnxStatusView(QWidget* parent = nullptr);
+    cSsnxStatusView(cSsnxModel* pModel, QWidget* parent = nullptr);
 	virtual ~cSsnxStatusView();
 
 	void createWidgets() override;

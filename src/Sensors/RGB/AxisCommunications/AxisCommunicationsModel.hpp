@@ -58,6 +58,11 @@ public:
     const std::vector<rgb::eIMAGE_FORMAT>& getImageFormats() const;
 
 
+    virtual int getActiveCameraID() const;
+    virtual int getActiveFramesRate_fps() const;
+    virtual rgb::sImageSize_t getActiveImageSize() const;
+
+
     bool configure(const nlohmann::json& jsonCfg) override;
 
     /*
@@ -70,8 +75,12 @@ public:
 
     void update() override;
 
+
 signals:
     void onNewImage(const QImage& image);
+    void cameraIdChanged(int id);
+    void frameRateChanged(int rate_fps);
+    void imageSizeChanged(int width, int height);
 
 protected slots:
     void requestReceived(QNetworkReply* pReply);

@@ -1,9 +1,7 @@
 
 #include "AxisCommunicationsStatusView.hpp"
-#include "../Sensors/SensorModel.hpp"
-#include "Constants.hpp"
+#include "AxisCommunicationsModel.hpp"
 
-#include <QCheckBox>
 #include <QLineEdit>
 #include <QLabel>
 #include <QGroupBox>
@@ -13,43 +11,31 @@
 #include <string>
 
 
-cAxisCommunicationsStatusView::cAxisCommunicationsStatusView(QWidget* parent)
+cAxisCommunicationsStatusView::cAxisCommunicationsStatusView(cAxisCommunicationsModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(parent)
+	cSensorStatusView(pModel, parent)
 {
-	setWindowTitle("Axis F44 Webcam");
 }
 
 cAxisCommunicationsStatusView::~cAxisCommunicationsStatusView()
 {
-
 }
-
 
 void cAxisCommunicationsStatusView::createWidgets()
 {
 	cSensorStatusView::createWidgets();
 
-	mpPvtCartesianValid = new QIndicator(this);
-	mpPvtCartesianValid->setText("Cartesian Position/Velocity/Time Valid");
+	mpCameraIdLabel = new QLabel("Camera ID:", this);
+	mpCameraId = new QLineEdit(this);
+	mpCameraId->setReadOnly(true);
 
-	mpPvtGeodeticValid = new QIndicator(this);
-	mpPvtGeodeticValid->setText("Geodetic Position/Velocity/Time Valid");
+	mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
+	mpImageSizes = new QLineEdit(this);
+	mpImageSizes->setReadOnly(true);
 
-	mpPosCovGeodeticValid = new QIndicator(this);
-	mpPosCovGeodeticValid->setText("Geodetic Position Covariance Matrix Valid");
-
-	mpVelCovGeodeticValid = new QIndicator(this);
-	mpVelCovGeodeticValid->setText("Geodetic Velocity Covariance Matrix Valid");
-
-	mpPosProjectedValid = new QIndicator(this);
-	mpPosProjectedValid->setText("Projected Position Valid");
-
-	mpReceiverTimeValid = new QIndicator(this);
-	mpReceiverTimeValid->setText("Receiver Time Valid");
-
-	mpRtcmDatumValid = new QIndicator(this);
-	mpRtcmDatumValid->setText("RTCM Datum Valid");
+	mpFrameRateLabel = new QLabel("Frames per Second:", this);
+	mpFrameRate_fps = new QLineEdit(this);
+	mpFrameRate_fps->setReadOnly(true);
 }
 
 void cAxisCommunicationsStatusView::doLayout()
@@ -58,55 +44,45 @@ void cAxisCommunicationsStatusView::doLayout()
 
 	mainLayout->addWidget(getSensorStatusBox());
 
-	QGroupBox* packetBox = new QGroupBox("Received Packets");
+	QGroupBox* infoBox = new QGroupBox("Camera Information");
 
-	auto* packetInfoLayout = new QFormLayout();
-	packetInfoLayout->addRow(mpPvtCartesianValid, mpPvtGeodeticValid);
-	packetInfoLayout->addRow(mpPosCovGeodeticValid, mpVelCovGeodeticValid);
-	packetInfoLayout->addRow(mpPosProjectedValid, mpReceiverTimeValid);
-	packetInfoLayout->addRow(mpRtcmDatumValid);
+	auto* cameraInfoLayout = new QHBoxLayout();
 
-	packetBox->setLayout(packetInfoLayout);
+	cameraInfoLayout->addWidget(mpCameraIdLabel);
+	cameraInfoLayout->addWidget(mpCameraId);
 
-	mainLayout->addWidget(packetBox);
+	cameraInfoLayout->addWidget(mpImageSizeLabel);
+	cameraInfoLayout->addWidget(mpImageSizes);
+
+	cameraInfoLayout->addWidget(mpFrameRateLabel);
+	cameraInfoLayout->addWidget(mpFrameRate_fps);
+
+	infoBox->setLayout(cameraInfoLayout);
+
+	mainLayout->addWidget(infoBox);
 
 	mainLayout->addStretch();
 
 	setLayout(mainLayout);
 }
 
-void cAxisCommunicationsStatusView::onPvtCartesianStateChange(bool valid)
+void cAxisCommunicationsStatusView::onCameraIdChange(int id)
 {
-	mpPvtCartesianValid->setState(valid);
+	mpCameraId->setText(QString::number(id));
 }
 
-void cAxisCommunicationsStatusView::onPvtGeodeticStateChange(bool valid)
+void cAxisCommunicationsStatusView::onFrameRateChange(int rate_fps)
 {
-	mpPvtGeodeticValid->setState(valid);
+	mpFrameRate_fps->setText(QString::number(rate_fps));
 }
 
-void cAxisCommunicationsStatusView::onPosCovGeodeticStateChange(bool valid)
+void cAxisCommunicationsStatusView::onImageSizeChange(int width, int height)
 {
-	mpPosCovGeodeticValid->setState(valid);
+	QString str = QString::number(width);
+	str += " x ";
+	str += QString::number(height);
+
+	mpImageSizes->setText(str);
 }
 
-void cAxisCommunicationsStatusView::onVelCovGeodeticStateChange(bool valid)
-{
-	mpVelCovGeodeticValid->setState(valid);
-}
-
-void cAxisCommunicationsStatusView::onPosProjectedStateChange(bool valid)
-{
-	mpPosProjectedValid->setState(valid);
-}
-
-void cAxisCommunicationsStatusView::onReceiverTimeStateChange(bool valid)
-{
-	mpReceiverTimeValid->setState(valid);
-}
-
-void cAxisCommunicationsStatusView::onRtcmDatumStateChange(bool valid)
-{
-	mpRtcmDatumValid->setState(valid);
-}
 

@@ -13,6 +13,7 @@ class QGroupBox;
 QT_END_NAMESPACE
 
 // Forward Declaration
+class cSensorModel;
 namespace sensor
 {
 	enum class eStatus;
@@ -24,7 +25,7 @@ class cSensorStatusView : public QWidget
 	Q_OBJECT
 
 public:
-	cSensorStatusView(QWidget* parent = nullptr);
+	cSensorStatusView(cSensorModel* pModel, QWidget* parent = nullptr);
 	virtual ~cSensorStatusView();
 
 public:

@@ -44,7 +44,13 @@ cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
 
 void cAxisCommunicationsModel_F44::updateViews()
 {
+    emit sensorStatusChanging(q_name(), status());
 
+    emit cameraIdChanged(getActiveCameraID());
+    emit frameRateChanged(getActiveFramesRate_fps());
+
+    auto s = getActiveImageSize();
+    emit imageSizeChanged(s.width, s.height);
 }
 
 bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
@@ -124,6 +130,8 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     size_t buffer_size = max_image_size.height * max_image_size.width;
 
     mSerializer.setBufferCapacity(buffer_size + 1024);
+
+    setStatus(sensor::eStatus::CONFIGURED);
 
     return true;
 }
@@ -247,6 +255,8 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
         auto size = mpActiveCamera->getImageSize();
         mSerializer.writeImageSize(size.width, size.height);
     }
+
+    emit cameraIdChanged(id);
 }
 
 rgb::sImageSize_t cAxisCommunicationsModel_F44::getActiveImageSize() const
@@ -281,6 +291,8 @@ void cAxisCommunicationsModel_F44::setActiveImageSize(rgb::sImageSize_t image_si
         auto size = mpActiveCamera->getImageSize();
         mSerializer.writeImageSize(size.width, size.height);
     }
+
+    emit imageSizeChanged(image_size.width, image_size.height);
 }
 
 int cAxisCommunicationsModel_F44::getActiveFramesRate_fps() const
@@ -312,6 +324,8 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
     {
         mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
     }
+
+    emit frameRateChanged(fps);
 }
 
 void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)

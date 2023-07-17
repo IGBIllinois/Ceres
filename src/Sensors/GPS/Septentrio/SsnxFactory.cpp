@@ -33,7 +33,7 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
         auto widgets = sSensorWidgets(pModel);
         if (protocol == "direct")
         {
-            auto* pView = new cSsnxStatusView();
+            auto* pView = new cSsnxStatusView(pModel);
             pView->createWidgets();
             pView->doLayout();
 

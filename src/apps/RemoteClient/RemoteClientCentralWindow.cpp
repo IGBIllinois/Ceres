@@ -2,6 +2,8 @@
 #include "RemoteClientCentralWindow.hpp"
 #include "LogWidget.hpp"
 
+#include <QDebug>
+
 
 //-----------------------------------------------------------------------------
 cRemoteClientCentalWindow::cRemoteClientCentalWindow(QWidget* parent) :
@@ -20,6 +22,12 @@ cRemoteClientCentalWindow::~cRemoteClientCentalWindow()
 //-----------------------------------------------------------------------------
 void cRemoteClientCentalWindow::updateSensorName(QString old_name, QString new_name)
 {
+    qInfo() << "Changing sensor name from ";
+    qInfo() << old_name;
+    qInfo() << " to ";
+    qInfo() << new_name;
+    qInfo() << "\n";
+
     auto n = count();
     for (int i = 0; i < n; ++i)
     {

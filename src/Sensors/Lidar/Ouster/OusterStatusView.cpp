@@ -4,7 +4,6 @@
 
 #include <ouster/ouster_utils.h>
 
-
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QLabel>
@@ -17,9 +16,8 @@
 
 cOusterStatusView::cOusterStatusView(cOusterModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(parent), mpModel(pModel)
+	cSensorStatusView(pModel, parent), mpModel(pModel)
 {
-	setWindowTitle("OUSTER");
 }
 
 cOusterStatusView::~cOusterStatusView()
@@ -56,14 +54,14 @@ void cOusterStatusView::createWidgets()
 
 	mpLidarModeLabel = new QLabel("Lidar Mode:", this);
 	mpLidarMode = new QLineEdit(this);
-	mpLidarMode->setEnabled(false);
+	mpLidarMode->setReadOnly(true);
 
 	mpMinAzimuthAngleLabel = new QLabel("Min (deg):", this);
 	mpMinAzimuthAngle_deg = new QLineEdit(this);
-	mpMinAzimuthAngle_deg->setEnabled(false);
+	mpMinAzimuthAngle_deg->setReadOnly(true);
 	mpMaxAzimuthAngleLabel = new QLabel("Max (deg):", this);
 	mpMaxAzimuthAngle_deg = new QLineEdit(this);
-	mpMaxAzimuthAngle_deg->setEnabled(false);
+	mpMaxAzimuthAngle_deg->setReadOnly(true);
 }
 
 void cOusterStatusView::doLayout()

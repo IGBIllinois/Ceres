@@ -63,6 +63,21 @@ const std::vector<rgb::eIMAGE_FORMAT>& cAxisCommunicationsModel::getImageFormats
     return mSupportedImageFormats;
 }
 
+int cAxisCommunicationsModel::getActiveCameraID() const
+{
+    return -1;
+}
+
+int cAxisCommunicationsModel::getActiveFramesRate_fps() const
+{
+    return -1;
+}
+
+rgb::sImageSize_t cAxisCommunicationsModel::getActiveImageSize() const
+{
+    return rgb::sImageSize_t{0,0};
+}
+
 bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
 {
     try

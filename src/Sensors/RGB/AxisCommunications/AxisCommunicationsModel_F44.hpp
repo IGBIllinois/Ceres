@@ -54,9 +54,9 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
-    int getActiveCameraID() const;
-    int getActiveFramesRate_fps() const;
-    rgb::sImageSize_t getActiveImageSize() const;
+    int getActiveCameraID() const override;
+    int getActiveFramesRate_fps() const override;
+    rgb::sImageSize_t getActiveImageSize() const override;
 
 signals:
     void enableCamera(int id);

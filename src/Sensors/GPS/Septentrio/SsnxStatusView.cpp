@@ -1,5 +1,6 @@
 
 #include "SsnxStatusView.hpp"
+#include "SsnxModel.hpp"
 #include "../Sensors/SensorModel.hpp"
 #include "Constants.hpp"
 
@@ -36,16 +37,14 @@ namespace
 }
 
 
-cSsnxStatusView::cSsnxStatusView(QWidget* parent)
+cSsnxStatusView::cSsnxStatusView(cSsnxModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(parent)
+	cSensorStatusView(pModel, parent)
 {
-	setWindowTitle("SSNX GPS");
 }
 
 cSsnxStatusView::~cSsnxStatusView()
 {
-
 }
 
 

@@ -10,10 +10,11 @@
 
 #include <string>
 
-cSensorStatusView::cSensorStatusView(QWidget* parent)
+cSensorStatusView::cSensorStatusView(cSensorModel* pModel, QWidget* parent)
 :
 	QWidget(parent)
 {
+	setWindowTitle(pModel->name().c_str());
 }
 
 cSensorStatusView::~cSensorStatusView()
@@ -26,6 +27,7 @@ void cSensorStatusView::createWidgets()
 	mpSensorLabel->setText("Status:");
 	mpSensorStatus = new QLineEdit();
 	mpSensorStatus->setReadOnly(true);
+	mpSensorStatus->setText("UNKNOWN");
 
 	mpSensorStatusBox = new QGroupBox("Sensor Status");
 

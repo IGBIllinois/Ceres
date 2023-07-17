@@ -453,21 +453,6 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         QObject::connect(widgets.pModel, &cSensorModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
         QObject::connect(widgets.pModel, &cSensorModel::logMessage,     this, &cRemoteClientWindow::onLogMessage);
 
-        if (configDoc.contains(type))
-        {
-            bool validSensor = false;
-            try
-            {
-                validSensor = widgets.pModel->configure(configDoc[type]);
-            }
-            catch (const std::exception& e)
-            {
-                validSensor = false;
-            }
-        }
-
-        mMainModel.addSensor(widgets.pModel);
-
         if (widgets.pStatusBar)
         {
             statusBar()->addPermanentWidget(widgets.pStatusBar);
@@ -485,6 +470,21 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
 
             widgets.pModel->updateViews();
         }
+
+        if (configDoc.contains(type))
+        {
+            bool validSensor = false;
+            try
+            {
+                validSensor = widgets.pModel->configure(configDoc[type]);
+            }
+            catch (const std::exception& e)
+            {
+                validSensor = false;
+            }
+        }
+
+        mMainModel.addSensor(widgets.pModel);
     }
 }
 
