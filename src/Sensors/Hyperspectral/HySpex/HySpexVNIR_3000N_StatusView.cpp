@@ -1,6 +1,7 @@
 
 #include "HySpexVNIR_3000N_StatusView.hpp"
 #include "HySpexVNIR_3000N_Model.hpp"
+#include "QIndicator.hpp"
 
 #include <QLineEdit>
 #include <QLabel>
@@ -13,7 +14,7 @@
 
 cHySpexVNIR_3000N_StatusView::cHySpexVNIR_3000N_StatusView(cHySpexVNIR_3000N_Model* pModel, QWidget* parent)
 :
-    cSensorStatusView(pModel, parent)
+	cHySpexStatusView(pModel, parent)
 {
 }
 
@@ -23,9 +24,31 @@ cHySpexVNIR_3000N_StatusView::~cHySpexVNIR_3000N_StatusView()
 
 void cHySpexVNIR_3000N_StatusView::createWidgets()
 {
-	cSensorStatusView::createWidgets();
+	cHySpexStatusView::createWidgets();
 
+	mpAvgFramesLabel = new QLabel("Avg Frames", this);
+	mpAvgFrames = new QLineEdit(this);
+	mpAvgFrames->setReadOnly(true);
 
+	mpFramePeriodLabel = new QLabel("Frame Period (us) :", this);
+	mpFramePeriod_us = new QLineEdit(this);
+	mpFramePeriod_us->setReadOnly(true);
+
+	mpMinFramePeriodLabel = new QLabel("Min Frame Period (us) :", this);
+	mpMinFramePeriod_us = new QLineEdit(this);
+	mpMinFramePeriod_us->setReadOnly(true);
+
+	mpIntegrationTimeLabel = new QLabel("Integration Time (us) :", this);
+	mpIntegrationTime_us = new QLineEdit(this);
+	mpIntegrationTime_us->setReadOnly(true);
+
+	mpMaxIntegrationTimeLabel = new QLabel("Max Integration Time (us) :", this);
+	mpMaxIntegrationTime_us = new QLineEdit(this);
+	mpMaxIntegrationTime_us->setReadOnly(true);
+
+	mpAmbientTempLabel = new QLabel("Ambient Temp (C) :", this);
+	mpAmbientTemp_C = new QLineEdit(this);
+	mpAmbientTemp_C->setReadOnly(true);
 }
 
 void cHySpexVNIR_3000N_StatusView::doLayout()
@@ -34,6 +57,32 @@ void cHySpexVNIR_3000N_StatusView::doLayout()
 
 	mainLayout->addWidget(getSensorStatusBox());
 
+	doSubLayout(mainLayout);
+
+	QGroupBox* acqBox = new QGroupBox("Acquisition Status");
+
+	auto* acqLayout = new QHBoxLayout(this);
+
+	acqLayout->addWidget(mpAvgFramesLabel);
+	acqLayout->addWidget(mpAvgFrames);
+
+	acqLayout->addWidget(mpFramePeriodLabel);
+	acqLayout->addWidget(mpFramePeriod_us);
+
+	acqLayout->addWidget(mpMinFramePeriodLabel);
+	acqLayout->addWidget(mpMinFramePeriod_us);
+
+	acqLayout->addWidget(mpIntegrationTimeLabel);
+	acqLayout->addWidget(mpIntegrationTime_us);
+
+	acqLayout->addWidget(mpMaxIntegrationTimeLabel);
+	acqLayout->addWidget(mpMaxIntegrationTime_us);
+
+	acqLayout->addWidget(mpAmbientTempLabel);
+	acqLayout->addWidget(mpAmbientTemp_C);
+
+	acqBox->setLayout(acqLayout);
+	mainLayout->addWidget(acqBox);
 
 	mainLayout->addStretch();
 
@@ -41,23 +90,39 @@ void cHySpexVNIR_3000N_StatusView::doLayout()
 }
 
 void cHySpexVNIR_3000N_StatusView::onAvgFramesChange(std::uint16_t avgFrames)
-{}
+{
+	mpAvgFrames->setText(QString::number(avgFrames));
+}
 
 void cHySpexVNIR_3000N_StatusView::onFramePeriodChange(std::uint32_t period_us)
-{}
+{
+	mpFramePeriod_us->setText(QString::number(period_us));
+}
 
 void cHySpexVNIR_3000N_StatusView::onMinFramePeriodChange(std::uint32_t period_us)
-{}
+{
+	mpMinFramePeriod_us->setText(QString::number(period_us));
+}
 
 void cHySpexVNIR_3000N_StatusView::onIntegrationTimeChange(std::uint32_t time_us)
-{}
+{
+	mpIntegrationTime_us->setText(QString::number(time_us));
+}
 
 void cHySpexVNIR_3000N_StatusView::onMaxIntegrationTimeChange(std::uint32_t time_us)
-{}
+{
+	mpMaxIntegrationTime_us->setText(QString::number(time_us));
+}
 
 void cHySpexVNIR_3000N_StatusView::onAmbientTempChange(double temp_C)
-{}
+{
+	mpAmbientTemp_C->setText(QString::number(temp_C, 'f', 1));
+}
 
 void cHySpexVNIR_3000N_StatusView::onSensorTempChange(double temp_C)
-{}
+{
+	QString label = QString::number(temp_C, 'f', 1);
+	label += " C";
+	mpCoolingStatus->setText(label);
+}
 

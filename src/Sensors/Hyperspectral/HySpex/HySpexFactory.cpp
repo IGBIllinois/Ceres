@@ -92,6 +92,13 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
         pView->doLayout();
 
         QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
+
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::acqStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onAcqStatusChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::bgStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onBgStatusChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::commStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onCommStatusChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::coolingStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onCoolingStatusChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::shutterStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onShutterStatusChange);
+
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::avgFramesChanged, pView, &cHySpexVNIR_3000N_StatusView::onAvgFramesChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::framePeriodChanged, pView, &cHySpexVNIR_3000N_StatusView::onFramePeriodChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::minFramePeriodChanged, pView, &cHySpexVNIR_3000N_StatusView::onMinFramePeriodChange);

@@ -3,6 +3,7 @@
 #include "SsnxModel.hpp"
 #include "../Sensors/SensorModel.hpp"
 #include "Constants.hpp"
+#include "QIndicator.hpp"
 
 #include <QCheckBox>
 #include <QLineEdit>
@@ -52,16 +53,16 @@ void cSsnxStatusView::createWidgets()
 {
 	cSensorStatusView::createWidgets();
 
-	mpPvtCartesianValid = new QIndicator("Cartesian Position/Velocity/Time Valid", this);
-	mpPvtGeodeticValid  = new QIndicator("Geodetic Position/Velocity/Time Valid", this);
+	mpPvtCartesianValid = new QLedIndicator("Cartesian Position/Velocity/Time Valid", this);
+	mpPvtGeodeticValid  = new QLedIndicator("Geodetic Position/Velocity/Time Valid", this);
 
-	mpPosCovGeodeticValid = new QIndicator("Geodetic Position Covariance Matrix Valid", this);
-	mpVelCovGeodeticValid = new QIndicator("Geodetic Velocity Covariance Matrix Valid", this);
+	mpPosCovGeodeticValid = new QLedIndicator("Geodetic Position Covariance Matrix Valid", this);
+	mpVelCovGeodeticValid = new QLedIndicator("Geodetic Velocity Covariance Matrix Valid", this);
 
-	mpPosProjectedValid = new QIndicator("Projected Position Valid", this);
-	mpReceiverTimeValid = new QIndicator("Receiver Time Valid", this);
+	mpPosProjectedValid = new QLedIndicator("Projected Position Valid", this);
+	mpReceiverTimeValid = new QLedIndicator("Receiver Time Valid", this);
 
-	mpRtcmDatumValid = new QIndicator("RTCM Datum Valid", this);
+	mpRtcmDatumValid = new QLedIndicator("RTCM Datum Valid", this);
 }
 
 void cSsnxStatusView::doLayout()

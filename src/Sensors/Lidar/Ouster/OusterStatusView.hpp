@@ -2,7 +2,6 @@
 #pragma once
 
 #include "../Sensors/SensorStatusView.hpp"
-#include "QIndicator.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -12,6 +11,7 @@ QT_END_NAMESPACE
 
 // Forward Declaration
 class cOusterModel;
+class QLedIndicator;
 
 
 class cOusterStatusView : public cSensorStatusView
@@ -37,14 +37,14 @@ public slots:
 
 
 private:
-	QIndicator* mpSensorInfoValid = nullptr;
-	QIndicator* mpTimeInfoValid = nullptr;
-	QIndicator* mpLidarModeValid = nullptr;
-	QIndicator* mpBeamIntrinsicsValid = nullptr;
-	QIndicator* mpImuIntrinsicsValid = nullptr;
-	QIndicator* mpLidarIntrinsicsValid = nullptr;
-	QIndicator* mpDataFormatValid = nullptr;
-	QIndicator* mpAzimuthWindowValid = nullptr;
+	QLedIndicator* mpSensorInfoValid = nullptr;
+	QLedIndicator* mpTimeInfoValid = nullptr;
+	QLedIndicator* mpLidarModeValid = nullptr;
+	QLedIndicator* mpBeamIntrinsicsValid = nullptr;
+	QLedIndicator* mpImuIntrinsicsValid = nullptr;
+	QLedIndicator* mpLidarIntrinsicsValid = nullptr;
+	QLedIndicator* mpDataFormatValid = nullptr;
+	QLedIndicator* mpAzimuthWindowValid = nullptr;
 
 	QLabel*    mpLidarModeLabel = nullptr;
 	QLineEdit* mpLidarMode = nullptr;

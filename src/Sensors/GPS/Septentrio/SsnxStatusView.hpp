@@ -2,7 +2,6 @@
 #pragma once
 
 #include "../Sensors/SensorStatusView.hpp"
-#include "QIndicator.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -11,6 +10,8 @@ QT_END_NAMESPACE
 
 // Forward Declaration
 class cSsnxModel;
+class QLedIndicator;
+class QButtonIndicator;
 
 
 class cSsnxStatusView : public cSensorStatusView
@@ -34,11 +35,11 @@ public slots:
 	void onRtcmDatumStateChange(bool valid);
 
 private:
-	QIndicator* mpPvtCartesianValid = nullptr;
-	QIndicator* mpPvtGeodeticValid = nullptr;
-	QIndicator* mpPosCovGeodeticValid = nullptr;
-	QIndicator* mpVelCovGeodeticValid = nullptr;
-	QIndicator* mpPosProjectedValid = nullptr;
-	QIndicator* mpReceiverTimeValid = nullptr;
-	QIndicator* mpRtcmDatumValid = nullptr;
+	QLedIndicator* mpPvtCartesianValid = nullptr;
+	QLedIndicator* mpPvtGeodeticValid = nullptr;
+	QLedIndicator* mpPosCovGeodeticValid = nullptr;
+	QLedIndicator* mpVelCovGeodeticValid = nullptr;
+	QLedIndicator* mpPosProjectedValid = nullptr;
+	QLedIndicator* mpReceiverTimeValid = nullptr;
+	QLedIndicator* mpRtcmDatumValid = nullptr;
 };

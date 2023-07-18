@@ -47,8 +47,13 @@ public:
 signals:
     void imageSizeChanged(std::size_t spatialSize, std::size_t spectralSize);
 
-
-//    hyspex::CoolingStatus mCoolingStatus = hyspex::CoolingStatus::HYSPEX_COOLING_UNKNOWN;
+    void acqStatusChanged(hyspex::AcquisitionStatus status);
+    void bgStatusChanged(hyspex::BackgroundStatus status);
+    void commStatusChanged(hyspex::CommunicationStatus status);
+    void coolingStatusChanged(hyspex::CoolingStatus status);
+    void initStatusChanged(hyspex::InitStatus status);
+    void recordingStatusChanged(hyspex::RecordingStatus status);
+    void shutterStatusChanged(hyspex::ShutterStatus status);
 
     void avgFramesChanged(std::uint16_t avgFrames);
     void framePeriodChanged(std::uint32_t period_us);
@@ -83,7 +88,9 @@ protected:
     // Max pixel value, 2 ^ bpp - 1 (bits per pixel).
     unsigned short mMaxPixelValue = 0;
 
-	hyspex::CoolingStatus mCoolingStatus = hyspex::CoolingStatus::HYSPEX_COOLING_UNKNOWN;
+    hyspex::InitStatus          mInitStatus = hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED;
+    hyspex::CommunicationStatus mCommStatus = hyspex::CommunicationStatus::HYSPEX_COMM_INIT;
+    hyspex::CoolingStatus       mCoolingStatus = hyspex::CoolingStatus::HYSPEX_COOLING_UNKNOWN;
 
 	std::uint16_t mAvgerageFrames = 0;
     std::uint32_t mFramePeriod_us = 0;
@@ -97,6 +104,8 @@ protected:
 	cHyperspectralImageBuffer<float> mBackground;
 
 	hyspex::AcquisitionStatus mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_STOPPED;
+
+    hyspex::ShutterStatus mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN;
 
 /*
 	auto badPixels = vnir->getBadPixels();

@@ -51,16 +51,16 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     // This usually requires two calls to init!
     mCamera->init(mNumBuffersRaw, mNumBufferPreProcessing);
 
-    auto status = mCamera->getInitStatus();
+    mInitStatus = mCamera->getInitStatus();
 
-    if (status == hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED)
+    if (mInitStatus == hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED)
     {
         mCamera->init(mNumBuffersRaw, mNumBufferPreProcessing);
     }
 
-    status = mCamera->getInitStatus();
+    mInitStatus = mCamera->getInitStatus();
 
-    switch (status)
+    switch (mInitStatus)
     {
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_DETECTION:
             break;
@@ -74,7 +74,7 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_TRANSPORT:
         {
             QString msg = "VNIR-3000N: ";
-            msg += to_string(status).c_str();
+            msg += to_string(mInitStatus).c_str();
             emit logMessage(logERROR, q_name(), msg);
 
             qCritical() << msg;
@@ -99,7 +99,11 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
 
     mMaxPixelValue = mCamera->getMaxPixelValue();
 
+    mCommStatus = mCamera->getCommunicationStatus();
+    emit commStatusChanged(mCommStatus);
+
 	mCoolingStatus = mCamera->getCoolingStatus();
+    emit coolingStatusChanged(mCoolingStatus);
 
 	mAvgerageFrames = mCamera->getAverageFrames();
     emit avgFramesChanged(mAvgerageFrames);
@@ -123,7 +127,10 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     emit sensorTempChanged(mSensorTemp_C);
 
 	mBackgroundStatus = mCamera->getBackgroundStatus();
+    emit bgStatusChanged(mBackgroundStatus);
+
 	mAcquisitionStatus = mCamera->getAcquisitionStatus();
+    emit acqStatusChanged(mAcquisitionStatus);
 
 /*
 	auto badPixels = vnir->getBadPixels();
@@ -161,6 +168,18 @@ void cHySpexVNIR_3000N_Model_direct::stopCommunications()
 
 void cHySpexVNIR_3000N_Model_direct::update()
 {
+    if (mInitStatus != hyspex::InitStatus::HYSPEX_INIT_OK)
+    {
+        mInitStatus = mCamera->getInitStatus();
+        return;
+    }
+
+    if (mCommStatus != hyspex::CommunicationStatus::HYSPEX_COMM_OK)
+    {
+        mCommStatus = mCamera->getCommunicationStatus();
+        emit commStatusChanged(mCommStatus);
+    }
+
 }
 
 void cHySpexVNIR_3000N_Model_direct::writeDataHeader()

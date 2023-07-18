@@ -90,6 +90,8 @@ set(HYSPEX_SOURCE_FILES
 	HySpexSWIR_384_PropertyPage.cpp
 
 
+    HySpexStatusView.hpp
+    HySpexStatusView.cpp
 	hyspex_utils.hpp
 	hyspex_utils.cpp
     HySpexFactory.cpp

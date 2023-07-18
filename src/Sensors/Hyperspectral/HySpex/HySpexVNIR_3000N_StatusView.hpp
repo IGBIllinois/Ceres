@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "../Sensors/SensorStatusView.hpp"
-#include "QIndicator.hpp"
+#include "HySpexStatusView.hpp"
+
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -10,9 +10,10 @@ QT_END_NAMESPACE
 
 // Forward Declaration
 class cHySpexVNIR_3000N_Model;
+class QLedIndicator;
 
 
-class cHySpexVNIR_3000N_StatusView : public cSensorStatusView
+class cHySpexVNIR_3000N_StatusView : public cHySpexStatusView
 {
 	Q_OBJECT
 
@@ -55,7 +56,4 @@ protected:
 
 	QLabel* mpAmbientTempLabel = nullptr;
 	QLineEdit* mpAmbientTemp_C = nullptr;
-
-	QLabel* mpSensorTempLabel = nullptr;
-	QLineEdit* mpSensorTemp_C = nullptr;
 };

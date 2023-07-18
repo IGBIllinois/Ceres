@@ -1,6 +1,7 @@
 
 #include "OusterStatusView.hpp"
 #include "OusterModel.hpp"
+#include "QIndicator.hpp"
 
 #include <ouster/ouster_utils.h>
 
@@ -28,28 +29,28 @@ void cOusterStatusView::createWidgets()
 {
 	cSensorStatusView::createWidgets();
 
-	mpSensorInfoValid = new QIndicator(this);
+	mpSensorInfoValid = new QLedIndicator(this);
 	mpSensorInfoValid->setText("Sensor Information Valid");
 
-	mpTimeInfoValid = new QIndicator(this);
+	mpTimeInfoValid = new QLedIndicator(this);
 	mpTimeInfoValid->setText("Time Information Valid");
 
-	mpLidarModeValid = new QIndicator(this);
+	mpLidarModeValid = new QLedIndicator(this);
 	mpLidarModeValid->setText("LiDAR Mode Valid");
 
-	mpBeamIntrinsicsValid = new QIndicator(this);
+	mpBeamIntrinsicsValid = new QLedIndicator(this);
 	mpBeamIntrinsicsValid->setText("Beam Intrinsics Valid");
 
-	mpImuIntrinsicsValid = new QIndicator(this);
+	mpImuIntrinsicsValid = new QLedIndicator(this);
 	mpImuIntrinsicsValid->setText("IMU Intrinsics Valid");
 
-	mpLidarIntrinsicsValid = new QIndicator(this);
+	mpLidarIntrinsicsValid = new QLedIndicator(this);
 	mpLidarIntrinsicsValid->setText("LiDAR Intrinsics Valid");
 
-	mpDataFormatValid = new QIndicator(this);
+	mpDataFormatValid = new QLedIndicator(this);
 	mpDataFormatValid->setText("Data Format Valid");
 
-	mpAzimuthWindowValid = new QIndicator(this);
+	mpAzimuthWindowValid = new QLedIndicator(this);
 	mpAzimuthWindowValid->setText("Azimuth Window Valid");
 
 	mpLidarModeLabel = new QLabel("Lidar Mode:", this);
