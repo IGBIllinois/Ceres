@@ -1,5 +1,6 @@
 
 #include "HySpexStatusView.hpp"
+#include "HySpexCameraModel.hpp"
 #include "QIndicator.hpp"
 
 #include <QLineEdit>
@@ -11,9 +12,9 @@
 #include <string>
 
 
-cHySpexStatusView::cHySpexStatusView(cSensorModel* pModel, QWidget* parent)
+cHySpexStatusView::cHySpexStatusView(cHySpexCameraModel* pModel, QWidget* parent)
 :
-    cSensorStatusView(pModel, parent)
+    cSensorStatusView(pModel, parent), mpModel(pModel)
 {
 }
 
@@ -25,39 +26,50 @@ void cHySpexStatusView::createWidgets()
 {
 	cSensorStatusView::createWidgets();
 
+	mpInitializationStatus = new QButtonIndicator(this);
+	mpInitializationStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	mpInitializationStatus->setMinimumWidth(125);
+
 	mpAcquisitionStatus = new QButtonIndicator(this);
 	mpAcquisitionStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	mpAcquisitionStatus->setMinimumWidth(50);
+	mpAcquisitionStatus->setMinimumWidth(125);
 
 	mpBackgroundStatus = new QButtonIndicator(this);
 	mpBackgroundStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	mpBackgroundStatus->setMinimumWidth(50);
+	mpBackgroundStatus->setMinimumWidth(125);
 
 	mpCommunicationStatus = new QButtonIndicator(this);
 	mpCommunicationStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	mpCommunicationStatus->setMinimumWidth(50);
+	mpCommunicationStatus->setMinimumWidth(125);
 
 	mpCoolingStatus = new QButtonIndicator(this);
 	mpCoolingStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	mpCoolingStatus->setMinimumWidth(50);
+	mpCoolingStatus->setMinimumWidth(125);
 
 	mpShutterStatus = new QButtonIndicator(this);
 	mpShutterStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	mpShutterStatus->setMinimumWidth(50);
+	mpShutterStatus->setMinimumWidth(125);
 
-//	mpTest->setState(QButtonIndicator::ACTIVE);
+	mLensNameLabel = new QLabel("Name");
+	mpLensName = new QLineEdit();
+	mpLensName->setReadOnly(true);
 
-//	auto font = mpTest->font();
-//	font.setPointSize(12);
-//	mpTest->setFont(font);
+	mLensWorkingDistanceLabel = new QLabel("WD (cm)");
+	mpLensWorkingDistance_cm = new QLineEdit();
+	mpLensWorkingDistance_cm->setReadOnly(true);
+
+	mLensFieldOfViewLabel = new QLabel("FOV (deg)");
+	mpLensFieldOfView_deg = new QLineEdit();
+	mpLensFieldOfView_deg->setReadOnly(true);
 }
 
-void cHySpexStatusView::doSubLayout(QBoxLayout* pMainLayout)
+void cHySpexStatusView::doStatusLayout(QBoxLayout* pMainLayout)
 {
 	QGroupBox* cameraStatusBox = new QGroupBox("Camera Status");
 
 	auto* statusLayout = new QHBoxLayout();
 
+	statusLayout->addWidget(mpInitializationStatus);
 	statusLayout->addWidget(mpCommunicationStatus);
 	statusLayout->addWidget(mpAcquisitionStatus);
 	statusLayout->addWidget(mpCoolingStatus);
@@ -67,12 +79,74 @@ void cHySpexStatusView::doSubLayout(QBoxLayout* pMainLayout)
 	cameraStatusBox->setLayout(statusLayout);
 
 	pMainLayout->addWidget(cameraStatusBox);
-
 }
 
-void cHySpexStatusView::onAcqStatusChange(hyspex::AcquisitionStatus status)
+void cHySpexStatusView::doLensInfoLayout(QBoxLayout* pMainLayout)
+{
+	QGroupBox* lensInfoBox = new QGroupBox("Lens Info");
+
+	auto* infoLayout = new QHBoxLayout();
+
+	infoLayout->addWidget(mLensNameLabel);
+	infoLayout->addWidget(mpLensName);
+
+	infoLayout->addWidget(mLensWorkingDistanceLabel);
+	infoLayout->addWidget(mpLensWorkingDistance_cm);
+
+	infoLayout->addWidget(mLensFieldOfViewLabel);
+	infoLayout->addWidget(mpLensFieldOfView_deg);
+
+	lensInfoBox->setLayout(infoLayout);
+
+	pMainLayout->addWidget(lensInfoBox);
+}
+
+void cHySpexStatusView::onInitStatusChange()
 {
 	using namespace hyspex;
+
+	auto status = mpModel->getInitStatus();
+
+	switch (status)
+	{
+	case HYSPEX_INIT_PENDING_DETECTION:   //!< Camera detection pending.
+		mpInitializationStatus->setState(QButtonIndicator::WARNING, "INIT DETECTION");
+		break;
+	case HYSPEX_INIT_PENDING_ELECTRONICS: //!< Pending initialization of I/O electronics.
+		mpInitializationStatus->setState(QButtonIndicator::WARNING, "INIT ELEC");
+		break;
+	case HYSPEX_INIT_PENDING_SENSOR:      //!< Pending initialization of Sensor.
+		mpInitializationStatus->setState(QButtonIndicator::WARNING, "INIT SENSOR");
+		break;
+	case HYSPEX_INIT_PENDING_TRANSPORT:   //!< Pending initialization of frame grabber (if applicable).
+		mpInitializationStatus->setState(QButtonIndicator::WARNING, "INIT TRANSPORT");
+		break;
+	case HYSPEX_INIT_OK:                  //!< Camera initialization OK.
+		mpInitializationStatus->setState(QButtonIndicator::OK, "INIT OK");
+		break;
+	case HYSPEX_INIT_FAILED_DETECTION:   //!< Camera detection failed. Internal use only, as the camera will not be returned by CameraManager in this state.
+		mpInitializationStatus->setState(QButtonIndicator::ERROR, "INIT DETECTION");
+		break;
+	case HYSPEX_INIT_FAILED_ELECTRONICS: //!< Failed to initialize I/O Electronics.
+		mpInitializationStatus->setState(QButtonIndicator::ERROR, "INIT ELEC");
+		break;
+	case HYSPEX_INIT_FAILED_SENSOR:      //!< Failed to initialize Sensor. Ensure settings are valid.
+		mpInitializationStatus->setState(QButtonIndicator::ERROR, "INIT SENSOR");
+		break;
+	case HYSPEX_INIT_FAILED_TRANSPORT:   //!< Failed to initialize frame grabber (if applicable). Check frame grabber configuration (name, 3-tap vs. 10-tap etc).
+		mpInitializationStatus->setState(QButtonIndicator::ERROR, "INIT TRANSPORT");
+		break;
+	case HYSPEX_INIT_NOT_STARTED:       //!< Canmera::init() has not been called yet. Call Camera::init()
+		mpInitializationStatus->setState(QButtonIndicator::ERROR, "INIT NOT STARTED");
+		break;
+	}
+}
+
+void cHySpexStatusView::onAcqStatusChange()
+{
+	using namespace hyspex;
+
+	auto status = mpModel->getAcquisitionStatus();
 
 	switch (status)
 	{
@@ -106,9 +180,11 @@ void cHySpexStatusView::onAcqStatusChange(hyspex::AcquisitionStatus status)
 	}
 }
 
-void cHySpexStatusView::onBgStatusChange(hyspex::BackgroundStatus status)
+void cHySpexStatusView::onBgStatusChange()
 {
 	using namespace hyspex;
+
+	auto status = mpModel->getBackgroundStatus();
 
 	switch (status)
 	{
@@ -120,7 +196,7 @@ void cHySpexStatusView::onBgStatusChange(hyspex::BackgroundStatus status)
 		break;
 	case HYSPEX_BG_VALID:
 	case HYSPEX_BG_PENDING_READY:
-		mpBackgroundStatus->setState(QButtonIndicator::OK, "BG OK");
+		mpBackgroundStatus->setState(QButtonIndicator::OK, "BG OK/CALC");
 		break;
 	case HYSPEX_BG_EXPIRED:
 		mpBackgroundStatus->setState(QButtonIndicator::ALERT, "BG EXPIRED");
@@ -131,9 +207,11 @@ void cHySpexStatusView::onBgStatusChange(hyspex::BackgroundStatus status)
 	}
 }
 
-void cHySpexStatusView::onCommStatusChange(hyspex::CommunicationStatus status)
+void cHySpexStatusView::onCommStatusChange()
 {
 	using namespace hyspex;
+
+	auto status = mpModel->getCommunicationStatus();
 
 	switch (status)
 	{
@@ -155,9 +233,11 @@ void cHySpexStatusView::onCommStatusChange(hyspex::CommunicationStatus status)
 	}
 }
 
-void cHySpexStatusView::onCoolingStatusChange(hyspex::CoolingStatus status)
+void cHySpexStatusView::onCoolingStatusChange()
 {
 	using namespace hyspex;
+
+	auto status = mpModel->getCoolingStatus();
 
 	switch (status)
 	{
@@ -182,9 +262,11 @@ void cHySpexStatusView::onCoolingStatusChange(hyspex::CoolingStatus status)
 	}
 }
 
-void cHySpexStatusView::onShutterStatusChange(hyspex::ShutterStatus status)
+void cHySpexStatusView::onShutterStatusChange()
 {
 	using namespace hyspex;
+
+	auto status = mpModel->getShutterStatus();
 
 	switch (status)
 	{
@@ -207,10 +289,20 @@ void cHySpexStatusView::onShutterStatusChange(hyspex::ShutterStatus status)
 		mpShutterStatus->setState(QButtonIndicator::ERROR, "SH CLOSE");
 		break;
 	case HYSPEX_SHUTTER_UNKNOWN:
-		mpShutterStatus->setState(QButtonIndicator::UNKNOWN, "SH UNKN");
+		mpShutterStatus->setState(QButtonIndicator::UNKNOWN, "SH UNKNOWN");
 		break;
 	}
 }
 
+void cHySpexStatusView::onLensInfoChange()
+{
+	auto name = mpModel->getLensName();
+	auto wd_cm = mpModel->getWorkingDistance_cm();
+	auto fov_deg = mpModel->getFieldOfView_deg();
+
+	mpLensName->setText(QString::fromStdString(name));
+	mpLensWorkingDistance_cm->setText(QString::number(wd_cm, 'f', 1));
+	mpLensFieldOfView_deg->setText(QString::number(fov_deg, 'f', 1));
+}
 
 

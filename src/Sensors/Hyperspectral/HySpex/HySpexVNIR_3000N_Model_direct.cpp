@@ -15,9 +15,13 @@ cHySpexVNIR_3000N_Model_direct::cHySpexVNIR_3000N_Model_direct(std::unique_ptr<h
 :
     cHySpexVNIR_3000N_Model(parent), mCamera(std::move(camera))
 {
+    mTemperatureUpdateTimer.interval_sec(5);
 }
 
-cHySpexVNIR_3000N_Model_direct::~cHySpexVNIR_3000N_Model_direct() {}
+cHySpexVNIR_3000N_Model_direct::~cHySpexVNIR_3000N_Model_direct()
+{
+    mCamera->unregisterNotificationCallback(&cHySpexCameraModel::handleStatusCallback);
+}
 
 
 void cHySpexVNIR_3000N_Model_direct::updateViews()
@@ -27,19 +31,51 @@ void cHySpexVNIR_3000N_Model_direct::updateViews()
 
 bool cHySpexVNIR_3000N_Model_direct::configure(const nlohmann::json& jsonCfg)
 {
+    mID = mCamera->getId();
+    mSerialNumber = mCamera->getSerialNumber();
+
+    mCamera->registerNotificationCallback(&cHySpexCameraModel::handleStatusCallback, this);
+
     try
     {
-        cHyperspectralModel::configure(jsonCfg);
+        auto section = jsonCfg["VNIR-3000N"];
+
+        cHySpexVNIR_3000N_Model::configure(section);
     }
     catch (const std::exception& e)
     {
-        QString msg = "Error in the \"hyspex\" configuration: ";
+        QString msg = "Error in the \"hyspex, VNIR-3000N\" camera configuration section: ";
         msg.append(e.what());
+        qCritical() << msg;
+
         emit logMessage(logERROR, q_name(), msg);
+
+        setStatus(sensor::eStatus::FAILED);
+
         return false;
     }
 
-    emit 
+    if (mLens != mCamera->getLensName())
+    {
+        auto n = mCamera->getLensCount();
+        for (unsigned int l = 0; l < n; ++l)
+        {
+            auto lens = mCamera->getLensNameFromId(l);
+            if (lens == mLens)
+            {
+                mCamera->useLensId(l);
+                break;
+            }
+        }
+    }
+
+    mLens = mCamera->getLensName();
+    mWorkingDistance_cm = mCamera->getLensWorkingDistance_cm();
+    mFieldOfView_deg = mCamera->getLensFieldOfView_rad() * nConstants::RAD_TO_DEG;
+    emit lensInfoChanged();
+
+    setStatus(sensor::eStatus::CONFIGURED);
+
     return true;
 }
 
@@ -52,6 +88,7 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     mCamera->init(mNumBuffersRaw, mNumBufferPreProcessing);
 
     mInitStatus = mCamera->getInitStatus();
+    emit initStatusChanged();
 
     if (mInitStatus == hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED)
     {
@@ -59,15 +96,16 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     }
 
     mInitStatus = mCamera->getInitStatus();
+    emit initStatusChanged();
 
     switch (mInitStatus)
     {
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_DETECTION:
-            break;
+        break;
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_ELECTRONICS:
-            break;
+        break;
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_SENSOR:
-            break;
+        break;
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_DETECTION:
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_ELECTRONICS:
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_SENSOR:
@@ -84,11 +122,6 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
         }
     }
 
-	//	auto commStatus = vnir->getCommunicationStatus();
-	//	std::cout << "COMM STATUS = " << hyspex::to_string(commStatus) << std::endl;
-
-	mID = mCamera->getId();
-    mSerialNumber = mCamera->getSerialNumber();
     mWavelengthRangeId = mCamera->getWavelengthRangeId();
 
     mSpectralSize = mCamera->getSpectralSize();
@@ -100,10 +133,13 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     mMaxPixelValue = mCamera->getMaxPixelValue();
 
     mCommStatus = mCamera->getCommunicationStatus();
-    emit commStatusChanged(mCommStatus);
+    emit commStatusChanged();
 
 	mCoolingStatus = mCamera->getCoolingStatus();
-    emit coolingStatusChanged(mCoolingStatus);
+    emit coolingStatusChanged();
+
+    mShutterStatus = mCamera->getShutterStatus();
+    emit shutterStatusChanged();
 
 	mAvgerageFrames = mCamera->getAverageFrames();
     emit avgFramesChanged(mAvgerageFrames);
@@ -127,10 +163,10 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     emit sensorTempChanged(mSensorTemp_C);
 
 	mBackgroundStatus = mCamera->getBackgroundStatus();
-    emit bgStatusChanged(mBackgroundStatus);
+    emit bgStatusChanged();
 
 	mAcquisitionStatus = mCamera->getAcquisitionStatus();
-    emit acqStatusChanged(mAcquisitionStatus);
+    emit acqStatusChanged();
 
 /*
 	auto badPixels = vnir->getBadPixels();
@@ -158,28 +194,53 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
 
 bool cHySpexVNIR_3000N_Model_direct::startCommunications()
 {
+    mTemperatureUpdateTimer.reset();
     mCamera->initAcquisition();
-    return true;
+
+    mCamera->startAcquisition();
+
+    mAcquisitionStatus = mCamera->getAcquisitionStatus();
+
+    mConnected = (mAcquisitionStatus == hyspex::AcquisitionStatus::HYSPEX_ACQ_PENDING)
+        || (mAcquisitionStatus == hyspex::AcquisitionStatus::HYSPEX_ACQ_RUNNING)
+        || (mAcquisitionStatus == hyspex::AcquisitionStatus::HYSPEX_ACQ_STOPPED);
+
+    if (mConnected)
+        setStatus(sensor::eStatus::RUNNING);
+    else
+        setStatus(sensor::eStatus::FAILED);
+
+    return mConnected;
 }
 
 void cHySpexVNIR_3000N_Model_direct::stopCommunications()
 {
+    mCamera->stopAcquisition();
+
+    mAcquisitionStatus = mCamera->getAcquisitionStatus();
+    emit acqStatusChanged();
+
+    mConnected = false;
+
+    setStatus(sensor::eStatus::STOPPED);
 }
 
 void cHySpexVNIR_3000N_Model_direct::update()
 {
-    if (mInitStatus != hyspex::InitStatus::HYSPEX_INIT_OK)
+    if (mTemperatureUpdateTimer.elapsed())
     {
-        mInitStatus = mCamera->getInitStatus();
-        return;
+        mAmbientTemp_C = mCamera->getAmbientTemperature_C();
+        emit ambientTempChanged(mAmbientTemp_C);
+
+        mSensorTemp_C = mCamera->getSensorTemperature_C();
+        emit sensorTempChanged(mSensorTemp_C);
     }
 
-    if (mCommStatus != hyspex::CommunicationStatus::HYSPEX_COMM_OK)
+    if (mRequestBackground)
     {
-        mCommStatus = mCamera->getCommunicationStatus();
-        emit commStatusChanged(mCommStatus);
+        mCamera->calculateBackground(0, 200);
+        mRequestBackground = false;
     }
-
 }
 
 void cHySpexVNIR_3000N_Model_direct::writeDataHeader()

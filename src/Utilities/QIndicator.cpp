@@ -291,10 +291,10 @@ void QButtonIndicator::setStatePattern(eState state, Qt::BrushStyle pattern)
 	}
 }
 
-QSize QButtonIndicator::minimumSizeHint() const
-{
-	return sizeHint();
-}
+//QSize QButtonIndicator::minimumSizeHint() const
+//{
+//	return sizeHint();
+//}
 
 QSize QButtonIndicator::sizeHint() const
 {

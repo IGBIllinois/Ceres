@@ -89,7 +89,13 @@ set(HYSPEX_SOURCE_FILES
 	HySpexSWIR_384_PropertyPage.hpp
 	HySpexSWIR_384_PropertyPage.cpp
 
-
+	
+#
+# HySpex Cameras General Files
+#
+	HySpexDataTypes.hpp
+    HySpexCameraModel.hpp
+    HySpexCameraModel.cpp
     HySpexStatusView.hpp
     HySpexStatusView.cpp
 	hyspex_utils.hpp

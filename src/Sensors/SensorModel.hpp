@@ -20,6 +20,9 @@ namespace sensor
     eStatus to_sensor_status(const std::string& str);
 }
 
+Q_DECLARE_METATYPE(sensor::eStatus)
+
+
 const quint8   logSTATUS  = 0;
 const quint8   logINFO    = 1;
 const quint8   logWARNING = 2;
@@ -87,12 +90,16 @@ public:
     /*
      * Apply any configuration parameters to the sensor
      * model.
+     * 
+     * A sensor model is configured first..
      */
     virtual bool configure(const nlohmann::json& jsonCfg);
 
     /*
      * Do any sensor initialization needed before the
      * sensor model is moved to the data thread.
+     * 
+     * and then initialize is called.
      */
     virtual bool isInitialized() const;
     virtual bool initialize();

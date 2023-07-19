@@ -1,6 +1,5 @@
 
 #include "HySpexVNIR_3000N_Model.hpp"
-#include "HySpexFactory.hpp"
 #include "Constants.hpp"
 
 #include <optional>
@@ -9,16 +8,9 @@
 
 cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
 :
-    cHyperspectralModel("VNIR 3000N", parent)
+    cHySpexCameraModel("VNIR 3000N", parent)
 {
-    mConnected = false;
-    mManufacturer = "HySpex";
     mModel = "VNIR 3000N";
-}
-
-const char* cHySpexVNIR_3000N_Model::descriptor() const
-{
-    return hyspex_id;
 }
 
 uint16_t cHySpexVNIR_3000N_Model::data_class_id() const
@@ -30,7 +22,6 @@ bool cHySpexVNIR_3000N_Model::configure(const nlohmann::json& jsonCfg)
 {
     try
     {
-        cHyperspectralModel::configure(jsonCfg);
     }
     catch (const std::exception& e)
     {
@@ -40,25 +31,7 @@ bool cHySpexVNIR_3000N_Model::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
-    return true;
-}
-
-bool cHySpexVNIR_3000N_Model::startCommunications()
-{
-    mConnected = true;
-
-    return true;
-}
-
-void cHySpexVNIR_3000N_Model::stopCommunications()
-{
-
-    mConnected = false;
-}
-
-void cHySpexVNIR_3000N_Model::update()
-{
-    if (!mConnected) return;
+    return cHySpexCameraModel::configure(jsonCfg);
 }
 
 void cHySpexVNIR_3000N_Model::enableDataRecording(cBlockDataFileWriter& file)

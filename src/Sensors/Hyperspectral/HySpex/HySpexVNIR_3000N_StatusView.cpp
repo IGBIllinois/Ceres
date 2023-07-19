@@ -57,7 +57,7 @@ void cHySpexVNIR_3000N_StatusView::doLayout()
 
 	mainLayout->addWidget(getSensorStatusBox());
 
-	doSubLayout(mainLayout);
+	doStatusLayout(mainLayout);
 
 	QGroupBox* acqBox = new QGroupBox("Acquisition Status");
 

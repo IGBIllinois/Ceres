@@ -2,6 +2,7 @@
 #pragma once
 
 #include "HySpexSWIR_384_Model.hpp"
+#include "Timers.hpp"
 
 #include <QObject>
 
@@ -28,6 +29,7 @@ public:
     void updateViews() override;
 
     bool configure(const nlohmann::json& jsonCfg) override;
+    bool initialize() override;
 
     void writeDataHeader() override;
 
@@ -45,6 +47,8 @@ protected:
     void update() override;
 
 private:
+    cIntervalTimer mTemperatureUpdateTimer;
+
     std::unique_ptr<hyspex::cSWIR384> mCamera;
 };
 

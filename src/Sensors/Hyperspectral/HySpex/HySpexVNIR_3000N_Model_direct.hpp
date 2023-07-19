@@ -2,6 +2,7 @@
 #pragma once
 
 #include "HySpexVNIR_3000N_Model.hpp"
+#include "Timers.hpp"
 
 #include <cbdf/HyperspectralBuffers.hpp>
 #include <cbdf/HySpexVNIR_3000N_Serializer.hpp>
@@ -48,8 +49,11 @@ signals:
 protected:
     void update() override;
 
-
 private:
+    cIntervalTimer mTemperatureUpdateTimer;
+
+    bool mRequestBackground = true;
+
     std::unique_ptr<hyspex::cVNIR3000N> mCamera;
 
 #if 0
@@ -440,35 +444,6 @@ public:
         ImageOptions options = HYSPEX_RE, bool removeBadPixels = true);
 
 
-public:
-    /****************************************************************
-     ***              Shutter   Properties / Control              ***
-     ****************************************************************/
-
-     /**
-      * @brief getShutterStatus
-      */
-    ShutterStatus getShutterStatus();
-
-    /**
-     * @brief isShutterOpen / isShutterClosed
-     * Request shutter status from electronics
-     */
-    bool isShutterOpen();
-    bool isShutterClosed();
-
-    /**
-     * @brief openShutter
-     * Signal to open shutter, will wait until operation is complete.
-     */
-    void openShutter();
-
-    /**
-     * @brief closeShutter
-     * Signal to close shutter, will wait until operation is complete.
-     */
-    void closeShutter();
-
 
 public:
     /****************************************************************
@@ -496,43 +471,6 @@ public:
     void stopHighSNRMode();
 
 
-public:
-    /****************************************************************
-     ***                      Calibrations                        ***
-     ****************************************************************/
-
-     /**
-      * Get calibrated spectral wavelength in nm for each spectral band.
-      */
-    const ConstBuffer<double>& getSpectralCalibrationPerBand() const;
-
-    /**
-     * Get calibrated spectral wavelength in nm for each spectral band. (full calibrated sensor)
-     */
-    const ConstBuffer<double>& getFullSpectralCalibrationPerBand() const;
-
-    /**
-     * Get delta wavelength in nm for each spectral band.
-     */
-    const ConstBuffer<double>& getSpectralDeltaPerBand() const;
-
-    /**
-     * Get calibrated spectral wavelength in nm for each spectral pixel.
-     * NB: just duplicated from spectral_calib unless spectral_calib_matrix is in .set file.
-     */
-    const ConstBuffer<double>& getSpectralCalibrationPerPixel() const;
-
-    /**
-     * Get calibrated spectral wavelength in nm for each pixel. (full calibrated sensor)
-     * NB: just duplicated from spectral_calib unless spectral_calib_matrix is in .set file.
-     */
-    const ConstBuffer<double>& getFullSpectralCalibrationPerPixel() const;
-
-    /**
-     * Get delta wavelength in nm for each pixel
-     * NB : just duplicated from spectral_calib unless spectral_calib_matrix is in .set file.
-     */
-    const ConstBuffer< double >& getSpectralDeltaPerPixel() const;
 #endif
 
 };

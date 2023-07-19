@@ -7,28 +7,20 @@
 #include "HySpexVNIR_3000N_Controller.hpp"
 #include "HySpexVNIR_3000N_View.hpp"
 #include "HySpexVNIR_3000N_StatusView.hpp"
+#include "HySpexVNIR_3000N_PropertyPage_Remote.hpp"
 #include "HySpexSWIR_384_Model_direct.hpp"
 #include "HySpexSWIR_384_Model_net.hpp"
 #include "HySpexSWIR_384_Controller.hpp"
 #include "HySpexSWIR_384_View.hpp"
 #include "HySpexSWIR_384_StatusView.hpp"
+#include "HySpexSWIR_384_PropertyPage_Remote.hpp"
 
 #include <HySpexConnect/HySpexCameraFactory.hpp>
 
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
-#include <QMetaType>
 #include <QDebug>
-#include <QMetaType>
-
-Q_DECLARE_METATYPE(hyspex::AcquisitionStatus);
-Q_DECLARE_METATYPE(hyspex::BackgroundStatus);
-Q_DECLARE_METATYPE(hyspex::CommunicationStatus);
-Q_DECLARE_METATYPE(hyspex::CoolingStatus);
-Q_DECLARE_METATYPE(hyspex::InitStatus);
-Q_DECLARE_METATYPE(hyspex::RecordingStatus);
-Q_DECLARE_METATYPE(hyspex::ShutterStatus);
 
 
 namespace
@@ -93,11 +85,14 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
 
         QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
 
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::initStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onInitStatusChange);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::commStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onCommStatusChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::acqStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onAcqStatusChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::bgStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onBgStatusChange);
-        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::commStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onCommStatusChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::coolingStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onCoolingStatusChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::shutterStatusChanged, pView, &cHySpexVNIR_3000N_StatusView::onShutterStatusChange);
+
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::lensInfoChanged, pView, &cHySpexVNIR_3000N_StatusView::onLensInfoChange);
 
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::avgFramesChanged, pView, &cHySpexVNIR_3000N_StatusView::onAvgFramesChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::framePeriodChanged, pView, &cHySpexVNIR_3000N_StatusView::onFramePeriodChange);
@@ -161,8 +156,25 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
 
         QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
 
-        auto* pController = new cHySpexSWIR_384_Controller(pModel);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::initStatusChanged, pView, &cHySpexSWIR_384_StatusView::onInitStatusChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::commStatusChanged, pView, &cHySpexSWIR_384_StatusView::onCommStatusChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::acqStatusChanged, pView, &cHySpexSWIR_384_StatusView::onAcqStatusChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::bgStatusChanged, pView, &cHySpexSWIR_384_StatusView::onBgStatusChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::coolingStatusChanged, pView, &cHySpexSWIR_384_StatusView::onCoolingStatusChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::shutterStatusChanged, pView, &cHySpexSWIR_384_StatusView::onShutterStatusChange);
 
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::lensInfoChanged, pView, &cHySpexSWIR_384_StatusView::onLensInfoChange);
+
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::avgFramesChanged, pView, &cHySpexSWIR_384_StatusView::onAvgFramesChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::framePeriodChanged, pView, &cHySpexSWIR_384_StatusView::onFramePeriodChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::minFramePeriodChanged, pView, &cHySpexSWIR_384_StatusView::onMinFramePeriodChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::integrationTimeChanged, pView, &cHySpexSWIR_384_StatusView::onIntegrationTimeChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::maxIntegrationTimeChanged, pView, &cHySpexSWIR_384_StatusView::onMaxIntegrationTimeChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::ambientTempChanged, pView, &cHySpexSWIR_384_StatusView::onAmbientTempChange);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::sensorTempChanged, pView, &cHySpexSWIR_384_StatusView::onSensorTempChange);
+
+
+        auto* pController = new cHySpexSWIR_384_Controller(pModel);
 
         return sSensorWidgets(pModel, pController, pView);
     }
@@ -200,5 +212,19 @@ bool hyspex::remove_sensor(sSensorWidgets widgets)
 cSensorPropertyPage* hyspex::create_sensor_property_page(const std::string& model, uint32_t version,
     const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
+    if (model == "VNIR-3000N")
+    {
+        auto page = new cHySpexVNIR_3000N_PropertyPage_Remote();
+        page->initialize(remote_ip_address, port, false, local_ip_address);
+        return page;
+    }
+
+    if (model == "SWIR-384")
+    {
+        auto page = new cHySpexSWIR_384_PropertyPage_Remote();
+        page->initialize(remote_ip_address, port, false, local_ip_address);
+        return page;
+    }
+
     return nullptr;
 }

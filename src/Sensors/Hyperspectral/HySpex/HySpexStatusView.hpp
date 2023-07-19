@@ -3,15 +3,18 @@
 
 #include "../Sensors/SensorStatusView.hpp"
 
-#include <hyspex/datatypes.h>
+#include "HySpexDataTypes.hpp"
 
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 	class QBoxLayout;
+	class QLabel;
+	class QLineEdit;
 QT_END_NAMESPACE
 
 // Forward Declaration
+class cHySpexCameraModel;
 class QButtonIndicator;
 
 
@@ -20,7 +23,7 @@ class cHySpexStatusView : public cSensorStatusView
 	Q_OBJECT
 
 public:
-	cHySpexStatusView(cSensorModel* pModel, QWidget* parent = nullptr);
+	cHySpexStatusView(cHySpexCameraModel* pModel, QWidget* parent = nullptr);
 	virtual ~cHySpexStatusView();
 
 public:
@@ -31,21 +34,37 @@ public:
 	void createWidgets() override;
 
 public slots:
-	void onAcqStatusChange(hyspex::AcquisitionStatus status);
-	void onBgStatusChange(hyspex::BackgroundStatus status);
-	void onCommStatusChange(hyspex::CommunicationStatus status);
-	void onCoolingStatusChange(hyspex::CoolingStatus status);
-	void onShutterStatusChange(hyspex::ShutterStatus status);
+	void onInitStatusChange();
+	void onCommStatusChange();
+	void onAcqStatusChange();
+	void onBgStatusChange();
+	void onCoolingStatusChange();
+	void onShutterStatusChange();
+
+	void onLensInfoChange();
+
+protected:
+	void doStatusLayout(QBoxLayout* pMainLayout);
+	void doLensInfoLayout(QBoxLayout* pMainLayout);
 
 
 protected:
-	void doSubLayout(QBoxLayout* pMainLayout);
-
-
-protected:
+	QButtonIndicator* mpInitializationStatus = nullptr;
+	QButtonIndicator* mpCommunicationStatus = nullptr;
 	QButtonIndicator* mpAcquisitionStatus = nullptr;
 	QButtonIndicator* mpBackgroundStatus = nullptr;
-	QButtonIndicator* mpCommunicationStatus = nullptr;
 	QButtonIndicator* mpCoolingStatus = nullptr;
 	QButtonIndicator* mpShutterStatus = nullptr;
+
+	QLabel* mLensNameLabel = nullptr;
+	QLineEdit* mpLensName = nullptr;
+
+	QLabel* mLensWorkingDistanceLabel = nullptr;
+	QLineEdit* mpLensWorkingDistance_cm = nullptr;
+
+	QLabel* mLensFieldOfViewLabel = nullptr;
+	QLineEdit* mpLensFieldOfView_deg = nullptr;
+
+private:
+	const cHySpexCameraModel* mpModel;
 };

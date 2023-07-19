@@ -1,28 +1,20 @@
 
 #pragma once
 
-#include "../HyperspectralModel.hpp"
-#include "../HyperspectralData.hpp"
-
-#include <hyspex/datatypes.h>
+#include "HySpexCameraModel.hpp"
 
 #include <cbdf/HySpexVNIR_3000N_Serializer.hpp>
 
 #include <QObject>
 
 
-class cHySpexVNIR_3000N_Model : public cHyperspectralModel
+class cHySpexVNIR_3000N_Model : public cHySpexCameraModel
 {
     Q_OBJECT
 
 public:
     cHySpexVNIR_3000N_Model(QObject* parent = nullptr);
     virtual ~cHySpexVNIR_3000N_Model() = default;
-
-    /*
-     * Returns a string used as a descriptor of the sensor.
-     */
-    const char* descriptor() const override;
 
     /*
      * Returns the class identifier used by the sensor's serializer
@@ -36,76 +28,12 @@ public:
 
     void writeDataHeader() override;
 
-    /*
-     * Starts/Stops communication with the endpoint.
-     * These methods are called inside the QThread so that
-     * all of the communication happens within the same thread!
-     */
-    bool startCommunications() override;
-    void stopCommunications() override;
-
 signals:
-    void imageSizeChanged(std::size_t spatialSize, std::size_t spectralSize);
-
-    void acqStatusChanged(hyspex::AcquisitionStatus status);
-    void bgStatusChanged(hyspex::BackgroundStatus status);
-    void commStatusChanged(hyspex::CommunicationStatus status);
-    void coolingStatusChanged(hyspex::CoolingStatus status);
-    void initStatusChanged(hyspex::InitStatus status);
-    void recordingStatusChanged(hyspex::RecordingStatus status);
-    void shutterStatusChanged(hyspex::ShutterStatus status);
-
-    void avgFramesChanged(std::uint16_t avgFrames);
-    void framePeriodChanged(std::uint32_t period_us);
-    void minFramePeriodChanged(std::uint32_t period_us);
-    void integrationTimeChanged(std::uint32_t time_us);
-    void maxIntegrationTimeChanged(std::uint32_t time_us);
-    void ambientTempChanged(double temp_C);
-    void sensorTempChanged(double temp_C);
 
 
 protected:
-    void update() override;
-
-protected:
-    bool mConnected;
-
-    unsigned int mNumBuffersRaw = 1024;
-    unsigned int mNumBufferPreProcessing = 128;
-
-    // Basic Camera Information...
-    std::string mID;
-    std::string mSerialNumber;
-    hyspex::WavelengthRangeId mWavelengthRangeId = hyspex::WavelengthRangeId::HYSPEX_WRID_UNDEFINED;
-
-	std::size_t mSpatialSize = 0;
-    std::size_t mSpectralSize = 0;
-
-    // This will be identical to SpatialSize/SpectralSize if no Spatial ROI is in effect.
-    std::size_t mMaxSpatialSize = 0;
-    std::size_t mMaxSpectralSize = 0;
-
-    // Max pixel value, 2 ^ bpp - 1 (bits per pixel).
-    unsigned short mMaxPixelValue = 0;
-
-    hyspex::InitStatus          mInitStatus = hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED;
-    hyspex::CommunicationStatus mCommStatus = hyspex::CommunicationStatus::HYSPEX_COMM_INIT;
-    hyspex::CoolingStatus       mCoolingStatus = hyspex::CoolingStatus::HYSPEX_COOLING_UNKNOWN;
-
-	std::uint16_t mAvgerageFrames = 0;
-    std::uint32_t mFramePeriod_us = 0;
-    std::uint32_t mMinFramePeriod_us = 0;
-    std::uint32_t mIntegrationTime_us = 0;
-    std::uint32_t mMaxIntegrationTime_us = 0;
-	double mAmbientTemp_C = 0.0;
-	double mSensorTemp_C = 0.0;
-
-	hyspex::BackgroundStatus mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_INVALID;
 	cHyperspectralImageBuffer<float> mBackground;
 
-	hyspex::AcquisitionStatus mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_STOPPED;
-
-    hyspex::ShutterStatus mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN;
 
 /*
 	auto badPixels = vnir->getBadPixels();

@@ -1,9 +1,7 @@
 
 #pragma once
 
-#include "../Sensors/SensorStatusView.hpp"
-#include "QIndicator.hpp"
-
+#include "HySpexStatusView.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -13,7 +11,7 @@ QT_END_NAMESPACE
 class cHySpexSWIR_384_Model;
 
 
-class cHySpexSWIR_384_StatusView : public cSensorStatusView
+class cHySpexSWIR_384_StatusView : public cHySpexStatusView
 {
 	Q_OBJECT
 
@@ -30,7 +28,30 @@ public:
 	void doLayout() override;
 
 public slots:
-
+	void onAvgFramesChange(std::uint16_t avgFrames);
+	void onFramePeriodChange(std::uint32_t period_us);
+	void onMinFramePeriodChange(std::uint32_t period_us);
+	void onIntegrationTimeChange(std::uint32_t time_us);
+	void onMaxIntegrationTimeChange(std::uint32_t time_us);
+	void onAmbientTempChange(double temp_C);
+	void onSensorTempChange(double temp_C);
 
 protected:
+	QLabel* mpAvgFramesLabel = nullptr;
+	QLineEdit* mpAvgFrames = nullptr;
+
+	QLabel* mpFramePeriodLabel = nullptr;
+	QLineEdit* mpFramePeriod_us = nullptr;
+
+	QLabel* mpMinFramePeriodLabel = nullptr;
+	QLineEdit* mpMinFramePeriod_us = nullptr;
+
+	QLabel* mpIntegrationTimeLabel = nullptr;
+	QLineEdit* mpIntegrationTime_us = nullptr;
+
+	QLabel* mpMaxIntegrationTimeLabel = nullptr;
+	QLineEdit* mpMaxIntegrationTime_us = nullptr;
+
+	QLabel* mpAmbientTempLabel = nullptr;
+	QLineEdit* mpAmbientTemp_C = nullptr;
 };

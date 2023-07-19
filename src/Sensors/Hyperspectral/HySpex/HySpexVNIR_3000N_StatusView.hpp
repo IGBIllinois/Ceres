@@ -3,7 +3,6 @@
 
 #include "HySpexStatusView.hpp"
 
-
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 QT_END_NAMESPACE

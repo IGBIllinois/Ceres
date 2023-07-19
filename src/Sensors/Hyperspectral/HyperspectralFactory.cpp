@@ -33,9 +33,8 @@ cSensorPropertyPage* hyperspectral::create_sensor_property_page(const std::strin
 {
     if (sensor_id.compare(hyspex_id) == 0)
     {
- //       return hyspex::create_sensor_property_page(version, remote_ip_address, port, local_ip_address);
+        return hyspex::create_sensor_property_page(model, version, remote_ip_address, port, local_ip_address);
     }
-
 
     return nullptr;
 }
