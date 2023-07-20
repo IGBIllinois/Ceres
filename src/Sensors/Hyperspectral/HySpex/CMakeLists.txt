@@ -1,11 +1,10 @@
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-source_group("Resources" FILES hyspex_swir_384_properties.proto hyspex_vnir_3000N_properties.proto)
+source_group("Resources" FILES hyspex_properties.proto)
 
 # Generate the header/source files needed from the protobuf
-protobuf_generate_cpp(HYSPEX_SWIR384_PROTO_SRCS HYSPEX_SWIR384_PROTO_HDRS DESCRIPTORS PROTO_DESCS hyspex_swir_384_properties.proto)
-protobuf_generate_cpp(HYSPEX_VNIR3000N_PROTO_SRCS HYSPEX_VNIR3000N_PROTO_HDRS DESCRIPTORS PROTO_DESCS hyspex_vnir_3000N_properties.proto)
+protobuf_generate_cpp(HYSPEX_PROTO_SRCS HYSPEX_PROTO_HDRS DESCRIPTORS PROTO_DESCS hyspex_properties.proto)
 
 # Add the public header files to use the library
 set(HYSPEX_PUBLIC_HEADERS
@@ -17,10 +16,8 @@ set(HYSPEX_SOURCE_FILES
 #
 # HySpex packet utilities
 #
-	hyspex_swir_384_packet_utils.hpp
-	hyspex_swir_384_packet_utils.cpp
-	hyspex_vnir_3000N_packet_utils.hpp
-	hyspex_vnir_3000N_packet_utils.cpp
+	hyspex_packet_utils.hpp
+	hyspex_packet_utils.cpp
 
 #
 # HySpex VNIR 3000N Cameras
@@ -94,6 +91,8 @@ set(HYSPEX_SOURCE_FILES
 # HySpex Cameras General Files
 #
 	HySpexDataTypes.hpp
+	HySpexCamera_PropertyPage.hpp
+	HySpexCamera_PropertyPage.cpp
     HySpexCameraModel.hpp
     HySpexCameraModel.cpp
     HySpexStatusView.hpp
@@ -125,13 +124,9 @@ PUBLIC
 PRIVATE
     ${HYSPEX_SOURCE_FILES}
 
-	${HYSPEX_SWIR384_PROTO_HDRS}
-    ${HYSPEX_SWIR384_PROTO_SRCS}
-	hyspex_swir_384_properties.proto
-
-	${HYSPEX_VNIR3000N_PROTO_HDRS}
-    ${HYSPEX_VNIR3000N_PROTO_SRCS}
-	hyspex_vnir_3000N_properties.proto
+	${HYSPEX_PROTO_HDRS}
+    ${HYSPEX_PROTO_SRCS}
+	hyspex_properties.proto
 )
 
 target_include_directories(hyspex_static PRIVATE ${COMMON_INCLUDE_DIR})

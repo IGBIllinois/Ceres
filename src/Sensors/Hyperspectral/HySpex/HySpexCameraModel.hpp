@@ -24,6 +24,11 @@ public:
     const char* descriptor() const override;
 
     /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
+    /*
      * The general configuration of a HySpex hyperspectral camera.
      */
     bool configure(const nlohmann::json& jsonCfg) override;
@@ -79,6 +84,11 @@ public:
     std::string getLensName() const;
     double getWorkingDistance_cm() const;
     double getFieldOfView_deg() const;
+
+    /*
+     * Retrieve information for the background
+     */
+    std::uint32_t getNumOfBackgrounds() const;
 
 signals:
     void initStatusChanged();
@@ -136,7 +146,7 @@ protected:
     hyspex::AcquisitionStatus   mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_STOPPED;
     hyspex::ShutterStatus       mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN;
 
-	std::uint16_t mAvgerageFrames = 0;
+	std::uint16_t mAverageFrames = 0;
     std::uint32_t mFramePeriod_us = 0;
     std::uint32_t mMinFramePeriod_us = 0;
     std::uint32_t mIntegrationTime_us = 0;
@@ -147,6 +157,8 @@ protected:
     std::string mLens;
     double mWorkingDistance_cm = 0.0;
     double mFieldOfView_deg = 0.0;
+
+    std::uint32_t mNumBackgrounds = 200;
 
 //	cHyperspectralImageBuffer<float> mBackground;
 

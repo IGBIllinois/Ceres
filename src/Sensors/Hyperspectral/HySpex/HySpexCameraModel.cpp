@@ -19,6 +19,26 @@ const char* cHySpexCameraModel::descriptor() const
     return hyspex_id;
 }
 
+void cHySpexCameraModel::updateViews()
+{
+    emit initStatusChanged();
+    emit commStatusChanged();
+    emit acqStatusChanged();
+    emit bgStatusChanged();
+    emit coolingStatusChanged();
+    emit shutterStatusChanged();
+
+    emit imageSizeChanged(mSpatialSize, mSpectralSize);
+
+    emit avgFramesChanged(mAverageFrames);
+    emit framePeriodChanged(mFramePeriod_us);
+    emit minFramePeriodChanged(mMinFramePeriod_us);
+    emit integrationTimeChanged(mIntegrationTime_us);
+    emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
+
+    emit lensInfoChanged();
+}
+
 bool cHySpexCameraModel::configure(const nlohmann::json& jsonCfg)
 {
     if (!jsonCfg.contains("lens"))
@@ -49,7 +69,7 @@ double cHySpexCameraModel::getSensorTemp_C() const { return mSensorTemp_C; }
 /*
  * Retrieve the current acquistion information
  */
-std::uint16_t cHySpexCameraModel::getAvgerageFrames() const { return mAvgerageFrames; }
+std::uint16_t cHySpexCameraModel::getAvgerageFrames() const { return mAverageFrames; }
 std::uint32_t cHySpexCameraModel::getFramePeriod_us() const { return mFramePeriod_us; }
 std::uint32_t cHySpexCameraModel::getMinFramePeriod_us() const { return mMinFramePeriod_us; }
 std::uint32_t cHySpexCameraModel::getIntegrationTime_us() const { return mIntegrationTime_us; }
@@ -61,6 +81,10 @@ std::uint32_t cHySpexCameraModel::getMaxIntegrationTime_us() const { return mMax
 std::string cHySpexCameraModel::getLensName() const { return mLens; }
 double cHySpexCameraModel::getWorkingDistance_cm() const { return mWorkingDistance_cm; }
 double cHySpexCameraModel::getFieldOfView_deg() const { return mFieldOfView_deg;  }
+
+std::uint32_t cHySpexCameraModel::getNumOfBackgrounds() const { return mNumBackgrounds; }
+
+
 
 void cHySpexCameraModel::handleStatusCallback(void* p, int eventId, int value)
 {
@@ -112,6 +136,13 @@ void cHySpexCameraModel::updateCommStatus(hyspex::CommunicationStatus status)
 void cHySpexCameraModel::updateCoolingStatus(hyspex::CoolingStatus status)
 {
     mCoolingStatus = status;
+
+    if (getStatus() == sensor::eStatus::BUSY)
+    {
+        if ((mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_OK) ||
+            (mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_DEGRADED))
+            setStatus(sensor::eStatus::RUNNING);
+    }
     emit coolingStatusChanged();
 }
 

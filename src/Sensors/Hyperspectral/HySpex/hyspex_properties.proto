@@ -3,23 +3,24 @@
 
 syntax = "proto3";
 
-// A Timestamp represents a point in time independent of any time zone or local
-// calendar, encoded as a count of seconds and fractions of seconds at
-// nanosecond resolution. The count is relative to an epoch at UTC midnight on
-// January 1, 1970, in the proleptic Gregorian calendar which extends the
-// Gregorian calendar backwards to year one.
-//
-//import "google/protobuf/timestamp.proto";
-
-package hyspex.vnir3000N;
+// Google protobuf does not support namespaces.  To avoid linker name conficts 
+// all messages must start with "namespace" name
 
 
 /******************************************************************************
  * Property Page -> Sensor Controller
  *****************************************************************************/
 
-message QueryState_1 
+ enum hyspex_eQuery 
 {
+  eQUERY_UNSPECIFIED = 0;
+  eQUERY_STATE = 1;
+  eQUERY_LENSES = 2;
+}
+
+message hyspex_QueryState_1 
+{
+	hyspex_eQuery query = 1;
 }
 
 
@@ -27,8 +28,15 @@ message QueryState_1
  * Sensor Controller -> Property Page
  *****************************************************************************/
 
- message CurrentState_1 
+ message hyspex_CurrentState_1 
 {
 	bool valid = 1;
+	uint32 average_frame = 2;
+    uint32 frame_period_us = 3;
+    uint32 min_frame_period_us = 4;
+    uint32 integration_time_us = 5;
+    uint32 max_integration_time_us = 6;
+    string lens_name = 7;
+    uint32 num_backgrounds = 8;
 }
 

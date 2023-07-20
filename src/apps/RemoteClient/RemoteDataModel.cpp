@@ -611,7 +611,7 @@ void cRemoteDataModel::newConnection()
 
         for (auto& sensor : mThread.mSensors)
         {
-            encodeSensorStatus(sensor->name(), to_string(sensor->status()));
+            encodeSensorStatus(sensor->name(), to_string(sensor->getStatus()));
         }
         cNetworkEncoder::sendData();
 

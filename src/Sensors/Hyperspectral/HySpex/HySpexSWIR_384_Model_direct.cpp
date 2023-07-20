@@ -25,6 +25,7 @@ cHySpexSWIR_384_Model_direct::~cHySpexSWIR_384_Model_direct()
 
 void cHySpexSWIR_384_Model_direct::updateViews()
 {
+    cHySpexSWIR_384_Model::updateViews();
 }
 
 bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
@@ -140,8 +141,8 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mShutterStatus = mCamera->getShutterStatus();
     emit shutterStatusChanged();
 
-	mAvgerageFrames = mCamera->getAverageFrames();
-    emit avgFramesChanged(mAvgerageFrames);
+	mAverageFrames = mCamera->getAverageFrames();
+    emit avgFramesChanged(mAverageFrames);
 
 	mFramePeriod_us = mCamera->getFramePeriod_us();
     emit framePeriodChanged(mFramePeriod_us);
@@ -161,7 +162,8 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mSensorTemp_C = mCamera->getSensorTemperature_C();
     emit sensorTempChanged(mSensorTemp_C);
 
-	mBackgroundStatus = mCamera->getBackgroundStatus();
+    mNumBackgrounds = mCamera->getNumberOfBackgrounds();
+    mBackgroundStatus = mCamera->getBackgroundStatus();
     emit bgStatusChanged();
 
 	mAcquisitionStatus = mCamera->getAcquisitionStatus();

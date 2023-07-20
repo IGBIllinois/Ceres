@@ -43,23 +43,6 @@ void cHySpexSWIR_384_PropertyPage_Remote::doApply()
 {
 	if (!mConnected)
 		return;
-
-	auto min_deg = mpMinAzimuthAngle_deg->text().toDouble();
-	auto max_deg = mpMaxAzimuthAngle_deg->text().toDouble();
-
-	if ((mMinAzimuthAngleDefault_deg != min_deg) ||
-		(mMaxAzimuthAngleDefault_deg != max_deg))
-	{
-		mMinAzimuthAngleDefault_deg = min_deg;
-		mMaxAzimuthAngleDefault_deg = max_deg;
-	}
-
-
-	auto mode = mpModes->currentText();
-	if (mode.compare(mModeDefault) != 0)
-	{
-		mModeDefault = mode;
-	}
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

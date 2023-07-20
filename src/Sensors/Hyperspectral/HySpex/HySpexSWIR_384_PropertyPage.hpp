@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "../../SensorPropertyPage.hpp"
-#include "ExperimentStateCreator.hpp"
+#include "HySpexCamera_PropertyPage.hpp"
 
  // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -18,7 +17,7 @@ class QGroupBox;
 QT_END_NAMESPACE
 
 
-class cHySpexSWIR_384_PropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
+class cHySpexSWIR_384_PropertyPage : public cHySpexCamera_PropertyPage
 {
 public:
     cHySpexSWIR_384_PropertyPage(QWidget* parent = nullptr);
@@ -28,20 +27,6 @@ public:
 
 public:
     cExperimentState* createState(const std::string& type) override;
-
-protected:
-    QLabel*     mpModeLabel = nullptr;
-    QComboBox*  mpModes = nullptr;
-
-    QGroupBox*  mpAzimuthWindow = nullptr;
-    QLabel*     mpMinAzimuthAngleLabel = nullptr;
-    QLineEdit*  mpMinAzimuthAngle_deg = nullptr;
-    QLabel*     mpMaxAzimuthAngleLabel = nullptr;
-    QLineEdit*  mpMaxAzimuthAngle_deg = nullptr;
-
-    QString mModeDefault;
-    double  mMinAzimuthAngleDefault_deg;
-    double  mMaxAzimuthAngleDefault_deg;
 };
 
 

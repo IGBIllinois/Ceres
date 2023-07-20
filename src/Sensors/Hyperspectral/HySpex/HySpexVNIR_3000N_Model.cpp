@@ -8,9 +8,9 @@
 
 cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
 :
-    cHySpexCameraModel("VNIR 3000N", parent)
+    cHySpexCameraModel("VNIR-3000N", parent)
 {
-    mModel = "VNIR 3000N";
+    mModel = "VNIR-3000N";
 }
 
 uint16_t cHySpexVNIR_3000N_Model::data_class_id() const

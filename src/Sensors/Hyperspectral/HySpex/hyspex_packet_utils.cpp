@@ -1,14 +1,12 @@
 
-#include "hyspex_vnir_3000N_packet_utils.hpp"
+#include "hyspex_packet_utils.hpp"
 #include "packet_utils.hpp"
 #include "net_buffer.hpp"
 
 #include <string>
 
-using namespace hyspex::vnir3000N;
 
-
-int hyspex::vnir3000N::encode_query_state(net_buffer& buffer)
+int hyspex::encode_query_state(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::QUERY_STATE);
@@ -21,7 +19,7 @@ int hyspex::vnir3000N::encode_query_state(net_buffer& buffer)
     return sizeof(sPacketHeader_t);
 }
 
-sCurrentState_t hyspex::vnir3000N::to_current_state_1(const CurrentState_1& pckt)
+hyspex::sCurrentState_t hyspex::to_current_state_1(const hyspex_CurrentState_1& pckt)
 {
     sCurrentState_t data;
 
@@ -37,11 +35,12 @@ sCurrentState_t hyspex::vnir3000N::to_current_state_1(const CurrentState_1& pckt
     return data;
 }
 
-int hyspex::vnir3000N::encode_current_state(bool valid, net_buffer& buffer)
+int hyspex::encode_current_state(const sCurrentState_t& state, net_buffer& buffer)
 {
-    CurrentState_1 pckt;
+    hyspex_CurrentState_1 pckt;
 
-    pckt.set_valid(valid);
+    pckt.set_valid(state.valid);
+    pckt.set_valid(state.valid);
 
     std::string str;
     pckt.SerializeToString(&str);

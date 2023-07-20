@@ -50,6 +50,32 @@ void cHySpexStatusView::createWidgets()
 	mpShutterStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	mpShutterStatus->setMinimumWidth(125);
 
+	/** Acquisition Info */
+	mpAvgFramesLabel = new QLabel("Avg Frames", this);
+	mpAvgFrames = new QLineEdit(this);
+	mpAvgFrames->setReadOnly(true);
+
+	mpFramePeriodLabel = new QLabel("Frame Period (us) :", this);
+	mpFramePeriod_us = new QLineEdit(this);
+	mpFramePeriod_us->setReadOnly(true);
+
+	mpMinFramePeriodLabel = new QLabel("Min Frame Period (us) :", this);
+	mpMinFramePeriod_us = new QLineEdit(this);
+	mpMinFramePeriod_us->setReadOnly(true);
+
+	mpIntegrationTimeLabel = new QLabel("Integration Time (us) :", this);
+	mpIntegrationTime_us = new QLineEdit(this);
+	mpIntegrationTime_us->setReadOnly(true);
+
+	mpMaxIntegrationTimeLabel = new QLabel("Max Integration Time (us) :", this);
+	mpMaxIntegrationTime_us = new QLineEdit(this);
+	mpMaxIntegrationTime_us->setReadOnly(true);
+
+	mpAmbientTempLabel = new QLabel("Ambient Temp (C) :", this);
+	mpAmbientTemp_C = new QLineEdit(this);
+	mpAmbientTemp_C->setReadOnly(true);
+
+	/** Lens Info */
 	mLensNameLabel = new QLabel("Name");
 	mpLensName = new QLineEdit();
 	mpLensName->setReadOnly(true);
@@ -79,6 +105,35 @@ void cHySpexStatusView::doStatusLayout(QBoxLayout* pMainLayout)
 	cameraStatusBox->setLayout(statusLayout);
 
 	pMainLayout->addWidget(cameraStatusBox);
+}
+
+void cHySpexStatusView::doAcqStatusLayout(QBoxLayout* pMainLayout)
+{
+	QGroupBox* acqBox = new QGroupBox("Acquisition Status");
+
+	auto* acqLayout = new QHBoxLayout();
+
+	acqLayout->addWidget(mpAvgFramesLabel);
+	acqLayout->addWidget(mpAvgFrames);
+
+	acqLayout->addWidget(mpFramePeriodLabel);
+	acqLayout->addWidget(mpFramePeriod_us);
+
+	acqLayout->addWidget(mpMinFramePeriodLabel);
+	acqLayout->addWidget(mpMinFramePeriod_us);
+
+	acqLayout->addWidget(mpIntegrationTimeLabel);
+	acqLayout->addWidget(mpIntegrationTime_us);
+
+	acqLayout->addWidget(mpMaxIntegrationTimeLabel);
+	acqLayout->addWidget(mpMaxIntegrationTime_us);
+
+	acqLayout->addWidget(mpAmbientTempLabel);
+	acqLayout->addWidget(mpAmbientTemp_C);
+
+	acqBox->setLayout(acqLayout);
+
+	pMainLayout->addWidget(acqBox);
 }
 
 void cHySpexStatusView::doLensInfoLayout(QBoxLayout* pMainLayout)
@@ -195,8 +250,10 @@ void cHySpexStatusView::onBgStatusChange()
 		mpBackgroundStatus->setState(QButtonIndicator::WARNING, "BG PENDING");
 		break;
 	case HYSPEX_BG_VALID:
+		mpBackgroundStatus->setState(QButtonIndicator::OK, "BG OK");
+		break;
 	case HYSPEX_BG_PENDING_READY:
-		mpBackgroundStatus->setState(QButtonIndicator::OK, "BG OK/CALC");
+		mpBackgroundStatus->setState(QButtonIndicator::ACTIVE, "BG OK/CALC");
 		break;
 	case HYSPEX_BG_EXPIRED:
 		mpBackgroundStatus->setState(QButtonIndicator::ALERT, "BG EXPIRED");
@@ -292,6 +349,44 @@ void cHySpexStatusView::onShutterStatusChange()
 		mpShutterStatus->setState(QButtonIndicator::UNKNOWN, "SH UNKNOWN");
 		break;
 	}
+}
+
+
+void cHySpexStatusView::onAvgFramesChange(std::uint16_t avgFrames)
+{
+	mpAvgFrames->setText(QString::number(avgFrames));
+}
+
+void cHySpexStatusView::onFramePeriodChange(std::uint32_t period_us)
+{
+	mpFramePeriod_us->setText(QString::number(period_us));
+}
+
+void cHySpexStatusView::onMinFramePeriodChange(std::uint32_t period_us)
+{
+	mpMinFramePeriod_us->setText(QString::number(period_us));
+}
+
+void cHySpexStatusView::onIntegrationTimeChange(std::uint32_t time_us)
+{
+	mpIntegrationTime_us->setText(QString::number(time_us));
+}
+
+void cHySpexStatusView::onMaxIntegrationTimeChange(std::uint32_t time_us)
+{
+	mpMaxIntegrationTime_us->setText(QString::number(time_us));
+}
+
+void cHySpexStatusView::onAmbientTempChange(double temp_C)
+{
+	mpAmbientTemp_C->setText(QString::number(temp_C, 'f', 1));
+}
+
+void cHySpexStatusView::onSensorTempChange(double temp_C)
+{
+	QString label = QString::number(temp_C, 'f', 1);
+	label += " C";
+	mpCoolingStatus->setText(label);
 }
 
 void cHySpexStatusView::onLensInfoChange()

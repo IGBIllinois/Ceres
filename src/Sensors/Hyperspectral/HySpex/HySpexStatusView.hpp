@@ -41,10 +41,19 @@ public slots:
 	void onCoolingStatusChange();
 	void onShutterStatusChange();
 
+	void onAvgFramesChange(std::uint16_t avgFrames);
+	void onFramePeriodChange(std::uint32_t period_us);
+	void onMinFramePeriodChange(std::uint32_t period_us);
+	void onIntegrationTimeChange(std::uint32_t time_us);
+	void onMaxIntegrationTimeChange(std::uint32_t time_us);
+	void onAmbientTempChange(double temp_C);
+	virtual void onSensorTempChange(double temp_C);
+
 	void onLensInfoChange();
 
 protected:
 	void doStatusLayout(QBoxLayout* pMainLayout);
+	void doAcqStatusLayout(QBoxLayout* pMainLayout);
 	void doLensInfoLayout(QBoxLayout* pMainLayout);
 
 
@@ -56,6 +65,30 @@ protected:
 	QButtonIndicator* mpCoolingStatus = nullptr;
 	QButtonIndicator* mpShutterStatus = nullptr;
 
+	/*
+	 * Acquisition Information
+	 */
+	QLabel* mpAvgFramesLabel = nullptr;
+	QLineEdit* mpAvgFrames = nullptr;
+
+	QLabel* mpFramePeriodLabel = nullptr;
+	QLineEdit* mpFramePeriod_us = nullptr;
+
+	QLabel* mpMinFramePeriodLabel = nullptr;
+	QLineEdit* mpMinFramePeriod_us = nullptr;
+
+	QLabel* mpIntegrationTimeLabel = nullptr;
+	QLineEdit* mpIntegrationTime_us = nullptr;
+
+	QLabel* mpMaxIntegrationTimeLabel = nullptr;
+	QLineEdit* mpMaxIntegrationTime_us = nullptr;
+
+	QLabel* mpAmbientTempLabel = nullptr;
+	QLineEdit* mpAmbientTemp_C = nullptr;
+
+	/*
+	 * Lens Information
+	 */
 	QLabel* mLensNameLabel = nullptr;
 	QLineEdit* mpLensName = nullptr;
 

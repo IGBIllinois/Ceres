@@ -22,7 +22,7 @@ cSsnxModel_direct::~cSsnxModel_direct()
 
 void cSsnxModel_direct::updateViews()
 {
-    emit sensorStatusChanging(q_name(), status());
+    emit sensorStatusChanging(q_name(), getStatus());
 
     emit pvtCartesianStateChanged(mPvtCartesianValid);
     emit pvtGeodeticStateChanged(mPvtGeodeticValid);
@@ -315,7 +315,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
         mVn_mps, mVe_mps, mVu_mps,
         mGroundTrack_deg, mDatum);
 
-    if (status() != sensor::eStatus::RUNNING)
+    if (getStatus() != sensor::eStatus::RUNNING)
         setStatus(sensor::eStatus::RUNNING);
 }
 

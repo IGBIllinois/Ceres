@@ -27,31 +27,5 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
-public slots:
-	void onAvgFramesChange(std::uint16_t avgFrames);
-	void onFramePeriodChange(std::uint32_t period_us);
-	void onMinFramePeriodChange(std::uint32_t period_us);
-	void onIntegrationTimeChange(std::uint32_t time_us);
-	void onMaxIntegrationTimeChange(std::uint32_t time_us);
-	void onAmbientTempChange(double temp_C);
-	void onSensorTempChange(double temp_C);
-
-protected:
-	QLabel* mpAvgFramesLabel = nullptr;
-	QLineEdit* mpAvgFrames = nullptr;
-
-	QLabel* mpFramePeriodLabel = nullptr;
-	QLineEdit* mpFramePeriod_us = nullptr;
-
-	QLabel* mpMinFramePeriodLabel = nullptr;
-	QLineEdit* mpMinFramePeriod_us = nullptr;
-
-	QLabel* mpIntegrationTimeLabel = nullptr;
-	QLineEdit* mpIntegrationTime_us = nullptr;
-
-	QLabel* mpMaxIntegrationTimeLabel = nullptr;
-	QLineEdit* mpMaxIntegrationTime_us = nullptr;
-
-	QLabel* mpAmbientTempLabel = nullptr;
-	QLineEdit* mpAmbientTemp_C = nullptr;
+	void onSensorTempChange(double temp_C) override;
 };

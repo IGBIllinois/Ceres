@@ -26,7 +26,7 @@ cHySpexVNIR_3000N_Model_direct::~cHySpexVNIR_3000N_Model_direct()
 
 void cHySpexVNIR_3000N_Model_direct::updateViews()
 {
-
+    cHySpexVNIR_3000N_Model::updateViews();
 }
 
 bool cHySpexVNIR_3000N_Model_direct::configure(const nlohmann::json& jsonCfg)
@@ -141,8 +141,8 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     mShutterStatus = mCamera->getShutterStatus();
     emit shutterStatusChanged();
 
-	mAvgerageFrames = mCamera->getAverageFrames();
-    emit avgFramesChanged(mAvgerageFrames);
+	mAverageFrames = mCamera->getAverageFrames();
+    emit avgFramesChanged(mAverageFrames);
 
 	mFramePeriod_us = mCamera->getFramePeriod_us();
     emit framePeriodChanged(mFramePeriod_us);
@@ -162,6 +162,7 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     mSensorTemp_C = mCamera->getSensorTemperature_C();
     emit sensorTempChanged(mSensorTemp_C);
 
+    mNumBackgrounds = mCamera->getNumberOfBackgrounds();
 	mBackgroundStatus = mCamera->getBackgroundStatus();
     emit bgStatusChanged();
 
@@ -206,7 +207,13 @@ bool cHySpexVNIR_3000N_Model_direct::startCommunications()
         || (mAcquisitionStatus == hyspex::AcquisitionStatus::HYSPEX_ACQ_STOPPED);
 
     if (mConnected)
-        setStatus(sensor::eStatus::RUNNING);
+    {
+        if ((mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_OK) || 
+            (mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_DEGRADED))
+            setStatus(sensor::eStatus::RUNNING);
+        else
+            setStatus(sensor::eStatus::BUSY);
+    }
     else
         setStatus(sensor::eStatus::FAILED);
 
@@ -234,12 +241,6 @@ void cHySpexVNIR_3000N_Model_direct::update()
 
         mSensorTemp_C = mCamera->getSensorTemperature_C();
         emit sensorTempChanged(mSensorTemp_C);
-    }
-
-    if (mRequestBackground)
-    {
-        mCamera->calculateBackground(0, 200);
-        mRequestBackground = false;
     }
 }
 
