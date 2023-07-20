@@ -312,7 +312,7 @@ void cHokuyoModel_UST10LX::update()
 
 //    cOusterLidarStream_Qt::processOneDatagram();
 
-    if (status() != sensor::eStatus::RUNNING)
+    if (getStatus() != sensor::eStatus::RUNNING)
         setStatus(sensor::eStatus::RUNNING);
 }
 

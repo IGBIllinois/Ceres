@@ -25,6 +25,7 @@ public:
     cAxisCommunicationsPropertyPage(QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage() = default;
 
+    void createWidgets() override;
     void doLayout() override;
 
 public:

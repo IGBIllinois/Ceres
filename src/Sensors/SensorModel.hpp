@@ -80,7 +80,7 @@ public:
     /*
      * Returns an enumeration of the current sensor status.
      */
-    sensor::eStatus status() const { return mStatus; };
+    sensor::eStatus getStatus() const { return mStatus; };
 
     /*
      * Emit all status messages to update all views

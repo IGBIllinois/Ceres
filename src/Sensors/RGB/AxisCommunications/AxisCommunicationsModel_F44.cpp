@@ -44,7 +44,7 @@ cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
 
 void cAxisCommunicationsModel_F44::updateViews()
 {
-    emit sensorStatusChanging(q_name(), status());
+    emit sensorStatusChanging(q_name(), getStatus());
 
     emit cameraIdChanged(getActiveCameraID());
     emit frameRateChanged(getActiveFramesRate_fps());

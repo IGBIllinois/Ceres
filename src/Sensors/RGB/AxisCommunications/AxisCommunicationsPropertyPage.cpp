@@ -11,11 +11,15 @@
 cAxisCommunicationsPropertyPage::cAxisCommunicationsPropertyPage(QWidget* parent)
 	: cSensorPropertyPage(parent)
 {
-    mpCameraIdLabel = new QLabel("Camera ID:", this);
-    mpCameraId = new QLineEdit(this);
+}
 
-    mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
-    mpImageSizes = new QComboBox(this);
+void cAxisCommunicationsPropertyPage::createWidgets()
+{
+	mpCameraIdLabel = new QLabel("Camera ID:", this);
+	mpCameraId = new QLineEdit(this);
+
+	mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
+	mpImageSizes = new QComboBox(this);
 	mpImageSizes->addItem("1920x1080");
 	mpImageSizes->addItem("1280x720");
 	mpImageSizes->addItem("1024x768");
@@ -23,8 +27,8 @@ cAxisCommunicationsPropertyPage::cAxisCommunicationsPropertyPage(QWidget* parent
 	mpImageSizes->addItem("800x600");
 	mpImageSizes->addItem("640x480");
 
-    mpFrameRateLabel = new QLabel("Frames per Second:", this);
-    mpFrameRate_fps = new QLineEdit(this);
+	mpFrameRateLabel = new QLabel("Frames per Second:", this);
+	mpFrameRate_fps = new QLineEdit(this);
 }
 
 void cAxisCommunicationsPropertyPage::doLayout()

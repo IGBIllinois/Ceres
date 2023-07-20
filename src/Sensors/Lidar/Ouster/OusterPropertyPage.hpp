@@ -24,6 +24,7 @@ public:
     cOusterPropertyPage(QWidget* parent = nullptr);
     ~cOusterPropertyPage() = default;
 
+    void createWidgets() override;
     void doLayout() override;
 
 public:

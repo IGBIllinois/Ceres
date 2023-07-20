@@ -32,6 +32,7 @@ public:
 
 	void setTitle(const QString& text);
 
+	virtual void createWidgets() = 0;
 	virtual void doLayout() = 0;
 
 	virtual void doOK();
