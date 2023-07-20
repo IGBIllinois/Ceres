@@ -169,6 +169,8 @@ if(WIN32)
     endif()
 endif(WIN32)
 
+# Find and include a simple plotting library
+find_package(QCustomPlot REQUIRED)
 
 # Find and include my libraries for data collection
 find_package(Ouster REQUIRED)
