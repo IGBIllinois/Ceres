@@ -130,9 +130,14 @@ set(LIBPCUSTOMPLOT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # Find all the packages needed by this code
 
 # Find and include Qt
-set(Qt Qt5)
+find_package(Qt6 COMPONENTS Core Widgets PrintSupport QUIET)
+if (NOT Qt6_FOUND)
+	set(Qt Qt5)
+    find_package(Qt5 COMPONENTS Core Widgets PrintSupport REQUIRED)
+else()
+	set(Qt Qt6)
+endif()
 
-find_package(${Qt} COMPONENTS Widgets PrintSupport REQUIRED)
 GET_TARGET_PROPERTY(QMAKE_LOCATION ${Qt}::qmake LOCATION)
 
 
