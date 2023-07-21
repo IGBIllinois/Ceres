@@ -11,16 +11,29 @@ syntax = "proto3";
  * Property Page -> Sensor Controller
  *****************************************************************************/
 
- enum hyspex_eQuery 
+message hyspex_SetAverageFrames_1 
 {
-  eQUERY_UNSPECIFIED = 0;
-  eQUERY_STATE = 1;
-  eQUERY_LENSES = 2;
+    uint32 average_frame = 1;
 }
 
-message hyspex_QueryState_1 
+message hyspex_SetFramePeriod_1 
 {
-	hyspex_eQuery query = 1;
+    uint32 frame_period_us = 1;
+}
+
+message hyspex_SetIntegrationTime_1 
+{
+    uint32 integration_time_us = 1;
+}
+
+message hyspex_SetLens_1 
+{
+    string lens_name = 1;
+}
+
+message hyspex_SetNumOfBackgrounds_1 
+{
+    uint32 num_backgrounds = 1;
 }
 
 
@@ -38,5 +51,19 @@ message hyspex_QueryState_1
     uint32 max_integration_time_us = 6;
     string lens_name = 7;
     uint32 num_backgrounds = 8;
+}
+
+ message hyspex_LensNames_1 
+{
+    string lens_name_0 = 1;
+    string lens_name_1 = 2;
+    string lens_name_2 = 3;
+    string lens_name_3 = 4;
+    string lens_name_4 = 5;
+    string lens_name_5 = 6;
+    string lens_name_6 = 7;
+    string lens_name_7 = 8;
+    string lens_name_8 = 9;
+    string lens_name_9 = 10;
 }
 

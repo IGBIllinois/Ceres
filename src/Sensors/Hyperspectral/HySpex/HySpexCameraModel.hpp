@@ -6,8 +6,9 @@
 #include "../HyperspectralModel.hpp"
 #include "../HyperspectralData.hpp"
 
-
 #include <QObject>
+
+#include <vector>
 
 
 class cHySpexCameraModel : public cHyperspectralModel
@@ -72,16 +73,21 @@ public:
     /*
      * Retrieve the current acquistion information
      */
-    std::uint16_t getAvgerageFrames() const;
+    std::uint16_t getAverageFrames() const;
     std::uint32_t getFramePeriod_us() const;
     std::uint32_t getMinFramePeriod_us() const;
     std::uint32_t getIntegrationTime_us() const;
     std::uint32_t getMaxIntegrationTime_us() const;
 
+    virtual void setAverageFrames(std::uint16_t frames) = 0;
+    virtual void setFramePeriod_us(std::uint32_t frame_period_us) = 0;
+    virtual void setIntegrationTime_us(std::uint32_t integration_time_us) = 0;
+
     /*
      * Retrieve the current lens information
      */
     std::string getLensName() const;
+    const std::vector<std::string>& getLensNames() const;
     double getWorkingDistance_cm() const;
     double getFieldOfView_deg() const;
 
@@ -89,6 +95,9 @@ public:
      * Retrieve information for the background
      */
     std::uint32_t getNumOfBackgrounds() const;
+
+    virtual void setNumOfBackgrounds(int num_backgrounds) = 0;
+    virtual void calcBackground() = 0;
 
 signals:
     void initStatusChanged();
@@ -155,6 +164,7 @@ protected:
 	double mSensorTemp_C = 0.0;
 
     std::string mLens;
+    std::vector<std::string> mLenses;
     double mWorkingDistance_cm = 0.0;
     double mFieldOfView_deg = 0.0;
 

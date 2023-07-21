@@ -1,14 +1,14 @@
 
 #pragma once
 
-#include "../../SensorController.hpp"
+#include "HySpexCamera_Controller.hpp"
 #include "HySpexSWIR_384_ControllerNetDecoder.hpp"
 #include "HySpexSWIR_384_ControllerNetEncoder.hpp"
 
 class cHySpexSWIR_384_Model;
 
 
-class cHySpexSWIR_384_Controller : public cSensorController,
+class cHySpexSWIR_384_Controller : public cHySpexCamera_Controller,
     private cHySpexSWIR_384_ControllerNetDecoder, 
     private cHySpexSWIR_384_ControllerNetEncoder
 {
@@ -17,16 +17,15 @@ class cHySpexSWIR_384_Controller : public cSensorController,
 public:
     cHySpexSWIR_384_Controller(cHySpexSWIR_384_Model* model, QObject* parent = nullptr);
 
-public:
-    const char* descriptor() const override;
-    uint32_t version() const override { return 1; };
-    const std::string& manufacturer() const override;
-    const std::string& model() const override;
-    const std::string& serial_number() const override;
-    const std::string& name() const override;
-
 protected:
     void onQueryState() override;
+    void onQueryLensNames() override;
+    void onSetAverageFrames(std::uint32_t average_frame) override;
+    void onSetFramePeriod_us(std::uint32_t frame_period_us) override;
+    void onSetIntegrationTime_us(std::uint32_t integration_time_us) override;
+    void onSetLensName(const std::string& lens_name) override;
+    void onSetNumOfBackgrounds(int num_backgrounds) override;
+    void onCalcBackground() override;
 
 protected:
     /**

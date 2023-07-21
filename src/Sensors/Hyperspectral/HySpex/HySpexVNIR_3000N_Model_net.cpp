@@ -55,6 +55,27 @@ void cHySpexVNIR_3000N_Model_net::writeDataHeader()
 {
 }
 
+void cHySpexVNIR_3000N_Model_net::setAverageFrames(std::uint16_t frames)
+{}
+
+void cHySpexVNIR_3000N_Model_net::setFramePeriod_us(std::uint32_t frame_period_us)
+{}
+
+void cHySpexVNIR_3000N_Model_net::setIntegrationTime_us(std::uint32_t integration_time_us)
+{}
+
+void cHySpexVNIR_3000N_Model_net::setNumOfBackgrounds(int num_backgrounds)
+{
+    if (num_backgrounds < 0) num_backgrounds = 0;
+    if (num_backgrounds > 1000) num_backgrounds = 1000;
+    mNumBackgrounds = num_backgrounds;
+}
+
+void cHySpexVNIR_3000N_Model_net::calcBackground()
+{
+
+}
+
 
 
 

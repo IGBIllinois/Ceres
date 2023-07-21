@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "net_packet_encoder.hpp"
+#include "HySpexCamera_ControllerNetEncoder.hpp"
 
 
-class cHySpexSWIR_384_ControllerNetEncoder : public cNetworkEncoder
+class cHySpexSWIR_384_ControllerNetEncoder : public cHySpexCamera_ControllerNetEncoder
 {
 
 public:
@@ -20,8 +20,6 @@ public:
     /*
      * Controller ----> Property Page
      */
-//    void sendCurrentState(bool valid, ouster::eLIDAR_MODE mode,
-//        double min_deg, double max_deg);
 };
 
 

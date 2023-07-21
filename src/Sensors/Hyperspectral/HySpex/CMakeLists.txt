@@ -93,6 +93,16 @@ set(HYSPEX_SOURCE_FILES
 	HySpexDataTypes.hpp
 	HySpexCamera_PropertyPage.hpp
 	HySpexCamera_PropertyPage.cpp
+	HySpexCamera_PropertiesNetDecoder.hpp
+	HySpexCamera_PropertiesNetDecoder.cpp
+	HySpexCamera_PropertiesNetEncoder.hpp
+	HySpexCamera_PropertiesNetEncoder.cpp
+    HySpexCamera_Controller.hpp
+    HySpexCamera_Controller.cpp
+	HySpexCamera_ControllerNetDecoder.hpp
+	HySpexCamera_ControllerNetDecoder.cpp
+	HySpexCamera_ControllerNetEncoder.hpp
+	HySpexCamera_ControllerNetEncoder.cpp
     HySpexCameraModel.hpp
     HySpexCameraModel.cpp
     HySpexStatusView.hpp

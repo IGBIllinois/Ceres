@@ -5,6 +5,6 @@
 
 
 cHySpexVNIR_3000N_ControllerNetEncoder::cHySpexVNIR_3000N_ControllerNetEncoder(std::size_t capacity)
-    : cNetworkEncoder(capacity)
+    : cHySpexCamera_ControllerNetEncoder(capacity)
 {}
 

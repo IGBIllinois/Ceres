@@ -12,18 +12,68 @@ cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWi
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
 {
+	setEnabled(false);
+	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
 	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
 }
 
-void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid)
+void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid,
+	std::uint16_t average_frames, std::uint32_t frame_period_us,
+	std::uint32_t min_frame_period_us, std::uint32_t integration_time_us,
+	std::uint32_t max_integration_time_us, std::uint32_t num_backgrounds,
+	const std::string& lens_name)
 {
 	if (!valid) return;
+
+	mpAvgFrames->setText(QString::number(average_frames));
+	mpFramePeriod_us->setText(QString::number(frame_period_us));
+	mpMinFramePeriod_us->setText(QString::number(min_frame_period_us));
+	mpIntegrationTime_us->setText(QString::number(integration_time_us));
+	mpMaxIntegrationTime_us->setText(QString::number(max_integration_time_us));
+	mpNumBackgrounds->setText(QString::number(num_backgrounds));
+
+	mDefaultAverageFrames = average_frames;
+	mDefaultFramePeriod_us = frame_period_us;
+	mDefaultIntegrationTime_us = integration_time_us;
+	mDefaultNumBackgrounds = num_backgrounds;
+
+	mDefaultLensName = QString::fromStdString(lens_name);
+
+	for (int i = 0; i < mpLenses->count(); ++i)
+	{
+		if (mDefaultLensName == mpLenses->itemText(i))
+		{
+			mpLenses->setCurrentIndex(i);
+			break;
+		}
+	}
+
+	setEnabled(true);
+	update();
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::onLensNames(const std::vector<std::string>& names)
+{
+	for (std::size_t i = 0; i < names.size(); ++i)
+	{
+		mpLenses->addItem(QString::fromStdString(names[i]));
+	}
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::showPage()
 {
 	openConnection();
 	cHySpexVNIR_3000N_PropertyPage::showPage();
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::doCalcBackground()
+{
+	if (!mConnected)
+		return;
+
+	doApply();
+
+	sendCalcBackground();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::doOK()
@@ -43,6 +93,50 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doApply()
 {
 	if (!mConnected)
 		return;
+
+	bool needs_update = false;
+
+	auto frames = mpAvgFrames->text().toInt();
+
+	if (mDefaultAverageFrames != frames)
+	{
+		sendAverageFrames(frames);
+		setEnabled(false);
+		needs_update = true;
+	}
+
+	auto frame_period_us = mpFramePeriod_us->text().toInt();
+
+	if (mDefaultFramePeriod_us != frame_period_us)
+	{
+		sendFramePeriod_us(frame_period_us);
+		setEnabled(false);
+		needs_update = true;
+	}
+
+	auto integration_time_us = mpIntegrationTime_us->text().toInt();
+
+	if (mDefaultIntegrationTime_us != integration_time_us)
+	{
+		sendIntegrationTime_us(integration_time_us);
+		setEnabled(false);
+		needs_update = true;
+	}
+
+	auto num_backgrounds = mpNumBackgrounds->text().toInt();
+
+	if (mDefaultNumBackgrounds != num_backgrounds)
+	{
+		sendNumOfBackgrounds(num_backgrounds);
+		setEnabled(false);
+		needs_update = true;
+	}
+
+	if (needs_update)
+	{
+		sendQueryState();
+		update();
+	}
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

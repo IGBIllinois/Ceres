@@ -7,34 +7,9 @@
 
 cHySpexSWIR_384_Controller::cHySpexSWIR_384_Controller(cHySpexSWIR_384_Model* model, QObject* parent)
     :
-    cSensorController(parent), cHySpexSWIR_384_ControllerNetEncoder(512), mpModel(model)
+    cHySpexCamera_Controller(model, parent), cHySpexSWIR_384_ControllerNetEncoder(512), mpModel(model)
 {
     assert(mpModel);
-}
-
-const char* cHySpexSWIR_384_Controller::descriptor() const
-{
-    return mpModel->descriptor();
-}
-
-const std::string& cHySpexSWIR_384_Controller::manufacturer() const
-{
-    return mpModel->manufacturer();
-}
-
-const std::string& cHySpexSWIR_384_Controller::model() const
-{
-    return mpModel->model();
-}
-
-const std::string& cHySpexSWIR_384_Controller::serial_number() const
-{
-    return mpModel->serial_number();
-}
-
-const std::string& cHySpexSWIR_384_Controller::name() const
-{
-    return mpModel->name();
 }
 
 void cHySpexSWIR_384_Controller::processStream(const void* pBuffer, std::size_t buf_length)
@@ -61,10 +36,35 @@ void cHySpexSWIR_384_Controller::processStream(const void* pBuffer, std::size_t 
 
 void cHySpexSWIR_384_Controller::onQueryState()
 {
-//    auto window = mpModel->getAzimuthWindow();
-//    auto mode = mpModel->getLidarMode();
+    txCurrentState(this);
+}
 
-//    sendCurrentState(true, mode, window.min_deg, window.max_deg);
+void cHySpexSWIR_384_Controller::onQueryLensNames()
+{
+    txLensNames(this);
+}
+
+
+void cHySpexSWIR_384_Controller::onSetAverageFrames(std::uint32_t average_frame)
+{}
+
+void cHySpexSWIR_384_Controller::onSetFramePeriod_us(std::uint32_t frame_period_us)
+{}
+
+void cHySpexSWIR_384_Controller::onSetIntegrationTime_us(std::uint32_t integration_time_us)
+{}
+
+void cHySpexSWIR_384_Controller::onSetLensName(const std::string& lens_name)
+{}
+
+void cHySpexSWIR_384_Controller::onSetNumOfBackgrounds(int num_backgrounds)
+{
+    mpModel->setNumOfBackgrounds(num_backgrounds);
+}
+
+void cHySpexSWIR_384_Controller::onCalcBackground()
+{
+    mpModel->calcBackground();
 }
 
 

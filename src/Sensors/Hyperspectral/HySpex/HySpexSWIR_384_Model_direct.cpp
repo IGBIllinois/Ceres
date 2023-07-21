@@ -35,6 +35,14 @@ bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
 
     mCamera->registerNotificationCallback(&cHySpexCameraModel::handleStatusCallback, this);
 
+    mLenses.clear();
+    auto n = mCamera->getLensCount();
+    for (unsigned int l = 0; l < n; ++l)
+    {
+        mLenses.emplace_back(mCamera->getLensNameFromId(l));
+    }
+
+
     try
     {
         auto section = jsonCfg["SWIR-384"];
@@ -239,4 +247,26 @@ void cHySpexSWIR_384_Model_direct::writeDataHeader()
 {
 }
 
+
+void cHySpexSWIR_384_Model_direct::setAverageFrames(std::uint16_t frames)
+{}
+
+void cHySpexSWIR_384_Model_direct::setFramePeriod_us(std::uint32_t frame_period_us)
+{}
+
+void cHySpexSWIR_384_Model_direct::setIntegrationTime_us(std::uint32_t integration_time_us)
+{}
+
+void cHySpexSWIR_384_Model_direct::setNumOfBackgrounds(int num_backgrounds)
+{
+    if (num_backgrounds < 0) num_backgrounds = 0;
+    if (num_backgrounds > 1000) num_backgrounds = 1000;
+    mNumBackgrounds = num_backgrounds;
+    mCamera->setNumberOfBackgrounds(num_backgrounds);
+}
+
+void cHySpexSWIR_384_Model_direct::calcBackground()
+{
+
+}
 

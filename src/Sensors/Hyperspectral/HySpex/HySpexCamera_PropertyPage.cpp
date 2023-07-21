@@ -36,10 +36,6 @@ void cHySpexCamera_PropertyPage::createWidgets()
 	/** Lens Info */
 	mpLensLabel = new QLabel("Name");
 	mpLenses = new QComboBox();
-	mpLenses->addItem("1 m");
-	mpLenses->addItem("3 m");
-	mpLenses->addItem("Plane");
-
 
 	/** Background Info */
 
@@ -47,11 +43,14 @@ void cHySpexCamera_PropertyPage::createWidgets()
 	mpNumBackgrounds = new QLineEdit(this);
 
 	mpDoBackground = new QPushButton("Calc Background");
+	mpDoBackground->setCheckable(true);
+	connect(mpDoBackground, &QPushButton::clicked, this, &cHySpexCamera_PropertyPage::doCalcBackground);
+
 }
 
 QGroupBox* cHySpexCamera_PropertyPage::getLensLayout()
 {
-	QGroupBox* lensBox = new QGroupBox("Lenes");
+	QGroupBox* lensBox = new QGroupBox("Lens");
 
 	auto* lensLayout = new QFormLayout();
 

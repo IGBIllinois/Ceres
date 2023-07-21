@@ -36,6 +36,14 @@ bool cHySpexVNIR_3000N_Model_direct::configure(const nlohmann::json& jsonCfg)
 
     mCamera->registerNotificationCallback(&cHySpexCameraModel::handleStatusCallback, this);
 
+    mLenses.clear();
+    auto n = mCamera->getLensCount();
+    for (unsigned int l = 0; l < n; ++l)
+    {
+        mLenses.emplace_back(mCamera->getLensNameFromId(l));
+    }
+
+
     try
     {
         auto section = jsonCfg["VNIR-3000N"];
@@ -248,76 +256,45 @@ void cHySpexVNIR_3000N_Model_direct::writeDataHeader()
 {
 }
 
-
-
-
-#if 0
-
-camera->init();
-
-auto status = camera->getInitStatus();
-std::cout << "init = " << hyspex::to_string(status) << std::endl;
-std::cout << std::endl;
-
-auto spectralSize = camera->getSpectralSize();
-auto spatialSize = camera->getSpatialSize();
-
-std::cout << "spectralSize = " << spectralSize << ", spatialSize = " << spatialSize << std::endl;
-std::cout << std::endl;
-
-camera->initAcquisition();
-
-std::cout << "*** Spectral Calibration Per Band ***" << std::endl;
-
-auto spectralCal = camera->getSpectralCalibrationPerBand();
-
-std::cout << "Spectral Calibration Per Band = " << spectralCal.size << std::endl;
-
-for (size_t x = 0; x < spectralCal.size; ++x)
+void cHySpexVNIR_3000N_Model_direct::setAverageFrames(std::uint16_t frames)
 {
-    double value = spectralCal.data[x];
-    std::cout << "SpectralCal[" << x << "] = " << value << std::endl;
+    mCamera->setAverageFrames(frames);
+    mAverageFrames = mCamera->getAverageFrames();
+    emit avgFramesChanged(mAverageFrames);
 }
 
-/*
-    std::cout << "*** Spectral Delta Per Pixel ***" << std::endl;
-
-    auto deltaPixel = camera->getSpectralDeltaPerPixel();
-
-    std::cout << "Spectral Delta Per Pixel = " << deltaPixel.size << std::endl;
-
-    // do stuff with image here.
-    for (size_t y = 0; y < spectralSize; ++y)
-    {
-        for (size_t x = 0; x < spatialSize; ++x)
-        {
-            double value = deltaPixel.data[y * spatialSize + x];
-            std::cout << "DeltaPixel[" << x << ", " << y << "] = " << value << std::endl;
-        }
-    }
-*/
-
-camera->closeShutter();
-camera->startAcquisition();
-camera->calculateBackground();
-
-camera->stopAcquisition();
-camera->openShutter();
-
-auto bcMatrix = camera->getBackgroundMatrix();
-
-std::cout << "*** Background Information ***" << std::endl;
-
-std::cout << "Background Matrix Size = " << bcMatrix.size << std::endl;
-
-// do stuff with image here.
-for (size_t y = 0; y < spectralSize; ++y)
+void cHySpexVNIR_3000N_Model_direct::setFramePeriod_us(std::uint32_t frame_period_us)
 {
-    for (size_t x = 0; x < spatialSize; ++x)
-    {
-        unsigned short value = bcMatrix.data[y * spatialSize + x];
-        std::cout << "Background[" << x << ", " << y << "] = " << value << std::endl;
-    }
+    mCamera->setFramePeriod_us(frame_period_us);
+    mFramePeriod_us = mCamera->getFramePeriod_us();
+    mMaxIntegrationTime_us = mCamera->getMaxIntegrationTime_us(mFramePeriod_us);
+    emit framePeriodChanged(mFramePeriod_us);
+    emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
 }
 
-#endif
+void cHySpexVNIR_3000N_Model_direct::setIntegrationTime_us(std::uint32_t integration_time_us)
+{
+    mCamera->setIntegrationTime_us(integration_time_us);
+    mIntegrationTime_us = mCamera->getIntegrationTime_us();
+    mMinFramePeriod_us = mCamera->getMinimumFramePeriod_us();
+    emit integrationTimeChanged(mIntegrationTime_us);
+    emit minFramePeriodChanged(mMinFramePeriod_us);
+}
+
+void cHySpexVNIR_3000N_Model_direct::setNumOfBackgrounds(int num_backgrounds)
+{
+    if (num_backgrounds < 0) num_backgrounds = 0;
+    if (num_backgrounds > 1000) num_backgrounds = 1000;
+    mCamera->setNumberOfBackgrounds(num_backgrounds);
+    mNumBackgrounds = mCamera->getNumberOfBackgrounds();
+}
+
+void cHySpexVNIR_3000N_Model_direct::calcBackground()
+{
+    mCamera->closeShutter();
+    mCamera->calculateBackground(0, mNumBackgrounds);
+}
+
+
+
+

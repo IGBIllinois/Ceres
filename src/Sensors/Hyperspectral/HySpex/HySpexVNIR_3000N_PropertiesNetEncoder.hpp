@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "net_packet_encoder.hpp"
+#include "HySpexCamera_PropertiesNetEncoder.hpp"
 #include <cstddef>
 
 
-class cHySpexVNIR_3000N_PropertiesNetEncoder : public cNetworkEncoder
+class cHySpexVNIR_3000N_PropertiesNetEncoder : public cHySpexCamera_PropertiesNetEncoder
 {
 
 public:
@@ -20,8 +20,6 @@ public:
     /*
      * Property Page ----> Controller
      */
-
-    void sendQueryState();
 };
 
 

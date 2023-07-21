@@ -4,7 +4,7 @@
 #include "hyspex_packet_utils.hpp"
 #include "net_buffer.hpp"
 
-
+/*
 void cHySpexSWIR_384_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
     using namespace hyspex;
@@ -25,3 +25,4 @@ void cHySpexSWIR_384_PropertiesNetDecoder::processPacket(const sPacketHeader_t& 
     }
     }
 }
+*/

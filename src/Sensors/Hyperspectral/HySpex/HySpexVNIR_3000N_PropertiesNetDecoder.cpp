@@ -5,6 +5,7 @@
 #include "net_buffer.hpp"
 
 
+/*
 void cHySpexVNIR_3000N_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
     using namespace hyspex;
@@ -25,3 +26,4 @@ void cHySpexVNIR_3000N_PropertiesNetDecoder::processPacket(const sPacketHeader_t
     }
     }
 }
+*/

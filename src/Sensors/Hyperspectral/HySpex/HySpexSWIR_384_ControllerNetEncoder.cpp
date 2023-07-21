@@ -7,6 +7,6 @@ using namespace hyspex;
 
 
 cHySpexSWIR_384_ControllerNetEncoder::cHySpexSWIR_384_ControllerNetEncoder(std::size_t capacity)
-    : cNetworkEncoder(capacity)
+    : cHySpexCamera_ControllerNetEncoder(capacity)
 {}
 

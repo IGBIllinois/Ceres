@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "net_packet_decoder.hpp"
+#include "HySpexCamera_PropertiesNetDecoder.hpp"
 
 #include <string>
 
 
-class cHySpexSWIR_384_PropertiesNetDecoder : public cNetworkDecoder
+class cHySpexSWIR_384_PropertiesNetDecoder : public cHySpexCamera_PropertiesNetDecoder
 {
 public:
 
@@ -22,10 +22,9 @@ protected:
     /*
      * Controller ----> Property Page
      */
-    virtual void onCurrentState(bool valid) = 0;
 
 protected:
-    void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
+//    void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
 };
 
 

@@ -19,13 +19,22 @@ public:
     ~cHySpexVNIR_3000N_PropertyPage_Remote() = default;
 
 public:
-    void onCurrentState(bool valid) override;
+    void onCurrentState(bool valid, std::uint16_t average_frames,
+        std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
+        std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
+        std::uint32_t num_backgrounds, const std::string& lens_name) override;
+
+    void onLensNames(const std::vector<std::string>& names) override;
+
 
 protected:
     void onConnect() override;
 
 protected:
     void showPage() override;
+
+    void doCalcBackground() override;
+
     void doOK() override;
     void doCancel() override;
     void doApply() override;
@@ -33,7 +42,6 @@ protected:
 protected:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
-
 };
 
 

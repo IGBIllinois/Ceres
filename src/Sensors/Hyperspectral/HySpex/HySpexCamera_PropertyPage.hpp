@@ -26,6 +26,8 @@ public:
 
     void createWidgets() override;
 
+    virtual void doCalcBackground() = 0;
+
 public:
     cExperimentState* createState(const std::string& type) override;
 
@@ -59,7 +61,13 @@ protected:
 
     QPushButton* mpDoBackground = nullptr;
 
-    QString mLensDefault;
+protected:
+    std::uint16_t mDefaultAverageFrames = 0;
+    std::uint32_t mDefaultFramePeriod_us = 0;
+    std::uint32_t mDefaultIntegrationTime_us = 0;
+    std::uint32_t mDefaultNumBackgrounds = 0;
+
+    QString mDefaultLensName;
 };
 
 

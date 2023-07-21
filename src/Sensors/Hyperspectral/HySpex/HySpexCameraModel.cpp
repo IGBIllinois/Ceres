@@ -69,7 +69,7 @@ double cHySpexCameraModel::getSensorTemp_C() const { return mSensorTemp_C; }
 /*
  * Retrieve the current acquistion information
  */
-std::uint16_t cHySpexCameraModel::getAvgerageFrames() const { return mAverageFrames; }
+std::uint16_t cHySpexCameraModel::getAverageFrames() const { return mAverageFrames; }
 std::uint32_t cHySpexCameraModel::getFramePeriod_us() const { return mFramePeriod_us; }
 std::uint32_t cHySpexCameraModel::getMinFramePeriod_us() const { return mMinFramePeriod_us; }
 std::uint32_t cHySpexCameraModel::getIntegrationTime_us() const { return mIntegrationTime_us; }
@@ -79,6 +79,7 @@ std::uint32_t cHySpexCameraModel::getMaxIntegrationTime_us() const { return mMax
  * Retrieve the current lens information
  */
 std::string cHySpexCameraModel::getLensName() const { return mLens; }
+const std::vector<std::string>& cHySpexCameraModel::getLensNames() const { return mLenses; }
 double cHySpexCameraModel::getWorkingDistance_cm() const { return mWorkingDistance_cm; }
 double cHySpexCameraModel::getFieldOfView_deg() const { return mFieldOfView_deg;  }
 
