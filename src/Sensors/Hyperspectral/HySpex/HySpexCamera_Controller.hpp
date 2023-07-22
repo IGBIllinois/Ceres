@@ -22,6 +22,9 @@ public:
     const std::string& serial_number() const override;
     const std::string& name() const override;
 
+public slots:
+    virtual void onBackgroundComplete() = 0;
+
 protected:
     void txCurrentState(cHySpexCamera_ControllerNetEncoder* encoder);
     void txLensNames(cHySpexCamera_ControllerNetEncoder* encoder);

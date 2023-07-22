@@ -5,6 +5,7 @@
 #include "hyspex_packet_utils.hpp"
 #include "net_buffer.hpp"
 
+#include <QDebug>
 
 void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
@@ -17,38 +18,34 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
     {
         break;
     }
-    case ePacketType::QUERY_STATE:
+    case ePacketType::HYSPEX_QUERY:
     {
-        onQueryState();
+        hyspex_QueryMessage_1 pckt;
+        pckt.ParseFromArray(buffer.data(), hdr.length);
+        auto query = pckt.query();
+//        auto query = to_hyspex_query_enum_1(hdr, buffer);
+        switch (query)
+        {
+        case eQUERY_STATE:
+            qInfo() << "Query status received.";
+            onQueryState();
+            break;
+        case eQUERY_LENS_NAMES:
+            qInfo() << "Query lens names received.";
+            onQueryLensNames();
+            break;
+        default:
+            qWarning() << "Unknown query state received: " << query;
+        }
         break;
     }
-    case ePacketType::QUERY_LENS_NAMES:
+    case ePacketType::SET_ACQUISITION_PARAMETERS:
     {
-        onQueryLensNames();
-        break;
-    }
-    case ePacketType::SET_AVERAGE_FRAMES:
-    {
-        hyspex_SetAverageFrames_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto data = to_average_frames_1(packet);
-        onSetAverageFrames(data);
-        break;
-    }
-    case ePacketType::SET_FRAME_PERIOD_US:
-    {
-        hyspex_SetFramePeriod_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto data = to_frame_period_1(packet);
-        onSetFramePeriod_us(data);
-        break;
-    }
-    case ePacketType::SET_INTEGRATION_TIME_US:
-    {
-        hyspex_SetIntegrationTime_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto data = to_integration_time_1(packet);
-        onSetIntegrationTime_us(data);
+//        hyspex_SetAcquisitionParameters_1 packet;
+//        packet.ParseFromArray(buffer.data(), hdr.length);
+//        auto data = to_acquisition_parameters_1(packet);
+        auto data = to_acquisition_parameters_1(hdr, buffer);
+        onSetAcquisitionParameters(data.average_frames, data.frame_period_us, data.integration_time_us);
         break;
     }
     case ePacketType::SET_LENS_NAME:

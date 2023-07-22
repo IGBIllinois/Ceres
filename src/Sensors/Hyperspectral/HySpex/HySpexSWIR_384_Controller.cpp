@@ -34,6 +34,11 @@ void cHySpexSWIR_384_Controller::processStream(const void* pBuffer, std::size_t 
     }
 }
 
+void cHySpexSWIR_384_Controller::onBackgroundComplete()
+{
+    //    send
+}
+
 void cHySpexSWIR_384_Controller::onQueryState()
 {
     txCurrentState(this);
@@ -45,13 +50,7 @@ void cHySpexSWIR_384_Controller::onQueryLensNames()
 }
 
 
-void cHySpexSWIR_384_Controller::onSetAverageFrames(std::uint32_t average_frame)
-{}
-
-void cHySpexSWIR_384_Controller::onSetFramePeriod_us(std::uint32_t frame_period_us)
-{}
-
-void cHySpexSWIR_384_Controller::onSetIntegrationTime_us(std::uint32_t integration_time_us)
+void cHySpexSWIR_384_Controller::onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {}
 
 void cHySpexSWIR_384_Controller::onSetLensName(const std::string& lens_name)

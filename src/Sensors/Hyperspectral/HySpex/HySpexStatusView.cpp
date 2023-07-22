@@ -331,7 +331,7 @@ void cHySpexStatusView::onShutterStatusChange()
 		mpShutterStatus->setState(QButtonIndicator::OK, "SH OPEN");
 		break;
 	case HYSPEX_SHUTTER_CLOSED:
-		mpShutterStatus->setState(QButtonIndicator::OK, "SH CLOSE");
+		mpShutterStatus->setState(QButtonIndicator::ACTIVE, "SH CLOSE");
 		break;
 	case HYSPEX_SHUTTER_PENDING_OPEN:
 		mpShutterStatus->setState(QButtonIndicator::WARNING, "SH OPEN");

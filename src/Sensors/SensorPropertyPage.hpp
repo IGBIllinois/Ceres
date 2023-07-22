@@ -70,6 +70,11 @@ public:
 	bool initialize(const std::string& hostname, uint16_t port,
 		bool use_ipv6, const std::string& local_ip);
 
+	std::string getHostname() const { return mHostname; }
+	std::string getLocalIpAddress() const { return mLocalIpAddress; }
+	uint16_t    getPort() const { return mPort; }
+
+	bool usingIpV6() const { return mUse_IpV6; }
 
 	bool openConnection();
 	void closeConnection();
@@ -86,6 +91,8 @@ private slots:
 	void errorOccurred(QAbstractSocket::SocketError socketError);
 	void hostFound();
 	void stateChanged(QAbstractSocket::SocketState socketState);
+
+protected slots:
 	void processIncomingData();
 
 protected:
@@ -103,6 +110,10 @@ protected:
 
 protected:
 	bool mConnected;
+
+	std::string mHostname;
+	std::string mLocalIpAddress;
+	bool mUse_IpV6 = false;
 
 	QHostAddress mLocalEndpoint;
 	QHostAddress mRemoteEndpoint;

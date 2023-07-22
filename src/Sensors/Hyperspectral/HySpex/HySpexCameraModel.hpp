@@ -79,9 +79,8 @@ public:
     std::uint32_t getIntegrationTime_us() const;
     std::uint32_t getMaxIntegrationTime_us() const;
 
-    virtual void setAverageFrames(std::uint16_t frames) = 0;
-    virtual void setFramePeriod_us(std::uint32_t frame_period_us) = 0;
-    virtual void setIntegrationTime_us(std::uint32_t integration_time_us) = 0;
+    virtual void setAcquisitionParameters(std::uint16_t avg_frames, 
+        std::uint32_t frame_period_us, std::uint32_t integration_time_us) = 0;
 
     /*
      * Retrieve the current lens information

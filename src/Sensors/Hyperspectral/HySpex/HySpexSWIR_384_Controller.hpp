@@ -17,12 +17,15 @@ class cHySpexSWIR_384_Controller : public cHySpexCamera_Controller,
 public:
     cHySpexSWIR_384_Controller(cHySpexSWIR_384_Model* model, QObject* parent = nullptr);
 
+    /*** Qt slot handler */
+public:
+    void onBackgroundComplete() override;
+
+    /*** Messages handlers from the decoder */
 protected:
     void onQueryState() override;
     void onQueryLensNames() override;
-    void onSetAverageFrames(std::uint32_t average_frame) override;
-    void onSetFramePeriod_us(std::uint32_t frame_period_us) override;
-    void onSetIntegrationTime_us(std::uint32_t integration_time_us) override;
+    void onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us) override;
     void onSetLensName(const std::string& lens_name) override;
     void onSetNumOfBackgrounds(int num_backgrounds) override;
     void onCalcBackground() override;

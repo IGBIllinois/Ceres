@@ -7,6 +7,7 @@
 #pragma once
 
 #include "net_packet_encoder.hpp"
+#include "hyspex_properties.pb.h"
 
 #include <vector>
 #include <string>
@@ -28,6 +29,8 @@ public:
         std::uint32_t num_backgrounds, const std::string& lens_name);
 
     void sendLensNames(const std::vector<std::string>& names);
+
+    void sendBackgroundReply(hyspex_eBackgroundReply reply);
 };
 
 

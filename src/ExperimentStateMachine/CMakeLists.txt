@@ -24,6 +24,8 @@ PRIVATE
     BasicExperimentStates.hpp
     BasicExperimentStates.cpp
 
+    ExperimentState.cpp
+
 #
 # The Experiment State Machine
 #

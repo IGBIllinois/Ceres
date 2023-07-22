@@ -79,7 +79,7 @@ void cSensorPropertyPage::buttonClicked(QAbstractButton* button)
 /** Interface for Remote Sensor Property Pages for Remote Sensor  **/
 /*******************************************************************/
 cSensorPropertyPageRemoteInterface::cSensorPropertyPageRemoteInterface(QObject* parent)
-    : QObject(parent), mConnected(false), mSocket(parent), mPort(0)
+    : QObject(parent), mConnected(false), mSocket(this), mPort(0)
 {
     mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
     mSocket.setSocketOption(QAbstractSocket::SocketOption::KeepAliveOption, 1);
@@ -112,6 +112,8 @@ bool cSensorPropertyPageRemoteInterface::initialize(const std::string& hostname,
     {
         mLocalEndpoint = QHostAddress(QString::fromStdString(local_ip));
         mSocket.bind(mLocalEndpoint, 0);
+
+        mLocalIpAddress = local_ip;
     }
 
     QHostInfo info = QHostInfo::fromName(QString::fromStdString(hostname));
@@ -119,6 +121,8 @@ bool cSensorPropertyPageRemoteInterface::initialize(const std::string& hostname,
     {
         return false;
     }
+
+    mHostname = hostname;
 
     auto endpoints = info.addresses();
     for (auto& endpoint : endpoints)
@@ -144,6 +148,7 @@ bool cSensorPropertyPageRemoteInterface::initialize(const std::string& hostname,
         return false;
     }
 
+    mUse_IpV6 = use_ipv6;
     mPort = port;
 
     return true;
@@ -151,6 +156,11 @@ bool cSensorPropertyPageRemoteInterface::initialize(const std::string& hostname,
 
 bool cSensorPropertyPageRemoteInterface::openConnection()
 {
+    if (mRemoteEndpoint.isNull())
+    {
+        return false;
+    }
+
     mSocket.connectToHost(mRemoteEndpoint, mPort);
     return true;
 }

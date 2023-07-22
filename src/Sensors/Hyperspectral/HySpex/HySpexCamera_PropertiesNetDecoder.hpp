@@ -30,6 +30,9 @@ protected:
 
     virtual void onLensNames(const std::vector<std::string>& names) = 0;
 
+    enum class eBackgroundReply {GOOD, FAILED, ABORTED};
+    virtual void onBackgroundReply(eBackgroundReply reply) = 0;
+
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
 };

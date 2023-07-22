@@ -28,6 +28,8 @@ public:
 
     void onLensNames(const std::vector<std::string>& names) override;
 
+    void onBackgroundReply(eBackgroundReply reply) override;
+
 protected:
     void onConnect() override;
 

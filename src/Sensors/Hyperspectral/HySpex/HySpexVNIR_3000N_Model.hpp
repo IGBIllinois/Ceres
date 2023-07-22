@@ -29,7 +29,7 @@ public:
     void writeDataHeader() override;
 
 signals:
-
+    void backgroundComplete();
 
 protected:
 	cHyperspectralImageBuffer<float> mBackground;

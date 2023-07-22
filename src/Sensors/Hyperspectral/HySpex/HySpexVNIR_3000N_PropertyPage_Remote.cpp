@@ -1,6 +1,7 @@
 
 
 #include "HySpexVNIR_3000N_PropertyPage_Remote.hpp"
+#include "HySpexExperimentStates.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
@@ -15,6 +16,16 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
 	setEnabled(false);
 	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
 	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+}
+
+cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::string& type)
+{
+	if (type == "VNIR-3000N")
+	{
+		return new cHySpexVNIR_3000N_Properties_Remote(this);
+	}
+
+	return nullptr;
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid,
@@ -48,7 +59,8 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid,
 		}
 	}
 
-	setEnabled(true);
+	if (!mWaitingForBackgroundReply)
+		setEnabled(true);
 	update();
 }
 
@@ -58,6 +70,13 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onLensNames(const std::vector<std::s
 	{
 		mpLenses->addItem(QString::fromStdString(names[i]));
 	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
+{
+	mWaitingForBackgroundReply = false;
+	setEnabled(true);
+	update();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::showPage()
@@ -71,6 +90,10 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doCalcBackground()
 	if (!mConnected)
 		return;
 
+	mWaitingForBackgroundReply = true;
+
+	setEnabled(false);
+
 	doApply();
 
 	sendCalcBackground();
@@ -78,7 +101,7 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doCalcBackground()
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::doOK()
 {
-	doApply();
+	sendChangedData();
 	closeConnection();
 	cHySpexVNIR_3000N_PropertyPage::doOK();
 }
@@ -96,30 +119,32 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doApply()
 
 	bool needs_update = false;
 
+	sendChangedData(&needs_update);
+
+	if (needs_update)
+	{
+		setEnabled(false);
+		sendQueryState();
+		update();
+	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::sendChangedData(bool* pNeedsUpdate)
+{
+	if (!mConnected)
+		return;
+
+	bool needs_update = false;
+
 	auto frames = mpAvgFrames->text().toInt();
-
-	if (mDefaultAverageFrames != frames)
-	{
-		sendAverageFrames(frames);
-		setEnabled(false);
-		needs_update = true;
-	}
-
 	auto frame_period_us = mpFramePeriod_us->text().toInt();
-
-	if (mDefaultFramePeriod_us != frame_period_us)
-	{
-		sendFramePeriod_us(frame_period_us);
-		setEnabled(false);
-		needs_update = true;
-	}
-
 	auto integration_time_us = mpIntegrationTime_us->text().toInt();
 
-	if (mDefaultIntegrationTime_us != integration_time_us)
+	if ((mDefaultAverageFrames != frames)
+		|| (mDefaultFramePeriod_us != frame_period_us)
+		|| (mDefaultIntegrationTime_us != integration_time_us))
 	{
-		sendIntegrationTime_us(integration_time_us);
-		setEnabled(false);
+		sendAcquisitionParameters(frames, frame_period_us, integration_time_us);
 		needs_update = true;
 	}
 
@@ -128,15 +153,11 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doApply()
 	if (mDefaultNumBackgrounds != num_backgrounds)
 	{
 		sendNumOfBackgrounds(num_backgrounds);
-		setEnabled(false);
 		needs_update = true;
 	}
 
-	if (needs_update)
-	{
-		sendQueryState();
-		update();
-	}
+	if (pNeedsUpdate)
+		*pNeedsUpdate = needs_update;
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

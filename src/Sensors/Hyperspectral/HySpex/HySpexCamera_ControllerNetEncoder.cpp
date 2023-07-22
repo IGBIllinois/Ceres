@@ -35,3 +35,9 @@ void cHySpexCamera_ControllerNetEncoder::sendLensNames(const std::vector<std::st
     encode_lens_names(names, mBuffer);
     sendData();
 }
+
+void cHySpexCamera_ControllerNetEncoder::sendBackgroundReply(hyspex_eBackgroundReply reply)
+{
+    encode_background_reply(reply, mBuffer);
+    sendData();
+}

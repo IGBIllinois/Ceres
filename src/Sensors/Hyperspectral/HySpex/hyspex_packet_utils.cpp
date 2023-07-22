@@ -5,99 +5,59 @@
 
 #include <string>
 
-
-int hyspex::encode_query_state(net_buffer& buffer)
+hyspex_eQuery hyspex::to_hyspex_query_enum_1(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
+    hyspex_QueryMessage_1 pckt;
+    pckt.ParseFromArray(buffer.data(), hdr.length);
+    return pckt.query();
+}
+
+int hyspex::encode_hyspex_query(hyspex_eQuery query, net_buffer& buffer)
+{
+    hyspex_QueryMessage_1 pckt;
+    pckt.set_query(query);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::QUERY_STATE);
+    hdr.id = static_cast<uint16_t>(ePacketType::HYSPEX_QUERY);
     hdr.revision = 1;
-    hdr.length = 0;
+    hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
     buffer << hdr;
+    buffer.write(str);
 
-    return sizeof(sPacketHeader_t);
+    return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int hyspex::encode_query_lens_names(net_buffer& buffer)
+//hyspex::sAcquisitionParameters_t hyspex::to_acquisition_parameters_1(const hyspex_SetAcquisitionParameters_1& pckt)
+hyspex::sAcquisitionParameters_t hyspex::to_acquisition_parameters_1(sPacketHeader_t hdr, const net_buffer_view& buffer)
 {
-    sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::QUERY_LENS_NAMES);
-    hdr.revision = 1;
-    hdr.length = 0;
-    set_timestamp(&hdr.timestamp);
+    hyspex_SetAcquisitionParameters_1 pckt;
+    pckt.ParseFromArray(buffer.data(), hdr.length);
 
-    buffer << hdr;
-
-    return sizeof(sPacketHeader_t);
+    hyspex::sAcquisitionParameters_t data;
+    data.average_frames = pckt.average_frame();
+    data.frame_period_us = pckt.frame_period_us();
+    data.integration_time_us = pckt.integration_time_us();
+    return data;
 }
 
-
-std::uint32_t hyspex::to_average_frames_1(const hyspex_SetAverageFrames_1& pckt)
+int hyspex::encode_acquisition_parameters(std::uint16_t average_frame,
+    std::uint32_t frame_period_us, std::uint32_t integration_time_us, net_buffer& buffer)
 {
-    return pckt.average_frame();
-}
-
-int hyspex::encode_average_frames(std::uint32_t average_frame, net_buffer& buffer)
-{
-    hyspex_SetAverageFrames_1 pckt;
+    hyspex_SetAcquisitionParameters_1 pckt;
     pckt.set_average_frame(average_frame);
-
-    std::string str;
-    pckt.SerializeToString(&str);
-
-    sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::SET_AVERAGE_FRAMES);
-    hdr.revision = 1;
-    hdr.length = str.length();
-    set_timestamp(&hdr.timestamp);
-
-    buffer << hdr;
-    buffer.write(str);
-
-    return sizeof(sPacketHeader_t) + hdr.length;
-}
-
-std::uint32_t hyspex::to_frame_period_1(const hyspex_SetFramePeriod_1& pckt)
-{
-    return pckt.frame_period_us();
-}
-
-int hyspex::encode_frame_period(std::uint32_t frame_period_us, net_buffer& buffer)
-{
-    hyspex_SetFramePeriod_1 pckt;
     pckt.set_frame_period_us(frame_period_us);
-
-    std::string str;
-    pckt.SerializeToString(&str);
-
-    sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::SET_FRAME_PERIOD_US);
-    hdr.revision = 1;
-    hdr.length = str.length();
-    set_timestamp(&hdr.timestamp);
-
-    buffer << hdr;
-    buffer.write(str);
-
-    return sizeof(sPacketHeader_t) + hdr.length;
-}
-
-std::uint32_t hyspex::to_integration_time_1(const hyspex_SetIntegrationTime_1& pckt)
-{
-    return pckt.integration_time_us();
-}
-
-int hyspex::encode_integration_time(std::uint32_t integration_time_us, net_buffer& buffer)
-{
-    hyspex_SetIntegrationTime_1 pckt;
     pckt.set_integration_time_us(integration_time_us);
 
     std::string str;
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::SET_INTEGRATION_TIME_US);
+    hdr.id = static_cast<uint16_t>(ePacketType::SET_ACQUISITION_PARAMETERS);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -361,3 +321,30 @@ int hyspex::encode_lens_names(const std::vector<std::string>& names, net_buffer&
     return total_length;
 }
 
+
+hyspex_eBackgroundReply hyspex::to_background_reply_1(sPacketHeader_t hdr, const net_buffer_view& buffer)
+{
+    hyspex_BackgroundReply_1 pckt;
+    pckt.ParseFromArray(buffer.data(), hdr.length);
+    return pckt.reply();
+}
+
+int hyspex::encode_background_reply(hyspex_eBackgroundReply reply, net_buffer& buffer)
+{
+    hyspex_BackgroundReply_1 pckt;
+    pckt.set_reply(reply);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::BACKGROUND_REPLY);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}

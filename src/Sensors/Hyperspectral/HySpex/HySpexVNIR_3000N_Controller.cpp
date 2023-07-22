@@ -34,6 +34,23 @@ void cHySpexVNIR_3000N_Controller::processStream(const void* pBuffer, std::size_
     }
 }
 
+void cHySpexVNIR_3000N_Controller::onBackgroundComplete()
+{
+    auto status = mpModel->getBackgroundStatus();
+    switch(status)
+    {
+    case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
+        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_GOOD);
+        break;
+    case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
+        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_ABORTED);
+        break;
+    default:
+        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_FAILED);
+        break;
+    }
+}
+
 void cHySpexVNIR_3000N_Controller::onQueryState()
 {
     txCurrentState(this);
@@ -44,19 +61,9 @@ void cHySpexVNIR_3000N_Controller::onQueryLensNames()
     txLensNames(this);
 }
 
-void cHySpexVNIR_3000N_Controller::onSetAverageFrames(std::uint32_t average_frame)
+void cHySpexVNIR_3000N_Controller::onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {
-    mpModel->setAverageFrames(average_frame);
-}
-
-void cHySpexVNIR_3000N_Controller::onSetFramePeriod_us(std::uint32_t frame_period_us)
-{
-    mpModel->setFramePeriod_us(frame_period_us);
-}
-
-void cHySpexVNIR_3000N_Controller::onSetIntegrationTime_us(std::uint32_t integration_time_us)
-{
-    mpModel->setIntegrationTime_us(integration_time_us);
+    mpModel->setAcquisitionParameters(average_frame, frame_period_us, integration_time_us);
 }
 
 void cHySpexVNIR_3000N_Controller::onSetLensName(const std::string& lens_name)

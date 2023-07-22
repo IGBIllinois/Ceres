@@ -195,7 +195,7 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
     }
 */
 
-    if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
+    if (mThread.mpController->loadExperiment(expName, expDoc["experiment"], &mThread))
     {
         mPrincipalInvestigator.clear();
         mResearchers.clear();

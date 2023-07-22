@@ -36,5 +36,22 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
 
         break;
     }
+    case ePacketType::BACKGROUND_REPLY:
+    {
+        auto reply = to_background_reply_1(hdr, buffer);
+        switch (reply)
+        {
+        case hyspex_eBackgroundReply::eQUERY_GOOD:
+            onBackgroundReply(eBackgroundReply::GOOD);
+            break;
+        case hyspex_eBackgroundReply::eQUERY_ABORTED:
+            onBackgroundReply(eBackgroundReply::ABORTED);
+            break;
+        case hyspex_eBackgroundReply::eQUERY_FAILED:
+            onBackgroundReply(eBackgroundReply::FAILED);
+            break;
+        }
+        break;
+    }
     }
 }

@@ -12,31 +12,20 @@ cHySpexCamera_PropertiesNetEncoder::cHySpexCamera_PropertiesNetEncoder(std::size
 
 void cHySpexCamera_PropertiesNetEncoder::sendQueryState()
 {
-    encode_query_state(mBuffer);
+    encode_hyspex_query(eQUERY_STATE, mBuffer);
     sendData();
 }
 
 void cHySpexCamera_PropertiesNetEncoder::sendQueryLensNames()
 {
-    encode_query_lens_names(mBuffer);
+    encode_hyspex_query(eQUERY_LENS_NAMES, mBuffer);
     sendData();
 }
 
-void cHySpexCamera_PropertiesNetEncoder::sendAverageFrames(std::uint32_t average_frame)
+void cHySpexCamera_PropertiesNetEncoder::sendAcquisitionParameters(std::uint16_t average_frame,
+    std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {
-    encode_average_frames(average_frame, mBuffer);
-    sendData();
-}
-
-void cHySpexCamera_PropertiesNetEncoder::sendFramePeriod_us(std::uint32_t frame_period_us)
-{
-    encode_frame_period(frame_period_us, mBuffer);
-    sendData();
-}
-
-void cHySpexCamera_PropertiesNetEncoder::sendIntegrationTime_us(std::uint32_t integration_time_us)
-{
-    encode_integration_time(integration_time_us, mBuffer);
+    encode_acquisition_parameters(average_frame, frame_period_us, integration_time_us, mBuffer);
     sendData();
 }
 

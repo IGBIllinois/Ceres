@@ -27,7 +27,7 @@ public:
     /*
      * Load an experiment from JSON file.
      */
-    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
+    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc, QThread* pThread);
 
     /*
      * Is there an experiment (state machine) loaded in the experiment

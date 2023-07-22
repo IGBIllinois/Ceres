@@ -24,9 +24,6 @@ public:
     ~cHySpexVNIR_3000N_PropertyPage() = default;
 
     void doLayout() override;
-
-public:
-    cExperimentState* createState(const std::string& type) override;
 };
 
 

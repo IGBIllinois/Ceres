@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <string>
 
+class sPacketHeader_t;
 class net_buffer;
 class net_buffer_view;
 
@@ -24,18 +25,16 @@ namespace hyspex
 		UNKNOWN = 0,
 
 		// Property Page -> Controller
-		QUERY_STATE = 1,
-		QUERY_LENS_NAMES = 2,
-		SET_AVERAGE_FRAMES = 3,
-		SET_FRAME_PERIOD_US = 4,
-		SET_INTEGRATION_TIME_US = 5,
-		SET_LENS_NAME = 6,
-		SET_NUM_BACKGROUNDS = 7,
-		CALC_BACKGROUND = 8,
+		HYSPEX_QUERY = 1,
+		SET_ACQUISITION_PARAMETERS = 2,
+		SET_LENS_NAME = 3,
+		SET_NUM_BACKGROUNDS = 4,
+		CALC_BACKGROUND = 5,
 
 		// Controller -> Property Page
 		CURRENT_STATE = 1000,
 		LENS_NAMES = 1001,
+		BACKGROUND_REPLY = 1002,
 	};
 
 
@@ -43,17 +42,19 @@ namespace hyspex
 	 * Property Page/Controller packets utilities
 	 **********************************************************/
 
-	int encode_query_state(net_buffer& buffer);
-	int encode_query_lens_names(net_buffer& buffer);
+	hyspex_eQuery to_hyspex_query_enum_1(const sPacketHeader_t& hdr, const net_buffer_view& buffer);
+	int encode_hyspex_query(hyspex_eQuery query, net_buffer& buffer);
 
-	std::uint32_t to_average_frames_1(const hyspex_SetAverageFrames_1& pckt);
-	int encode_average_frames(std::uint32_t average_frame, net_buffer& buffer);
-
-	std::uint32_t to_frame_period_1(const hyspex_SetFramePeriod_1& pckt);
-	int encode_frame_period(std::uint32_t frame_period_us, net_buffer& buffer);
-
-	std::uint32_t to_integration_time_1(const hyspex_SetIntegrationTime_1& pckt);
-	int encode_integration_time(std::uint32_t integration_time_us, net_buffer& buffer);
+	struct sAcquisitionParameters_t
+	{
+		std::uint16_t average_frames = 0;
+		std::uint32_t frame_period_us = 0;
+		std::uint32_t integration_time_us = 0;
+	};
+//	sAcquisitionParameters_t to_acquisition_parameters_1(const hyspex_SetAcquisitionParameters_1& pckt);
+	sAcquisitionParameters_t to_acquisition_parameters_1(sPacketHeader_t hdr, const net_buffer_view& buffer);
+	int encode_acquisition_parameters(std::uint16_t average_frame,
+		std::uint32_t frame_period_us, std::uint32_t integration_time_us, net_buffer& buffer);
 
 	std::string to_lens_name_1(const hyspex_SetLens_1& pckt);
 	int encode_lens_name(const std::string& lens_name, net_buffer& buffer);
@@ -79,6 +80,9 @@ namespace hyspex
 
 	std::vector<std::string> to_lens_names_1(const hyspex_LensNames_1& pckt);
 	int encode_lens_names(const std::vector<std::string>& names, net_buffer& buffer);
+
+	hyspex_eBackgroundReply to_background_reply_1(sPacketHeader_t hdr, const net_buffer_view& buffer);
+	int encode_background_reply(hyspex_eBackgroundReply reply, net_buffer& buffer);
 
 } // End of namespace hyspex
 

@@ -24,9 +24,7 @@ protected:
      */
     virtual void onQueryState() = 0;
     virtual void onQueryLensNames() = 0;
-    virtual void onSetAverageFrames(std::uint32_t average_frame) = 0;
-    virtual void onSetFramePeriod_us(std::uint32_t frame_period_us) = 0;
-    virtual void onSetIntegrationTime_us(std::uint32_t integration_time_us) = 0;
+    virtual void onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us) = 0;
     virtual void onSetLensName(const std::string& lens_name) = 0;
     virtual void onSetNumOfBackgrounds(int num_backgrounds) = 0;
     virtual void onCalcBackground() = 0;

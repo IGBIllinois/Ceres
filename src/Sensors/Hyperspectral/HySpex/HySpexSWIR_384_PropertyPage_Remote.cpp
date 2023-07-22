@@ -58,6 +58,10 @@ void cHySpexSWIR_384_PropertyPage_Remote::onLensNames(const std::vector<std::str
 	}
 }
 
+
+void cHySpexSWIR_384_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
+{}
+
 void cHySpexSWIR_384_PropertyPage_Remote::showPage()
 {
 	openConnection();

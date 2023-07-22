@@ -26,6 +26,10 @@ public:
 
     void onLensNames(const std::vector<std::string>& names) override;
 
+    void onBackgroundReply(eBackgroundReply reply) override;
+
+public:
+    cExperimentState* createState(const std::string& type) override;
 
 protected:
     void onConnect() override;
@@ -40,8 +44,12 @@ protected:
     void doApply() override;
 
 protected:
+    void sendChangedData(bool* pNeedsUpdate = nullptr);
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
+
+private:
+    bool mWaitingForBackgroundReply = false;
 };
 
 

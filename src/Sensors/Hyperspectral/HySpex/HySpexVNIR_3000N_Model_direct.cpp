@@ -153,17 +153,27 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     emit avgFramesChanged(mAverageFrames);
 
 	mFramePeriod_us = mCamera->getFramePeriod_us();
-    emit framePeriodChanged(mFramePeriod_us);
-
     mMinFramePeriod_us = mCamera->getMinimumFramePeriod_us();
     emit minFramePeriodChanged(mMinFramePeriod_us);
-	
+
+    if (mFramePeriod_us < mMinFramePeriod_us)
+    {
+        mCamera->setFramePeriod_us(mMinFramePeriod_us);
+        mFramePeriod_us = mCamera->getFramePeriod_us();
+    }
+    emit framePeriodChanged(mFramePeriod_us);
+
     mIntegrationTime_us = mCamera->getIntegrationTime_us();
-    emit integrationTimeChanged(mIntegrationTime_us);
-	
     mMaxIntegrationTime_us = mCamera->getMaxIntegrationTime_us(mFramePeriod_us);
     emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
-	
+
+    if (mIntegrationTime_us > mMaxIntegrationTime_us)
+    {
+        mCamera->setIntegrationTime_us(mMaxIntegrationTime_us);
+        mIntegrationTime_us = mCamera->getIntegrationTime_us();
+    }
+    emit integrationTimeChanged(mIntegrationTime_us);
+
     mAmbientTemp_C = mCamera->getAmbientTemperature_C();
     emit ambientTempChanged(mAmbientTemp_C);
 	
@@ -250,35 +260,100 @@ void cHySpexVNIR_3000N_Model_direct::update()
         mSensorTemp_C = mCamera->getSensorTemperature_C();
         emit sensorTempChanged(mSensorTemp_C);
     }
+
+    if (mBackgroundState != eBgStates::NONE)
+    {
+        switch (mBackgroundState)
+        {
+        case eBgStates::SH_CLOSE:
+        {
+            if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED)
+            {
+                mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_PENDING;
+                mCamera->calculateBackgroundAsync(0, mNumBackgrounds);
+                mBackgroundState = eBgStates::COMPLETE;
+            }
+            break;
+        }
+        case eBgStates::COMPLETE:
+        {
+            switch (mBackgroundStatus)
+            {
+            case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
+            {
+                mCamera->getBackgroundMatrix();
+                mCamera->openShutter();
+                mBackgroundState = eBgStates::SH_OPEN;
+                break;
+            }
+            case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
+            {
+                mCamera->openShutter();
+                mBackgroundState = eBgStates::SH_OPEN;
+                break;
+            }
+            }
+
+            break;
+        }
+        case eBgStates::SH_OPEN:
+        {
+            if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN)
+            {
+                mBackgroundState = eBgStates::NONE;
+                emit backgroundComplete();
+            }
+            break;
+        }
+        }
+
+        return;
+    }
 }
 
 void cHySpexVNIR_3000N_Model_direct::writeDataHeader()
 {
 }
 
-void cHySpexVNIR_3000N_Model_direct::setAverageFrames(std::uint16_t frames)
+void cHySpexVNIR_3000N_Model_direct::setAcquisitionParameters(std::uint16_t avg_frames,
+    std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {
-    mCamera->setAverageFrames(frames);
+    auto prevAverageFrames = mAverageFrames;
+    mCamera->setAverageFrames(avg_frames);
     mAverageFrames = mCamera->getAverageFrames();
-    emit avgFramesChanged(mAverageFrames);
-}
 
-void cHySpexVNIR_3000N_Model_direct::setFramePeriod_us(std::uint32_t frame_period_us)
-{
-    mCamera->setFramePeriod_us(frame_period_us);
-    mFramePeriod_us = mCamera->getFramePeriod_us();
-    mMaxIntegrationTime_us = mCamera->getMaxIntegrationTime_us(mFramePeriod_us);
-    emit framePeriodChanged(mFramePeriod_us);
-    emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
-}
+    auto prevMaxIntegrationTime_us = mMaxIntegrationTime_us;
+    mMaxIntegrationTime_us = mCamera->getMaxIntegrationTime_us(frame_period_us);
+    if (integration_time_us > mMaxIntegrationTime_us)
+        integration_time_us = mMaxIntegrationTime_us;
 
-void cHySpexVNIR_3000N_Model_direct::setIntegrationTime_us(std::uint32_t integration_time_us)
-{
+    auto prevIntegrationTime_us = mIntegrationTime_us;
+    auto prevMinFramePeriod_us = mMinFramePeriod_us;
     mCamera->setIntegrationTime_us(integration_time_us);
     mIntegrationTime_us = mCamera->getIntegrationTime_us();
     mMinFramePeriod_us = mCamera->getMinimumFramePeriod_us();
-    emit integrationTimeChanged(mIntegrationTime_us);
-    emit minFramePeriodChanged(mMinFramePeriod_us);
+
+    if (frame_period_us < mMinFramePeriod_us)
+        frame_period_us = mMinFramePeriod_us;
+
+    auto prevFramePeriod_us = mFramePeriod_us;
+    mCamera->setFramePeriod_us(frame_period_us);
+    mFramePeriod_us = mCamera->getFramePeriod_us();
+
+    if (prevAverageFrames != mAverageFrames)
+        emit avgFramesChanged(mAverageFrames);
+
+    if (prevMaxIntegrationTime_us != mMaxIntegrationTime_us)
+        emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
+
+    if (prevMinFramePeriod_us != mMinFramePeriod_us)
+        emit minFramePeriodChanged(mMinFramePeriod_us);
+
+    if (prevFramePeriod_us != mFramePeriod_us)
+        emit framePeriodChanged(mFramePeriod_us);
+
+    if (prevIntegrationTime_us != mIntegrationTime_us)
+        emit integrationTimeChanged(mIntegrationTime_us);
 }
 
 void cHySpexVNIR_3000N_Model_direct::setNumOfBackgrounds(int num_backgrounds)
@@ -292,7 +367,7 @@ void cHySpexVNIR_3000N_Model_direct::setNumOfBackgrounds(int num_backgrounds)
 void cHySpexVNIR_3000N_Model_direct::calcBackground()
 {
     mCamera->closeShutter();
-    mCamera->calculateBackground(0, mNumBackgrounds);
+    mBackgroundState = eBgStates::SH_CLOSE;
 }
 
 

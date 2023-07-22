@@ -12,11 +12,6 @@ cHySpexVNIR_3000N_PropertyPage::cHySpexVNIR_3000N_PropertyPage(QWidget* parent)
 {
 }
 
-cExperimentState* cHySpexVNIR_3000N_PropertyPage::createState(const std::string& type)
-{
-	return nullptr;
-}
-
 void cHySpexVNIR_3000N_PropertyPage::doLayout()
 {
 	auto* mainLayout = new QVBoxLayout(this);

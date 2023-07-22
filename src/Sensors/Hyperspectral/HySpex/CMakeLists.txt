@@ -86,6 +86,12 @@ set(HYSPEX_SOURCE_FILES
 	HySpexSWIR_384_PropertyPage.hpp
 	HySpexSWIR_384_PropertyPage.cpp
 
+
+#
+# HySpex Experiment State Files
+#
+	HySpexExperimentStates.hpp
+	HySpexExperimentStates.cpp
 	
 #
 # HySpex Cameras General Files

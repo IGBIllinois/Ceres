@@ -541,8 +541,8 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
 
     if (creator)
     {
-        mThread.mpController->addStateCreator(creator);
         mStateCreators.push_back(creator);
+        mThread.mpController->addStateCreator(creator);
     }
 }
 

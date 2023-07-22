@@ -248,13 +248,8 @@ void cHySpexSWIR_384_Model_direct::writeDataHeader()
 }
 
 
-void cHySpexSWIR_384_Model_direct::setAverageFrames(std::uint16_t frames)
-{}
-
-void cHySpexSWIR_384_Model_direct::setFramePeriod_us(std::uint32_t frame_period_us)
-{}
-
-void cHySpexSWIR_384_Model_direct::setIntegrationTime_us(std::uint32_t integration_time_us)
+void cHySpexSWIR_384_Model_direct::setAcquisitionParameters(std::uint16_t avg_frames,
+    std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {}
 
 void cHySpexSWIR_384_Model_direct::setNumOfBackgrounds(int num_backgrounds)

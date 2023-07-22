@@ -30,9 +30,8 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
-    void setAverageFrames(std::uint16_t frames) override;
-    void setFramePeriod_us(std::uint32_t frame_period_us) override;
-    void setIntegrationTime_us(std::uint32_t integration_time_us) override;
+    void setAcquisitionParameters(std::uint16_t avg_frames,
+        std::uint32_t frame_period_us, std::uint32_t integration_time_us) override;
 
     void setNumOfBackgrounds(int num_backgrounds) override;
     void calcBackground() override;

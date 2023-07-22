@@ -55,13 +55,8 @@ void cHySpexVNIR_3000N_Model_net::writeDataHeader()
 {
 }
 
-void cHySpexVNIR_3000N_Model_net::setAverageFrames(std::uint16_t frames)
-{}
-
-void cHySpexVNIR_3000N_Model_net::setFramePeriod_us(std::uint32_t frame_period_us)
-{}
-
-void cHySpexVNIR_3000N_Model_net::setIntegrationTime_us(std::uint32_t integration_time_us)
+void cHySpexVNIR_3000N_Model_net::setAcquisitionParameters(std::uint16_t avg_frames,
+    std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {}
 
 void cHySpexVNIR_3000N_Model_net::setNumOfBackgrounds(int num_backgrounds)

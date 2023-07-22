@@ -4,6 +4,8 @@
 #include "ExperimentStateCreator.hpp"
 #include "BasicExperimentStates.hpp"
 
+#include <QThread>
+
 #include <algorithm>
 
 Q_DECLARE_METATYPE(experiment::eState)
@@ -96,7 +98,7 @@ cExperimentState* cExperimentStateMachine::createState(const std::string& type)
 }
 
 
-bool cExperimentStateMachine::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
+bool cExperimentStateMachine::loadExperiment(const std::string& expName, const nlohmann::json& expDoc, QThread* pThread)
 {
     using namespace experiment;
 
@@ -118,7 +120,15 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
             for (auto* creator : mStateCreators)
             {
                 pState = creator->createState(type);
-                if (pState) break;
+                if (pState)
+                {
+                    QObject* pObject = dynamic_cast<QObject*>(pState);
+                    if (pObject)
+                    {
+//                        pObject->moveToThread(pThread);
+                    }
+                    break;
+                }
             }
         }
 

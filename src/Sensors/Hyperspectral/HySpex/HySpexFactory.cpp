@@ -105,6 +105,7 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
 
         auto* pController = new cHySpexVNIR_3000N_Controller(pModel);
 
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::backgroundComplete, pController, &cHySpexVNIR_3000N_Controller::onBackgroundComplete);
 
         return sSensorWidgets(pModel, pController, pView);
     }
