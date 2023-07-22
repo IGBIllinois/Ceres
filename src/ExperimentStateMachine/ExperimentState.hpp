@@ -26,6 +26,7 @@ public:
 	virtual QString getStatusStr() = 0;
 
 	virtual void configure(const nlohmann::json& stateDoc) = 0;
+	virtual void cleanup() {};
 
 	virtual bool needsDataFile() { return recording(); }
 	virtual bool recording() = 0;
@@ -52,6 +53,8 @@ public:
 
 	bool initialize(const std::string& hostname, uint16_t port,
 		bool use_ipv6, const std::string& local_ip);
+
+	void destroy();
 
 	std::string getHostname() const { return mHostname; }
 	std::string getLocalIpAddress() const { return mLocalIpAddress; }

@@ -16,11 +16,16 @@ cHySpexVNIR_3000N_Properties_Remote::cHySpexVNIR_3000N_Properties_Remote(cHySpex
 
 cHySpexVNIR_3000N_Properties_Remote::~cHySpexVNIR_3000N_Properties_Remote()
 {
-	closeConnection();
 }
 
 void cHySpexVNIR_3000N_Properties_Remote::configure(const nlohmann::json& stateDoc)
 {
+}
+
+void cHySpexVNIR_3000N_Properties_Remote::cleanup()
+{
+	closeConnection();
+	destroy();
 }
 
 QString cHySpexVNIR_3000N_Properties_Remote::getStatusStr()

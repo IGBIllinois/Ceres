@@ -14,6 +14,11 @@ cExperimentStateRemoteInterface::cExperimentStateRemoteInterface(QObject* parent
 
 cExperimentStateRemoteInterface::~cExperimentStateRemoteInterface()
 {
+    destroy();
+}
+
+void cExperimentStateRemoteInterface::destroy()
+{
     if (mpSocket)
     {
         if (mpSocket->isOpen())
@@ -31,6 +36,7 @@ cExperimentStateRemoteInterface::~cExperimentStateRemoteInterface()
         QObject::disconnect(mpSocket, &QTcpSocket::readyRead, this, &cExperimentStateRemoteInterface::processIncomingData);
 
         mpSocket->deleteLater();
+        mpSocket = nullptr;
     }
 }
 

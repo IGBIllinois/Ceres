@@ -22,6 +22,7 @@ public:
 	QString getStatusStr() override;
 
 	void configure(const nlohmann::json& stateDoc) override;
+	void cleanup() override;
 
 	bool recording() override;
 

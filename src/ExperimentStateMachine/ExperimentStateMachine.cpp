@@ -256,6 +256,7 @@ void cExperimentStateMachine::updateExperimentStateMachine()
 
         if (mActiveStateNumber < mExperiment.size())
         {
+            mpActiveState->cleanup();
             mpActiveState = mExperiment[mActiveStateNumber];
             mpActiveState->initialize();
             QString msg;
