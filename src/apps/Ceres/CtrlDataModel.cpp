@@ -72,6 +72,10 @@ void cCtrlDataModel::addExperimentControlModel(cExperimentControlModel* pControl
     }
 }
 
+std::size_t cCtrlDataModel::sensorCount() const
+{
+    return mThread.mSensors.size();
+}
 
 void cCtrlDataModel::addSensor(cSensorModel* pSensor)
 {

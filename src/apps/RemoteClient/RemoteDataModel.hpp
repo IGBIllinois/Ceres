@@ -39,6 +39,7 @@ public:
 
     bool startTcpServer(const std::string& ip, uint16_t port);
 
+    std::size_t sensorCount() const override;
     void addSensor(cSensorModel* pSensor) override;
     void addSensorController(cSensorController* pController);
 

@@ -97,6 +97,11 @@ bool cRemoteDataModel::startTcpServer(const std::string& ip, uint16_t port)
     return mpTcpServer->listen(local_endpoint, port);
 }
 
+std::size_t cRemoteDataModel::sensorCount() const
+{
+    return mThread.mSensors.size();
+}
+
 void cRemoteDataModel::addSensor(cSensorModel* pSensor)
 {
     if (pSensor)

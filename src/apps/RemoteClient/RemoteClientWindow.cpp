@@ -115,72 +115,73 @@ cRemoteClientWindow::~cRemoteClientWindow()
 void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 {
     mpSplashScreen = pSplashScreen;
-
-/* Comment out for short/no splash screen! */
-    std::string cfgFileName = getCfgFilePath();
+    std::string cfgFileName;
     nlohmann::json configDoc;
 
-    qInfo() << "Loading configuration file " << cfgFileName.c_str() << "...";
-
-    if (!cfgFileName.empty())
+    if (mpSplashScreen)
     {
-        std::ifstream in;
-        in.open(cfgFileName);
+        cfgFileName = getCfgFilePath();
 
-        if (!in.is_open())
+        qInfo() << "Loading configuration file " << cfgFileName.c_str() << "...";
+
+        if (!cfgFileName.empty())
         {
-            QString msg = "Could not open ";
-            msg += cfgFileName.c_str();
-            msg += " for reading!";
+            std::ifstream in;
+            in.open(cfgFileName);
 
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
+            if (!in.is_open())
+            {
+                QString msg = "Could not open ";
+                msg += cfgFileName.c_str();
+                msg += " for reading!";
 
-            exit(EXIT_FAILURE);
+                QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
+
+            try
+            {
+                configDoc = nlohmann::json::parse(in, nullptr, true, true);
+            }
+            catch (const nlohmann::json::parse_error& e)
+            {
+                QString msg = "Parsing error in ";
+                msg += cfgFileName.c_str();
+                msg += ".\n";
+                msg += e.what();
+
+                QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
+            catch (const std::exception& e)
+            {
+                QString msg = "Unknown error in ";
+                msg += cfgFileName.c_str();
+                msg += ".\n";
+                msg += e.what();
+
+                QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
         }
 
-        try
+        if (configDoc.contains("default data folder"))
         {
-            configDoc = nlohmann::json::parse(in, nullptr, true, true);
-        }
-        catch (const nlohmann::json::parse_error& e)
-        {
-            QString msg = "Parsing error in ";
-            msg += cfgFileName.c_str();
-            msg += ".\n";
-            msg += e.what();
-
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
-
-            exit(EXIT_FAILURE);
-        }
-        catch (const std::exception& e)
-        {
-            QString msg = "Unknown error in ";
-            msg += cfgFileName.c_str();
-            msg += ".\n";
-            msg += e.what();
-
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
-
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    if (configDoc.contains("default data folder"))
-    {
-        auto folders = configDoc["default data folder"];
+            auto folders = configDoc["default data folder"];
 #ifdef WIN32
-        if (folders.contains("windows"))
-        {
-            mMainModel.setDefaultDataPath(folders["windows"].get<std::string>());
-        }
+            if (folders.contains("windows"))
+            {
+                mMainModel.setDefaultDataPath(folders["windows"].get<std::string>());
+            }
 #endif
+        }
     }
-/* Comment out for short/no splash screen! */
-
 
     createMainMenu();
     createSubMenusAndActions();
@@ -190,38 +191,39 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
     createStatusBar();
 
-/* Comment out for short/no splash screen! */
-    try
+    if (mpSplashScreen)
     {
-        qInfo() << "Initializing sensors...";
-
-        onStatusUpdate("Initializing sensors...");
-        createSensorModelsAndViews(configDoc);
-
-        qInfo() << "Initializing TCP server...";
-
-        onStatusUpdate("Initializing TCP server...");
-        if (!initializeServer(configDoc))
+        try
         {
-            QMessageBox mb(QMessageBox::Critical, "TCP Server Error", "Could not start the TCP server!");
+            qInfo() << "Initializing sensors...";
+
+            onStatusUpdate("Initializing sensors...");
+            createSensorModelsAndViews(configDoc);
+
+            qInfo() << "Initializing TCP server...";
+
+            onStatusUpdate("Initializing TCP server...");
+            if (!initializeServer(configDoc))
+            {
+                QMessageBox mb(QMessageBox::Critical, "TCP Server Error", "Could not start the TCP server!");
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            std::string msg = "Error in ";
+            msg += cfgFileName;
+            msg += ": ";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
             mb.exec();
 
             exit(EXIT_FAILURE);
         }
     }
-    catch (const std::exception& e)
-    {
-        std::string msg = "Error in ";
-        msg += cfgFileName;
-        msg += ": ";
-        msg += e.what();
-
-        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
-        mb.exec();
-
-        exit(EXIT_FAILURE);
-    }
-    /* Comment out for short/no splash screen! */
 
     mpSplashScreen = nullptr;
 
@@ -231,103 +233,102 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
 void cRemoteClientWindow::startDataAcquisitionSystem()
 {
-/* Uncomment for short/no splash screen! */
-/*
-    std::string cfgFileName = getCfgFilePath();
-    nlohmann::json configDoc;
-
-    qInfo() << "Loading configuration file " << cfgFileName.c_str() << "...";
-
-    if (!cfgFileName.empty())
+    if (mMainModel.sensorCount() == 0)
     {
-        std::ifstream in;
-        in.open(cfgFileName);
+        std::string cfgFileName = getCfgFilePath();
+        nlohmann::json configDoc;
 
-        if (!in.is_open())
+        qInfo() << "Loading configuration file " << cfgFileName.c_str() << "...";
+
+        if (!cfgFileName.empty())
         {
-            QString msg = "Could not open ";
-            msg += cfgFileName.c_str();
-            msg += " for reading!";
+            std::ifstream in;
+            in.open(cfgFileName);
 
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
+            if (!in.is_open())
+            {
+                QString msg = "Could not open ";
+                msg += cfgFileName.c_str();
+                msg += " for reading!";
 
-            exit(EXIT_FAILURE);
+                QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
+
+            try
+            {
+                configDoc = nlohmann::json::parse(in, nullptr, true, true);
+            }
+            catch (const nlohmann::json::parse_error& e)
+            {
+                QString msg = "Parsing error in ";
+                msg += cfgFileName.c_str();
+                msg += ".\n";
+                msg += e.what();
+
+                QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
+            catch (const std::exception& e)
+            {
+                QString msg = "Unknown error in ";
+                msg += cfgFileName.c_str();
+                msg += ".\n";
+                msg += e.what();
+
+                QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        if (configDoc.contains("default data folder"))
+        {
+            auto folders = configDoc["default data folder"];
+#ifdef WIN32
+            if (folders.contains("windows"))
+            {
+                mMainModel.setDefaultDataPath(folders["windows"].get<std::string>());
+            }
+#endif
         }
 
         try
         {
-            configDoc = nlohmann::json::parse(in, nullptr, true, true);
-        }
-        catch (const nlohmann::json::parse_error& e)
-        {
-            QString msg = "Parsing error in ";
-            msg += cfgFileName.c_str();
-            msg += ".\n";
-            msg += e.what();
+            qInfo() << "Initializing sensors...";
 
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
+            onStatusUpdate("Initializing sensors...");
+            createSensorModelsAndViews(configDoc);
 
-            exit(EXIT_FAILURE);
+            qInfo() << "Initializing TCP server...";
+
+            onStatusUpdate("Initializing TCP server...");
+            if (!initializeServer(configDoc))
+            {
+                QMessageBox mb(QMessageBox::Critical, "TCP Server Error", "Could not start the TCP server!");
+                mb.exec();
+
+                exit(EXIT_FAILURE);
+            }
         }
         catch (const std::exception& e)
         {
-            QString msg = "Unknown error in ";
-            msg += cfgFileName.c_str();
-            msg += ".\n";
+            std::string msg = "Error in ";
+            msg += cfgFileName;
+            msg += ": ";
             msg += e.what();
 
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
             mb.exec();
 
             exit(EXIT_FAILURE);
         }
     }
-
-    if (configDoc.contains("default data folder"))
-    {
-        auto folders = configDoc["default data folder"];
-#ifdef WIN32
-        if (folders.contains("windows"))
-        {
-            mMainModel.setDefaultDataPath(folders["windows"].get<std::string>());
-        }
-#endif
-    }
-
-    try
-    {
-        qInfo() << "Initializing sensors...";
-
-        onStatusUpdate("Initializing sensors...");
-        createSensorModelsAndViews(configDoc);
-
-        qInfo() << "Initializing TCP server...";
-
-        onStatusUpdate("Initializing TCP server...");
-        if (!initializeServer(configDoc))
-        {
-            QMessageBox mb(QMessageBox::Critical, "TCP Server Error", "Could not start the TCP server!");
-            mb.exec();
-
-            exit(EXIT_FAILURE);
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::string msg = "Error in ";
-        msg += cfgFileName;
-        msg += ": ";
-        msg += e.what();
-
-        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
-        mb.exec();
-
-        exit(EXIT_FAILURE);
-    }
-*/
-/* Uncomment for short/no splash screen! */
 
     qInfo() << "Starting data acquisition thread....";
     mMainModel.startDataThread();

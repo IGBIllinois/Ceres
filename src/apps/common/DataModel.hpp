@@ -22,6 +22,7 @@ public:
     explicit cDataModel(QObject* parent = nullptr);
     ~cDataModel();
 
+    virtual std::size_t sensorCount() const = 0;
     virtual void addSensor(cSensorModel* pSensor) = 0;
 
 signals:

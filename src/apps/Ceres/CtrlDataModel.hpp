@@ -39,6 +39,8 @@ public:
     ~cCtrlDataModel();
 
     virtual void addExperimentControlModel(cExperimentControlModel* pModel);
+
+    std::size_t sensorCount() const override;
     void addSensor(cSensorModel* pSensor) override;
 
     void addSensorPropertyPage(cSensorPropertyPage* pPage);
