@@ -57,8 +57,3 @@ void cOusterPropertyPage::doLayout()
 
 	setLayout(pMainLayout);
 }
-
-cExperimentState* cOusterPropertyPage::createState(const std::string& type)
-{
-	return nullptr;
-}

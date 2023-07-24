@@ -12,11 +12,6 @@ cHySpexSWIR_384_PropertyPage::cHySpexSWIR_384_PropertyPage(QWidget* parent)
 {
 }
 
-cExperimentState* cHySpexSWIR_384_PropertyPage::createState(const std::string& type)
-{
-	return nullptr;
-}
-
 void cHySpexSWIR_384_PropertyPage::doLayout()
 {
 	auto* mainLayout = new QVBoxLayout(this);

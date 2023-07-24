@@ -27,9 +27,6 @@ public:
     void createWidgets() override;
     void doLayout() override;
 
-public:
-    cExperimentState* createState(const std::string& type) override;
-
 protected:
     QLabel*     mpLidarModeLabel = nullptr;
     QComboBox*  mpLidarModes = nullptr;

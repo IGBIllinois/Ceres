@@ -24,7 +24,8 @@ PRIVATE
     BasicExperimentStates.hpp
     BasicExperimentStates.cpp
 
-    ExperimentState.cpp
+    ExperimentStateRemoteInterface.hpp
+    ExperimentStateRemoteInterface.cpp
 
 #
 # The Experiment State Machine

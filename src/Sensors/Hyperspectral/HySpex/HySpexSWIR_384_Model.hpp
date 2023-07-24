@@ -27,6 +27,9 @@ public:
 
     void writeDataHeader() override;
 
+signals:
+    void backgroundComplete();
+
 private:
     cHySpexSWIR_384_Serializer mSerializer;
 };

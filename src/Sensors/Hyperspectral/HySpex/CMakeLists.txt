@@ -119,6 +119,13 @@ set(HYSPEX_SOURCE_FILES
 )
 
 
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+#set_property(SOURCE ExperimentCtrlView.hpp PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+
+
 # The static library (.lib/.a) for communicating with HySpex Cameras
 add_library(hyspex_static STATIC)
 
@@ -152,6 +159,7 @@ target_include_directories(hyspex_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCL
 
 target_link_libraries(hyspex_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(hyspex_static PUBLIC ${Qt}::Network)
+target_link_libraries(hyspex_static PRIVATE ExperimentStateMachine)
 target_link_libraries(hyspex_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(hyspex_static PRIVATE ${Protobuf_LIBRARIES})
 target_link_libraries(hyspex_static PRIVATE HySpexConnect::hyspex_connect_static)

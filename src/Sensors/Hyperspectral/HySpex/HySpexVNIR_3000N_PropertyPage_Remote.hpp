@@ -19,6 +19,9 @@ public:
     ~cHySpexVNIR_3000N_PropertyPage_Remote() = default;
 
 public:
+    cExperimentState* createState(const std::string& type) override;
+
+public:
     void onCurrentState(bool valid, std::uint16_t average_frames,
         std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
         std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
@@ -27,9 +30,6 @@ public:
     void onLensNames(const std::vector<std::string>& names) override;
 
     void onBackgroundReply(eBackgroundReply reply) override;
-
-public:
-    cExperimentState* createState(const std::string& type) override;
 
 protected:
     void onConnect() override;

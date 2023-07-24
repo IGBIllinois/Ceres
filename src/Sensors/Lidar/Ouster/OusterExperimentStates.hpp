@@ -2,20 +2,26 @@
 #pragma once
 
 #include "ExperimentState.hpp"
-
+#include "ExperimentStateRemoteInterface.hpp"
 
 // Forward Declarations
-class cOusterPropertyPage;
+class cHySpexSWIR_384_PropertyPage_Remote;
+class cHySpexVNIR_3000N_PropertyPage_Remote;
 
+/*******************************************************************/
+/**           Base Class for Ouster Experiment States             **/
+/*******************************************************************/
 
-class cOusterExperimentState_State : public cExperimentState
+class cOuster_Properties_Remote : public cExperimentStateRemoteInterface, public cExperimentState
 {
-public:
-	cOusterExperimentState_State(cOusterPropertyPage& propertyPage);
+	Q_OBJECT
 
-	QString getStatusStr() override;
+public:
+	cOuster_Properties_Remote();
+	~cOuster_Properties_Remote();
 
 	void configure(const nlohmann::json& stateDoc) override;
+	void cleanup() override;
 
 	bool recording() override;
 
@@ -25,6 +31,12 @@ public:
 	void stop() override;
 	eRESULT finished() override;
 
-private:
+protected:
+	std::string mHostname;
+	std::string mLocalIpAddress;
+	bool mUse_IpV6 = false;
+	uint16_t   mPort = 0;
 };
+
+
 

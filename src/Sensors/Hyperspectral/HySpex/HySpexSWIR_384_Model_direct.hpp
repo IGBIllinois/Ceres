@@ -4,6 +4,9 @@
 #include "HySpexSWIR_384_Model.hpp"
 #include "Timers.hpp"
 
+#include <cbdf/HyperspectralBuffers.hpp>
+#include <cbdf/HySpexSWIR_384_Serializer.hpp>
+
 #include <QObject>
 
 #include <memory>
@@ -47,13 +50,14 @@ public:
     void setNumOfBackgrounds(int num_backgrounds) override;
     void calcBackground() override;
 
-signals:
-
 protected:
     void update() override;
 
 private:
     cIntervalTimer mTemperatureUpdateTimer;
+
+    enum class eBgStates {NONE, SH_CLOSE, COMPLETE, SH_OPEN };
+    eBgStates mBackgroundState = eBgStates::NONE;
 
     std::unique_ptr<hyspex::cSWIR384> mCamera;
 };

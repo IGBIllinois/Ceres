@@ -1,6 +1,7 @@
 
 
 #include "OusterPropertyPage_Remote.hpp"
+#include "OusterExperimentStates.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
@@ -9,6 +10,11 @@ cOusterPropertyPage_Remote::cOusterPropertyPage_Remote(QWidget* parent)
 	: cOusterPropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
 		cOusterPropertiesNetEncoder(255)
 {}
+
+cExperimentState* cOusterPropertyPage_Remote::createState(const std::string& type)
+{
+	return nullptr;
+}
 
 void cOusterPropertyPage_Remote::onConnect()
 {

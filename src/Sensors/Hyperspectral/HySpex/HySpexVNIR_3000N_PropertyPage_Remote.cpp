@@ -11,13 +11,6 @@ cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWi
 		cHySpexVNIR_3000N_PropertiesNetEncoder(255)
 {}
 
-void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
-{
-	setEnabled(false);
-	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
-	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
-}
-
 cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::string& type)
 {
 	if (type == "VNIR-3000N")
@@ -26,6 +19,14 @@ cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::
 	}
 
 	return nullptr;
+}
+
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
+{
+	setEnabled(false);
+	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
+	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid,

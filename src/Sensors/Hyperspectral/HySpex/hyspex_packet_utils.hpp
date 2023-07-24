@@ -1,5 +1,5 @@
 /*
-   Packet Utilities of HySpex VNIR 3000N Property Page <-> HySpex VNIR 3000N controller
+   Packet Utilities of HySpex Camera Property Page <-> HySpex Camera controller
 */
 
 #pragma once
@@ -42,28 +42,33 @@ namespace hyspex
 	 * Property Page/Controller packets utilities
 	 **********************************************************/
 
-	hyspex_eQuery to_hyspex_query_enum_1(const sPacketHeader_t& hdr, const net_buffer_view& buffer);
+	/*** send/receive the query message ***/
+	hyspex_eQuery to_hyspex_query_enum_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_hyspex_query(hyspex_eQuery query, net_buffer& buffer);
 
+	/*** send/receive the acquisition parameters message ***/
 	struct sAcquisitionParameters_t
 	{
 		std::uint16_t average_frames = 0;
 		std::uint32_t frame_period_us = 0;
 		std::uint32_t integration_time_us = 0;
 	};
-//	sAcquisitionParameters_t to_acquisition_parameters_1(const hyspex_SetAcquisitionParameters_1& pckt);
-	sAcquisitionParameters_t to_acquisition_parameters_1(sPacketHeader_t hdr, const net_buffer_view& buffer);
+	sAcquisitionParameters_t to_acquisition_parameters_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_acquisition_parameters(std::uint16_t average_frame,
 		std::uint32_t frame_period_us, std::uint32_t integration_time_us, net_buffer& buffer);
 
-	std::string to_lens_name_1(const hyspex_SetLens_1& pckt);
+	/*** send/receive the lens name message ***/
+	std::string to_lens_name_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_lens_name(const std::string& lens_name, net_buffer& buffer);
 
-	int to_num_backgrounds_1(const hyspex_SetNumOfBackgrounds_1& pckt);
+	/*** send/receive the number of backgrounds message ***/
+	int to_num_backgrounds_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_num_backgrounds(int num_backgrounds, net_buffer& buffer);
 
+	/*** send the calculate backgrounds message ***/
 	int encode_calc_background(net_buffer& buffer);
 
+	/*** send/receive the current state message ***/
 	struct sCurrentState_t
 	{
 		bool valid = false;
@@ -75,13 +80,15 @@ namespace hyspex
 		std::uint32_t num_backgrounds = 0;
 		std::string lens_name;
 	};
-	sCurrentState_t to_current_state_1(const hyspex_CurrentState_1& pckt);
+	sCurrentState_t to_current_state_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_current_state(const sCurrentState_t& state, net_buffer& buffer);
 
-	std::vector<std::string> to_lens_names_1(const hyspex_LensNames_1& pckt);
+	/*** send/receive the list of lens names message ***/
+	std::vector<std::string> to_lens_names_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_lens_names(const std::vector<std::string>& names, net_buffer& buffer);
 
-	hyspex_eBackgroundReply to_background_reply_1(sPacketHeader_t hdr, const net_buffer_view& buffer);
+	/*** send/receive the background reply message ***/
+	hyspex_eBackgroundReply to_background_reply_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_background_reply(hyspex_eBackgroundReply reply, net_buffer& buffer);
 
 } // End of namespace hyspex

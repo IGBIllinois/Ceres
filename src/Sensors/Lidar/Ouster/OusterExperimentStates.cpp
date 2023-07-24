@@ -1,49 +1,63 @@
 
 #include "OusterExperimentStates.hpp"
-#include "OusterController.hpp"
-#include "Constants.hpp"
 
-#include <thread>
 
-cOusterExperimentState_State::cOusterExperimentState_State(cOusterPropertyPage& propertyPage)
-{
-}
+/*******************************************************************/
+/**           Base Class for Ouster Experiment States             **/
+/*******************************************************************/
 
-void cOusterExperimentState_State::configure(const nlohmann::json& stateDoc)
-{
-}
+cOuster_Properties_Remote::cOuster_Properties_Remote()
+	: cExperimentStateRemoteInterface()
+{}
 
-QString cOusterExperimentState_State::getStatusStr()
-{
-	QString msg = "Moving to: ";
-	return msg;
-}
+cOuster_Properties_Remote::~cOuster_Properties_Remote()
+{}
 
-bool cOusterExperimentState_State::recording()
+bool cOuster_Properties_Remote::recording()
 {
 	return false;
 }
 
-void cOusterExperimentState_State::initialize()
+void cOuster_Properties_Remote::configure(const nlohmann::json& stateDoc)
 {
 }
 
-void cOusterExperimentState_State::run()
+void cOuster_Properties_Remote::cleanup()
 {
+	closeConnection();
+	destroy();
 }
 
-void cOusterExperimentState_State::pause()
+void cOuster_Properties_Remote::initialize()
 {
+	if (!cExperimentStateRemoteInterface::initialize(mHostname, mPort, mUse_IpV6, mLocalIpAddress))
+		return;
+
+	openConnection();
 }
 
-void cOusterExperimentState_State::stop()
-{
-}
+void cOuster_Properties_Remote::run()
+{}
 
-cExperimentState::eRESULT cOusterExperimentState_State::finished()
+void cOuster_Properties_Remote::pause()
+{}
+
+void cOuster_Properties_Remote::stop()
+{}
+
+cExperimentState::eRESULT cOuster_Properties_Remote::finished()
 {
 	return eRESULT::DONE;
-		
+
+/*
+	if (mState == eSTATE::ERROR)
+		return eRESULT::ABORT;
+
+	if (mState == eSTATE::COMPLETE)
+		return eRESULT::DONE;
+
 	return eRESULT::WAITING;
+*/
 }
+
 

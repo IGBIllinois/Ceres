@@ -30,13 +30,25 @@ void cHySpexSWIR_384_Controller::processStream(const void* pBuffer, std::size_t 
             break;
         }
 
-        processPacket(hdr, buffer);
+        cHySpexCamera_ControllerNetDecoder::processPacket(hdr, buffer);
     }
 }
 
 void cHySpexSWIR_384_Controller::onBackgroundComplete()
 {
-    //    send
+    auto status = mpModel->getBackgroundStatus();
+    switch(status)
+    {
+    case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
+        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_GOOD);
+        break;
+    case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
+        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_ABORTED);
+        break;
+    default:
+        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_FAILED);
+        break;
+    }
 }
 
 void cHySpexSWIR_384_Controller::onQueryState()
@@ -49,9 +61,10 @@ void cHySpexSWIR_384_Controller::onQueryLensNames()
     txLensNames(this);
 }
 
-
 void cHySpexSWIR_384_Controller::onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
-{}
+{
+    mpModel->setAcquisitionParameters(average_frame, frame_period_us, integration_time_us);
+}
 
 void cHySpexSWIR_384_Controller::onSetLensName(const std::string& lens_name)
 {}

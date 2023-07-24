@@ -30,7 +30,7 @@ void cHySpexVNIR_3000N_Controller::processStream(const void* pBuffer, std::size_
             break;
         }
 
-        processPacket(hdr, buffer);
+        cHySpexCamera_ControllerNetDecoder::processPacket(hdr, buffer);
     }
 }
 

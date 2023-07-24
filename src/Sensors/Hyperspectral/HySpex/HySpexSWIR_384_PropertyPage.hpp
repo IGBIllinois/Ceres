@@ -24,9 +24,6 @@ public:
     ~cHySpexSWIR_384_PropertyPage() = default;
 
     void doLayout() override;
-
-public:
-    cExperimentState* createState(const std::string& type) override;
 };
 
 

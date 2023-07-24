@@ -1,6 +1,7 @@
 
 
 #include "HySpexSWIR_384_PropertyPage_Remote.hpp"
+#include "HySpexExperimentStates.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
@@ -9,6 +10,17 @@ cHySpexSWIR_384_PropertyPage_Remote::cHySpexSWIR_384_PropertyPage_Remote(QWidget
 	: cHySpexSWIR_384_PropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
 		cHySpexSWIR_384_PropertiesNetEncoder(255)
 {}
+
+cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::string& type)
+{
+	if (type == "SWIR-384")
+	{
+		return new cHySpexSWIR_384_Properties_Remote(this);
+	}
+
+	return nullptr;
+}
+
 
 void cHySpexSWIR_384_PropertyPage_Remote::onConnect()
 {

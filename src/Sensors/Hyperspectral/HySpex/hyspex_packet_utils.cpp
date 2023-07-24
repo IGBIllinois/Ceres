@@ -5,10 +5,10 @@
 
 #include <string>
 
-hyspex_eQuery hyspex::to_hyspex_query_enum_1(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
+hyspex_eQuery hyspex::to_hyspex_query_enum_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     hyspex_QueryMessage_1 pckt;
-    pckt.ParseFromArray(buffer.data(), hdr.length);
+    pckt.ParseFromArray(buffer.data(), length);
     return pckt.query();
 }
 
@@ -32,11 +32,10 @@ int hyspex::encode_hyspex_query(hyspex_eQuery query, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-//hyspex::sAcquisitionParameters_t hyspex::to_acquisition_parameters_1(const hyspex_SetAcquisitionParameters_1& pckt)
-hyspex::sAcquisitionParameters_t hyspex::to_acquisition_parameters_1(sPacketHeader_t hdr, const net_buffer_view& buffer)
+hyspex::sAcquisitionParameters_t hyspex::to_acquisition_parameters_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     hyspex_SetAcquisitionParameters_1 pckt;
-    pckt.ParseFromArray(buffer.data(), hdr.length);
+    pckt.ParseFromArray(buffer.data(), length);
 
     hyspex::sAcquisitionParameters_t data;
     data.average_frames = pckt.average_frame();
@@ -68,8 +67,11 @@ int hyspex::encode_acquisition_parameters(std::uint16_t average_frame,
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-std::string hyspex::to_lens_name_1(const hyspex_SetLens_1& pckt)
+std::string hyspex::to_lens_name_1(std::uint16_t length, const net_buffer_view& buffer)
 {
+    hyspex_SetLens_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+
     return pckt.lens_name();
 }
 
@@ -93,8 +95,10 @@ int hyspex::encode_lens_name(const std::string& lens_name, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int hyspex::to_num_backgrounds_1(const hyspex_SetNumOfBackgrounds_1& pckt)
+int hyspex::to_num_backgrounds_1(std::uint16_t length, const net_buffer_view& buffer)
 {
+    hyspex_SetNumOfBackgrounds_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
     return pckt.num_backgrounds();
 }
 
@@ -131,9 +135,12 @@ int hyspex::encode_calc_background(net_buffer& buffer)
     return sizeof(sPacketHeader_t);
 }
 
-hyspex::sCurrentState_t hyspex::to_current_state_1(const hyspex_CurrentState_1& pckt)
+hyspex::sCurrentState_t hyspex::to_current_state_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     hyspex::sCurrentState_t data;
+
+    hyspex_CurrentState_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
 
     data.valid = pckt.valid();
 
@@ -190,11 +197,14 @@ int hyspex::encode_current_state(const sCurrentState_t& state, net_buffer& buffe
 }
 
 
-std::vector<std::string> hyspex::to_lens_names_1(const hyspex_LensNames_1& pckt)
+std::vector<std::string> hyspex::to_lens_names_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     std::vector<std::string> names;
     std::string name;
-    
+ 
+    hyspex_LensNames_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+
     name = pckt.lens_name_0();
     if (name.empty()) return names;
     names.push_back(name);
@@ -322,10 +332,10 @@ int hyspex::encode_lens_names(const std::vector<std::string>& names, net_buffer&
 }
 
 
-hyspex_eBackgroundReply hyspex::to_background_reply_1(sPacketHeader_t hdr, const net_buffer_view& buffer)
+hyspex_eBackgroundReply hyspex::to_background_reply_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     hyspex_BackgroundReply_1 pckt;
-    pckt.ParseFromArray(buffer.data(), hdr.length);
+    pckt.ParseFromArray(buffer.data(), length);
     return pckt.reply();
 }
 

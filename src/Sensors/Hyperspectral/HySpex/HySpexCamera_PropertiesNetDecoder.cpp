@@ -12,15 +12,12 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
     switch (static_cast<ePacketType>(hdr.id))
     {
     case ePacketType::UNKNOWN:
-    default:
     {
         break;
     }
     case ePacketType::CURRENT_STATE:
     {
-        hyspex_CurrentState_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        sCurrentState_t data = to_current_state_1(packet);
+        sCurrentState_t data = to_current_state_1(hdr.length, buffer);
         
         onCurrentState(data.valid, data.average_frames,data.frame_period_us,
             data.min_frame_period_us, data.integration_time_us, data.max_integration_time_us,
@@ -30,15 +27,13 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
     }
     case ePacketType::LENS_NAMES:
     {
-        hyspex_LensNames_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onLensNames( to_lens_names_1(packet) );
+        onLensNames( to_lens_names_1(hdr.length, buffer) );
 
         break;
     }
     case ePacketType::BACKGROUND_REPLY:
     {
-        auto reply = to_background_reply_1(hdr, buffer);
+        auto reply = to_background_reply_1(hdr.length, buffer);
         switch (reply)
         {
         case hyspex_eBackgroundReply::eQUERY_GOOD:
@@ -51,6 +46,11 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
             onBackgroundReply(eBackgroundReply::FAILED);
             break;
         }
+        break;
+    }
+    default:
+    {
+        processPacket(static_cast<ePacketType>(hdr.id), hdr.length, buffer);
         break;
     }
     }

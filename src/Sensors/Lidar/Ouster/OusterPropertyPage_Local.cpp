@@ -2,6 +2,7 @@
 
 #include "OusterPropertyPage_Local.hpp"
 #include "OusterModel.hpp"
+#include "OusterExperimentStates.hpp"
 
 #include <ouster/ouster_utils.h>
 
@@ -13,6 +14,11 @@ cOusterPropertyPage_Local::cOusterPropertyPage_Local(cOusterModel* model, QWidge
 	: cOusterPropertyPage(parent), mpModel(model)
 {
 	assert(mpModel);
+}
+
+cExperimentState* cOusterPropertyPage_Local::createState(const std::string& type)
+{
+	return nullptr;
 }
 
 void cOusterPropertyPage_Local::doLayout()

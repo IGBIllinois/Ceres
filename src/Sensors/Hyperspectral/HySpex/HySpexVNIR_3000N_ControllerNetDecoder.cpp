@@ -5,27 +5,18 @@
 #include "hyspex_packet_utils.hpp"
 #include "net_buffer.hpp"
 
-/*
-void cHySpexVNIR_3000N_ControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
+
+void cHySpexVNIR_3000N_ControllerNetDecoder::processPacket(hyspex::ePacketType id, std::uint16_t length, const net_buffer_view& buffer)
 {
     using namespace hyspex;
 
-    switch (static_cast<ePacketType>(hdr.id))
+    switch (id)
     {
-    case ePacketType::UNKNOWN:
     default:
     {
         break;
     }
-    case ePacketType::QUERY_STATE:
-    {
-        onQueryState();
-        break;
-    }
     }
 }
-*/
-
-
 
 

@@ -45,6 +45,7 @@ PRIVATE
 # in the main application
 set_property(SOURCE ExperimentCtrlView.hpp PROPERTY SKIP_AUTOMOC ON)
 set_property(SOURCE ExperimentCtrlModel.hpp PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

@@ -16,6 +16,9 @@ public:
     cOusterPropertyPage_Local(cOusterModel* model, QWidget* parent = nullptr);
     ~cOusterPropertyPage_Local() = default;
 
+public:
+    cExperimentState* createState(const std::string& type) override;
+
     void doLayout() override;
 
 signals:

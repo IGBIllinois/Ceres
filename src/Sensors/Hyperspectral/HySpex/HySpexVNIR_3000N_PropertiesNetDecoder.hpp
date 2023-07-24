@@ -24,7 +24,7 @@ protected:
      */
 
 protected:
-//    void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
+    void processPacket(hyspex::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) override;
 };
 
 

@@ -120,15 +120,17 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
             for (auto* creator : mStateCreators)
             {
                 pState = creator->createState(type);
+/*
                 if (pState)
                 {
                     QObject* pObject = dynamic_cast<QObject*>(pState);
                     if (pObject)
                     {
-//                        pObject->moveToThread(pThread);
+                        pObject->moveToThread(pThread);
                     }
                     break;
                 }
+*/
             }
         }
 
@@ -267,6 +269,7 @@ void cExperimentStateMachine::updateExperimentStateMachine()
         else
         {
             recordingStateChanged(false);
+            mpActiveState->cleanup();
             mRunning = false;
             mExperimentName.clear();
             emit experimentStateChanged(eState::COMPLETED);

@@ -14,16 +14,12 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
     switch (static_cast<ePacketType>(hdr.id))
     {
     case ePacketType::UNKNOWN:
-    default:
     {
         break;
     }
     case ePacketType::HYSPEX_QUERY:
     {
-        hyspex_QueryMessage_1 pckt;
-        pckt.ParseFromArray(buffer.data(), hdr.length);
-        auto query = pckt.query();
-//        auto query = to_hyspex_query_enum_1(hdr, buffer);
+        auto query = to_hyspex_query_enum_1(hdr.length, buffer);
         switch (query)
         {
         case eQUERY_STATE:
@@ -41,32 +37,30 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
     }
     case ePacketType::SET_ACQUISITION_PARAMETERS:
     {
-//        hyspex_SetAcquisitionParameters_1 packet;
-//        packet.ParseFromArray(buffer.data(), hdr.length);
-//        auto data = to_acquisition_parameters_1(packet);
-        auto data = to_acquisition_parameters_1(hdr, buffer);
+        auto data = to_acquisition_parameters_1(hdr.length, buffer);
         onSetAcquisitionParameters(data.average_frames, data.frame_period_us, data.integration_time_us);
         break;
     }
     case ePacketType::SET_LENS_NAME:
     {
-        hyspex_SetLens_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto data = to_lens_name_1(packet);
+        auto data = to_lens_name_1(hdr.length, buffer);
         onSetLensName(data);
         break;
     }
     case ePacketType::SET_NUM_BACKGROUNDS:
     {
-        hyspex_SetNumOfBackgrounds_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto data = to_num_backgrounds_1(packet);
+        auto data = to_num_backgrounds_1(hdr.length, buffer);
         onSetNumOfBackgrounds(data);
         break;
     }
     case ePacketType::CALC_BACKGROUND:
     {
         onCalcBackground();
+        break;
+    }
+    default:
+    {
+        processPacket(static_cast<ePacketType>(hdr.id), hdr.length, buffer);
         break;
     }
     }

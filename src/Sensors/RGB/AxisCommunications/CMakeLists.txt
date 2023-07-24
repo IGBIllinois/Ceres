@@ -61,6 +61,12 @@ set(AXIS_COMM_SOURCE_FILES
 )
 
 
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+
+
 # The static library (.lib/.a) for communicating with Axis Communications Cameras
 add_library(axis_communications_static STATIC)
 
@@ -97,6 +103,7 @@ target_include_directories(axis_communications_static PRIVATE ${EXPERIMENT_STATE
 target_link_libraries(axis_communications_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(axis_communications_static PUBLIC ${Qt}::Network)
 target_link_libraries(axis_communications_static PUBLIC ${Qt}::Multimedia)
+target_link_libraries(axis_communications_static PRIVATE ExperimentStateMachine)
 target_link_libraries(axis_communications_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(axis_communications_static PRIVATE ${Protobuf_LIBRARIES})
 

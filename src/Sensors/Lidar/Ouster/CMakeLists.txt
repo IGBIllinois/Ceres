@@ -69,6 +69,10 @@ set(OUSTER_SOURCE_FILES
 
 )
 
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
 
 # The static library (.lib/.a) for incorporating OUSTER LiDAR data in Ceres
 add_library(ouster_sensor_static STATIC)
@@ -103,6 +107,7 @@ target_include_directories(ouster_sensor_static PRIVATE ${EXPERIMENT_STATE_MACHI
 
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Network)
+target_link_libraries(ouster_sensor_static PRIVATE ExperimentStateMachine)
 target_link_libraries(ouster_sensor_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(ouster_sensor_static PRIVATE ouster::ouster_static)
 target_link_libraries(ouster_sensor_static INTERFACE ouster::OusterVisualization)
