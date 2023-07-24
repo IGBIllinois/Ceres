@@ -1,5 +1,5 @@
 
-#include "ExperimentState.hpp"
+#include "ExperimentStateRemoteInterface.hpp"
 
 
 /*******************************************************************/
@@ -35,7 +35,7 @@ void cExperimentStateRemoteInterface::destroy()
         QObject::disconnect(mpSocket, &QTcpSocket::stateChanged, this, &cExperimentStateRemoteInterface::stateChanged);
         QObject::disconnect(mpSocket, &QTcpSocket::readyRead, this, &cExperimentStateRemoteInterface::processIncomingData);
 
-        mpSocket->deleteLater();
+        delete mpSocket;
         mpSocket = nullptr;
     }
 }
@@ -43,7 +43,7 @@ void cExperimentStateRemoteInterface::destroy()
 bool cExperimentStateRemoteInterface::initialize(const std::string& hostname, uint16_t port,
     bool use_ipv6, const std::string& local_ip)
 {
-    mpSocket = new QTcpSocket(this);
+    mpSocket = new QTcpSocket();
     mpSocket->setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
     mpSocket->setSocketOption(QAbstractSocket::SocketOption::KeepAliveOption, 1);
 
