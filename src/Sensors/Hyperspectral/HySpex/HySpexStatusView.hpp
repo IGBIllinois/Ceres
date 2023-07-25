@@ -11,11 +11,13 @@ QT_BEGIN_NAMESPACE
 	class QBoxLayout;
 	class QLabel;
 	class QLineEdit;
-QT_END_NAMESPACE
+	class QPushButton;
+	QT_END_NAMESPACE
 
 // Forward Declaration
 class cHySpexCameraModel;
 class QButtonIndicator;
+class QCustomPlot;
 
 
 class cHySpexStatusView : public cSensorStatusView
@@ -51,10 +53,13 @@ public slots:
 
 	void onLensInfoChange();
 
+	void saturationButtonToggled(bool state);
+
 protected:
 	void doStatusLayout(QBoxLayout* pMainLayout);
 	void doAcqStatusLayout(QBoxLayout* pMainLayout);
 	void doLensInfoLayout(QBoxLayout* pMainLayout);
+	void doPlotLayout(QBoxLayout* pMainLayout);
 
 
 protected:
@@ -97,6 +102,14 @@ protected:
 
 	QLabel* mLensFieldOfViewLabel = nullptr;
 	QLineEdit* mpLensFieldOfView_deg = nullptr;
+
+	/*
+	 * Various items for showing HySpex data
+	 */
+	bool mShowSaturation = false;
+	QPushButton* mpSaturationButton = nullptr;
+
+	QCustomPlot* mpPlot = nullptr;
 
 private:
 	const cHySpexCameraModel* mpModel;

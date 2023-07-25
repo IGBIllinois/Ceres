@@ -156,7 +156,7 @@ find_package(Catch2 QUIET)
 # Find and include Qt
 set(Qt Qt5)
 
-find_package(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort REQUIRED)
+find_package(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort PrintSupport REQUIRED)
 GET_TARGET_PROPERTY(QMAKE_LOCATION Qt5::qmake LOCATION)
 
 if(WIN32)

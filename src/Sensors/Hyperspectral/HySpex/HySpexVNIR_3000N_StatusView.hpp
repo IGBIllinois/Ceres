@@ -27,4 +27,7 @@ public:
 	 */
 	void createWidgets() override;
 	void doLayout() override;
+
+protected:
+	void resizeEvent(QResizeEvent* event) override;
 };

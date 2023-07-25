@@ -8,9 +8,16 @@
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QFormLayout>
+#include <QPushButton>
+
+#include <QCustomPlot/qcustomplot.h>
 
 #include <string>
 
+/** ERROR is define in Windows */
+#ifdef ERROR
+	#undef ERROR
+#endif
 
 cHySpexStatusView::cHySpexStatusView(cHySpexCameraModel* pModel, QWidget* parent)
 :
@@ -87,11 +94,30 @@ void cHySpexStatusView::createWidgets()
 	mLensFieldOfViewLabel = new QLabel("FOV (deg)");
 	mpLensFieldOfView_deg = new QLineEdit();
 	mpLensFieldOfView_deg->setReadOnly(true);
+
+	/** Display */
+	mpSaturationButton = new QPushButton("%SAT");
+	mpSaturationButton->setCheckable(true);
+	QObject::connect(mpSaturationButton, &QPushButton::clicked, this, &cHySpexStatusView::saturationButtonToggled);
+
+	mpPlot = new QCustomPlot();
+	mpPlot->setMinimumHeight(300);
+	mpPlot->addGraph();
+
+//	customPlot->graph(0)->setData(x, y);
+	// give the axes some labels:
+//	customPlot->xAxis->setLabel("x");
+//	customPlot->yAxis->setLabel("y");
+	// set axes ranges, so we see all data:
+	mpPlot->xAxis->setRange(0, 1);
+	mpPlot->yAxis->setRange(0, 1);
+
 }
 
 void cHySpexStatusView::doStatusLayout(QBoxLayout* pMainLayout)
 {
 	QGroupBox* cameraStatusBox = new QGroupBox("Camera Status");
+	cameraStatusBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	auto* statusLayout = new QHBoxLayout();
 
@@ -110,6 +136,7 @@ void cHySpexStatusView::doStatusLayout(QBoxLayout* pMainLayout)
 void cHySpexStatusView::doAcqStatusLayout(QBoxLayout* pMainLayout)
 {
 	QGroupBox* acqBox = new QGroupBox("Acquisition Status");
+	acqBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	auto* acqLayout = new QHBoxLayout();
 
@@ -139,6 +166,7 @@ void cHySpexStatusView::doAcqStatusLayout(QBoxLayout* pMainLayout)
 void cHySpexStatusView::doLensInfoLayout(QBoxLayout* pMainLayout)
 {
 	QGroupBox* lensInfoBox = new QGroupBox("Lens Info");
+	lensInfoBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	auto* infoLayout = new QHBoxLayout();
 
@@ -154,6 +182,21 @@ void cHySpexStatusView::doLensInfoLayout(QBoxLayout* pMainLayout)
 	lensInfoBox->setLayout(infoLayout);
 
 	pMainLayout->addWidget(lensInfoBox);
+}
+
+void cHySpexStatusView::doPlotLayout(QBoxLayout* pMainLayout)
+{
+	auto* plotLayout = new QVBoxLayout();
+
+	auto* buttonLayout = new QHBoxLayout();
+
+	buttonLayout->addWidget(mpSaturationButton);
+
+	plotLayout->addLayout(buttonLayout);
+
+	plotLayout->addWidget(mpPlot);
+
+	pMainLayout->addLayout(plotLayout);
 }
 
 void cHySpexStatusView::onInitStatusChange()
@@ -244,22 +287,22 @@ void cHySpexStatusView::onBgStatusChange()
 	switch (status)
 	{
 	case HYSPEX_BG_INVALID:
-		mpBackgroundStatus->setState(QButtonIndicator::UNKNOWN, "BG NONE");
+		mpBackgroundStatus->setState(QButtonIndicator::eState::UNKNOWN, "BG NONE");
 		break;
 	case HYSPEX_BG_PENDING:
-		mpBackgroundStatus->setState(QButtonIndicator::WARNING, "BG PENDING");
+		mpBackgroundStatus->setState(QButtonIndicator::eState::WARNING, "BG PENDING");
 		break;
 	case HYSPEX_BG_VALID:
-		mpBackgroundStatus->setState(QButtonIndicator::OK, "BG OK");
+		mpBackgroundStatus->setState(QButtonIndicator::eState::OK, "BG OK");
 		break;
 	case HYSPEX_BG_PENDING_READY:
-		mpBackgroundStatus->setState(QButtonIndicator::ACTIVE, "BG OK/CALC");
+		mpBackgroundStatus->setState(QButtonIndicator::eState::ACTIVE, "BG OK/CALC");
 		break;
 	case HYSPEX_BG_EXPIRED:
-		mpBackgroundStatus->setState(QButtonIndicator::ALERT, "BG EXPIRED");
+		mpBackgroundStatus->setState(QButtonIndicator::eState::ALERT, "BG EXPIRED");
 		break;
 	case HYSPEX_BG_ABORTED:
-		mpBackgroundStatus->setState(QButtonIndicator::ERROR, "BG ABORTED");
+		mpBackgroundStatus->setState(QButtonIndicator::eState::ERROR, "BG ABORTED");
 		break;
 	}
 }
@@ -400,4 +443,20 @@ void cHySpexStatusView::onLensInfoChange()
 	mpLensFieldOfView_deg->setText(QString::number(fov_deg, 'f', 1));
 }
 
+void cHySpexStatusView::saturationButtonToggled(bool state)
+{
+	mShowSaturation = state;
+	if (mShowSaturation)
+	{
+		mpPlot->yAxis->setRange(0, 100);
+		mpPlot->yAxis->setLabel("% Saturation");
+
+		auto chn = mpModel->getSpatialSize();
+		auto bands = mpModel->getSpectralSize();
+
+		mpPlot->xAxis->setRange(0, chn);
+		mpPlot->xAxis->setLabel("Channel");
+		mpPlot->replot();
+	}
+}
 

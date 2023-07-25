@@ -30,6 +30,7 @@ void cSensorStatusView::createWidgets()
 	mpSensorStatus->setText("UNKNOWN");
 
 	mpSensorStatusBox = new QGroupBox("Sensor Status");
+	mpSensorStatusBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	auto* sensorInfoLayout = new QFormLayout();
 	sensorInfoLayout->addRow(mpSensorLabel, mpSensorStatus);

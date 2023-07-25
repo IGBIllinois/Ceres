@@ -9,6 +9,8 @@
 #include <QGridLayout>
 #include <QFormLayout>
 
+#include <QCustomPlot/qcustomplot.h>
+
 #include <string>
 
 
@@ -42,8 +44,20 @@ void cHySpexVNIR_3000N_StatusView::doLayout()
 
 	mainLayout->addLayout(infoLayout);
 
-	mainLayout->addStretch();
+	doPlotLayout(mainLayout);
+
+//	mainLayout->addStretch();
 
 	setLayout(mainLayout);
 }
 
+void cHySpexVNIR_3000N_StatusView::resizeEvent(QResizeEvent* event)
+{
+//	auto layout = QWidget::layout();
+//	auto layout_rect = layout->contentsRect();
+
+//	auto win_size = event->size();
+//	mpPlot->setMinimumHeight(400);
+
+	QWidget::resizeEvent(event);
+}
