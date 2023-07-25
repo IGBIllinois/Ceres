@@ -48,4 +48,27 @@ bool cRemoteDataThread::stopCommunications()
     return true;
 }
 
+void cRemoteDataThread::run()
+{
+    mStartTime = std::chrono::steady_clock::now();
+    cDataThread::run();
+}
 
+void cRemoteDataThread::updateAll()
+{
+    ++mLoopCount;
+
+    cDataThread::updateAll();
+
+    auto endTime = std::chrono::steady_clock::now();
+    auto diff_us = std::chrono::duration_cast<std::chrono::microseconds>(endTime - mStartTime).count();
+
+    if (diff_us >= 1'000'000)
+    {
+        float time_ms = diff_us / 1000.0f;
+        mAvgLoopTime_ms = time_ms / mLoopCount;
+        mLoopCount = 0;
+        mStartTime = endTime;
+        emit updateLoopTime(mAvgLoopTime_ms);
+    }
+}

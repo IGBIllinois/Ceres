@@ -52,6 +52,7 @@ public:
     void sendLogMessage(uint8_t type, const QString& device, const QString& msg);
     void sendLogMessage(uint8_t type, const std::string& device, const std::string& msg);
 
+    const cRemoteDataThread& getThread() const { return mThread; }
 
 signals:
     void requestDataRecordingState(bool record);

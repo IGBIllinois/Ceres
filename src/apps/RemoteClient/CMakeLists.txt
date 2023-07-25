@@ -64,6 +64,8 @@ PRIVATE
     RemoteDataModel.cpp
     RemoteDataThread.hpp
     RemoteDataThread.cpp
+    LoopTimeMeter.hpp
+    LoopTimeMeter.cpp
 
     RemoteClientWindow.hpp
     RemoteClientWindow.cpp

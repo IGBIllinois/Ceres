@@ -4,6 +4,7 @@
 
 #include "CeresSplashScreen.hpp"
 #include "RemoteClientCentralWindow.hpp"
+#include "LoopTimeMeter.hpp"
 
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
@@ -79,6 +80,7 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     mpSplashScreen(nullptr),
     mpFileMenu(nullptr),
     mpHelpMenu(nullptr),
+    mpLoopMeter(nullptr),
     mpUI(new Ui::MainWindow),
     mpCentralWindow(nullptr)
 {
@@ -186,9 +188,7 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
     createMainMenu();
     createSubMenusAndActions();
     createActions();
-
     createToolBars();
-
     createStatusBar();
 
     if (mpSplashScreen)
@@ -226,6 +226,9 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
     }
 
     mpSplashScreen = nullptr;
+
+    QObject::connect(&mMainModel.getThread(), &cRemoteDataThread::updateLoopTime, mpLoopMeter, &cLoopTimeMeter::loopTimeUpdated);
+    statusBar()->addPermanentWidget(mpLoopMeter);
 
     qInfo() << "Single shot timer to start data acquisition.";
     QTimer::singleShot(1000, this, &cRemoteClientWindow::startDataAcquisitionSystem);
@@ -418,6 +421,8 @@ void cRemoteClientWindow::createToolBars()
 void cRemoteClientWindow::createStatusBar()
 {
     statusBar();
+
+    mpLoopMeter = new cLoopTimeMeter(statusBar());
 }
 
 //-----------------------------------------------------------------------------

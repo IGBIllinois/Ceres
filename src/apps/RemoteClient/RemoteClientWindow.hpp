@@ -24,6 +24,7 @@ QT_END_NAMESPACE
 // Forward Declarations
 class cCeresSplashScreen;
 class cRemoteClientCentalWindow;
+class cLoopTimeMeter;
 
 
 namespace Ui 
@@ -67,8 +68,9 @@ private:
     cRemoteClientCentalWindow* mpCentralWindow;
 
     QMenu* mpFileMenu;
-
     QMenu* mpHelpMenu;
+
+    cLoopTimeMeter* mpLoopMeter;
 
     Ui::MainWindow* mpUI;
     QString mCurrentFile;
