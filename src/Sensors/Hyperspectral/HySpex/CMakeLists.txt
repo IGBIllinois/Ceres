@@ -26,6 +26,8 @@ set(HYSPEX_SOURCE_FILES
     HySpexVNIR_3000N_Model_net.cpp
     HySpexVNIR_3000N_Model_direct.hpp
     HySpexVNIR_3000N_Model_direct.cpp
+    HySpexVNIR_3000N_Model_simulation.hpp
+    HySpexVNIR_3000N_Model_simulation.cpp
     HySpexVNIR_3000N_Model.hpp
     HySpexVNIR_3000N_Model.cpp
     HySpexVNIR_3000N_View.hpp
@@ -159,6 +161,7 @@ target_include_directories(hyspex_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCL
 
 target_link_libraries(hyspex_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(hyspex_static PUBLIC ${Qt}::Network)
+target_link_libraries(hyspex_static PRIVATE QCustomPlot::qcustomplot_static)
 target_link_libraries(hyspex_static PRIVATE ExperimentStateMachine)
 target_link_libraries(hyspex_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(hyspex_static PRIVATE ${Protobuf_LIBRARIES})

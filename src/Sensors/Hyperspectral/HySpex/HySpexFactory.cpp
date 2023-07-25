@@ -4,6 +4,7 @@
 #include "HySpexFactory.hpp"
 #include "HySpexVNIR_3000N_Model_direct.hpp"
 #include "HySpexVNIR_3000N_Model_net.hpp"
+#include "HySpexVNIR_3000N_Model_simulation.hpp"
 #include "HySpexVNIR_3000N_Controller.hpp"
 #include "HySpexVNIR_3000N_View.hpp"
 #include "HySpexVNIR_3000N_StatusView.hpp"
@@ -72,6 +73,8 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
     }
     else if (protocol == "net")
         pModel = new cHySpexVNIR_3000N_Model_net();
+    else if (protocol == "simulation")
+        pModel = new cHySpexVNIR_3000N_Model_simulation();
 
     if (!pModel)
         throw std::runtime_error("HySpex VNIR 3000N: Unknown protocol type!");
