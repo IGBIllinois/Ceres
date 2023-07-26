@@ -1,6 +1,6 @@
 
-#include "HySpexStatusView.hpp"
-#include "HySpexCameraModel.hpp"
+#include "HySpexCamera_StatusView.hpp"
+#include "HySpexCamera_Model.hpp"
 #include "QIndicator.hpp"
 
 #include <QLineEdit>
@@ -111,7 +111,7 @@ void cHySpexStatusView::createWidgets()
 	// set axes ranges, so we see all data:
 	mpPlot->xAxis->setRange(0, 1);
 	mpPlot->yAxis->setRange(0, 1);
-
+	mpPlot->axisRect()->setupFullAxesBox();
 }
 
 void cHySpexStatusView::doStatusLayout(QBoxLayout* pMainLayout)

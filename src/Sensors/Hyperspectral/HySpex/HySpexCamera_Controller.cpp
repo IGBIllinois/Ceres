@@ -1,6 +1,6 @@
 
 #include "HySpexCamera_Controller.hpp"
-#include "HySpexCameraModel.hpp"
+#include "HySpexCamera_Model.hpp"
 #include "HySpexCamera_ControllerNetEncoder.hpp"
 
 #include <cassert>

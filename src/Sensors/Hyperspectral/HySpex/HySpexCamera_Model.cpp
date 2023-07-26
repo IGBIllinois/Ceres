@@ -1,5 +1,5 @@
 
-#include "HySpexCameraModel.hpp"
+#include "HySpexCamera_Model.hpp"
 #include "HySpexFactory.hpp"
 #include "Constants.hpp"
 

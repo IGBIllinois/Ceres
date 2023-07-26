@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "HySpexStatusView.hpp"
+#include "HySpexCamera_StatusView.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE

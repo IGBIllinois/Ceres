@@ -111,10 +111,10 @@ set(HYSPEX_SOURCE_FILES
 	HySpexCamera_ControllerNetDecoder.cpp
 	HySpexCamera_ControllerNetEncoder.hpp
 	HySpexCamera_ControllerNetEncoder.cpp
-    HySpexCameraModel.hpp
-    HySpexCameraModel.cpp
-    HySpexStatusView.hpp
-    HySpexStatusView.cpp
+    HySpexCamera_Model.hpp
+    HySpexCamera_Model.cpp
+    HySpexCamera_StatusView.hpp
+    HySpexCamera_StatusView.cpp
 	hyspex_utils.hpp
 	hyspex_utils.cpp
     HySpexFactory.cpp

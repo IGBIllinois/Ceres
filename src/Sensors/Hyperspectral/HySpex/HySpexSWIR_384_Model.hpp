@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "HySpexCameraModel.hpp"
+#include "HySpexCamera_Model.hpp"
 
 #include <cbdf/HySpexSWIR_384_Serializer.hpp>
 
