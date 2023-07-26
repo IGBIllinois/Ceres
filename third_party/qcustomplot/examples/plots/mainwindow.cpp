@@ -81,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
   // 20: setupPolarPlotDemo(ui->customPlot);
     
   // for making screenshots of the current demo or all demos (for website screenshots):
-  //QTimer::singleShot(1500, this, SLOT(allScreenShots()));
+  QTimer::singleShot(3000, this, SLOT(allScreenShots()));
   //QTimer::singleShot(4000, this, SLOT(screenShot()));
 }
 
@@ -1532,9 +1532,9 @@ void MainWindow::allScreenShots()
 #else
   QPixmap pm = qApp->primaryScreen()->grabWindow(0, this->x()-7, this->y()-7, this->frameGeometry().width()+14, this->frameGeometry().height()+14);
 #endif
-  QString fileName = demoName.toLower()+".png";
-  fileName.replace(" ", "");
-  pm.save("./screenshots/"+fileName);
+//  QString fileName = demoName.toLower()+".png";
+//  fileName.replace(" ", "");
+//  pm.save("./screenshots/"+fileName);
   
   if (currentDemoIndex < 19)
   {
@@ -1546,7 +1546,7 @@ void MainWindow::allScreenShots()
     ui->verticalLayout->addWidget(ui->customPlot);
     setupDemo(currentDemoIndex+1);
     // setup delay for demos that need time to develop proper look:
-    int delay = 250;
+    int delay = 3000; // 250;
     if (currentDemoIndex == 10) // Next is Realtime data demo
       delay = 12000;
     else if (currentDemoIndex == 15) // Next is Item demo
