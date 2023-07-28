@@ -11,6 +11,19 @@
 
 using namespace hyspex;
 
+
+void cHySpexVNIR_3000N_Model_direct::handleImageCallback(void* p, hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image)
+{
+    using namespace hyspex;
+
+    if (!p) return;
+
+    auto* self = static_cast<cHySpexVNIR_3000N_Model_direct*>(p);
+
+    self->updateImageData(a_options, a_image);
+}
+
+
 cHySpexVNIR_3000N_Model_direct::cHySpexVNIR_3000N_Model_direct(std::unique_ptr<hyspex::cVNIR3000N> camera, QObject* parent)
 :
     cHySpexVNIR_3000N_Model(parent), mCamera(std::move(camera))
@@ -20,7 +33,7 @@ cHySpexVNIR_3000N_Model_direct::cHySpexVNIR_3000N_Model_direct(std::unique_ptr<h
 
 cHySpexVNIR_3000N_Model_direct::~cHySpexVNIR_3000N_Model_direct()
 {
-    mCamera->unregisterNotificationCallback(&cHySpexCameraModel::handleStatusCallback);
+    mCamera->unregisterNotificationCallback(&cHySpexVNIR_3000N_Model_direct::handleStatusCallback);
 }
 
 
@@ -34,7 +47,7 @@ bool cHySpexVNIR_3000N_Model_direct::configure(const nlohmann::json& jsonCfg)
     mID = mCamera->getId();
     mSerialNumber = mCamera->getSerialNumber();
 
-    mCamera->registerNotificationCallback(&cHySpexCameraModel::handleStatusCallback, this);
+    mCamera->registerNotificationCallback(&cHySpexVNIR_3000N_Model_direct::handleStatusCallback, this);
 
     mLenses.clear();
     auto n = mCamera->getLensCount();
@@ -139,6 +152,8 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
     mMaxSpectralSize = mCamera->getMaxSpectralSize();
 
     mMaxPixelValue = mCamera->getMaxPixelValue();
+    if (mMaxPixelValue > 2)
+        mSaturationValue = mMaxPixelValue - 2;
 
     mCommStatus = mCamera->getCommunicationStatus();
     emit commStatusChanged();
@@ -216,6 +231,8 @@ bool cHySpexVNIR_3000N_Model_direct::startCommunications()
     mTemperatureUpdateTimer.reset();
     mCamera->initAcquisition();
 
+    mCamera->registerImageCallback(&cHySpexVNIR_3000N_Model_direct::handleImageCallback, hyspex::ImageOptions::HYSPEX_RAW, this);
+
     mCamera->startAcquisition();
 
     mAcquisitionStatus = mCamera->getAcquisitionStatus();
@@ -247,6 +264,8 @@ void cHySpexVNIR_3000N_Model_direct::stopCommunications()
 
     mConnected = false;
 
+    mCamera->unregisterImageCallback(&cHySpexVNIR_3000N_Model_direct::handleImageCallback);
+
     setStatus(sensor::eStatus::STOPPED);
 }
 
@@ -277,6 +296,7 @@ void cHySpexVNIR_3000N_Model_direct::update()
         }
         case eBgStates::COMPLETE:
         {
+            mBackgroundStatus = mCamera->getBackgroundStatus();
             switch (mBackgroundStatus)
             {
             case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
@@ -309,6 +329,18 @@ void cHySpexVNIR_3000N_Model_direct::update()
 
         return;
     }
+}
+
+void cHySpexVNIR_3000N_Model_direct::enableDataRecording(cBlockDataFileWriter& file)
+{
+    mCamera->openShutter();
+    mBackgroundState = eBgStates::NONE;
+    cHySpexVNIR_3000N_Model::enableDataRecording(file);
+}
+
+void cHySpexVNIR_3000N_Model_direct::disableDataRecording()
+{
+    cHySpexVNIR_3000N_Model::disableDataRecording();
 }
 
 void cHySpexVNIR_3000N_Model_direct::writeDataHeader()
@@ -370,6 +402,167 @@ void cHySpexVNIR_3000N_Model_direct::calcBackground()
     mBackgroundState = eBgStates::SH_CLOSE;
 }
 
+void cHySpexVNIR_3000N_Model_direct::computePercentSaturation(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexVNIR_3000N_Model::computePercentSaturation(compute);
+}
+
+void cHySpexVNIR_3000N_Model_direct::computePercentBand(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexVNIR_3000N_Model::computePercentBand(compute);
+}
+
+void cHySpexVNIR_3000N_Model_direct::computeFocus(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexVNIR_3000N_Model::computeFocus(compute);
+}
+
+/********************************************************************
+ *  Status Callback Methods
+ ********************************************************************/
+
+void cHySpexVNIR_3000N_Model_direct::handleStatusCallback(void* p, int eventId, int value)
+{
+    using namespace hyspex;
+
+    if (!p) return;
+
+    cHySpexVNIR_3000N_Model_direct* self = static_cast<cHySpexVNIR_3000N_Model_direct*>(p);
+
+    switch (static_cast<EventType>(eventId))
+    {
+    case HYSPEX_EVENT_ACQUISITION_STATUS_CHANGED:    //!< Acquisition status changed, check Camera::getAcquisitionStatus().
+        self->updateAcquisitionStatus(static_cast<AcquisitionStatus>(value));
+        break;
+    case HYSPEX_EVENT_COOLING_STATUS_CHANGED:        //!< Cooling status changed, check Camera::getCoolingStatus().
+        self->updateCoolingStatus(static_cast<CoolingStatus>(value));
+        break;
+    case HYSPEX_EVENT_BACKGROUND_STATUS_CHANGED:     //!< Background status changed, check Camera::getBackgroundStatus().
+        self->updateBackgroundStatus(static_cast<BackgroundStatus>(value));
+        break;
+    case HYSPEX_EVENT_INIT_STATUS_CHANGED:           //!< Init status changed, check Camera::getInitStatus().
+        self->updateInitStatus(static_cast<InitStatus>(value));
+        break;
+    case HYSPEX_EVENT_SHUTTER_STATUS_CHANGED:        //!< Shutter status changed, check Camera::getShutterStatus();
+        self->updateShutterStatus(static_cast<ShutterStatus>(value));
+        break;
+    case HYSPEX_EVENT_COMMUNICATION_STATUS_CHANGED:  //!< Communication status changed. check Camera::getCommunicationStatus().
+        self->updateCommStatus(static_cast<CommunicationStatus>(value));
+        break;
+    case HYSPEX_EVENT_MANUAL_SHUTTER_OPEN_REQUEST:   //!< Manual Shutter: open requested.
+    case HYSPEX_EVENT_MANUAL_SHUTTER_CLOSE_REQUEST:  //!< Manual Shutter: close requested.
+    case HYSPEX_EVENT_ERROR:                         //!< Future: unused.
+    case HYSPEX_EVENT_WARNING:                       //!< Future: unused.
+        break;
+    }
+}
+
+void cHySpexVNIR_3000N_Model_direct::updateInitStatus(hyspex::InitStatus status)
+{
+    mInitStatus = status;
+    emit initStatusChanged();
+}
+
+void cHySpexVNIR_3000N_Model_direct::updateCommStatus(hyspex::CommunicationStatus status)
+{
+    mCommStatus = status;
+    emit commStatusChanged();
+}
+
+void cHySpexVNIR_3000N_Model_direct::updateCoolingStatus(hyspex::CoolingStatus status)
+{
+    mCoolingStatus = status;
+
+    if (getStatus() == sensor::eStatus::BUSY)
+    {
+        if ((mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_OK) ||
+            (mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_DEGRADED))
+            setStatus(sensor::eStatus::RUNNING);
+    }
+    emit coolingStatusChanged();
+}
+
+void cHySpexVNIR_3000N_Model_direct::updateBackgroundStatus(hyspex::BackgroundStatus status)
+{
+    mBackgroundStatus = status;
+    emit bgStatusChanged();
+}
+
+void cHySpexVNIR_3000N_Model_direct::updateAcquisitionStatus(hyspex::AcquisitionStatus status)
+{
+    mAcquisitionStatus = status;
+    emit acqStatusChanged();
+}
+
+void cHySpexVNIR_3000N_Model_direct::updateShutterStatus(hyspex::ShutterStatus status)
+{
+    mShutterStatus = status;
+    emit shutterStatusChanged();
+}
+
+void cHySpexVNIR_3000N_Model_direct::updateImageData(hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image)
+{
+    switch (meComputeData)
+    {
+    default:
+    case eCompute::NONE:
+        break;
+    case eCompute::PERCENT_SATURATION:
+    {
+        auto n = a_image.saturated.size;
+        auto spectral_size = a_image.spectral_size;
+
+        const std::lock_guard<std::mutex> lock(mPercentSaturationLock);
+
+        mPercentSaturation.resize(n);
+        for (uint64_t i = 0; i < n; ++i)
+            mPercentSaturation[i] = (100.0f * a_image.saturated.data[i]) / spectral_size;
+
+        emit newPercentSaturationData();
+        break;
+    }
+    case eCompute::PERCENT_BAND:
+    {
+        auto spatial_size = a_image.spatial_size;
+        auto spectral_size = a_image.spectral_size;
+
+        auto image = HySpexConnect::spatial_major_data<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
+        auto num_bands = image.num_bands();
+
+        const std::lock_guard<std::mutex> lock(mPercentBandLock);
+
+        mPercentBand.resize(num_bands);
+        for (std::size_t b = 0; b < num_bands; ++b)
+        {
+            int count = 0;
+            auto band = image.channels(b);
+            for (auto value : band)
+            {
+                if (value >= mSaturationValue)
+                    ++count;
+            }
+            mPercentBand[b] = (100.0f * count) / spatial_size;
+        }
+
+        emit newPercentBandData();
+        break;
+    }
+    case eCompute::FOCUS:
+    {
+        emit newFocusData();
+        break;
+    }
+    }
+//    auto n = a_image.saturated.size;
+//    mSaturationLevel.resize(n);
+//    for (uint64_t i = 0; i < n; ++i)
+//        mSaturationLevel[i] = a_image.saturated.data[i];
+
+    emit newImageData();
+}
 
 
 

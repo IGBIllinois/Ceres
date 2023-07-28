@@ -20,7 +20,7 @@ cHySpexSWIR_384_Model_direct::cHySpexSWIR_384_Model_direct(std::unique_ptr<hyspe
 
 cHySpexSWIR_384_Model_direct::~cHySpexSWIR_384_Model_direct()
 {
-    mCamera->unregisterNotificationCallback(&cHySpexCameraModel::handleStatusCallback);
+    mCamera->unregisterNotificationCallback(&cHySpexSWIR_384_Model_direct::handleStatusCallback);
 }
 
 void cHySpexSWIR_384_Model_direct::updateViews()
@@ -33,7 +33,7 @@ bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
     mID = mCamera->getId();
     mSerialNumber = mCamera->getSerialNumber();
 
-    mCamera->registerNotificationCallback(&cHySpexCameraModel::handleStatusCallback, this);
+    mCamera->registerNotificationCallback(&cHySpexSWIR_384_Model_direct::handleStatusCallback, this);
 
     mLenses.clear();
     auto n = mCamera->getLensCount();
@@ -138,6 +138,8 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mMaxSpectralSize = mCamera->getMaxSpectralSize();
 
     mMaxPixelValue = mCamera->getMaxPixelValue();
+    if (mMaxPixelValue > 2)
+        mSaturationValue = mMaxPixelValue - 2;
 
     mCommStatus = mCamera->getCommunicationStatus();
     emit commStatusChanged();
@@ -366,6 +368,90 @@ void cHySpexSWIR_384_Model_direct::calcBackground()
 {
     mCamera->closeShutter();
     mBackgroundState = eBgStates::SH_CLOSE;
+}
+
+
+/********************************************************************
+ *  Status Callback Methods
+ ********************************************************************/
+
+void cHySpexSWIR_384_Model_direct::handleStatusCallback(void* p, int eventId, int value)
+{
+    using namespace hyspex;
+
+    if (!p) return;
+
+    cHySpexSWIR_384_Model_direct* self = static_cast<cHySpexSWIR_384_Model_direct*>(p);
+
+    switch (static_cast<EventType>(eventId))
+    {
+    case HYSPEX_EVENT_ACQUISITION_STATUS_CHANGED:    //!< Acquisition status changed, check Camera::getAcquisitionStatus().
+        self->updateAcquisitionStatus(static_cast<AcquisitionStatus>(value));
+        break;
+    case HYSPEX_EVENT_COOLING_STATUS_CHANGED:        //!< Cooling status changed, check Camera::getCoolingStatus().
+        self->updateCoolingStatus(static_cast<CoolingStatus>(value));
+        break;
+    case HYSPEX_EVENT_BACKGROUND_STATUS_CHANGED:     //!< Background status changed, check Camera::getBackgroundStatus().
+        self->updateBackgroundStatus(static_cast<BackgroundStatus>(value));
+        break;
+    case HYSPEX_EVENT_INIT_STATUS_CHANGED:           //!< Init status changed, check Camera::getInitStatus().
+        self->updateInitStatus(static_cast<InitStatus>(value));
+        break;
+    case HYSPEX_EVENT_SHUTTER_STATUS_CHANGED:        //!< Shutter status changed, check Camera::getShutterStatus();
+        self->updateShutterStatus(static_cast<ShutterStatus>(value));
+        break;
+    case HYSPEX_EVENT_COMMUNICATION_STATUS_CHANGED:  //!< Communication status changed. check Camera::getCommunicationStatus().
+        self->updateCommStatus(static_cast<CommunicationStatus>(value));
+        break;
+    case HYSPEX_EVENT_MANUAL_SHUTTER_OPEN_REQUEST:   //!< Manual Shutter: open requested.
+    case HYSPEX_EVENT_MANUAL_SHUTTER_CLOSE_REQUEST:  //!< Manual Shutter: close requested.
+    case HYSPEX_EVENT_ERROR:                         //!< Future: unused.
+    case HYSPEX_EVENT_WARNING:                       //!< Future: unused.
+        break;
+    }
+}
+
+void cHySpexSWIR_384_Model_direct::updateInitStatus(hyspex::InitStatus status)
+{
+    mInitStatus = status;
+    emit initStatusChanged();
+}
+
+void cHySpexSWIR_384_Model_direct::updateCommStatus(hyspex::CommunicationStatus status)
+{
+    mCommStatus = status;
+    emit commStatusChanged();
+}
+
+void cHySpexSWIR_384_Model_direct::updateCoolingStatus(hyspex::CoolingStatus status)
+{
+    mCoolingStatus = status;
+
+    if (getStatus() == sensor::eStatus::BUSY)
+    {
+        if ((mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_OK) ||
+            (mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_DEGRADED))
+            setStatus(sensor::eStatus::RUNNING);
+    }
+    emit coolingStatusChanged();
+}
+
+void cHySpexSWIR_384_Model_direct::updateBackgroundStatus(hyspex::BackgroundStatus status)
+{
+    mBackgroundStatus = status;
+    emit bgStatusChanged();
+}
+
+void cHySpexSWIR_384_Model_direct::updateAcquisitionStatus(hyspex::AcquisitionStatus status)
+{
+    mAcquisitionStatus = status;
+    emit acqStatusChanged();
+}
+
+void cHySpexSWIR_384_Model_direct::updateShutterStatus(hyspex::ShutterStatus status)
+{
+    mShutterStatus = status;
+    emit shutterStatusChanged();
 }
 
 

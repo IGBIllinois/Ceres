@@ -85,83 +85,30 @@ double cHySpexCameraModel::getFieldOfView_deg() const { return mFieldOfView_deg;
 
 std::uint32_t cHySpexCameraModel::getNumOfBackgrounds() const { return mNumBackgrounds; }
 
-
-
-void cHySpexCameraModel::handleStatusCallback(void* p, int eventId, int value)
+void cHySpexCameraModel::computePercentSaturation(bool compute)
 {
-    using namespace hyspex;
-
-    cHySpexCameraModel* self = static_cast<cHySpexCameraModel*>(p);
-
-    switch (static_cast<EventType>(eventId))
-    {
-    case HYSPEX_EVENT_ACQUISITION_STATUS_CHANGED:    //!< Acquisition status changed, check Camera::getAcquisitionStatus().
-        self->updateAcquisitionStatus(static_cast<AcquisitionStatus>(value));
-        break;
-    case HYSPEX_EVENT_COOLING_STATUS_CHANGED:        //!< Cooling status changed, check Camera::getCoolingStatus().
-        self->updateCoolingStatus(static_cast<CoolingStatus>(value));
-        break;
-    case HYSPEX_EVENT_BACKGROUND_STATUS_CHANGED:     //!< Background status changed, check Camera::getBackgroundStatus().
-        self->updateBackgroundStatus(static_cast<BackgroundStatus>(value));
-        break;
-    case HYSPEX_EVENT_INIT_STATUS_CHANGED:           //!< Init status changed, check Camera::getInitStatus().
-        self->updateInitStatus(static_cast<InitStatus>(value));
-        break;
-    case HYSPEX_EVENT_SHUTTER_STATUS_CHANGED:        //!< Shutter status changed, check Camera::getShutterStatus();
-        self->updateShutterStatus(static_cast<ShutterStatus>(value));
-        break;
-    case HYSPEX_EVENT_COMMUNICATION_STATUS_CHANGED:  //!< Communication status changed. check Camera::getCommunicationStatus().
-        self->updateCommStatus(static_cast<CommunicationStatus>(value));
-        break;
-    case HYSPEX_EVENT_MANUAL_SHUTTER_OPEN_REQUEST:   //!< Manual Shutter: open requested.
-    case HYSPEX_EVENT_MANUAL_SHUTTER_CLOSE_REQUEST:  //!< Manual Shutter: close requested.
-    case HYSPEX_EVENT_ERROR:                         //!< Future: unused.
-    case HYSPEX_EVENT_WARNING:                       //!< Future: unused.
-        break;
-    }
+    meComputeData = compute ? eCompute::PERCENT_SATURATION : eCompute::NONE;
 }
 
-
-void cHySpexCameraModel::updateInitStatus(hyspex::InitStatus status)
+void cHySpexCameraModel::computePercentBand(bool compute)
 {
-    mInitStatus = status;
-    emit initStatusChanged();
+    meComputeData = compute ? eCompute::PERCENT_BAND : eCompute::NONE;
 }
 
-void cHySpexCameraModel::updateCommStatus(hyspex::CommunicationStatus status)
+void cHySpexCameraModel::computeFocus(bool compute)
 {
-    mCommStatus = status;
-    emit commStatusChanged();
+    meComputeData = compute ? eCompute::FOCUS : eCompute::NONE;
 }
 
-void cHySpexCameraModel::updateCoolingStatus(hyspex::CoolingStatus status)
+std::vector<float> cHySpexCameraModel::getPercentSaturation() const
 {
-    mCoolingStatus = status;
-
-    if (getStatus() == sensor::eStatus::BUSY)
-    {
-        if ((mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_OK) ||
-            (mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_DEGRADED))
-            setStatus(sensor::eStatus::RUNNING);
-    }
-    emit coolingStatusChanged();
+    const std::lock_guard<std::mutex> lock(mPercentSaturationLock);
+    return mPercentSaturation;
 }
 
-void cHySpexCameraModel::updateBackgroundStatus(hyspex::BackgroundStatus status)
+std::vector<float> cHySpexCameraModel::getPercentBands() const
 {
-    mBackgroundStatus = status;
-    emit bgStatusChanged();
-}
-
-void cHySpexCameraModel::updateAcquisitionStatus(hyspex::AcquisitionStatus status)
-{
-    mAcquisitionStatus = status;
-    emit acqStatusChanged();
-}
-
-void cHySpexCameraModel::updateShutterStatus(hyspex::ShutterStatus status)
-{
-    mShutterStatus = status;
-    emit shutterStatusChanged();
+    const std::lock_guard<std::mutex> lock(mPercentBandLock);
+    return mPercentBand;
 }
 

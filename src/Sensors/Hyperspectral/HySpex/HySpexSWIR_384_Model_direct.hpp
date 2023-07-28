@@ -50,6 +50,18 @@ public:
     void setNumOfBackgrounds(int num_backgrounds) override;
     void calcBackground() override;
 
+    /*
+     * Status Callback Methods
+     */
+protected:
+    static void handleStatusCallback(void* p, int eventId, int value);
+    void updateInitStatus(hyspex::InitStatus status);
+    void updateCommStatus(hyspex::CommunicationStatus status);
+    void updateCoolingStatus(hyspex::CoolingStatus status);
+    void updateBackgroundStatus(hyspex::BackgroundStatus status);
+    void updateAcquisitionStatus(hyspex::AcquisitionStatus status);
+    void updateShutterStatus(hyspex::ShutterStatus status);
+
 protected:
     void update() override;
 

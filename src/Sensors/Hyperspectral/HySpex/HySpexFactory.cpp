@@ -105,6 +105,10 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::ambientTempChanged, pView, &cHySpexVNIR_3000N_StatusView::onAmbientTempChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::sensorTempChanged, pView, &cHySpexVNIR_3000N_StatusView::onSensorTempChange);
 
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newPercentSaturationData, pView, &cHySpexVNIR_3000N_StatusView::onSaturationDataUpdated);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newPercentBandData, pView, &cHySpexVNIR_3000N_StatusView::onBandDataUpdated);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newFocusData, pView, &cHySpexVNIR_3000N_StatusView::onFocusDataUpdated);
+
 
         auto* pController = new cHySpexVNIR_3000N_Controller(pModel);
 

@@ -88,7 +88,8 @@ bool cHySpexVNIR_3000N_Model_simulation::initialize()
     mMaxSpatialSize = 700;
     mMaxSpectralSize = 3408;
 
-    mMaxPixelValue = 4096;
+    mMaxPixelValue = 4095;
+    mSaturationValue = mMaxPixelValue - 2;
 
     mCommStatus = hyspex::CommunicationStatus::HYSPEX_COMM_OK;
     emit commStatusChanged();

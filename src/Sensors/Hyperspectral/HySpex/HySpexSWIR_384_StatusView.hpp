@@ -11,7 +11,7 @@ QT_END_NAMESPACE
 class cHySpexSWIR_384_Model;
 
 
-class cHySpexSWIR_384_StatusView : public cHySpexStatusView
+class cHySpexSWIR_384_StatusView : public cHySpexCamera_StatusView
 {
 	Q_OBJECT
 

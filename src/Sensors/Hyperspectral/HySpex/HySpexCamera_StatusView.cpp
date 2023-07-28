@@ -19,17 +19,22 @@
 	#undef ERROR
 #endif
 
-cHySpexStatusView::cHySpexStatusView(cHySpexCameraModel* pModel, QWidget* parent)
+namespace
+{
+	constexpr uint32_t UPDATE_RATE_US = 100000;
+}
+
+cHySpexCamera_StatusView::cHySpexCamera_StatusView(cHySpexCameraModel* pModel, QWidget* parent)
 :
     cSensorStatusView(pModel, parent), mpModel(pModel)
 {
 }
 
-cHySpexStatusView::~cHySpexStatusView()
+cHySpexCamera_StatusView::~cHySpexCamera_StatusView()
 {
 }
 
-void cHySpexStatusView::createWidgets()
+void cHySpexCamera_StatusView::createWidgets()
 {
 	cSensorStatusView::createWidgets();
 
@@ -96,9 +101,18 @@ void cHySpexStatusView::createWidgets()
 	mpLensFieldOfView_deg->setReadOnly(true);
 
 	/** Display */
-	mpSaturationButton = new QPushButton("%SAT");
-	mpSaturationButton->setCheckable(true);
-	QObject::connect(mpSaturationButton, &QPushButton::clicked, this, &cHySpexStatusView::saturationButtonToggled);
+	mpPercentSaturationButton = new QPushButton("%SAT");
+	mpPercentSaturationButton->setCheckable(true);
+	QObject::connect(mpPercentSaturationButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::saturationButtonToggled);
+
+	mpPercentBandButton = new QPushButton("%BAND");
+	mpPercentBandButton->setCheckable(true);
+	QObject::connect(mpPercentBandButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::bandButtonToggled);
+
+	mpFocusButton = new QPushButton("Focus");
+	mpFocusButton->setCheckable(true);
+	QObject::connect(mpFocusButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::focusButtonToggled);
+
 
 	mpPlot = new QCustomPlot();
 	mpPlot->setMinimumHeight(300);
@@ -114,7 +128,7 @@ void cHySpexStatusView::createWidgets()
 	mpPlot->axisRect()->setupFullAxesBox();
 }
 
-void cHySpexStatusView::doStatusLayout(QBoxLayout* pMainLayout)
+void cHySpexCamera_StatusView::doStatusLayout(QBoxLayout* pMainLayout)
 {
 	QGroupBox* cameraStatusBox = new QGroupBox("Camera Status");
 	cameraStatusBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -133,7 +147,7 @@ void cHySpexStatusView::doStatusLayout(QBoxLayout* pMainLayout)
 	pMainLayout->addWidget(cameraStatusBox);
 }
 
-void cHySpexStatusView::doAcqStatusLayout(QBoxLayout* pMainLayout)
+void cHySpexCamera_StatusView::doAcqStatusLayout(QBoxLayout* pMainLayout)
 {
 	QGroupBox* acqBox = new QGroupBox("Acquisition Status");
 	acqBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -163,7 +177,7 @@ void cHySpexStatusView::doAcqStatusLayout(QBoxLayout* pMainLayout)
 	pMainLayout->addWidget(acqBox);
 }
 
-void cHySpexStatusView::doLensInfoLayout(QBoxLayout* pMainLayout)
+void cHySpexCamera_StatusView::doLensInfoLayout(QBoxLayout* pMainLayout)
 {
 	QGroupBox* lensInfoBox = new QGroupBox("Lens Info");
 	lensInfoBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -184,13 +198,16 @@ void cHySpexStatusView::doLensInfoLayout(QBoxLayout* pMainLayout)
 	pMainLayout->addWidget(lensInfoBox);
 }
 
-void cHySpexStatusView::doPlotLayout(QBoxLayout* pMainLayout)
+void cHySpexCamera_StatusView::doPlotLayout(QBoxLayout* pMainLayout)
 {
 	auto* plotLayout = new QVBoxLayout();
 
 	auto* buttonLayout = new QHBoxLayout();
 
-	buttonLayout->addWidget(mpSaturationButton);
+	buttonLayout->addWidget(mpPercentSaturationButton);
+	buttonLayout->addWidget(mpPercentBandButton);
+	buttonLayout->addWidget(mpFocusButton);
+	buttonLayout->addStretch();
 
 	plotLayout->addLayout(buttonLayout);
 
@@ -199,7 +216,7 @@ void cHySpexStatusView::doPlotLayout(QBoxLayout* pMainLayout)
 	pMainLayout->addLayout(plotLayout);
 }
 
-void cHySpexStatusView::onInitStatusChange()
+void cHySpexCamera_StatusView::onInitStatusChange()
 {
 	using namespace hyspex;
 
@@ -240,7 +257,7 @@ void cHySpexStatusView::onInitStatusChange()
 	}
 }
 
-void cHySpexStatusView::onAcqStatusChange()
+void cHySpexCamera_StatusView::onAcqStatusChange()
 {
 	using namespace hyspex;
 
@@ -278,7 +295,7 @@ void cHySpexStatusView::onAcqStatusChange()
 	}
 }
 
-void cHySpexStatusView::onBgStatusChange()
+void cHySpexCamera_StatusView::onBgStatusChange()
 {
 	using namespace hyspex;
 
@@ -307,7 +324,7 @@ void cHySpexStatusView::onBgStatusChange()
 	}
 }
 
-void cHySpexStatusView::onCommStatusChange()
+void cHySpexCamera_StatusView::onCommStatusChange()
 {
 	using namespace hyspex;
 
@@ -333,7 +350,7 @@ void cHySpexStatusView::onCommStatusChange()
 	}
 }
 
-void cHySpexStatusView::onCoolingStatusChange()
+void cHySpexCamera_StatusView::onCoolingStatusChange()
 {
 	using namespace hyspex;
 
@@ -362,7 +379,7 @@ void cHySpexStatusView::onCoolingStatusChange()
 	}
 }
 
-void cHySpexStatusView::onShutterStatusChange()
+void cHySpexCamera_StatusView::onShutterStatusChange()
 {
 	using namespace hyspex;
 
@@ -395,44 +412,44 @@ void cHySpexStatusView::onShutterStatusChange()
 }
 
 
-void cHySpexStatusView::onAvgFramesChange(std::uint16_t avgFrames)
+void cHySpexCamera_StatusView::onAvgFramesChange(std::uint16_t avgFrames)
 {
 	mpAvgFrames->setText(QString::number(avgFrames));
 }
 
-void cHySpexStatusView::onFramePeriodChange(std::uint32_t period_us)
+void cHySpexCamera_StatusView::onFramePeriodChange(std::uint32_t period_us)
 {
 	mpFramePeriod_us->setText(QString::number(period_us));
 }
 
-void cHySpexStatusView::onMinFramePeriodChange(std::uint32_t period_us)
+void cHySpexCamera_StatusView::onMinFramePeriodChange(std::uint32_t period_us)
 {
 	mpMinFramePeriod_us->setText(QString::number(period_us));
 }
 
-void cHySpexStatusView::onIntegrationTimeChange(std::uint32_t time_us)
+void cHySpexCamera_StatusView::onIntegrationTimeChange(std::uint32_t time_us)
 {
 	mpIntegrationTime_us->setText(QString::number(time_us));
 }
 
-void cHySpexStatusView::onMaxIntegrationTimeChange(std::uint32_t time_us)
+void cHySpexCamera_StatusView::onMaxIntegrationTimeChange(std::uint32_t time_us)
 {
 	mpMaxIntegrationTime_us->setText(QString::number(time_us));
 }
 
-void cHySpexStatusView::onAmbientTempChange(double temp_C)
+void cHySpexCamera_StatusView::onAmbientTempChange(double temp_C)
 {
 	mpAmbientTemp_C->setText(QString::number(temp_C, 'f', 1));
 }
 
-void cHySpexStatusView::onSensorTempChange(double temp_C)
+void cHySpexCamera_StatusView::onSensorTempChange(double temp_C)
 {
 	QString label = QString::number(temp_C, 'f', 1);
 	label += " C";
 	mpCoolingStatus->setText(label);
 }
 
-void cHySpexStatusView::onLensInfoChange()
+void cHySpexCamera_StatusView::onLensInfoChange()
 {
 	auto name = mpModel->getLensName();
 	auto wd_cm = mpModel->getWorkingDistance_cm();
@@ -443,20 +460,125 @@ void cHySpexStatusView::onLensInfoChange()
 	mpLensFieldOfView_deg->setText(QString::number(fov_deg, 'f', 1));
 }
 
-void cHySpexStatusView::saturationButtonToggled(bool state)
+void cHySpexCamera_StatusView::saturationButtonToggled(bool state)
 {
-	mShowSaturation = state;
-	if (mShowSaturation)
+	if (state)
 	{
-		mpPlot->yAxis->setRange(0, 100);
+		// Only one button can be active at one time!
+		mpPercentBandButton->setChecked(false);
+		mpFocusButton->setChecked(false);
+
+		mpPlot->yAxis->setRange(-1, 100);
 		mpPlot->yAxis->setLabel("% Saturation");
 
 		auto chn = mpModel->getSpatialSize();
 		auto bands = mpModel->getSpectralSize();
 
 		mpPlot->xAxis->setRange(0, chn);
-		mpPlot->xAxis->setLabel("Channel");
+		mpPlot->xAxis->setLabel("Spatial Channel");
 		mpPlot->replot();
+
+		mRateLimitCount = static_cast<int>(UPDATE_RATE_US / mpModel->getFramePeriod_us());
+		mUpdateCounter = mRateLimitCount;
+
+		mX.resize(chn);
+		for (std::size_t i = 0; i < chn; ++i)
+			mX[i] = i;
 	}
+
+	mpModel->computePercentSaturation(state);
 }
 
+
+void cHySpexCamera_StatusView::onSaturationDataUpdated()
+{
+	++mUpdateCounter;
+	if (mUpdateCounter < mRateLimitCount) return;
+	mUpdateCounter = 0;
+
+	auto data = mpModel->getPercentSaturation();
+	QVector<qreal> y;
+	y.resize(data.size());
+	for (std::size_t i = 0; i < data.size(); ++i)
+		y[i] = data[i];
+
+	mpPlot->graph(0)->setData(mX, y, true);
+
+	mpPlot->replot();
+}
+
+void cHySpexCamera_StatusView::bandButtonToggled(bool state)
+{
+	if (state)
+	{
+		// Only one button can be active at one time!
+		mpPercentSaturationButton->setChecked(false);
+		mpFocusButton->setChecked(false);
+
+		mpPlot->yAxis->setRange(-1, 100);
+		mpPlot->yAxis->setLabel("% Saturation");
+
+		auto chn = mpModel->getSpatialSize();
+		auto bands = mpModel->getSpectralSize();
+
+		mpPlot->xAxis->setRange(0, bands);
+		mpPlot->xAxis->setLabel("Spectral Band");
+		mpPlot->replot();
+
+		mRateLimitCount = static_cast<int>(UPDATE_RATE_US / mpModel->getFramePeriod_us());
+		mUpdateCounter = mRateLimitCount;
+
+		mX.resize(bands);
+		for (std::size_t i = 0; i < bands; ++i)
+			mX[i] = i;
+	}
+
+	mpModel->computePercentBand(state);
+}
+
+void cHySpexCamera_StatusView::onBandDataUpdated()
+{
+	++mUpdateCounter;
+	if (mUpdateCounter < mRateLimitCount) return;
+	mUpdateCounter = 0;
+
+	auto data = mpModel->getPercentBands();
+	QVector<qreal> y;
+	y.resize(data.size());
+	for (std::size_t i = 0; i < data.size(); ++i)
+		y[i] = data[i];
+
+	mpPlot->graph(0)->setData(mX, y, true);
+
+	mpPlot->replot();
+}
+
+void cHySpexCamera_StatusView::focusButtonToggled(bool state)
+{
+	if (state)
+	{
+		// Only one button can be active at one time!
+		mpPercentSaturationButton->setChecked(false);
+		mpPercentBandButton->setChecked(false);
+
+		mpPlot->yAxis->setRange(0, 100);
+		mpPlot->yAxis->setLabel("Focus");
+
+		auto chn = mpModel->getSpatialSize();
+		auto bands = mpModel->getSpectralSize();
+
+		mpPlot->xAxis->setRange(0, chn);
+		mpPlot->xAxis->setLabel("Time");
+		mpPlot->replot();
+
+		mRateLimitCount = static_cast<int>(UPDATE_RATE_US / mpModel->getFramePeriod_us());
+		mUpdateCounter = mRateLimitCount;
+	}
+
+	mpModel->computeFocus(state);
+}
+
+void cHySpexCamera_StatusView::onFocusDataUpdated()
+{
+
+}

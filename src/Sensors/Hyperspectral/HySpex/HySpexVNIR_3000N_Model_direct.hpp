@@ -18,7 +18,7 @@ namespace hyspex
     class cVNIR3000N;
 }
 
-class cHySpexVNIR_3000N_Model_direct : public cHySpexVNIR_3000N_Model
+class cHySpexVNIR_3000N_Model_direct : public cHySpexVNIR_3000N_Model //, public cHySpexCamera_StatusCallbackInterface
 {
     Q_OBJECT
 
@@ -33,6 +33,9 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
     bool initialize() override;
+
+    void enableDataRecording(cBlockDataFileWriter& file) override;
+    void disableDataRecording() override;
 
     void writeDataHeader() override;
 
@@ -50,8 +53,38 @@ public:
     void setNumOfBackgrounds(int num_backgrounds) override;
     void calcBackground() override;
 
+    /*
+     * Turn on/off data computations
+     */
+    void computePercentSaturation(bool compute) override;
+    void computePercentBand(bool compute) override;
+    void computeFocus(bool compute) override;
+
+/*
+ * Status Callback Methods
+ */
+protected:
+    static void handleStatusCallback(void* p, int eventId, int value);
+    void updateInitStatus(hyspex::InitStatus status);
+    void updateCommStatus(hyspex::CommunicationStatus status);
+    void updateCoolingStatus(hyspex::CoolingStatus status);
+    void updateBackgroundStatus(hyspex::BackgroundStatus status);
+    void updateAcquisitionStatus(hyspex::AcquisitionStatus status);
+    void updateShutterStatus(hyspex::ShutterStatus status);
+
+/*
+ * Image Callback Method
+ */
+protected:
+    static void handleImageCallback(void* p, hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image);
+    void updateImageData(hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image);
+
+/*
+ * Sensor Method Update
+ */
 protected:
     void update() override;
+
 
 private:
     cIntervalTimer mTemperatureUpdateTimer;

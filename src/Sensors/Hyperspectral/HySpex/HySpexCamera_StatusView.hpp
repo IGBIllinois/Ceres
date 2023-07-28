@@ -20,13 +20,13 @@ class QButtonIndicator;
 class QCustomPlot;
 
 
-class cHySpexStatusView : public cSensorStatusView
+class cHySpexCamera_StatusView : public cSensorStatusView
 {
 	Q_OBJECT
 
 public:
-	cHySpexStatusView(cHySpexCameraModel* pModel, QWidget* parent = nullptr);
-	virtual ~cHySpexStatusView();
+	cHySpexCamera_StatusView(cHySpexCameraModel* pModel, QWidget* parent = nullptr);
+	virtual ~cHySpexCamera_StatusView();
 
 public:
 	/*
@@ -53,7 +53,9 @@ public slots:
 
 	void onLensInfoChange();
 
-	void saturationButtonToggled(bool state);
+	void onSaturationDataUpdated();
+	void onBandDataUpdated();
+	void onFocusDataUpdated();
 
 protected:
 	void doStatusLayout(QBoxLayout* pMainLayout);
@@ -61,6 +63,10 @@ protected:
 	void doLensInfoLayout(QBoxLayout* pMainLayout);
 	void doPlotLayout(QBoxLayout* pMainLayout);
 
+private slots:
+	void saturationButtonToggled(bool state);
+	void bandButtonToggled(bool state);
+	void focusButtonToggled(bool state);
 
 protected:
 	QButtonIndicator* mpInitializationStatus = nullptr;
@@ -106,11 +112,15 @@ protected:
 	/*
 	 * Various items for showing HySpex data
 	 */
-	bool mShowSaturation = false;
-	QPushButton* mpSaturationButton = nullptr;
+	QPushButton* mpPercentSaturationButton = nullptr;
+	QPushButton* mpPercentBandButton = nullptr;
+	QPushButton* mpFocusButton = nullptr;
 
 	QCustomPlot* mpPlot = nullptr;
+	QVector<qreal> mX;
+	int mUpdateCounter = 0;
+	int mRateLimitCount = 0;
 
 private:
-	const cHySpexCameraModel* mpModel;
+	cHySpexCameraModel* const mpModel;
 };

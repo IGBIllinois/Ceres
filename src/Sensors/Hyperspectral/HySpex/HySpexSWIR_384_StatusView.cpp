@@ -14,7 +14,7 @@
 
 cHySpexSWIR_384_StatusView::cHySpexSWIR_384_StatusView(cHySpexSWIR_384_Model* pModel, QWidget* parent)
 :
-	cHySpexStatusView(pModel, parent)
+	cHySpexCamera_StatusView(pModel, parent)
 {
 }
 
@@ -24,7 +24,7 @@ cHySpexSWIR_384_StatusView::~cHySpexSWIR_384_StatusView()
 
 void cHySpexSWIR_384_StatusView::createWidgets()
 {
-	cHySpexStatusView::createWidgets();
+	cHySpexCamera_StatusView::createWidgets();
 }
 
 void cHySpexSWIR_384_StatusView::doLayout()

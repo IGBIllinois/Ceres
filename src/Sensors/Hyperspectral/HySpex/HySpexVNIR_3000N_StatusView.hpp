@@ -12,7 +12,7 @@ class cHySpexVNIR_3000N_Model;
 class QLedIndicator;
 
 
-class cHySpexVNIR_3000N_StatusView : public cHySpexStatusView
+class cHySpexVNIR_3000N_StatusView : public cHySpexCamera_StatusView
 {
 	Q_OBJECT
 
@@ -27,7 +27,4 @@ public:
 	 */
 	void createWidgets() override;
 	void doLayout() override;
-
-protected:
-	void resizeEvent(QResizeEvent* event) override;
 };

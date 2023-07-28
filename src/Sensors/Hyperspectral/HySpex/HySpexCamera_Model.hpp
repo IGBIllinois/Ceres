@@ -9,6 +9,7 @@
 #include <QObject>
 
 #include <vector>
+#include <mutex>
 
 
 class cHySpexCameraModel : public cHyperspectralModel
@@ -98,6 +99,16 @@ public:
     virtual void setNumOfBackgrounds(int num_backgrounds) = 0;
     virtual void calcBackground() = 0;
 
+    /*
+     * Turn on/off data computations
+     */
+    virtual void computePercentSaturation(bool compute);
+    virtual void computePercentBand(bool compute);
+    virtual void computeFocus(bool compute);
+
+    std::vector<float> getPercentSaturation() const;
+    std::vector<float> getPercentBands() const;
+
 signals:
     void initStatusChanged();
     void commStatusChanged();
@@ -118,14 +129,12 @@ signals:
 
     void lensInfoChanged();
 
-protected:
-    static void handleStatusCallback(void* p, int eventId, int value);
-    virtual void updateInitStatus(hyspex::InitStatus status);
-    virtual void updateCommStatus(hyspex::CommunicationStatus status);
-    virtual void updateCoolingStatus(hyspex::CoolingStatus status);
-    virtual void updateBackgroundStatus(hyspex::BackgroundStatus status);
-    virtual void updateAcquisitionStatus(hyspex::AcquisitionStatus status);
-    virtual void updateShutterStatus(hyspex::ShutterStatus status);
+    void newPercentSaturationData();
+    void newPercentBandData();
+    void newFocusData();
+
+    void newImageData();
+
 
 protected:
     bool mConnected;
@@ -146,6 +155,7 @@ protected:
 
     // Max pixel value, 2 ^ bpp - 1 (bits per pixel).
     unsigned short mMaxPixelValue = 0;
+    unsigned short mSaturationValue = 0;
 
     hyspex::InitStatus          mInitStatus = hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED;
     hyspex::CommunicationStatus mCommStatus = hyspex::CommunicationStatus::HYSPEX_COMM_INIT;
@@ -175,5 +185,12 @@ protected:
 //	cHyperspectralImageBuffer<float> mQuantumEfficiencyMatrix;
 
 //	cHyperspectralSpectralBuffer<float> SpectralCalibrationPerBand;
+
+    enum class eCompute {NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS} meComputeData = eCompute::NONE;
+    mutable std::mutex mPercentSaturationLock;
+    std::vector<float> mPercentSaturation;
+
+    mutable std::mutex mPercentBandLock;
+    std::vector<float> mPercentBand;
 };
 
