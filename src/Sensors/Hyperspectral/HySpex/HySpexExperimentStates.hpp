@@ -16,6 +16,82 @@ class cHySpexVNIR_3000N_PropertyPage_Remote;
 /**           Base Class for HySpex Experiment States             **/
 /*******************************************************************/
 
+class cHySpexCamera_ExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState
+{
+	Q_OBJECT
+
+public:
+	cHySpexCamera_ExperimentState_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6);
+	virtual ~cHySpexCamera_ExperimentState_Remote();
+
+	void cleanup() override;
+
+	bool recording() override;
+	void initialize() override;
+
+protected:
+	std::string mHostname;
+	std::string mLocalIpAddress;
+	bool mUse_IpV6 = false;
+	uint16_t   mPort = 0;
+};
+
+/*******************************************************************/
+/**         HySpex Experiment States to Control Shutter           **/
+/*******************************************************************/
+
+class cHySpexCamera_ShutterCtrl_Remote : public cHySpexCamera_ExperimentState_Remote,
+	protected cHySpexCamera_PropertiesNetDecoder, private cHySpexCamera_PropertiesNetEncoder
+{
+	Q_OBJECT
+
+public:
+	cHySpexCamera_ShutterCtrl_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state);
+
+	eRESULT finished() override;
+
+protected:
+
+	void onCurrentState(bool valid, std::uint16_t average_frames,
+		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
+		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
+		std::uint32_t num_backgrounds, const std::string& lens_name) override {};
+
+	void onLensNames(const std::vector<std::string>& names) override {};
+
+	void onBackgroundReply(eBackgroundReply reply) override {};
+
+	void onShutterState(eShutterState state) override;
+
+	void onConnect() override;
+	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
+	int sendOutgoingData(const char* data, std::size_t len) override;
+
+protected:
+	eShutterState mShutterState = eShutterState::UNKNOWN;
+	const eShutterState mDesiredState;
+};
+
+class cHySpexCamera_CloseShutter_Remote : public cHySpexCamera_ShutterCtrl_Remote
+{
+public:
+	cHySpexCamera_CloseShutter_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6);
+};
+
+class cHySpexCamera_OpenShutter_Remote : public cHySpexCamera_ShutterCtrl_Remote
+{
+public:
+	cHySpexCamera_OpenShutter_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6);
+};
+
+
+
+
+
 class cHySpexCamera_Properties_Remote : public cExperimentStateRemoteInterface, public cExperimentState
 {
 	Q_OBJECT
@@ -55,7 +131,7 @@ protected:
 
 
 /*******************************************************************/
-/**            The HySpex VNIR-3000N Experiment State             **/
+/**            The HySpex VNIR-3000N Experiment States            **/
 /*******************************************************************/
 
 class cHySpexVNIR_3000N_Properties_Remote : public cHySpexCamera_Properties_Remote,
@@ -78,6 +154,8 @@ protected:
 	void onLensNames(const std::vector<std::string>& names) override;
 
 	void onBackgroundReply(eBackgroundReply reply) override;
+
+	void onShutterState(eShutterState state) override;
 
 	void onConnect() override;
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
@@ -115,6 +193,8 @@ protected:
 	void onLensNames(const std::vector<std::string>& names) override;
 
 	void onBackgroundReply(eBackgroundReply reply) override;
+
+	void onShutterState(eShutterState state) override;
 
 	void onConnect() override;
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;

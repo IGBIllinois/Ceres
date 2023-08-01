@@ -5,8 +5,117 @@
 
 
 /*******************************************************************/
-/**           Base Class for HySpex Experiment States             **/
+/**       Base Class for Remote HySpex Experiment States          **/
 /*******************************************************************/
+cHySpexCamera_ExperimentState_Remote::cHySpexCamera_ExperimentState_Remote
+	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6)
+{
+	mHostname = hostname;
+	mPort = port;
+	mLocalIpAddress = localIpAddress;
+	mUse_IpV6 = use_IpV6;
+}
+
+cHySpexCamera_ExperimentState_Remote::~cHySpexCamera_ExperimentState_Remote()
+{}
+
+void cHySpexCamera_ExperimentState_Remote::initialize()
+{
+	if (!cExperimentStateRemoteInterface::initialize(mHostname, mPort, mUse_IpV6, mLocalIpAddress))
+		return;
+
+	openConnection();
+}
+
+void cHySpexCamera_ExperimentState_Remote::cleanup()
+{
+	closeConnection();
+	destroy();
+}
+
+bool cHySpexCamera_ExperimentState_Remote::recording()
+{
+	return false;
+}
+
+
+/*******************************************************************/
+/**         HySpex Experiment States to Control Shutter           **/
+/*******************************************************************/
+cHySpexCamera_ShutterCtrl_Remote::cHySpexCamera_ShutterCtrl_Remote(const std::string& hostname, uint16_t port,
+	const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state)
+	:
+	cHySpexCamera_ExperimentState_Remote(hostname, port, localIpAddress, use_IpV6), cHySpexCamera_PropertiesNetEncoder(255),
+	mDesiredState(desired_state)
+{}
+
+cExperimentState::eRESULT cHySpexCamera_ShutterCtrl_Remote::finished()
+{
+	if (mShutterState == eShutterState::ERROR)
+		return eRESULT::ABORT;
+
+	if (mShutterState == mDesiredState)
+		return eRESULT::DONE;
+
+	return eRESULT::WAITING;
+}
+
+void cHySpexCamera_ShutterCtrl_Remote::onShutterState(eShutterState state)
+{
+	mShutterState = state;
+
+	if ((mShutterState == eShutterState::ERROR) ||
+		(mShutterState == mDesiredState))
+			return;
+
+	if (mDesiredState == eShutterState::CLOSED)
+	{
+		sendCloseShutter();
+		sendQueryShutterState();
+	}
+
+	if (mDesiredState == eShutterState::OPEN)
+	{
+		sendOpenShutter();
+		sendQueryShutterState();
+	}
+}
+
+void cHySpexCamera_ShutterCtrl_Remote::onConnect()
+{
+	sendQueryShutterState();
+}
+
+void cHySpexCamera_ShutterCtrl_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
+{
+	cHySpexCamera_PropertiesNetDecoder::decode(pBuffer, buf_length);
+}
+
+int cHySpexCamera_ShutterCtrl_Remote::sendOutgoingData(const char* data, std::size_t len)
+{
+	return cExperimentStateRemoteInterface::sendOutgoingData(data, len);
+}
+
+/*** Experimental State to Close Shutter ***/
+cHySpexCamera_CloseShutter_Remote::cHySpexCamera_CloseShutter_Remote(const std::string& hostname, uint16_t port,
+	const std::string& localIpAddress, bool use_IpV6)
+	:
+	cHySpexCamera_ShutterCtrl_Remote(hostname, port, localIpAddress, use_IpV6, eShutterState::CLOSED)
+{}
+
+/*** Experimental State to Open Shutter ***/
+cHySpexCamera_OpenShutter_Remote::cHySpexCamera_OpenShutter_Remote(const std::string& hostname, uint16_t port,
+	const std::string& localIpAddress, bool use_IpV6)
+	:
+	cHySpexCamera_ShutterCtrl_Remote(hostname, port, localIpAddress, use_IpV6, eShutterState::OPEN)
+{}
+
+
+
+
+
+
+
 
 cHySpexCamera_Properties_Remote::cHySpexCamera_Properties_Remote()
 	: cExperimentStateRemoteInterface()
@@ -161,6 +270,9 @@ void cHySpexVNIR_3000N_Properties_Remote::onBackgroundReply(eBackgroundReply rep
 		mState = eSTATE::ERROR;
 }
 
+void cHySpexVNIR_3000N_Properties_Remote::onShutterState(eShutterState state)
+{}
+
 void cHySpexVNIR_3000N_Properties_Remote::onConnect()
 {
 	mState = eSTATE::WAIT_FOR_STATE;
@@ -254,6 +366,9 @@ void cHySpexSWIR_384_Properties_Remote::onBackgroundReply(eBackgroundReply reply
 	else
 		mState = eSTATE::ERROR;
 }
+
+void cHySpexSWIR_384_Properties_Remote::onShutterState(eShutterState state)
+{}
 
 void cHySpexSWIR_384_Properties_Remote::onConnect()
 {

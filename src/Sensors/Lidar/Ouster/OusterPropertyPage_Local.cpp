@@ -16,7 +16,7 @@ cOusterPropertyPage_Local::cOusterPropertyPage_Local(cOusterModel* model, QWidge
 	assert(mpModel);
 }
 
-cExperimentState* cOusterPropertyPage_Local::createState(const std::string& type)
+cExperimentState* cOusterPropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry)
 {
 	return nullptr;
 }

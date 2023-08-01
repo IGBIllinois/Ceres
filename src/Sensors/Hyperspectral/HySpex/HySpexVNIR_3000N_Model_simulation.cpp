@@ -286,6 +286,18 @@ void cHySpexVNIR_3000N_Model_simulation::calcBackground()
     mBackgroundState = eBgStates::SH_CLOSE;
 }
 
+void cHySpexVNIR_3000N_Model_simulation::open_shutter()
+{
+    mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN;
+    emit shutterStatusChanged();
+}
+
+void cHySpexVNIR_3000N_Model_simulation::close_shutter()
+{
+    mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED;
+    emit shutterStatusChanged();
+}
+
 
 
 

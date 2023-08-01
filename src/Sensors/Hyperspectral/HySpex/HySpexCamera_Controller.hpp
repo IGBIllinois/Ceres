@@ -28,6 +28,7 @@ public slots:
 protected:
     void txCurrentState(cHySpexCamera_ControllerNetEncoder* encoder);
     void txLensNames(cHySpexCamera_ControllerNetEncoder* encoder);
+    void txShutterState(cHySpexCamera_ControllerNetEncoder* encoder);
 
 private:
     cHySpexCameraModel* mpModel = nullptr;

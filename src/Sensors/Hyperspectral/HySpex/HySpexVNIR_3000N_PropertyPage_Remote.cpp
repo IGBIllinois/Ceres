@@ -11,10 +11,11 @@ cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWi
 		cHySpexVNIR_3000N_PropertiesNetEncoder(255)
 {}
 
-cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::string& type)
+cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry)
 {
 	if (type == "VNIR-3000N")
 	{
+		std::string cmd = entry["command"];
 		return new cHySpexVNIR_3000N_Properties_Remote(this);
 	}
 
@@ -78,6 +79,10 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onBackgroundReply(eBackgroundReply r
 	mWaitingForBackgroundReply = false;
 	setEnabled(true);
 	update();
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::onShutterState(eShutterState state)
+{
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::showPage()

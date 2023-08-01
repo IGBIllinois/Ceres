@@ -30,6 +30,10 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
             qInfo() << "Query lens names received.";
             onQueryLensNames();
             break;
+        case eQUERY_SHUTTER_STATE:
+            qInfo() << "Query shutter state received.";
+            onQueryShutterState();
+            break;
         default:
             qWarning() << "Unknown query state received: " << query;
         }
@@ -56,6 +60,18 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
     case ePacketType::CALC_BACKGROUND:
     {
         onCalcBackground();
+        break;
+    }
+    case ePacketType::SET_SHUTTER_STATE:
+    {
+        auto state = to_set_shutter_state_1(hdr.length, buffer);
+
+        if (state == hyspex_eShutterState::eShutterState_OPEN)
+            onOpenShutter();
+
+        if (state == hyspex_eShutterState::eShutterState_CLOSED)
+            onCloseShutter();
+
         break;
     }
     default:

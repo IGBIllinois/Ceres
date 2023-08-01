@@ -11,7 +11,7 @@ cHySpexSWIR_384_PropertyPage_Remote::cHySpexSWIR_384_PropertyPage_Remote(QWidget
 		cHySpexSWIR_384_PropertiesNetEncoder(255)
 {}
 
-cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::string& type)
+cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry)
 {
 	if (type == "SWIR-384")
 	{
@@ -72,6 +72,9 @@ void cHySpexSWIR_384_PropertyPage_Remote::onLensNames(const std::vector<std::str
 
 
 void cHySpexSWIR_384_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
+{}
+
+void cHySpexSWIR_384_PropertyPage_Remote::onShutterState(eShutterState state)
 {}
 
 void cHySpexSWIR_384_PropertyPage_Remote::showPage()

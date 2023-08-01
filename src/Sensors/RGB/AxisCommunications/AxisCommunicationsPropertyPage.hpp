@@ -29,7 +29,7 @@ public:
     void doLayout() override;
 
 public:
-    cExperimentState* createState(const std::string& type) override;
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry) override;
 
 protected:
     QLabel* mpCameraIdLabel = nullptr;

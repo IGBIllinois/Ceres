@@ -57,6 +57,28 @@ void cHySpexCamera_Controller::txLensNames(cHySpexCamera_ControllerNetEncoder* e
     encoder->sendLensNames(mpModel->getLensNames());
 }
 
+void cHySpexCamera_Controller::txShutterState(cHySpexCamera_ControllerNetEncoder* encoder)
+{
+    switch (mpModel->getShutterStatus())
+    {
+    case hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN:
+        encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_OPEN);
+        break;
+    case hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED:
+        encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_CLOSED);
+        break;
+    case hyspex::ShutterStatus::HYSPEX_SHUTTER_FAIL_CLOSE:
+    case hyspex::ShutterStatus::HYSPEX_SHUTTER_FAIL_OPEN:
+        encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_ERROR);
+        break;
+    case hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN:
+    case hyspex::ShutterStatus::HYSPEX_SHUTTER_PENDING_OPEN:
+    case hyspex::ShutterStatus::HYSPEX_SHUTTER_PENDING_CLOSE:
+        encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_UNKNOWN);
+        break;
+    }
+}
+
 /*
 void cHySpexCamera_Controller::processStream(const void* pBuffer, std::size_t buf_length)
 {

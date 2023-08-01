@@ -25,10 +25,14 @@ public:
 protected:
     void onQueryState() override;
     void onQueryLensNames() override;
+    void onQueryShutterState() override;
     void onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us) override;
     void onSetLensName(const std::string& lens_name) override;
     void onSetNumOfBackgrounds(int num_backgrounds) override;
     void onCalcBackground() override;
+
+    void onOpenShutter() override;
+    void onCloseShutter() override;
 
 protected:
     /**

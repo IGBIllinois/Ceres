@@ -30,11 +30,13 @@ namespace hyspex
 		SET_LENS_NAME = 3,
 		SET_NUM_BACKGROUNDS = 4,
 		CALC_BACKGROUND = 5,
+		SET_SHUTTER_STATE = 6,
 
 		// Controller -> Property Page
 		CURRENT_STATE = 1000,
 		LENS_NAMES = 1001,
 		BACKGROUND_REPLY = 1002,
+		SHUTTER_STATE_REPLY = 1003,
 	};
 
 
@@ -90,6 +92,13 @@ namespace hyspex
 	/*** send/receive the background reply message ***/
 	hyspex_eBackgroundReply to_background_reply_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_background_reply(hyspex_eBackgroundReply reply, net_buffer& buffer);
+
+	/*** send/receive the shutter state set/reply message ***/
+	hyspex_eShutterState to_set_shutter_state_1(std::uint16_t length, const net_buffer_view& buffer);
+	int encode_set_shutter_state(hyspex_eShutterState state, net_buffer& buffer);
+
+	hyspex_eShutterState to_shutter_state_reply_1(std::uint16_t length, const net_buffer_view& buffer);
+	int encode_shutter_state_reply(hyspex_eShutterState state, net_buffer& buffer);
 
 } // End of namespace hyspex
 

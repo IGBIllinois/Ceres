@@ -67,9 +67,13 @@ void cHySpexVNIR_3000N_Model_net::setNumOfBackgrounds(int num_backgrounds)
 }
 
 void cHySpexVNIR_3000N_Model_net::calcBackground()
-{
+{}
 
-}
+void cHySpexVNIR_3000N_Model_net::open_shutter()
+{}
+
+void cHySpexVNIR_3000N_Model_net::close_shutter()
+{}
 
 
 

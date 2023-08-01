@@ -38,6 +38,9 @@ protected:
     enum class eBackgroundReply {GOOD, FAILED, ABORTED};
     virtual void onBackgroundReply(eBackgroundReply reply) = 0;
 
+    enum class eShutterState { UNKNOWN, OPEN, CLOSED, PENDING_OPEN, PENDING_CLOSED, ERROR };
+    virtual void onShutterState(eShutterState reply) = 0;
+
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
     virtual void processPacket(hyspex::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) = 0;

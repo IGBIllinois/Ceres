@@ -40,13 +40,13 @@ void cHySpexVNIR_3000N_Controller::onBackgroundComplete()
     switch(status)
     {
     case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
-        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_GOOD);
+        sendBackgroundReply(hyspex_eBackgroundReply::eBackgroundReply_GOOD);
         break;
     case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
-        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_ABORTED);
+        sendBackgroundReply(hyspex_eBackgroundReply::eBackgroundReply_ABORTED);
         break;
     default:
-        sendBackgroundReply(hyspex_eBackgroundReply::eQUERY_FAILED);
+        sendBackgroundReply(hyspex_eBackgroundReply::eBackgroundReply_FAILED);
         break;
     }
 }
@@ -59,6 +59,11 @@ void cHySpexVNIR_3000N_Controller::onQueryState()
 void cHySpexVNIR_3000N_Controller::onQueryLensNames()
 {
     txLensNames(this);
+}
+
+void cHySpexVNIR_3000N_Controller::onQueryShutterState()
+{
+    txShutterState(this);
 }
 
 void cHySpexVNIR_3000N_Controller::onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
@@ -78,4 +83,16 @@ void cHySpexVNIR_3000N_Controller::onCalcBackground()
 {
     mpModel->calcBackground();
 }
+
+void cHySpexVNIR_3000N_Controller::onOpenShutter()
+{
+    mpModel->open_shutter();
+}
+
+void cHySpexVNIR_3000N_Controller::onCloseShutter()
+{
+    mpModel->close_shutter();
+}
+
+
 

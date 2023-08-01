@@ -370,6 +370,16 @@ void cHySpexSWIR_384_Model_direct::calcBackground()
     mBackgroundState = eBgStates::SH_CLOSE;
 }
 
+void cHySpexSWIR_384_Model_direct::open_shutter()
+{
+    mCamera->openShutter();
+}
+
+void cHySpexSWIR_384_Model_direct::close_shutter()
+{
+    mCamera->closeShutter();
+}
+
 
 /********************************************************************
  *  Status Callback Methods

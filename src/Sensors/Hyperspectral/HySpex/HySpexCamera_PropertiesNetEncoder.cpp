@@ -22,6 +22,12 @@ void cHySpexCamera_PropertiesNetEncoder::sendQueryLensNames()
     sendData();
 }
 
+void cHySpexCamera_PropertiesNetEncoder::sendQueryShutterState()
+{
+    encode_hyspex_query(eQUERY_SHUTTER_STATE, mBuffer);
+    sendData();
+}
+
 void cHySpexCamera_PropertiesNetEncoder::sendAcquisitionParameters(std::uint16_t average_frame,
     std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {
@@ -44,6 +50,18 @@ void cHySpexCamera_PropertiesNetEncoder::sendNumOfBackgrounds(int num_background
 void cHySpexCamera_PropertiesNetEncoder::sendCalcBackground()
 {
     encode_calc_background(mBuffer);
+    sendData();
+}
+
+void cHySpexCamera_PropertiesNetEncoder::sendOpenShutter()
+{
+    encode_set_shutter_state(hyspex_eShutterState::eShutterState_OPEN, mBuffer);
+    sendData();
+}
+
+void cHySpexCamera_PropertiesNetEncoder::sendCloseShutter()
+{
+    encode_set_shutter_state(hyspex_eShutterState::eShutterState_CLOSED, mBuffer);
     sendData();
 }
 

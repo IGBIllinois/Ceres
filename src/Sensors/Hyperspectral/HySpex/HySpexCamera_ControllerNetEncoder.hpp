@@ -31,6 +31,8 @@ public:
     void sendLensNames(const std::vector<std::string>& names);
 
     void sendBackgroundReply(hyspex_eBackgroundReply reply);
+
+    void sendShutterStateReply(hyspex_eShutterState state);
 };
 
 

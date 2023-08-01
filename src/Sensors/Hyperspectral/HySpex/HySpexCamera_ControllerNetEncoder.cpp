@@ -41,3 +41,9 @@ void cHySpexCamera_ControllerNetEncoder::sendBackgroundReply(hyspex_eBackgroundR
     encode_background_reply(reply, mBuffer);
     sendData();
 }
+
+void cHySpexCamera_ControllerNetEncoder::sendShutterStateReply(hyspex_eShutterState state)
+{
+    encode_shutter_state_reply(state, mBuffer);
+    sendData();
+}

@@ -358,3 +358,62 @@ int hyspex::encode_background_reply(hyspex_eBackgroundReply reply, net_buffer& b
 
     return sizeof(sPacketHeader_t) + hdr.length;
 }
+
+
+/*** send/receive the shutter state reply message ***/
+hyspex_eShutterState hyspex::to_set_shutter_state_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    hyspex_SetShutterState_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+    return pckt.state();
+}
+
+int hyspex::encode_set_shutter_state(hyspex_eShutterState state, net_buffer& buffer)
+{
+    hyspex_SetShutterState_1 pckt;
+    pckt.set_state(state);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SET_SHUTTER_STATE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+
+hyspex_eShutterState hyspex::to_shutter_state_reply_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    hyspex_ShutterStateReply_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+    return pckt.state();
+}
+
+int hyspex::encode_shutter_state_reply(hyspex_eShutterState state, net_buffer& buffer)
+{
+    hyspex_ShutterStateReply_1 pckt;
+    pckt.set_state(state);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SHUTTER_STATE_REPLY);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+

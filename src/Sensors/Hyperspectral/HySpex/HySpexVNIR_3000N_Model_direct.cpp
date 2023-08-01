@@ -402,6 +402,17 @@ void cHySpexVNIR_3000N_Model_direct::calcBackground()
     mBackgroundState = eBgStates::SH_CLOSE;
 }
 
+
+void cHySpexVNIR_3000N_Model_direct::open_shutter()
+{
+    mCamera->openShutter();
+}
+
+void cHySpexVNIR_3000N_Model_direct::close_shutter()
+{
+    mCamera->closeShutter();
+}
+
 void cHySpexVNIR_3000N_Model_direct::computePercentSaturation(bool compute)
 {
     mCamera->openShutter();

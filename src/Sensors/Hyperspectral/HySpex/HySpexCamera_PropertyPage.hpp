@@ -29,7 +29,7 @@ public:
     virtual void doCalcBackground() = 0;
 
 public:
-    cExperimentState* createState(const std::string& type) override;
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry) override;
 
 protected:
     QGroupBox* getLensLayout();

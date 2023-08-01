@@ -36,14 +36,40 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
         auto reply = to_background_reply_1(hdr.length, buffer);
         switch (reply)
         {
-        case hyspex_eBackgroundReply::eQUERY_GOOD:
+        case hyspex_eBackgroundReply::eBackgroundReply_GOOD:
             onBackgroundReply(eBackgroundReply::GOOD);
             break;
-        case hyspex_eBackgroundReply::eQUERY_ABORTED:
+        case hyspex_eBackgroundReply::eBackgroundReply_ABORTED:
             onBackgroundReply(eBackgroundReply::ABORTED);
             break;
-        case hyspex_eBackgroundReply::eQUERY_FAILED:
+        case hyspex_eBackgroundReply::eBackgroundReply_FAILED:
             onBackgroundReply(eBackgroundReply::FAILED);
+            break;
+        }
+        break;
+    }
+    case ePacketType::SHUTTER_STATE_REPLY:
+    {
+        auto reply = to_shutter_state_reply_1(hdr.length, buffer);
+        switch (reply)
+        {
+        case hyspex_eShutterState::eShutterState_UNKNOWN:
+            onShutterState(eShutterState::UNKNOWN);
+            break;
+        case hyspex_eShutterState::eShutterState_OPEN:
+            onShutterState(eShutterState::OPEN);
+            break;
+        case hyspex_eShutterState::eShutterState_CLOSED:
+            onShutterState(eShutterState::CLOSED);
+            break;
+        case hyspex_eShutterState::eShutterState_PENDING_OPEN:
+            onShutterState(eShutterState::PENDING_OPEN);
+            break;
+        case hyspex_eShutterState::eShutterState_PENDING_CLOSE:
+            onShutterState(eShutterState::PENDING_CLOSED);
+            break;
+        case hyspex_eShutterState::eShutterState_ERROR:
+            onShutterState(eShutterState::ERROR);
             break;
         }
         break;

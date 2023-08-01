@@ -47,6 +47,9 @@ public:
     void setNumOfBackgrounds(int num_backgrounds) override;
     void calcBackground() override;
 
+    void open_shutter() override;
+    void close_shutter() override;
+
 protected:
     void update() override;
 

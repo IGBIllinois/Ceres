@@ -8,7 +8,7 @@ syntax = "proto3";
 
 
 /******************************************************************************
- * Property Page -> Sensor Controller
+ * Enums used in various messages
  *****************************************************************************/
 
  enum hyspex_eQuery 
@@ -16,7 +16,29 @@ syntax = "proto3";
     eQUERY_UNSPECIFIED = 0;
     eQUERY_STATE = 1;
     eQUERY_LENS_NAMES = 2;
+    eQUERY_SHUTTER_STATE = 3;
 }
+
+ enum hyspex_eBackgroundReply
+{
+    eBackgroundReply_GOOD = 0;
+    eBackgroundReply_FAILED = 1;
+    eBackgroundReply_ABORTED = 2;
+}
+
+ enum hyspex_eShutterState
+{
+    eShutterState_UNKNOWN        = 0;
+    eShutterState_OPEN           = 1;
+    eShutterState_CLOSED         = 2;
+    eShutterState_PENDING_OPEN   = 3;
+    eShutterState_PENDING_CLOSE  = 4;
+    eShutterState_ERROR          = 5;
+}
+
+/******************************************************************************
+ * Property Page -> Sensor Controller
+ *****************************************************************************/
 
 message hyspex_QueryMessage_1 
 {
@@ -38,6 +60,11 @@ message hyspex_SetLens_1
 message hyspex_SetNumOfBackgrounds_1 
 {
     uint32 num_backgrounds = 1;
+}
+
+message hyspex_SetShutterState_1 
+{
+    hyspex_eShutterState state = 1;
 }
 
 
@@ -71,14 +98,12 @@ message hyspex_SetNumOfBackgrounds_1
     string lens_name_9 = 10;
 }
 
- enum hyspex_eBackgroundReply
-{
-    eQUERY_GOOD = 0;
-    eQUERY_FAILED = 1;
-    eQUERY_ABORTED = 2;
-}
-
 message hyspex_BackgroundReply_1 
 {
 	hyspex_eBackgroundReply reply = 1;
+}
+
+message hyspex_ShutterStateReply_1 
+{
+	hyspex_eShutterState state = 1;
 }
