@@ -189,12 +189,12 @@ bool cSpidercamModel::systemReady() const
     return true;
 }
 
-cExperimentState* cSpidercamModel::createState(const std::string& type)
+cExperimentState* cSpidercamModel::createState(const std::string& type, const nlohmann::json& expDoc)
 {
     if (type == "movement")
         return new cSpidercamExperimentState_Movement(mCurrentPosition, mController, mPositionTolerance_mm);
 
-    return cExperimentControlModel::createState(type);
+    return cExperimentControlModel::createState(type, expDoc);
 }
 
 void cSpidercamModel::startExperiment()

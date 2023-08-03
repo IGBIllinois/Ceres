@@ -18,8 +18,9 @@ bool cOuster_Properties_Remote::recording()
 	return false;
 }
 
-void cOuster_Properties_Remote::configure(const nlohmann::json& stateDoc)
+bool cOuster_Properties_Remote::configure(const nlohmann::json& stateDoc)
 {
+	return true;
 }
 
 void cOuster_Properties_Remote::cleanup()
@@ -28,12 +29,12 @@ void cOuster_Properties_Remote::cleanup()
 	destroy();
 }
 
-void cOuster_Properties_Remote::initialize()
+bool cOuster_Properties_Remote::initialize()
 {
 	if (!cExperimentStateRemoteInterface::initialize(mHostname, mPort, mUse_IpV6, mLocalIpAddress))
-		return;
+		return false;
 
-	openConnection();
+	return openConnection();
 }
 
 void cOuster_Properties_Remote::run()

@@ -24,6 +24,8 @@ cExperimentStateMachine::cExperimentStateMachine(QObject* parent)
 
 void cExperimentStateMachine::addStateCreator(cExperimentStateCreator* pCreator)
 {
+    std::lock_guard<std::mutex> lock{mStateCreatorsMutex};
+
     if (std::find(mStateCreators.begin(), mStateCreators.end(), pCreator) == mStateCreators.end())
     {
         mStateCreators.push_back(pCreator);
@@ -32,6 +34,8 @@ void cExperimentStateMachine::addStateCreator(cExperimentStateCreator* pCreator)
 
 void cExperimentStateMachine::removeStateCreator(cExperimentStateCreator* pCreator)
 {
+    std::lock_guard<std::mutex> lock{mStateCreatorsMutex};
+
     auto it = std::remove(mStateCreators.begin(), mStateCreators.end(), pCreator);
 }
 
@@ -47,12 +51,12 @@ void cExperimentStateMachine::recordingStateChanged(bool recording)
 
 bool cExperimentStateMachine::hasExperiment() const
 {
-    return !mExperiment.empty();
+    return !mExperimentStates.empty();
 }
 
 bool cExperimentStateMachine::experimentRequiresDataFile() const
 {
-	for (auto* state : mExperiment)
+	for (auto* state : mExperimentStates)
 	{
         if (state->needsDataFile())
             return true;
@@ -77,16 +81,18 @@ void cExperimentStateMachine::clearExperiment()
     mActiveStateNumber = 0;
     mpActiveState = nullptr;
 
-    for (std::size_t i = 0; i < mExperiment.size(); ++i)
+    std::lock_guard<std::mutex> lock{mPendingDeleteMutex};
+
+    for (std::size_t i = 0; i < mExperimentStates.size(); ++i)
     {
-        delete mExperiment[i];
-        mExperiment[i] = nullptr;
+        mPendingDelete.emplace_back(mExperimentStates[i]);
+        mExperimentStates[i] = nullptr;
     }
 
-    mExperiment.clear();
+    mExperimentStates.clear();
 }
 
-cExperimentState* cExperimentStateMachine::createState(const std::string& type)
+cExperimentState* cExperimentStateMachine::createState(const std::string& type, const nlohmann::json& expDoc)
 {
     if (type == "delay")
         return new cExperimentState_Delay();
@@ -98,47 +104,70 @@ cExperimentState* cExperimentStateMachine::createState(const std::string& type)
 }
 
 
-bool cExperimentStateMachine::loadExperiment(const std::string& expName, const nlohmann::json& expDoc, QThread* pThread)
+bool cExperimentStateMachine::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
 {
     using namespace experiment;
+    using namespace nlohmann;
 
     if (mRunning)
         return false;
 
     clearExperiment();
 
-    mExperiment.push_back(new cExperimentState_Dummy());
+    mExperimentStates.push_back(new cExperimentState_Dummy());
 
-    for (auto entry : expDoc)
+    try
     {
-        std::string type = entry["type"];
-
-        cExperimentState* pState = createState(type);
-
-        if (!pState)
+        for (auto entry : expDoc)
         {
-            for (auto* creator : mStateCreators)
+            std::string type = entry["type"];
+
+            cExperimentState* pState = createState(type, entry);
+
+            if (!pState)
             {
-                pState = creator->createState(type, entry);
-/*
-                if (pState)
+                for (auto* creator : mStateCreators)
                 {
-                    QObject* pObject = dynamic_cast<QObject*>(pState);
-                    if (pObject)
-                    {
-                        pObject->moveToThread(pThread);
-                    }
-                    break;
+                    pState = creator->createState(type, entry);
                 }
-*/
+            }
+
+            if (pState)
+            {
+                pState->configure(entry);
+                mExperimentStates.push_back(pState);
             }
         }
+    }
+    catch (const detail::parse_error& e)
+    {
+        QString msg = "Experiment \"";
+        msg += QString::fromStdString(expName);
+        msg += "\" failed to load due to parse error.";
+        emitStatusMessage(msg);
 
-        if (pState)
-        {
-            pState->configure(entry);
-            mExperiment.push_back(pState);
-        }
+        emit experimentStateChanged(eState::EXP_ERROR);
+        return false;
+    }
+    catch (const detail::type_error& e)
+    {
+        QString msg = "Experiment \"";
+        msg += QString::fromStdString(expName);
+        msg += "\" failed to load due to type error.";
+        emitStatusMessage(msg);
+
+        emit experimentStateChanged(eState::EXP_ERROR);
+        return false;
+    }
+    catch (const detail::exception& e)
+    {
+        QString msg = "Experiment \"";
+        msg += QString::fromStdString(expName);
+        msg += "\" failed to load due to unknown error.";
+        emitStatusMessage(msg);
+
+        emit experimentStateChanged(eState::EXP_ERROR);
+        return false;
     }
 
     mExperimentName = expName;
@@ -158,7 +187,7 @@ void cExperimentStateMachine::startExperiment()
 {
     using namespace experiment;
 
-    if (mExperiment.empty())
+    if (mExperimentStates.empty())
         return;
 
     if (mPaused)
@@ -179,7 +208,7 @@ void cExperimentStateMachine::startExperiment()
 
     mRunning = true;
     mActiveStateNumber = 0;
-    mpActiveState = mExperiment[mActiveStateNumber];
+    mpActiveState = mExperimentStates[mActiveStateNumber];
     mpActiveState->initialize();
 
     emit experimentStateChanged(eState::RUNNING);
@@ -203,7 +232,9 @@ void cExperimentStateMachine::terminateExperiment()
     recordingStateChanged(false);
 
     if (mpActiveState)
+    {
         mpActiveState->stop();
+    }
 
     mRunning = false;
     mPaused = false;
@@ -231,6 +262,17 @@ void cExperimentStateMachine::updateExperimentStateMachine()
 {
     using namespace experiment;
 
+    if (!mPendingDelete.empty())
+    {
+        std::lock_guard<std::mutex> lock{mPendingDeleteMutex};
+        for (auto state : mPendingDelete)
+        {
+            delete state;
+        }
+
+        mPendingDelete.clear();
+    }
+
     if (!mRunning || (mpActiveState == nullptr)) return;
 
     mRecording = mpActiveState->recording();
@@ -256,15 +298,25 @@ void cExperimentStateMachine::updateExperimentStateMachine()
     {
         ++mActiveStateNumber;
 
-        if (mActiveStateNumber < mExperiment.size())
+        if (mActiveStateNumber < mExperimentStates.size())
         {
             mpActiveState->cleanup();
-            mpActiveState = mExperiment[mActiveStateNumber];
-            mpActiveState->initialize();
-            QString msg;
-            msg.sprintf("Step %d: ", mActiveStateNumber);
-            msg += mpActiveState->getStatusStr();
-            emit experimentStatus(msg);
+            mpActiveState = mExperimentStates[mActiveStateNumber];
+            if (mpActiveState->initialize())
+            {
+                QString msg;
+                msg.sprintf("Step %d: ", mActiveStateNumber);
+                msg += mpActiveState->getStatusStr();
+                emit experimentStatus(msg);
+            }
+            else
+            {
+                recordingStateChanged(false);
+                mpActiveState->cleanup();
+                mRunning = false;
+                mExperimentName.clear();
+                emit experimentStateChanged(eState::EXP_ERROR);
+            }
         }
         else
         {

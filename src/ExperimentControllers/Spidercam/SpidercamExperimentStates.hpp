@@ -17,11 +17,11 @@ public:
 
 	QString getStatusStr() override;
 
-	void configure(const nlohmann::json& stateDoc) override;
+	bool configure(const nlohmann::json& stateDoc) override;
 
 	bool recording() override;
 
-	void initialize() override;
+	bool initialize() override;
 	void run() override;
 	void pause() override;
 	void stop() override;

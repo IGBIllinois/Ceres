@@ -2,12 +2,12 @@
 #pragma once
 
 #include "ExperimentTypes.hpp"
-//#include "ExperimentState.hpp"
 #include "../Utilities/Utilities.hpp"
 
 #include <QObject>
 #include <nlohmann/json.hpp>
 #include <vector>
+#include <mutex>
 
 // Forward Declarations
 class cExperimentState;
@@ -27,7 +27,7 @@ public:
     /*
      * Load an experiment from JSON file.
      */
-    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc, QThread* pThread);
+    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
 
     /*
      * Is there an experiment (state machine) loaded in the experiment
@@ -87,7 +87,7 @@ public:
 protected:
     cExperimentStateMachine(QObject* parent = nullptr);
 
-    virtual cExperimentState* createState(const std::string& type);
+    virtual cExperimentState* createState(const std::string& type, const nlohmann::json& expState);
 
     void recordingStateChanged(bool recording);
 
@@ -103,11 +103,15 @@ protected:
     edge_detect<bool>	mRecording;
 
 private:
+    std::mutex mStateCreatorsMutex;
     std::vector<cExperimentStateCreator*> mStateCreators;
 
     std::string mExperimentName;
-    std::vector<cExperimentState*> mExperiment;
+
+    std::vector<cExperimentState*> mExperimentStates;
     std::size_t mActiveStateNumber;
     cExperimentState* mpActiveState;
 
+    std::mutex mPendingDeleteMutex;
+    std::vector<cExperimentState*> mPendingDelete;
 };

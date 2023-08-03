@@ -358,6 +358,8 @@ bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
 
 bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
 {
+    using namespace nlohmann;
+
     std::ifstream in;
     in.open(experiment_file);
 
@@ -367,9 +369,23 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
     }
 
     nlohmann::json jsonDoc;
-    in >> jsonDoc;
+    std::string name;
 
-    std::string name = jsonDoc["experiment_name"];
+    try
+    {
+        in >> jsonDoc;
+
+        name = jsonDoc["experiment_name"];
+    }
+    catch (const detail::exception& e)
+    {
+        QString msg = "Failed to loading experiment file: ";
+        msg += QString::fromStdString(experiment_file.string());
+        onWarningMessage("File Error", msg);
+
+        return false;
+    }
+
 
     QString msg = "Loading experiment \"";
     msg += QString::fromStdString(name);
@@ -856,9 +872,17 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
 
         if (widgets.pModel == nullptr)
         {
-            std::string msg = "Unknown sensor type \"";
+            std::string msg = "Unknown sensor type or sensor not found: type is \"";
             msg += type;
-            msg += "\".";
+            msg += "\"";
+
+            if (sensor.contains("sensor"))
+            {
+                msg += ", sensor name: ";
+                msg += sensor["sensor"];
+            }
+            else
+                msg += ".";
 
             QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
             mb.exec();
@@ -889,13 +913,11 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
             validSensor = false;
         }
 
-//*BAF
         if (!validSensor)
         {
             remove_sensor(type, widgets);
             continue;
         }
-//*/
 
         mpModel->addSensor(widgets.pModel);
 

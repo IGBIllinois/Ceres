@@ -4,7 +4,10 @@
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
+#include <QMessageBox>
+
 #include <tuple>
+
 
 namespace
 {
@@ -165,198 +168,239 @@ bool cCtrlDataModel::experimentRequiresDataFile() const
 
 bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
 {
+    using namespace nlohmann;
+
     if (isExperimentRunning())
     {
         return false;
     }
 
-    if (!expDoc.contains("experiment"))
+    try
     {
-        return false;
-    }
+        if (!expDoc.contains("experiment"))
+        {
+            return false;
+        }
     
-    std::string ctrl = expDoc["controller"];
-    if (ctrl.compare(mThread.mpController->descriptor()) != 0)
-    {
-        return false;
-    }
+        std::string ctrl = expDoc["controller"];
+        if (ctrl.compare(mThread.mpController->descriptor()) != 0)
+        {
+            return false;
+        }
 
-    auto required_sensors = expDoc["sensors"];
+        auto required_sensors = expDoc["sensors"];
 
 /*
-    for (auto required_sensor : required_sensors)
-    {
-        bool found = false;
-
-        for (auto& sensor : mThread.mActiveSensors)
+        for (auto required_sensor : required_sensors)
         {
-            if (required_sensor == sensor->descriptor())
+            bool found = false;
+
+            for (auto& sensor : mThread.mActiveSensors)
             {
-                found = true;
-                break;
+                if (required_sensor == sensor->descriptor())
+                {
+                    found = true;
+                    break;
+                }
             }
         }
-    }
 */
 
-    if (mThread.mpController->loadExperiment(expName, expDoc["experiment"], &mThread))
-    {
-        mPrincipalInvestigator.clear();
-        mResearchers.clear();
-        mSpecies.clear();
-        mCultivar.clear();
-        mPermitInfo.clear();
-        mTreatments.clear();
-        mConstructName.clear();
-        mEventNumbers.clear();
-        mFieldDesign.clear();
-        mComments.clear();
-        mPlantingDate = 0;
-        mHarvestDate = 0;
-
-        mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
-
-        if (expDoc.contains("principal investigator"))
+        if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
         {
-            mPrincipalInvestigator = expDoc["principal investigator"];
-        }
+            mPrincipalInvestigator.clear();
+            mResearchers.clear();
+            mSpecies.clear();
+            mCultivar.clear();
+            mPermitInfo.clear();
+            mTreatments.clear();
+            mConstructName.clear();
+            mEventNumbers.clear();
+            mFieldDesign.clear();
+            mComments.clear();
+            mPlantingDate = 0;
+            mHarvestDate = 0;
 
-        if (expDoc.contains("researcher"))
-        {
-            mResearchers.push_back( expDoc["researcher"] );
-        }
+            mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
 
-        if (expDoc.contains("researchers"))
-        {
-            auto researchers = expDoc["researchers"];
-            for (auto it = researchers.begin(); it != researchers.end(); ++it)
-                mResearchers.push_back(*it);
-        }
-
-        if (expDoc.contains("species"))
-        {
-            mSpecies = expDoc["species"];
-        }
-
-        if (expDoc.contains("cultivar"))
-        {
-            mCultivar = expDoc["cultivar"];
-        }
-
-        if (expDoc.contains("permit info"))
-        {
-            mPermitInfo = expDoc["permit info"];
-        }
-
-        if (expDoc.contains("construct"))
-        {
-            mConstructName = expDoc["construct"];
-        }
-
-        if (expDoc.contains("event number"))
-        {
-            mEventNumbers.push_back( expDoc["event number"] );
-        }
-
-        if (expDoc.contains("event numbers"))
-        {
-            auto event_numbers = expDoc["event numbers"];
-            for (auto it = event_numbers.begin(); it != event_numbers.end(); ++it)
-                mEventNumbers.push_back(*it);
-        }
-
-        if (expDoc.contains("field design"))
-        {
-            mFieldDesign = expDoc["field design"];
-        }
-
-        if (expDoc.contains("treatment"))
-        {
-            mTreatments.push_back(expDoc["treatment"]);
-        }
-
-        if (expDoc.contains("treatments"))
-        {
-            auto treatments = expDoc["treatments"];
-            if (treatments.is_string())
+            if (expDoc.contains("principal investigator"))
             {
-                mTreatments.push_back(treatments);
+                mPrincipalInvestigator = expDoc["principal investigator"];
             }
-            else if (treatments.is_array())
+
+            if (expDoc.contains("researcher"))
             {
-                for (auto it = treatments.begin(); it != treatments.end(); ++it)
-                    mTreatments.push_back(*it);
+                mResearchers.push_back( expDoc["researcher"] );
             }
-        }
 
-        if (expDoc.contains("comment"))
-        {
-            mComments.push_back(expDoc["comment"]);
-        }
-
-        if (expDoc.contains("comments"))
-        {
-            auto comments = expDoc["comments"];
-            if (comments.is_string())
+            if (expDoc.contains("researchers"))
             {
-                mComments.push_back(comments);
+                auto researchers = expDoc["researchers"];
+                for (auto it = researchers.begin(); it != researchers.end(); ++it)
+                    mResearchers.push_back(*it);
             }
-            else if (comments.is_array())
+
+            if (expDoc.contains("species"))
             {
-                for (auto it = comments.begin(); it != comments.end(); ++it)
-                    mComments.push_back(*it);
+                mSpecies = expDoc["species"];
             }
-        }
 
-        std::string month;
-        std::string day;
-        std::string year;
+            if (expDoc.contains("cultivar"))
+            {
+                mCultivar = expDoc["cultivar"];
+            }
 
-        if (expDoc.contains("planting date (m/d/y)"))
-        {
-            std::string date = expDoc["planting date (m/d/y)"];
-            std::tie(month, day, year) = date_split(date);
-        }
+            if (expDoc.contains("permit info"))
+            {
+                mPermitInfo = expDoc["permit info"];
+            }
 
-        if (expDoc.contains("planting date (d/m/y)"))
-        {
-            std::string date = expDoc["planting date (d/m/y)"];
-            std::tie(day, month, year) = date_split(date);
-        }
+            if (expDoc.contains("construct"))
+            {
+                mConstructName = expDoc["construct"];
+            }
 
-        if (expDoc.contains("planting date (y/m/d)"))
-        {
-            std::string date = expDoc["planting date (y/m/d)"];
-            std::tie(year, month, day) = date_split(date);
-        }
+            if (expDoc.contains("event number"))
+            {
+                mEventNumbers.push_back( expDoc["event number"] );
+            }
 
-        mPlantingDate = to_time_t(month, day, year);
+            if (expDoc.contains("event numbers"))
+            {
+                auto event_numbers = expDoc["event numbers"];
+                for (auto it = event_numbers.begin(); it != event_numbers.end(); ++it)
+                    mEventNumbers.push_back(*it);
+            }
 
-        month.clear();
-        day.clear();
-        year.clear();
+            if (expDoc.contains("field design"))
+            {
+                mFieldDesign = expDoc["field design"];
+            }
 
-        if (expDoc.contains("target harvest date (m/d/y)"))
-        {
-            std::string date = expDoc["target harvest date (m/d/y)"];
-            std::tie(month, day, year) = date_split(date);
-        }
+            if (expDoc.contains("treatment"))
+            {
+                mTreatments.push_back(expDoc["treatment"]);
+            }
 
-        if (expDoc.contains("target harvest date (d/m/y)"))
-        {
-            std::string date = expDoc["target harvest date (d/m/y)"];
-            std::tie(day, month, year) = date_split(date);
-        }
+            if (expDoc.contains("treatments"))
+            {
+                auto treatments = expDoc["treatments"];
+                if (treatments.is_string())
+                {
+                    mTreatments.push_back(treatments);
+                }
+                else if (treatments.is_array())
+                {
+                    for (auto it = treatments.begin(); it != treatments.end(); ++it)
+                        mTreatments.push_back(*it);
+                }
+            }
 
-        if (expDoc.contains("target harvest date (y/m/d)"))
-        {
-            std::string date = expDoc["target harvest date (y/m/d)"];
-            std::tie(year, month, day) = date_split(date);
-        }
+            if (expDoc.contains("comment"))
+            {
+                mComments.push_back(expDoc["comment"]);
+            }
+
+            if (expDoc.contains("comments"))
+            {
+                auto comments = expDoc["comments"];
+                if (comments.is_string())
+                {
+                    mComments.push_back(comments);
+                }
+                else if (comments.is_array())
+                {
+                    for (auto it = comments.begin(); it != comments.end(); ++it)
+                        mComments.push_back(*it);
+                }
+            }
+
+            std::string month;
+            std::string day;
+            std::string year;
+
+            if (expDoc.contains("planting date (m/d/y)"))
+            {
+                std::string date = expDoc["planting date (m/d/y)"];
+                std::tie(month, day, year) = date_split(date);
+            }
+
+            if (expDoc.contains("planting date (d/m/y)"))
+            {
+                std::string date = expDoc["planting date (d/m/y)"];
+                std::tie(day, month, year) = date_split(date);
+            }
+
+            if (expDoc.contains("planting date (y/m/d)"))
+            {
+                std::string date = expDoc["planting date (y/m/d)"];
+                std::tie(year, month, day) = date_split(date);
+            }
+
+            mPlantingDate = to_time_t(month, day, year);
+
+            month.clear();
+            day.clear();
+            year.clear();
+
+            if (expDoc.contains("target harvest date (m/d/y)"))
+            {
+                std::string date = expDoc["target harvest date (m/d/y)"];
+                std::tie(month, day, year) = date_split(date);
+            }
+
+            if (expDoc.contains("target harvest date (d/m/y)"))
+            {
+                std::string date = expDoc["target harvest date (d/m/y)"];
+                std::tie(day, month, year) = date_split(date);
+            }
+
+            if (expDoc.contains("target harvest date (y/m/d)"))
+            {
+                std::string date = expDoc["target harvest date (y/m/d)"];
+                std::tie(year, month, day) = date_split(date);
+            }
         
-        mHarvestDate = to_time_t(month, day, year);
+            mHarvestDate = to_time_t(month, day, year);
 
-        mExperimentDoc = to_string(expDoc);
+            mExperimentDoc = to_string(expDoc);
+        }
+    }
+    catch (const detail::parse_error& e)
+    {
+        QString msg = "Parse Error: ";
+        msg += e.what();
+        msg += "\n\n";
+        msg += "Skipping experiment: " + QString::fromStdString(expName);
+
+        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(expName), msg);
+        mb.exec();
+
+        return false;
+    }
+    catch (const detail::type_error& e)
+    {
+        QString msg = "Type Error: ";
+        msg += e.what();
+        msg += "\n\n";
+        msg += "Skipping experiment: " + QString::fromStdString(expName);
+
+        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(expName), msg);
+        mb.exec();
+
+        return false;
+    }
+    catch (const detail::exception& e)
+    {
+        QString msg = "Unknown Error: ";
+        msg += e.what();
+        msg += "\n\n";
+        msg += "Skipping experiment: " + QString::fromStdString(expName);
+
+        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(expName), msg);
+        mb.exec();
+
+        return false;
     }
 
     return true;
@@ -393,6 +437,14 @@ void cCtrlDataModel::onExperimentStateChange(experiment::eState state)
     {
         case eState::PAUSED:
             break;
+        case eState::EXP_ERROR:
+        {
+            doExperimentCleanup();
+
+            emit experimentTerminated();
+
+            break;
+        }
         case eState::COMPLETED:
         {
             doExperimentCleanup();
@@ -422,6 +474,8 @@ void cCtrlDataModel::doExperimentCleanup()
     mExperimentDoc.clear();
 	
     if (mThread.mpController)
+    {
         mThread.mpController->clearExperiment();
+    }
 }
 

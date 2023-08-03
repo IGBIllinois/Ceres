@@ -21,13 +21,13 @@ public:
 
 	virtual QString getStatusStr() = 0;
 
-	virtual void configure(const nlohmann::json& stateDoc) = 0;
+	virtual bool configure(const nlohmann::json& stateDoc) = 0;
 	virtual void cleanup() {};
 
 	virtual bool needsDataFile() { return recording(); }
 	virtual bool recording() = 0;
 
-	virtual void initialize() = 0;
+	virtual bool initialize() = 0;
 	virtual void run() = 0;
 	virtual void pause() = 0;
 	virtual void stop() = 0;

@@ -42,7 +42,7 @@ public:
 	/*
 	 * Create a experiment state for the state machine
 	 */
-	cExperimentState* createState(const std::string& type) override;
+	cExperimentState* createState(const std::string& type, const nlohmann::json& expState) override;
 
 	/**
 	 * Started the loaded experiment.

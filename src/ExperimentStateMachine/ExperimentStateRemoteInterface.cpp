@@ -63,7 +63,8 @@ bool cExperimentStateRemoteInterface::initialize(const std::string& hostname, ui
     }
 
     QHostInfo info = QHostInfo::fromName(QString::fromStdString(hostname));
-    if (info.error() != QHostInfo::NoError)
+    auto result = info.error();
+    if (result != QHostInfo::NoError)
     {
         return false;
     }

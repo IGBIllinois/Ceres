@@ -280,38 +280,47 @@ void cHySpexVNIR_3000N_Model_direct::update()
         emit sensorTempChanged(mSensorTemp_C);
     }
 
-    if (mBackgroundState != eBgStates::NONE)
+    if (mBgCurrentState != eBgStates::NONE)
     {
-        switch (mBackgroundState)
+        switch (mBgCurrentState)
         {
         case eBgStates::SH_CLOSE:
         {
             if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED)
             {
                 mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_PENDING;
-                mCamera->calculateBackgroundAsync(0, mNumBackgrounds);
-                mBackgroundState = eBgStates::COMPLETE;
+                unsigned int timeout_ms = ((mNumBackgrounds + 10) * mFramePeriod_us) / 1000;
+                mCamera->calculateBackgroundAsync(timeout_ms, mNumBackgrounds);
+                mBgCurrentState = eBgStates::STARTED;
             }
             break;
         }
-        case eBgStates::COMPLETE:
+        case eBgStates::STARTED:
         {
+            auto oldBackgroundStatus = mBackgroundStatus;
+
             mBackgroundStatus = mCamera->getBackgroundStatus();
             switch (mBackgroundStatus)
             {
             case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
             {
+                mCamera->stopCalculatingBackground();
                 mCamera->getBackgroundMatrix();
                 mCamera->openShutter();
-                mBackgroundState = eBgStates::SH_OPEN;
+                mBgCurrentState = eBgStates::SH_OPEN;
                 break;
             }
             case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
             {
                 mCamera->openShutter();
-                mBackgroundState = eBgStates::SH_OPEN;
+                mBgCurrentState = eBgStates::SH_OPEN;
                 break;
             }
+            }
+
+            if (oldBackgroundStatus != mBackgroundStatus)
+            {
+                emit bgStatusChanged();
             }
 
             break;
@@ -320,7 +329,7 @@ void cHySpexVNIR_3000N_Model_direct::update()
         {
             if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN)
             {
-                mBackgroundState = eBgStates::NONE;
+                mBgCurrentState = eBgStates::NONE;
                 emit backgroundComplete();
             }
             break;
@@ -334,7 +343,7 @@ void cHySpexVNIR_3000N_Model_direct::update()
 void cHySpexVNIR_3000N_Model_direct::enableDataRecording(cBlockDataFileWriter& file)
 {
     mCamera->openShutter();
-    mBackgroundState = eBgStates::NONE;
+    mBgCurrentState = eBgStates::NONE;
     cHySpexVNIR_3000N_Model::enableDataRecording(file);
 }
 
@@ -399,7 +408,14 @@ void cHySpexVNIR_3000N_Model_direct::setNumOfBackgrounds(int num_backgrounds)
 void cHySpexVNIR_3000N_Model_direct::calcBackground()
 {
     mCamera->closeShutter();
-    mBackgroundState = eBgStates::SH_CLOSE;
+
+    // Sometimes calculating a background gets stuck in the pending stage.
+    if (mBackgroundStatus == hyspex::BackgroundStatus::HYSPEX_BG_PENDING)
+    {
+        mCamera->stopCalculatingBackground();
+    }
+
+    mBgCurrentState = eBgStates::SH_CLOSE;
 }
 
 

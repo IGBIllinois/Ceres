@@ -20,12 +20,12 @@ public:
 	cOuster_Properties_Remote();
 	~cOuster_Properties_Remote();
 
-	void configure(const nlohmann::json& stateDoc) override;
+	bool configure(const nlohmann::json& stateDoc) override;
 	void cleanup() override;
 
 	bool recording() override;
 
-	void initialize() override;
+	bool initialize() override;
 	void run() override;
 	void pause() override;
 	void stop() override;

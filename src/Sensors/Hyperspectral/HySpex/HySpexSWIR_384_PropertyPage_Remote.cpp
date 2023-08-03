@@ -15,7 +15,21 @@ cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::st
 {
 	if (type == "SWIR-384")
 	{
-		return new cHySpexSWIR_384_Properties_Remote(this);
+		auto hostname = getHostname();
+		auto port = getPort();
+		auto localIp = getLocalIpAddress();
+		auto use_IpV6 = usingIpV6();
+
+		std::string cmd = entry["command"];
+
+		if (cmd == "background")
+			return new cHySpexCamera_Background_Remote(hostname, port, localIp, use_IpV6);
+
+		if (cmd == "close shutter")
+			return new cHySpexCamera_CloseShutter_Remote(hostname, port, localIp, use_IpV6);
+
+		if (cmd == "open shutter")
+			return new cHySpexCamera_OpenShutter_Remote(hostname, port, localIp, use_IpV6);
 	}
 
 	return nullptr;

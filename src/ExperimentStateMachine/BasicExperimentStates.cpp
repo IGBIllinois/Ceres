@@ -15,21 +15,40 @@ cExperimentState_Delay::cExperimentState_Delay()
 }
 
 
-void cExperimentState_Delay::configure(const nlohmann::json& stateDoc)
+bool cExperimentState_Delay::configure(const nlohmann::json& stateDoc)
 {
+	using namespace nlohmann;
+
 	mWaitTime_sec = 0;
 
-	if (stateDoc.contains("wait (sec)"))
-		mWaitTime_sec += stateDoc["wait (sec)"];
+	try
+	{
+		if (stateDoc.contains("wait (sec)"))
+			mWaitTime_sec += stateDoc["wait (sec)"];
 
-	if (stateDoc.contains("wait (min)"))
-		mWaitTime_sec += 60.0 * stateDoc["wait (min)"];
+		if (stateDoc.contains("wait (min)"))
+			mWaitTime_sec += 60.0 * stateDoc["wait (min)"];
 
-	if (stateDoc.contains("wait (hr)"))
-		mWaitTime_sec += 3600.0 * stateDoc["wait (hr)"];
+		if (stateDoc.contains("wait (hr)"))
+			mWaitTime_sec += 3600.0 * stateDoc["wait (hr)"];
 
-	if (stateDoc.contains("record"))
-		mRecording = stateDoc["record"];
+		if (stateDoc.contains("record"))
+			mRecording = stateDoc["record"];
+	}
+	catch (const detail::parse_error& e)
+	{
+		return false;
+	}
+	catch (const detail::type_error& e)
+	{
+		return false;
+	}
+	catch (const detail::exception& e)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 QString cExperimentState_Delay::getStatusStr()
@@ -45,10 +64,12 @@ bool cExperimentState_Delay::recording()
 	return mRecording;
 }
 
-void cExperimentState_Delay::initialize()
+bool cExperimentState_Delay::initialize()
 {
 	mElapsedTime_sec = 0;
 	mStart = std::chrono::steady_clock::now();
+
+	return true;
 }
 
 void cExperimentState_Delay::run()
@@ -84,13 +105,15 @@ cExperimentState_Pause::~cExperimentState_Pause()
 	mpDlg->deleteLater();
 }
 
-void cExperimentState_Pause::configure(const nlohmann::json& stateDoc)
+bool cExperimentState_Pause::configure(const nlohmann::json& stateDoc)
 {
 	// We are in the data thread.  Any GUI object must exists in the
 	// QApplication thread!
 	mpDlg = new cPauseExperimentStateDlg();
 	mpDlg->moveToThread(QApplication::instance()->thread());
 	QObject::connect(this, &cExperimentState_Pause::showDlg, mpDlg, &cPauseExperimentStateDlg::showDlg);
+
+	return true;
 }
 
 QString cExperimentState_Pause::getStatusStr()
@@ -103,9 +126,11 @@ bool cExperimentState_Pause::recording()
 	return false;
 }
 
-void cExperimentState_Pause::initialize()
+bool cExperimentState_Pause::initialize()
 {
 	emit showDlg();
+
+	return true;
 }
 
 void cExperimentState_Pause::run()

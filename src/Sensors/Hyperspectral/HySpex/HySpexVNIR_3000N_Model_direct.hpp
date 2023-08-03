@@ -92,8 +92,8 @@ protected:
 private:
     cIntervalTimer mTemperatureUpdateTimer;
 
-    enum class eBgStates {NONE, SH_CLOSE, COMPLETE, SH_OPEN };
-    eBgStates mBackgroundState = eBgStates::NONE;
+    enum class eBgStates {NONE, SH_CLOSE, STARTED, SH_OPEN };
+    eBgStates mBgCurrentState = eBgStates::NONE;
 
     std::unique_ptr<hyspex::cVNIR3000N> mCamera;
 };

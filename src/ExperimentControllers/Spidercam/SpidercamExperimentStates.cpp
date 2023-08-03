@@ -3,6 +3,8 @@
 #include "SpidercamCtrl.hpp"
 #include "../../Utilities/Constants.hpp"
 
+#include <QMessageBox>
+
 #include <thread>
 
 namespace
@@ -37,57 +39,94 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 	mInScriptMode = false;
 }
 
-void cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
+bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
 {
-	auto pos = stateDoc["position"];
+	using namespace nlohmann;
 
-	if (pos.contains("x (mm)"))
+	try
 	{
-		mX_mm = static_cast<uint32_t>(pos["x (mm)"].get<double>());
+		auto pos = stateDoc["position"];
+
+		if (pos.contains("x (mm)"))
+		{
+			mX_mm = static_cast<uint32_t>(pos["x (mm)"].get<double>());
+		}
+		else if (pos.contains("x (m)"))
+		{
+			mX_mm = static_cast<uint32_t>(pos["x (m)"].get<double>() * nConstants::M_TO_MM);
+		}
+		else
+		{
+			mX_NeedsInitialization = true;
+			mX_mm = -1.0;
+		}
+
+		if (pos.contains("y (mm)"))
+		{
+			mY_mm = static_cast<uint32_t>(pos["y (mm)"].get<double>());
+		}
+		else if (pos.contains("y (m)"))
+		{
+			mY_mm = static_cast<uint32_t>(pos["y (m)"].get<double>() * nConstants::M_TO_MM);
+		}
+		else
+		{
+			mY_NeedsInitialization = true;
+			mY_mm = -1.0;
+		}
+
+		if (pos.contains("z (mm)"))
+		{
+			mZ_mm = static_cast<uint32_t>(pos["z (mm)"].get<double>());
+		}
+		else if (pos.contains("z (m)"))
+		{
+			mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
+		}
+		else
+		{
+			mZ_NeedsInitialization = true;
+			mZ_mm = -1.0;
+		}
+
+		mSpeed_mmps = stateDoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM;
+		mPan_deg = stateDoc["pan"];
+		mTilt_deg = stateDoc["tilt"];
+
+		mRecordData = stateDoc["record"];
 	}
-	else if (pos.contains("x (m)"))
+	catch (const detail::parse_error& e)
 	{
-		mX_mm = static_cast<uint32_t>(pos["x (m)"].get<double>() * nConstants::M_TO_MM);
+		QString msg = "Parse Error: ";
+		msg += e.what();
+
+		QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+		mb.exec();
+
+		return false;
 	}
-	else
+	catch (const detail::type_error& e)
 	{
-		mX_NeedsInitialization = true;
-		mX_mm = -1.0;
+		QString msg = "Type Error: ";
+		msg += e.what();
+
+		QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+		mb.exec();
+
+		return false;
+	}
+	catch (const detail::exception& e)
+	{
+		QString msg = "Unknown Error: ";
+		msg += e.what();
+
+		QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+		mb.exec();
+
+		return false;
 	}
 
-	if (pos.contains("y (mm)"))
-	{
-		mY_mm = static_cast<uint32_t>(pos["y (mm)"].get<double>());
-	}
-	else if (pos.contains("y (m)"))
-	{
-		mY_mm = static_cast<uint32_t>(pos["y (m)"].get<double>() * nConstants::M_TO_MM);
-	}
-	else
-	{
-		mY_NeedsInitialization = true;
-		mY_mm = -1.0;
-	}
-
-	if (pos.contains("z (mm)"))
-	{
-		mZ_mm = static_cast<uint32_t>(pos["z (mm)"].get<double>());
-	}
-	else if (pos.contains("z (m)"))
-	{
-		mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
-	}
-	else
-	{
-		mZ_NeedsInitialization = true;
-		mZ_mm = -1.0;
-	}
-
-	mSpeed_mmps = stateDoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM;
-	mPan_deg = stateDoc["pan"];
-	mTilt_deg = stateDoc["tilt"];
-
-	mRecordData = stateDoc["record"];
+	return true;
 }
 
 QString cSpidercamExperimentState_Movement::getStatusStr()
@@ -109,7 +148,7 @@ bool cSpidercamExperimentState_Movement::recording()
 	return mRecordData;
 }
 
-void cSpidercamExperimentState_Movement::initialize()
+bool cSpidercamExperimentState_Movement::initialize()
 {
 	mMotionDetected = false;
 	mMoveCommandSent = false;
@@ -138,6 +177,8 @@ void cSpidercamExperimentState_Movement::initialize()
 
 	mPan_deg = mController.getLastKnownPosition().pan_deg;
 	mTilt_deg = mController.getLastKnownPosition().tilt_deg;
+
+	return true;
 }
 
 void cSpidercamExperimentState_Movement::run()

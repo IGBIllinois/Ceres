@@ -15,8 +15,21 @@ cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::
 {
 	if (type == "VNIR-3000N")
 	{
+		auto hostname = getHostname();
+		auto port = getPort();
+		auto localIp = getLocalIpAddress();
+		auto use_IpV6 = usingIpV6();
+
 		std::string cmd = entry["command"];
-		return new cHySpexVNIR_3000N_Properties_Remote(this);
+
+		if (cmd == "background")
+			return new cHySpexCamera_Background_Remote(hostname, port, localIp, use_IpV6);
+
+		if (cmd == "close shutter")
+			return new cHySpexCamera_CloseShutter_Remote(hostname, port, localIp, use_IpV6);
+
+		if (cmd == "open shutter")
+			return new cHySpexCamera_OpenShutter_Remote(hostname, port, localIp, use_IpV6);
 	}
 
 	return nullptr;
