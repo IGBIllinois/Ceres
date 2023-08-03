@@ -17,7 +17,12 @@ public:
 	virtual ~QLogWidget();
 
 public:
-    void appendMessage(const QString& text);
+    void logStatusMessage(const QString& device, const QString& msg);
+    void logInfoMessage(const QString& device, const QString& msg);
+    void logWarningMessage(const QString& device, const QString& msg);
+    void logErrorMessage(const QString& device, const QString& msg);
+
+    void logMessage(const QString& device, const QString& msg);
 };
 
 

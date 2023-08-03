@@ -42,23 +42,22 @@ void cRemoteClientCentalWindow::updateSensorName(QString old_name, QString new_n
 //-----------------------------------------------------------------------------
 void cRemoteClientCentalWindow::logMessage(uint8_t type, QString device, QString msg)
 {
-    QString text = device;
-    text += ",\t";
     switch (type)
     {
     case 0:
-        text += "Status,\t";
+        mpLogWindow->logStatusMessage(device, msg);
         break;
     case 1:
-        text += "Info,\t";
+        mpLogWindow->logInfoMessage(device, msg);
         break;
     case 2:
-        text += "Warning,\t";
+        mpLogWindow->logWarningMessage(device, msg);
         break;
     case 3:
-        text += "Error,\t";
+        mpLogWindow->logErrorMessage(device, msg);
+        break;
+    default:
+        mpLogWindow->logMessage(device, msg);
         break;
     }
-    text += msg;
-    mpLogWindow->appendMessage(text);
 }
