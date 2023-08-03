@@ -439,7 +439,7 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
 
         if (widgets.pModel == nullptr)
         {
-            std::string msg = "Unknown sensor type \"";
+            std::string msg = "Unknown sensor type or sensor not found: type is \"";
             msg += type;
             msg += "\"";
 

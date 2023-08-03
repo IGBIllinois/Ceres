@@ -49,6 +49,9 @@ public:
     void sendStopDataRecording();
 
     void sendSpidercamPosition(const spidercam::sPosition_1_t& pos);
-    void sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg);
+    void sendWindData(bool valid, double wind_speed_mps, double wind_direction_deg);
+    void sendTemperatureData(double temp_C);
+    void sendRelativeHumidityData(double rh_pct);
+    void sendParData(double par_umole);
 };
 

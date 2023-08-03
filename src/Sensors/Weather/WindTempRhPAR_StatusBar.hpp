@@ -20,13 +20,13 @@ public:
 public slots:
     void updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
     void updateTemperature(double temp_C);
-    void updateRelativeHumidity(double RH_percent);
+    void updateRelativeHumidity(double RH_pct);
     void updatePAR(double par_umole);
 
 private:
     QLineEdit* mpWindSpeed_mph;
     QLineEdit* mpWindDirection_deg;
     QLineEdit* mpTemperature_C;
-    QLineEdit* mpRelativeHumidity_per;
+    QLineEdit* mpRelativeHumidity_pct;
     QLineEdit* mpPAR_umole;
 };

@@ -54,7 +54,10 @@ enum class ePacketType : uint16_t
 
 	SPIDER_CAM_DATA = 1000,
 
-	WEATHER_DATA	= 1100,
+	WIND_DATA	= 1100,
+	TEMPERATURE_DATA,
+	RELATIVE_HUMIDITY_DATA,
+	PAR_DATA,
 };
 
 
@@ -170,21 +173,30 @@ int encode_sensor_property_connect_info(const std::string& sensor,
 /**********************************************************
  * Spidercam packets utilities
  **********************************************************/
-spidercam::sPosition_1_t to_spidercam_position_1(const Spidercam_Position_1& pckt);
+spidercam::sPosition_1_t to_spidercam_position_1(std::uint16_t length, const net_buffer_view& buffer);
 int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer);
 
 
 /**********************************************************
  * Weather Data packets utilities
  **********************************************************/
-struct sWeatherData_t
+struct sWindData_t
 {
 	bool  dataValid;
 	float wind_speed_mps;
 	float wind_direction_deg;
 };
 
-sWeatherData_t to_weather_data_1(const WeatherData_1& pckt);
-int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction_deg, net_buffer& buffer);
+sWindData_t to_wind_data_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_wind_data(bool valid, double wind_speed_mps, double wind_direction_deg, net_buffer& buffer);
+
+float to_temperature_data_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_temperature_data(double temp_C, net_buffer& buffer);
+
+float to_relative_humidity_data_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_relative_humidity_data(double rh_pct, net_buffer& buffer);
+
+float to_par_data_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_par_data(double par_umole, net_buffer& buffer);
 
 

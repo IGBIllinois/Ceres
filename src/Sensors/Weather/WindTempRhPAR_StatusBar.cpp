@@ -35,11 +35,11 @@ cWindTempRhPAR_StatusBar::cWindTempRhPAR_StatusBar(QWidget* parent)
 	mpTemperature_C->setToolTip(tr("Temperature in Centigrade"));
 
 	pixelsWide = fm.horizontalAdvance("Rh: XXX.X ");
-	mpRelativeHumidity_per = new QLineEdit(this);
-	mpRelativeHumidity_per->setReadOnly(true);
-	mpRelativeHumidity_per->setFixedWidth(pixelsWide);
-	mpRelativeHumidity_per->setAlignment(Qt::AlignCenter);
-	mpRelativeHumidity_per->setToolTip(tr("Relative Humidity"));
+	mpRelativeHumidity_pct = new QLineEdit(this);
+	mpRelativeHumidity_pct->setReadOnly(true);
+	mpRelativeHumidity_pct->setFixedWidth(pixelsWide);
+	mpRelativeHumidity_pct->setAlignment(Qt::AlignCenter);
+	mpRelativeHumidity_pct->setToolTip(tr("Relative Humidity %"));
 
 	pixelsWide = fm.horizontalAdvance("PAR: XXX.X ");
 	mpPAR_umole = new QLineEdit(this);
@@ -51,7 +51,7 @@ cWindTempRhPAR_StatusBar::cWindTempRhPAR_StatusBar(QWidget* parent)
 	addPermanentWidget(mpWindSpeed_mph);
 	addPermanentWidget(mpWindDirection_deg);
 	addPermanentWidget(mpTemperature_C);
-	addPermanentWidget(mpRelativeHumidity_per);
+	addPermanentWidget(mpRelativeHumidity_pct);
 	addPermanentWidget(mpPAR_umole);
 
 	setWindowTitle("Wind, Temp, Rh, and PAR");
@@ -93,11 +93,11 @@ void cWindTempRhPAR_StatusBar::updateTemperature(double temp_C)
 	mpTemperature_C->setText(s);
 }
 
-void cWindTempRhPAR_StatusBar::updateRelativeHumidity(double RH_percent)
+void cWindTempRhPAR_StatusBar::updateRelativeHumidity(double RH_pct)
 {
 	QString s = "Rh: ";
-	s += QString::number(RH_percent, 'f', 1);
-	mpRelativeHumidity_per->setText(s);
+	s += QString::number(RH_pct, 'f', 1);
+	mpRelativeHumidity_pct->setText(s);
 }
 
 void cWindTempRhPAR_StatusBar::updatePAR(double par_umole)

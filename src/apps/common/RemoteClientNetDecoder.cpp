@@ -150,17 +150,28 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     }
     case ePacketType::SPIDER_CAM_DATA:
     {
-        Spidercam_Position_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onSpidercamPosition(to_spidercam_position_1(packet));
+        onSpidercamPosition(to_spidercam_position_1(hdr.length, buffer));
         break;
     }
-    case ePacketType::WEATHER_DATA:
+    case ePacketType::WIND_DATA:
     {
-        WeatherData_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        sWeatherData_t data = to_weather_data_1(packet);
-        onWeatherData(data.dataValid, data.wind_speed_mps, data.wind_direction_deg);
+        sWindData_t data = to_wind_data_1(hdr.length, buffer);
+        onWindData(data.dataValid, data.wind_speed_mps, data.wind_direction_deg);
+        break;
+    }
+    case ePacketType::TEMPERATURE_DATA:
+    {
+        onTemperatureData(to_temperature_data_1(hdr.length, buffer));
+        break;
+    }
+    case ePacketType::RELATIVE_HUMIDITY_DATA:
+    {
+        onRelativeHumidityData(to_relative_humidity_data_1(hdr.length, buffer));
+        break;
+    }
+    case ePacketType::PAR_DATA:
+    {
+        onParData(to_par_data_1(hdr.length, buffer));
         break;
     }
     }

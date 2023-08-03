@@ -126,9 +126,27 @@ void cCeresNetEncoder::sendSpidercamPosition(const spidercam::sPosition_1_t& pos
     sendData();
 }
 
-void cCeresNetEncoder::sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg)
+void cCeresNetEncoder::sendWindData(bool valid, double wind_speed_mps, double wind_direction_deg)
 {
-    encode_weather_data(valid, wind_speed_mps, wind_direction_deg, mBuffer);
+    encode_wind_data(valid, wind_speed_mps, wind_direction_deg, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendTemperatureData(double temp_C)
+{
+    encode_temperature_data(temp_C, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendRelativeHumidityData(double rh_pct)
+{
+    encode_relative_humidity_data(rh_pct, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendParData(double par_umole)
+{
+    encode_par_data(par_umole, mBuffer);
     sendData();
 }
 

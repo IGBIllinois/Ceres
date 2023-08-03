@@ -67,6 +67,9 @@ signals:
 public slots:
     void updatePosition(spidercam::sPosition_1_t pos);
     void updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
+    void updateTemperatureData(double temp_C);
+    void updateRelativeHumidityData(double rh_pct);
+    void updateParData(double par_umole);
 
 /*
  * Signals handlers from the TCP socket
@@ -106,6 +109,9 @@ private:
     bool   mWindSpeedValid;
     double mWindSpeed_mps;
     double mWind_dir_deg;
+    double mTemperature_C;
+    double mRH_pct;
+    double mPAR_umole;
 
 private:
     bool mConnected;

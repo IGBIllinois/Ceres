@@ -5,6 +5,7 @@
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
 #include "Weather/WeatherDataModel_Http_Wind.hpp"
+#include "Weather/WeatherDataModel_Http_Wind_T_RH_PAR.hpp"
 #include "TimestampProvider.hpp"
 #include "SensorPropertyPage.hpp"
 #include "ExperimentStateCreator.hpp"
@@ -43,6 +44,10 @@ cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
     mWindSpeedValid = false;
     mWindSpeed_mps = 0.0;
     mWind_dir_deg = 0.0;
+    mTemperature_C = 0.0;
+    mRH_pct = 0.0;
+    mPAR_umole = 0.0;
+
 }
 
 cCtrlDataModelRemote::~cCtrlDataModelRemote()
@@ -96,20 +101,47 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
 {
     cCtrlDataModel::addSensor(pSensor);
 
-    auto* pWeather = dynamic_cast<cWeatherDataModel_Http_Wind*>(pSensor);
+    auto* pWind = dynamic_cast<cWeatherDataModel_Http_Wind*>(pSensor);
 
-    if (pWeather)
+    if (pWind)
     {
-        if (pWeather->windDataValid())
+        if (pWind->windDataValid())
         {
             mWindSpeedValid = true;
-            mWindSpeed_mps = pWeather->windSpeed_mps();
-            mWind_dir_deg = pWeather->windDirection_deg();
+            mWindSpeed_mps = pWind->windSpeed_mps();
+            mWind_dir_deg = pWind->windDirection_deg();
 
-            sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+            sendWindData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
         }
 
-        QObject::connect(pWeather, &cWeatherDataModel_Http_Wind::windDataChanged, this, &cCtrlDataModelRemote::updateWindData);
+        QObject::connect(pWind, &cWeatherDataModel_Http_Wind::windDataChanged, this, &cCtrlDataModelRemote::updateWindData);
+    }
+
+    auto* pWind_T_RH_PAR = dynamic_cast<cWeatherDataModel_Http_Wind_T_RH_PAR*>(pSensor);
+
+    if (pWind_T_RH_PAR)
+    {
+        if (pWind_T_RH_PAR->windDataValid())
+        {
+            mWindSpeedValid = true;
+            mWindSpeed_mps = pWind_T_RH_PAR->windSpeed_mps();
+            mWind_dir_deg = pWind_T_RH_PAR->windDirection_deg();
+
+            sendWindData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+        }
+
+        mTemperature_C = pWind_T_RH_PAR->temperature_C();
+        mRH_pct = pWind_T_RH_PAR->relativeHumidity_pct();
+        mPAR_umole = pWind_T_RH_PAR->par_umole();
+
+        sendTemperatureData(mTemperature_C);
+        sendRelativeHumidityData(mRH_pct);
+        sendParData(mPAR_umole);
+
+        QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::windDataChanged, this, &cCtrlDataModelRemote::updateWindData);
+        QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::temperatureChanged, this, &cCtrlDataModelRemote::updateTemperatureData);
+        QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::relativeHumidityChanged, this, &cCtrlDataModelRemote::updateRelativeHumidityData);
+        QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::parChanged, this, &cCtrlDataModelRemote::updateParData);
     }
 }
 
@@ -143,7 +175,34 @@ void cCtrlDataModelRemote::updateWindData(bool valid_wind_speed, double wind_spe
 
     if (!mConnected) return;
 
-    sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+    sendWindData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
+}
+
+void cCtrlDataModelRemote::updateTemperatureData(double temp_C)
+{
+    mTemperature_C = temp_C;
+
+    if (!mConnected) return;
+
+    sendTemperatureData(mTemperature_C);
+}
+
+void cCtrlDataModelRemote::updateRelativeHumidityData(double rh_pct)
+{
+    mRH_pct = rh_pct;
+
+    if (!mConnected) return;
+
+    sendRelativeHumidityData(mRH_pct);
+}
+
+void cCtrlDataModelRemote::updateParData(double par_umole)
+{
+    mPAR_umole = par_umole;
+
+    if (!mConnected) return;
+
+    sendParData(mPAR_umole);
 }
 
 bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port, 
@@ -289,6 +348,7 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
         return false;
 
     bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
+    if (!result) return false;
 
     if (mSpecies.empty())
     {

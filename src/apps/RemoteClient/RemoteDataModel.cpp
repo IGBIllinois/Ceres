@@ -542,7 +542,7 @@ void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
     }
 }
 
-void cRemoteDataModel::onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg)
+void cRemoteDataModel::onWindData(bool valid, double wind_speed_mps, double wind_direction_deg)
 {
     mWindDataValid = valid;
     mWindSpeed_mps = wind_speed_mps;
@@ -552,6 +552,36 @@ void cRemoteDataModel::onWeatherData(bool valid, double wind_speed_mps, double w
     {
         mWeatherSerializer.writeWindData_mps(mWindDataValid, 
             mWindSpeed_mps, mWindDirection_deg);
+    }
+}
+
+void cRemoteDataModel::onTemperatureData(double temp_C)
+{
+    mTemperature_C = temp_C;
+
+    if (mIsRecording)
+    {
+        mWeatherSerializer.writeTemperature_C(mTemperature_C);
+    }
+}
+
+void cRemoteDataModel::onRelativeHumidityData(double rh_pct)
+{
+    mRelativeHumidity_pct = rh_pct;
+
+    if (mIsRecording)
+    {
+        mWeatherSerializer.writeRelativeHumidity_pct(mRelativeHumidity_pct);
+    }
+}
+
+void cRemoteDataModel::onParData(double par_umole)
+{
+    mPAR_umole = par_umole;
+
+    if (mIsRecording)
+    {
+        mWeatherSerializer.writePAR_umole(mPAR_umole);
     }
 }
 

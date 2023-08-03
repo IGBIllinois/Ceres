@@ -180,12 +180,12 @@ bool cWeatherDataModel_Http_Wind_T_RH_PAR::configure(const nlohmann::json& jsonC
 		mWindDirection_deg = mData[1];
 		mDataValid = mData[2] == 0;
 		mOAT_C = mData[3];
-		mRH_percent = mData[4];
+		mRH_pct = mData[4];
 		mPAR_umole = mData[5];
 
 		emit windDataChanged(mDataValid, mWindSpeed_mps, mWindDirection_deg);
 		emit temperatureChanged(mOAT_C);
-		emit relativeHumidityChanged(mRH_percent);
+		emit relativeHumidityChanged(mRH_pct);
 		emit parChanged(mPAR_umole);
 	}
 	catch (const std::exception& e)
@@ -216,7 +216,7 @@ void cWeatherDataModel_Http_Wind_T_RH_PAR::writeDataHeader()
 	mSerializer.writeConfigInfo(mConfigInfo);
 	mSerializer.writeWindData_mps(mDataValid, mWindSpeed_mps, mWindDirection_deg);
 	mSerializer.writeTemperature_C(mOAT_C);
-	mSerializer.writeRelativeHumidity(mRH_percent);
+	mSerializer.writeRelativeHumidity_pct(mRH_pct);
 	mSerializer.writePAR_umole(mPAR_umole);
 }
 
@@ -241,8 +241,8 @@ void cWeatherDataModel_Http_Wind_T_RH_PAR::processReply(const std::string& reply
 	bool oat_changed = mOAT_C != mData[3];
 	mOAT_C = mData[3];
 
-	bool rh_changed = mRH_percent != mData[4];
-	mRH_percent = mData[4];
+	bool rh_changed = mRH_pct != mData[4];
+	mRH_pct = mData[4];
 
 	bool par_changed = mPAR_umole != mData[5];
 	mPAR_umole = mData[5];
@@ -251,7 +251,7 @@ void cWeatherDataModel_Http_Wind_T_RH_PAR::processReply(const std::string& reply
 	{
 		mSerializer.writeWindData_mps(mDataValid, mWindSpeed_mps, mWindDirection_deg);
 		mSerializer.writeTemperature_C(mOAT_C);
-		mSerializer.writeRelativeHumidity(mRH_percent);
+		mSerializer.writeRelativeHumidity_pct(mRH_pct);
 		mSerializer.writePAR_umole(mPAR_umole);
 	}
 
@@ -267,7 +267,7 @@ void cWeatherDataModel_Http_Wind_T_RH_PAR::processReply(const std::string& reply
 		emit temperatureChanged(mOAT_C);
 
 	if (rh_changed)
-		emit relativeHumidityChanged(mRH_percent);
+		emit relativeHumidityChanged(mRH_pct);
 
 	if (par_changed)
 		emit parChanged(mPAR_umole);

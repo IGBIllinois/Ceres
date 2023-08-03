@@ -646,8 +646,11 @@ int encode_sensor_property_connect_info(const std::string& sensor, const std::st
 /*
  * Spidercam Packets
  */
-spidercam::sPosition_1_t to_spidercam_position_1(const Spidercam_Position_1& pckt)
+spidercam::sPosition_1_t to_spidercam_position_1(std::uint16_t length, const net_buffer_view& buffer)
 {
+    Spidercam_Position_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+
     spidercam::sPosition_1_t data;
 
     data.X_mm = pckt.x_mm();
@@ -703,9 +706,12 @@ int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer
 /*
  * Weather Packets
  */
-sWeatherData_t to_weather_data_1(const WeatherData_1& pckt)
+sWindData_t to_wind_data_1(std::uint16_t length, const net_buffer_view& buffer)
 {
-    sWeatherData_t data;
+    WindData_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+
+    sWindData_t data;
 
     data.dataValid = pckt.datavalid();
     data.wind_speed_mps = pckt.wind_speed_mps();
@@ -714,9 +720,9 @@ sWeatherData_t to_weather_data_1(const WeatherData_1& pckt)
     return data;
 }
 
-int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction_deg, net_buffer& buffer)
+int encode_wind_data(bool valid, double wind_speed_mps, double wind_direction_deg, net_buffer& buffer)
 {
-    WeatherData_1 pckt;
+    WindData_1 pckt;
 
     pckt.set_datavalid(valid);
     pckt.set_wind_speed_mps(wind_speed_mps);
@@ -726,7 +732,7 @@ int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::WEATHER_DATA);
+    hdr.id = static_cast<uint16_t>(ePacketType::WIND_DATA);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -737,5 +743,89 @@ int encode_weather_data(bool valid, double wind_speed_mps, double wind_direction
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+
+float to_temperature_data_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    TemperatureData_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+    return pckt.temperature_c();
+}
+
+int encode_temperature_data(double temp_C, net_buffer& buffer)
+{
+    TemperatureData_1 pckt;
+
+    pckt.set_temperature_c(temp_C);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::TEMPERATURE_DATA);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+float to_relative_humidity_data_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    RelativeHumidityData_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+    return pckt.rh_pct();
+}
+
+int encode_relative_humidity_data(double rh_pct, net_buffer& buffer)
+{
+    RelativeHumidityData_1 pckt;
+
+    pckt.set_rh_pct(rh_pct);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::RELATIVE_HUMIDITY_DATA);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+float to_par_data_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    ParData_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+    return pckt.par_umole();
+}
+
+int encode_par_data(double par_umole, net_buffer& buffer)
+{
+    ParData_1 pckt;
+
+    pckt.set_par_umole(par_umole);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::PAR_DATA);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
 
 

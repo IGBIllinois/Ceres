@@ -115,7 +115,10 @@ private slots:
     void onStopDataRecording() override;
 
     void onSpidercamPosition(const spidercam::sPosition_1_t& pos) override;
-    void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
+    void onWindData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
+    void onTemperatureData(double temp_C) override;
+    void onRelativeHumidityData(double rh_pct) override;
+    void onParData(double par_umole) override;
 
 private:
     void clearExperimentInfo();
@@ -169,6 +172,9 @@ private:
     bool mWindDataValid;
     double mWindSpeed_mps;
     double mWindDirection_deg;
+    double mTemperature_C;
+    double mRelativeHumidity_pct;
+    double mPAR_umole;
 };
 
 

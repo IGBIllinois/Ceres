@@ -52,8 +52,10 @@ protected:
 
     virtual void onSpidercamPosition(const spidercam::sPosition_1_t& pos) = 0;
 
-    virtual void onWeatherData(bool valid, double wind_speed_mps,
-        double wind_direction_deg) = 0;
+    virtual void onWindData(bool valid, double wind_speed_mps, double wind_direction_deg) = 0;
+    virtual void onTemperatureData(double temp_C) = 0;
+    virtual void onRelativeHumidityData(double rh_pct) = 0;
+    virtual void onParData(double par_umole) = 0;
 
 /*
  * The Ceres Remote Client application sends these packets and should never receive them!

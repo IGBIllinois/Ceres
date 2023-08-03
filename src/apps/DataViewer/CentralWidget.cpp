@@ -549,5 +549,5 @@ void cCentralWidget::onWindData_knots(bool valid, double speed_knots, double dir
 }
 
 void cCentralWidget::onTemperature_C(double temperature_C) {}
-void cCentralWidget::onRelativeHumidity(double rh_percent) {}
+void cCentralWidget::onRelativeHumidity_pct(double rh_pct) {}
 void cCentralWidget::onPAR_umole(double par_umole) {}

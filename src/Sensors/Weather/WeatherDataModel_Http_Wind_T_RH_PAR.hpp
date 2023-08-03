@@ -37,7 +37,7 @@ public:
     double windDirection_deg() const;
 
     double temperature_C() const;
-    double relativeHumidity_percent() const;
+    double relativeHumidity_pct() const;
 
     /* Get PAR in umole/s/m^2*/
     double par_umole() const;
@@ -55,7 +55,7 @@ public:
 signals:
     void windDataChanged(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
     void temperatureChanged(double temp_C);
-    void relativeHumidityChanged(double RH_percent);
+    void relativeHumidityChanged(double RH_pct);
     void parChanged(double par_umole);
 
 protected:
@@ -71,7 +71,7 @@ private:
     double mWindDirection_deg;
 
     double mOAT_C;
-    double mRH_percent;
+    double mRH_pct;
     double mPAR_umole;
 
     std::string mConfigInfo;
@@ -98,9 +98,9 @@ inline double cWeatherDataModel_Http_Wind_T_RH_PAR::temperature_C() const
     return mOAT_C;
 }
 
-inline double cWeatherDataModel_Http_Wind_T_RH_PAR::relativeHumidity_percent() const
+inline double cWeatherDataModel_Http_Wind_T_RH_PAR::relativeHumidity_pct() const
 {
-    return mRH_percent;
+    return mRH_pct;
 }
 
 inline double cWeatherDataModel_Http_Wind_T_RH_PAR::par_umole() const

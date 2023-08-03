@@ -12,10 +12,24 @@ syntax = "proto3";
 //import "google/protobuf/timestamp.proto";
 
 
-message WeatherData_1 
+message WindData_1 
 {
 	bool  dataValid = 1;
 	float wind_speed_mps = 2;
 	float wind_direction_deg = 3;
 }
 
+message TemperatureData_1 
+{
+	float temperature_C = 1;
+}
+
+message RelativeHumidityData_1 
+{
+	float rh_pct = 1;
+}
+
+message ParData_1 
+{
+	float par_umole = 1;
+}
