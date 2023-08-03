@@ -5,6 +5,8 @@
 
 #include <functional>
 
+#define USE_LOG_MESSAGE
+
 
 using namespace ssnx;
 
@@ -117,7 +119,11 @@ bool cSsnxModel_direct::isConnected()
 {
     if (!mSerialPort.isOpen())
     {
+#ifdef USE_LOG_MESSAGE
+        emit logMessage(logSTATUS, q_name(), "Serial port is not open.");
+#else
         emit statusMessage("Serial port is not open.");
+#endif
     }
 
     return true;
@@ -133,7 +139,12 @@ void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDes
 {
     QString msg = "newConnectionDescriptor: ";
     msg += QString::fromStdString(connectionDescriptor);
+
+#ifdef USE_LOG_MESSAGE
+    emit logMessage(logSTATUS, q_name(), msg);
+#else
     emit statusMessage(msg);
+#endif
 
     setStatus(sensor::eStatus::CONNECTED);
 }
@@ -150,7 +161,12 @@ void cSsnxModel_direct::newAsciiDisplay(const std::string& asciiDisplay)
 {
     QString msg = "newAsciiDisplay: ";
     msg += QString::fromStdString(asciiDisplay);
+
+#ifdef USE_LOG_MESSAGE
+    emit logMessage(logSTATUS, q_name(), msg);
+#else
     emit statusMessage(msg);
+#endif
 }
 
 void cSsnxModel_direct::stopReceived()
@@ -169,7 +185,12 @@ void cSsnxModel_direct::stopReceived()
     // The commands will be sent when the prompts are sent again.
     mAsciiCommandQueue.swap(mSavedCommandQueue);
 
+
+#ifdef USE_LOG_MESSAGE
+    emit logMessage(logSTATUS, q_name(), "STOP received from the GPS receiver!");
+#else
     emit statusMessage("STOP received from the GPS receiver!");
+#endif
 
     setStatus(sensor::eStatus::STOPPED);
 }
@@ -225,47 +246,6 @@ void cSsnxModel_direct::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t& pvt)
 
     if (pvt.VAccuracy_m.has_value())
         mCartesianPVT.vAccuracy_m = pvt.VAccuracy_m.value();
-
-
-/*
-    pvt.dataValid;
-    pvt.timestamp_s;
-    eSolutionType  Mode;
-    bool		   HeightComputed;
-    uint8_t        Error;
-    double		   X_m;
-    double		   Y_m;
-    double		   Z_m;
-    float          Undulation_m;
-    float          Vx_mps;
-    float          Vy_mps;
-    float          Vz_mps;
-    float          GroundTrack_deg;
-    double		   RxClkBias_ms;
-    float          RxClkDrift_ppm;
-    eTimeSystem    TimeSystem;
-    eDatum         Datum;
-    uint8_t        NrSV;
-    bool		   SatClockCorrectionUsed;
-    bool		   RangeCorrectionUsed;
-    bool		   IonosphericInfoUsed;
-    bool		   OrbitAccuracyInfoUsed;
-    bool		   PrecisionApproachModeActive;
-    uint16_t       ReferenceId;
-    float          MeanCorrAge_s;
-    uint32_t       SignalInfo;
-    uint8_t        AlertFlag;
-
-    // Version 2.1 of this packet
-    std::optional<uint8_t>        NrBases;
-    std::optional<uint16_t>		  AgeOfSeed_s;
-    std::optional<ePPP_LastSeed>  LastSeed;
-
-    // Version 2.2 of this packet
-    std::optional<float>          Latency_s;
-    std::optional<float>          HAccuracy_m;
-    std::optional<float>          VAccuracy_m;
-*/
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
@@ -363,18 +343,6 @@ void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t& pvt)
     mPosPojected.Northing_m = pvt.Northing_m;
     mPosPojected.Easting_m = pvt.Easting_m;
     mPosPojected.Alt_m = pvt.Alt_m;
-
-/*
-    bool           dataValid;
-    double         timestamp_s;
-    eSolutionType  Mode;
-    bool		   HeightComputed;
-    uint8_t        Error;
-    double	       Northing_m;
-    double		   Easting_m;
-    double		   Alt_m;
-    uint8_t        Datum;
-*/
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
