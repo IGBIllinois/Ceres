@@ -9,6 +9,8 @@
 
 const std::size_t MAX_CAMERAS = 4;
 
+#define USE_LOG_MESSAGE
+
 namespace
 {
     bool operator>(const rgb::sImageSize_t& lhs, const rgb::sImageSize_t& rhs)
@@ -284,7 +286,11 @@ void cAxisCommunicationsModel_F44::setActiveImageSize(rgb::sImageSize_t image_si
     msg += "x";
     msg += QString::number(image_size.height);
 
+#ifdef USE_LOG_MESSAGE
+    emit logMessage(logSTATUS, q_name(), msg);
+#else
     emit statusMessage(msg);
+#endif
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
@@ -318,7 +324,11 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
     msg += " frame per second set to ";
     msg += QString::number(fps);
 
+#ifdef USE_LOG_MESSAGE
+    emit logMessage(logSTATUS, q_name(), msg);
+#else
     emit statusMessage(msg);
+#endif
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
@@ -405,7 +415,12 @@ void cAxisCommunicationsModel_F44::stateChanged(int id, cAxisCamera::GrabbingSta
         msg += " has an error.";
         break;
     }
+
+#ifdef USE_LOG_MESSAGE
+    emit logMessage(logSTATUS, q_name(), msg);
+#else
     emit statusMessage(msg);
+#endif
 }
 
 

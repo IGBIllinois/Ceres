@@ -8,6 +8,9 @@
 #include <string>
 
 
+#define USE_LOG_MESSAGE
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // The OUSTER model class
 ///////////////////////////////////////////////////////////////////////////////
@@ -415,7 +418,12 @@ bool cOusterModel_net::startCommunications()
     mConnected = true;
 
     setStatus(sensor::eStatus::CONNECTED);
+
+#ifdef USE_LOG_MESSAGE
+    emit logMessage(logSTATUS, q_name(), "LiDAR data connected");
+#else
     emit statusMessage("LiDAR data connected");
+#endif
 
     return true;
 }
@@ -768,12 +776,6 @@ void cOusterModel_net::emitLogMessage(quint8 type, QString msg)
 
 void cOusterModel_net::startCmdQueue()
 {
-/*
-    QString msg = "Starting command queue...";
-    emit statusMessage(msg);
-    emit logMessage(logINFO, q_name(), msg);
-*/
-
     if (mQueueTimer.isActive()) return;
 
     while (!mCmdQueue.empty())
@@ -794,12 +796,6 @@ void cOusterModel_net::checkCmdQueue()
 {
     if (mCmdQueue.empty())
     {
-/*
-        QString msg = "Command queue complete";
-        emit statusMessage(msg);
-        emit logMessage(logINFO, q_name(), msg);
-*/
-
         mQueueTimer.stop();
         return;
     }

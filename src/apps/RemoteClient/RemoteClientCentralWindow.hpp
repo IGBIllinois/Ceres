@@ -5,7 +5,7 @@
 
 
 // Forward Declarations
-class cLogWidget;
+class QLogWidget;
 
 
 class cRemoteClientCentalWindow : public QTabWidget
@@ -24,6 +24,6 @@ public slots:
     void logMessage(uint8_t type, QString device, QString msg);
 
 private:
-    cLogWidget* mpLogWindow;
+    QLogWidget* mpLogWindow;
 };
 

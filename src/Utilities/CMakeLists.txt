@@ -14,6 +14,7 @@ PUBLIC
 	ColorGradient.hpp
 	Timers.hpp
 	QIndicator.hpp
+	QLogWidget.hpp
 	
 	net_buffer.hpp
 	packet_utils.hpp
@@ -26,6 +27,7 @@ PRIVATE
 	ColorGradient.cpp
 	Timers.cpp
 	QIndicator.cpp
+	QLogWidget.cpp
 	
 	net_buffer.cpp
 	packet_utils.cpp

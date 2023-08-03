@@ -1,6 +1,6 @@
 
 #include "RemoteClientCentralWindow.hpp"
-#include "LogWidget.hpp"
+#include "QLogWidget.hpp"
 
 #include <QDebug>
 
@@ -9,7 +9,7 @@
 cRemoteClientCentalWindow::cRemoteClientCentalWindow(QWidget* parent) :
     QTabWidget(parent), mpLogWindow(nullptr)
 {
-    mpLogWindow = new cLogWidget();
+    mpLogWindow = new QLogWidget();
 
     addTab(mpLogWindow, "Log");
 }
@@ -42,5 +42,23 @@ void cRemoteClientCentalWindow::updateSensorName(QString old_name, QString new_n
 //-----------------------------------------------------------------------------
 void cRemoteClientCentalWindow::logMessage(uint8_t type, QString device, QString msg)
 {
-
+    QString text = device;
+    text += ",\t";
+    switch (type)
+    {
+    case 0:
+        text += "Status,\t";
+        break;
+    case 1:
+        text += "Info,\t";
+        break;
+    case 2:
+        text += "Warning,\t";
+        break;
+    case 3:
+        text += "Error,\t";
+        break;
+    }
+    text += msg;
+    mpLogWindow->appendMessage(text);
 }

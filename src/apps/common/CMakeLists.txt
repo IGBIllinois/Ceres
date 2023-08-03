@@ -37,9 +37,6 @@ PRIVATE
     CeresSplashScreen.hpp
     CeresSplashScreen.cpp
 
-    LogWidget.hpp
-    LogWidget.cpp
-
 	remote_client_utils.hpp
 	remote_client_utils.cpp
 
