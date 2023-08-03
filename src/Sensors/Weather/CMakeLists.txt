@@ -9,11 +9,17 @@ set(WEATHER_SOURCE_FILES
 #
 # Weather Station at the Energy Farm
 #
-    WindSpeedAndDirection.hpp
-    WindSpeedAndDirection.cpp
+    WindSpeedDirection_StatusBar.hpp
+    WindSpeedDirection_StatusBar.cpp
 
     WeatherDataModel_Http_Wind.hpp
     WeatherDataModel_Http_Wind.cpp
+
+    WindTempRhPAR_StatusBar.hpp
+    WindTempRhPAR_StatusBar.cpp
+
+    WeatherDataModel_Http_Wind_T_RH_PAR.hpp
+    WeatherDataModel_Http_Wind_T_RH_PAR.cpp
 
 #
 # Weather Station

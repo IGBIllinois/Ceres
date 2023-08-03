@@ -1,11 +1,11 @@
 
-#include "WindSpeedAndDirection.hpp"
+#include "WindSpeedDirection_StatusBar.hpp"
 #include "../../Utilities/Constants.hpp"
 
 #include <QLineEdit>
 
 
-cWindSpeedAndDirection::cWindSpeedAndDirection(QWidget* parent)
+cWindSpeedDirection_StatusBar::cWindSpeedDirection_StatusBar(QWidget* parent)
 	:
 	QStatusBar(parent), mpWindSpeed_mph(nullptr), mpWindDirection_deg(nullptr)
 {
@@ -35,7 +35,7 @@ cWindSpeedAndDirection::cWindSpeedAndDirection(QWidget* parent)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
-void cWindSpeedAndDirection::updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg)
+void cWindSpeedDirection_StatusBar::updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg)
 {
 	if (valid_wind_speed)
 	{

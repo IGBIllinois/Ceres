@@ -5,6 +5,8 @@
 #include <QEventLoop>
 #include <QNetworkReply>
 
+#include <fstream>
+
 
 cWeatherDataModel_Http_Wind::cWeatherDataModel_Http_Wind(QObject* parent)
 :
@@ -82,7 +84,12 @@ bool cWeatherDataModel_Http_Wind::configure(const nlohmann::json& jsonCfg)
 
 	try
 	{
-		nlohmann::json jsonDoc = nlohmann::json::parse(replyText.toStdString());
+		auto msg = replyText.toStdString();
+//BAF		std::ofstream output("weather_station.txt");
+//		output << msg;
+//		output.close();
+
+		nlohmann::json jsonDoc = nlohmann::json::parse(msg);
 		auto& jsonHead = jsonDoc["head"];
 
 		/*
