@@ -118,6 +118,9 @@ private:
     void onConfigInfo(const std::string& info) override;
     void onWindData_mps(bool valid, double speed_mps, double dir_deg) override;
     void onWindData_knots(bool valid, double speed_knots, double dir_deg) override;
+    void onTemperature_C(double temperature_C) override;
+    void onRelativeHumidity(double rh_percent) override;
+    void onPAR_umole(double par_umole) override;
 
 private:
     cCeresDataFile mDataFile;
