@@ -56,6 +56,7 @@ public:
 
 signals:
     void requestDataRecordingState(bool record);
+    void logMessage(quint8 type, QString device, QString msg);
 
 /*
  * Signals handlers from the timer

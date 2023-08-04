@@ -96,10 +96,11 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
 
     mpCentralWindow = new cRemoteClientCentalWindow(this);
 
-    QObject::connect(&mMainModel, &cDataModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
-    QObject::connect(&mMainModel, &cDataModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
-    QObject::connect(&mMainModel, &cDataModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
-    QObject::connect(&mMainModel, &cDataModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
+    QObject::connect(&mMainModel, &cRemoteDataModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
+    QObject::connect(&mMainModel, &cRemoteDataModel::infoMessage,    this, &cRemoteClientWindow::onInfoMessage);
+    QObject::connect(&mMainModel, &cRemoteDataModel::warningMessage, this, &cRemoteClientWindow::onWarningMessage);
+    QObject::connect(&mMainModel, &cRemoteDataModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
+    QObject::connect(&mMainModel, &cRemoteDataModel::logMessage,     this, &cRemoteClientWindow::onLogMessage);
 
     setCentralWidget(mpCentralWindow);
 }

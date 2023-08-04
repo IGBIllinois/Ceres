@@ -224,7 +224,7 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
         sendDataFileState(false);
         QString msg = "Failed to open file ";
         msg.append(mFullyQualifiedFileName.c_str());
-        sendLogMessage(logERROR, "Remote Client", msg);
+        emit logMessage(logERROR, "Remote Client", msg);
         emit statusMessage(msg);
         sendDataFileState(false);
         return;
@@ -267,10 +267,10 @@ void cRemoteDataModel::onCloseDataFile()
     emit statusMessage("Data file closed.");
 
     auto fs = file_size(mFullyQualifiedFileName);
-    std::string msg = mFullyQualifiedFileName.filename().string();
+    QString msg = QString::fromStdString(mFullyQualifiedFileName.filename().string());
     msg += ", size = ";
-    msg += to_human_readable_size(fs);
-    sendLogMessage(logINFO, "Remote Client", msg);
+    msg += QString::fromStdString(to_human_readable_size(fs));
+    emit logMessage(logINFO, "Remote Client", msg);
 }
 
 void cRemoteDataModel::onStartDataRecording()
@@ -316,6 +316,10 @@ void cRemoteDataModel::onStartExperiment()
         emit statusMessage("Experiment Started: no data recording!");
         return;
     }
+
+    QString msg = "Experiment Started: ";
+    msg += QString::fromStdString(mExperimentTitle);
+    emit logMessage(logSTATUS, "Remote Client", msg);
 
     mSerializer.writeBeginHeader();
     mSerializer.writeTitle(mExperimentTitle);
@@ -482,13 +486,11 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
 void cRemoteDataModel::onPrincipalInvestigator(const std::string& pi)
 {
     mPrincipalInvestigator = pi;
-
 }
 
 void cRemoteDataModel::onResearcher(const std::string& researcher)
 {
     mResearchers.push_back(researcher);
-
 }
 
 void cRemoteDataModel::onConstructName(const std::string& name)
@@ -713,14 +715,11 @@ void cRemoteDataModel::clientDisconnected()
 
 void cRemoteDataModel::clientErrorOccurred(QAbstractSocket::SocketError socketError)
 {
-
 }
 
 void cRemoteDataModel::clientStateChanged(QAbstractSocket::SocketState socketState)
 {
-
 }
-
 
 int cRemoteDataModel::sendOutgoingData(const char* data, std::size_t len)
 {
@@ -750,6 +749,5 @@ void cRemoteDataModel::clearExperimentInfo()
     mHarvestDate = 0;
     mTreatments.clear();
     mComments.clear();
-
 }
 
