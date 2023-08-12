@@ -142,6 +142,7 @@ void cSpidercamView::experimentStateChanging(experiment::eState state)
 		break;
 	case eState::COMPLETED:
 	case eState::TERMINATED:
+		mpExperimentStatus->clearMessage();
 		mpExperimentStatus->setHidden(true);
 		break;
 	case eState::EXP_ERROR:
