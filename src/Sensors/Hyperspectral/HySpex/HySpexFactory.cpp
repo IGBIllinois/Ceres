@@ -181,8 +181,14 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
         QObject::connect(pModel, &cHySpexSWIR_384_Model::ambientTempChanged, pView, &cHySpexSWIR_384_StatusView::onAmbientTempChange);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::sensorTempChanged, pView, &cHySpexSWIR_384_StatusView::onSensorTempChange);
 
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::newPercentSaturationData, pView, &cHySpexSWIR_384_StatusView::onSaturationDataUpdated);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::newPercentBandData, pView, &cHySpexSWIR_384_StatusView::onBandDataUpdated);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::newFocusData, pView, &cHySpexSWIR_384_StatusView::onFocusDataUpdated);
+
 
         auto* pController = new cHySpexSWIR_384_Controller(pModel);
+
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::backgroundComplete, pController, &cHySpexSWIR_384_Controller::onBackgroundComplete);
 
         return sSensorWidgets(pModel, pController, pView);
     }
