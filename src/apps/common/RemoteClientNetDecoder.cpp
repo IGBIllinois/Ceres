@@ -5,6 +5,7 @@
 #include "remote_client_utils.hpp"
 #include "net_buffer.hpp"
 
+
 void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
     switch (static_cast<ePacketType>(hdr.id))
@@ -38,6 +39,12 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
 
         break;
     }
+    case ePacketType::START_OF_TREATMENT_LIST:
+        onStartOfTreatmentList();
+        break;
+    case ePacketType::END_OF_TREATMENT_LIST:
+        onEndOfTreatmentList();
+        break;
     case ePacketType::TREATMENT:
     {
         ExperimentTreatment_1 packet;
@@ -52,6 +59,12 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onPrincipalInvestigator(to_principal_investigator_1(packet));
         break;
     }
+    case ePacketType::START_OF_RESEARCHER_LIST:
+        onStartOfResearcherList();
+        break;
+    case ePacketType::END_OF_RESEARCHER_LIST:
+        onEndOfResearcherList();
+        break;
     case ePacketType::RESEARCHER:
     {
         Researcher_1 packet;
@@ -66,6 +79,12 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onConstructName(to_construct_name_1(packet));
         break;
     }
+    case ePacketType::START_OF_EVENT_NUMBER_LIST:
+        onStartOfEventNumberList();
+        break;
+    case ePacketType::END_OF_EVENT_NUMBER_LIST:
+        onEndOfEventNumberList();
+        break;
     case ePacketType::EVENT_NUMBER:
     {
         EventNumber_1 packet;
@@ -94,6 +113,12 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onHarvestDate(to_harvest_date_1(packet));
         break;
     }
+    case ePacketType::START_OF_COMMENT_LIST:
+        onStartOfCommentList();
+        break;
+    case ePacketType::END_OF_COMMENT_LIST:
+        onEndOfCommentList();
+        break;
     case ePacketType::COMMENT:
     {
         ExperimentComment_1 packet;
@@ -150,7 +175,8 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     }
     case ePacketType::SPIDER_CAM_DATA:
     {
-        onSpidercamPosition(to_spidercam_position_1(hdr.length, buffer));
+        auto data = to_spidercam_position_1(hdr.length, buffer);
+        onSpidercamPosition(data);
         break;
     }
     case ePacketType::WIND_DATA:
@@ -161,17 +187,20 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     }
     case ePacketType::TEMPERATURE_DATA:
     {
-        onTemperatureData(to_temperature_data_1(hdr.length, buffer));
+        auto data = to_temperature_data_1(hdr.length, buffer);
+        onTemperatureData(data);
         break;
     }
     case ePacketType::RELATIVE_HUMIDITY_DATA:
     {
-        onRelativeHumidityData(to_relative_humidity_data_1(hdr.length, buffer));
+        auto data = to_relative_humidity_data_1(hdr.length, buffer);
+        onRelativeHumidityData(data);
         break;
     }
     case ePacketType::PAR_DATA:
     {
-        onParData(to_par_data_1(hdr.length, buffer));
+        auto data = to_par_data_1(hdr.length, buffer);
+        onParData(data);
         break;
     }
     }

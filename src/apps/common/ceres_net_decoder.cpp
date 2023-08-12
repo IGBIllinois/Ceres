@@ -16,6 +16,7 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
     }
     case ePacketType::EXPERIMENT_INFO_REPLY:
     {
+        onExperimentInfoReply();
         break;
     }
     case ePacketType::DATA_FILE_STATE:

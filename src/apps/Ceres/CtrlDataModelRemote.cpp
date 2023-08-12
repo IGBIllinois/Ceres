@@ -134,9 +134,10 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
         mRH_pct = pWind_T_RH_PAR->relativeHumidity_pct();
         mPAR_umole = pWind_T_RH_PAR->par_umole();
 
-        sendTemperatureData(mTemperature_C);
-        sendRelativeHumidityData(mRH_pct);
-        sendParData(mPAR_umole);
+        encodeTemperatureData(mTemperature_C);
+        encodeRelativeHumidityData(mRH_pct);
+        encodeParData(mPAR_umole);
+        sendData();
 
         QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::windDataChanged, this, &cCtrlDataModelRemote::updateWindData);
         QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::temperatureChanged, this, &cCtrlDataModelRemote::updateTemperatureData);
@@ -350,61 +351,75 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
     bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
     if (!result) return false;
 
-    if (mSpecies.empty())
+    mExperimentInfoConfirmed = false;
+
+    // We are going to try send the experiment info on the remote computer
+    // three times.
+    for (int i = 0; i < 3; ++i)
     {
-        if (mResearchers.empty())
-            sendExperimentInfo(mExperimentTitle, "", mCultivar, mExperimentDoc);
+        if (mSpecies.empty())
+        {
+            if (mResearchers.empty())
+                encodeExperimentInfo(mExperimentTitle, "", mCultivar, mExperimentDoc);
+            else
+                encodeExperimentInfo(mExperimentTitle, mResearchers[0], mCultivar, mExperimentDoc);
+        }
         else
-            sendExperimentInfo(mExperimentTitle, mResearchers[0], mCultivar, mExperimentDoc);
-    }
-    else
-    {
-        if (mResearchers.empty())
-            sendExperimentInfo(mExperimentTitle, "", mSpecies, mCultivar, mExperimentDoc);
-        else
-            sendExperimentInfo(mExperimentTitle, mResearchers[0], mSpecies, mCultivar, mExperimentDoc);
-    }
+        {
+            if (mResearchers.empty())
+                encodeExperimentInfo(mExperimentTitle, "", mSpecies, mCultivar, mExperimentDoc);
+            else
+                encodeExperimentInfo(mExperimentTitle, mResearchers[0], mSpecies, mCultivar, mExperimentDoc);
+        }
 
-    if (!mPrincipalInvestigator.empty())
-        sendPrincipalInvestigator(mPrincipalInvestigator);
+        if (!mPrincipalInvestigator.empty())
+            encodePrincipalInvestigator(mPrincipalInvestigator);
 
-    if (mResearchers.size() > 1)
-    {
-        for (int i = 1; i < mResearchers.size(); ++i)
-            sendResearcher(mResearchers[i]);
-    }
+        if (mResearchers.size() > 1)
+        {
+            encodeResearchers(mResearchers);
+        }
 
-    if (!mConstructName.empty())
-        sendConstructName(mConstructName);
+        if (!mConstructName.empty())
+            encodeConstructName(mConstructName);
     
-    if (!mEventNumbers.empty())
-    {
-        for (const auto& event_num : mEventNumbers)
-            sendEventNumber(event_num);
-    }
+        if (!mEventNumbers.empty())
+        {
+            encodeEventNumbers(mEventNumbers);
+        }
     
-    if (!mFieldDesign.empty())
-        sendFieldDesign(mFieldDesign);
+        if (!mFieldDesign.empty())
+            encodeFieldDesign(mFieldDesign);
 
-    if (!mPermitInfo.empty())
-        sendPermitInfo(mPermitInfo);
+        if (!mPermitInfo.empty())
+            encodePermitInfo(mPermitInfo);
 
-    if (mPlantingDate > 0)
-        sendPlantingDate(mPlantingDate);
+        if (mPlantingDate > 0)
+            encodePlantingDate(mPlantingDate);
 
-    if (mHarvestDate > 0)
-        sendHarvestDate(mHarvestDate);
+        if (mHarvestDate > 0)
+            encodeHarvestDate(mHarvestDate);
 
-    if (!mTreatments.empty())
-    {
-        for (const auto& treatment : mTreatments)
-            sendTreatment(treatment);
-    }
+        if (!mTreatments.empty())
+        {
+            encodeTreatments(mTreatments);
+        }
 
-    if (!mComments.empty())
-    {
-        for (const auto& comment : mComments)
-            sendComment(comment);
+        if (!mComments.empty())
+        {
+            encodeComments(mComments);
+        }
+
+        encodeEndOfExperimentInfo();
+        sendData();
+
+        QTime delayTime = QTime::currentTime().addSecs(3);
+        while (QTime::currentTime() < delayTime)
+        {
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            if (mExperimentInfoConfirmed)
+                break;
+        }
     }
 
     return result;
@@ -456,11 +471,7 @@ void cCtrlDataModelRemote::disconnected()
         mpView->removeAllSensors();
     }
 
-    for (auto* creator : mStateCreators)
-    {
-        mThread.mpController->removeStateCreator(creator);
-    }
-    mStateCreators.clear();
+    mThread.mpController->clearStateCreators();
 
     for (auto* page : mPropertyPages)
     {
@@ -468,6 +479,8 @@ void cCtrlDataModelRemote::disconnected()
         page->deleteLater();
     }
     mPropertyPages.clear();
+
+    cNetworkEncoder::clear();
 
     mDataFileIsOpen = false;
     mConnected = false;
@@ -542,6 +555,11 @@ int cCtrlDataModelRemote::sendOutgoingData(const char* data, std::size_t len)
 /**********************************************************
  * Packet Handlers
  *********************************************************/
+void cCtrlDataModelRemote::onExperimentInfoReply()
+{
+    mExperimentInfoConfirmed = true;
+}
+
 void cCtrlDataModelRemote::onDataFileState(bool is_open)
 {
     mDataFileIsOpen = is_open;

@@ -23,6 +23,7 @@ public:
 
     void addStateCreator(cExperimentStateCreator* pCreator);
     void removeStateCreator(cExperimentStateCreator* pCreator);
+    void clearStateCreators();
 
     /*
      * Load an experiment from JSON file.

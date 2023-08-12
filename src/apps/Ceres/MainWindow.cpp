@@ -249,45 +249,10 @@ void cMainWindow::fileRefresh()
 }
 
 //-----------------------------------------------------------------------------
-/*
-void cMainWindow::fileNew()
-{
-    if (mpModel->isExperimentRunning())
-    {
-        //TODO: Something here!
-    }
-
-    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
-    if ((pExperiment == nullptr) || (!pExperiment->hasExperimentDocument()))
-    {
-        return;
-    }
-
-    QString msg = "Loading experiment \"";
-    msg += pExperiment->text(0);
-    msg += "\" from file ";
-    msg += pExperiment->getFilename();
-
-    onStatusUpdate(msg);
-    auto expDoc = pExperiment->getExperimentDocument();
-    if (!mpModel->loadExperiment(expDoc))
-    {
-    }
-
-}
-*/
 
 //-----------------------------------------------------------------------------
 void cMainWindow::fileAddExperiment()
 {
-/*
-    QTreeWidgetItem* experiment = new QTreeWidgetItem();
-    experiment->setText(0, "Hello");
-    QTreeWidgetItem* title = new QTreeWidgetItem();
-    title->setText(0, "Title");
-    experiment->addChild(title);
-    mpExperiments->addTopLevelItem(experiment);
-*/
 }
 
 //-----------------------------------------------------------------------------

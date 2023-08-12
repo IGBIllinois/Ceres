@@ -11,6 +11,19 @@
 
 using namespace hyspex;
 
+
+void cHySpexSWIR_384_Model_direct::handleImageCallback(void* p, hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image)
+{
+    using namespace hyspex;
+
+    if (!p) return;
+
+    auto* self = static_cast<cHySpexSWIR_384_Model_direct*>(p);
+
+    self->updateImageData(a_options, a_image);
+}
+
+
 cHySpexSWIR_384_Model_direct::cHySpexSWIR_384_Model_direct(std::unique_ptr<hyspex::cSWIR384> camera, QObject* parent)
 :
     cHySpexSWIR_384_Model(parent), mCamera(std::move(camera))
@@ -188,25 +201,13 @@ bool cHySpexSWIR_384_Model_direct::initialize()
 	mAcquisitionStatus = mCamera->getAcquisitionStatus();
     emit acqStatusChanged();
 
-/*
-	auto badPixels = vnir->getBadPixels();
-	std::cout << "Num Bad Pixels = " << badPixels.size << std::endl;
+    mBadPixelCorrectionData  = mCamera->getBadPixelsWithCalculatedCorrections();
+    mResponsivityMatrix      = mCamera->getResponsivityMatrix();
+    mQuantumEfficiencyData   = mCamera->getQuantumEfficiencyData();
 
-	auto badCorrPixels = vnir->getBadPixelsWithCalculatedCorrections();
-	std::cout << "Bad Pixels With Calculated Corrections = " << badCorrPixels.size << std::endl;
+    mSpectralCalibrationPerBand = mCamera->getFullSpectralCalibrationPerBand();
 
-	auto badPixelsMatrix = vnir->getBadPixelsMatrix();
-	std::cout << "Bad Pixels Matrix = " << badPixelsMatrix.size() << std::endl;
-*/
-
-	auto reMatrix = mCamera->getResponsivityMatrix();
-	auto qeMatrix = mCamera->getQuantumEfficiencyMatrix();
-
-	auto spectralCal = mCamera->getSpectralCalibrationPerBand();
-	auto fullSpectralCal = mCamera->getFullSpectralCalibrationPerBand();
-
-    //    mBackground.resize(mSpatialSize, mSpectralSize);
-    //    mBackground = mCamera->getBackgroundMatrix();
+    mSerializer.setBufferCapacity(mResponsivityMatrix.size() * sizeof(float) + 1024);
 
     return cHySpexSWIR_384_Model::initialize();
 }
@@ -215,6 +216,8 @@ bool cHySpexSWIR_384_Model_direct::startCommunications()
 {
     mTemperatureUpdateTimer.reset();
     mCamera->initAcquisition();
+
+    mCamera->registerImageCallback(&cHySpexSWIR_384_Model_direct::handleImageCallback, hyspex::ImageOptions::HYSPEX_RAW, this);
 
     mCamera->startAcquisition();
 
@@ -247,6 +250,8 @@ void cHySpexSWIR_384_Model_direct::stopCommunications()
 
     mConnected = false;
 
+    mCamera->unregisterImageCallback(&cHySpexSWIR_384_Model_direct::handleImageCallback);
+
     setStatus(sensor::eStatus::STOPPED);
 }
 
@@ -261,37 +266,54 @@ void cHySpexSWIR_384_Model_direct::update()
         emit sensorTempChanged(mSensorTemp_C);
     }
 
-    if (mBackgroundState != eBgStates::NONE)
+    if (mBgCurrentState != eBgStates::NONE)
     {
-        switch (mBackgroundState)
+        switch (mBgCurrentState)
         {
         case eBgStates::SH_CLOSE:
         {
             if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED)
             {
                 mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_PENDING;
-                mCamera->calculateBackgroundAsync(0, mNumBackgrounds);
-                mBackgroundState = eBgStates::COMPLETE;
+                unsigned int timeout_ms = ((mNumBackgrounds + 10) * mFramePeriod_us) / 1000;
+                mCamera->calculateBackgroundAsync(timeout_ms, mNumBackgrounds);
+                mBgCurrentState = eBgStates::STARTED;
             }
             break;
         }
-        case eBgStates::COMPLETE:
+        case eBgStates::STARTED:
         {
+            auto oldBackgroundStatus = mBackgroundStatus;
+
+            mBackgroundStatus = mCamera->getBackgroundStatus();
             switch (mBackgroundStatus)
             {
             case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
             {
-                mCamera->getBackgroundMatrix();
+                mCamera->stopCalculatingBackground();
+                mBackgroundMatrix = mCamera->getBackgroundMatrix();
                 mCamera->openShutter();
-                mBackgroundState = eBgStates::SH_OPEN;
+                mBgCurrentState = eBgStates::SH_OPEN;
+
+                if (mIsRecording && mSerializer)
+                {
+                    mSerializer.writeNumOfBackgrounds(mNumBackgrounds);
+                    mSerializer.writeBackgroundMatrix(mBackgroundMatrix);
+                }
+
                 break;
             }
             case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
             {
                 mCamera->openShutter();
-                mBackgroundState = eBgStates::SH_OPEN;
+                mBgCurrentState = eBgStates::SH_OPEN;
                 break;
             }
+            }
+
+            if (oldBackgroundStatus != mBackgroundStatus)
+            {
+                emit bgStatusChanged();
             }
 
             break;
@@ -300,7 +322,7 @@ void cHySpexSWIR_384_Model_direct::update()
         {
             if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN)
             {
-                mBackgroundState = eBgStates::NONE;
+                mBgCurrentState = eBgStates::NONE;
                 emit backgroundComplete();
             }
             break;
@@ -311,8 +333,28 @@ void cHySpexSWIR_384_Model_direct::update()
     }
 }
 
+void cHySpexSWIR_384_Model_direct::enableDataRecording(cBlockDataFileWriter& file)
+{
+    mCamera->openShutter();
+    mBgCurrentState = eBgStates::NONE;
+    cHySpexSWIR_384_Model::enableDataRecording(file);
+}
+
+void cHySpexSWIR_384_Model_direct::disableDataRecording()
+{
+    cHySpexSWIR_384_Model::disableDataRecording();
+}
+
 void cHySpexSWIR_384_Model_direct::writeDataHeader()
 {
+    cHySpexSWIR_384_Model::writeDataHeader();
+
+    if (!mBackgroundMatrix.empty())
+    {
+        auto age_ms = mCamera->getBackgroundMatrixAge_ms();
+        mSerializer.writeBackgroundMatrixAge_ms(age_ms);
+        mSerializer.writeBackgroundMatrix(mBackgroundMatrix);
+    }
 }
 
 void cHySpexSWIR_384_Model_direct::setAcquisitionParameters(std::uint16_t avg_frames,
@@ -367,7 +409,14 @@ void cHySpexSWIR_384_Model_direct::setNumOfBackgrounds(int num_backgrounds)
 void cHySpexSWIR_384_Model_direct::calcBackground()
 {
     mCamera->closeShutter();
-    mBackgroundState = eBgStates::SH_CLOSE;
+
+    // Sometimes calculating a background gets stuck in the pending stage.
+    if (mBackgroundStatus == hyspex::BackgroundStatus::HYSPEX_BG_PENDING)
+    {
+        mCamera->stopCalculatingBackground();
+    }
+
+    mBgCurrentState = eBgStates::SH_CLOSE;
 }
 
 void cHySpexSWIR_384_Model_direct::open_shutter()
@@ -380,6 +429,23 @@ void cHySpexSWIR_384_Model_direct::close_shutter()
     mCamera->closeShutter();
 }
 
+void cHySpexSWIR_384_Model_direct::computePercentSaturation(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexSWIR_384_Model::computePercentSaturation(compute);
+}
+
+void cHySpexSWIR_384_Model_direct::computePercentBand(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexSWIR_384_Model::computePercentBand(compute);
+}
+
+void cHySpexSWIR_384_Model_direct::computeFocus(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexSWIR_384_Model::computeFocus(compute);
+}
 
 /********************************************************************
  *  Status Callback Methods
@@ -464,6 +530,74 @@ void cHySpexSWIR_384_Model_direct::updateShutterStatus(hyspex::ShutterStatus sta
     emit shutterStatusChanged();
 }
 
+void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image)
+{
+    switch (meComputeData)
+    {
+    default:
+    case eCompute::NONE:
+        break;
+    case eCompute::PERCENT_SATURATION:
+    {
+        auto n = a_image.saturated.size;
+        auto spectral_size = a_image.spectral_size;
+
+        const std::lock_guard<std::mutex> lock(mPercentSaturationLock);
+
+        mPercentSaturation.resize(n);
+        for (uint64_t i = 0; i < n; ++i)
+            mPercentSaturation[i] = (100.0f * a_image.saturated.data[i]) / spectral_size;
+
+        emit newPercentSaturationData();
+        break;
+    }
+    case eCompute::PERCENT_BAND:
+    {
+        auto spatial_size = a_image.spatial_size;
+        auto spectral_size = a_image.spectral_size;
+
+        auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
+        auto num_bands = image.num_bands();
+
+        const std::lock_guard<std::mutex> lock(mPercentBandLock);
+
+        mPercentBand.resize(num_bands);
+        for (std::size_t b = 0; b < num_bands; ++b)
+        {
+            int count = 0;
+            auto band = image.channels(b);
+            for (auto value : band)
+            {
+                if (value >= mSaturationValue)
+                    ++count;
+            }
+            mPercentBand[b] = (100.0f * count) / spatial_size;
+        }
+
+        emit newPercentBandData();
+        break;
+    }
+    case eCompute::FOCUS:
+    {
+        emit newFocusData();
+        break;
+    }
+    }
+
+    if (mIsRecording && mSerializer)
+    {
+        mImageData = HySpexConnect::image_data_view<unsigned short>(a_image);
+
+        mSerializer.writeImage(mImageData);
+    }
+
+//    auto n = a_image.saturated.size;
+//    mSaturationLevel.resize(n);
+//    for (uint64_t i = 0; i < n; ++i)
+//        mSaturationLevel[i] = a_image.saturated.data[i];
+
+    emit newImageData();
+}
 
 
 

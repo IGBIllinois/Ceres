@@ -8,6 +8,230 @@ cCeresNetEncoder::cCeresNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
 {}
 
+void cCeresNetEncoder::encodeExperimentInfo(const std::string& title, const std::string& researcher,
+    const std::string& cultivar, const std::string& doc)
+{
+    if (encode_exp_info_data(title, researcher, cultivar, doc, mBuffer) < 0)
+    {
+        sendData();
+        encode_exp_info_data(title, researcher, cultivar, doc, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeExperimentInfo(const std::string& title, const std::string& researcher,
+    const std::string& species, const std::string& cultivar, const std::string& doc)
+{
+    if (encode_exp_info_data(title, researcher, species, cultivar, doc, mBuffer) < 0)
+    {
+        sendData();
+        encode_exp_info_data(title, researcher, species, cultivar, doc, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodePrincipalInvestigator(const std::string& pi)
+{
+    if (encode_principal_investigator(pi, mBuffer) < 0)
+    {
+        sendData();
+        encode_principal_investigator(pi, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeResearchers(const std::vector<std::string>& researchers)
+{
+    if (encode_start_of_researcher_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_start_of_event_number_list(mBuffer);
+    }
+
+    for (auto researcher : researchers)
+    {
+        if (encode_researcher(researcher, mBuffer) < 0)
+        {
+            sendData();
+            encode_researcher(researcher, mBuffer);
+        }
+    }
+
+    if (encode_end_of_researcher_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_end_of_event_number_list(mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeConstructName(const std::string& name)
+{
+    if (encode_construct_name(name, mBuffer) < 0)
+    {
+        sendData();
+        encode_construct_name(name, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeEventNumbers(const std::vector<std::string>& event_numbers)
+{
+    if (encode_start_of_event_number_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_start_of_event_number_list(mBuffer);
+    }
+
+    for (auto event_number : event_numbers)
+    {
+        if (encode_event_number(event_number, mBuffer) < 0)
+        {
+            sendData();
+            encode_event_number(event_number, mBuffer);
+        }
+    }
+
+    if (encode_end_of_event_number_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_end_of_event_number_list(mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeFieldDesign(const std::string& design)
+{
+    if (encode_field_design(design, mBuffer) < 0)
+    {
+        sendData();
+        encode_field_design(design, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodePlantingDate(std::time_t date)
+{
+    if (encode_planting_date(date, mBuffer) < 0)
+    {
+        sendData();
+        encode_planting_date(date, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeHarvestDate(std::time_t date)
+{
+    if (encode_harvest_date(date, mBuffer) < 0)
+    {
+        sendData();
+        encode_harvest_date(date, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeTreatments(const std::vector<std::string>& treatments)
+{
+    if (encode_start_of_treatment_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_start_of_treatment_list(mBuffer);
+    }
+
+    for (auto treatment : treatments)
+    {
+        if (encode_treatment(treatment, mBuffer) < 0)
+        {
+            sendData();
+            encode_treatment(treatment, mBuffer);
+        }
+    }
+
+    if (encode_end_of_treatment_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_end_of_treatment_list(mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeComments(const std::vector<std::string>& comments)
+{
+    if (encode_start_of_comment_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_start_of_comment_list(mBuffer);
+    }
+
+    for (auto comment : comments)
+    {
+        if (encode_comment(comment, mBuffer) < 0)
+        {
+            sendData();
+            encode_comment(comment, mBuffer);
+        }
+    }
+
+    if (encode_end_of_comment_list(mBuffer) < 0)
+    {
+        sendData();
+        encode_end_of_comment_list(mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodePermitInfo(const std::string& permit)
+{
+    if (encode_permit_info(permit, mBuffer) < 0)
+    {
+        sendData();
+        encode_permit_info(permit, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeSpidercamPosition(const spidercam::sPosition_1_t& pos)
+{
+    if (encode_spidercam_pos(pos, mBuffer) < 0)
+    {
+        sendData();
+        encode_spidercam_pos(pos, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeWindData(bool valid, double wind_speed_mps, double wind_direction_deg)
+{
+    if (encode_wind_data(valid, wind_speed_mps, wind_direction_deg, mBuffer) < 0)
+    {
+        sendData();
+        encode_wind_data(valid, wind_speed_mps, wind_direction_deg, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeTemperatureData(double temp_C)
+{
+    if (encode_temperature_data(temp_C, mBuffer) < 0)
+    {
+        sendData();
+        encode_temperature_data(temp_C, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeRelativeHumidityData(double rh_pct)
+{
+    if (encode_relative_humidity_data(rh_pct, mBuffer) < 0)
+    {
+        sendData();
+        encode_relative_humidity_data(rh_pct, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeParData(double par_umole)
+{
+    if (encode_par_data(par_umole, mBuffer) < 0)
+    {
+        sendData();
+        encode_par_data(par_umole, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeEndOfExperimentInfo()
+{
+    if (encode_end_of_experiment_info(mBuffer) < 0)
+    {
+        sendData();
+        encode_end_of_experiment_info(mBuffer);
+    }
+}
+
 
 void cCeresNetEncoder::sendExperimentInfo(const std::string& title, const std::string& researcher,
     const std::string& cultivar, const std::string& doc)
@@ -80,6 +304,12 @@ void cCeresNetEncoder::sendComment(const std::string& comment)
 void cCeresNetEncoder::sendPermitInfo(const std::string& permit)
 {
     encode_permit_info(permit, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendEndOfExperimentInfo()
+{
+    encode_end_of_experiment_info(mBuffer);
     sendData();
 }
 

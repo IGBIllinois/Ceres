@@ -18,8 +18,9 @@ public:
 
 protected:
     /*
-     * The Ceres application sends these packets and should never receive them!
+     * The Ceres Remote Client sends these packets and should never receive them!
      */
+    virtual void onExperimentInfoReply() = 0;
     virtual void onDataFileState(bool is_open) = 0;
 
     virtual void onStatusMessage(const std::string& msg) = 0;

@@ -38,6 +38,8 @@ cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::st
 
 void cHySpexSWIR_384_PropertyPage_Remote::onConnect()
 {
+	setEnabled(false);
+	cHySpexSWIR_384_PropertiesNetEncoder::sendQueryLensNames();
 	cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
 }
 
@@ -72,7 +74,9 @@ void cHySpexSWIR_384_PropertyPage_Remote::onCurrentState(bool valid,
 		}
 	}
 
-	setEnabled(true);
+	if (!mWaitingForBackgroundReply)
+		setEnabled(true);
+
 	update();
 }
 
@@ -84,9 +88,12 @@ void cHySpexSWIR_384_PropertyPage_Remote::onLensNames(const std::vector<std::str
 	}
 }
 
-
 void cHySpexSWIR_384_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
-{}
+{
+	mWaitingForBackgroundReply = false;
+	setEnabled(true);
+	update();
+}
 
 void cHySpexSWIR_384_PropertyPage_Remote::onShutterState(eShutterState state)
 {}
@@ -99,12 +106,21 @@ void cHySpexSWIR_384_PropertyPage_Remote::showPage()
 
 void cHySpexSWIR_384_PropertyPage_Remote::doCalcBackground()
 {
+	if (!mConnected)
+		return;
 
+	mWaitingForBackgroundReply = true;
+
+	setEnabled(false);
+
+	doApply();
+
+	sendCalcBackground();
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::doOK()
 {
-	doApply();
+	sendChangedData();
 	closeConnection();
 	cHySpexSWIR_384_PropertyPage::doOK();
 }
@@ -119,6 +135,48 @@ void cHySpexSWIR_384_PropertyPage_Remote::doApply()
 {
 	if (!mConnected)
 		return;
+
+	bool needs_update = false;
+
+	sendChangedData(&needs_update);
+
+	if (needs_update)
+	{
+		setEnabled(false);
+		sendQueryState();
+		update();
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::sendChangedData(bool* pNeedsUpdate)
+{
+	if (!mConnected)
+		return;
+
+	bool needs_update = false;
+
+	auto frames = mpAvgFrames->text().toInt();
+	auto frame_period_us = mpFramePeriod_us->text().toInt();
+	auto integration_time_us = mpIntegrationTime_us->text().toInt();
+
+	if ((mDefaultAverageFrames != frames)
+		|| (mDefaultFramePeriod_us != frame_period_us)
+		|| (mDefaultIntegrationTime_us != integration_time_us))
+	{
+		sendAcquisitionParameters(frames, frame_period_us, integration_time_us);
+		needs_update = true;
+	}
+
+	auto num_backgrounds = mpNumBackgrounds->text().toInt();
+
+	if (mDefaultNumBackgrounds != num_backgrounds)
+	{
+		sendNumOfBackgrounds(num_backgrounds);
+		needs_update = true;
+	}
+
+	if (pNeedsUpdate)
+		*pNeedsUpdate = needs_update;
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

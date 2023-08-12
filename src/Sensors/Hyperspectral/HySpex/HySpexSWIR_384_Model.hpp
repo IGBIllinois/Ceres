@@ -33,7 +33,7 @@ public:
 signals:
     void backgroundComplete();
 
-private:
+protected:
     cHySpexSWIR_384_Serializer mSerializer;
 };
 

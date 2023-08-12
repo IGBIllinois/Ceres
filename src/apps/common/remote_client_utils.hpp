@@ -51,6 +51,15 @@ enum class ePacketType : uint16_t
 	COMMENT,
 	PERMIT_INFO,
 	RESEARCHER,
+	END_OF_EXPERIMENT_INFO,
+	START_OF_TREATMENT_LIST,
+	END_OF_TREATMENT_LIST,
+	START_OF_EVENT_NUMBER_LIST,
+	END_OF_EVENT_NUMBER_LIST,
+	START_OF_COMMENT_LIST,
+	END_OF_COMMENT_LIST,
+	START_OF_RESEARCHER_LIST,
+	END_OF_RESEARCHER_LIST,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -86,12 +95,16 @@ std::string to_principal_investigator_1(const PrincipalInvestigator_1& pckt);
 int encode_principal_investigator(const std::string& pi, net_buffer& buffer);
 
 std::string to_researcher_1(const Researcher_1& pckt);
+int encode_start_of_researcher_list(net_buffer& buffer);
+int encode_end_of_researcher_list(net_buffer& buffer);
 int encode_researcher(const std::string& researcher, net_buffer& buffer);
 
 std::string to_construct_name_1(const ConstructName_1& pckt);
 int encode_construct_name(const std::string& name, net_buffer& buffer);
 
 std::string to_event_number_1(const EventNumber_1& pckt);
+int encode_start_of_event_number_list(net_buffer& buffer);
+int encode_end_of_event_number_list(net_buffer& buffer);
 int encode_event_number(const std::string& number, net_buffer& buffer);
 
 std::string to_field_design_1(const FieldDesign_1& pckt);
@@ -104,14 +117,20 @@ std::time_t to_harvest_date_1(const HarvestDate_1& pckt);
 int encode_harvest_date(std::time_t date, net_buffer& buffer);
 
 std::string to_treatment_1(const ExperimentTreatment_1& pckt);
+int encode_start_of_treatment_list(net_buffer& buffer);
+int encode_end_of_treatment_list(net_buffer& buffer);
 int encode_treatment(const std::string& treatment, net_buffer& buffer);
 
 std::string to_comment_1(const ExperimentComment_1& pckt);
+int encode_start_of_comment_list(net_buffer& buffer);
+int encode_end_of_comment_list(net_buffer& buffer);
 int encode_comment(const std::string& comment, net_buffer& buffer);
 
 std::string to_permit_info_1(const ExperimentPermitInfo_1& pckt);
 int encode_permit_info(const std::string& permit, net_buffer& buffer);
 
+int encode_experiment_info_reply(net_buffer& buffer);
+int encode_end_of_experiment_info(net_buffer& buffer);
 
 int encode_start_experiment(net_buffer& buffer);
 int encode_stop_experiment(net_buffer& buffer);

@@ -37,7 +37,17 @@ void cExperimentStateMachine::removeStateCreator(cExperimentStateCreator* pCreat
     std::lock_guard<std::mutex> lock{mStateCreatorsMutex};
 
     auto it = std::remove(mStateCreators.begin(), mStateCreators.end(), pCreator);
+
+    mStateCreators.erase(it);
 }
+
+void cExperimentStateMachine::clearStateCreators()
+{
+    std::lock_guard<std::mutex> lock{ mStateCreatorsMutex };
+
+    mStateCreators.clear();
+}
+
 
 bool cExperimentStateMachine::isRecording()
 {

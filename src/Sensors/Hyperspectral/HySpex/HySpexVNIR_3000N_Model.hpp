@@ -14,7 +14,7 @@ class cHySpexVNIR_3000N_Model : public cHySpexCameraModel
 
 public:
     cHySpexVNIR_3000N_Model(QObject* parent = nullptr);
-    virtual ~cHySpexVNIR_3000N_Model() = default;
+    virtual ~cHySpexVNIR_3000N_Model();
 
     /*
      * Returns the class identifier used by the sensor's serializer
@@ -35,27 +35,6 @@ signals:
     void backgroundComplete();
 
 protected:
-	cHyperspectralImageBuffer<float> mBackground;
-
-
-/*
-	auto badPixels = vnir->getBadPixels();
-	std::cout << "Num Bad Pixels = " << badPixels.size << std::endl;
-
-	auto badCorrPixels = vnir->getBadPixelsWithCalculatedCorrections();
-	std::cout << "Bad Pixels With Calculated Corrections = " << badCorrPixels.size << std::endl;
-
-	auto badPixelsMatrix = vnir->getBadPixelsMatrix();
-	std::cout << "Bad Pixels Matrix = " << badPixelsMatrix.size() << std::endl;
-*/
-
-	cHyperspectralImageBuffer<float> mResponsivityMatrix;
-	cHyperspectralImageBuffer<float> mQuantumEfficiencyMatrix;
-
-	cHyperspectralSpectralBuffer<float> SpectralCalibrationPerBand;
-
-
-
     cHySpexVNIR_3000N_Serializer mSerializer;
 };
 

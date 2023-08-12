@@ -10,3 +10,5 @@ cHySpexSWIR_384_ControllerNetEncoder::cHySpexSWIR_384_ControllerNetEncoder(std::
     : cHySpexCamera_ControllerNetEncoder(capacity)
 {}
 
+cHySpexSWIR_384_ControllerNetEncoder::~cHySpexSWIR_384_ControllerNetEncoder()
+{}

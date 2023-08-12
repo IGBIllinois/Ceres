@@ -10,16 +10,29 @@ cCeresRemoteClientNetEncoder::cCeresRemoteClientNetEncoder(std::size_t capacity)
 
 void cCeresRemoteClientNetEncoder::encodeSensorStatus(const std::string& sensor, const std::string& status)
 {
-    encode_sensor_status(sensor, status, mBuffer);
+    if (encode_sensor_status(sensor, status, mBuffer) < 0)
+    {
+        sendData();
+        encode_sensor_status(sensor, status, mBuffer);
+    }
 }
 
 void cCeresRemoteClientNetEncoder::encodeSensorPropertyConnectInfo(const std::string& sensor,
     const std::string& model, uint32_t version, const std::string& name, const std::string& ip_address,
     uint16_t port)
 {
-    encode_sensor_property_connect_info(sensor, model, version, name, ip_address, port, mBuffer);
+    if (encode_sensor_property_connect_info(sensor, model, version, name, ip_address, port, mBuffer) < 0)
+    {
+        sendData();
+        encode_sensor_property_connect_info(sensor, model, version, name, ip_address, port, mBuffer);
+    }
 }
 
+void cCeresRemoteClientNetEncoder::sendExperimentInfoReply()
+{
+    encode_experiment_info_reply(mBuffer);
+    sendData();
+}
 
 void cCeresRemoteClientNetEncoder::sendDataFileState(bool is_open)
 {

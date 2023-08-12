@@ -51,6 +51,9 @@ public slots:
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString msg);
 
+    void onLocalStatusUpdate(QString msg);
+    void onLocalLogMessage(uint8_t type, QString device, QString msg);
+
 private slots:
 
 private:

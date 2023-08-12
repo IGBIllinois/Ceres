@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Add the public header files to use the library
 set(HYPERSPECTRAL_PUBLIC_HEADERS
     HyperspectralFactory.hpp
-    HyperspectralData.hpp
+#    HyperspectralData.hpp
 )
 
 # Add the public header files to use the library

@@ -10,6 +10,7 @@
 #include <sstream>
 #include <ctime>
 
+//#define LOG_EXPERIMENT_INFO
 
 namespace
 {
@@ -92,6 +93,8 @@ bool cRemoteDataModel::startTcpServer(const std::string& ip, uint16_t port)
         //          pController->moveToThread(&mThread);
     }
 
+    if (mpTcpServer->isListening()) return true;
+
     QHostAddress local_endpoint(ip.c_str());
 
     return mpTcpServer->listen(local_endpoint, port);
@@ -171,6 +174,10 @@ void cRemoteDataModel::sendLogMessage(uint8_t type, const std::string& device, c
 void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 {
     using namespace std::filesystem;
+
+    QString log_msg = "Open Data File: ";
+    log_msg += QString::fromStdString(fileName);
+    qInfo() << log_msg;
 
     if (mFile.isOpen())
     {
@@ -289,7 +296,10 @@ void cRemoteDataModel::onStartDataRecording()
     mSerializer.startRecordingTimestamp(timestamp_ns());
     mpHeartbeatTimer->start(1000);
 
-    emit statusMessage("Data recording started.");
+    QString msg = "Data recording started.";
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+
+    emit statusMessage(msg);
 }
 
 void cRemoteDataModel::onStopDataRecording()
@@ -304,7 +314,10 @@ void cRemoteDataModel::onStopDataRecording()
     if (static_cast<bool>(mSerializer))
         mSerializer.endRecordingTimestamp(timestamp_ns());
 
-    emit statusMessage("Data recording stopped.");
+    QString msg = "Data recording stopped.";
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+
+    emit statusMessage(msg);
 }
 
 void cRemoteDataModel::onStartExperiment()
@@ -464,6 +477,10 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
 
     if (mSerializer.bufferCapacity() < mExperimentDoc.size())
         mSerializer.setBufferCapacity(mExperimentDoc.size() + 32);
+
+    QString msg = "Experiment Info: ";
+    msg += QString::fromStdString(mExperimentTitle);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
 }
 
 void cRemoteDataModel::onExperimentInfo(const std::string& title,
@@ -481,62 +498,163 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
 
     if (mSerializer.bufferCapacity() < mExperimentDoc.size())
         mSerializer.setBufferCapacity(mExperimentDoc.size() + 32);
+
+    QString msg = "Experiment Info: ";
+    msg += QString::fromStdString(mExperimentTitle);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
 }
 
 void cRemoteDataModel::onPrincipalInvestigator(const std::string& pi)
 {
     mPrincipalInvestigator = pi;
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "PrincipalInvestigator: ";
+    msg += QString::fromStdString(mPrincipalInvestigator);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
 }
+
+void cRemoteDataModel::onStartOfResearcherList()
+{
+    mResearchers.clear();
+}
+
+void cRemoteDataModel::onEndOfResearcherList()
+{}
 
 void cRemoteDataModel::onResearcher(const std::string& researcher)
 {
     mResearchers.push_back(researcher);
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Researchers: ";
+    msg += QString::fromStdString(researcher);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
 }
 
 void cRemoteDataModel::onConstructName(const std::string& name)
 {
     mConstructName = name;
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Construct Name: ";
+    msg += QString::fromStdString(mConstructName);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
 }
+
+void cRemoteDataModel::onStartOfEventNumberList()
+{
+    mEventNumbers.clear();
+}
+
+void cRemoteDataModel::onEndOfEventNumberList()
+{}
 
 void cRemoteDataModel::onEventNumber(const std::string& event_num)
 {
     mEventNumbers.push_back(event_num);
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Event Numbers: ";
+    msg += QString::fromStdString(event_num);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
 }
 
 void cRemoteDataModel::onFieldDesign(const std::string& design)
 {
     mFieldDesign = design;
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Field Design: ";
+    msg += QString::fromStdString(mFieldDesign);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
 }
 
 void cRemoteDataModel::onPlantingDate(std::time_t date)
 {
     mPlantingDate = date;
+
+#ifdef LOG_EXPERIMENT_INFO
+    emit localLogMessage(logSTATUS, "Remote Client", "Planting Date");
+#endif
 }
 
 void cRemoteDataModel::onHarvestDate(std::time_t date)
 {
     mHarvestDate = date;
+
+#ifdef LOG_EXPERIMENT_INFO
+    emit localLogMessage(logSTATUS, "Remote Client", "Harvest Date");
+#endif
 }
+
+void cRemoteDataModel::onStartOfTreatmentList()
+{
+    mTreatments.clear();
+}
+
+void cRemoteDataModel::onEndOfTreatmentList()
+{}
 
 void cRemoteDataModel::onTreatment(const std::string& treatment)
 {
     mTreatments.push_back(treatment);
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Treatment: ";
+    msg += QString::fromStdString(treatment);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
 }
+
+void cRemoteDataModel::onStartOfCommentList()
+{
+    mComments.clear();
+}
+
+void cRemoteDataModel::onEndOfCommentList()
+{}
 
 void cRemoteDataModel::onComment(const std::string& comment)
 {
     mComments.push_back(comment);
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Comments: ";
+    msg += QString::fromStdString(comment);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
 }
 
 void cRemoteDataModel::onPermitInfo(const std::string& permit)
 {
     mPermitInfo = permit;
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Permit Info: ";
+    msg += QString::fromStdString(mPermitInfo);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
+}
+
+void cRemoteDataModel::onEndOfExperimentInfo()
+{
+    sendExperimentInfoReply();
 }
 
 
 void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
 {
     mDollyPosition = pos;
+
+#ifdef LOG_EXPERIMENT_INFO
+    emit localStatusMessage("Dolly data updated");
+#endif
 
     if (mIsRecording)
     {
@@ -550,7 +668,11 @@ void cRemoteDataModel::onWindData(bool valid, double wind_speed_mps, double wind
     mWindSpeed_mps = wind_speed_mps;
     mWindDirection_deg = wind_direction_deg;
 
-    if (mIsRecording)
+#ifdef LOG_EXPERIMENT_INFO
+    emit localStatusMessage("Wind data updated");
+#endif
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mWeatherSerializer.writeWindData_mps(mWindDataValid, 
             mWindSpeed_mps, mWindDirection_deg);
@@ -561,7 +683,11 @@ void cRemoteDataModel::onTemperatureData(double temp_C)
 {
     mTemperature_C = temp_C;
 
-    if (mIsRecording)
+#ifdef LOG_EXPERIMENT_INFO
+    emit localStatusMessage("Temperature data updated");
+#endif
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mWeatherSerializer.writeTemperature_C(mTemperature_C);
     }
@@ -571,7 +697,11 @@ void cRemoteDataModel::onRelativeHumidityData(double rh_pct)
 {
     mRelativeHumidity_pct = rh_pct;
 
-    if (mIsRecording)
+#ifdef LOG_EXPERIMENT_INFO
+    emit localStatusMessage("Relative Humidity data updated");
+#endif
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mWeatherSerializer.writeRelativeHumidity_pct(mRelativeHumidity_pct);
     }
@@ -581,7 +711,11 @@ void cRemoteDataModel::onParData(double par_umole)
 {
     mPAR_umole = par_umole;
 
-    if (mIsRecording)
+#ifdef LOG_EXPERIMENT_INFO
+    emit localStatusMessage("PAR data updated");
+#endif
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mWeatherSerializer.writePAR_umole(mPAR_umole);
     }
@@ -589,7 +723,7 @@ void cRemoteDataModel::onParData(double par_umole)
 
 void cRemoteDataModel::onHeartbeat()
 {
-    if (mIsRecording)
+    if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mSerializer.heartbeatTimestamp(timestamp_ns());
     }

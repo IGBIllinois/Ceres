@@ -6,6 +6,8 @@
 #include "../HyperspectralModel.hpp"
 #include "../HyperspectralData.hpp"
 
+#include <HySpexConnect/HySpexData.hpp>
+
 #include <QObject>
 
 #include <vector>
@@ -179,12 +181,13 @@ protected:
 
     std::uint32_t mNumBackgrounds = 200;
 
-//	cHyperspectralImageBuffer<float> mBackground;
+    HySpexConnect::cSpatialMajorData<float> mBackgroundMatrix;
+    HySpexConnect::cSpatialMajorData<float> mResponsivityMatrix;
+    HySpexConnect::cSpectralData<float>     mQuantumEfficiencyData;
+    HySpexConnect::cSpectralData<float>     mSpectralCalibrationPerBand;
+    HySpexConnect::cBadPixelCorrectionData  mBadPixelCorrectionData;
+    HySpexConnect::cImageData<uint16_t>     mImageData;
 
-//	cHyperspectralImageBuffer<float> mResponsivityMatrix;
-//	cHyperspectralImageBuffer<float> mQuantumEfficiencyMatrix;
-
-//	cHyperspectralSpectralBuffer<float> SpectralCalibrationPerBand;
 
     enum class eCompute {NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS} meComputeData = eCompute::NONE;
     mutable std::mutex mPercentSaturationLock;

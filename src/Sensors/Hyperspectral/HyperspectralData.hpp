@@ -16,6 +16,8 @@
 
 #pragma once
 
+#if 0
+
 #include <array>
 #include <vector>
 #include <cassert>
@@ -1020,4 +1022,6 @@ inline std::vector<T> to_vector(const hyperspectral::span<T>& s)
 		result[i] = s[i];
 	return result;
 }
+
+#endif
 

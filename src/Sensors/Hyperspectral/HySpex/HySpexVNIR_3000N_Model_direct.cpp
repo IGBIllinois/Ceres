@@ -202,25 +202,13 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
 	mAcquisitionStatus = mCamera->getAcquisitionStatus();
     emit acqStatusChanged();
 
-/*
-	auto badPixels = vnir->getBadPixels();
-	std::cout << "Num Bad Pixels = " << badPixels.size << std::endl;
+    mBadPixelCorrectionData  = mCamera->getBadPixelsWithCalculatedCorrections();
+    mResponsivityMatrix      = mCamera->getResponsivityMatrix();
+    mQuantumEfficiencyData   = mCamera->getQuantumEfficiencyData();
 
-	auto badCorrPixels = vnir->getBadPixelsWithCalculatedCorrections();
-	std::cout << "Bad Pixels With Calculated Corrections = " << badCorrPixels.size << std::endl;
+    mSpectralCalibrationPerBand = mCamera->getFullSpectralCalibrationPerBand();
 
-	auto badPixelsMatrix = vnir->getBadPixelsMatrix();
-	std::cout << "Bad Pixels Matrix = " << badPixelsMatrix.size() << std::endl;
-*/
-
-	auto reMatrix = mCamera->getResponsivityMatrix();
-	auto qeMatrix = mCamera->getQuantumEfficiencyMatrix();
-
-	auto spectralCal = mCamera->getSpectralCalibrationPerBand();
-	auto fullSpectralCal = mCamera->getFullSpectralCalibrationPerBand();
-
-    //    mBackground.resize(mSpatialSize, mSpectralSize);
-    //    mBackground = mCamera->getBackgroundMatrix();
+    mSerializer.setBufferCapacity(mResponsivityMatrix.size() * sizeof(float) + 1024);
 
     return cHySpexVNIR_3000N_Model::initialize();
 }
@@ -305,9 +293,16 @@ void cHySpexVNIR_3000N_Model_direct::update()
             case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
             {
                 mCamera->stopCalculatingBackground();
-                mCamera->getBackgroundMatrix();
+                mBackgroundMatrix = mCamera->getBackgroundMatrix();
                 mCamera->openShutter();
                 mBgCurrentState = eBgStates::SH_OPEN;
+
+                if (mIsRecording && mSerializer)
+                {
+                    mSerializer.writeNumOfBackgrounds(mNumBackgrounds);
+                    mSerializer.writeBackgroundMatrix(mBackgroundMatrix);
+                }
+
                 break;
             }
             case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
@@ -354,6 +349,14 @@ void cHySpexVNIR_3000N_Model_direct::disableDataRecording()
 
 void cHySpexVNIR_3000N_Model_direct::writeDataHeader()
 {
+    cHySpexVNIR_3000N_Model::writeDataHeader();
+
+    if (!mBackgroundMatrix.empty())
+    {
+        auto age_ms = mCamera->getBackgroundMatrixAge_ms();
+        mSerializer.writeBackgroundMatrixAge_ms(age_ms);
+        mSerializer.writeBackgroundMatrix(mBackgroundMatrix);
+    }
 }
 
 void cHySpexVNIR_3000N_Model_direct::setAcquisitionParameters(std::uint16_t avg_frames,
@@ -556,7 +559,7 @@ void cHySpexVNIR_3000N_Model_direct::updateImageData(hyspex::ImageOptions a_opti
         auto spatial_size = a_image.spatial_size;
         auto spectral_size = a_image.spectral_size;
 
-        auto image = HySpexConnect::spatial_major_data<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
+        auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
         auto num_bands = image.num_bands();
 
         const std::lock_guard<std::mutex> lock(mPercentBandLock);
@@ -583,6 +586,14 @@ void cHySpexVNIR_3000N_Model_direct::updateImageData(hyspex::ImageOptions a_opti
         break;
     }
     }
+
+    if (mIsRecording && mSerializer)
+    {
+        mImageData = HySpexConnect::image_data_view<unsigned short>(a_image);
+
+        mSerializer.writeImage(mImageData);
+    }
+
 //    auto n = a_image.saturated.size;
 //    mSaturationLevel.resize(n);
 //    for (uint64_t i = 0; i < n; ++i)

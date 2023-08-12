@@ -9,6 +9,8 @@ cNetworkEncoder::cNetworkEncoder(std::size_t capacity)
 
 int cNetworkEncoder::sendData()
 {
+    if (mBuffer.empty()) return 0;
+
     auto n = sendOutgoingData(static_cast<const char*>(mBuffer.data()), mBuffer.size());
     clear();
 

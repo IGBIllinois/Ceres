@@ -4,7 +4,6 @@
 #include "HySpexVNIR_3000N_Model.hpp"
 #include "Timers.hpp"
 
-#include <cbdf/HyperspectralBuffers.hpp>
 #include <cbdf/HySpexVNIR_3000N_Serializer.hpp>
 
 #include <QObject>

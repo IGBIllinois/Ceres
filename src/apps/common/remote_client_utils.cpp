@@ -60,10 +60,15 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
@@ -93,10 +98,15 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_principal_investigator_1(const PrincipalInvestigator_1& pckt)
@@ -119,15 +129,56 @@ int encode_principal_investigator(const std::string& pi, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_researcher_1(const Researcher_1& pckt)
 {
     return pckt.researcher();
+}
+
+int encode_start_of_researcher_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::START_OF_RESEARCHER_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
+}
+
+int encode_end_of_researcher_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::END_OF_RESEARCHER_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
 }
 
 int encode_researcher(const std::string& researcher, net_buffer& buffer)
@@ -145,10 +196,15 @@ int encode_researcher(const std::string& researcher, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_construct_name_1(const ConstructName_1& pckt)
@@ -171,15 +227,56 @@ int encode_construct_name(const std::string& name, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_event_number_1(const EventNumber_1& pckt)
 {
     return pckt.event_number();
+}
+
+int encode_start_of_event_number_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::START_OF_EVENT_NUMBER_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
+}
+
+int encode_end_of_event_number_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::END_OF_EVENT_NUMBER_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
 }
 
 int encode_event_number(const std::string& number, net_buffer& buffer)
@@ -197,10 +294,15 @@ int encode_event_number(const std::string& number, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_field_design_1(const FieldDesign_1& pckt)
@@ -223,10 +325,15 @@ int encode_field_design(const std::string& design, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::time_t to_planting_date_1(const PlantingDate_1& pckt)
@@ -249,10 +356,15 @@ int encode_planting_date(std::time_t date, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::time_t to_harvest_date_1(const HarvestDate_1& pckt)
@@ -275,15 +387,56 @@ int encode_harvest_date(std::time_t date, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_treatment_1(const ExperimentTreatment_1& pckt)
 {
     return pckt.treatment();
+}
+
+int encode_start_of_treatment_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::START_OF_TREATMENT_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
+}
+
+int encode_end_of_treatment_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::END_OF_TREATMENT_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
 }
 
 int encode_treatment(const std::string& treatment, net_buffer& buffer)
@@ -301,15 +454,56 @@ int encode_treatment(const std::string& treatment, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_comment_1(const ExperimentComment_1& pckt)
 {
     return pckt.comment();
+}
+
+int encode_start_of_comment_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::START_OF_COMMENT_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
+}
+
+int encode_end_of_comment_list(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::END_OF_COMMENT_LIST);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
 }
 
 int encode_comment(const std::string& comment, net_buffer& buffer)
@@ -327,10 +521,15 @@ int encode_comment(const std::string& comment, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 std::string to_permit_info_1(const ExperimentPermitInfo_1& pckt)
@@ -353,10 +552,51 @@ int encode_permit_info(const std::string& permit, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
+}
+
+int encode_experiment_info_reply(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_INFO_REPLY);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
+}
+
+int encode_end_of_experiment_info(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::END_OF_EXPERIMENT_INFO);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
 }
 
 
@@ -368,9 +608,14 @@ int encode_start_experiment(net_buffer& buffer)
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
 
-    return sizeof(sPacketHeader_t);
+    return pckt_size;
 }
 
 int encode_stop_experiment(net_buffer& buffer)
@@ -381,9 +626,14 @@ int encode_stop_experiment(net_buffer& buffer)
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
 
-    return sizeof(sPacketHeader_t);
+    return pckt_size;
 }
 
 std::string to_filename_1(const OpenDataFile_1& pckt)
@@ -406,10 +656,15 @@ int encode_open_data_file(const std::string& filename, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 int encode_close_data_file(net_buffer& buffer)
@@ -420,9 +675,14 @@ int encode_close_data_file(net_buffer& buffer)
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
 
-    return sizeof(sPacketHeader_t);
+    return pckt_size;
 }
 
 bool to_file_open_state_1(const FileOpenState_1& pckt)
@@ -445,10 +705,15 @@ int encode_file_open_state(bool open, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 int encode_start_data_recording(net_buffer& buffer)
@@ -459,9 +724,14 @@ int encode_start_data_recording(net_buffer& buffer)
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
 
-    return sizeof(sPacketHeader_t);
+    return pckt_size;
 }
 
 int encode_stop_data_recording(net_buffer& buffer)
@@ -472,9 +742,14 @@ int encode_stop_data_recording(net_buffer& buffer)
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t);
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
 
-    return sizeof(sPacketHeader_t);
+    return pckt_size;
 }
 
 
@@ -498,10 +773,15 @@ int encode_status_message(const std::string& message, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 sLogMessage_t to_log_message_1(const LogMessage_1& pckt)
@@ -532,10 +812,15 @@ int encode_log_message(uint8_t msg_type, const std::string& device, const std::s
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 sSensorStatus_t to_sensor_status_1(const SensorStatus_1& pckt)
@@ -564,10 +849,15 @@ int encode_sensor_status(const std::string& device, const std::string& message, 
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt)
@@ -596,10 +886,15 @@ int encode_sensor_name_change(const std::string& old_name, const std::string& ne
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPropertyConnectInfo_1& pckt)
@@ -637,10 +932,15 @@ int encode_sensor_property_connect_info(const std::string& sensor, const std::st
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 /*
@@ -696,10 +996,15 @@ int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 
@@ -737,10 +1042,15 @@ int encode_wind_data(bool valid, double wind_speed_mps, double wind_direction_de
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 
@@ -766,10 +1076,15 @@ int encode_temperature_data(double temp_C, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 float to_relative_humidity_data_1(std::uint16_t length, const net_buffer_view& buffer)
@@ -794,10 +1109,15 @@ int encode_relative_humidity_data(double rh_pct, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 float to_par_data_1(std::uint16_t length, const net_buffer_view& buffer)
@@ -822,10 +1142,15 @@ int encode_par_data(double par_umole, net_buffer& buffer)
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
     buffer << hdr;
     buffer.write(str);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    return pckt_size;
 }
 
 

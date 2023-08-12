@@ -14,7 +14,7 @@ class cHySpexSWIR_384_ControllerNetEncoder : public cHySpexCamera_ControllerNetE
 
 public:
     cHySpexSWIR_384_ControllerNetEncoder(std::size_t capacity);
-    ~cHySpexSWIR_384_ControllerNetEncoder() = default;
+    ~cHySpexSWIR_384_ControllerNetEncoder();
 
 public:
     /*

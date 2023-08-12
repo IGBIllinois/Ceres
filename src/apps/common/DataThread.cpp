@@ -3,6 +3,7 @@
 #include "../Sensors/SensorModel.hpp"
 
 #include <QAbstractEventDispatcher>
+#include <QDebug>
 
 cDataThread::cDataThread()
 {
@@ -69,28 +70,51 @@ void cDataThread::updateAll()
 
 void cDataThread::run()
 {
-    if (!startCommunications())
+    try
     {
+        if (!startCommunications())
+        {
+            goto cleanup;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        qCritical() << e.what();
         goto cleanup;
     }
 
-    auto* pDispatcher = eventDispatcher();
-
-    forever
+    try
     {
-        if (pDispatcher->hasPendingEvents())
+        QAbstractEventDispatcher* pDispatcher = eventDispatcher();
+
+        forever
         {
-            pDispatcher->processEvents(QEventLoop::ExcludeUserInputEvents);
+            if (pDispatcher->hasPendingEvents())
+            {
+                pDispatcher->processEvents(QEventLoop::ExcludeUserInputEvents);
+            }
+
+            if (mAbort)
+                return;
+
+            updateAll();
         }
-
-        if (mAbort)
-            return;
-
-        updateAll();
+    }
+    catch (const std::exception& e)
+    {
+        qCritical() << e.what();
     }
 
 cleanup:
-    stopCommunications();
+
+    try
+    {
+        stopCommunications();
+    }
+    catch (const std::exception& e)
+    {
+        qCritical() << e.what();
+    }
 
     QString msg("Data collection thread terminated.");
 

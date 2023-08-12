@@ -102,6 +102,9 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     QObject::connect(&mMainModel, &cRemoteDataModel::errorMessage,   this, &cRemoteClientWindow::onErrorMessage);
     QObject::connect(&mMainModel, &cRemoteDataModel::logMessage,     this, &cRemoteClientWindow::onLogMessage);
 
+    QObject::connect(&mMainModel, &cRemoteDataModel::localStatusMessage, this, &cRemoteClientWindow::onLocalStatusUpdate);
+    QObject::connect(&mMainModel, &cRemoteDataModel::localLogMessage, this, &cRemoteClientWindow::onLocalLogMessage);
+
     setCentralWidget(mpCentralWindow);
 }
 
@@ -378,6 +381,18 @@ void cRemoteClientWindow::onLogMessage(uint8_t type, QString device, QString msg
 {
     mMainModel.sendLogMessage(type, device, msg);
 
+    if (mpCentralWindow)
+        mpCentralWindow->logMessage(type, device, msg);
+}
+
+void cRemoteClientWindow::onLocalStatusUpdate(QString msg)
+{
+    if (statusBar())
+        statusBar()->showMessage(msg);
+}
+
+void cRemoteClientWindow::onLocalLogMessage(uint8_t type, QString device, QString msg)
+{
     if (mpCentralWindow)
         mpCentralWindow->logMessage(type, device, msg);
 }

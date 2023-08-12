@@ -58,6 +58,9 @@ signals:
     void requestDataRecordingState(bool record);
     void logMessage(quint8 type, QString device, QString msg);
 
+    void localStatusMessage(QString msg) const;
+    void localLogMessage(quint8 type, QString device, QString msg);
+
 /*
  * Signals handlers from the timer
  */
@@ -97,15 +100,32 @@ private slots:
         const std::string& species, const std::string& cultivar, const std::string& doc) override;
 
     void onPrincipalInvestigator(const std::string& pi) override;
+
+    void onStartOfResearcherList() override;
+    void onEndOfResearcherList() override;
     void onResearcher(const std::string& researcher) override;
+
     void onConstructName(const std::string& name) override;
+
+    void onStartOfEventNumberList() override;
+    void onEndOfEventNumberList() override;
     void onEventNumber(const std::string& event_num) override;
+
     void onFieldDesign(const std::string& design) override;
     void onPlantingDate(std::time_t date) override;
     void onHarvestDate(std::time_t date) override;
+
+    void onStartOfTreatmentList() override;
+    void onEndOfTreatmentList() override;
     void onTreatment(const std::string& treatment) override;
+
+    void onStartOfCommentList() override;
+    void onEndOfCommentList() override;
     void onComment(const std::string& comment) override;
+
     void onPermitInfo(const std::string& permit) override;
+
+    void onEndOfExperimentInfo() override;
 
     void onStartExperiment() override;
     void onStopExperiment() override;
@@ -128,8 +148,8 @@ private:
 
 protected:
     std::filesystem::path mDefaultDataPath;
-    bool mIsRecording;
-    bool mIsExperimentRunning;
+    bool mIsRecording = false;
+    bool mIsExperimentRunning = false;
 
     std::filesystem::path   mFullyQualifiedFileName;
     cBlockDataFileWriter    mFile;
@@ -140,10 +160,10 @@ protected:
     cRemoteDataThread mThread;
 
     std::string mLocalIpAddress;
-    QTcpServer* mpTcpServer;
-    QTcpSocket* mpClient;
+    QTcpServer* mpTcpServer = nullptr;
+    QTcpSocket* mpClient = nullptr;
 
-    QTimer* mpHeartbeatTimer;
+    QTimer* mpHeartbeatTimer = nullptr;
 
     std::vector<cSensorController*> mSensorControllers;
 
@@ -160,8 +180,8 @@ private:
     std::string  mFieldDesign;
     std::string  mExperimentDoc;
 
-    std::time_t mPlantingDate;
-    std::time_t mHarvestDate;
+    std::time_t mPlantingDate = {};
+    std::time_t mHarvestDate = {};
 
     std::vector<std::string>  mTreatments;
     std::vector<std::string>  mComments;
@@ -170,12 +190,12 @@ private:
     spidercam::sPosition_1_t mDollyPosition;
 
     // Weather Info
-    bool mWindDataValid;
-    double mWindSpeed_mps;
-    double mWindDirection_deg;
-    double mTemperature_C;
-    double mRelativeHumidity_pct;
-    double mPAR_umole;
+    bool mWindDataValid = false;
+    double mWindSpeed_mps = 0.0;
+    double mWindDirection_deg = 0.0;
+    double mTemperature_C = 0.0;
+    double mRelativeHumidity_pct = 0.0;
+    double mPAR_umole = 0.0;
 };
 
 

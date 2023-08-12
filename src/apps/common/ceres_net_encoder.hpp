@@ -4,6 +4,7 @@
 #include "net_packet_encoder.hpp"
 #include <cstddef>
 #include <ctime>
+#include <vector>
 
 // Forward Declarations
 namespace spidercam
@@ -22,6 +23,40 @@ public:
     /*
      * Ceres ----> Ceres Remote Client
      */
+
+    /*
+     * The encode methods will encode the packet into the data buffer but will not send the
+     * data unless the packet will not fit into the buffer.
+     * 
+     * You need to call sendData to make sure the data is sent out!
+     */
+    void encodeExperimentInfo(const std::string& title, const std::string& researcher,
+        const std::string& cultivar, const std::string& doc);
+
+    void encodeExperimentInfo(const std::string& title, const std::string& researcher,
+        const std::string& species, const std::string& cultivar, const std::string& doc);
+
+    void encodePrincipalInvestigator(const std::string& pi);
+    void encodeResearchers(const std::vector<std::string>& researchers);
+    void encodeConstructName(const std::string& name);
+    void encodeEventNumbers(const std::vector<std::string>& event_numbers);
+    void encodeFieldDesign(const std::string& design);
+    void encodePlantingDate(std::time_t date);
+    void encodeHarvestDate(std::time_t date);
+    void encodeTreatments(const std::vector<std::string>& treatments);
+    void encodeComments(const std::vector<std::string>& comments);
+    void encodePermitInfo(const std::string& permit);
+
+    void encodeEndOfExperimentInfo();
+
+    void encodeSpidercamPosition(const spidercam::sPosition_1_t& pos);
+    void encodeWindData(bool valid, double wind_speed_mps, double wind_direction_deg);
+    void encodeTemperatureData(double temp_C);
+    void encodeRelativeHumidityData(double rh_pct);
+    void encodeParData(double par_umole);
+
+
+
     void sendExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc);
 
@@ -38,6 +73,8 @@ public:
     void sendTreatment(const std::string& treatment);
     void sendComment(const std::string& comment);
     void sendPermitInfo(const std::string& permit);
+
+    void sendEndOfExperimentInfo();
 
     void sendStartExperiment();
     void sendStopExperiment();

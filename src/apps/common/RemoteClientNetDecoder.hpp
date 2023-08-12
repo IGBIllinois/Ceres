@@ -31,15 +31,32 @@ protected:
         const std::string& cultivar, const std::string& doc) = 0;
 
     virtual void onPrincipalInvestigator(const std::string& pi) = 0;
+
+    virtual void onStartOfResearcherList() = 0;
+    virtual void onEndOfResearcherList() = 0;
     virtual void onResearcher(const std::string& researcher) = 0;
+
     virtual void onConstructName(const std::string& name) = 0;
+
+    virtual void onStartOfEventNumberList() = 0;
+    virtual void onEndOfEventNumberList() = 0;
     virtual void onEventNumber(const std::string& event_num) = 0;
+
     virtual void onFieldDesign(const std::string& comment) = 0;
     virtual void onPlantingDate(std::time_t date) = 0;
     virtual void onHarvestDate(std::time_t date) = 0;
+
+    virtual void onStartOfTreatmentList() = 0;
+    virtual void onEndOfTreatmentList() = 0;
     virtual void onTreatment(const std::string& treatment) = 0;
+
+    virtual void onStartOfCommentList() = 0;
+    virtual void onEndOfCommentList() = 0;
     virtual void onComment(const std::string& comment) = 0;
+
     virtual void onPermitInfo(const std::string& permit) = 0;
+
+    virtual void onEndOfExperimentInfo() = 0;
 
     virtual void onStartExperiment() = 0;
     virtual void onStopExperiment() = 0;

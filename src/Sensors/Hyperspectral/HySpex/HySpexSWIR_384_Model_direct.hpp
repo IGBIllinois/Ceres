@@ -4,7 +4,6 @@
 #include "HySpexSWIR_384_Model.hpp"
 #include "Timers.hpp"
 
-#include <cbdf/HyperspectralBuffers.hpp>
 #include <cbdf/HySpexSWIR_384_Serializer.hpp>
 
 #include <QObject>
@@ -34,6 +33,9 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
     bool initialize() override;
 
+    void enableDataRecording(cBlockDataFileWriter& file) override;
+    void disableDataRecording() override;
+
     void writeDataHeader() override;
 
     /*
@@ -54,8 +56,15 @@ public:
     void close_shutter() override;
 
     /*
-     * Status Callback Methods
+     * Turn on/off data computations
      */
+    void computePercentSaturation(bool compute) override;
+    void computePercentBand(bool compute) override;
+    void computeFocus(bool compute) override;
+
+/*
+ * Status Callback Methods
+ */
 protected:
     static void handleStatusCallback(void* p, int eventId, int value);
     void updateInitStatus(hyspex::InitStatus status);
@@ -65,14 +74,25 @@ protected:
     void updateAcquisitionStatus(hyspex::AcquisitionStatus status);
     void updateShutterStatus(hyspex::ShutterStatus status);
 
+/*
+ * Image Callback Method
+ */
+protected:
+    static void handleImageCallback(void* p, hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image);
+    void updateImageData(hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image);
+
+/*
+ * Sensor Method Update
+ */
 protected:
     void update() override;
+
 
 private:
     cIntervalTimer mTemperatureUpdateTimer;
 
-    enum class eBgStates {NONE, SH_CLOSE, COMPLETE, SH_OPEN };
-    eBgStates mBackgroundState = eBgStates::NONE;
+    enum class eBgStates {NONE, SH_CLOSE, STARTED, SH_OPEN };
+    eBgStates mBgCurrentState = eBgStates::NONE;
 
     std::unique_ptr<hyspex::cSWIR384> mCamera;
 };
