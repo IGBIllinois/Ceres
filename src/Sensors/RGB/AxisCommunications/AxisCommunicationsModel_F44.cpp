@@ -254,11 +254,17 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
+        mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
+
         auto size = mpActiveCamera->getImageSize();
         mSerializer.writeImageSize(size.width, size.height);
     }
 
     emit cameraIdChanged(id);
+    emit frameRateChanged(mpActiveCamera->getFramesPerSeconds());
+
+    auto s = mpActiveCamera->getImageSize();
+    emit imageSizeChanged(s.width, s.height);
 }
 
 rgb::sImageSize_t cAxisCommunicationsModel_F44::getActiveImageSize() const
