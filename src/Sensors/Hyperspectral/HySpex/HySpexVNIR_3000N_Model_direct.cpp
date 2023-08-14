@@ -447,6 +447,9 @@ void cHySpexVNIR_3000N_Model_direct::computePercentBand(bool compute)
 void cHySpexVNIR_3000N_Model_direct::computeFocus(bool compute)
 {
     mCamera->openShutter();
+
+    mCamera->setAverageFrames(compute ? 10 : mAverageFrames);
+
     cHySpexVNIR_3000N_Model::computeFocus(compute);
 }
 
@@ -568,8 +571,8 @@ void cHySpexVNIR_3000N_Model_direct::updateImageData(hyspex::ImageOptions a_opti
         for (std::size_t b = 0; b < num_bands; ++b)
         {
             int count = 0;
-            auto band = image.channels(b);
-            for (auto value : band)
+            auto channels = image.band(b);
+            for (auto value : channels)
             {
                 if (value >= mSaturationValue)
                     ++count;
@@ -582,7 +585,9 @@ void cHySpexVNIR_3000N_Model_direct::updateImageData(hyspex::ImageOptions a_opti
     }
     case eCompute::FOCUS:
     {
-        emit newFocusData();
+        auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data,
+                                                a_image.buffer.size, a_image.spatial_size, a_image.spectral_size);
+        computeFocusNumber(image);
         break;
     }
     }

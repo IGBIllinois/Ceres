@@ -5,6 +5,39 @@
 
 #include <optional>
 #include <iostream>
+#include <array>
+#include <valarray>
+
+
+namespace
+{
+    using namespace HySpexConnect;
+
+
+    template<typename T>
+    std::valarray<double> convolution1D(view<T>& f)
+    {
+        const std::array<double, 3> focus_convolution = { -1, 2, -1 };
+        const int nf = f.size();
+        constexpr int ng = focus_convolution.size();
+        int const n = nf + ng - 1;
+        
+        std::valarray<double> out;
+        out.resize(n, 0.0);
+
+        for (auto i(0); i < n; ++i) 
+        {
+            const int jmn = (i >= ng - 1) ? i - (ng - 1) : 0;
+            const int jmx = (i < nf - 1) ? i : nf - 1;
+            for (auto j(jmn); j <= jmx; ++j) 
+            {
+                out[i] += (f[j] * focus_convolution[i - j]);
+            }
+        }
+        return std::move(out);
+    }
+}
+
 
 cHySpexCameraModel::cHySpexCameraModel(const std::string& name, QObject* parent)
 :
@@ -112,3 +145,22 @@ std::vector<float> cHySpexCameraModel::getPercentBands() const
     return mPercentBand;
 }
 
+void cHySpexCameraModel::computeFocusNumber(const HySpexConnect::spatial_major_data_view<uint16_t>& image)
+{
+    double focusNumber = 0;
+
+    for (int b = 0; b < image.num_bands(); ++b)
+    {
+        auto chns = image.band(b);
+        std::valarray<double> convolution_result = convolution1D(chns);
+        double mean = convolution_result.sum() / convolution_result.size();
+        double sd = 0.0;
+        for (auto v : convolution_result)
+            sd += (v - mean) * (v - mean);
+        focusNumber += sd / convolution_result.size();
+    }
+
+    focusNumber = sqrt(focusNumber / image.num_bands()) / 16.0;
+
+    emit newFocusData(focusNumber);
+}

@@ -21,7 +21,8 @@
 
 namespace
 {
-	constexpr uint32_t UPDATE_RATE_US = 100000;
+	constexpr int MAX_UPDATE_RATE_MSEC = 100;
+	constexpr int FOCUS_UPDATE_RATE_MSEC = 100;
 }
 
 cHySpexCamera_StatusView::cHySpexCamera_StatusView(cHySpexCameraModel* pModel, QWidget* parent)
@@ -112,6 +113,18 @@ void cHySpexCamera_StatusView::createWidgets()
 	mpFocusButton = new QPushButton("Focus");
 	mpFocusButton->setCheckable(true);
 	QObject::connect(mpFocusButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::focusButtonToggled);
+
+	mpCurrentFocusLabel = new QLabel("Current Focus");
+	mpCurrentFocusLabel->hide();
+	mpCurrentFocus = new QLineEdit();
+	mpCurrentFocus->setReadOnly(true);
+	mpCurrentFocus->hide();
+
+	mpBestFocusLabel = new QLabel("Best Focus");
+	mpBestFocusLabel->hide();
+	mpBestFocus = new QLineEdit();
+	mpBestFocus->setReadOnly(true);
+	mpBestFocus->hide();
 
 
 	mpPlot = new QCustomPlot();
@@ -210,6 +223,15 @@ void cHySpexCamera_StatusView::doPlotLayout(QBoxLayout* pMainLayout)
 	buttonLayout->addStretch();
 
 	plotLayout->addLayout(buttonLayout);
+
+	auto* focusLayout = new QHBoxLayout();
+	focusLayout->addStretch();
+	focusLayout->addWidget(mpCurrentFocusLabel);
+	focusLayout->addWidget(mpCurrentFocus);
+	focusLayout->addWidget(mpBestFocusLabel);
+	focusLayout->addWidget(mpBestFocus);
+	focusLayout->addStretch();
+	plotLayout->addLayout(focusLayout);
 
 	plotLayout->addWidget(mpPlot);
 
@@ -467,6 +489,11 @@ void cHySpexCamera_StatusView::saturationButtonToggled(bool state)
 		// Only one button can be active at one time!
 		mpPercentBandButton->setChecked(false);
 		mpFocusButton->setChecked(false);
+		mpCurrentFocusLabel->hide();
+		mpCurrentFocus->hide();
+		mpBestFocusLabel->hide();
+		mpBestFocus->hide();
+
 
 		mpPlot->yAxis->setRange(-1, 100);
 		mpPlot->yAxis->setLabel("% Saturation");
@@ -477,9 +504,6 @@ void cHySpexCamera_StatusView::saturationButtonToggled(bool state)
 		mpPlot->xAxis->setRange(0, chn);
 		mpPlot->xAxis->setLabel("Spatial Channel");
 		mpPlot->replot();
-
-		mRateLimitCount = static_cast<int>(UPDATE_RATE_US / mpModel->getFramePeriod_us());
-		mUpdateCounter = mRateLimitCount;
 
 		mX.resize(chn);
 		for (std::size_t i = 0; i < chn; ++i)
@@ -492,9 +516,16 @@ void cHySpexCamera_StatusView::saturationButtonToggled(bool state)
 
 void cHySpexCamera_StatusView::onSaturationDataUpdated()
 {
-	++mUpdateCounter;
-	if (mUpdateCounter < mRateLimitCount) return;
-	mUpdateCounter = 0;
+	static QTime timeStart = QTime::currentTime();
+	static int lastPointKey_ms = 0;
+
+	auto key_ms = timeStart.msecsTo(QTime::currentTime());
+
+	// at most add point every MAX_UPDATE_RATE_MSEC
+	if ((key_ms - lastPointKey_ms) < MAX_UPDATE_RATE_MSEC)
+		return;
+
+	lastPointKey_ms = key_ms;
 
 	auto data = mpModel->getPercentSaturation();
 	QVector<qreal> y;
@@ -514,6 +545,10 @@ void cHySpexCamera_StatusView::bandButtonToggled(bool state)
 		// Only one button can be active at one time!
 		mpPercentSaturationButton->setChecked(false);
 		mpFocusButton->setChecked(false);
+		mpCurrentFocusLabel->hide();
+		mpCurrentFocus->hide();
+		mpBestFocusLabel->hide();
+		mpBestFocus->hide();
 
 		mpPlot->yAxis->setRange(-1, 100);
 		mpPlot->yAxis->setLabel("% Saturation");
@@ -525,9 +560,6 @@ void cHySpexCamera_StatusView::bandButtonToggled(bool state)
 		mpPlot->xAxis->setLabel("Spectral Band");
 		mpPlot->replot();
 
-		mRateLimitCount = static_cast<int>(UPDATE_RATE_US / mpModel->getFramePeriod_us());
-		mUpdateCounter = mRateLimitCount;
-
 		mX.resize(bands);
 		for (std::size_t i = 0; i < bands; ++i)
 			mX[i] = i;
@@ -538,9 +570,16 @@ void cHySpexCamera_StatusView::bandButtonToggled(bool state)
 
 void cHySpexCamera_StatusView::onBandDataUpdated()
 {
-	++mUpdateCounter;
-	if (mUpdateCounter < mRateLimitCount) return;
-	mUpdateCounter = 0;
+	static QTime timeStart = QTime::currentTime();
+	static int lastPointKey_ms = 0;
+
+	auto key_ms = timeStart.msecsTo(QTime::currentTime());
+
+	// at most add point every 2 ms
+	if ((key_ms - lastPointKey_ms) < MAX_UPDATE_RATE_MSEC)
+		return;
+
+	lastPointKey_ms = key_ms;
 
 	auto data = mpModel->getPercentBands();
 	QVector<qreal> y;
@@ -560,25 +599,47 @@ void cHySpexCamera_StatusView::focusButtonToggled(bool state)
 		// Only one button can be active at one time!
 		mpPercentSaturationButton->setChecked(false);
 		mpPercentBandButton->setChecked(false);
+		mpCurrentFocusLabel->show();
+		mpCurrentFocus->show();
+		mpBestFocusLabel->show();
+		mpBestFocus->show();
 
-		mpPlot->yAxis->setRange(0, 100);
+		mpPlot->yAxis->setRange(0, 10.0);
 		mpPlot->yAxis->setLabel("Focus");
 
-		auto chn = mpModel->getSpatialSize();
-		auto bands = mpModel->getSpectralSize();
-
-		mpPlot->xAxis->setRange(0, chn);
+		mpPlot->xAxis->setRange(0, 100);
 		mpPlot->xAxis->setLabel("Time");
 		mpPlot->replot();
 
-		mRateLimitCount = static_cast<int>(UPDATE_RATE_US / mpModel->getFramePeriod_us());
-		mUpdateCounter = mRateLimitCount;
+		mFocusTimeStart = QTime::currentTime();
+		mFocusLastPointKey_ms = 0;
+		mMaxFocusValue = 0.0;
+		mFocusCounter = 0;
 	}
 
 	mpModel->computeFocus(state);
 }
 
-void cHySpexCamera_StatusView::onFocusDataUpdated()
+void cHySpexCamera_StatusView::onFocusDataUpdated(double focus_number)
 {
+	auto key_ms = mFocusTimeStart.msecsTo(QTime::currentTime());
 
+	// at most add point every MAX_UPDATE_RATE_MSEC
+	if ((key_ms - mFocusLastPointKey_ms) < FOCUS_UPDATE_RATE_MSEC)
+		return;
+
+	mFocusLastPointKey_ms = key_ms;
+	++mFocusCounter;
+
+	mMaxFocusValue = std::max(mMaxFocusValue, focus_number);
+
+	mpCurrentFocus->setText(QString::number(focus_number, 'f', 1));
+	mpBestFocus->setText(QString::number(mMaxFocusValue, 'f', 1));
+
+	// add data to lines:
+	mpPlot->graph(0)->addData(mFocusCounter, focus_number);
+
+	// make key axis range scroll with the data:
+	mpPlot->xAxis->setRange(mFocusCounter, 100, Qt::AlignRight);
+	mpPlot->replot();
 }

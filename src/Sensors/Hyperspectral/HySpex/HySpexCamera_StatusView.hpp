@@ -5,6 +5,7 @@
 
 #include "HySpexDataTypes.hpp"
 
+#include <QTime>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -55,7 +56,7 @@ public slots:
 
 	void onSaturationDataUpdated();
 	void onBandDataUpdated();
-	void onFocusDataUpdated();
+	void onFocusDataUpdated(double focus_number);
 
 protected:
 	void doStatusLayout(QBoxLayout* pMainLayout);
@@ -118,8 +119,17 @@ protected:
 
 	QCustomPlot* mpPlot = nullptr;
 	QVector<qreal> mX;
-	int mUpdateCounter = 0;
-	int mRateLimitCount = 0;
+
+	QTime mFocusTimeStart;
+	double mMaxFocusValue = 0.0;
+	int mFocusLastPointKey_ms = 0;
+	int mFocusCounter = 0;
+
+	QLabel* mpCurrentFocusLabel = nullptr;
+	QLineEdit* mpCurrentFocus = nullptr;
+
+	QLabel* mpBestFocusLabel = nullptr;
+	QLineEdit* mpBestFocus = nullptr;
 
 private:
 	cHySpexCameraModel* const mpModel;

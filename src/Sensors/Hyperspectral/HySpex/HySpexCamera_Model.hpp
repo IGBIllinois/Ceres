@@ -133,10 +133,13 @@ signals:
 
     void newPercentSaturationData();
     void newPercentBandData();
-    void newFocusData();
+    void newFocusData(double focus_number);
 
     void newImageData();
 
+
+protected:
+    void computeFocusNumber(const HySpexConnect::spatial_major_data_view<uint16_t>& image);
 
 protected:
     bool mConnected;

@@ -444,6 +444,9 @@ void cHySpexSWIR_384_Model_direct::computePercentBand(bool compute)
 void cHySpexSWIR_384_Model_direct::computeFocus(bool compute)
 {
     mCamera->openShutter();
+
+    mCamera->setAverageFrames(compute ? 10 : mAverageFrames);
+
     cHySpexSWIR_384_Model::computeFocus(compute);
 }
 
@@ -565,8 +568,8 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
         for (std::size_t b = 0; b < num_bands; ++b)
         {
             int count = 0;
-            auto band = image.channels(b);
-            for (auto value : band)
+            auto channels = image.band(b);
+            for (auto value : channels)
             {
                 if (value >= mSaturationValue)
                     ++count;
@@ -579,7 +582,10 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
     }
     case eCompute::FOCUS:
     {
-        emit newFocusData();
+        auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data,
+            a_image.buffer.size, a_image.spatial_size, a_image.spectral_size);
+        computeFocusNumber(image);
+
         break;
     }
     }
