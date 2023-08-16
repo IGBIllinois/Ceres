@@ -51,6 +51,7 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
     mIsExperimentRunning = false;
 
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cRemoteDataModel::onStatusUpdate);
+    QObject::connect(&mThread, &cDataThread::errorMessage, this, &cRemoteDataModel::onErrorUpdate);
 
     mpTcpServer = new QTcpServer();
 
@@ -332,7 +333,7 @@ void cRemoteDataModel::onStartExperiment()
 
     QString msg = "Experiment Started: ";
     msg += QString::fromStdString(mExperimentTitle);
-    emit logMessage(logSTATUS, "Remote Client", msg);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
 
     mSerializer.writeBeginHeader();
     mSerializer.writeTitle(mExperimentTitle);
@@ -439,7 +440,7 @@ void cRemoteDataModel::onStartExperiment()
     mSerializer.startTime(time(nullptr));
     mSerializer.writeEndOfHeader();
 
-    emit statusMessage("Experiment Started!");
+    emit statusMessage(msg);
 }
 
 void cRemoteDataModel::onStopExperiment()
@@ -644,6 +645,11 @@ void cRemoteDataModel::onPermitInfo(const std::string& permit)
 
 void cRemoteDataModel::onEndOfExperimentInfo()
 {
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "onEndOfExperimentInfo";
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
+
     sendExperimentInfoReply();
 }
 

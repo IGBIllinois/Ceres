@@ -13,6 +13,8 @@
 #include <QDockWidget>
 #include <QTime>
 #include <QCoreApplication>
+#include <QAbstractEventDispatcher>
+
 
 //Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
 //Q_DECLARE_METATYPE(QAbstractSocket::SocketState)
@@ -300,6 +302,7 @@ bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::s
 
     // We are going to try an open a data file on the remote computer
     // three times.
+
     for (int i = 0; i < 3; ++i)
     {
         sendOpenDataFile(filename);
@@ -413,12 +416,13 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
         encodeEndOfExperimentInfo();
         sendData();
 
-        QTime delayTime = QTime::currentTime().addSecs(3);
+        QTime delayTime = QTime::currentTime().addSecs(5);
         while (QTime::currentTime() < delayTime)
         {
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+
             if (mExperimentInfoConfirmed)
-                break;
+                return result;
         }
     }
 

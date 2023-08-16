@@ -55,6 +55,8 @@ cCtrlDataModel::cCtrlDataModel(QObject* parent)
     cDataModel(parent)
 {
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cCtrlDataModel::onStatusUpdate);
+    QObject::connect(&mThread, &cDataThread::errorMessage, this, &cCtrlDataModel::onErrorUpdate);
+    QObject::connect(&mThread, &cDataThread::terminate, this, &cCtrlDataModel::onDataThreadTermination);
 
     mPlantingDate = 0;
     mHarvestDate = 0;
@@ -477,5 +479,11 @@ void cCtrlDataModel::doExperimentCleanup()
     {
         mThread.mpController->clearExperiment();
     }
+}
+
+void cCtrlDataModel::onDataThreadTermination()
+{
+    if (isExperimentRunning())
+        terminateExperiment();
 }
 

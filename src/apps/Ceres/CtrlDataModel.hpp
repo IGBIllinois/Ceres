@@ -84,6 +84,7 @@ protected slots:
 
 private slots:
     void onExperimentStateChange(experiment::eState state);
+    void onDataThreadTermination();
 
 protected:
     virtual void endDataRecording() = 0;

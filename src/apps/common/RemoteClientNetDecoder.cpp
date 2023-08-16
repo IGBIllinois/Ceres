@@ -133,8 +133,9 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onPermitInfo(to_permit_info_1(packet));
         break;
     }
-    case ePacketType::EXPERIMENT_INFO_REPLY:
+    case ePacketType::END_OF_EXPERIMENT_INFO:
     {
+        onEndOfExperimentInfo();
         break;
     }
     case ePacketType::OPEN_DATA_FILE:
@@ -169,10 +170,6 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onStopExperiment();
         break;
     }
-    case ePacketType::DATA_RECORDING_STATE:
-    {
-        break;
-    }
     case ePacketType::SPIDER_CAM_DATA:
     {
         auto data = to_spidercam_position_1(hdr.length, buffer);
@@ -201,6 +198,11 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     {
         auto data = to_par_data_1(hdr.length, buffer);
         onParData(data);
+        break;
+    }
+    case ePacketType::EXPERIMENT_INFO_REPLY:
+    case ePacketType::DATA_RECORDING_STATE:
+    {
         break;
     }
     }

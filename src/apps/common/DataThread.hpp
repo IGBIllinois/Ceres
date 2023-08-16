@@ -20,6 +20,8 @@ public:
 
 signals:
     void statusMessage(QString msg);
+    void errorMessage(QString title, QString msg);
+    void terminated();
 
 protected:
     void run() override;

@@ -74,12 +74,21 @@ void cDataThread::run()
     {
         if (!startCommunications())
         {
+            QString msg("Data collection thread: Communications failed during startup.");
+            emit errorMessage("Critical Error", msg);
+
             goto cleanup;
         }
     }
     catch (const std::exception& e)
     {
         qCritical() << e.what();
+
+        QString msg("Data collection thread terminal error: ");
+        msg += e.what();
+
+        emit errorMessage("Critical Error", msg);
+
         goto cleanup;
     }
 
@@ -103,6 +112,11 @@ void cDataThread::run()
     catch (const std::exception& e)
     {
         qCritical() << e.what();
+
+        QString msg("Data collection thread terminal error: ");
+        msg += e.what();
+
+        emit errorMessage("Critical Error", msg);
     }
 
 cleanup:
@@ -119,4 +133,5 @@ cleanup:
     QString msg("Data collection thread terminated.");
 
     emit statusMessage(msg);
+    emit terminated();
 }
