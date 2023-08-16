@@ -217,7 +217,8 @@ bool cHySpexSWIR_384_Model_direct::startCommunications()
     mTemperatureUpdateTimer.reset();
     mCamera->initAcquisition();
 
-    mCamera->registerImageCallback(&cHySpexSWIR_384_Model_direct::handleImageCallback, hyspex::ImageOptions::HYSPEX_RAW, this);
+//    mCamera->registerImageCallback(&cHySpexSWIR_384_Model_direct::handleImageCallback, hyspex::ImageOptions::HYSPEX_RAW, this);
+    mCamera->registerImageCallback(&cHySpexSWIR_384_Model_direct::handleImageCallback, hyspex::ImageOptions::HYSPEX_RE, this);
 
     mCamera->startAcquisition();
 
@@ -608,6 +609,32 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
             mFocusMatrix.zero();
         }
 
+        break;
+    }
+    case eCompute::SPATIAL_DISTRIBUTION:
+    {
+        auto spatial_size = a_image.spatial_size;
+        auto spectral_size = a_image.spectral_size;
+
+        auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
+        mSpatialDistributionSpectralBand = image.num_bands() / 2;
+
+        mSpatialDistributionData = image.band(mSpatialDistributionSpectralBand);
+
+        emit newSpatialDistributionData();
+        break;
+    }
+    case eCompute::SPECTRAL_DISTRIBUTION:
+    {
+        auto spatial_size = a_image.spatial_size;
+        auto spectral_size = a_image.spectral_size;
+
+        auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
+        mSpectralDistributionSpatialChannel = image.num_channels() / 2;
+
+        mSpectralDistributionData = image.channel(mSpectralDistributionSpatialChannel);
+
+        emit newSpectralDistributionData();
         break;
     }
     }

@@ -9,6 +9,8 @@
 #include <QGridLayout>
 #include <QFormLayout>
 
+#include <QCustomPlot/qcustomplot.h>
+
 #include <string>
 
 
@@ -29,12 +31,16 @@ void cHySpexSWIR_384_StatusView::createWidgets()
 
 void cHySpexSWIR_384_StatusView::doLayout()
 {
+	qInfo() << "Delete old layout...";
+
+	auto old_layout = layout();
+	delete old_layout;
+
 	auto* mainLayout = new QVBoxLayout(this);
 
 	mainLayout->addWidget(getSensorStatusBox());
 
 	doStatusLayout(mainLayout);
-
 
 	auto* infoLayout = new QHBoxLayout(this);
 
@@ -43,7 +49,9 @@ void cHySpexSWIR_384_StatusView::doLayout()
 
 	mainLayout->addLayout(infoLayout);
 
-	mainLayout->addStretch();
+	doPlotLayout(mainLayout);
+
+//	mainLayout->addStretch();
 
 	setLayout(mainLayout);
 }
