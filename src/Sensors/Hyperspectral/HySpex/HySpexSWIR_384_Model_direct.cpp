@@ -445,9 +445,23 @@ void cHySpexSWIR_384_Model_direct::computeFocus(bool compute)
 {
     mCamera->openShutter();
 
-    mCamera->setAverageFrames(compute ? 10 : mAverageFrames);
+    mFocusAverageCount = 0;
+    mFocusMatrix.resize(mSpatialSize, mSpectralSize);
+    mFocusMatrix.zero();
 
     cHySpexSWIR_384_Model::computeFocus(compute);
+}
+
+void cHySpexSWIR_384_Model_direct::computeSpatialDistribution(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexSWIR_384_Model::computeSpatialDistribution(compute);
+}
+
+void cHySpexSWIR_384_Model_direct::computeSpectralDistribution(bool compute)
+{
+    mCamera->openShutter();
+    cHySpexSWIR_384_Model::computeSpectralDistribution(compute);
 }
 
 /********************************************************************
@@ -582,9 +596,17 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
     }
     case eCompute::FOCUS:
     {
-        auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data,
+        ++mFocusAverageCount;
+        mFocusMatrix += HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data,
             a_image.buffer.size, a_image.spatial_size, a_image.spectral_size);
-        computeFocusNumber(image);
+
+        if (mFocusAverageCount >= mFocusAverageMaxCount)
+        {
+            mFocusMatrix /= mFocusAverageCount;
+            computeFocusNumber(mFocusMatrix);
+            mFocusAverageCount = 0;
+            mFocusMatrix.zero();
+        }
 
         break;
     }

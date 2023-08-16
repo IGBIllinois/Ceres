@@ -114,6 +114,17 @@ void cHySpexCamera_StatusView::createWidgets()
 	mpFocusButton->setCheckable(true);
 	QObject::connect(mpFocusButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::focusButtonToggled);
 
+	mpSpatialDistribution = new QPushButton("Spatial Distribution");
+	mpSpatialDistribution->setCheckable(true);
+	QObject::connect(mpSpatialDistribution, &QPushButton::clicked, this, &cHySpexCamera_StatusView::SpatialDistributionButtonToggled);
+
+	mpSpectralDistribution = new QPushButton("Spectral Distribution");
+	mpSpectralDistribution->setCheckable(true);
+	QObject::connect(mpSpectralDistribution, &QPushButton::clicked, this, &cHySpexCamera_StatusView::SpectralDistributionButtonToggled);
+
+	mpDoBackground = new QPushButton("Calculate Background");
+	QObject::connect(mpDoBackground, &QPushButton::pressed, this, &cHySpexCamera_StatusView::backgroundPressed);
+
 	mpCurrentFocusLabel = new QLabel("Current Focus");
 	mpCurrentFocusLabel->hide();
 	mpCurrentFocus = new QLineEdit();
@@ -220,7 +231,10 @@ void cHySpexCamera_StatusView::doPlotLayout(QBoxLayout* pMainLayout)
 	buttonLayout->addWidget(mpPercentSaturationButton);
 	buttonLayout->addWidget(mpPercentBandButton);
 	buttonLayout->addWidget(mpFocusButton);
+	buttonLayout->addWidget(mpSpatialDistribution);
+	buttonLayout->addWidget(mpSpectralDistribution);
 	buttonLayout->addStretch();
+	buttonLayout->addWidget(mpDoBackground);
 
 	plotLayout->addLayout(buttonLayout);
 
@@ -486,14 +500,7 @@ void cHySpexCamera_StatusView::saturationButtonToggled(bool state)
 {
 	if (state)
 	{
-		// Only one button can be active at one time!
-		mpPercentBandButton->setChecked(false);
-		mpFocusButton->setChecked(false);
-		mpCurrentFocusLabel->hide();
-		mpCurrentFocus->hide();
-		mpBestFocusLabel->hide();
-		mpBestFocus->hide();
-
+		unclickAllButtons(mpPercentSaturationButton);
 
 		mpPlot->yAxis->setRange(-1, 100);
 		mpPlot->yAxis->setLabel("% Saturation");
@@ -542,13 +549,7 @@ void cHySpexCamera_StatusView::bandButtonToggled(bool state)
 {
 	if (state)
 	{
-		// Only one button can be active at one time!
-		mpPercentSaturationButton->setChecked(false);
-		mpFocusButton->setChecked(false);
-		mpCurrentFocusLabel->hide();
-		mpCurrentFocus->hide();
-		mpBestFocusLabel->hide();
-		mpBestFocus->hide();
+		unclickAllButtons(mpPercentBandButton);
 
 		mpPlot->yAxis->setRange(-1, 100);
 		mpPlot->yAxis->setLabel("% Saturation");
@@ -596,13 +597,7 @@ void cHySpexCamera_StatusView::focusButtonToggled(bool state)
 {
 	if (state)
 	{
-		// Only one button can be active at one time!
-		mpPercentSaturationButton->setChecked(false);
-		mpPercentBandButton->setChecked(false);
-		mpCurrentFocusLabel->show();
-		mpCurrentFocus->show();
-		mpBestFocusLabel->show();
-		mpBestFocus->show();
+		unclickAllButtons(mpFocusButton);
 
 		mpPlot->yAxis->setRange(0, 10.0);
 		mpPlot->yAxis->setLabel("Focus");
@@ -642,4 +637,156 @@ void cHySpexCamera_StatusView::onFocusDataUpdated(double focus_number)
 	// make key axis range scroll with the data:
 	mpPlot->xAxis->setRange(mFocusCounter, 100, Qt::AlignRight);
 	mpPlot->replot();
+}
+
+void cHySpexCamera_StatusView::SpatialDistributionButtonToggled(bool state)
+{
+	if (state)
+	{
+		unclickAllButtons(mpSpatialDistribution);
+
+		mpPlot->yAxis->setRange(0, 100);
+		QString str = "Digital Number (max = ";
+		str += QString::number(mpModel->getMaxPixelValue());
+		str += ")";
+		mpPlot->yAxis->setLabel(str);
+
+		auto chn = mpModel->getSpatialSize();
+
+		mpPlot->xAxis->setRange(0, chn);
+		mpPlot->xAxis->setLabel("Channel Number");
+		mpPlot->replot();
+
+		mX.resize(chn);
+		for (std::size_t i = 0; i < chn; ++i)
+			mX[i] = i;
+	}
+
+	mpModel->computeSpatialDistribution(state);
+}
+
+void cHySpexCamera_StatusView::onSpatialDistributionUpdated()
+{
+	static QTime timeStart = QTime::currentTime();
+	static int lastPointKey_ms = 0;
+
+	auto key_ms = timeStart.msecsTo(QTime::currentTime());
+
+	// at most add point every 2 ms
+	if ((key_ms - lastPointKey_ms) < MAX_UPDATE_RATE_MSEC)
+		return;
+
+	lastPointKey_ms = key_ms;
+
+	auto data = mpModel->getSpatialDistributionData();
+	QVector<qreal> y;
+	y.resize(data.size());
+	for (std::size_t i = 0; i < data.size(); ++i)
+		y[i] = data[i];
+
+	mpPlot->graph(0)->setData(mX, y, true);
+	mpPlot->yAxis->rescale();
+
+	mpPlot->replot();
+}
+
+void cHySpexCamera_StatusView::SpectralDistributionButtonToggled(bool state)
+{
+	if (state)
+	{
+		unclickAllButtons(mpSpectralDistribution);
+
+		mpPlot->yAxis->setRange(0, 100);
+		QString str = "Digital Number (max = ";
+		str += QString::number(mpModel->getMaxPixelValue());
+		str += ")";
+		mpPlot->yAxis->setLabel(str);
+
+		auto wavelengths_nm = mpModel->getSpectralCalibrationPerBand();
+
+		mpPlot->xAxis->setRange(wavelengths_nm[0], wavelengths_nm[wavelengths_nm.size()-1]);
+		mpPlot->xAxis->setLabel("Wavelengths (nm)");
+		mpPlot->replot();
+
+		mX.resize(wavelengths_nm.size());
+
+		for (std::size_t i = 0; i < wavelengths_nm.size(); ++i)
+			mX[i] = wavelengths_nm[i];
+	}
+
+	mpModel->computeSpectralDistribution(state);
+
+}
+
+void cHySpexCamera_StatusView::onSpectralDistributionUpdated()
+{
+	static QTime timeStart = QTime::currentTime();
+	static int lastPointKey_ms = 0;
+
+	auto key_ms = timeStart.msecsTo(QTime::currentTime());
+
+	// at most add point every 2 ms
+	if ((key_ms - lastPointKey_ms) < MAX_UPDATE_RATE_MSEC)
+		return;
+
+	lastPointKey_ms = key_ms;
+
+	auto data = mpModel->getSpectralDistributionData();
+	QVector<qreal> y;
+	y.resize(data.size());
+	for (std::size_t i = 0; i < data.size(); ++i)
+		y[i] = data[i];
+
+	mpPlot->graph(0)->setData(mX, y, true);
+	mpPlot->yAxis->rescale();
+
+	mpPlot->replot();
+}
+
+void cHySpexCamera_StatusView::backgroundPressed()
+{
+	unclickAllButtons(nullptr);
+	mpModel->calcBackground();
+}
+
+void cHySpexCamera_StatusView::unclickAllButtons(QPushButton* pExcept)
+{
+	// Only one button can be active at one time!
+	if (pExcept != mpPercentSaturationButton)
+		mpPercentSaturationButton->setChecked(false);
+
+	if (pExcept != mpPercentBandButton)
+		mpPercentBandButton->setChecked(false);
+
+	if (pExcept != mpFocusButton)
+	{
+		mpFocusButton->setChecked(false);
+		mpCurrentFocusLabel->hide();
+		mpCurrentFocus->hide();
+		mpBestFocusLabel->hide();
+		mpBestFocus->hide();
+	}
+	else
+	{
+		mpCurrentFocusLabel->show();
+		mpCurrentFocus->show();
+		mpBestFocusLabel->show();
+		mpBestFocus->show();
+	}
+
+	if (pExcept != mpSpatialDistribution)
+	{
+		mpSpatialDistribution->setChecked(false);
+	}
+	else
+	{
+	}
+
+	if (pExcept != mpSpectralDistribution)
+	{
+		mpSpectralDistribution->setChecked(false);
+	}
+	else
+	{
+	}
 }

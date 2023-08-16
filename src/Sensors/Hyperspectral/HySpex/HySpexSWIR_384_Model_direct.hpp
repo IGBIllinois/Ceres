@@ -61,6 +61,8 @@ public:
     void computePercentSaturation(bool compute) override;
     void computePercentBand(bool compute) override;
     void computeFocus(bool compute) override;
+    void computeSpatialDistribution(bool compute) override;
+    void computeSpectralDistribution(bool compute) override;
 
 /*
  * Status Callback Methods

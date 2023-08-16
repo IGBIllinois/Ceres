@@ -126,17 +126,9 @@ bool cHySpexVNIR_3000N_Model_simulation::initialize()
 	mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_PENDING;
     emit acqStatusChanged();
 
-
-/*
-	auto reMatrix = mCamera->getResponsivityMatrix();
-	auto qeMatrix = mCamera->getQuantumEfficiencyMatrix();
-
-	auto spectralCal = mCamera->getSpectralCalibrationPerBand();
-	auto fullSpectralCal = mCamera->getFullSpectralCalibrationPerBand();
-
-    //    mBackground.resize(mSpatialSize, mSpectralSize);
-    //    mBackground = mCamera->getBackgroundMatrix();
-*/
+    mSpectralCalibrationPerBand.resize(700);
+    for (int i = 0; i < 700; ++i)
+        mSpectralCalibrationPerBand[i] = 0.846498 * i + 404.895;
 
     return cHySpexVNIR_3000N_Model::initialize();
 }

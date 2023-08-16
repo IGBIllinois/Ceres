@@ -57,6 +57,8 @@ public slots:
 	void onSaturationDataUpdated();
 	void onBandDataUpdated();
 	void onFocusDataUpdated(double focus_number);
+	void onSpatialDistributionUpdated();
+	void onSpectralDistributionUpdated();
 
 protected:
 	void doStatusLayout(QBoxLayout* pMainLayout);
@@ -68,6 +70,12 @@ private slots:
 	void saturationButtonToggled(bool state);
 	void bandButtonToggled(bool state);
 	void focusButtonToggled(bool state);
+	void SpatialDistributionButtonToggled(bool state);
+	void SpectralDistributionButtonToggled(bool state);
+	void backgroundPressed();
+
+private:
+	void unclickAllButtons(QPushButton* pExcept);
 
 protected:
 	QButtonIndicator* mpInitializationStatus = nullptr;
@@ -116,6 +124,9 @@ protected:
 	QPushButton* mpPercentSaturationButton = nullptr;
 	QPushButton* mpPercentBandButton = nullptr;
 	QPushButton* mpFocusButton = nullptr;
+	QPushButton* mpSpatialDistribution = nullptr;
+	QPushButton* mpSpectralDistribution = nullptr;
+	QPushButton* mpDoBackground = nullptr;
 
 	QCustomPlot* mpPlot = nullptr;
 	QVector<qreal> mX;

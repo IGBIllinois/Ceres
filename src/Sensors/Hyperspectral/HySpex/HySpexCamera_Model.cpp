@@ -96,6 +96,11 @@ std::size_t cHySpexCameraModel::getMaxSpatialSize() const { return mMaxSpatialSi
 std::size_t cHySpexCameraModel::getMaxSpectralSize() const { return mMaxSpectralSize; }
 unsigned short cHySpexCameraModel::getMaxPixelValue() const { return mMaxPixelValue; }
 
+const HySpexConnect::cSpectralData<float>& cHySpexCameraModel::getSpectralCalibrationPerBand() const
+{
+    return mSpectralCalibrationPerBand;
+}
+
 double cHySpexCameraModel::getAmbientTemp_C() const { return mAmbientTemp_C; }
 double cHySpexCameraModel::getSensorTemp_C() const { return mSensorTemp_C; }
 
@@ -133,6 +138,16 @@ void cHySpexCameraModel::computeFocus(bool compute)
     meComputeData = compute ? eCompute::FOCUS : eCompute::NONE;
 }
 
+void cHySpexCameraModel::computeSpatialDistribution(bool compute)
+{
+    meComputeData = compute ? eCompute::SPATIAL_DISTRIBUTION : eCompute::NONE;
+}
+
+void cHySpexCameraModel::computeSpectralDistribution(bool compute)
+{
+    meComputeData = compute ? eCompute::SPECTRAL_DISTRIBUTION : eCompute::NONE;
+}
+
 std::vector<float> cHySpexCameraModel::getPercentSaturation() const
 {
     const std::lock_guard<std::mutex> lock(mPercentSaturationLock);
@@ -143,6 +158,16 @@ std::vector<float> cHySpexCameraModel::getPercentBands() const
 {
     const std::lock_guard<std::mutex> lock(mPercentBandLock);
     return mPercentBand;
+}
+
+HySpexConnect::cSpatialData<uint16_t> cHySpexCameraModel::getSpatialDistributionData() const
+{
+    return mSpatialDistributionData;
+}
+
+HySpexConnect::cSpectralData<uint16_t> cHySpexCameraModel::getSpectralDistributionData() const
+{
+    return mSpectralDistributionData;
 }
 
 void cHySpexCameraModel::computeFocusNumber(const HySpexConnect::spatial_major_data_view<uint16_t>& image)
@@ -164,3 +189,24 @@ void cHySpexCameraModel::computeFocusNumber(const HySpexConnect::spatial_major_d
 
     emit newFocusData(focusNumber);
 }
+
+void cHySpexCameraModel::computeFocusNumber(const HySpexConnect::cSpatialMajorData<float>& image)
+{
+    double focusNumber = 0;
+
+    for (int b = 0; b < image.num_bands(); ++b)
+    {
+        auto chns = image.band(b);
+        std::valarray<double> convolution_result = convolution1D(chns);
+        double mean = convolution_result.sum() / convolution_result.size();
+        double sd = 0.0;
+        for (auto v : convolution_result)
+            sd += (v - mean) * (v - mean);
+        focusNumber += sd / convolution_result.size();
+    }
+
+    focusNumber = sqrt(focusNumber / image.num_bands()) / 16.0;
+
+    emit newFocusData(focusNumber);
+}
+

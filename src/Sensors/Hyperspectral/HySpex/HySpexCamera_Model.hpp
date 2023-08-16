@@ -67,6 +67,8 @@ public:
     // Max pixel value, 2 ^ bpp - 1 (bits per pixel).
     unsigned short getMaxPixelValue() const;
 
+    const HySpexConnect::cSpectralData<float>& getSpectralCalibrationPerBand() const;
+
     /*
      * Retrieve the current camera information
      */
@@ -107,9 +109,13 @@ public:
     virtual void computePercentSaturation(bool compute);
     virtual void computePercentBand(bool compute);
     virtual void computeFocus(bool compute);
+    virtual void computeSpatialDistribution(bool compute);
+    virtual void computeSpectralDistribution(bool compute);
 
     std::vector<float> getPercentSaturation() const;
     std::vector<float> getPercentBands() const;
+    HySpexConnect::cSpatialData<uint16_t> getSpatialDistributionData() const;
+    HySpexConnect::cSpectralData<uint16_t> getSpectralDistributionData() const;
 
 signals:
     void initStatusChanged();
@@ -134,12 +140,15 @@ signals:
     void newPercentSaturationData();
     void newPercentBandData();
     void newFocusData(double focus_number);
+    void newSpatialDistributionData();
+    void newSpectralDistributionData();
 
     void newImageData();
 
 
 protected:
     void computeFocusNumber(const HySpexConnect::spatial_major_data_view<uint16_t>& image);
+    void computeFocusNumber(const HySpexConnect::cSpatialMajorData<float>& image);
 
 protected:
     bool mConnected;
@@ -192,11 +201,23 @@ protected:
     HySpexConnect::cImageData<uint16_t>     mImageData;
 
 
-    enum class eCompute {NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS} meComputeData = eCompute::NONE;
+    enum class eCompute {NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS, 
+        SPATIAL_DISTRIBUTION, SPECTRAL_DISTRIBUTION} meComputeData = eCompute::NONE;
+
     mutable std::mutex mPercentSaturationLock;
     std::vector<float> mPercentSaturation;
 
     mutable std::mutex mPercentBandLock;
     std::vector<float> mPercentBand;
+
+    int mFocusAverageCount = 0;
+    int mFocusAverageMaxCount = 10;
+    HySpexConnect::cSpatialMajorData<float> mFocusMatrix;
+
+    std::size_t mSpatialDistributionSpectralBand = 0;
+    HySpexConnect::cSpatialData<uint16_t>  mSpatialDistributionData;
+
+    std::size_t mSpectralDistributionSpatialChannel = 0;
+    HySpexConnect::cSpectralData<uint16_t> mSpectralDistributionData;
 };
 
