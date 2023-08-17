@@ -160,12 +160,12 @@ std::vector<float> cHySpexCameraModel::getPercentBands() const
     return mPercentBand;
 }
 
-HySpexConnect::cSpatialData<uint16_t> cHySpexCameraModel::getSpatialDistributionData() const
+HySpexConnect::cSpatialData<float> cHySpexCameraModel::getSpatialDistributionData() const
 {
     return mSpatialDistributionData;
 }
 
-HySpexConnect::cSpectralData<uint16_t> cHySpexCameraModel::getSpectralDistributionData() const
+HySpexConnect::cSpectralData<float> cHySpexCameraModel::getSpectralDistributionData() const
 {
     return mSpectralDistributionData;
 }

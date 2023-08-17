@@ -130,6 +130,7 @@ protected:
 
 	QCustomPlot* mpPlot = nullptr;
 	QVector<qreal> mX;
+	QVector<qreal> mY;
 
 	QTime mFocusTimeStart;
 	double mMaxFocusValue = 0.0;

@@ -30,6 +30,8 @@ bool cRemoteDataThread::startCommunications()
         QObject::connect(mpController, &cRemoteDataModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
     }
 
+    emit statusMessage("");
+
     return true;
 }
 
@@ -44,6 +46,8 @@ bool cRemoteDataThread::stopCommunications()
     }
 
     cDataThread::stopCommunications();
+
+    emit statusMessage("");
 
     return true;
 }

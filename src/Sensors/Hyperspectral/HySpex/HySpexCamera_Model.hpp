@@ -114,8 +114,8 @@ public:
 
     std::vector<float> getPercentSaturation() const;
     std::vector<float> getPercentBands() const;
-    HySpexConnect::cSpatialData<uint16_t> getSpatialDistributionData() const;
-    HySpexConnect::cSpectralData<uint16_t> getSpectralDistributionData() const;
+    HySpexConnect::cSpatialData<float> getSpatialDistributionData() const;
+    HySpexConnect::cSpectralData<float> getSpectralDistributionData() const;
 
 signals:
     void initStatusChanged();
@@ -214,10 +214,16 @@ protected:
     int mFocusAverageMaxCount = 10;
     HySpexConnect::cSpatialMajorData<float> mFocusMatrix;
 
+    int mSpatialDistributionAverageCount = 0;
+    const int mSpatialDistributionAverageMaxCount = 10;
     std::size_t mSpatialDistributionSpectralBand = 0;
-    HySpexConnect::cSpatialData<uint16_t>  mSpatialDistributionData;
+    HySpexConnect::cSpatialData<float>  mSpatialDistWorkingData;
+    HySpexConnect::cSpatialData<float>  mSpatialDistributionData;
 
+    int mSpectralDistributionAverageCount = 0;
+    const int mSpectralDistributionAverageMaxCount = 10;
     std::size_t mSpectralDistributionSpatialChannel = 0;
-    HySpexConnect::cSpectralData<uint16_t> mSpectralDistributionData;
+    HySpexConnect::cSpectralData<float> mSpectralDistWorkingData;
+    HySpexConnect::cSpectralData<float> mSpectralDistributionData;
 };
 

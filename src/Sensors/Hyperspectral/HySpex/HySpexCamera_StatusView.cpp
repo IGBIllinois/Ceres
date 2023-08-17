@@ -142,10 +142,6 @@ void cHySpexCamera_StatusView::createWidgets()
 	mpPlot->setMinimumHeight(300);
 	mpPlot->addGraph();
 
-//	customPlot->graph(0)->setData(x, y);
-	// give the axes some labels:
-//	customPlot->xAxis->setLabel("x");
-//	customPlot->yAxis->setLabel("y");
 	// set axes ranges, so we see all data:
 	mpPlot->xAxis->setRange(0, 1);
 	mpPlot->yAxis->setRange(0, 1);
@@ -679,13 +675,22 @@ void cHySpexCamera_StatusView::onSpatialDistributionUpdated()
 	lastPointKey_ms = key_ms;
 
 	auto data = mpModel->getSpatialDistributionData();
-	QVector<qreal> y;
-	y.resize(data.size());
-	for (std::size_t i = 0; i < data.size(); ++i)
-		y[i] = data[i];
 
-	mpPlot->graph(0)->setData(mX, y, true);
-	mpPlot->yAxis->rescale();
+	float max_y = 0;
+	mY.resize(data.size());
+	for (std::size_t i = 0; i < data.size(); ++i)
+	{
+		mY[i] = data[i];
+		if (data[i] > max_y) max_y = data[i];
+	}
+
+	if (max_y < 5)
+		max_y = 5.0f;
+	else
+		max_y = 10.0f * ((static_cast<int>(max_y) / 10) + 1);
+
+	mpPlot->graph(0)->setData(mX, mY, true);
+	mpPlot->yAxis->setRangeUpper(max_y);
 
 	mpPlot->replot();
 }
@@ -706,12 +711,17 @@ void cHySpexCamera_StatusView::SpectralDistributionButtonToggled(bool state)
 
 		mpPlot->xAxis->setRange(wavelengths_nm[0], wavelengths_nm[wavelengths_nm.size()-1]);
 		mpPlot->xAxis->setLabel("Wavelengths (nm)");
-		mpPlot->replot();
 
 		mX.resize(wavelengths_nm.size());
+		mY.resize(wavelengths_nm.size());
 
 		for (std::size_t i = 0; i < wavelengths_nm.size(); ++i)
+		{
 			mX[i] = wavelengths_nm[i];
+			mY[i] = 0.0;
+		}
+
+		mpPlot->replot();
 	}
 
 	mpModel->computeSpectralDistribution(state);
@@ -732,13 +742,21 @@ void cHySpexCamera_StatusView::onSpectralDistributionUpdated()
 	lastPointKey_ms = key_ms;
 
 	auto data = mpModel->getSpectralDistributionData();
-	QVector<qreal> y;
-	y.resize(data.size());
+	float max_y = 0;
+	mY.resize(data.size());
 	for (std::size_t i = 0; i < data.size(); ++i)
-		y[i] = data[i];
+	{
+		mY[i] = data[i];
+		if (data[i] > max_y) max_y = data[i];
+	}
 
-	mpPlot->graph(0)->setData(mX, y, true);
-	mpPlot->yAxis->rescale();
+	if (max_y < 5)
+		max_y = 5.0f;
+	else
+		max_y = 10.0f * ((static_cast<int>(max_y) / 10) + 1);
+
+	mpPlot->graph(0)->setData(mX, mY, true);
+	mpPlot->yAxis->setRangeUpper(max_y);
 
 	mpPlot->replot();
 }

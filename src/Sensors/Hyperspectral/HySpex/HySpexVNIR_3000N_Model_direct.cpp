@@ -236,6 +236,9 @@ bool cHySpexVNIR_3000N_Model_direct::startCommunications()
             setStatus(sensor::eStatus::RUNNING);
         else
             setStatus(sensor::eStatus::BUSY);
+
+        setAcquisitionParameters(mAverageFrames, mFramePeriod_us, mIntegrationTime_us);
+        calcBackground();
     }
     else
         setStatus(sensor::eStatus::FAILED);
@@ -362,6 +365,8 @@ void cHySpexVNIR_3000N_Model_direct::writeDataHeader()
 void cHySpexVNIR_3000N_Model_direct::setAcquisitionParameters(std::uint16_t avg_frames,
     std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {
+    mCamera->stopAcquisition();
+
     auto prevAverageFrames = mAverageFrames;
     mCamera->setAverageFrames(avg_frames);
     mAverageFrames = mCamera->getAverageFrames();
@@ -383,6 +388,8 @@ void cHySpexVNIR_3000N_Model_direct::setAcquisitionParameters(std::uint16_t avg_
     auto prevFramePeriod_us = mFramePeriod_us;
     mCamera->setFramePeriod_us(frame_period_us);
     mFramePeriod_us = mCamera->getFramePeriod_us();
+
+    mCamera->startAcquisition();
 
     if (prevAverageFrames != mAverageFrames)
         emit avgFramesChanged(mAverageFrames);
@@ -458,12 +465,24 @@ void cHySpexVNIR_3000N_Model_direct::computeFocus(bool compute)
 void cHySpexVNIR_3000N_Model_direct::computeSpatialDistribution(bool compute)
 {
     mCamera->openShutter();
+
+    mSpatialDistributionAverageCount = 0;
+
+    mSpatialDistWorkingData.resize(mSpatialSize);
+    mSpatialDistWorkingData.zero();
+
     cHySpexVNIR_3000N_Model::computeSpatialDistribution(compute);
 }
 
 void cHySpexVNIR_3000N_Model_direct::computeSpectralDistribution(bool compute)
 {
     mCamera->openShutter();
+
+    mSpectralDistributionAverageCount = 0;
+
+    mSpectralDistWorkingData.resize(mSpectralSize);
+    mSpectralDistWorkingData.zero();
+
     cHySpexVNIR_3000N_Model::computeSpectralDistribution(compute);
 }
 
@@ -615,28 +634,51 @@ void cHySpexVNIR_3000N_Model_direct::updateImageData(hyspex::ImageOptions a_opti
     }
     case eCompute::SPATIAL_DISTRIBUTION:
     {
+        ++mSpatialDistributionAverageCount;
+
         auto spatial_size = a_image.spatial_size;
         auto spectral_size = a_image.spectral_size;
 
         auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
         mSpatialDistributionSpectralBand = image.num_bands() / 2;
 
-        mSpatialDistributionData = image.band(mSpatialDistributionSpectralBand);
+        auto view = image.band(mSpatialDistributionSpectralBand);
+        mSpatialDistWorkingData += view;
 
-        emit newSpatialDistributionData();
+        if (mSpatialDistributionAverageCount >= mSpatialDistributionAverageMaxCount)
+        {
+            mSpatialDistWorkingData /= mSpatialDistributionAverageCount;
+            mSpatialDistributionData = mSpatialDistWorkingData;
+            emit newSpatialDistributionData();
+
+            mSpatialDistributionAverageCount = 0;
+            mSpatialDistWorkingData.zero();
+        }
+
         break;
     }
     case eCompute::SPECTRAL_DISTRIBUTION:
     {
+        ++mSpectralDistributionAverageCount;
+
         auto spatial_size = a_image.spatial_size;
         auto spectral_size = a_image.spectral_size;
 
         auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
         mSpectralDistributionSpatialChannel = image.num_channels() / 2;
 
-        mSpectralDistributionData = image.channel(mSpectralDistributionSpatialChannel);
+        mSpectralDistWorkingData += image.channel(mSpectralDistributionSpatialChannel);
 
-        emit newSpectralDistributionData();
+        if (mSpectralDistributionAverageCount >= mSpectralDistributionAverageMaxCount)
+        {
+            mSpectralDistWorkingData /= mSpectralDistributionAverageCount;
+            mSpectralDistributionData = mSpectralDistWorkingData;
+            emit newSpectralDistributionData();
+
+            mSpectralDistributionAverageCount = 0;
+            mSpectralDistWorkingData.zero();
+        }
+
         break;
     }
     }
