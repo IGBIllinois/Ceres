@@ -145,7 +145,10 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mWavelengthRangeId = mCamera->getWavelengthRangeId();
 
     mSpectralSize = mCamera->getSpectralSize();
+    mSpatialDistributionSpectralBand = mSpectralSize / 2;
+
     mSpatialSize = mCamera->getSpatialSize();
+    mSpectralDistributionSpatialChannel = mSpatialSize / 2;
 
     mMaxSpatialSize = mCamera->getMaxSpatialSize();
     mMaxSpectralSize = mCamera->getMaxSpectralSize();
@@ -638,7 +641,6 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
         auto spectral_size = a_image.spectral_size;
 
         auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
-        mSpatialDistributionSpectralBand = image.num_bands() / 2;
 
         auto view = image.band(mSpatialDistributionSpectralBand);
         mSpatialDistWorkingData += view;
@@ -663,7 +665,6 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
         auto spectral_size = a_image.spectral_size;
 
         auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
-        mSpectralDistributionSpatialChannel = image.num_channels() / 2;
 
         mSpectralDistWorkingData += image.channel(mSpectralDistributionSpatialChannel);
 

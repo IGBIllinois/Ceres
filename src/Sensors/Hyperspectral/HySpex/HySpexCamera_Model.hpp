@@ -211,7 +211,7 @@ protected:
     std::vector<float> mPercentBand;
 
     int mFocusAverageCount = 0;
-    int mFocusAverageMaxCount = 10;
+    const int mFocusAverageMaxCount = 10;
     HySpexConnect::cSpatialMajorData<float> mFocusMatrix;
 
     int mSpatialDistributionAverageCount = 0;
