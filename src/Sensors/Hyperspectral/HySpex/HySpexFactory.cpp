@@ -105,6 +105,8 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::ambientTempChanged, pView, &cHySpexVNIR_3000N_StatusView::onAmbientTempChange);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::sensorTempChanged, pView, &cHySpexVNIR_3000N_StatusView::onSensorTempChange);
 
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::computeModeChanged, pView, &cHySpexVNIR_3000N_StatusView::onComputeModeChange);
+
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newPercentSaturationData, pView, &cHySpexVNIR_3000N_StatusView::onSaturationDataUpdated);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newPercentBandData, pView, &cHySpexVNIR_3000N_StatusView::onBandDataUpdated);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newFocusData, pView, &cHySpexVNIR_3000N_StatusView::onFocusDataUpdated);
@@ -182,6 +184,8 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
         QObject::connect(pModel, &cHySpexSWIR_384_Model::maxIntegrationTimeChanged, pView, &cHySpexSWIR_384_StatusView::onMaxIntegrationTimeChange);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::ambientTempChanged, pView, &cHySpexSWIR_384_StatusView::onAmbientTempChange);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::sensorTempChanged, pView, &cHySpexSWIR_384_StatusView::onSensorTempChange);
+
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::computeModeChanged, pView, &cHySpexSWIR_384_StatusView::onComputeModeChange);
 
         QObject::connect(pModel, &cHySpexSWIR_384_Model::newPercentSaturationData, pView, &cHySpexSWIR_384_StatusView::onSaturationDataUpdated);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::newPercentBandData, pView, &cHySpexSWIR_384_StatusView::onBandDataUpdated);

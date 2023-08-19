@@ -13,7 +13,6 @@ class cHySpexVNIR_3000N_PropertyPage_Remote : public cHySpexVNIR_3000N_PropertyP
     public cSensorPropertyPageRemoteInterface, 
     private cHySpexVNIR_3000N_PropertiesNetDecoder, private cHySpexVNIR_3000N_PropertiesNetEncoder
 {
-
 public:
     cHySpexVNIR_3000N_PropertyPage_Remote(QWidget* parent = nullptr);
     ~cHySpexVNIR_3000N_PropertyPage_Remote() = default;
@@ -35,6 +34,7 @@ public:
 
 protected:
     void onConnect() override;
+    void onDisconnect() override;
 
 protected:
     void showPage() override;
@@ -49,6 +49,9 @@ protected:
     void sendChangedData(bool* pNeedsUpdate = nullptr);
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
+
+private slots:
+    void timerExpired();
 
 private:
     bool mWaitingForBackgroundReply = false;

@@ -5,6 +5,7 @@
 
 #include <QLineEdit>
 #include <QComboBox>
+#include <QTimer>
 
 cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWidget* parent)
 	: cHySpexVNIR_3000N_PropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
@@ -39,8 +40,18 @@ cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::
 void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
 {
 	setEnabled(false);
+
+	mWaitingForBackgroundReply = false;
+
 	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
 	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+
+//	QTimer::singleShot(3000, static_cast<cHySpexCamera_PropertyPage*>(this), SLOT(timerExpired()));
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::onDisconnect()
+{
+	doCancel();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid,

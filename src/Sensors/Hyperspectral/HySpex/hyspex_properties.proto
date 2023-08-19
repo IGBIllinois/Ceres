@@ -17,6 +17,7 @@ syntax = "proto3";
     eQUERY_STATE = 1;
     eQUERY_LENS_NAMES = 2;
     eQUERY_SHUTTER_STATE = 3;
+    eQUERY_BACKGROUND_STATE = 4;
 }
 
  enum hyspex_eBackgroundReply
@@ -24,6 +25,7 @@ syntax = "proto3";
     eBackgroundReply_GOOD = 0;
     eBackgroundReply_FAILED = 1;
     eBackgroundReply_ABORTED = 2;
+    eBackgroundReply_PENDING = 3;
 }
 
  enum hyspex_eShutterState

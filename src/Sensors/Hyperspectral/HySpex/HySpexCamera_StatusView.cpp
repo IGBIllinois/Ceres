@@ -559,7 +559,6 @@ void cHySpexCamera_StatusView::onSaturationDataUpdated()
 
 	if (mY.size() != intensity_pct.size())
 	{
-		qCritical() << "mY/intensity_pct size mismatch in onSaturationDataUpdated";
 		return;
 	}
 
@@ -572,7 +571,6 @@ void cHySpexCamera_StatusView::onSaturationDataUpdated()
 
 	if (mY.size() != num_saturated.size())
 	{
-		qCritical() << "mY/num_saturated size mismatch in onSaturationDataUpdated";
 		return;
 	}
 
@@ -641,7 +639,6 @@ void cHySpexCamera_StatusView::onBandDataUpdated()
 
 	if (mY.size() != intensity_pct.size())
 	{
-		qCritical() << "mY/intensity_pct size mismatch in onBandDataUpdated";
 		return;
 	}
 
@@ -651,7 +648,12 @@ void cHySpexCamera_StatusView::onBandDataUpdated()
 	mpPlot->graph(0)->setData(mX, mY, true);
 
 	auto num_saturated = mpModel->getNumSaturated();
-	mY.resize(num_saturated.size());
+
+	if (mY.size() != num_saturated.size())
+	{
+		return;
+	}
+
 	for (std::size_t i = 0; i < num_saturated.size(); ++i)
 		mY[i] = num_saturated[i];
 
@@ -770,7 +772,12 @@ void cHySpexCamera_StatusView::onSpatialDistributionUpdated()
 	auto data = mpModel->getSpatialDistributionData();
 
 	float max_y = 0;
-	mY.resize(data.size());
+
+	if (mY.size() != data.size())
+	{
+		return;
+	}
+
 	for (std::size_t i = 0; i < data.size(); ++i)
 	{
 		mY[i] = data[i];
@@ -848,7 +855,6 @@ void cHySpexCamera_StatusView::onSpectralDistributionUpdated()
 
 	if (mY.size() != data.size())
 	{
-		qCritical() << "mY/data size mismatch in onSpectralDistributionUpdated";
 		return;
 	}
 

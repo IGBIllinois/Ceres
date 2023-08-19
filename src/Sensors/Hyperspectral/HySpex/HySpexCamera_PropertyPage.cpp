@@ -6,11 +6,11 @@
 #include <QLayout>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QTimer>
 
 cHySpexCamera_PropertyPage::cHySpexCamera_PropertyPage(QWidget* parent)
 	: cSensorPropertyPage(parent)
-{
-}
+{}
 
 void cHySpexCamera_PropertyPage::createWidgets()
 {
@@ -43,9 +43,9 @@ void cHySpexCamera_PropertyPage::createWidgets()
 	mpNumBackgrounds = new QLineEdit(this);
 
 	mpDoBackground = new QPushButton("Calc Background");
-	mpDoBackground->setCheckable(true);
-	connect(mpDoBackground, &QPushButton::clicked, this, &cHySpexCamera_PropertyPage::doCalcBackground);
-
+//	mpDoBackground->setCheckable(true);
+//	connect(mpDoBackground, &QPushButton::clicked, this, &cHySpexCamera_PropertyPage::doCalcBackground);
+	connect(mpDoBackground, &QPushButton::pressed, this, &cHySpexCamera_PropertyPage::doCalcBackground);
 }
 
 QGroupBox* cHySpexCamera_PropertyPage::getLensLayout()

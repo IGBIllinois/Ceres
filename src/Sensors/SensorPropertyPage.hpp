@@ -88,9 +88,10 @@ public:
 private slots:
 	void connected();
 	void disconnected();
-	void errorOccurred(QAbstractSocket::SocketError socketError);
-	void hostFound();
-	void stateChanged(QAbstractSocket::SocketState socketState);
+
+	virtual void errorOccurred(QAbstractSocket::SocketError socketError);
+	virtual void hostFound();
+	virtual void stateChanged(QAbstractSocket::SocketState socketState);
 
 protected slots:
 	void processIncomingData();
