@@ -154,8 +154,8 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mMaxSpectralSize = mCamera->getMaxSpectralSize();
 
     mMaxPixelValue = mCamera->getMaxPixelValue();
-    if (mMaxPixelValue > 2)
-        mSaturationValue = mMaxPixelValue - 2;
+    if (mMaxPixelValue > 10)
+        mSaturationValue = mMaxPixelValue - 10;
 
     mCommStatus = mCamera->getCommunicationStatus();
     emit commStatusChanged();
@@ -344,6 +344,13 @@ void cHySpexSWIR_384_Model_direct::enableDataRecording(cBlockDataFileWriter& fil
 {
     mCamera->openShutter();
     mBgCurrentState = eBgStates::NONE;
+
+    bool computeStateChange = meComputeData != eCompute::NONE;
+    meComputeData = eCompute::NONE;
+
+    if (computeStateChange)
+        emit computeModeChanged();
+
     cHySpexSWIR_384_Model::enableDataRecording(file);
 }
 
@@ -582,11 +589,15 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
         auto n = a_image.saturated.size;
         auto spectral_size = a_image.spectral_size;
 
-        const std::lock_guard<std::mutex> lock(mPercentSaturationLock);
+        const std::lock_guard<std::mutex> lock(mSaturationLock);
 
-        mPercentSaturation.resize(n);
+        mNumSaturated.resize(n);
+        mMaxIntensity_pct.resize(n);
         for (uint64_t i = 0; i < n; ++i)
-            mPercentSaturation[i] = (100.0f * a_image.saturated.data[i]) / spectral_size;
+        {
+            mNumSaturated[i]     = a_image.saturated.data[i];
+            mMaxIntensity_pct[i] = (100.0f * a_image.max_saturation.data[i]) / mMaxPixelValue;
+        }
 
         emit newPercentSaturationData();
         break;
@@ -599,19 +610,24 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
         auto image = HySpexConnect::spatial_major_data_view<unsigned short>(a_image.buffer.data, a_image.buffer.size, spatial_size, spectral_size);
         auto num_bands = image.num_bands();
 
-        const std::lock_guard<std::mutex> lock(mPercentBandLock);
+        const std::lock_guard<std::mutex> lock(mSaturationLock);
 
-        mPercentBand.resize(num_bands);
+        mNumSaturated.resize(num_bands);
+        mMaxIntensity_pct.resize(num_bands);
         for (std::size_t b = 0; b < num_bands; ++b)
         {
             int count = 0;
+            uint16_t max_value = 0;
             auto channels = image.band(b);
             for (auto value : channels)
             {
                 if (value >= mSaturationValue)
                     ++count;
+                if (value >= max_value)
+                    max_value = value;
             }
-            mPercentBand[b] = (100.0f * count) / spatial_size;
+            mNumSaturated[b] = count;
+            mMaxIntensity_pct[b] = (100.0f * max_value) / mMaxPixelValue;
         }
 
         emit newPercentBandData();

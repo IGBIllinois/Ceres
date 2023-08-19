@@ -125,39 +125,59 @@ std::uint32_t cHySpexCameraModel::getNumOfBackgrounds() const { return mNumBackg
 
 void cHySpexCameraModel::computePercentSaturation(bool compute)
 {
+    auto prevComputeState = meComputeData;
     meComputeData = compute ? eCompute::PERCENT_SATURATION : eCompute::NONE;
+
+    if (prevComputeState != meComputeData)
+        emit computeModeChanged();
 }
 
 void cHySpexCameraModel::computePercentBand(bool compute)
 {
+    auto prevComputeState = meComputeData;
     meComputeData = compute ? eCompute::PERCENT_BAND : eCompute::NONE;
+
+    if (prevComputeState != meComputeData)
+        emit computeModeChanged();
 }
 
 void cHySpexCameraModel::computeFocus(bool compute)
 {
+    auto prevComputeState = meComputeData;
     meComputeData = compute ? eCompute::FOCUS : eCompute::NONE;
+
+    if (prevComputeState != meComputeData)
+        emit computeModeChanged();
 }
 
 void cHySpexCameraModel::computeSpatialDistribution(bool compute)
 {
+    auto prevComputeState = meComputeData;
     meComputeData = compute ? eCompute::SPATIAL_DISTRIBUTION : eCompute::NONE;
+
+    if (prevComputeState != meComputeData)
+        emit computeModeChanged();
 }
 
 void cHySpexCameraModel::computeSpectralDistribution(bool compute)
 {
+    auto prevComputeState = meComputeData;
     meComputeData = compute ? eCompute::SPECTRAL_DISTRIBUTION : eCompute::NONE;
+
+    if (prevComputeState != meComputeData)
+        emit computeModeChanged();
 }
 
-std::vector<float> cHySpexCameraModel::getPercentSaturation() const
+std::vector<uint16_t> cHySpexCameraModel::getNumSaturated() const
 {
-    const std::lock_guard<std::mutex> lock(mPercentSaturationLock);
-    return mPercentSaturation;
+    const std::lock_guard<std::mutex> lock(mSaturationLock);
+    return mNumSaturated;
 }
 
-std::vector<float> cHySpexCameraModel::getPercentBands() const
+std::vector<float> cHySpexCameraModel::getMaxIntensity_pct() const
 {
-    const std::lock_guard<std::mutex> lock(mPercentBandLock);
-    return mPercentBand;
+    const std::lock_guard<std::mutex> lock(mSaturationLock);
+    return mMaxIntensity_pct;
 }
 
 HySpexConnect::cSpatialData<float> cHySpexCameraModel::getSpatialDistributionData() const

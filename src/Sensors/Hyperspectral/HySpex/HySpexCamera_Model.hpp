@@ -112,8 +112,9 @@ public:
     virtual void computeSpatialDistribution(bool compute);
     virtual void computeSpectralDistribution(bool compute);
 
-    std::vector<float> getPercentSaturation() const;
-    std::vector<float> getPercentBands() const;
+    std::vector<uint16_t> getNumSaturated() const;
+    std::vector<float>    getMaxIntensity_pct() const;
+
     HySpexConnect::cSpatialData<float> getSpatialDistributionData() const;
     HySpexConnect::cSpectralData<float> getSpectralDistributionData() const;
 
@@ -137,6 +138,9 @@ signals:
 
     void lensInfoChanged();
 
+    void computeModeChanged();
+
+
     void newPercentSaturationData();
     void newPercentBandData();
     void newFocusData(double focus_number);
@@ -145,6 +149,12 @@ signals:
 
     void newImageData();
 
+public:
+
+    enum class eCompute { NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS,
+        SPATIAL_DISTRIBUTION, SPECTRAL_DISTRIBUTION };
+
+    eCompute getComputeState() const { return meComputeData; }
 
 protected:
     void computeFocusNumber(const HySpexConnect::spatial_major_data_view<uint16_t>& image);
@@ -201,14 +211,20 @@ protected:
     HySpexConnect::cImageData<uint16_t>     mImageData;
 
 
-    enum class eCompute {NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS, 
-        SPATIAL_DISTRIBUTION, SPECTRAL_DISTRIBUTION} meComputeData = eCompute::NONE;
+    enum class eCompute meComputeData = eCompute::NONE;
 
-    mutable std::mutex mPercentSaturationLock;
-    std::vector<float> mPercentSaturation;
+    mutable std::mutex mSaturationLock;
 
-    mutable std::mutex mPercentBandLock;
-    std::vector<float> mPercentBand;
+    /**
+     * The number of pixels in saturation for either a spatial channel or a spectral band
+     */
+    std::vector<uint16_t> mNumSaturated;
+
+    /**
+     * For the spatial channel or spectral band with the greatest intensity expressed
+     * as a percentage of the maximum pixel value
+     */
+    std::vector<float> mMaxIntensity_pct;
 
     int mFocusAverageCount = 0;
     const int mFocusAverageMaxCount = 10;

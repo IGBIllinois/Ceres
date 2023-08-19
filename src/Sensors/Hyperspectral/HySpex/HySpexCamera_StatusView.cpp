@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QFormLayout>
 #include <QPushButton>
+#include <QDebug>
 
 #include <QCustomPlot/qcustomplot.h>
 
@@ -492,6 +493,15 @@ void cHySpexCamera_StatusView::onLensInfoChange()
 	mpLensFieldOfView_deg->setText(QString::number(fov_deg, 'f', 1));
 }
 
+void cHySpexCamera_StatusView::onComputeModeChange()
+{
+	if (mpModel->getComputeState() == cHySpexCameraModel::eCompute::NONE)
+	{
+		unclickAllButtons(nullptr);
+	}
+}
+
+
 void cHySpexCamera_StatusView::saturationButtonToggled(bool state)
 {
 	if (state)
@@ -500,15 +510,30 @@ void cHySpexCamera_StatusView::saturationButtonToggled(bool state)
 
 		mpPlot->yAxis->setRange(-1, 100);
 		mpPlot->yAxis->setLabel("% Saturation");
+		mpPlot->yAxis2->setLabel("Number Saturated");
+		mpPlot->yAxis2->setTickLabels(true);
 
 		auto chn = mpModel->getSpatialSize();
 		auto bands = mpModel->getSpectralSize();
 
 		mpPlot->xAxis->setRange(0, chn);
 		mpPlot->xAxis->setLabel("Spatial Channel");
+		mpPlot->graph(0)->data()->clear();
+		if (mpPlot->graphCount() == 1)
+		{
+			auto graph = mpPlot->addGraph(mpPlot->xAxis, mpPlot->yAxis2);
+			graph->setPen(QPen(Qt::red));
+			mpPlot->yAxis2->setRange(-0.1, 5);
+		}
+		else
+		{
+			mpPlot->graph(1)->data()->clear();
+		}
+
 		mpPlot->replot();
 
 		mX.resize(chn);
+		mY.resize(chn);
 		for (std::size_t i = 0; i < chn; ++i)
 			mX[i] = i;
 	}
@@ -530,13 +555,32 @@ void cHySpexCamera_StatusView::onSaturationDataUpdated()
 
 	lastPointKey_ms = key_ms;
 
-	auto data = mpModel->getPercentSaturation();
-	QVector<qreal> y;
-	y.resize(data.size());
-	for (std::size_t i = 0; i < data.size(); ++i)
-		y[i] = data[i];
+	auto intensity_pct = mpModel->getMaxIntensity_pct();
 
-	mpPlot->graph(0)->setData(mX, y, true);
+	if (mY.size() != intensity_pct.size())
+	{
+		qCritical() << "mY/intensity_pct size mismatch in onSaturationDataUpdated";
+		return;
+	}
+
+	for (std::size_t i = 0; i < intensity_pct.size(); ++i)
+		mY[i] = intensity_pct[i];
+
+	mpPlot->graph(0)->setData(mX, mY, true);
+
+	auto num_saturated = mpModel->getNumSaturated();
+
+	if (mY.size() != num_saturated.size())
+	{
+		qCritical() << "mY/num_saturated size mismatch in onSaturationDataUpdated";
+		return;
+	}
+
+	for (std::size_t i = 0; i < num_saturated.size(); ++i)
+		mY[i] = num_saturated[i];
+
+	mpPlot->graph(1)->setData(mX, mY, true);
+	mpPlot->graph(1)->rescaleValueAxis(true);
 
 	mpPlot->replot();
 }
@@ -549,17 +593,32 @@ void cHySpexCamera_StatusView::bandButtonToggled(bool state)
 
 		mpPlot->yAxis->setRange(-1, 100);
 		mpPlot->yAxis->setLabel("% Saturation");
+		mpPlot->yAxis2->setLabel("Number Saturated");
+		mpPlot->yAxis2->setTickLabels(true);
 
-		auto chn = mpModel->getSpatialSize();
-		auto bands = mpModel->getSpectralSize();
+		auto wavelengths_nm = mpModel->getSpectralCalibrationPerBand();
 
-		mpPlot->xAxis->setRange(0, bands);
-		mpPlot->xAxis->setLabel("Spectral Band");
+		mpPlot->xAxis->setRange(wavelengths_nm[0], wavelengths_nm[wavelengths_nm.size() - 1]);
+		mpPlot->xAxis->setLabel("Wavelengths (nm)");
+
+		mpPlot->graph(0)->data()->clear();
+		if (mpPlot->graphCount() == 1)
+		{
+			auto graph = mpPlot->addGraph(mpPlot->xAxis, mpPlot->yAxis2);
+			graph->setPen(QPen(Qt::red));
+			mpPlot->yAxis2->setRange(-0.1, 5);
+		}
+		else
+		{
+			mpPlot->graph(1)->data()->clear();
+		}
+
 		mpPlot->replot();
 
-		mX.resize(bands);
-		for (std::size_t i = 0; i < bands; ++i)
-			mX[i] = i;
+		mX.resize(wavelengths_nm.size());
+		mY.resize(wavelengths_nm.size());
+		for (std::size_t i = 0; i < wavelengths_nm.size(); ++i)
+			mX[i] = wavelengths_nm[i];
 	}
 
 	mpModel->computePercentBand(state);
@@ -578,13 +637,26 @@ void cHySpexCamera_StatusView::onBandDataUpdated()
 
 	lastPointKey_ms = key_ms;
 
-	auto data = mpModel->getPercentBands();
-	QVector<qreal> y;
-	y.resize(data.size());
-	for (std::size_t i = 0; i < data.size(); ++i)
-		y[i] = data[i];
+	auto intensity_pct = mpModel->getMaxIntensity_pct();
 
-	mpPlot->graph(0)->setData(mX, y, true);
+	if (mY.size() != intensity_pct.size())
+	{
+		qCritical() << "mY/intensity_pct size mismatch in onBandDataUpdated";
+		return;
+	}
+
+	for (std::size_t i = 0; i < intensity_pct.size(); ++i)
+		mY[i] = intensity_pct[i];
+
+	mpPlot->graph(0)->setData(mX, mY, true);
+
+	auto num_saturated = mpModel->getNumSaturated();
+	mY.resize(num_saturated.size());
+	for (std::size_t i = 0; i < num_saturated.size(); ++i)
+		mY[i] = num_saturated[i];
+
+	mpPlot->graph(1)->setData(mX, mY, true);
+	mpPlot->graph(1)->rescaleValueAxis(true);
 
 	mpPlot->replot();
 }
@@ -597,9 +669,19 @@ void cHySpexCamera_StatusView::focusButtonToggled(bool state)
 
 		mpPlot->yAxis->setRange(0, 10.0);
 		mpPlot->yAxis->setLabel("Focus");
+		mpPlot->yAxis2->setLabel("");
+		mpPlot->yAxis2->setTickLabels(false);
 
 		mpPlot->xAxis->setRange(0, 100);
 		mpPlot->xAxis->setLabel("Time");
+		mpPlot->graph(0)->data()->clear();
+
+		if (mpPlot->graphCount() == 2)
+		{
+			mpPlot->graph(1)->data()->clear();
+			mpPlot->removeGraph(1);
+		}
+
 		mpPlot->replot();
 
 		mFocusTimeStart = QTime::currentTime();
@@ -646,14 +728,25 @@ void cHySpexCamera_StatusView::SpatialDistributionButtonToggled(bool state)
 		str += QString::number(mpModel->getMaxPixelValue());
 		str += ")";
 		mpPlot->yAxis->setLabel(str);
+		mpPlot->yAxis2->setLabel("");
+		mpPlot->yAxis2->setTickLabels(false);
 
 		auto chn = mpModel->getSpatialSize();
 
 		mpPlot->xAxis->setRange(0, chn);
 		mpPlot->xAxis->setLabel("Channel Number");
+		mpPlot->graph(0)->data()->clear();
+
+		if (mpPlot->graphCount() == 2)
+		{
+			mpPlot->graph(1)->data()->clear();
+			mpPlot->removeGraph(1);
+		}
+
 		mpPlot->replot();
 
 		mX.resize(chn);
+		mY.resize(chn);
 		for (std::size_t i = 0; i < chn; ++i)
 			mX[i] = i;
 	}
@@ -706,11 +799,20 @@ void cHySpexCamera_StatusView::SpectralDistributionButtonToggled(bool state)
 		str += QString::number(mpModel->getMaxPixelValue());
 		str += ")";
 		mpPlot->yAxis->setLabel(str);
+		mpPlot->yAxis2->setLabel("");
+		mpPlot->yAxis2->setTickLabels(false);
 
 		auto wavelengths_nm = mpModel->getSpectralCalibrationPerBand();
 
 		mpPlot->xAxis->setRange(wavelengths_nm[0], wavelengths_nm[wavelengths_nm.size()-1]);
 		mpPlot->xAxis->setLabel("Wavelengths (nm)");
+		mpPlot->graph(0)->data()->clear();
+
+		if (mpPlot->graphCount() == 2)
+		{
+			mpPlot->graph(1)->data()->clear();
+			mpPlot->removeGraph(1);
+		}
 
 		mX.resize(wavelengths_nm.size());
 		mY.resize(wavelengths_nm.size());
@@ -743,7 +845,13 @@ void cHySpexCamera_StatusView::onSpectralDistributionUpdated()
 
 	auto data = mpModel->getSpectralDistributionData();
 	float max_y = 0;
-	mY.resize(data.size());
+
+	if (mY.size() != data.size())
+	{
+		qCritical() << "mY/data size mismatch in onSpectralDistributionUpdated";
+		return;
+	}
+
 	for (std::size_t i = 0; i < data.size(); ++i)
 	{
 		mY[i] = data[i];

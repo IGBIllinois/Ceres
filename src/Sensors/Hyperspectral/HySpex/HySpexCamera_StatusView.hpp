@@ -54,6 +54,8 @@ public slots:
 
 	void onLensInfoChange();
 
+	void onComputeModeChange();
+
 	void onSaturationDataUpdated();
 	void onBandDataUpdated();
 	void onFocusDataUpdated(double focus_number);
