@@ -165,7 +165,7 @@ target_link_libraries(hyspex_static PRIVATE QCustomPlot::qcustomplot_static)
 target_link_libraries(hyspex_static PRIVATE ExperimentStateMachine)
 target_link_libraries(hyspex_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(hyspex_static PRIVATE ${Protobuf_LIBRARIES})
-target_link_libraries(hyspex_static PRIVATE HySpexConnect::hyspex_connect_static)
+target_link_libraries(hyspex_static PRIVATE HySpexConnect::HySpexConnect_static)
 target_link_libraries(hyspex_static PRIVATE HySpex::HySpex)
 target_link_libraries(hyspex_static PRIVATE Spinnaker::Spinnaker)
 

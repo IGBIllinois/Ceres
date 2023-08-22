@@ -39,6 +39,8 @@ public:
 	virtual void doCancel();
 	virtual void doApply();
 
+	virtual void hidePage();
+
 signals:
 	void statusMessage(QString msg);
 

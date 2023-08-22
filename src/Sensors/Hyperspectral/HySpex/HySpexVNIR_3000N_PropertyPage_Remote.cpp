@@ -6,6 +6,10 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QTimer>
+#include <QTime>
+#include <QCoreApplication>
+#include <QMessageBox>
+
 
 cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWidget* parent)
 	: cHySpexVNIR_3000N_PropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
@@ -43,14 +47,49 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
 
 	mWaitingForBackgroundReply = false;
 
-	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
-	cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+	if (mpLenses->count() == 0)
+	{
+		// We are going to try to get the lens names three times.
+
+		for (int i = 0; i < 3; ++i)
+		{
+			cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
+
+			QTime delayTime = QTime::currentTime().addSecs(3);
+			while (QTime::currentTime() < delayTime)
+			{
+				QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+				if (mpLenses->count() > 0)
+					goto query_state;
+			}
+		}
+	}
+
+query_state:
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
 
 //	QTimer::singleShot(3000, static_cast<cHySpexCamera_PropertyPage*>(this), SLOT(timerExpired()));
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onDisconnect()
 {
+	mpLenses->clear();
+	mAcquisitionParametersValid = false;
+
 	doCancel();
 }
 
@@ -61,6 +100,8 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid,
 	const std::string& lens_name)
 {
 	if (!valid) return;
+
+	mAcquisitionParametersValid = true;
 
 	mpAvgFrames->setText(QString::number(average_frames));
 	mpFramePeriod_us->setText(QString::number(frame_period_us));
@@ -111,7 +152,14 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onShutterState(eShutterState state)
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::showPage()
 {
-	openConnection();
+	if (!openConnection())
+	{
+		QMessageBox::warning(this, "Ceres",
+			"Could not connect to the VNIR 3000N controller.",
+			QMessageBox::Ok);
+
+	}
+
 	cHySpexVNIR_3000N_PropertyPage::showPage();
 }
 
@@ -157,6 +205,11 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doApply()
 		sendQueryState();
 		update();
 	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::reject()
+{
+	doCancel();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::sendChangedData(bool* pNeedsUpdate)

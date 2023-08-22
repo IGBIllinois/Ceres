@@ -45,6 +45,8 @@ protected:
     void doCancel() override;
     void doApply() override;
 
+    void reject() override;
+
 protected:
     void sendChangedData(bool* pNeedsUpdate = nullptr);
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
@@ -54,6 +56,7 @@ private slots:
     void timerExpired();
 
 private:
+    bool mAcquisitionParametersValid = false;
     bool mWaitingForBackgroundReply = false;
 };
 

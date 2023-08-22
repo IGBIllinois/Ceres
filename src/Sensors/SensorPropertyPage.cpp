@@ -35,6 +35,11 @@ void cSensorPropertyPage::showPage()
     show();
 }
 
+void cSensorPropertyPage::hidePage()
+{
+    hide();
+}
+
 QAction* cSensorPropertyPage::showAction() const
 {
     return mpShowAction;
@@ -42,12 +47,12 @@ QAction* cSensorPropertyPage::showAction() const
 
 void cSensorPropertyPage::doOK()
 {
-    hide();
+    hidePage();
 }
 
 void cSensorPropertyPage::doCancel()
 {
-    hide();
+    hidePage();
 }
 
 void cSensorPropertyPage::doApply()
@@ -161,6 +166,7 @@ bool cSensorPropertyPageRemoteInterface::openConnection()
         return false;
     }
 
+    if (mConnected) return true;
     mSocket.connectToHost(mRemoteEndpoint, mPort);
     return true;
 }
@@ -168,6 +174,7 @@ bool cSensorPropertyPageRemoteInterface::openConnection()
 void cSensorPropertyPageRemoteInterface::closeConnection()
 {
     mSocket.close();
+    mConnected = false;
 }
 
 
