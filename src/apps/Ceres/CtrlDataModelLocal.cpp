@@ -47,7 +47,21 @@ void cCtrlDataModelLocal::stopDataThread()
 bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath, 
     const std::string& defaultFileName, bool autoSave)
 {
-    QString fileName;
+    QString fileName = QString::fromStdString(defaultFileName);
+
+    std::replace_if(fileName.begin(), fileName.end(),
+        [](QString::value_type c)
+        {
+            if (c == '/') return true;
+            if (c == '*') return true;
+            if (c == '\\') return true;
+            if (c == '<') return true;
+            if (c == '>') return true;
+            if (c == ':') return true;
+            if (c == '|') return true;
+            if (c == '?') return true;
+            return c <= QChar::Space;
+        }, '_');
 
     std::time_t t = std::time(nullptr);
     tm* ltm = localtime(&t);
@@ -79,7 +93,7 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath,
         {
             create_directories(testPath);
         }
-        testPath /= defaultFileName;
+        testPath /= fileName.toStdString();
         fileName = QString::fromStdString(testPath.string());
         fileName += ".ceres";
     }
@@ -94,7 +108,7 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath,
             using namespace std::filesystem;
 
             path testPath = defaultPath.toStdString();
-            testPath /= defaultFileName;
+            testPath /= fileName.toStdString();
             fileName = QString::fromStdString(testPath.string());
             fileName += ".ceres";
         }
@@ -117,9 +131,6 @@ bool cCtrlDataModelLocal::openDataFile(const QString& defaultPath,
 
     fileName.insert(ext, "_");
     fileName.insert(ext + 1, timestamp);
-
-    std::replace_if(fileName.begin(), fileName.end(),
-        [](QString::value_type c) {return c <= QChar::Space; }, '_');
 
     std::string filename = fileName.toStdString();
     mFile.open(filename);

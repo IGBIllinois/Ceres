@@ -207,10 +207,11 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 
     qualifiedFileName += "_";
     qualifiedFileName += timestamp;
-    qualifiedFileName += ".ceres";
 
     std::replace_if(qualifiedFileName.begin(), qualifiedFileName.end(),
-        [](QString::value_type c) {return c <= QChar::Space; }, '_');
+        [](QString::value_type c) { return c <= QChar::Space; }, '_');
+
+    qualifiedFileName += ".ceres";
 
     mFullyQualifiedFileName = mDefaultDataPath / qualifiedFileName;
 

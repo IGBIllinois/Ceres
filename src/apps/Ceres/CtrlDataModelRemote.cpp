@@ -274,12 +274,27 @@ void cCtrlDataModelRemote::try_reconnection()
     mSocket.connectToHost(mRemoteEndpoint, mPort);
 }
 
-bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::string&, bool autoSave)
+bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::string& defaultFilename, bool autoSave)
 {
     std::time_t t = std::time(nullptr);
     tm* ltm = localtime(&t);
 
     std::string filename;
+    std::string experiment_title = mExperimentTitle;
+
+    std::replace_if(experiment_title.begin(), experiment_title.end(),
+        [](std::string::value_type c)
+        {
+            if (c == '/') return true;
+            if (c == '*') return true;
+            if (c == '\\') return true;
+            if (c == '<') return true;
+            if (c == '>') return true;
+            if (c == ':') return true;
+            if (c == '|') return true;
+            if (c == '?') return true;
+            return c <= ' ';
+        }, '_');
 
     switch (ltm->tm_mon)
     {
@@ -298,7 +313,7 @@ bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::s
     }
     filename += std::to_string(ltm->tm_mday);
     filename += "/";
-    filename += mExperimentTitle;
+    filename += experiment_title;
 
     // We are going to try an open a data file on the remote computer
     // three times.
