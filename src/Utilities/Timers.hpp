@@ -16,11 +16,14 @@ public:
 	uint32_t interval_ms() const;
 	void interval_ms(uint32_t interval_ms);
 
+	void stop();
+
 	void reset();
 
 	bool elapsed();
 
 private:
+	bool mRunning = true;
 	std::chrono::high_resolution_clock::time_point mStartTime;
 	std::chrono::nanoseconds mInterval;
 };

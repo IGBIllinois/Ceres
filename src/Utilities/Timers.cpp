@@ -36,13 +36,20 @@ void cIntervalTimer::interval_ms(uint32_t interval_ms)
 	mInterval = std::chrono::milliseconds(interval_ms);
 }
 
+void cIntervalTimer::stop()
+{
+	mRunning = false;
+}
+
 void cIntervalTimer::reset()
 {
+	mRunning = true;
 	mStartTime = std::chrono::high_resolution_clock::now();
 }
 
 bool cIntervalTimer::elapsed()
 {
+	if (!mRunning) return false;
 	auto now = std::chrono::high_resolution_clock::now();
 
 	auto diff = now - mStartTime;
