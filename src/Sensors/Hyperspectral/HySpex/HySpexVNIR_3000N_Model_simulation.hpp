@@ -45,6 +45,7 @@ public:
 
     void setNumOfBackgrounds(int num_backgrounds) override;
     void calcBackground() override;
+    void stopBackground() override;
 
     void open_shutter() override;
     void close_shutter() override;
@@ -58,7 +59,7 @@ private:
     cIntervalTimer mBackgroundTimer;
     cIntervalTimer mSimDataUpdateTimer;
 
-    enum class eBgStates {NONE, SH_CLOSE, COMPLETE, SH_OPEN };
+    enum class eBgStates {NONE, SH_CLOSE, COMPLETE, SH_OPEN, ABORT};
     eBgStates mBackgroundState = eBgStates::NONE;
 };
 

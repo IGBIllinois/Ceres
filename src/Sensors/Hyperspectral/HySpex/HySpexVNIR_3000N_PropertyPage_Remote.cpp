@@ -45,44 +45,15 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
 {
 	setEnabled(false);
 
-	mWaitingForBackgroundReply = false;
-
 	if (mpLenses->count() == 0)
 	{
-		// We are going to try to get the lens names three times.
-
-		for (int i = 0; i < 3; ++i)
-		{
-			cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
-
-			QTime delayTime = QTime::currentTime().addSecs(3);
-			while (QTime::currentTime() < delayTime)
-			{
-				QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-				if (mpLenses->count() > 0)
-					goto query_state;
-			}
-		}
+		queryLensNames();
 	}
 
-query_state:
-	mAcquisitionParametersValid = false;
+	queryState();
 
-	// We are going to try to get the acquisition parameters three times.
-	for (int i = 0; i < 3; ++i)
-	{
-		cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
-
-		QTime delayTime = QTime::currentTime().addSecs(3);
-		while (QTime::currentTime() < delayTime)
-		{
-			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-			if (mAcquisitionParametersValid)
-				return;
-		}
-	}
-
-//	QTimer::singleShot(3000, static_cast<cHySpexCamera_PropertyPage*>(this), SLOT(timerExpired()));
+	setEnabled(true);
+	update();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onDisconnect()
@@ -125,10 +96,6 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onCurrentState(bool valid,
 			break;
 		}
 	}
-
-	if (!mWaitingForBackgroundReply)
-		setEnabled(true);
-	update();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onLensNames(const std::vector<std::string>& names)
@@ -139,16 +106,18 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onLensNames(const std::vector<std::s
 	}
 }
 
+void cHySpexVNIR_3000N_PropertyPage_Remote::onCommandReply(eCommandReply reply)
+{}
+
 void cHySpexVNIR_3000N_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
 {
-	mWaitingForBackgroundReply = false;
+	mBackgroundValid = true;
 	setEnabled(true);
 	update();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::onShutterState(eShutterState state)
-{
-}
+{}
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::showPage()
 {
@@ -168,13 +137,15 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doCalcBackground()
 	if (!mConnected)
 		return;
 
-	mWaitingForBackgroundReply = true;
-
 	setEnabled(false);
+	update();
 
-	doApply();
+	sendChangedData();
 
-	sendCalcBackground();
+	calcBackground();
+
+	setEnabled(true);
+	update();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::doOK()
@@ -195,16 +166,10 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doApply()
 	if (!mConnected)
 		return;
 
-	bool needs_update = false;
+	sendChangedData();
 
-	sendChangedData(&needs_update);
-
-	if (needs_update)
-	{
-		setEnabled(false);
-		sendQueryState();
-		update();
-	}
+	setEnabled(true);
+	update();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::reject()
@@ -212,35 +177,157 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::reject()
 	doCancel();
 }
 
-void cHySpexVNIR_3000N_PropertyPage_Remote::sendChangedData(bool* pNeedsUpdate)
+/*
+ * Network communications methods
+ */
+void cHySpexVNIR_3000N_PropertyPage_Remote::sendChangedData()
 {
 	if (!mConnected)
 		return;
 
-	bool needs_update = false;
-
 	auto frames = mpAvgFrames->text().toInt();
 	auto frame_period_us = mpFramePeriod_us->text().toInt();
 	auto integration_time_us = mpIntegrationTime_us->text().toInt();
+	auto num_backgrounds = mpNumBackgrounds->text().toInt();
+
+	if ((mDefaultAverageFrames != frames)
+		|| (mDefaultFramePeriod_us != frame_period_us)
+		|| (mDefaultIntegrationTime_us != integration_time_us)
+		|| (mDefaultNumBackgrounds != num_backgrounds))
+	{
+		setEnabled(false);
+	}
 
 	if ((mDefaultAverageFrames != frames)
 		|| (mDefaultFramePeriod_us != frame_period_us)
 		|| (mDefaultIntegrationTime_us != integration_time_us))
 	{
-		sendAcquisitionParameters(frames, frame_period_us, integration_time_us);
-		needs_update = true;
+		setAcquisitionParameters(frames, frame_period_us, integration_time_us);
 	}
-
-	auto num_backgrounds = mpNumBackgrounds->text().toInt();
 
 	if (mDefaultNumBackgrounds != num_backgrounds)
 	{
-		sendNumOfBackgrounds(num_backgrounds);
-		needs_update = true;
+		setNumOfBackgrounds(num_backgrounds);
+	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::queryState()
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::queryLensNames()
+{
+	// We are going to try to get the lens names three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryLensNames();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mpLenses->count() > 0)
+				return;
+		}
+	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendAcquisitionParameters(average_frame, frame_period_us, integration_time_us);
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::setLensName(const std::string& lens_name)
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendLensName(lens_name);
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::setNumOfBackgrounds(int num_backgrounds)
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendNumOfBackgrounds(num_backgrounds);
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::calcBackground()
+{
+	mBackgroundValid = false;
+
+	int secs = static_cast<int>(3 * mDefaultNumBackgrounds * mDefaultAverageFrames * (mDefaultFramePeriod_us / 1'000'000.0));
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexVNIR_3000N_PropertiesNetEncoder::sendCalcBackground();
+
+		QTime delayTime = QTime::currentTime().addSecs(secs);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mBackgroundValid)
+				return;
+		}
 	}
 
-	if (pNeedsUpdate)
-		*pNeedsUpdate = needs_update;
+	cHySpexVNIR_3000N_PropertiesNetEncoder::sendStopBackground();
 }
 
 void cHySpexVNIR_3000N_PropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

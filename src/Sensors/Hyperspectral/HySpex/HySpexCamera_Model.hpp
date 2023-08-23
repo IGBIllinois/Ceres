@@ -102,6 +102,7 @@ public:
 
     virtual void setNumOfBackgrounds(int num_backgrounds) = 0;
     virtual void calcBackground() = 0;
+    virtual void stopBackground() = 0;
 
     /*
      * Turn on/off data computations
@@ -150,11 +151,12 @@ signals:
     void newImageData();
 
 public:
-
     enum class eCompute { NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS,
         SPATIAL_DISTRIBUTION, SPECTRAL_DISTRIBUTION };
 
     eCompute getComputeState() const { return meComputeData; }
+
+    void postLogMessage(quint8 type, QString device, QString msg);
 
 protected:
     void computeFocusNumber(const HySpexConnect::spatial_major_data_view<uint16_t>& image);

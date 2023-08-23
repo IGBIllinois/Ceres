@@ -35,7 +35,10 @@ protected:
 
     virtual void onLensNames(const std::vector<std::string>& names) = 0;
 
-    enum class eBackgroundReply {GOOD, FAILED, ABORTED};
+    enum class eCommandReply { UNKNOWN, CALC_BACKGROUND, STOP_BACKGROUND };
+    virtual void onCommandReply(eCommandReply reply) = 0;
+
+    enum class eBackgroundReply {GOOD, FAILED, ABORTED, PENDING};
     virtual void onBackgroundReply(eBackgroundReply reply) = 0;
 
     enum class eShutterState { UNKNOWN, OPEN, CLOSED, PENDING_OPEN, PENDING_CLOSED, ERROR };

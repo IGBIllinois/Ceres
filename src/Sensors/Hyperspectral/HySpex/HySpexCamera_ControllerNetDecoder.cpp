@@ -7,6 +7,8 @@
 
 #include <QDebug>
 
+//#define LOG_MESSAGE
+
 void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
     using namespace hyspex;
@@ -23,15 +25,21 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
         switch (query)
         {
         case eQUERY_STATE:
+#ifdef LOG_MESSAGE
             qInfo() << "Query status received.";
+#endif
             onQueryState();
             break;
         case eQUERY_LENS_NAMES:
+#ifdef LOG_MESSAGE
             qInfo() << "Query lens names received.";
+#endif
             onQueryLensNames();
             break;
         case eQUERY_SHUTTER_STATE:
+#ifdef LOG_MESSAGE
             qInfo() << "Query shutter state received.";
+#endif
             onQueryShutterState();
             break;
         default:
@@ -72,6 +80,22 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
         if (state == hyspex_eShutterState::eShutterState_CLOSED)
             onCloseShutter();
 
+        break;
+    }
+    case ePacketType::HYSPEX_COMMAND:
+    {
+        auto command = to_hyspex_command_enum_1(hdr.length, buffer);
+        switch (command)
+        {
+        case eCOMMAND_CALC_BACKGROUND:
+            onCalcBackground();
+            break;
+        case eCOMMAND_STOP_BACKGROUND:
+            onStopBackground();
+            break;
+        default:
+            qWarning() << "Unknown command received: " << command;
+        }
         break;
     }
     default:

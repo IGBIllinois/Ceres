@@ -335,6 +335,13 @@ void cHySpexVNIR_3000N_Model_direct::update()
             }
             break;
         }
+        case eBgStates::ABORT:
+        {
+            mCamera->stopCalculatingBackground();
+            mCamera->openShutter();
+            mBgCurrentState = eBgStates::SH_OPEN;
+            break;
+        }
         }
 
         return;
@@ -436,6 +443,11 @@ void cHySpexVNIR_3000N_Model_direct::calcBackground()
     }
 
     mBgCurrentState = eBgStates::SH_CLOSE;
+}
+
+void cHySpexVNIR_3000N_Model_direct::stopBackground()
+{
+    mBgCurrentState = eBgStates::ABORT;
 }
 
 

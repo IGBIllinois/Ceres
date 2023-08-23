@@ -35,6 +35,7 @@ protected:
     virtual void onSetLensName(const std::string& lens_name) = 0;
     virtual void onSetNumOfBackgrounds(int num_backgrounds) = 0;
     virtual void onCalcBackground() = 0;
+    virtual void onStopBackground() = 0;
 
     virtual void onOpenShutter() = 0;
     virtual void onCloseShutter() = 0;

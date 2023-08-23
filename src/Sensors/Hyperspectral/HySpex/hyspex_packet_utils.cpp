@@ -32,6 +32,33 @@ int hyspex::encode_hyspex_query(hyspex_eQuery query, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+hyspex_eCommand hyspex::to_hyspex_command_enum_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    hyspex_CommandMessage_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+    return pckt.command();
+}
+
+int hyspex::encode_hyspex_command(hyspex_eCommand command, net_buffer& buffer)
+{
+    hyspex_CommandMessage_1 pckt;
+    pckt.set_command(command);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::HYSPEX_COMMAND);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
 hyspex::sAcquisitionParameters_t hyspex::to_acquisition_parameters_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     hyspex_SetAcquisitionParameters_1 pckt;
@@ -331,6 +358,34 @@ int hyspex::encode_lens_names(const std::vector<std::string>& names, net_buffer&
     return total_length;
 }
 
+
+/*** send/receive the command reply message ***/
+hyspex_eCommand hyspex::to_command_reply_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    hyspex_CommandReply_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+    return pckt.reply();
+}
+
+int hyspex::encode_command_reply(hyspex_eCommand reply, net_buffer& buffer)
+{
+    hyspex_CommandReply_1 pckt;
+    pckt.set_reply(reply);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::COMMAND_REPLY);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
 
 hyspex_eBackgroundReply hyspex::to_background_reply_1(std::uint16_t length, const net_buffer_view& buffer)
 {

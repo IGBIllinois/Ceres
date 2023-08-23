@@ -38,6 +38,13 @@ syntax = "proto3";
     eShutterState_ERROR          = 5;
 }
 
+ enum hyspex_eCommand
+{
+    eCOMMAND_UNSPECIFIED = 0;
+    eCOMMAND_CALC_BACKGROUND = 1;
+    eCOMMAND_STOP_BACKGROUND = 2;
+}
+
 /******************************************************************************
  * Property Page -> Sensor Controller
  *****************************************************************************/
@@ -45,6 +52,11 @@ syntax = "proto3";
 message hyspex_QueryMessage_1 
 {
 	hyspex_eQuery query = 1;
+}
+
+message hyspex_CommandMessage_1 
+{
+	hyspex_eCommand command = 1;
 }
 
 message hyspex_SetAcquisitionParameters_1 
@@ -98,6 +110,11 @@ message hyspex_SetShutterState_1
     string lens_name_7 = 8;
     string lens_name_8 = 9;
     string lens_name_9 = 10;
+}
+
+message hyspex_CommandReply_1 
+{
+	hyspex_eCommand reply = 1;
 }
 
 message hyspex_BackgroundReply_1 

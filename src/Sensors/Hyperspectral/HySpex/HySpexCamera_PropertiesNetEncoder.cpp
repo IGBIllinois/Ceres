@@ -10,6 +10,98 @@ cHySpexCamera_PropertiesNetEncoder::cHySpexCamera_PropertiesNetEncoder(std::size
     : cNetworkEncoder(capacity)
 {}
 
+/**   Encode Methods   */
+void cHySpexCamera_PropertiesNetEncoder::encodeQueryState()
+{
+    if (encode_hyspex_query(eQUERY_STATE, mBuffer) < 0)
+    {
+        sendData();
+        encode_hyspex_query(eQUERY_STATE, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeQueryLensNames()
+{
+    if (encode_hyspex_query(eQUERY_LENS_NAMES, mBuffer) < 0)
+    {
+        sendData();
+        encode_hyspex_query(eQUERY_LENS_NAMES, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeQueryShutterState()
+{
+    if (encode_hyspex_query(eQUERY_SHUTTER_STATE, mBuffer) < 0)
+    {
+        sendData();
+        encode_hyspex_query(eQUERY_SHUTTER_STATE, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
+{
+    if (encode_acquisition_parameters(average_frame, frame_period_us, integration_time_us, mBuffer) < 0)
+    {
+        sendData();
+        encode_acquisition_parameters(average_frame, frame_period_us, integration_time_us, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeLensName(const std::string& lens_name)
+{
+    if (encode_lens_name(lens_name, mBuffer) < 0)
+    {
+        sendData();
+        encode_lens_name(lens_name, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeNumOfBackgrounds(int num_backgrounds)
+{
+    if (encode_num_backgrounds(num_backgrounds, mBuffer) < 0)
+    {
+        sendData();
+        encode_num_backgrounds(num_backgrounds, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeCalcBackground()
+{
+    if (encode_hyspex_command(eCOMMAND_CALC_BACKGROUND,  mBuffer) < 0)
+    {
+        sendData();
+        encode_hyspex_command(eCOMMAND_CALC_BACKGROUND, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeStopBackground()
+{
+    if (encode_hyspex_command(eCOMMAND_STOP_BACKGROUND, mBuffer) < 0)
+    {
+        sendData();
+        encode_hyspex_command(eCOMMAND_STOP_BACKGROUND, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeOpenShutter()
+{
+    if (encode_set_shutter_state(hyspex_eShutterState::eShutterState_OPEN, mBuffer) < 0)
+    {
+        sendData();
+        encode_set_shutter_state(hyspex_eShutterState::eShutterState_OPEN, mBuffer);
+    }
+}
+
+void cHySpexCamera_PropertiesNetEncoder::encodeCloseShutter()
+{
+    if (encode_set_shutter_state(hyspex_eShutterState::eShutterState_CLOSED, mBuffer) < 0)
+    {
+        sendData();
+        encode_set_shutter_state(hyspex_eShutterState::eShutterState_CLOSED, mBuffer);
+    }
+}
+
+/**   Send Methods   */
 void cHySpexCamera_PropertiesNetEncoder::sendQueryState()
 {
     encode_hyspex_query(eQUERY_STATE, mBuffer);
@@ -49,7 +141,13 @@ void cHySpexCamera_PropertiesNetEncoder::sendNumOfBackgrounds(int num_background
 
 void cHySpexCamera_PropertiesNetEncoder::sendCalcBackground()
 {
-    encode_calc_background(mBuffer);
+    encode_hyspex_command(eCOMMAND_CALC_BACKGROUND, mBuffer);
+    sendData();
+}
+
+void cHySpexCamera_PropertiesNetEncoder::sendStopBackground()
+{
+    encode_hyspex_command(eCOMMAND_STOP_BACKGROUND, mBuffer);
     sendData();
 }
 

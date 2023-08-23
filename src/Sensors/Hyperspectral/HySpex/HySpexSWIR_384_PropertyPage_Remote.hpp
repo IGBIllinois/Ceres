@@ -31,6 +31,8 @@ public:
 
     void onLensNames(const std::vector<std::string>& names) override;
 
+    void onCommandReply(eCommandReply reply) override;
+
     void onBackgroundReply(eBackgroundReply reply) override;
 
     void onShutterState(eShutterState state) override;

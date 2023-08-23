@@ -84,6 +84,11 @@ void cHySpexSWIR_384_Controller::onCalcBackground()
     mpModel->calcBackground();
 }
 
+void cHySpexSWIR_384_Controller::onStopBackground()
+{
+    mpModel->stopBackground();
+}
+
 void cHySpexSWIR_384_Controller::onOpenShutter()
 {
     mpModel->open_shutter();

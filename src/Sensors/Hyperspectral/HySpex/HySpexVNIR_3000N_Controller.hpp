@@ -30,6 +30,7 @@ protected:
     void onSetLensName(const std::string& lens_name) override;
     void onSetNumOfBackgrounds(int num_backgrounds) override;
     void onCalcBackground() override;
+    void onStopBackground() override;
 
     void onOpenShutter() override;
     void onCloseShutter() override;

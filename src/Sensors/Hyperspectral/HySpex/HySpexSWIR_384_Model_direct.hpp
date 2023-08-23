@@ -51,6 +51,7 @@ public:
 
     void setNumOfBackgrounds(int num_backgrounds) override;
     void calcBackground() override;
+    void stopBackground() override;
 
     void open_shutter() override;
     void close_shutter() override;
@@ -93,7 +94,7 @@ protected:
 private:
     cIntervalTimer mTemperatureUpdateTimer;
 
-    enum class eBgStates {NONE, SH_CLOSE, STARTED, SH_OPEN };
+    enum class eBgStates {NONE, SH_CLOSE, STARTED, SH_OPEN, ABORT };
     eBgStates mBgCurrentState = eBgStates::NONE;
 
     std::unique_ptr<hyspex::cSWIR384> mCamera;

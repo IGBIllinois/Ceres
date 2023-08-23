@@ -49,14 +49,25 @@ cHySpexCamera_ShutterCtrl_Remote::cHySpexCamera_ShutterCtrl_Remote(const std::st
 	:
 	cHySpexCamera_ExperimentState_Remote(hostname, port, localIpAddress, use_IpV6), cHySpexCamera_PropertiesNetEncoder(255),
 	mDesiredState(desired_state)
-{}
+{
+	mShutterTimer.interval_sec(5);
+	mShutterTimer.stop();
+}
 
 bool cHySpexCamera_ShutterCtrl_Remote::configure(const nlohmann::json& stateDoc)
 {
 	return true;
 }
 
-void cHySpexCamera_ShutterCtrl_Remote::run() {}
+void cHySpexCamera_ShutterCtrl_Remote::run() 
+{
+	if (mShutterTimer.elapsed())
+	{
+		sendQueryShutterState();
+		mShutterTimer.reset();
+	}
+}
+
 void cHySpexCamera_ShutterCtrl_Remote::pause() {}
 void cHySpexCamera_ShutterCtrl_Remote::stop() {}
 
@@ -95,6 +106,7 @@ void cHySpexCamera_ShutterCtrl_Remote::onShutterState(eShutterState state)
 void cHySpexCamera_ShutterCtrl_Remote::onConnect()
 {
 	sendQueryShutterState();
+	mShutterTimer.reset();
 }
 
 void cHySpexCamera_ShutterCtrl_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
@@ -386,13 +398,22 @@ void cHySpexCamera_Background_Remote::onCurrentState(bool valid, std::uint16_t a
 	sendCalcBackground();
 }
 
+void cHySpexCamera_Background_Remote::onCommandReply(eCommandReply reply)
+{}
 
 void cHySpexCamera_Background_Remote::onBackgroundReply(eBackgroundReply reply)
 {
-	if (reply == eBackgroundReply::GOOD)
+	switch (reply)
+	{
+	case eBackgroundReply::GOOD:
 		mState = eSTATE::COMPLETE;
-	else
+		break;
+	case eBackgroundReply::PENDING:
+		mState = eSTATE::WAIT_FOR_BACKGROUND;
+		break;
+	default:
 		mState = eSTATE::ERROR;
+	}
 }
 
 void cHySpexCamera_Background_Remote::onConnect()

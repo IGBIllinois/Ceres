@@ -28,6 +28,8 @@ public:
 
     void onLensNames(const std::vector<std::string>& names) override;
 
+    void onCommandReply(eCommandReply reply) override;
+
     void onBackgroundReply(eBackgroundReply reply) override;
 
     void onShutterState(eShutterState state) override;
@@ -47,17 +49,22 @@ protected:
 
     void reject() override;
 
-protected:
-    void sendChangedData(bool* pNeedsUpdate = nullptr);
+private:
+    void sendChangedData();
+    void queryState();
+    void queryLensNames();
+    void setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
+    void setLensName(const std::string& lens_name);
+    void setNumOfBackgrounds(int num_backgrounds);
+    void calcBackground();
+
+private:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
 
-private slots:
-    void timerExpired();
-
 private:
     bool mAcquisitionParametersValid = false;
-    bool mWaitingForBackgroundReply = false;
+    bool mBackgroundValid = false;
 };
 
 

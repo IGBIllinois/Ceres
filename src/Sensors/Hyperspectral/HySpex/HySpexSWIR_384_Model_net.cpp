@@ -71,6 +71,9 @@ void cHySpexSWIR_384_Model_net::setNumOfBackgrounds(int num_backgrounds)
 void cHySpexSWIR_384_Model_net::calcBackground()
 {}
 
+void cHySpexSWIR_384_Model_net::stopBackground()
+{}
+
 void cHySpexSWIR_384_Model_net::open_shutter()
 {}
 

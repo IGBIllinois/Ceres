@@ -214,6 +214,11 @@ void cHySpexVNIR_3000N_Model_simulation::update()
             }
             break;
         }
+        case eBgStates::ABORT:
+        {
+            mBackgroundState = eBgStates::SH_OPEN;
+            break;
+        }
         }
 
         return;
@@ -276,6 +281,11 @@ void cHySpexVNIR_3000N_Model_simulation::calcBackground()
 {
     mShutterTimer.reset();
     mBackgroundState = eBgStates::SH_CLOSE;
+}
+
+void cHySpexVNIR_3000N_Model_simulation::stopBackground()
+{
+    mBackgroundState = eBgStates::ABORT;
 }
 
 void cHySpexVNIR_3000N_Model_simulation::open_shutter()

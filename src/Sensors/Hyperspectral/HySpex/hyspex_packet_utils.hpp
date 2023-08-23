@@ -31,12 +31,14 @@ namespace hyspex
 		SET_NUM_BACKGROUNDS = 4,
 		CALC_BACKGROUND = 5,
 		SET_SHUTTER_STATE = 6,
+		HYSPEX_COMMAND = 7,
 
 		// Controller -> Property Page
 		CURRENT_STATE = 1000,
 		LENS_NAMES = 1001,
 		BACKGROUND_REPLY = 1002,
 		SHUTTER_STATE_REPLY = 1003,
+		COMMAND_REPLY = 1004,
 	};
 
 
@@ -47,6 +49,10 @@ namespace hyspex
 	/*** send/receive the query message ***/
 	hyspex_eQuery to_hyspex_query_enum_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_hyspex_query(hyspex_eQuery query, net_buffer& buffer);
+
+	/*** send/receive the command message ***/
+	hyspex_eCommand to_hyspex_command_enum_1(std::uint16_t length, const net_buffer_view& buffer);
+	int encode_hyspex_command(hyspex_eCommand command, net_buffer& buffer);
 
 	/*** send/receive the acquisition parameters message ***/
 	struct sAcquisitionParameters_t
@@ -88,6 +94,10 @@ namespace hyspex
 	/*** send/receive the list of lens names message ***/
 	std::vector<std::string> to_lens_names_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_lens_names(const std::vector<std::string>& names, net_buffer& buffer);
+
+	/*** send/receive the command reply message ***/
+	hyspex_eCommand to_command_reply_1(std::uint16_t length, const net_buffer_view& buffer);
+	int encode_command_reply(hyspex_eCommand reply, net_buffer& buffer);
 
 	/*** send/receive the background reply message ***/
 	hyspex_eBackgroundReply to_background_reply_1(std::uint16_t length, const net_buffer_view& buffer);

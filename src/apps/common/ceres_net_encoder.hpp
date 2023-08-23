@@ -56,7 +56,10 @@ public:
     void encodeParData(double par_umole);
 
 
-
+    /*
+     * The send methods will encode the packet into the data buffer and will automatically
+     * send the data.
+     */
     void sendExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc);
 

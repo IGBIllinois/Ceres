@@ -8,11 +8,15 @@
 #include "HySpexSWIR_384_PropertiesNetDecoder.hpp"
 #include "HySpexSWIR_384_PropertiesNetEncoder.hpp"
 
+#include "Timers.hpp"
+
+
 // Forward Declarations
 class cHySpexSWIR_384_PropertyPage_Remote;
 class cHySpexVNIR_3000N_PropertyPage_Remote;
 
 #include <optional>
+
 
 /*******************************************************************/
 /**           Base Class for HySpex Experiment States             **/
@@ -69,6 +73,7 @@ protected:
 
 	void onLensNames(const std::vector<std::string>& names) override {};
 
+	void onCommandReply(eCommandReply reply) override {};
 	void onBackgroundReply(eBackgroundReply reply) override {};
 
 	void onShutterState(eShutterState state) override;
@@ -80,6 +85,8 @@ protected:
 protected:
 	eShutterState mShutterState = eShutterState::UNKNOWN;
 	const eShutterState mDesiredState;
+
+	cIntervalTimer mShutterTimer;
 };
 
 /*** Experimental State to Close Shutter ***/
@@ -186,6 +193,7 @@ protected:
 		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 		std::uint32_t num_backgrounds, const std::string& lens_name) override;
 
+	void onCommandReply(eCommandReply reply) override;
 	void onBackgroundReply(eBackgroundReply reply) override;
 
 	void onConnect() override;

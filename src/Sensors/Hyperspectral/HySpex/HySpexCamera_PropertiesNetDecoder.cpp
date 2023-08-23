@@ -31,6 +31,24 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
 
         break;
     }
+    case ePacketType::COMMAND_REPLY:
+    {
+        auto reply = to_command_reply_1(hdr.length, buffer);
+        switch (reply)
+        {
+        case hyspex_eCommand::eCOMMAND_CALC_BACKGROUND:
+            onCommandReply(eCommandReply::CALC_BACKGROUND);
+            break;
+        case hyspex_eCommand::eCOMMAND_STOP_BACKGROUND:
+            onCommandReply(eCommandReply::STOP_BACKGROUND);
+            break;
+        case hyspex_eCommand::eCOMMAND_UNSPECIFIED:
+        default:
+            onCommandReply(eCommandReply::UNKNOWN);
+            break;
+        }
+        break;
+    }
     case ePacketType::BACKGROUND_REPLY:
     {
         auto reply = to_background_reply_1(hdr.length, buffer);
@@ -44,6 +62,9 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
             break;
         case hyspex_eBackgroundReply::eBackgroundReply_FAILED:
             onBackgroundReply(eBackgroundReply::FAILED);
+            break;
+        case hyspex_eBackgroundReply::eBackgroundReply_PENDING:
+            onBackgroundReply(eBackgroundReply::PENDING);
             break;
         }
         break;
