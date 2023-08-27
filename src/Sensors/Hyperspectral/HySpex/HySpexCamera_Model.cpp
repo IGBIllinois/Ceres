@@ -22,16 +22,18 @@ namespace
         constexpr int ng = focus_convolution.size();
         int const n = nf + ng - 1;
         
+        // Note: we shrink n by four bacause we want to get rid of edge effects
         std::valarray<double> out;
-        out.resize(n, 0.0);
+        out.resize(n-4, 0.0);
 
-        for (auto i(0); i < n; ++i) 
+        // Note: we start at 2 and goto n-2 to avoid edge effects
+        for (auto i(2); i < n-2; ++i)
         {
             const int jmn = (i >= ng - 1) ? i - (ng - 1) : 0;
             const int jmx = (i < nf - 1) ? i : nf - 1;
             for (auto j(jmn); j <= jmx; ++j) 
             {
-                out[i] += (f[j] * focus_convolution[i - j]);
+                out[i-2] += (f[j] * focus_convolution[i - j]);
             }
         }
         return std::move(out);
