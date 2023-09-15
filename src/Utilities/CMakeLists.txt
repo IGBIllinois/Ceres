@@ -10,6 +10,7 @@ target_sources(Utilities
 PUBLIC
 
 	Constants.hpp
+	StringUtils.hpp
 	Utilities.hpp
 	ColorGradient.hpp
 	Timers.hpp
@@ -28,6 +29,7 @@ PRIVATE
 	Timers.cpp
 	QIndicator.cpp
 	QLogWidget.cpp
+	StringUtils.cpp
 	
 	net_buffer.cpp
 	packet_utils.cpp
