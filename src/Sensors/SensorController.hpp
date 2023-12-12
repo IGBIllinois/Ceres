@@ -33,6 +33,8 @@ public:
 
     bool hasClient() const;
 
+    void update();
+
 protected:
     /**
      * @brief processStream

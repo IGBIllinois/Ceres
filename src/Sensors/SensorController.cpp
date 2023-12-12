@@ -42,6 +42,15 @@ bool cSensorController::hasClient() const
     return mpClient;
 }
 
+void cSensorController::update()
+{
+    if (mpClient)
+    {
+        if (mpClient->bytesAvailable() > 0)
+            processNewCommand();
+    }
+}
+
 int cSensorController::sendOutgoingData(const char* data, std::size_t len)
 {
     if (!mpClient)
