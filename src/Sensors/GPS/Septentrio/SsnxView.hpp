@@ -17,7 +17,7 @@ public:
 
 public slots:
     void updatePVT(double timestamp_s,
-        double lat_rad, double lng_rad, double height_m, 
+        double lat_rad, double lng_rad, double height_m,
         double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps, 
         double groundTrack_deg, gps::eDatum datum);
 

@@ -15,7 +15,7 @@ public:
 	 * Returns a string used as a descriptor of the experiment
 	 * controller.
 	 */
-	char* descriptor() const override { return "dummy"; };
+	const char* descriptor() const override { return "dummy"; };
 
     /*
      * Apply any configuration parameters to the sensor

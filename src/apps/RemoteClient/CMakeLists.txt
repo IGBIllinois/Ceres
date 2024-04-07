@@ -42,7 +42,7 @@ qt5_add_resources(UI_RESOURCES ceres_remote_client.qrc OPTIONS "--verbose")
 #
 add_executable(CeresRemoteClient WIN32 MACOSX_BUNDLE)
 
-target_compile_features(CeresRemoteClient PRIVATE cxx_std_17)
+target_compile_features(CeresRemoteClient PRIVATE cxx_std_20)
 
 
 target_sources(CeresRemoteClient

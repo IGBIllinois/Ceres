@@ -28,7 +28,7 @@ endif (MSVC)
 
 set_target_properties(multispectral_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(multispectral_static PRIVATE cxx_std_17)
+target_compile_features(multispectral_static PRIVATE cxx_std_20)
 
 target_sources(multispectral_static
 PUBLIC

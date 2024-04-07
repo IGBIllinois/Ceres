@@ -4,7 +4,7 @@ add_library(Utilities STATIC)
 
 #set_target_properties(Utilities PROPERTIES LANGUAGE C CXX)
 
-target_compile_features(Utilities PRIVATE cxx_std_17)
+target_compile_features(Utilities PRIVATE cxx_std_20)
 
 target_sources(Utilities
 PUBLIC

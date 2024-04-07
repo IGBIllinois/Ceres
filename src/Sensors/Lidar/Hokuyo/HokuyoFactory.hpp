@@ -4,7 +4,7 @@
 #include "../../SensorFactory.hpp"
 
 
-static char* hokuyo_id = "hokuyo";
+static const char* hokuyo_id = "hokuyo";
 
 namespace hokuyo
 {

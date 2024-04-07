@@ -38,7 +38,7 @@ endif (MSVC)
 
 set_target_properties(rgb_camera_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(rgb_camera_static PRIVATE cxx_std_17)
+target_compile_features(rgb_camera_static PRIVATE cxx_std_20)
 
 target_sources(rgb_camera_static
 PUBLIC

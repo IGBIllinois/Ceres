@@ -24,7 +24,7 @@ public:
      * Returns a string used as a descriptor of the experiment
      * controller.
      */
-    virtual char* descriptor() const = 0;
+    virtual const char* descriptor() const = 0;
 
     /*
      * Apply any configuration parameters to the experiment

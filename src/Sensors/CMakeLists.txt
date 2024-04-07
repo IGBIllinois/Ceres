@@ -5,7 +5,7 @@ add_library(Sensors STATIC)
 
 #set_target_properties(Sensors PROPERTIES LANGUAGE C CXX)
 
-target_compile_features(Sensors PRIVATE cxx_std_17)
+target_compile_features(Sensors PRIVATE cxx_std_20)
 
 target_sources(Sensors
 

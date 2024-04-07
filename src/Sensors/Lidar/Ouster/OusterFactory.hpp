@@ -4,7 +4,7 @@
 #include "../../SensorFactory.hpp"
 
 
-static char* ouster_id = "ouster";
+static const char* ouster_id = "ouster";
 
 namespace ouster
 {

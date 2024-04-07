@@ -4,7 +4,7 @@
 #include "../../SensorFactory.hpp"
 
 
-static char* hyspex_id = "hyspex";
+static const char* hyspex_id = "hyspex";
 
 namespace hyspex
 {

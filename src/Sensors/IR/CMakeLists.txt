@@ -28,7 +28,7 @@ endif (MSVC)
 
 set_target_properties(ir_camera_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(ir_camera_static PRIVATE cxx_std_17)
+target_compile_features(ir_camera_static PRIVATE cxx_std_20)
 
 target_sources(ir_camera_static
 PUBLIC

@@ -4,7 +4,7 @@
 #include "../../SensorFactory.hpp"
 
 
-static char* ssnx_id = "ssnx";
+static const char* ssnx_id = "ssnx";
 
 namespace ssnx
 {

@@ -16,7 +16,7 @@ public:
      * Returns a string used as a class descriptor of the
      * type sensor.
      */
-    static char* data_type() { return "wind, temp, rh, par"; };
+    static const char* data_type() { return "wind, temp, rh, par"; };
     /*
      * Returns the class identifier used by the sensor's serializer
      */

@@ -4,7 +4,7 @@
 #include "../../SensorFactory.hpp"
 
 
-static char* axis_communications_id = "axis_communications";
+static const char* axis_communications_id = "axis_communications";
 
 namespace axis_communications
 {

@@ -79,7 +79,7 @@ endif (MSVC)
 
 set_target_properties(axis_communications_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(axis_communications_static PRIVATE cxx_std_17)
+target_compile_features(axis_communications_static PRIVATE cxx_std_20)
 
 target_sources(axis_communications_static
 PUBLIC

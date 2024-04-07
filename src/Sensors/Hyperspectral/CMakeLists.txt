@@ -34,7 +34,7 @@ endif (MSVC)
 
 set_target_properties(hyperspectral_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(hyperspectral_static PRIVATE cxx_std_17)
+target_compile_features(hyperspectral_static PRIVATE cxx_std_20)
 
 target_sources(hyperspectral_static
 PUBLIC

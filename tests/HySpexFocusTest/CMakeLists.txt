@@ -9,7 +9,7 @@ add_executable(HySpexFocusTests)
 
 set_target_properties(HySpexFocusTests PROPERTIES LANGUAGE CXX)
 
-target_compile_features(HySpexFocusTests PRIVATE cxx_std_17)
+target_compile_features(HySpexFocusTests PRIVATE cxx_std_20)
 
 target_sources(HySpexFocusTests
 PRIVATE

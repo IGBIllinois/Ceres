@@ -47,7 +47,7 @@ endif (MSVC)
 
 set_target_properties(septentrio_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(septentrio_static PRIVATE cxx_std_17)
+target_compile_features(septentrio_static PRIVATE cxx_std_20)
 
 target_sources(septentrio_static
 

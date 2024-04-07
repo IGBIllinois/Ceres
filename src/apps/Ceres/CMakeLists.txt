@@ -43,7 +43,7 @@ add_executable(Ceres WIN32 MACOSX_BUNDLE)
 
 #set_target_properties(Ceres PROPERTIES LANGUAGE C CXX)
 
-target_compile_features(Ceres PRIVATE cxx_std_17)
+target_compile_features(Ceres PRIVATE cxx_std_20)
 
 target_sources(Ceres
 PUBLIC

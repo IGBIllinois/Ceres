@@ -45,7 +45,7 @@ endif (MSVC)
 
 set_target_properties(weather_static PROPERTIES LANGUAGE CXX)
 
-target_compile_features(weather_static PRIVATE cxx_std_17)
+target_compile_features(weather_static PRIVATE cxx_std_20)
 
 target_sources(weather_static
 

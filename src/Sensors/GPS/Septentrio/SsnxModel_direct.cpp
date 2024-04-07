@@ -275,6 +275,8 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     mVu_mps = pvt.Vu_mps;
     mGroundTrack_deg = pvt.GroundTrack_deg;
 
+    double height_m = mHeight_m - mUndulation_m;
+
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mSerializer.write(pvt);
@@ -283,7 +285,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     if (mRecordTrack)
     {
         ::gps::sGpsPoint point = { mPvtTimestamp_s,
-            mLatitude_rad, mLongitude_rad, mHeight_m,
+            mLatitude_rad, mLongitude_rad, height_m,
             mVn_mps, mVe_mps, mVu_mps,
             mGroundTrack_deg };
 
@@ -291,7 +293,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     }
 
     emit updateGeodeticPVT(mPvtTimestamp_s,
-        mLatitude_rad, mLongitude_rad, mHeight_m,
+        mLatitude_rad, mLongitude_rad, height_m,
         mVn_mps, mVe_mps, mVu_mps,
         mGroundTrack_deg, mDatum);
 

@@ -22,7 +22,7 @@ public:
      * Returns a string used as a protocol descriptor of the
      * type sensor.
      */
-    static char* protocol() { return "http"; };
+    static const char* protocol() { return "http"; };
 
     QUrl url() const { return mUrl; }
 

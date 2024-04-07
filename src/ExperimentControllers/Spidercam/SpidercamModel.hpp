@@ -24,7 +24,7 @@ public:
 	 * Returns a string used as a descriptor of the experiment
 	 * controller.
 	 */
-	char* descriptor() const override { return "spidercam"; };
+	const char* descriptor() const override { return "spidercam"; };
 
 	const spidercam::sPosition_1_t& currentPosition() const;
 

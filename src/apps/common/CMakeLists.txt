@@ -7,7 +7,7 @@ add_library(common STATIC)
 
 #set_target_properties(Sensors PROPERTIES LANGUAGE C CXX)
 
-target_compile_features(common PRIVATE cxx_std_17)
+target_compile_features(common PRIVATE cxx_std_20)
 
 source_group("Resources" FILES
 	ceres_remote_client.proto
@@ -25,6 +25,8 @@ PRIVATE
 #
 # General Application files
 #
+    Constants.hpp
+	
     DataModel.hpp
     DataModel.cpp
 	
@@ -36,6 +38,9 @@ PRIVATE
 	
     CeresSplashScreen.hpp
     CeresSplashScreen.cpp
+
+    RappFieldBoundary.hpp
+    RappFieldBoundary.cpp
 
 	remote_client_utils.hpp
 	remote_client_utils.cpp

@@ -4,7 +4,7 @@
 #include "SensorFactory.hpp"
 
 
-static char* dummy_id = "dummy";
+static const char* dummy_id = "dummy";
 
 sSensorWidgets create_dummy_sensor(bool no_visualization);
 

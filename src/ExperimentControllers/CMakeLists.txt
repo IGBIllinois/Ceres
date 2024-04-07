@@ -6,7 +6,7 @@ add_library(ExperimentControllers STATIC)
 
 set_target_properties(ExperimentControllers PROPERTIES LANGUAGE CXX)
 
-target_compile_features(ExperimentControllers PRIVATE cxx_std_17)
+target_compile_features(ExperimentControllers PRIVATE cxx_std_20)
 
 target_sources(ExperimentControllers
 PUBLIC
