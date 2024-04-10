@@ -91,7 +91,7 @@ void cSpidercamDollyStatus::createWidgets()
 	mpSpeed_mps->setReadOnly(true);
 
 	mpBatteryLabel = new QLabel();
-	mpBatteryLabel->setText("Battery (pct)");
+	mpBatteryLabel->setText("Battery (%)");
 	mpBatteryLevel_pct = new QLineEdit();
 	mpBatteryLevel_pct->setReadOnly(true);
 }
@@ -203,7 +203,7 @@ cBatteryStatus::cBatteryStatus(QWidget* parent)
 	mpBatteryLevel_pct->setReadOnly(true);
 	mpBatteryLevel_pct->setFixedWidth(pixelsWide);
 	mpBatteryLevel_pct->setAlignment(Qt::AlignCenter);
-	mpBatteryLevel_pct->setToolTip(tr("Battery Level"));
+	mpBatteryLevel_pct->setToolTip(tr("Battery Level (%)"));
 
 	addPermanentWidget(mpBatteryLevel_pct);
 

@@ -56,5 +56,8 @@ private:
 	double mSpeed_mmps;
 	double mPan_deg;
 	double mTilt_deg;
+
+	bool mPan_NeedsInitialization = false;
+	bool mTilt_NeedsInitialization = false;
 };
 

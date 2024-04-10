@@ -238,6 +238,99 @@ void cSpidercamModel::update()
     if (mController.checkForReply() || true)
     {
         mController.readReply();
+
+        mLastReplyWasError = mController.lastReplyWasError();
+
+        if (mLastReplyWasError.IsRising())
+        {
+            const auto& error = mController.getLastReportedError();
+
+            QString msg = "SpiderCam Error Response: Group ID = ";
+            msg += QString::fromStdString(error.groupID);
+            msg += ", Device ID = ";
+            msg += QString::fromStdString(error.deviceID);
+
+            switch (error.errorID)
+            {
+            case 1000:
+                msg += ", Error = The data format sent by C3 is incorrect.";
+                break;
+            case 1001:
+                msg += ", Error = Cannot convert \"CO\" position data.";
+                break;
+            case 1002:
+                msg += ", Error = Command not accepted.";
+                break;
+            case 1003:
+                msg += ", Error = Invalid data from C3.";
+                break;
+            case 1004:
+                msg += ", Error = Found points outside the current border.";
+                break;
+            case 1005:
+                msg += ", Error = Incorrect command for update fieldmap.";
+                break;
+            case 1006:
+                msg += ", Error = While updating fieldmap - update denied.";
+                break;
+            case 1007:
+                msg += ", Error = Incorrect data for \"Update fieldmap\".";
+                break;
+            case 1008:
+                msg += ", Error = C2 not in script mode.";
+                break;
+            case 1009:
+                msg += ", Error = Check Activate, TwinSafeRestart, and Motors.";
+                break;
+            case 1010:
+                msg += ", Error = C1 is busy or moving.";
+                break;
+            case 1011:
+                msg += ", Error = Unknown command.";
+                break;
+            case 1012:
+                msg += ", Error = Exception while reading request.";
+                break;
+            case 1013:
+                msg += ", Error = Header is not C3.";
+                break;
+            case 1014:
+                msg += ", Error = Data couldn't be interpreted as XML.";
+                break;
+            case 1015:
+                msg += ", Error = Exception while reading XML header.";
+                break;
+            case 1016:
+                msg += ", Error = NullReferenceException while sending actual position to C3.";
+                break;
+            case 1017:
+                msg += ", Error = SocketException while sending actual position to C3.";
+                break;
+            case 7000:
+                msg += ", Error = Either pan or tilt is not in the range.";
+                break;
+            case 7001:
+                msg += ", Error = Velocity is zero.";
+                break;
+            case 7002:
+                msg += ", Error = Check zoom, focus, and iris.";
+                break;
+            case 7003:
+                msg += ", Error = SG requested height is lower than 2m or higher than 15m.";
+                break;
+            default:
+                msg += ", Error ID = ";
+                msg += QString::number(error.errorID);
+                break;
+            }
+
+            emit statusMessage(msg);
+        }
+
+        if (mLastReplyWasError.IsFalling())
+        {
+            emit statusMessage("");
+        }
     }
 
     const auto& pos = mController.getLastKnownPosition();

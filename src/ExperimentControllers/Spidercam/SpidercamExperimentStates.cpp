@@ -29,6 +29,9 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 	mY_NeedsInitialization = false;
 	mZ_NeedsInitialization = false;
 
+	mPan_NeedsInitialization = false;
+	mTilt_NeedsInitialization = false;
+
 	mMotionDetected = false;
 	mMoveCommandSent = false;
 	mStopCommandSent = false;
@@ -90,8 +93,24 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 		}
 
 		mSpeed_mmps = stateDoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM;
-		mPan_deg = stateDoc["pan"];
-		mTilt_deg = stateDoc["tilt"];
+
+		if (stateDoc.contains("pan"))
+		{
+			mPan_deg = stateDoc["pan"];
+		}
+		else
+		{
+			mPan_NeedsInitialization = true;
+		}
+
+		if (stateDoc.contains("tilt"))
+		{
+			mTilt_deg = stateDoc["tilt"];
+		}
+		else
+		{
+			mTilt_NeedsInitialization = true;
+		}
 
 		mRecordData = stateDoc["record"];
 	}
@@ -175,8 +194,15 @@ bool cSpidercamExperimentState_Movement::initialize()
 		mZ_mm = mController.getLastKnownPosition().Z_mm;
 	}
 
-	mPan_deg = mController.getLastKnownPosition().pan_deg;
-	mTilt_deg = mController.getLastKnownPosition().tilt_deg;
+	if (mPan_NeedsInitialization)
+	{
+		mPan_deg = mController.getLastKnownPosition().pan_deg;
+	}
+	
+	if (mTilt_NeedsInitialization)
+	{
+		mTilt_deg = mController.getLastKnownPosition().tilt_deg;
+	}
 
 	return true;
 }

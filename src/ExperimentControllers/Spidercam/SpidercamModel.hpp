@@ -105,6 +105,7 @@ protected:
 
 	spidercam::sPosition_1_t mCurrentPosition;
 
+	edge_detect<bool>	mLastReplyWasError;
 
 	comparator<int, spidercam::window_compare<int, 2>> mBatteryLevel_pct;
 
