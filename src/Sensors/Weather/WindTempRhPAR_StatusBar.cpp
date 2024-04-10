@@ -27,7 +27,7 @@ cWindTempRhPAR_StatusBar::cWindTempRhPAR_StatusBar(QWidget* parent)
 	mpWindDirection_deg->setAlignment(Qt::AlignCenter);
 	mpWindDirection_deg->setToolTip(tr("Wind Direction in degrees"));
 
-	pixelsWide = fm.horizontalAdvance("T: XX.X ");
+	pixelsWide = fm.horizontalAdvance("T: XXX.X ");
 	mpTemperature_C = new QLineEdit(this);
 	mpTemperature_C->setReadOnly(true);
 	mpTemperature_C->setFixedWidth(pixelsWide);
@@ -41,7 +41,7 @@ cWindTempRhPAR_StatusBar::cWindTempRhPAR_StatusBar(QWidget* parent)
 	mpRelativeHumidity_pct->setAlignment(Qt::AlignCenter);
 	mpRelativeHumidity_pct->setToolTip(tr("Relative Humidity %"));
 
-	pixelsWide = fm.horizontalAdvance("PAR: XXX.X ");
+	pixelsWide = fm.horizontalAdvance("PAR: XXXX.X ");
 	mpPAR_umole = new QLineEdit(this);
 	mpPAR_umole->setReadOnly(true);
 	mpPAR_umole->setFixedWidth(pixelsWide);
