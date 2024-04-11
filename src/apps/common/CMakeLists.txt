@@ -25,8 +25,6 @@ PRIVATE
 #
 # General Application files
 #
-    Constants.hpp
-	
     DataModel.hpp
     DataModel.cpp
 	
@@ -38,9 +36,6 @@ PRIVATE
 	
     CeresSplashScreen.hpp
     CeresSplashScreen.cpp
-
-    RappFieldBoundary.hpp
-    RappFieldBoundary.cpp
 
 	remote_client_utils.hpp
 	remote_client_utils.cpp

@@ -39,6 +39,7 @@ signals:
     void posProjectedStateChanged(bool valid);
     void receiverTimeStateChanged(bool valid);
     void rtcmDatumStateChanged(bool valid);
+    void positionChanged(int x_mm, int y_mm, int z_mm);
 
 signals:
     void updateGeodeticPVT(double timestamp_s,
@@ -50,6 +51,5 @@ signals:
 
 protected:
     cSsnxSerializer mSerializer;
-
 };
 

@@ -1,7 +1,9 @@
 
 #include "SsnxModel.hpp"
 #include "SsnxFactory.hpp"
+
 #include <functional>
+
 
 cSsnxModel::cSsnxModel(QObject* parent)
 :

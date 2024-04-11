@@ -1,5 +1,6 @@
 
 #include "SsnxModel_direct.hpp"
+#include "RappFieldBoundary.hpp"
 
 #include <QtSerialPort/QSerialPortInfo>
 
@@ -262,7 +263,11 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
 
-    if (!mPvtValid) return;
+    if (!mPvtValid)
+    {
+        emit positionChanged(-1, -1, -1);
+        return;
+    }
 
     mDatum = static_cast<::gps::eDatum>(pvt.Datum);
 
@@ -276,6 +281,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     mGroundTrack_deg = pvt.GroundTrack_deg;
 
     double height_m = mHeight_m - mUndulation_m;
+
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
@@ -296,6 +302,15 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
         mLatitude_rad, mLongitude_rad, height_m,
         mVn_mps, mVe_mps, mVu_mps,
         mGroundTrack_deg, mDatum);
+
+    auto pos = rfb::fromGPS(mLatitude_rad, mLongitude_rad, height_m);
+
+    // Adjust position here due to antenna offset on dolly
+    //pos.x_mm + or - ???;
+    //pos.y_mm + or - ???;
+    pos.z_mm -= 400;
+
+    emit positionChanged(pos.x_mm, pos.y_mm, pos.z_mm);
 
     if (getStatus() != sensor::eStatus::RUNNING)
         setStatus(sensor::eStatus::RUNNING);

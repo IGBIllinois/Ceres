@@ -63,6 +63,15 @@ void cSsnxStatusView::createWidgets()
 	mpReceiverTimeValid = new QLedIndicator("Receiver Time Valid", this);
 
 	mpRtcmDatumValid = new QLedIndicator("RTCM Datum Valid", this);
+
+	mpX_mm = new QLineEdit(this);
+	mpX_mm->setReadOnly(true);
+
+	mpY_mm = new QLineEdit(this);
+	mpY_mm->setReadOnly(true);
+
+	mpZ_mm = new QLineEdit(this);
+	mpZ_mm->setReadOnly(true);
 }
 
 void cSsnxStatusView::doLayout()
@@ -85,6 +94,29 @@ void cSsnxStatusView::doLayout()
 	packetBox->setLayout(packetInfoLayout);
 
 	mainLayout->addWidget(packetBox);
+
+	mainLayout->addSpacing(10);
+
+	QGroupBox* posBox = new QGroupBox("Approximate Position");
+
+	auto* pPosLayout = new QHBoxLayout();
+	QLabel* text = new QLabel("X (mm)", this);
+	pPosLayout->addWidget(text);
+	pPosLayout->addWidget(mpX_mm, 1);
+	pPosLayout->addSpacing(10);
+
+	text = new QLabel("Y (mm)", this);
+	pPosLayout->addWidget(text);
+	pPosLayout->addWidget(mpY_mm, 1);
+	pPosLayout->addSpacing(10);
+
+	text = new QLabel("Z (mm)", this);
+	pPosLayout->addWidget(text);
+	pPosLayout->addWidget(mpZ_mm, 1);
+
+	posBox->setLayout(pPosLayout);
+
+	mainLayout->addWidget(posBox);
 
 	mainLayout->addStretch();
 
@@ -126,3 +158,21 @@ void cSsnxStatusView::onRtcmDatumStateChange(bool valid)
 	mpRtcmDatumValid->setState(valid);
 }
 
+void cSsnxStatusView::onPositionChange(int x_mm, int y_mm, int z_mm)
+{
+	if (x_mm < 0)
+		mpX_mm->setText("");
+	else
+		mpX_mm->setText(QString::number(x_mm));
+
+	if (y_mm < 0)
+		mpY_mm->setText("");
+	else
+		mpY_mm->setText(QString::number(y_mm));
+
+	if (z_mm < 0)
+		mpZ_mm->setText("");
+	else
+		mpZ_mm->setText(QString::number(z_mm));
+
+}

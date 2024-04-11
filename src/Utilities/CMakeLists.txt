@@ -8,7 +8,6 @@ target_compile_features(Utilities PRIVATE cxx_std_20)
 
 target_sources(Utilities
 PUBLIC
-
 	Constants.hpp
 	StringUtils.hpp
 	Utilities.hpp
@@ -22,9 +21,9 @@ PUBLIC
 	net_packet_encoder.hpp
 	net_packet_decoder.hpp
 
+    RappFieldBoundary.hpp
 
 PRIVATE
-
 	ColorGradient.cpp
 	Timers.cpp
 	QIndicator.cpp
@@ -35,6 +34,8 @@ PRIVATE
 	packet_utils.cpp
 	net_packet_encoder.cpp
 	net_packet_decoder.cpp
+
+    RappFieldBoundary.cpp
 )
 
 target_link_libraries(Utilities PRIVATE ${Qt}::Widgets)
