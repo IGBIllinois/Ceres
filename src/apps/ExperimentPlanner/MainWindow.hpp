@@ -1,0 +1,107 @@
+
+#pragma once
+
+#include <vector>
+#include <filesystem>
+
+#include <QMainWindow>
+#include <QString>
+
+#include <nlohmann/json.hpp>
+
+
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QAction;
+class QListWidget;
+class QMenu;
+class QTextEdit;
+class QLineEdit;
+class QToolBar;
+QT_END_NAMESPACE
+
+
+// Forward Declarations
+class cExperimentManager;
+class cExperimentTreeItem;
+
+namespace Ui 
+{
+    class MainWindow;
+}
+
+class cMainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit cMainWindow(QWidget* parent = nullptr);
+    ~cMainWindow();
+
+    void initialize();
+
+signals:
+    void experimentRunning();
+    void experimentPaused();
+    void experimentStopped();
+    void refreshDisplay();
+
+public slots:
+    void addSensorPropertyPage(QAction* pAction);
+    void removeSensorPropertyPage(QAction* pAction);
+
+public slots:
+    void onStatusUpdate(QString msg);
+    void onInfoMessage(QString title, QString msg);
+    void onWarningMessage(QString title, QString msg);
+    void onErrorMessage(QString title, QString msg);
+    void onLogMessage(uint8_t type, QString device, QString msg);
+
+    void onExperimentTerminated();
+    void onExperimentCompleted();
+
+private slots:
+    void fileRefresh();
+    void fileAddExperiment();
+    void onExperimentLoad();
+    void onExperimentRun();
+    void onExperimentPause();
+    void onExperimentStop();
+    void helpAbout();
+
+private:
+    bool loadExperiment(const cExperimentTreeItem& experiment);
+    bool loadExperiment(const std::filesystem::path& experiment);
+
+private:
+    void createMainMenu();
+    void createSubMenusAndActions();
+    void createActions();
+    void createToolBars();
+    void createStatusBar();
+    void createDockWindows(const nlohmann::json& configDoc);
+    void createDataModel(const nlohmann::json& configDoc);
+
+    cExperimentManager* mpExperiments;
+
+    QString mDefaultDataPath;
+    QString mExperimentFilesPath;
+
+    QMenu* mpFileMenu;
+    QMenu* mpExperimentMenu;
+
+    QAction* mpExpLoad;
+    QAction* mpExpRun;
+    QAction* mpExpPause;
+    QAction* mpExpStop;
+
+    QMenu* mpViewMenu;
+    QMenu* mpSensorMenu;
+    QMenu* mpHelpMenu;
+
+    QToolBar* mpFileBar;
+
+    Ui::MainWindow* mpUI;
+    QString mCurrentFile;
+};
+
