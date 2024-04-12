@@ -29,6 +29,7 @@ public:
     void updateDollyPosition(uint32_t x, uint32_t y);
 
     void loadLayout(const std::string& layout_filename);
+    void saveLayout(const std::string& layout_filename);
 
 public slots:
     void updateSecondaryDollyPosition(bool valid, uint32_t x, uint32_t y);
@@ -85,10 +86,16 @@ private:
         captionLayout_t caption;
 
         QColor  color;
+
         uint32_t x_mm = 0;
         uint32_t y_mm = 0;
         uint32_t height_mm = 0;
         uint32_t width_mm = 0;
+ 
+        float east_m = 0;
+        float north_m = 0;
+        float west_m = 0;
+        float south_m = 0;
     };
 
     std::vector<experimentLayout_t> mLayouts;

@@ -70,14 +70,22 @@ add_subdirectory(DataViewer)
 # Data Verificaton
 #******************************************************************************
 
-message("Creating data verification application...")
-add_subdirectory(DataVerification)
+#message("Creating data verification application...")
+#add_subdirectory(DataVerification)
 
 
 #******************************************************************************
 # Data Repair
 #******************************************************************************
 
-message("Creating data repair application...")
-add_subdirectory(DataRepair)
+#message("Creating data repair application...")
+#add_subdirectory(DataRepair)
+
+
+#******************************************************************************
+# Ceres Experiment Planner
+#******************************************************************************
+
+message("Creating Ceres Experiment Planner application...")
+add_subdirectory(ExperimentPlanner)
 

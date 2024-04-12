@@ -217,15 +217,15 @@ void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
 			int a = color["alpha"];
 			expLayout.color = QColor(r, g, b, a);
 
-			uint32_t east_m = layout["east (m)"];
-			uint32_t north_m = layout["north (m)"];
-			uint32_t west_m = layout["west (m)"];
-			uint32_t south_m = layout["south (m)"];
+			expLayout.east_m = layout["east (m)"];
+			expLayout.north_m = layout["north (m)"];
+			expLayout.west_m = layout["west (m)"];
+			expLayout.south_m = layout["south (m)"];
 
-			expLayout.x_mm = north_m * nConstants::M_TO_MM;
-			expLayout.y_mm = west_m * nConstants::M_TO_MM;
-			expLayout.height_mm = (east_m - west_m) * nConstants::M_TO_MM;
-			expLayout.width_mm = (south_m - north_m) * nConstants::M_TO_MM;
+			expLayout.x_mm = expLayout.north_m * nConstants::M_TO_MM;
+			expLayout.y_mm = expLayout.west_m * nConstants::M_TO_MM;
+			expLayout.height_mm = (expLayout.east_m - expLayout.west_m) * nConstants::M_TO_MM;
+			expLayout.width_mm = (expLayout.south_m - expLayout.north_m) * nConstants::M_TO_MM;
 
 			// caption information
 			auto caption = layout["caption"];
@@ -297,6 +297,117 @@ void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
 	{
 		return;
 	}
+}
+
+void cSpidercamScanArea::saveLayout(const std::string& layout_filename)
+{
+	if (layout_filename.empty())
+		return;
+
+	nlohmann::json layouts;
+
+	for (const auto& expLayout : mLayouts)
+	{
+		nlohmann::json layout;
+
+		// bounding box information
+		nlohmann::json color;
+
+		int r = expLayout.color.red();
+		int g = expLayout.color.green();
+		int b = expLayout.color.blue();
+		int a = expLayout.color.alpha();
+
+		color["red"]   = r;
+		color["green"] = g;
+		color["blue"]  = b;
+		color["alpha"] = a;
+
+		layout["color"] = color;
+
+		layout["east (m)"] = expLayout.east_m;
+		layout["north (m)"] = expLayout.north_m;
+		layout["west (m)"] = expLayout.west_m;
+		layout["south (m)"] = expLayout.south_m;
+
+		// caption information
+		nlohmann::json caption;
+
+		caption["label"] = expLayout.caption.label.toStdString();
+
+		int cr = expLayout.caption.color.red();
+		int cg = expLayout.caption.color.green();
+		int cb = expLayout.caption.color.blue();
+		int ca = expLayout.caption.color.alpha();
+
+		if ((r != cr) || (g != cg) || (b != cb) || (a != ca))
+		{
+			nlohmann::json color;
+
+			int r = expLayout.caption.color.red();
+			int g = expLayout.caption.color.green();
+			int b = expLayout.caption.color.blue();
+			int a = expLayout.caption.color.alpha();
+
+			color["red"] = r;
+			color["green"] = g;
+			color["blue"] = b;
+			color["alpha"] = a;
+
+			caption["color"] = color;
+		}
+
+		if (expLayout.caption.font_size != 0)
+		{
+			caption["font size"] = expLayout.caption.font_size;
+		}
+
+		switch (expLayout.caption.horizontal_align)
+		{
+		case eHorizontalAlignment::LEFT:
+			caption["horizontal align"] = "left";
+			break;
+		case eHorizontalAlignment::CENTER:
+			caption["horizontal align"] = "center";
+			break;
+		case eHorizontalAlignment::RIGHT:
+			caption["horizontal align"] = "right";
+			break;
+		}
+
+		switch (expLayout.caption.vertical_align)
+		{
+		case eVerticalAlignment::TOP:
+			caption["vertical align"] = "top";
+			break;
+		case eVerticalAlignment::CENTER:
+			caption["vertical align"] = "center";
+			break;
+		case eVerticalAlignment::BOTTOM:
+			caption["vertical align"] = "bottom";
+			break;
+		}
+
+		if (expLayout.caption.orientation_deg != 0.0f)
+		{
+			caption["orientation (deg)"] = expLayout.caption.orientation_deg;
+		}
+
+		layout["caption"] = caption;
+
+		layouts.push_back(layout);
+	}
+
+	nlohmann::json layoutDoc;
+
+	layoutDoc["layout"] = layouts;
+
+	std::ofstream out;
+	out.open(layout_filename, std::ios::trunc);
+	if (!out.is_open())
+		return;
+
+	out << std::setw(4) << layoutDoc << std::endl;
 }
 
 void cSpidercamScanArea::paintEvent(QPaintEvent* event)
