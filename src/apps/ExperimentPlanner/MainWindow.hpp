@@ -6,6 +6,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QSettings>
 
 #include <nlohmann/json.hpp>
 
@@ -24,6 +25,9 @@ QT_END_NAMESPACE
 // Forward Declarations
 class cExperimentManager;
 class cExperimentTreeItem;
+class cSpidercamScanArea;
+class cExperimentDesignWidget;
+
 
 namespace Ui 
 {
@@ -41,14 +45,7 @@ public:
     void initialize();
 
 signals:
-    void experimentRunning();
-    void experimentPaused();
-    void experimentStopped();
     void refreshDisplay();
-
-public slots:
-    void addSensorPropertyPage(QAction* pAction);
-    void removeSensorPropertyPage(QAction* pAction);
 
 public slots:
     void onStatusUpdate(QString msg);
@@ -57,17 +54,27 @@ public slots:
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString msg);
 
-    void onExperimentTerminated();
-    void onExperimentCompleted();
 
+// Slots associated with "File" menu actions
 private slots:
-    void fileRefresh();
-    void fileAddExperiment();
-    void onExperimentLoad();
-    void onExperimentRun();
-    void onExperimentPause();
-    void onExperimentStop();
-    void helpAbout();
+    void onFileNewExperiment();
+    void onFileOpenExperiment();
+    void onFileSaveExperimentFile();
+    void onFileSaveAsExperimentFile();
+
+// Slots associated with "Edit" menu actions
+private slots:
+    void onEditExperimentMetaInfo();
+
+// Slots associated with "Preference" menu actions
+private slots:
+    void onPreferenceDefaultExperimentDirectory();
+    void onPreferenceDefaultFieldLayoutFile();
+    void onPreferenceDefaultPlotSplitDirectory();
+
+// Slots associated with "Help" menu actions
+private slots:
+    void onHelpAbout();
 
 private:
     bool loadExperiment(const cExperimentTreeItem& experiment);
@@ -79,29 +86,29 @@ private:
     void createActions();
     void createToolBars();
     void createStatusBar();
-    void createDockWindows(const nlohmann::json& configDoc);
+    void createDockWindows();
     void createDataModel(const nlohmann::json& configDoc);
 
-    cExperimentManager* mpExperiments;
+private:
+    QSettings mSettings;
 
-    QString mDefaultDataPath;
+    cExperimentManager* mpExperiments = nullptr;
+    cSpidercamScanArea* mpScanArea = nullptr;
+    cExperimentDesignWidget* mpExpDesign = nullptr;
+
     QString mExperimentFilesPath;
+    QString mFieldLayoutFile;
+    QString mPlotSplitsPath;
 
-    QMenu* mpFileMenu;
-    QMenu* mpExperimentMenu;
+    QMenu* mpFileMenu = nullptr;
+    QMenu* mpEditMenu = nullptr;
+    QMenu* mpPreferencesMenu = nullptr;
+    QMenu* mpViewMenu = nullptr;
+    QMenu* mpHelpMenu = nullptr;
 
-    QAction* mpExpLoad;
-    QAction* mpExpRun;
-    QAction* mpExpPause;
-    QAction* mpExpStop;
+    QToolBar* mpFileBar = nullptr;
 
-    QMenu* mpViewMenu;
-    QMenu* mpSensorMenu;
-    QMenu* mpHelpMenu;
-
-    QToolBar* mpFileBar;
-
-    Ui::MainWindow* mpUI;
+    Ui::MainWindow* mpUI = nullptr;
     QString mCurrentFile;
 };
 

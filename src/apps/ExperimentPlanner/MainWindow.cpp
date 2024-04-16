@@ -4,6 +4,10 @@
 
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
+#include "Spidercam/SpidercamScanArea.hpp"
+#include "ExperimentDesignWidget.hpp"
+
+#include "ExperimentMetaInfoDlg.hpp"
 
 #include "RappFieldBoundary.hpp"
 
@@ -25,16 +29,8 @@
 cMainWindow::cMainWindow(QWidget* parent) :
     QMainWindow(parent),
     mpExperiments(nullptr),
-    mpExpLoad(nullptr),
-    mpExpRun(nullptr),
-    mpExpPause(nullptr),
-    mpExpStop(nullptr),
-    mpFileMenu(nullptr),
-    mpExperimentMenu(nullptr),
-    mpViewMenu(nullptr),
-    mpHelpMenu(nullptr),
-    mpFileBar(nullptr),
-    mpUI(new Ui::MainWindow)
+    mpUI(new Ui::MainWindow),
+    mSettings("UIUC", "Ceres Experiment Planner")
 {
     mpUI->setupUi(this);
 
@@ -42,11 +38,9 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     setUnifiedTitleAndToolBarOnMac(true);
 
-    auto cwd = std::filesystem::current_path();
-    auto data_path = cwd / "Data";
-    auto exp_path = cwd / "Experiments";
-    mDefaultDataPath = QString::fromLatin1(data_path.string().c_str());
-    mExperimentFilesPath = QString::fromLatin1(exp_path.string().c_str());
+    mExperimentFilesPath = mSettings.value("Defaults/experimentDirectory").toString();
+    mFieldLayoutFile = mSettings.value("Defaults/fieldLayoutFile").toString();
+    mPlotSplitsPath = mSettings.value("Defaults/plotSplitDirectory").toString();
 }
 
 //-----------------------------------------------------------------------------
@@ -59,55 +53,32 @@ cMainWindow::~cMainWindow()
 //-----------------------------------------------------------------------------
 void cMainWindow::initialize()
 {
-    onStatusUpdate("Initializing menus...");
     createMainMenu();
     createSubMenusAndActions();
     createActions();
 
-    onStatusUpdate("Initializing toolbars...");
     createToolBars();
+    createDockWindows();
 
-    onStatusUpdate("Initializing status bar...");
     createStatusBar();
+
+    mpScanArea = new cSpidercamScanArea(this);
+
+    auto* mainlayout = new QVBoxLayout();
+    mainlayout->addSpacing(10);
+    mainlayout->addWidget(mpScanArea);
+    mainlayout->addSpacing(10);
+
+    auto* centralWidget = new QWidget(this);
+    centralWidget->setLayout(mainlayout);
+
+    setCentralWidget(centralWidget);
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::fileRefresh()
-{
-    mpExperiments->refresh();
 
-    emit refreshDisplay();
-}
 
 //-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-void cMainWindow::fileAddExperiment()
-{
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::onExperimentLoad()
-{
-    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
-
-    if (pExperiment == nullptr)
-    {
-        return;
-    }
-
-    if (pExperiment->hasExperimentDocument())
-    {
-        loadExperiment(*pExperiment);
-        return;
-    }
-
-    if (0 == pExperiment->childCount())
-    {
-        return;
-    }
-}
-
 //-----------------------------------------------------------------------------
 bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
 {
@@ -163,27 +134,6 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
     return true;
 }
 
-//-----------------------------------------------------------------------------
-void cMainWindow::onExperimentRun()
-{
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::onExperimentPause()
-{
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::onExperimentStop()
-{
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::helpAbout()
-{
-
-}
-
 void cMainWindow::onStatusUpdate(QString msg)
 {
     if (statusBar())
@@ -213,39 +163,13 @@ void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
     onStatusUpdate(msg);
 }
 
-void cMainWindow::onExperimentTerminated()
-{
-    mpExpLoad->setEnabled(true);
-    mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(false);
-    mpExpStop->setEnabled(false);
-
-    emit experimentStopped();
-
-    onStatusUpdate("Experiment stopped!");
-}
-
-void cMainWindow::onExperimentCompleted()
-{
-    mpExpLoad->setEnabled(true);
-    mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(false);
-    mpExpStop->setEnabled(false);
-
-    emit experimentStopped();
-
-    QSound::play(":/ripe.illinois.edu/end_experiment.wav");
-    onStatusUpdate("Experiment completed!");
-}
-
-
 //-----------------------------------------------------------------------------
 void cMainWindow::createMainMenu()
 {
     mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
-    mpExperimentMenu = mpUI->menuBar->addMenu(tr("&Experiment"));
+    mpEditMenu = mpUI->menuBar->addMenu(tr("&Edit"));
+    mpPreferencesMenu = mpUI->menuBar->addMenu(tr("&Preferences"));
     mpViewMenu = mpUI->menuBar->addMenu(tr("&View"));
-    mpSensorMenu = mpUI->menuBar->addMenu(tr("&Sensors"));
     mpHelpMenu = mpUI->menuBar->addMenu(tr("&Help"));
 }
 
@@ -254,10 +178,29 @@ void cMainWindow::createSubMenusAndActions()
 {
     QAction* pMenuItem = nullptr;
 
-    // Build the File Menu
-    pMenuItem = new QAction(tr("Refresh"), this);
-    pMenuItem->setStatusTip(tr("Refresh the experiment window"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileRefresh);
+    //
+    // Build the File Sub Menu
+    //
+    pMenuItem = new QAction(tr("New Experiment File"), this);
+    pMenuItem->setStatusTip(tr("Create a new experiment file"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment);
+    mpFileMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Open Experiment File..."), this);
+    pMenuItem->setStatusTip(tr("Loads experiment file into memory"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileOpenExperiment);
+    mpFileMenu->addAction(pMenuItem);
+
+    mpFileMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Save Experiment File"), this);
+    pMenuItem->setStatusTip(tr("Save the experiment file"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveExperimentFile);
+    mpFileMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Save Experiment File As..."), this);
+    pMenuItem->setStatusTip(tr("Save the experiment file with a different file name"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveAsExperimentFile);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
@@ -268,40 +211,28 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, &QApplication::closeAllWindows);
     mpFileMenu->addAction(pMenuItem);
 
-    // Build the Experiment Menu
-    mpExpLoad = new QAction(tr("&Load"), this);
-    mpExpLoad->setStatusTip(tr("Load experiment..."));
-    connect(mpExpLoad, &QAction::triggered, this, &cMainWindow::onExperimentLoad);
-    mpExperimentMenu->addAction(mpExpLoad);
+    //
+    // Build the Edit Sub Menu
+    //
+    pMenuItem = new QAction(tr("&Edit Experiment Meta Data..."), this);
+    pMenuItem->setStatusTip(tr("Edit the experiment meta information..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditExperimentMetaInfo);
+    mpEditMenu->addAction(pMenuItem);
 
-    mpExperimentMenu->addSeparator();
-
-    mpExpRun = new QAction(tr("&Run"), this);
-    mpExpRun->setStatusTip(tr("Run experiment..."));
-    connect(mpExpRun, &QAction::triggered, this, &cMainWindow::onExperimentRun);
-    mpExperimentMenu->addAction(mpExpRun);
-
-    mpExpPause = new QAction(tr("&Pause"), this);
-    mpExpPause->setStatusTip(tr("Pause the currently running experiment"));
-    connect(mpExpPause, &QAction::triggered, this, &cMainWindow::onExperimentPause);
-    mpExperimentMenu->addAction(mpExpPause);
-    mpExpPause->setEnabled(false);
-
-    mpExpStop = new QAction(tr("&Stop"), this);
-    mpExpStop->setStatusTip(tr("Stop the currently running experiment"));
-    connect(mpExpStop, &QAction::triggered, this, &cMainWindow::onExperimentStop);
-    mpExperimentMenu->addAction(mpExpStop);
-    mpExpStop->setEnabled(false);
+    //
+    // Build the Preference Sub Menu
+    //
+    pMenuItem = new QAction(tr("Default Experiment Directory"), this);
+    pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading experiment files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultExperimentDirectory);
+    mpPreferencesMenu->addAction(pMenuItem);
 
     // Build the View Menu
     /* The view menu is built by the dock window system */
 
-    // Build the Sensor Menu
-    /* The sensor menu is built by the sensor loading system */
-
     // Build the Help Menu
     pMenuItem = new QAction(tr("&About"), this);
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::helpAbout);
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onHelpAbout);
     mpHelpMenu->addAction(pMenuItem);
 }
 
@@ -326,27 +257,24 @@ void cMainWindow::createStatusBar()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::createDockWindows(const nlohmann::json& configDoc)
+void cMainWindow::createDockWindows()
 {
-    if (configDoc.contains("experiment file folder"))
-    {
-        auto folders = configDoc["experiment file folder"];
-#ifdef WIN32
-        if (folders.contains("windows"))
-        {
-            mExperimentFilesPath = QString::fromLatin1(folders["windows"].get<std::string>().c_str());
-        }
-#endif
-    }
-
     QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
-    connect(mpExperiments, &cExperimentManager::runExperiment, this, &cMainWindow::onExperimentRun);
-
+//    connect(mpExperiments, &cExperimentManager::runExperiment, this, &cMainWindow::onExperimentRun);
 
     dock->setWidget(mpExperiments);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
+    mpViewMenu->addAction(dock->toggleViewAction());
+
+    dock = new QDockWidget(tr("Experiment Plan"), this);
+    dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    mpExpDesign = new cExperimentDesignWidget(dock);
+    //    connect(mpExperiments, &cExperimentManager::runExperiment, this, &cMainWindow::onExperimentRun);
+
+    dock->setWidget(mpExpDesign);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
 }
 
@@ -355,12 +283,85 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 {
 }
 
-void cMainWindow::addSensorPropertyPage(QAction* pAction)
+
+/********************************************************************
+ * Slots associated with "File" menu actions
+ *******************************************************************/
+void cMainWindow::onFileNewExperiment()
 {
-    mpSensorMenu->addAction(pAction);
+
 }
 
-void cMainWindow::removeSensorPropertyPage(QAction* pAction)
+void cMainWindow::onFileOpenExperiment()
 {
-    mpSensorMenu->removeAction(pAction);
+
 }
+
+void cMainWindow::onFileSaveExperimentFile()
+{
+
+}
+
+void cMainWindow::onFileSaveAsExperimentFile()
+{
+
+}
+
+
+/********************************************************************
+ * Slots associated with "Edit" menu actions
+ *******************************************************************/
+void cMainWindow::onEditExperimentMetaInfo()
+{
+    cExperimentMetaInfoDlg dlg(this);
+
+    dlg.exec();
+}
+
+/********************************************************************
+ * Slots associated with "Preference" menu actions
+ *******************************************************************/
+void cMainWindow::onPreferenceDefaultExperimentDirectory()
+{
+    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
+
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Select Default Directory for Saving/Loading Experiment Files..."), defaultDirectory);
+
+    if (directory.isEmpty())
+        return;
+
+    mSettings.setValue("Defaults/experimentDirectory", directory);
+}
+
+void cMainWindow::onPreferenceDefaultFieldLayoutFile()
+{
+    QString defaultFile = mSettings.value("Defaults/fieldLayoutFile").toString();
+
+    QString layoutFile = QFileDialog::getOpenFileName(this, tr("Select the Field Layout File..."), defaultFile,
+        tr("Field Layout (*.json)"));
+
+    if (layoutFile.isEmpty())
+        return;
+
+    mSettings.setValue("Defaults/fieldLayoutFile", layoutFile);
+}
+
+void cMainWindow::onPreferenceDefaultPlotSplitDirectory()
+{
+    QString defaultDirectory = mSettings.value("Defaults/plotSplitDirectory").toString();
+
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Select Default Directory for Saving/Loading Plot Split Files..."), defaultDirectory);
+
+    if (directory.isEmpty())
+        return;
+
+    mSettings.setValue("Defaults/plotSplitDirectory", directory);
+}
+
+/********************************************************************
+ * Slots associated with "Help" menu actions
+ *******************************************************************/
+void cMainWindow::onHelpAbout()
+{
+}
+

@@ -59,6 +59,15 @@ PRIVATE
 #
 # General Application files
 #
+    ExperimentMetaInfoDlg.hpp
+    ExperimentMetaInfoDlg.cpp
+
+    ExperimentDesignWidget.hpp
+    ExperimentDesignWidget.cpp
+
+    ExperimentDesignItems.hpp
+    ExperimentDesignItems.cpp
+
     ExperimentManager.hpp
     ExperimentManager.cpp
     ExperimentTreeItem.hpp
@@ -87,11 +96,13 @@ if(APPLE)
 endif()
 
 target_include_directories(CeresExperimentPlanner PRIVATE ${UTILITIES_INCLUDE_DIR})
+target_include_directories(CeresExperimentPlanner PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
 
 target_link_libraries(CeresExperimentPlanner PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresExperimentPlanner PRIVATE ${Qt}::Multimedia)
 target_link_libraries(CeresExperimentPlanner PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(CeresExperimentPlanner PRIVATE Utilities)
+target_link_libraries(CeresExperimentPlanner PRIVATE ExperimentControllers)
 
 set_target_properties(CeresExperimentPlanner PROPERTIES FOLDER "Apps")
 

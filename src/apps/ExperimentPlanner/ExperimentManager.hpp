@@ -23,10 +23,10 @@ public:
 	const cExperimentTreeItem* experiments() const;
 
 signals:
-	void runExperiment();
+	void openExperiment();
 
 public slots:
-	void refresh();
+	void reloadExperiments(QString path);
 
 protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;

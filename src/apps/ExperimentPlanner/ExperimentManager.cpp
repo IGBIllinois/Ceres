@@ -35,8 +35,9 @@ cExperimentManager::cExperimentManager(const QString& path, QWidget* parent)
     loadExperiments();
 }
 
-void cExperimentManager::refresh()
+void cExperimentManager::reloadExperiments(QString path)
 {
+    mExperimentPath = path.toStdString();
     clear();
     loadExperiments();
 }
@@ -45,9 +46,9 @@ void cExperimentManager::contextMenuEvent(QContextMenuEvent* event)
 {
     QMenu contextMenu(this);
 
-    QAction run("Run...", this);
-    connect(&run, &QAction::triggered, this, &cExperimentManager::runExperiment);
-    contextMenu.addAction(&run);
+    QAction open("Open...", this);
+    connect(&open, &QAction::triggered, this, &cExperimentManager::openExperiment);
+    contextMenu.addAction(&open);
 
     contextMenu.exec(event->globalPos());
 }
