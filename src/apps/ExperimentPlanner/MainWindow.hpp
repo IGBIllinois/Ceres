@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ExperimentFile.hpp"
+
 #include <vector>
 #include <filesystem>
 
@@ -91,6 +93,8 @@ private:
 
 private:
     QSettings mSettings;
+
+    cExperimentFile mExperimentFile;
 
     cExperimentManager* mpExperiments = nullptr;
     cSpidercamScanArea* mpScanArea = nullptr;

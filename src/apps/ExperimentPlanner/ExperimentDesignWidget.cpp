@@ -1,6 +1,8 @@
 
 #include "ExperimentDesignWidget.hpp"
 #include "ExperimentDesignItems.hpp"
+#include "ExperimentFile.hpp"
+#include "ExperimentSteps.hpp"
 
 #include <QLabel>
 #include <QLayout>
@@ -23,6 +25,7 @@ cExperimentDesignWidget::cExperimentDesignWidget(QWidget *parent)
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
 
+/*
     cTerminal* start = new cStartTerminal();
     mScene.addItem(start);
 
@@ -37,6 +40,42 @@ cExperimentDesignWidget::cExperimentDesignWidget(QWidget *parent)
     arrow = new cFlowArrow();
     arrow->setTopPoint(step->getBottomPoint());
     mScene.addItem(arrow);
+
+    cTerminal* end = new cEndTerminal();
+    end->setTopPoint(arrow->getBottomPoint());
+    mScene.addItem(end);
+
+    show();
+*/
+}
+
+void cExperimentDesignWidget::clear()
+{
+    mScene.clear();
+    show();
+}
+
+void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
+{
+    mScene.clear();
+
+    cTerminal* start = new cStartTerminal();
+    mScene.addItem(start);
+
+    cFlowArrow* arrow = new cFlowArrow();
+    arrow->setTopPoint(start->getBottomPoint());
+    mScene.addItem(arrow);
+
+    for (auto step : experiment)
+    {
+        auto item = step->graphicsItem();
+        item->setTopPoint(arrow->getBottomPoint());
+        mScene.addItem(item);
+
+        arrow = new cFlowArrow();
+        arrow->setTopPoint(item->getBottomPoint());
+        mScene.addItem(arrow);
+    }
 
     cTerminal* end = new cEndTerminal();
     end->setTopPoint(arrow->getBottomPoint());

@@ -294,7 +294,42 @@ void cMainWindow::onFileNewExperiment()
 
 void cMainWindow::onFileOpenExperiment()
 {
+    if (mExperimentFile.isDirty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The experiment configuration file has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
 
+        if (ret == QMessageBox::Save)
+        {
+//            onFileSavePlotConfigFile();
+        }
+        else if (ret == QMessageBox::Cancel)
+        {
+            return;
+        }
+    }
+
+    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Experiment File"), defaultDirectory,
+        "Experiment Files (*.json)");
+
+    if (fileName.isEmpty())
+        return;
+
+    mExperimentFile.clear();
+
+    mExperimentFile.open(fileName.toStdString());
+
+    QString title = "RAPP Plot Mapper - ";
+    title += fileName;
+    setWindowTitle(title);
+
+    mpExpDesign->loadExperiment(mExperimentFile);
 }
 
 void cMainWindow::onFileSaveExperimentFile()

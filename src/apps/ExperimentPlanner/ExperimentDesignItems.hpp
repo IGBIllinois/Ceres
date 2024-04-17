@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <QGraphicsItem>
 #include <QPen>
 #include <QBrush>
@@ -16,8 +17,23 @@ class QLabel;
 QT_END_NAMESPACE
 
 
-class cFlowArrow : public QGraphicsItem
+class cConnectedItem : public QGraphicsItem
 {
+public:
+	explicit cConnectedItem(QGraphicsItem* parent = nullptr);
+
+	void setTopPoint(int x, int y);
+	virtual void setTopPoint(QPoint p) = 0;
+
+	virtual QPoint getBottomPoint() const = 0;
+};
+
+
+class cFlowArrow : public QObject, public cConnectedItem
+{
+	Q_INTERFACES(QGraphicsItem)
+	Q_OBJECT
+
 public:
 	explicit cFlowArrow(QGraphicsItem* parent = nullptr);
 
@@ -60,8 +76,11 @@ private:
  *
  ********************************************************************/
 
-class cTerminal : public QGraphicsItem
+class cTerminal : public QObject, public cConnectedItem
 {
+	Q_INTERFACES(QGraphicsItem)
+	Q_OBJECT
+
 public:
 	explicit cTerminal(QGraphicsItem* parent = nullptr);
 	explicit cTerminal(const QString& text, QGraphicsItem* parent = nullptr);
@@ -124,21 +143,30 @@ protected:
 };
 
 
-class cProcessStep : public QGraphicsItem
+class cProcessStep : public QObject, public cConnectedItem
 {
+	Q_INTERFACES(QGraphicsItem)
+	Q_OBJECT
+
 public:
 	explicit cProcessStep(QGraphicsItem* parent = nullptr);
 	explicit cProcessStep(const QString& text, QGraphicsItem* parent = nullptr);
 
 	const QString& title() const;
-	void setTitle(const QString& text);
 
 	void setTopPoint(int x, int y);
 	void setTopPoint(QPoint p);
 
 	QPoint getBottomPoint() const;
 
+signals:
+	void editStep();
+
 public slots:
+	void setTitle(const QString& title);
+	void setSubHeading1(const QString& heading);
+	void setSubHeading2(const QString& heading);
+	void setSubHeading3(const QString& heading);
 	void setScale(int scale);
 	void setPen(const QPen& pen);
 	void setBrush(const QBrush& brush);
@@ -153,16 +181,18 @@ protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private:
+	void recomputeBoxSize();
+
+private:
 	QPoint mTop;
 	QPoint mBottom;
 
 	QFont mFont;
 
-	int mMinTextWidth = 0;
-	int mMinTextHeight = 0;
-
 	QString mTitle;
-	QString mSubTitle;
+	QString mSubHeading1;
+	QString mSubHeading2;
+	QString mSubHeading3;
 
 	float mScale = 1.0;
 	int mBoxWidth = 50;

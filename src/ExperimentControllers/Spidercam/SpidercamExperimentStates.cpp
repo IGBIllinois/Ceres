@@ -21,25 +21,8 @@ namespace
 cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
 	cSpidercamController& controller, uint32_t tolerance_mm)
 :
-	mDollyPos(pos), mController(controller), mRecordData(false), 
-	mX_mm(0), mY_mm(0), mZ_mm(0), mTolerance_mm(tolerance_mm),
-	mSpeed_mmps(0), mPan_deg(0), mTilt_deg(0)
+	mDollyPos(pos), mController(controller), mTolerance_mm(tolerance_mm)
 {
-	mX_NeedsInitialization = false;
-	mY_NeedsInitialization = false;
-	mZ_NeedsInitialization = false;
-
-	mPan_NeedsInitialization = false;
-	mTilt_NeedsInitialization = false;
-
-	mMotionDetected = false;
-	mMoveCommandSent = false;
-	mStopCommandSent = false;
-	mBusy = false;
-	mIsMoving = false;
-	mIsSetPointEnabled = false;
-	mInError = false;
-	mInScriptMode = false;
 }
 
 bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
@@ -92,11 +75,20 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 			mZ_mm = -1.0;
 		}
 
-		mSpeed_mmps = stateDoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM;
+		if (stateDoc.contains("speed (mm/s)"))
+		{
+			mSpeed_mmps = stateDoc["speed (mm/s)"].get<double>();
+		}
+		else
+			mSpeed_mmps = stateDoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM;
 
 		if (stateDoc.contains("pan"))
 		{
 			mPan_deg = stateDoc["pan"];
+		}
+		else if (stateDoc.contains("pan (deg)"))
+		{
+			mPan_deg = stateDoc["pan (deg)"];
 		}
 		else
 		{
@@ -107,9 +99,26 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 		{
 			mTilt_deg = stateDoc["tilt"];
 		}
+		else if (stateDoc.contains("tilt (deg)"))
+		{
+			mTilt_deg = stateDoc["tilt (deg)"];
+		}
 		else
 		{
 			mTilt_NeedsInitialization = true;
+		}
+
+		if (stateDoc.contains("roll"))
+		{
+			mRoll_deg = stateDoc["roll"];
+		}
+		else if (stateDoc.contains("roll (deg)"))
+		{
+			mRoll_deg = stateDoc["roll (deg)"];
+		}
+		else
+		{
+			mRoll_NeedsInitialization = true;
 		}
 
 		mRecordData = stateDoc["record"];

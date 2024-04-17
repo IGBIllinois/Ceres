@@ -31,33 +31,36 @@ private:
 	const spidercam::sPosition_1_t& mDollyPos;
 	cSpidercamController& mController;
 
-	bool mMotionDetected;
-	bool mMoveCommandSent;
-	bool mStopCommandSent;
-	bool mBusy;
-	bool mIsConsoleConnected;
-	bool mIsMoving;
-	bool mIsSetPointEnabled;
-	bool mInError;
-	bool mInScriptMode;
+	bool mMotionDetected = false;
+	bool mMoveCommandSent = false;
+	bool mStopCommandSent = false;
+	bool mBusy = false;
+	bool mIsConsoleConnected = false;
+	bool mIsMoving = false;
+	bool mIsSetPointEnabled = false;
+	bool mInError = false;
+	bool mInScriptMode = false;
 
-	bool mRecordData;
+	bool mRecordData = false;
 
-	double mX_mm;
-	double mY_mm;
-	double mZ_mm;
+	double mX_mm = 0.0;
+	double mY_mm = 0.0;
+	double mZ_mm = 0.0;
 
-	bool mX_NeedsInitialization;
-	bool mY_NeedsInitialization;
-	bool mZ_NeedsInitialization;
+	bool mX_NeedsInitialization = false;
+	bool mY_NeedsInitialization = false;
+	bool mZ_NeedsInitialization = false;
 
-	uint32_t mTolerance_mm;
+	uint32_t mTolerance_mm = 10.0;
 
-	double mSpeed_mmps;
-	double mPan_deg;
-	double mTilt_deg;
+	double mSpeed_mmps = 0.0;
+
+	double mPan_deg = 0.0;
+	double mTilt_deg = 0.0;
+	double mRoll_deg = 0.0;
 
 	bool mPan_NeedsInitialization = false;
 	bool mTilt_NeedsInitialization = false;
+	bool mRoll_NeedsInitialization = false;
 };
 

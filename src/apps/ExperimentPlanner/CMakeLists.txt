@@ -62,11 +62,22 @@ PRIVATE
     ExperimentMetaInfoDlg.hpp
     ExperimentMetaInfoDlg.cpp
 
+    DelayStepInfoDlg.hpp
+    DelayStepInfoDlg.cpp
+
+    MovementStepInfoDlg.hpp
+    MovementStepInfoDlg.cpp
+
     ExperimentDesignWidget.hpp
     ExperimentDesignWidget.cpp
 
     ExperimentDesignItems.hpp
     ExperimentDesignItems.cpp
+
+    ExperimentFile.hpp
+    ExperimentFile.cpp
+    ExperimentSteps.hpp
+    ExperimentSteps.cpp
 
     ExperimentManager.hpp
     ExperimentManager.cpp

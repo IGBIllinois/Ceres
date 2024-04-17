@@ -16,10 +16,16 @@ class QLabel;
 QT_END_NAMESPACE
 
 
+// Forward Declaration
+class cExperimentFile;
+
 class cExperimentDesignWidget : public QGraphicsView
 {
 public:
 	explicit cExperimentDesignWidget(QWidget* parent = nullptr);
+
+    void clear();
+    void loadExperiment(const cExperimentFile& experiment);
 
 	QSize minimumSizeHint() const override;
 	QSize sizeHint() const override;
