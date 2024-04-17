@@ -1,0 +1,404 @@
+
+#include "ExperimentSteps.hpp"
+#include "ExperimentDesignItems.hpp"
+
+#include "DelayStepInfoDlg.hpp"
+#include "MovementStepInfoDlg.hpp"
+
+#include "Constants.hpp"
+
+#include <QLayout>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QComboBox>
+#include <QLabel>
+#include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QMenu>
+
+#include <string>
+
+namespace fs = std::filesystem;
+
+//-----------------------------------------------------------------------------
+
+cExerimentStep::~cExerimentStep()
+{}
+
+bool cExerimentStep::isDirty() const
+{
+	return mDirty;
+}
+
+//-----------------------------------------------------------------------------
+
+cConnectedItem* cExerimentStep_Delay::graphicsItem() const
+{
+	auto step = new cProcessStep();
+	connect(step, &cProcessStep::editStep, this, &cExerimentStep_Delay::onEdit);
+	connect(this, &cExerimentStep_Delay::onDescriptionChange, step, &cProcessStep::setSubHeading1);
+	connect(this, &cExerimentStep_Delay::onCommentChange, step, &cProcessStep::setSubHeading2);
+
+	step->setTitle("Delay");
+
+	auto description = generateDescription();
+	step->setSubHeading1(description);
+
+	auto comment = generateComment();
+	step->setSubHeading2(comment);
+
+	return step;
+}
+
+void cExerimentStep_Delay::load(const nlohmann::json& jdoc)
+{
+	using namespace nlohmann;
+
+	mWaitTime_sec = 0;
+
+	if (jdoc.contains("wait (sec)"))
+		mWaitTime_sec = jdoc["wait (sec)"];
+
+	if (jdoc.contains("wait (min)"))
+		mWaitTime_min = jdoc["wait (min)"];
+
+	if (jdoc.contains("wait (hr)"))
+		mWaitTime_hr = jdoc["wait (hr)"];
+
+	if (jdoc.contains("record"))
+		mRecording = jdoc["record"];
+}
+
+nlohmann::json cExerimentStep_Delay::save()
+{
+	nlohmann::json entry;
+
+	entry["type"] = "delay";
+
+	if (mWaitTime_hr.has_value())
+	{
+		int hours = mWaitTime_hr.value();
+		entry["wait (hr)"] = hours;
+	}
+
+	if (mWaitTime_min.has_value())
+	{
+		int minutes = mWaitTime_min.value();
+		entry["wait (min)"] = minutes;
+	}
+
+	entry["wait (sec)"] = mWaitTime_sec;
+
+	entry["record"] = mRecording;
+
+	mDirty = false;
+
+	return entry;
+}
+
+void cExerimentStep_Delay::onEdit()
+{
+	cDelayStepInfoDlg dlg;
+
+	if (mWaitTime_hr.has_value())
+		dlg.setHours(mWaitTime_hr.value());
+
+	if (mWaitTime_min.has_value())
+		dlg.setMinutes(mWaitTime_min.value());
+
+	dlg.setSeconds(mWaitTime_sec);
+	dlg.setRecording(mRecording);
+
+	auto result = dlg.exec();
+
+	if (result == QDialog::Rejected)
+		return;
+
+	std::optional<int> hours;
+	if (dlg.hasHours())
+	{
+		if (dlg.hours() > 0)
+			hours = dlg.hours();
+	}
+	mDirty = mWaitTime_hr != hours;
+	mWaitTime_hr = hours;
+
+	std::optional<int> minutes;
+	if (dlg.hasMinutes())
+	{
+		if (dlg.minutes() > 0)
+			minutes = dlg.minutes();
+	}
+	mDirty = mWaitTime_min != minutes;
+	mWaitTime_min = minutes;
+
+	double seconds = dlg.seconds();
+	mDirty = mWaitTime_sec != seconds;
+	mWaitTime_sec = seconds;
+
+	bool record = dlg.recording();
+	mDirty = mRecording != record;
+	mRecording = record;
+
+	auto description = generateDescription();
+	emit onDescriptionChange(description);
+
+	auto comment = generateComment();
+	emit onCommentChange(comment);
+}
+
+QString cExerimentStep_Delay::generateDescription() const
+{
+	QString description = "Delay for ";
+
+	if (mWaitTime_hr.has_value())
+	{
+		int hour = mWaitTime_hr.value();
+		description += QString::number(hour);
+		description += ":";
+
+		if (mWaitTime_min.has_value())
+		{
+			int minutes = mWaitTime_min.value();
+			if (minutes < 10)
+			{
+				description += "0";
+			}
+			description += QString::number(minutes);
+			description += ":";
+		}
+		else
+		{
+			description += "00:";
+		}
+
+		description += QString::number(mWaitTime_sec);
+	}
+	else if (mWaitTime_min.has_value())
+	{
+		int minutes = mWaitTime_min.value();
+		if (minutes < 10)
+		{
+			double time = minutes * 60.0 + mWaitTime_sec;
+			description += QString::number(time);
+			description += " sec";
+		}
+		else
+		{
+			description += QString::number(minutes);
+			description += ":";
+			description += QString::number(mWaitTime_sec);
+		}
+	}
+	else
+	{
+		description += QString::number(mWaitTime_sec);
+		description += " sec";
+	}
+
+	return description;
+}
+
+QString cExerimentStep_Delay::generateComment() const
+{
+	if (mRecording)
+		return QString("Recording: On");
+
+	return QString();
+}
+
+//-----------------------------------------------------------------------------
+
+cConnectedItem* cExerimentStep_Movement::graphicsItem() const
+{
+	auto step = new cProcessStep();
+	connect(step, &cProcessStep::editStep, this, &cExerimentStep_Movement::onEdit);
+	connect(this, &cExerimentStep_Movement::onMovementTextChange, step, &cProcessStep::setSubHeading1);
+	connect(this, &cExerimentStep_Movement::onOrientationTextChange, step, &cProcessStep::setSubHeading2);
+	connect(this, &cExerimentStep_Movement::onCommentChange, step, &cProcessStep::setSubHeading3);
+
+	step->setTitle("Movement");
+
+	auto msg = generateMovementDescription();
+	step->setSubHeading1(msg);
+
+	msg = generateOrientationDescription();
+	step->setSubHeading2(msg);
+
+	msg = generateComment();
+	step->setSubHeading3(msg);
+
+	return step;
+}
+
+void cExerimentStep_Movement::load(const nlohmann::json& jdoc)
+{
+	auto pos = jdoc["position"];
+
+	if (pos.contains("x (mm)"))
+	{
+		mX_mm = static_cast<uint32_t>(pos["x (mm)"].get<int>());
+	}
+	else if (pos.contains("x (m)"))
+	{
+		mX_mm = static_cast<uint32_t>(pos["x (m)"].get<double>() * nConstants::M_TO_MM);
+	}
+
+	if (pos.contains("y (mm)"))
+	{
+		mY_mm = static_cast<uint32_t>(pos["y (mm)"].get<int>());
+	}
+	else if (pos.contains("y (m)"))
+	{
+		mY_mm = static_cast<uint32_t>(pos["y (m)"].get<double>() * nConstants::M_TO_MM);
+	}
+
+	if (pos.contains("z (mm)"))
+	{
+		mZ_mm = static_cast<uint32_t>(pos["z (mm)"].get<int>());
+	}
+	else if (pos.contains("z (m)"))
+	{
+		mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
+	}
+
+	if (pos.contains("speed (mm/s)"))
+	{
+		mSpeed_mmps = jdoc["speed (mm/s)"].get<int>();
+	}
+	else
+	{
+		mSpeed_mmps = static_cast<uint32_t>(jdoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM);
+	}
+
+	if (jdoc.contains("pan"))
+	{
+		mPan_deg = jdoc["pan"];
+	}
+	else if (jdoc.contains("pan (deg)"))
+	{
+		mPan_deg = jdoc["pan (deg)"];
+	}
+
+	if (jdoc.contains("tilt"))
+	{
+		mTilt_deg = jdoc["tilt"];
+	}
+	else if (jdoc.contains("tilt (deg)"))
+	{
+		mTilt_deg = jdoc["tilt (deg)"];
+	}
+
+	mRecording = jdoc["record"];
+}
+
+nlohmann::json cExerimentStep_Movement::save()
+{
+	nlohmann::json entry;
+
+	entry["type"] = "movement";
+
+	entry["record"] = mRecording;
+
+	return entry;
+}
+
+
+void cExerimentStep_Movement::onEdit()
+{
+
+}
+
+QString cExerimentStep_Movement::generateMovementDescription() const
+{
+	QString description;
+
+	if (mX_mm.has_value() && mY_mm.has_value() && mZ_mm.has_value())
+	{
+		description = "Moving to ";
+		description += QString::number(mX_mm.value());
+		description += " mm, ";
+		description += QString::number(mY_mm.value());
+		description += " mm, ";
+		description += QString::number(mZ_mm.value());
+		description += " mm @ ";
+		description += QString::number(mSpeed_mmps);
+		description += " mm/sec";
+	}
+	else if (mX_mm.has_value() && mY_mm.has_value())
+	{
+		description = "Moving horizontally to ";
+		description += QString::number(mX_mm.value());
+		description += " mm, ";
+		description += QString::number(mY_mm.value());
+		description += " mm @ ";
+		description += QString::number(mSpeed_mmps);
+		description += " mm/sec";
+	}
+	else if (mZ_mm.has_value())
+	{
+		description = "Moving vertically to ";
+		description += QString::number(mZ_mm.value());
+		description += " mm @ ";
+		description += QString::number(mSpeed_mmps);
+		description += " mm/sec";
+	}
+
+	return description;
+}
+
+QString cExerimentStep_Movement::generateOrientationDescription() const
+{
+	QString description;
+
+	if (mPan_deg.has_value() || mTilt_deg.has_value() || mRoll_deg.has_value())
+	{
+		description = "Setting ";
+
+		if (mPan_deg.has_value())
+		{
+			double pan_deg = mPan_deg.value();
+
+			description += "pan to ";
+			description += QString::number(pan_deg, 'f', 1);
+			description += " deg";
+		}
+
+		if (mTilt_deg.has_value())
+		{
+			if (mPan_deg.has_value())
+				description += ", ";
+
+			double tilt_deg = mTilt_deg.value();
+
+			description += "tilt to ";
+			description += QString::number(tilt_deg, 'f', 1);
+			description += " deg";
+		}
+
+		if (mRoll_deg.has_value())
+		{
+			if (mPan_deg.has_value() || mTilt_deg.has_value())
+				description += ", ";
+
+			double roll_deg = mRoll_deg.value();
+
+			description += "roll to ";
+			description += QString::number(roll_deg, 'f', 1);
+			description += " deg";
+		}
+	}
+
+	return description;
+}
+
+QString cExerimentStep_Movement::generateComment() const
+{
+	if (mRecording)
+		return QString("Recording: On");
+
+	return QString();
+}
+
+
+
