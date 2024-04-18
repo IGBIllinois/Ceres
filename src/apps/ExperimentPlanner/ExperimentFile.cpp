@@ -33,18 +33,22 @@ const std::string& cExperimentFile::getFileName() const
 
 bool cExperimentFile::isDirty() const
 {
+	bool dirty = mMetaInfo.isDirty();
+
 	for (const auto step : mSteps)
 	{
 		if (step->isDirty())
 			return true;
 	}
 
-	return false;
+	return dirty;
 }
 
 void cExperimentFile::clear()
 {
 	mFileName.clear();
+
+	mMetaInfo.clear();
 
 	for (auto step : mSteps)
 	{
@@ -80,7 +84,7 @@ void cExperimentFile::open(const std::string& file_name)
 
 	mFileName = file_name;
 
-//	mOptions.load(configDoc);
+	mMetaInfo.load(configDoc);
 
 	if (configDoc.contains("experiment"))
 	{
@@ -118,9 +122,7 @@ void cExperimentFile::save()
 
 	nlohmann::json configDoc;
 
-/*
-	configDoc["options"] = mOptions.save();
-*/
+	mMetaInfo.save(configDoc);
 
 	nlohmann::json stepsDoc;
 

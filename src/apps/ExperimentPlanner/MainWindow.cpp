@@ -4,7 +4,7 @@
 
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
-#include "Spidercam/SpidercamScanArea.hpp"
+#include "FieldLayoutWidget.hpp"
 #include "ExperimentDesignWidget.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
@@ -62,6 +62,7 @@ void cMainWindow::initialize()
 
     createStatusBar();
 
+/*
     mpScanArea = new cSpidercamScanArea(this);
 
     auto* mainlayout = new QVBoxLayout();
@@ -73,6 +74,10 @@ void cMainWindow::initialize()
     centralWidget->setLayout(mainlayout);
 
     setCentralWidget(centralWidget);
+*/
+
+    mpExpDesign = new cExperimentDesignWidget(this);
+    setCentralWidget(mpExpDesign);
 }
 
 //-----------------------------------------------------------------------------
@@ -262,18 +267,17 @@ void cMainWindow::createDockWindows()
     QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
-//    connect(mpExperiments, &cExperimentManager::runExperiment, this, &cMainWindow::onExperimentRun);
 
     dock->setWidget(mpExperiments);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
 
-    dock = new QDockWidget(tr("Experiment Plan"), this);
+    dock = new QDockWidget(tr("Field Layout"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    mpExpDesign = new cExperimentDesignWidget(dock);
-    //    connect(mpExperiments, &cExperimentManager::runExperiment, this, &cMainWindow::onExperimentRun);
+    mpFieldLayout = new cFieldLayoutWidget(dock);
+    mpFieldLayout->initialize();
 
-    dock->setWidget(mpExpDesign);
+    dock->setWidget(mpFieldLayout);
     addDockWidget(Qt::RightDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
 }
@@ -305,7 +309,7 @@ void cMainWindow::onFileOpenExperiment()
 
         if (ret == QMessageBox::Save)
         {
-//            onFileSavePlotConfigFile();
+            onFileSaveExperimentFile();
         }
         else if (ret == QMessageBox::Cancel)
         {

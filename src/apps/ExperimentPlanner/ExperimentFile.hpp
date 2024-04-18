@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ExperimentMetaInfo.hpp"
+
 #include <QtWidgets>
 #include <QDialog>
 
@@ -72,6 +74,8 @@ public:
 private:
 	std::filesystem::path	mExperimentPath;
 	std::string	mFileName;
+
+	cExperimentMetaInfo mMetaInfo;
 
 	std::list<cExerimentStep*> mSteps;
 };

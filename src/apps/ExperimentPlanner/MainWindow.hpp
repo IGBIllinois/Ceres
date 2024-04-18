@@ -27,7 +27,7 @@ QT_END_NAMESPACE
 // Forward Declarations
 class cExperimentManager;
 class cExperimentTreeItem;
-class cSpidercamScanArea;
+class cFieldLayoutWidget;
 class cExperimentDesignWidget;
 
 
@@ -97,7 +97,7 @@ private:
     cExperimentFile mExperimentFile;
 
     cExperimentManager* mpExperiments = nullptr;
-    cSpidercamScanArea* mpScanArea = nullptr;
+    cFieldLayoutWidget* mpFieldLayout = nullptr;
     cExperimentDesignWidget* mpExpDesign = nullptr;
 
     QString mExperimentFilesPath;

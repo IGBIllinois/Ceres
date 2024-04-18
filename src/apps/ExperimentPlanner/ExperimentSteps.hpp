@@ -126,7 +126,7 @@ private:
 	std::optional<int> mY_mm;
 	std::optional<int> mZ_mm;
 
-	int mSpeed_mmps;
+	int mSpeed_mmps = 0;
 
 	std::optional<double> mPan_deg;
 	std::optional<double> mTilt_deg;

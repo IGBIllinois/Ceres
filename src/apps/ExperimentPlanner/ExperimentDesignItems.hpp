@@ -69,7 +69,6 @@ private:
 };
 
 
-
 /********************************************************************
  *
  * Flow Chart Step: Terminal
@@ -143,6 +142,12 @@ protected:
 };
 
 
+/********************************************************************
+ *
+ * Flow Chart Step: Process Step
+ *
+ ********************************************************************/
+
 class cProcessStep : public QObject, public cConnectedItem
 {
 	Q_INTERFACES(QGraphicsItem)
@@ -202,4 +207,77 @@ private:
 	QBrush  mBrush;
 	bool    mAntialiased = false;
 };
+
+
+/********************************************************************
+ *
+ * Flow Chart Step: Input/Output Step
+ *
+ ********************************************************************/
+
+class cIoStep : public QObject, public cConnectedItem
+{
+	Q_INTERFACES(QGraphicsItem)
+		Q_OBJECT
+
+public:
+	explicit cIoStep(QGraphicsItem* parent = nullptr);
+	explicit cIoStep(const QString& text, QGraphicsItem* parent = nullptr);
+
+	const QString& title() const;
+
+	void setTopPoint(int x, int y);
+	void setTopPoint(QPoint p);
+
+	QPoint getBottomPoint() const;
+
+	bool readOnly() const;
+	void setReadOnly(bool read_only);
+
+signals:
+	void editStep();
+
+public slots:
+	void setTitle(const QString& title);
+	void setSubHeading1(const QString& heading);
+	void setSubHeading2(const QString& heading);
+	void setSubHeading3(const QString& heading);
+	void setScale(int scale);
+	void setPen(const QPen& pen);
+	void setBrush(const QBrush& brush);
+	void setFont(const QFont& font);
+	void setAntialiased(bool antialiased);
+
+public:
+	QRectF	boundingRect() const override;
+	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+protected:
+	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+
+private:
+	void recomputeBoxSize();
+
+private:
+	QPoint mTop;
+	QPoint mBottom;
+
+	QFont mFont;
+
+	QString mTitle;
+	QString mSubHeading1;
+	QString mSubHeading2;
+	QString mSubHeading3;
+
+	float mScale = 1.0;
+	int mShift = 5;
+	int mBoxWidth = 50;
+	int mBoxHeight = 20;
+
+	QPen    mPen;
+	QBrush  mBrush;
+	bool    mAntialiased = false;
+	bool	mAllowEdit = true;
+};
+
 

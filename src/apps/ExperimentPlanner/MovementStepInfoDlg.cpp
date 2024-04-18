@@ -29,16 +29,31 @@ cMovementStepInfoDlg::~cMovementStepInfoDlg()
 
 void cMovementStepInfoDlg::createControls()
 {
-	mpPlotName = new QLineEdit(this);
-	mpDescription = new QLineEdit(this);
-	mpSpecies = new QLineEdit(this);
-	mpCultivar = new QLineEdit(this);
+	mpX_mm = new QLineEdit(this);
+	mpX_mm->setValidator(new QIntValidator(0, 190000));
 
-	mpEvent = new QLineEdit(this);
-	mpConstructName = new QLineEdit(this);
-	mpPotLabel = new QLineEdit(this);
-	mpSeedGeneration = new QLineEdit(this);
-	mpCopyNumber = new QLineEdit(this);
+	mpY_mm = new QLineEdit(this);
+	mpY_mm->setValidator(new QIntValidator(0, 190000));
+
+	mpZ_mm = new QLineEdit(this);
+	mpZ_mm->setValidator(new QIntValidator(-5000, 10000));
+
+
+	mpSpeed_mmps = new QLineEdit(this);
+	mpSpeed_mmps->setValidator(new QIntValidator(10, 2000));
+	mpSpeed_mmps->setText("10");
+
+
+	mpPan_deg = new QLineEdit(this);
+	mpPan_deg->setValidator(new QDoubleValidator(0.0, 360.0, 1));
+
+	mpTilt_deg = new QLineEdit(this);
+	mpTilt_deg->setValidator(new QDoubleValidator(-90.0, 90.0, 1));
+
+	mpRoll_deg = new QLineEdit(this);
+	mpRoll_deg->setValidator(new QDoubleValidator(-180.0, 180.0, 1));
+
+	mpRecord = new QCheckBox("Record Data During Movement", this);
 }
 
 void cMovementStepInfoDlg::createLayout()
@@ -48,46 +63,57 @@ void cMovementStepInfoDlg::createLayout()
 
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
 
-	QGridLayout* pPlotInfo = new QGridLayout();
-	pPlotInfo->setColumnMinimumWidth(2, 10);
+	QGroupBox* pGroupBox = new QGroupBox(tr("Linear Information"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	pText = new QLabel("Name");
-	pPlotInfo->addWidget(pText, 1, 0);
-	pPlotInfo->addWidget(mpPlotName, 1, 1);
+	QGridLayout* pGridLayout = new QGridLayout();
+	pGridLayout->setColumnMinimumWidth(2, 10);
 
-	pText = new QLabel("Description");
-	pPlotInfo->addWidget(pText, 2, 0);
-	pPlotInfo->addWidget(mpDescription, 2, 1);
+	pText = new QLabel("X (mm)");
+	pGridLayout->addWidget(pText, 0, 0);
+	pGridLayout->addWidget(mpX_mm, 0, 1);
 
-	pText = new QLabel("Cultivar");
-	pPlotInfo->addWidget(pText, 3, 0);
-	pPlotInfo->addWidget(mpCultivar, 3, 1);
+	pText = new QLabel("Y (mm)");
+	pGridLayout->addWidget(pText, 0, 3);
+	pGridLayout->addWidget(mpY_mm, 0, 4);
 
-	pText = new QLabel("Species");
-	pPlotInfo->addWidget(pText, 4, 0);
-	pPlotInfo->addWidget(mpSpecies, 4, 1);
+	pText = new QLabel("Z (mm)");
+	pGridLayout->addWidget(pText, 0, 6);
+	pGridLayout->addWidget(mpZ_mm, 0, 7);
 
-	pText = new QLabel("Event");
-	pPlotInfo->addWidget(pText, 5, 0);
-	pPlotInfo->addWidget(mpEvent, 5, 1);
+	pText = new QLabel("Speed (mm/s)");
+	pGridLayout->addWidget(pText, 0, 9);
+	pGridLayout->addWidget(mpSpeed_mmps, 0, 10);
 
-	pText = new QLabel("Construct Name");
-	pPlotInfo->addWidget(pText, 6, 0);
-	pPlotInfo->addWidget(mpConstructName, 6, 1);
+	pGroupBox->setLayout(pGridLayout);
+	pMainLayout->addWidget(pGroupBox);
 
-	pText = new QLabel("Pot Label");
-	pPlotInfo->addWidget(pText, 7, 0);
-	pPlotInfo->addWidget(mpPotLabel, 7, 1);
+	pMainLayout->addSpacing(10);
 
-	pText = new QLabel("Seed Generation");
-	pPlotInfo->addWidget(pText, 8, 0);
-	pPlotInfo->addWidget(mpSeedGeneration, 8, 1);
+	pGroupBox = new QGroupBox(tr("Orientation Information"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	pText = new QLabel("Copy Number");
-	pPlotInfo->addWidget(pText, 9, 0);
-	pPlotInfo->addWidget(mpCopyNumber, 9, 1);
+	pGridLayout = new QGridLayout();
+	pGridLayout->setColumnMinimumWidth(2, 10);
 
-	pMainLayout->addLayout(pPlotInfo);
+	pText = new QLabel("Pan (deg)");
+	pGridLayout->addWidget(pText, 0, 0);
+	pGridLayout->addWidget(mpPan_deg, 0, 1);
+
+	pText = new QLabel("Title (deg)");
+	pGridLayout->addWidget(pText, 0, 3);
+	pGridLayout->addWidget(mpTilt_deg, 0, 4);
+
+	pText = new QLabel("Roll (deg)");
+	pGridLayout->addWidget(pText, 0, 6);
+	pGridLayout->addWidget(mpRoll_deg, 0, 7);
+
+	pGroupBox->setLayout(pGridLayout);
+	pMainLayout->addWidget(pGroupBox);
+
+	pMainLayout->addSpacing(10);
+
+	pMainLayout->addWidget(mpRecord);
 
 	pMainLayout->addSpacing(10);
 
@@ -100,6 +126,116 @@ void cMovementStepInfoDlg::createLayout()
 	pMainLayout->addWidget(buttonBox);
 
 	setLayout(pMainLayout);
+}
+
+bool cMovementStepInfoDlg::hasX() const
+{
+	return !mpX_mm->text().isEmpty();
+}
+
+int  cMovementStepInfoDlg::x_mm() const
+{
+	return mpX_mm->text().toInt();
+}
+
+bool cMovementStepInfoDlg::hasY() const
+{
+	return !mpY_mm->text().isEmpty();
+}
+
+int  cMovementStepInfoDlg::y_mm() const
+{
+	return mpY_mm->text().toInt();
+}
+
+bool cMovementStepInfoDlg::hasZ() const
+{
+	return !mpZ_mm->text().isEmpty();
+}
+
+int  cMovementStepInfoDlg::z_mm() const
+{
+	return mpZ_mm->text().toInt();
+}
+
+int  cMovementStepInfoDlg::speed_mmps() const
+{
+	return mpSpeed_mmps->text().toInt();
+}
+
+bool cMovementStepInfoDlg::hasPan() const
+{
+	return !mpPan_deg->text().isEmpty();
+}
+
+double cMovementStepInfoDlg::pan_deg() const
+{
+	return mpPan_deg->text().toDouble();
+}
+
+bool cMovementStepInfoDlg::hasTilt() const
+{
+	return !mpTilt_deg->text().isEmpty();
+}
+
+double cMovementStepInfoDlg::tilt_deg() const
+{
+	return mpTilt_deg->text().toDouble();
+}
+
+bool cMovementStepInfoDlg::hasRoll() const
+{
+	return !mpRoll_deg->text().isEmpty();
+}
+
+double cMovementStepInfoDlg::roll_deg() const
+{
+	return mpRoll_deg->text().toDouble();
+}
+
+bool cMovementStepInfoDlg::recording() const
+{
+	return mpRecord->isChecked();
+}
+
+void cMovementStepInfoDlg::setX_mm(int x_mm)
+{
+	mpX_mm->setText(QString::number(x_mm));
+}
+
+void cMovementStepInfoDlg::setY_mm(int y_mm)
+{
+	mpY_mm->setText(QString::number(y_mm));
+}
+
+void cMovementStepInfoDlg::setZ_mm(int z_mm)
+{
+	mpZ_mm->setText(QString::number(z_mm));
+}
+
+void cMovementStepInfoDlg::setSpeed_mmps(int speed_mmps)
+{
+	mpSpeed_mmps->setText(QString::number(speed_mmps));
+}
+
+void cMovementStepInfoDlg::setPan_deg(double pan_deg)
+{
+	mpPan_deg->setText(QString::number(pan_deg));
+}
+
+void cMovementStepInfoDlg::setTilt_deg(double tilt_deg)
+{
+	mpTilt_deg->setText(QString::number(tilt_deg));
+}
+
+void cMovementStepInfoDlg::setRoll_deg(double roll_deg)
+{
+	mpRoll_deg->setText(QString::number(roll_deg));
+}
+
+void cMovementStepInfoDlg::setRecording(bool recording)
+{
+	mpRecord->setChecked(recording);
 }
 
 

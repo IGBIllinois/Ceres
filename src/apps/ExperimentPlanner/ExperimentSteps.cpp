@@ -20,7 +20,12 @@
 
 namespace fs = std::filesystem;
 
-//-----------------------------------------------------------------------------
+
+/********************************************************************
+ *
+ * Experiment Step: Base Class
+ *
+ ********************************************************************/
 
 cExerimentStep::~cExerimentStep()
 {}
@@ -30,7 +35,13 @@ bool cExerimentStep::isDirty() const
 	return mDirty;
 }
 
-//-----------------------------------------------------------------------------
+
+
+/********************************************************************
+ *
+ * Experiment Step: Simple Delay
+ *
+ ********************************************************************/
 
 cConnectedItem* cExerimentStep_Delay::graphicsItem() const
 {
@@ -207,7 +218,42 @@ QString cExerimentStep_Delay::generateComment() const
 	return QString();
 }
 
-//-----------------------------------------------------------------------------
+
+/********************************************************************
+ *
+ * Experiment Step: Pause
+ *
+ ********************************************************************/
+
+cConnectedItem* cExerimentStep_Pause::graphicsItem() const
+{
+	auto step = new cIoStep();
+	step->setReadOnly(true);
+	step->setTitle("Wait for User OK to Advance...");
+
+	return step;
+}
+
+void cExerimentStep_Pause::load(const nlohmann::json& jdoc)
+{
+	using namespace nlohmann;
+}
+
+nlohmann::json cExerimentStep_Pause::save()
+{
+	nlohmann::json entry;
+
+	entry["type"] = "pause";
+
+	return entry;
+}
+
+
+/********************************************************************
+ *
+ * Experiment Step: SpiderCam Movement
+ *
+ ********************************************************************/
 
 cConnectedItem* cExerimentStep_Movement::graphicsItem() const
 {
@@ -306,7 +352,95 @@ nlohmann::json cExerimentStep_Movement::save()
 
 void cExerimentStep_Movement::onEdit()
 {
+	cMovementStepInfoDlg dlg;
 
+	if (mX_mm.has_value())
+		dlg.setX_mm(mX_mm.value());
+
+	if (mY_mm.has_value())
+		dlg.setY_mm(mY_mm.value());
+
+	if (mZ_mm.has_value())
+		dlg.setZ_mm(mZ_mm.value());
+
+	dlg.setSpeed_mmps(mSpeed_mmps);
+
+	if (mPan_deg.has_value())
+		dlg.setPan_deg(mPan_deg.value());
+
+	if (mTilt_deg.has_value())
+		dlg.setTilt_deg(mTilt_deg.value());
+
+	if (mRoll_deg.has_value())
+		dlg.setRoll_deg(mRoll_deg.value());
+
+	dlg.setSpeed_mmps(mSpeed_mmps);
+
+	dlg.setRecording(mRecording);
+
+	auto result = dlg.exec();
+
+	if (result == QDialog::Rejected)
+		return;
+
+	std::optional<int> x_mm;
+	if (dlg.hasX())
+	{
+		if (dlg.x_mm() > 0)
+			x_mm = dlg.x_mm();
+	}
+	mDirty = mX_mm != x_mm;
+	mX_mm = x_mm;
+
+	std::optional<int> y_mm;
+	if (dlg.hasY())
+	{
+		if (dlg.y_mm() > 0)
+			y_mm = dlg.y_mm();
+	}
+	mDirty = mY_mm != y_mm;
+	mY_mm = y_mm;
+
+	std::optional<int> z_mm;
+	if (dlg.hasZ())
+	{
+		if (dlg.z_mm() > 0)
+			z_mm = dlg.z_mm();
+	}
+	mDirty = mZ_mm != z_mm;
+	mZ_mm = z_mm;
+
+	int speed_mmps = dlg.speed_mmps();
+	mDirty = mSpeed_mmps != speed_mmps;
+	mSpeed_mmps = speed_mmps;
+
+	std::optional<int> pan_deg;
+	if (dlg.hasPan())
+	{
+		pan_deg = dlg.pan_deg();
+	}
+	mDirty = mPan_deg != pan_deg;
+	mPan_deg = pan_deg;
+
+	std::optional<int> tilt_deg;
+	if (dlg.hasTilt())
+	{
+		tilt_deg = dlg.tilt_deg();
+	}
+	mDirty = mTilt_deg != tilt_deg;
+	mTilt_deg = tilt_deg;
+
+	std::optional<int> roll_deg;
+	if (dlg.hasRoll())
+	{
+		roll_deg = dlg.roll_deg();
+	}
+	mDirty = mRoll_deg != roll_deg;
+	mRoll_deg = roll_deg;
+
+	bool recording = dlg.recording();
+	mDirty = mRecording != recording;
+	mRecording = recording;
 }
 
 QString cExerimentStep_Movement::generateMovementDescription() const

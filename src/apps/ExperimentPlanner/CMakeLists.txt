@@ -76,6 +76,8 @@ PRIVATE
 
     ExperimentFile.hpp
     ExperimentFile.cpp
+    ExperimentMetaInfo.hpp
+    ExperimentMetaInfo.cpp
     ExperimentSteps.hpp
     ExperimentSteps.cpp
 
@@ -83,6 +85,9 @@ PRIVATE
     ExperimentManager.cpp
     ExperimentTreeItem.hpp
     ExperimentTreeItem.cpp
+
+    FieldLayoutWidget.hpp
+    FieldLayoutWidget.cpp
 
     MainWindow.hpp
     MainWindow.cpp
