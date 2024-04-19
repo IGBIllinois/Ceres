@@ -7,6 +7,8 @@
 #include "FieldLayoutWidget.hpp"
 #include "ExperimentDesignWidget.hpp"
 
+#include "ExperimentSteps.hpp"
+
 #include "ExperimentMetaInfoDlg.hpp"
 
 #include "RappFieldBoundary.hpp"
@@ -62,21 +64,10 @@ void cMainWindow::initialize()
 
     createStatusBar();
 
-/*
-    mpScanArea = new cSpidercamScanArea(this);
-
-    auto* mainlayout = new QVBoxLayout();
-    mainlayout->addSpacing(10);
-    mainlayout->addWidget(mpScanArea);
-    mainlayout->addSpacing(10);
-
-    auto* centralWidget = new QWidget(this);
-    centralWidget->setLayout(mainlayout);
-
-    setCentralWidget(centralWidget);
-*/
-
     mpExpDesign = new cExperimentDesignWidget(this);
+    connect(mpExpDesign, &cExperimentDesignWidget::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(mpExpDesign, &cExperimentDesignWidget::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+
     setCentralWidget(mpExpDesign);
 }
 
@@ -186,10 +177,18 @@ void cMainWindow::createSubMenusAndActions()
     //
     // Build the File Sub Menu
     //
-    pMenuItem = new QAction(tr("New Experiment File"), this);
-    pMenuItem->setStatusTip(tr("Create a new experiment file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment);
-    mpFileMenu->addAction(pMenuItem);
+
+    QMenu* newMenu = mpFileMenu->addMenu(tr("New Experiment File..."));
+
+    pMenuItem = new QAction(tr("Blank"), this);
+    pMenuItem->setStatusTip(tr("Creates a blank experiment file"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment_Blank);
+    newMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("From GPS data"), this);
+    pMenuItem->setStatusTip(tr("Creates an experiment file from GPS data"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment_GPS);
+    newMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Open Experiment File..."), this);
     pMenuItem->setStatusTip(tr("Loads experiment file into memory"));
@@ -230,6 +229,16 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem = new QAction(tr("Default Experiment Directory"), this);
     pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading experiment files"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultExperimentDirectory);
+    mpPreferencesMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Default Field Layout File"), this);
+    pMenuItem->setStatusTip(tr("The default file for saving/loading the field layout"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultFieldLayoutFile);
+    mpPreferencesMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Default Plot Split Directory"), this);
+    pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading plot split files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultPlotSplitDirectory);
     mpPreferencesMenu->addAction(pMenuItem);
 
     // Build the View Menu
@@ -277,6 +286,11 @@ void cMainWindow::createDockWindows()
     mpFieldLayout = new cFieldLayoutWidget(dock);
     mpFieldLayout->initialize();
 
+    mpFieldLayout->setBounds(0, 190000, 0, 190000);
+
+    QString defaultFile = mSettings.value("Defaults/fieldLayoutFile").toString();
+    mpFieldLayout->load(defaultFile);
+
     dock->setWidget(mpFieldLayout);
     addDockWidget(Qt::RightDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
@@ -287,16 +301,8 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 {
 }
 
-
-/********************************************************************
- * Slots associated with "File" menu actions
- *******************************************************************/
-void cMainWindow::onFileNewExperiment()
-{
-
-}
-
-void cMainWindow::onFileOpenExperiment()
+//-----------------------------------------------------------------------------
+void cMainWindow::doSaveCheck()
 {
     if (mExperimentFile.isDirty())
     {
@@ -316,6 +322,31 @@ void cMainWindow::onFileOpenExperiment()
             return;
         }
     }
+}
+
+
+/********************************************************************
+ * Slots associated with "File" menu actions
+ *******************************************************************/
+void cMainWindow::onFileNewExperiment_Blank()
+{
+    doSaveCheck();
+
+    mExperimentFile.clearSteps();
+
+    mpExpDesign->loadExperiment(mExperimentFile);
+}
+
+void cMainWindow::onFileNewExperiment_GPS()
+{
+    doSaveCheck();
+
+    mExperimentFile.clearSteps();
+}
+
+void cMainWindow::onFileOpenExperiment()
+{
+    doSaveCheck();
 
     QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
 

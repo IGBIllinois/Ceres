@@ -59,7 +59,8 @@ public slots:
 
 // Slots associated with "File" menu actions
 private slots:
-    void onFileNewExperiment();
+    void onFileNewExperiment_Blank();
+    void onFileNewExperiment_GPS();
     void onFileOpenExperiment();
     void onFileSaveExperimentFile();
     void onFileSaveAsExperimentFile();
@@ -90,6 +91,8 @@ private:
     void createStatusBar();
     void createDockWindows();
     void createDataModel(const nlohmann::json& configDoc);
+
+    void doSaveCheck();
 
 private:
     QSettings mSettings;
