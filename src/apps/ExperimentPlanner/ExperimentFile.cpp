@@ -31,9 +31,36 @@ const std::string& cExperimentFile::getFileName() const
 	return mFileName;
 }
 
+void cExperimentFile::setFileName(const std::string& filename)
+{
+	mFileName = filename;
+}
+
+
+const std::string& cExperimentFile::getLayoutName() const
+{
+	return mLayoutName;
+}
+
+void cExperimentFile::setLayoutName(const std::string& layout_name)
+{
+	mDirty = mLayoutName != layout_name;
+	mLayoutName = layout_name;
+}
+
 bool cExperimentFile::isDirty() const
 {
-	bool dirty = mMetaInfo.isDirty();
+	if (mMetaInfo.isDirty())
+		return true;
+
+	if (mpController && mpController->isDirty())
+		return true;
+
+	for (const auto sensor : mSensors)
+	{
+		if (sensor->isDirty())
+			return true;
+	}
 
 	for (const auto step : mSteps)
 	{
@@ -41,20 +68,34 @@ bool cExperimentFile::isDirty() const
 			return true;
 	}
 
-	return dirty;
+	return mDirty;
 }
 
 void cExperimentFile::clear()
 {
 	mFileName.clear();
+	mLayoutName.clear();
 
 	mMetaInfo.clear();
+	mpController.reset();
 
+	for (auto sensor : mSensors)
+	{
+		delete sensor;
+	}
+	mSensors.clear();
+
+	clearSteps();
+
+	mDirty = false;
+}
+
+void cExperimentFile::clearSteps()
+{
 	for (auto step : mSteps)
 	{
 		delete step;
 	}
-
 	mSteps.clear();
 }
 
@@ -85,6 +126,40 @@ void cExperimentFile::open(const std::string& file_name)
 	mFileName = file_name;
 
 	mMetaInfo.load(configDoc);
+
+	std::string controller = configDoc["controller"];
+
+	if (controller == cExperimentCtrlInfo_SpiderCam::type())
+	{
+		mpController = std::make_unique<cExperimentCtrlInfo_SpiderCam>();
+		mpController->load(configDoc[cExperimentCtrlInfo_SpiderCam::type()]);
+	}
+	else
+		mpController = std::make_unique<cExperimentCtrlInfo_Dummy>();
+
+	auto sensors = configDoc["sensors"];
+
+	cExperimentSensorInfo* pSensor = nullptr;
+	for (std::string sensor : sensors)
+	{
+		if (sensor == cExperimentSensorInfo_Ouster::type())
+		{
+			pSensor = new cExperimentSensorInfo_Ouster();
+		}
+		else if (sensor == cExperimentSensorInfo_Septentrio::type())
+		{
+			pSensor = new cExperimentSensorInfo_Septentrio();
+		}
+		else
+		{
+			pSensor = new cExperimentSensorInfo_Dummy();
+		}
+
+		if (configDoc.contains(pSensor->getType()))
+			pSensor->load(configDoc[pSensor->getType()]);
+
+		mSensors.push_back(pSensor);
+	}
 
 	if (configDoc.contains("experiment"))
 	{
@@ -122,17 +197,7 @@ void cExperimentFile::save()
 
 	nlohmann::json configDoc;
 
-	mMetaInfo.save(configDoc);
-
-	nlohmann::json stepsDoc;
-
-	for (auto step : mSteps)
-	{
-		stepsDoc.push_back(step->save());
-	}
-
-	if (!stepsDoc.is_null())
-		configDoc["experiment"] = stepsDoc;
+	buildDocument(configDoc);
 
 	std::ofstream out;
 	out.open(mFileName, std::ios::trunc);
@@ -140,22 +205,15 @@ void cExperimentFile::save()
 		return;
 
 	out << std::setw(4) << configDoc << std::endl;
+
+	mDirty = false;
 }
 
 void cExperimentFile::save_as(const std::string& file_name)
 {
 	nlohmann::json configDoc;
 
-//	configDoc["options"] = mOptions.save();
-
-	nlohmann::json stepsDoc;
-
-	for (auto step : mSteps)
-	{
-		stepsDoc.push_back(step->save());
-	}
-
-	configDoc["experiment"] = stepsDoc;
+	buildDocument(configDoc);
 
 	std::ofstream out;
 	out.open(file_name);
@@ -165,6 +223,56 @@ void cExperimentFile::save_as(const std::string& file_name)
 	out << std::setw(4) << configDoc << std::endl;
 
 	mFileName = file_name;
+
+	mDirty = false;
+}
+
+void cExperimentFile::buildDocument(nlohmann::json& configDoc)
+{
+	mMetaInfo.save(configDoc);
+
+	if (mpController)
+	{
+		configDoc["controller"] = mpController->getType();
+	}
+	else
+	{
+		configDoc["controller"] = "dummy";
+	}
+
+	nlohmann::json sensorList;
+	if (mSensors.empty())
+	{
+		sensorList.push_back("dummy");
+	}
+	else
+	{
+		for (auto sensor : mSensors)
+		{
+			sensorList.push_back(sensor->getType());
+		}
+	}
+
+	configDoc["sensors"] = sensorList;
+
+	if (mpController)
+	{
+		mpController->save(configDoc);
+	}
+
+	for (auto sensor : mSensors)
+	{
+		sensor->save(configDoc);
+	}
+
+	nlohmann::json stepsDoc;
+
+	for (auto step : mSteps)
+	{
+		stepsDoc.push_back(step->save());
+	}
+
+	configDoc["experiment"] = stepsDoc;
 }
 
 bool cExperimentFile::empty() const
@@ -189,6 +297,26 @@ bool cExperimentFile::contains(const std::string& name)
 	return false;
 }
 */
+
+cExperimentCtrlInfo* const cExperimentFile::getController() const
+{
+	return mpController.get();
+}
+
+void cExperimentFile::setController(cExperimentCtrlInfo* controller)
+{
+	mpController.reset(controller);
+}
+
+const std::vector<cExperimentSensorInfo*>& cExperimentFile::getSensors() const
+{
+	return mSensors;
+}
+
+void cExperimentFile::addSensor(cExperimentSensorInfo* sensor)
+{
+	mSensors.push_back(sensor);
+}
 
 const cExerimentStep& cExperimentFile::front() const { return *(mSteps.front()); }
 cExerimentStep& cExperimentFile::front() { return *(mSteps.front()); }

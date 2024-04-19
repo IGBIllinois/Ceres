@@ -100,6 +100,18 @@ class cExerimentStep_Movement : public QObject, public cExerimentStep
 public:
 	cExerimentStep_Movement() = default;
 
+	const std::optional<int>& getX_mm() const;
+	const std::optional<int>& getY_mm() const;
+	const std::optional<int>& getZ_mm() const;
+
+	int getSpeed_mmps() const;
+
+	const std::optional<double>& getPan_deg() const;
+	const std::optional<double>& getTilt_deg() const;
+	const std::optional<double>& getRoll_deg() const;
+
+	bool isRecording() const;
+
 	cConnectedItem* graphicsItem() const override;
 
 signals:

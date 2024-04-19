@@ -255,6 +255,18 @@ nlohmann::json cExerimentStep_Pause::save()
  *
  ********************************************************************/
 
+const std::optional<int>& cExerimentStep_Movement::getX_mm() const { return mX_mm; }
+const std::optional<int>& cExerimentStep_Movement::getY_mm() const { return mY_mm; }
+const std::optional<int>& cExerimentStep_Movement::getZ_mm() const { return mZ_mm; }
+
+int cExerimentStep_Movement::getSpeed_mmps() const { return mSpeed_mmps; }
+
+const std::optional<double>& cExerimentStep_Movement::getPan_deg() const { return mPan_deg; }
+const std::optional<double>& cExerimentStep_Movement::getTilt_deg() const { return mTilt_deg; }
+const std::optional<double>& cExerimentStep_Movement::getRoll_deg() const { return mRoll_deg; }
+
+bool cExerimentStep_Movement::isRecording() const { return mRecording; }
+
 cConnectedItem* cExerimentStep_Movement::graphicsItem() const
 {
 	auto step = new cProcessStep();

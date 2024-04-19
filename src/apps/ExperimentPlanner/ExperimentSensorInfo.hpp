@@ -30,6 +30,22 @@ protected:
 };
 
 
+class cExperimentSensorInfo_Dummy : public cExperimentSensorInfo
+{
+public:
+	cExperimentSensorInfo_Dummy();
+	virtual ~cExperimentSensorInfo_Dummy();
+
+	static const char* type();
+
+	std::string getType() const override;
+
+protected:
+	void load(const nlohmann::json& jdoc) override;
+	void save(nlohmann::json& jdoc) override;
+};
+
+
 class cExperimentSensorInfo_Ouster : public cExperimentSensorInfo
 {
 public:

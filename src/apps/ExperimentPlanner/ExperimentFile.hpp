@@ -2,13 +2,19 @@
 #pragma once
 
 #include "ExperimentMetaInfo.hpp"
+#include "ExperimentCtrlInfo.hpp"
+#include "ExperimentSensorInfo.hpp"
+
+#include <nlohmann/json.hpp>
 
 #include <QtWidgets>
 #include <QDialog>
 
 #include <filesystem>
+#include <vector>
 #include <list>
 #include <string>
+#include <memory>
 
 
 // Qt Forward Declaration
@@ -33,10 +39,15 @@ public:
 	~cExperimentFile();
 
 	const std::string& getFileName() const;
+	void setFileName(const std::string& filename);
+
+	const std::string& getLayoutName() const;
+	void setLayoutName(const std::string& filename);
 
 	bool isDirty() const;
 
 	void clear();
+	void clearSteps();
 
 	void open(const std::string& file_name);
 
@@ -47,7 +58,13 @@ public:
 	bool empty() const;
 	std::size_t size() const;
 
-//	bool contains(const std::string& name);
+	cExperimentCtrlInfo* const getController() const;
+	void setController(cExperimentCtrlInfo* controller);
+
+	const std::vector<cExperimentSensorInfo*>& getSensors() const;
+	void addSensor(cExperimentSensorInfo* sensor);
+
+	//	bool contains(const std::string& name);
 
 	const cExerimentStep& front() const;
 	cExerimentStep& front();
@@ -70,12 +87,22 @@ public:
 	const cExerimentStep& operator[](int index) const;
 	cExerimentStep& operator[](int index);
 
+private:
+	void buildDocument(nlohmann::json& jdoc);
 
 private:
 	std::filesystem::path	mExperimentPath;
 	std::string	mFileName;
 
+	std::string	mLayoutName;
+
+	bool mDirty = false;
+
 	cExperimentMetaInfo mMetaInfo;
+
+	std::unique_ptr<cExperimentCtrlInfo> mpController;
+
+	std::vector<cExperimentSensorInfo*> mSensors;
 
 	std::list<cExerimentStep*> mSteps;
 };

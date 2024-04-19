@@ -21,6 +21,8 @@ class cExperimentFile;
 
 class cExperimentDesignWidget : public QGraphicsView
 {
+    Q_OBJECT
+
 public:
 	explicit cExperimentDesignWidget(QWidget* parent = nullptr);
 
@@ -29,15 +31,16 @@ public:
 
 	QSize minimumSizeHint() const override;
 	QSize sizeHint() const override;
-	
+
+signals:
+    void clearPaths();
+    void drawPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
+
 public slots:
     void setPen(const QPen &pen);
     void setBrush(const QBrush &brush);
     void setAntialiased(bool antialiased);
     void setTransformed(bool transformed);
-
-protected:
-//    void paintEvent(QPaintEvent *event) override;
 
 private:
     QGraphicsScene mScene;

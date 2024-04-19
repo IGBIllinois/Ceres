@@ -78,6 +78,10 @@ PRIVATE
     ExperimentFile.cpp
     ExperimentMetaInfo.hpp
     ExperimentMetaInfo.cpp
+    ExperimentCtrlInfo.hpp
+    ExperimentCtrlInfo.cpp
+    ExperimentSensorInfo.hpp
+    ExperimentSensorInfo.cpp
     ExperimentSteps.hpp
     ExperimentSteps.cpp
 
@@ -113,6 +117,7 @@ endif()
 
 target_include_directories(CeresExperimentPlanner PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(CeresExperimentPlanner PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
+target_include_directories(CeresExperimentPlanner PRIVATE ${SENSORS_INCLUDE_DIR})
 
 target_link_libraries(CeresExperimentPlanner PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresExperimentPlanner PRIVATE ${Qt}::Multimedia)

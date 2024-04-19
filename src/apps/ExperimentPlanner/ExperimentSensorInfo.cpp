@@ -1,6 +1,7 @@
 
 #include "ExperimentSensorInfo.hpp"
 
+#include "DummySensorFactory.hpp"
 #include "GPS/Septentrio/SsnxFactory.hpp"
 #include "Lidar/Ouster/OusterFactory.hpp"
 #include "RGB/AxisCommunications/AxisCommunicationsFactory.hpp"
@@ -18,6 +19,23 @@ bool cExperimentSensorInfo::isDirty() const
 {
 	return mDirty;
 }
+
+
+
+cExperimentSensorInfo_Dummy::cExperimentSensorInfo_Dummy()
+{}
+
+cExperimentSensorInfo_Dummy::~cExperimentSensorInfo_Dummy()
+{}
+
+const char* cExperimentSensorInfo_Dummy::type() { return dummy_id; }
+std::string cExperimentSensorInfo_Dummy::getType() const { return type(); }
+
+void cExperimentSensorInfo_Dummy::load(const nlohmann::json& jdoc)
+{}
+
+void cExperimentSensorInfo_Dummy::save(nlohmann::json& jdoc)
+{}
 
 
 
