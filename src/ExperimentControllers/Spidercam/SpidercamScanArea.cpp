@@ -2,12 +2,40 @@
 #include "SpidercamScanArea.hpp"
 #include "../../Utilities/Constants.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <QPaintEvent>
 
 #include <fstream>
+#include <algorithm>
 
-#include <nlohmann/json.hpp>
 
+bool cSpidercamScanArea::captionLayout_t::operator==(const captionLayout_t& rhs) const
+{
+	return (color == rhs.color) && (label == rhs.label) && (font_size == rhs.font_size)
+		&& (horizontal_align == rhs.horizontal_align) && (vertical_align == rhs.vertical_align)
+		&& (orientation_deg == rhs.orientation_deg);
+}
+
+bool cSpidercamScanArea::screen_t::contains(int x, int y) const
+{
+	if ((x < min_x) || (x > max_x)) return false;
+	if ((y < min_y) || (y > max_y)) return false;
+
+	return true;
+}
+
+bool cSpidercamScanArea::experimentLayout_t::operator==(const experimentLayout_t& rhs) const
+{
+	return (x_mm == rhs.x_mm) && (y_mm == rhs.y_mm) && (height_mm == rhs.height_mm) && (width_mm == rhs.width_mm)
+		&& (east_m == rhs.east_m) && (north_m == rhs.north_m) && (west_m == rhs.west_m) && (south_m == rhs.south_m)
+		&& (color == rhs.color) && (caption == rhs.caption);
+}
+
+bool cSpidercamScanArea::experimentLayout_t::operator==(const QString& label) const
+{
+	return caption.label == label;
+}
 
 cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 :
@@ -99,6 +127,27 @@ cSpidercamScanArea::~cSpidercamScanArea()
 {
 }
 
+bool cSpidercamScanArea::isDollyPositionVisible() const
+{
+	return mShowDollyPosition;
+}
+
+void cSpidercamScanArea::hideDollyPosition(bool hide)
+{
+	mShowDollyPosition = !hide;
+}
+
+void cSpidercamScanArea::showDollyPosition(bool show)
+{
+	mShowDollyPosition = show;
+}
+
+void cSpidercamScanArea::setDollyColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+	mDollyColor.setRgb(r, g, b, a);
+	mDollyPen.setColor(mDollyColor);
+}
+
 bool cSpidercamScanArea::isRecording() const
 {
 	return mIsRecording;
@@ -126,6 +175,11 @@ void cSpidercamScanArea::clearRecordedPath()
 {
 	mMeasurementPaths.clear();
 	mpActivePath = nullptr;
+}
+
+void cSpidercamScanArea::setMeasurementColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+	mMeasurementColor.setRgb(r, g, b, a);
 }
 
 void cSpidercamScanArea::updateDollyPosition(uint32_t x, uint32_t y)
@@ -410,6 +464,47 @@ void cSpidercamScanArea::saveLayout(const std::string& layout_filename)
 	out << std::setw(4) << layoutDoc << std::endl;
 }
 
+void cSpidercamScanArea::clearLayouts()
+{
+	mLayouts.clear();
+
+	repaint();
+}
+
+void cSpidercamScanArea::addLayout(const experimentLayout_t& layout)
+{
+	mLayouts.push_back(layout);
+
+	repaint();
+}
+
+void cSpidercamScanArea::replaceLayout(const experimentLayout_t& original_layout, const experimentLayout_t& new_layout)
+{
+	auto it = std::find(mLayouts.begin(), mLayouts.end(), original_layout);
+
+	if (it == mLayouts.end())
+	{
+		mLayouts.push_back(new_layout);
+	}
+	else
+		*it = new_layout;
+
+	repaint();
+}
+
+const std::vector<cSpidercamScanArea::experimentLayout_t>& cSpidercamScanArea::getLayouts() const
+{
+	return mLayouts;
+}
+
+std::tuple<int, int> cSpidercamScanArea::toSpiderCamCoordinates(int window_x, int window_y)
+{
+	int x = mMinX + (window_x - mX_Offset) / mX_Scale;
+	int y = mMaxY - (window_y - mY_Offset) / mY_Scale;
+
+	return { x, y };
+}
+
 void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 {
 	QPainter painter(this);
@@ -454,14 +549,16 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		painter.drawPolygon(greenway.data(), 8);
 
 		// Draw the spidercam border and tower markings
+		mBorderWidth  = window_height;
+		mBorderHeight = window_height;
 		painter.setPen(mBorderPen);
 		painter.setBrush(mBorderBrush);
-		painter.drawRect(mX_Offset, mY_Offset, window_height, window_height);
+		painter.drawRect(mX_Offset, mY_Offset, mBorderWidth, mBorderHeight);
 
 		auto xBounds = metrics.tightBoundingRect("X");
-		painter.drawText(QPoint(mX_Offset - w1Bounds.width(), window_height), QString("W1"));
-		painter.drawText(QPoint(mX_Offset + window_height + xBounds.width(), window_height), QString("W2"));
-		painter.drawText(QPoint(mX_Offset + window_height + xBounds.width(), xBounds.height()), QString("W3"));
+		painter.drawText(QPoint(mX_Offset - w1Bounds.width(), mBorderHeight), QString("W1"));
+		painter.drawText(QPoint(mX_Offset + mBorderWidth + xBounds.width(), mBorderHeight), QString("W2"));
+		painter.drawText(QPoint(mX_Offset + mBorderWidth + xBounds.width(), xBounds.height()), QString("W3"));
 		painter.drawText(QPoint(mX_Offset - w4Bounds.width(), w4Bounds.height()), QString("W4"));
 	}
 	else
@@ -495,39 +592,44 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		painter.drawPolygon(greenway.data(), 8);
 
 		// Draw the spidercam border and tower markings
+		mBorderWidth = l;
+		mBorderHeight = l;
 		painter.setPen(mBorderPen);
 		painter.setBrush(mBorderBrush);
-		painter.drawRect(mX_Offset, mY_Offset, l, l);
+		painter.drawRect(mX_Offset, mY_Offset, mBorderWidth, mBorderHeight);
 
-		double y = mY_Offset + l + w1Bounds.height() + 3;
+		double y = mY_Offset + mBorderHeight + w1Bounds.height() + 3;
 		painter.drawText(QPoint(mX_Offset, y), QString("W1"));
-		painter.drawText(QPoint(mX_Offset + l - w3Bounds.width(), y), QString("W2"));
-		painter.drawText(QPoint(mX_Offset + l - w3Bounds.width(), mY_Offset - 3), QString("W3"));
+		painter.drawText(QPoint(mX_Offset + mBorderWidth - w3Bounds.width(), y), QString("W2"));
+		painter.drawText(QPoint(mX_Offset + mBorderWidth - w3Bounds.width(), mY_Offset - 3), QString("W3"));
 		painter.drawText(QPoint(mX_Offset, mY_Offset - 3), QString("W4"));
-
-		window_height = l;
 	}
 
-	for (const auto& layout : mLayouts)
+	for (auto& layout : mLayouts)
 	{
 		drawLayout(painter, window_height, layout);
 	}
 
-	if (mHasSecondaryPosition)
+	if (mShowDollyPosition && mHasSecondaryPosition)
 	{
 		drawDollyMarker(painter, window_height,
 			mSecondaryDollyPosition, mSecondaryDollyPen, mSecondaryDollyBrush);
 	}
 
-	drawDollyMarker(painter, window_height, mDollyPosition, mDollyPen, mDollyBrush);
+	if (mShowDollyPosition)
+		drawDollyMarker(painter, window_height, mDollyPosition, mDollyPen, mDollyBrush);
+
 	drawPath(painter, window_height);
 }
 
 
-void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const experimentLayout_t& layout)
+void cSpidercamScanArea::drawLayout(QPainter& painter, double height, experimentLayout_t& layout)
 {
 	painter.save();
 	painter.setPen(QPen(layout.color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
+	int field_offset_x = layout.x_mm - mMinX;
+	int field_offset_y = layout.y_mm - mMinY;
 
 	int x = mX_Scale * (layout.x_mm - mMinX) + mX_Offset;
 	int y = mY_Scale * (layout.y_mm - mMinY) + mY_Offset;
@@ -536,6 +638,23 @@ void cSpidercamScanArea::drawLayout(QPainter& painter, double height, const expe
 	double aspectRatio = static_cast<double>(w) / static_cast<double>(h);
 
 	y = height - y - h;
+
+	if (parent())
+	{
+		auto p1 = mapToParent(QPoint(x, y));
+		auto p2 = mapToParent(QPoint(x + w, y + h));
+		layout.pos.min_x = p1.x();
+		layout.pos.min_y = p1.y();
+		layout.pos.max_x = p2.x();
+		layout.pos.max_y = p2.y();
+	}
+	else
+	{
+		layout.pos.min_x = x;
+		layout.pos.min_y = y;
+		layout.pos.max_x = x + w;
+		layout.pos.max_y = y + h;
+	}
 
 	painter.drawRect(x, y, w, h);
 
