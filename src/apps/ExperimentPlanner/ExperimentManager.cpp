@@ -27,9 +27,12 @@ cExperimentManager::cExperimentManager(const QString& path, QWidget* parent)
     setSelectionBehavior(QAbstractItemView::SelectItems);
     setSelectionMode(QAbstractItemView::SingleSelection);
 
-    if (!fs::exists(mExperimentPath))
+    if (!path.isEmpty())
     {
-        fs::create_directory(mExperimentPath);
+        if (!fs::exists(mExperimentPath))
+        {
+            fs::create_directory(mExperimentPath);
+        }
     }
 
     loadExperiments();
@@ -61,6 +64,9 @@ const cExperimentTreeItem* cExperimentManager::experiments() const
 
 void cExperimentManager::loadExperiments()
 {
+    if (mExperimentPath.string().empty())
+        return;
+
 //    mpExperimentItems = new cExperimentTreeItem(this, "Experiments");
 
 //    loadExperiments(*mpExperimentItems, mExperimentPath);
