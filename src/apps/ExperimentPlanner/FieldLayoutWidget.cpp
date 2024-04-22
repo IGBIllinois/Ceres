@@ -1,5 +1,6 @@
 
 #include "FieldLayoutWidget.hpp"
+#include "FieldLayoutDlg.hpp"
 
 #include "Spidercam/SpidercamScanArea.hpp"
 
@@ -25,6 +26,11 @@ void cFieldLayoutWidget::initialize()
     mainlayout->addSpacing(10);
 
     setLayout(mainlayout);
+}
+
+bool cFieldLayoutWidget::isDirty() const
+{
+    return mDirty;
 }
 
 void cFieldLayoutWidget::setBounds(double minX_mm, double maxX_mm, double minY_mm, double maxY_mm)
@@ -77,6 +83,25 @@ void cFieldLayoutWidget::contextMenuEvent(QContextMenuEvent* event)
 
         if (layout.pos.contains(x, y))
         {
+            auto original = layout;
+
+            cFieldLayoutDlg dlg(this);
+
+            dlg.setDefaults(original);
+
+            auto result = dlg.exec();
+
+            if (result == QDialog::Rejected)
+                return;
+
+            auto new_layout = dlg.getLayout();
+
+            if (original != new_layout)
+            {
+                mpScanArea->replaceLayout(original, new_layout);
+                mDirty = true;
+            }
+
             break;
         }
     }

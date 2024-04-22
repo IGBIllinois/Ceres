@@ -93,6 +93,9 @@ PRIVATE
     FieldBoundaryDlg.hpp
     FieldBoundaryDlg.cpp
 
+    FieldLayoutDlg.hpp
+    FieldLayoutDlg.cpp
+
     FieldLayoutWidget.hpp
     FieldLayoutWidget.cpp
 

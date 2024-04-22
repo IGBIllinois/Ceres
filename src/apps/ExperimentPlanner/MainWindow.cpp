@@ -482,3 +482,33 @@ void cMainWindow::onHelpAbout()
 {
 }
 
+//-----------------------------------------------------------------------------
+void cMainWindow::closeEvent(QCloseEvent* event)
+{
+/*
+    if (mPlotData.isDirty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The plot configuration file has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
+
+        if (ret == QMessageBox::Save)
+        {
+            onFileSavePlotConfigFile();
+        }
+        else if (ret == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
+    }
+*/
+
+//    mSettings.setValue("mainWindow/geometry", saveGeometry());
+//    mSettings.setValue("mainWindow/windowState", saveState());
+    QMainWindow::closeEvent(event);
+}
+

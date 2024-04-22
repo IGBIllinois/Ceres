@@ -80,6 +80,9 @@ private slots:
 private slots:
     void onHelpAbout();
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     bool loadExperiment(const cExperimentTreeItem& experiment);
     bool loadExperiment(const std::filesystem::path& experiment);

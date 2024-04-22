@@ -25,6 +25,8 @@ public:
 
 	void initialize();
 
+	bool isDirty() const;
+
 	void setBounds(double minX_mm, double maxX_mm, double minY_mm, double maxY_mm);
 
 	void load(const QString& layout_filename);
@@ -38,6 +40,8 @@ protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
+	bool mDirty = false;
+
 	cSpidercamScanArea* mpScanArea = nullptr;
 
 };
