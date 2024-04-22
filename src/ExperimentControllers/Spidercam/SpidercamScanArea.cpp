@@ -17,6 +17,11 @@ bool cSpidercamScanArea::captionLayout_t::operator==(const captionLayout_t& rhs)
 		&& (orientation_deg == rhs.orientation_deg);
 }
 
+bool cSpidercamScanArea::captionLayout_t::operator!=(const captionLayout_t& rhs) const
+{
+	return !operator==(rhs);
+}
+
 bool cSpidercamScanArea::screen_t::contains(int x, int y) const
 {
 	if ((x < min_x) || (x > max_x)) return false;
@@ -25,11 +30,24 @@ bool cSpidercamScanArea::screen_t::contains(int x, int y) const
 	return true;
 }
 
+void cSpidercamScanArea::experimentLayout_t::computeBounds()
+{
+	x_mm = north_m * nConstants::M_TO_MM;
+	y_mm = west_m * nConstants::M_TO_MM;
+	height_mm = (east_m - west_m) * nConstants::M_TO_MM;
+	width_mm = (south_m - north_m) * nConstants::M_TO_MM;
+}
+
 bool cSpidercamScanArea::experimentLayout_t::operator==(const experimentLayout_t& rhs) const
 {
 	return (x_mm == rhs.x_mm) && (y_mm == rhs.y_mm) && (height_mm == rhs.height_mm) && (width_mm == rhs.width_mm)
 		&& (east_m == rhs.east_m) && (north_m == rhs.north_m) && (west_m == rhs.west_m) && (south_m == rhs.south_m)
 		&& (color == rhs.color) && (caption == rhs.caption);
+}
+
+bool cSpidercamScanArea::experimentLayout_t::operator!=(const experimentLayout_t& rhs) const
+{
+	return !operator==(rhs);
 }
 
 bool cSpidercamScanArea::experimentLayout_t::operator==(const QString& label) const
@@ -276,10 +294,7 @@ void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
 			expLayout.west_m = layout["west (m)"];
 			expLayout.south_m = layout["south (m)"];
 
-			expLayout.x_mm = expLayout.north_m * nConstants::M_TO_MM;
-			expLayout.y_mm = expLayout.west_m * nConstants::M_TO_MM;
-			expLayout.height_mm = (expLayout.east_m - expLayout.west_m) * nConstants::M_TO_MM;
-			expLayout.width_mm = (expLayout.south_m - expLayout.north_m) * nConstants::M_TO_MM;
+			expLayout.computeBounds();
 
 			// caption information
 			auto caption = layout["caption"];

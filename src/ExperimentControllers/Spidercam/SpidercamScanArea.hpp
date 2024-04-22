@@ -32,6 +32,7 @@ public:
         float orientation_deg = 0;
 
         bool operator==(const captionLayout_t& rhs) const;
+        bool operator!=(const captionLayout_t& rhs) const;
     };
 
     struct screen_t
@@ -62,7 +63,10 @@ public:
 
         screen_t pos;
 
+        void computeBounds();
+
         bool operator==(const experimentLayout_t& rhs) const;
+        bool operator!=(const experimentLayout_t& rhs) const;
         bool operator==(const QString& label) const;
     };
 
