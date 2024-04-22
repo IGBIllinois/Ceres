@@ -90,6 +90,9 @@ PRIVATE
     ExperimentTreeItem.hpp
     ExperimentTreeItem.cpp
 
+    FieldBoundaryDlg.hpp
+    FieldBoundaryDlg.cpp
+
     FieldLayoutWidget.hpp
     FieldLayoutWidget.cpp
 

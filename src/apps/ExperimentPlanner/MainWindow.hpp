@@ -74,6 +74,7 @@ private slots:
     void onPreferenceDefaultExperimentDirectory();
     void onPreferenceDefaultFieldLayoutFile();
     void onPreferenceDefaultPlotSplitDirectory();
+    void onPreferenceDefaultFieldBoundaries();
 
 // Slots associated with "Help" menu actions
 private slots:

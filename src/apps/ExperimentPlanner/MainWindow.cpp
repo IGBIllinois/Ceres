@@ -12,6 +12,7 @@
 #include "ExperimentMetaInfoDlg.hpp"
 
 #include "RappFieldBoundary.hpp"
+#include "FieldBoundaryDlg.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>
@@ -40,7 +41,9 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     setUnifiedTitleAndToolBarOnMac(true);
 
-    mExperimentFilesPath = mSettings.value("Defaults/experimentDirectory").toString();
+    auto cwd = std::filesystem::current_path();
+
+    mExperimentFilesPath = mSettings.value("Defaults/experimentDirectory", cwd.c_str()).toString();
     mFieldLayoutFile = mSettings.value("Defaults/fieldLayoutFile").toString();
     mPlotSplitsPath = mSettings.value("Defaults/plotSplitDirectory").toString();
 }
@@ -241,6 +244,13 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultPlotSplitDirectory);
     mpPreferencesMenu->addAction(pMenuItem);
 
+    mpPreferencesMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Default Field Boundaries"), this);
+    pMenuItem->setStatusTip(tr("Sets the default field boundaries"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultFieldBoundaries);
+    mpPreferencesMenu->addAction(pMenuItem);
+
     // Build the View Menu
     /* The view menu is built by the dock window system */
 
@@ -286,7 +296,12 @@ void cMainWindow::createDockWindows()
     mpFieldLayout = new cFieldLayoutWidget(dock);
     mpFieldLayout->initialize();
 
-    mpFieldLayout->setBounds(0, 190000, 0, 190000);
+    auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 0).toInt();
+    auto maxX_mm = mSettings.value("Defaults/fieldBounds/maxX_mm", 190000).toInt();
+    auto minY_mm = mSettings.value("Defaults/fieldBounds/minY_mm", 0).toInt();
+    auto maxY_mm = mSettings.value("Defaults/fieldBounds/maxY_mm", 190000).toInt();
+
+    mpFieldLayout->setBounds(minX_mm, maxX_mm, minY_mm, maxY_mm);
 
     QString defaultFile = mSettings.value("Defaults/fieldLayoutFile").toString();
     mpFieldLayout->load(defaultFile);
@@ -426,6 +441,38 @@ void cMainWindow::onPreferenceDefaultPlotSplitDirectory()
         return;
 
     mSettings.setValue("Defaults/plotSplitDirectory", directory);
+}
+
+void cMainWindow::onPreferenceDefaultFieldBoundaries()
+{
+    auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 0).toInt();
+    auto maxX_mm = mSettings.value("Defaults/fieldBounds/maxX_mm", 190000).toInt();
+    auto minY_mm = mSettings.value("Defaults/fieldBounds/minY_mm", 0).toInt();
+    auto maxY_mm = mSettings.value("Defaults/fieldBounds/maxY_mm", 190000).toInt();
+
+    cFieldBoundaryDlg dlg(this);
+
+    dlg.setMinX_mm(minX_mm);
+    dlg.setMaxX_mm(maxX_mm);
+    dlg.setMinY_mm(minY_mm);
+    dlg.setMaxY_mm(maxY_mm);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    minX_mm = dlg.minX_mm();
+    maxX_mm = dlg.maxX_mm();
+    minY_mm = dlg.minY_mm();
+    maxY_mm = dlg.maxY_mm();
+
+    mpFieldLayout->setBounds(minX_mm, maxX_mm, minY_mm, maxY_mm);
+
+    mSettings.setValue("Defaults/fieldBounds/minX_mm", minX_mm);
+    mSettings.setValue("Defaults/fieldBounds/maxX_mm", maxX_mm);
+    mSettings.setValue("Defaults/fieldBounds/minY_mm", minY_mm);
+    mSettings.setValue("Defaults/fieldBounds/maxY_mm", maxY_mm);
 }
 
 /********************************************************************
