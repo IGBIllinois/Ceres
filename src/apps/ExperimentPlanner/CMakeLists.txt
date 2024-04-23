@@ -85,6 +85,9 @@ PRIVATE
     ExperimentSteps.hpp
     ExperimentSteps.cpp
 
+    ExperimentFieldLayoutDlg.hpp
+    ExperimentFieldLayoutDlg.cpp
+
     ExperimentManager.hpp
     ExperimentManager.cpp
     ExperimentTreeItem.hpp
