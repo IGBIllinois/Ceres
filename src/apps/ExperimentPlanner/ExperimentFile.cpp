@@ -36,16 +36,26 @@ void cExperimentFile::setFileName(const std::string& filename)
 	mFileName = filename;
 }
 
+const std::string& cExperimentFile::getExperimentName() const
+{
+	return mExperimentName;
+}
+
+void cExperimentFile::setExperimentName(const std::string& name)
+{
+	mDirty = mExperimentName != name;
+	mExperimentName = name;
+}
 
 const std::string& cExperimentFile::getLayoutName() const
 {
 	return mLayoutName;
 }
 
-void cExperimentFile::setLayoutName(const std::string& layout_name)
+void cExperimentFile::setLayoutName(const std::string& name)
 {
-	mDirty = mLayoutName != layout_name;
-	mLayoutName = layout_name;
+	mDirty = mLayoutName != name;
+	mLayoutName = name;
 }
 
 bool cExperimentFile::isDirty() const
@@ -75,6 +85,7 @@ void cExperimentFile::clear()
 {
 	mFileName.clear();
 	mLayoutName.clear();
+	mExperimentName.clear();
 
 	mMetaInfo.clear();
 	mpController.reset();
@@ -124,6 +135,14 @@ void cExperimentFile::open(const std::string& file_name)
 	}
 
 	mFileName = file_name;
+
+	if (configDoc.contains("experiment name"))
+		mExperimentName = configDoc["experiment name"];
+	else
+		mExperimentName = configDoc["experiment_name"];
+
+	if (configDoc.contains("layout name"))
+		mLayoutName = configDoc["layout name"];
 
 	mMetaInfo.load(configDoc);
 
@@ -229,6 +248,11 @@ void cExperimentFile::save_as(const std::string& file_name)
 
 void cExperimentFile::buildDocument(nlohmann::json& configDoc)
 {
+	configDoc["experiment_name"] = mExperimentName;
+
+	if (!mLayoutName.empty())
+		configDoc["layout name"] = mLayoutName;
+
 	mMetaInfo.save(configDoc);
 
 	if (mpController)
@@ -297,6 +321,16 @@ bool cExperimentFile::contains(const std::string& name)
 	return false;
 }
 */
+
+const cExperimentMetaInfo& cExperimentFile::getMetaData() const
+{
+	return mMetaInfo;
+}
+
+cExperimentMetaInfo& cExperimentFile::getMetaData()
+{
+	return mMetaInfo;
+}
 
 cExperimentCtrlInfo* const cExperimentFile::getController() const
 {

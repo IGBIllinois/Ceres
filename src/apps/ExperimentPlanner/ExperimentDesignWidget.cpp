@@ -24,29 +24,6 @@ cExperimentDesignWidget::cExperimentDesignWidget(QWidget *parent)
     setScene(&mScene);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-
-/*
-    cTerminal* start = new cStartTerminal();
-    mScene.addItem(start);
-
-    cFlowArrow* arrow = new cFlowArrow();
-    arrow->setTopPoint(start->getBottomPoint());
-    mScene.addItem(arrow);
-
-    cProcessStep* step = new cProcessStep();
-    step->setTopPoint(arrow->getBottomPoint());
-    mScene.addItem(step);
-
-    arrow = new cFlowArrow();
-    arrow->setTopPoint(step->getBottomPoint());
-    mScene.addItem(arrow);
-
-    cTerminal* end = new cEndTerminal();
-    end->setTopPoint(arrow->getBottomPoint());
-    mScene.addItem(end);
-
-    show();
-*/
 }
 
 void cExperimentDesignWidget::clear()
@@ -111,22 +88,6 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
     mScene.addItem(end);
 
     show();
-
-/*
-    for (auto step : mExperimentFile)
-    {
-        auto movement = dynamic_cast<cExerimentStep_Movement*>(step);
-
-        if (movement)
-        {
-
-        }
-
-    }
-
-    mpFieldLayout->drawRecordingPath(25000, 25000, 125000, 125000);
-*/
-
 }
 
 QSize cExperimentDesignWidget::minimumSizeHint() const

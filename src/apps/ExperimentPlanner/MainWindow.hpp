@@ -68,6 +68,9 @@ private slots:
 // Slots associated with "Edit" menu actions
 private slots:
     void onEditExperimentMetaInfo();
+    void onEditExperimentCtrlInfo();
+    void onEditExperimentSernsorInfo();
+    void onEditAddExperimentToLayout();
 
 // Slots associated with "Preference" menu actions
 private slots:
@@ -80,12 +83,12 @@ private slots:
 private slots:
     void onHelpAbout();
 
+// Helper slots
+private slots:
+    void onOpenExperiment(const QString& filename);
+
 protected:
     void closeEvent(QCloseEvent* event) override;
-
-private:
-    bool loadExperiment(const cExperimentTreeItem& experiment);
-    bool loadExperiment(const std::filesystem::path& experiment);
 
 private:
     void createMainMenu();

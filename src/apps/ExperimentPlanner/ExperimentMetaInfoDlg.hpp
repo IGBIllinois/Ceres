@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ExperimentMetaInfo.hpp"
+
 #include <QDialog>
 
 // Qt Forward Declaration
@@ -11,13 +13,14 @@ class QLineEdit;
 class QCheckBox;
 class QLabel;
 class QPlainTextEdit;
+class QComboBox;
 QT_END_NAMESPACE
 
 
 class cExperimentMetaInfoDlg : public QDialog
 {
 public:
-	cExperimentMetaInfoDlg(QWidget* parent = nullptr);
+	cExperimentMetaInfoDlg(cExperimentMetaInfo& info, QWidget* parent = nullptr);
 	virtual ~cExperimentMetaInfoDlg();
 
 private slots:
@@ -30,6 +33,8 @@ private:
 	void createLayout();
 
 private:
+	cExperimentMetaInfo& mInfo;
+
 	QLineEdit* mpPrincipalInvestigator = nullptr;
 	QPlainTextEdit* mpResearchers = nullptr;
 	QPlainTextEdit* mpComments = nullptr;
@@ -42,8 +47,13 @@ private:
 
 	QLineEdit* mpFieldDesign = nullptr;
 
-	QLineEdit* mpPlantingDate = nullptr;
-	QLineEdit* mpTargetHarvestDate = nullptr;
+	QComboBox* mpPlantingMonth = nullptr;
+	QLineEdit* mpPlantingDay = nullptr;
+	QComboBox* mpPlantingYear = nullptr;
+
+	QComboBox* mpTargetHarvestMonth = nullptr;
+	QLineEdit* mpTargetHarvestDay = nullptr;
+	QComboBox* mpTargetHarvestYear = nullptr;
 
 	QLineEdit* mpPermitInfo = nullptr;
 };

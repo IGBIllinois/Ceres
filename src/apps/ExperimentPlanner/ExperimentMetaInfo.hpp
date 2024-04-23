@@ -29,12 +29,17 @@ public:
 
 	const std::string& getFieldDesign() const;
 
-	const std::string& getPlantingDate() const;
-	const std::string& getTargetHarvestDate() const;
+	std::string getPlantingDate_ymd() const;
+	const std::string& getPlantingDay() const;
+	const std::string& getPlantingMonth() const;
+	const std::string& getPlantingYear() const;
+
+	std::string getTargetHarvestDate_ymd() const;
+	const std::string& getTargetHarvestDay() const;
+	const std::string& getTargetHarvestMonth() const;
+	const std::string& getTargetHarvestYear() const;
 
 	const std::string& getPermitInfo() const;
-
-
 
 
 
@@ -64,8 +69,13 @@ private:
 
 	std::string mFieldDesign;
 
-	std::string mPlantingDate;
-	std::string mTargetHarvestDate;
+	std::string mPlantingDay;
+	std::string mPlantingMonth;
+	std::string mPlantingYear;
+
+	std::string mTargetHarvestDay;
+	std::string mTargetHarvestMonth;
+	std::string mTargetHarvestYear;
 
 	std::string mPermitInfo;
 

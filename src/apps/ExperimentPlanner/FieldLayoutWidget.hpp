@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "Spidercam/SpidercamScanArea.hpp"
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
@@ -11,9 +13,6 @@ class QLineEdit;
 class QCheckBox;
 class QLabel;
 QT_END_NAMESPACE
-
-// Forward Declarations
-class cSpidercamScanArea;
 
 
 class cFieldLayoutWidget : public QWidget
@@ -28,6 +27,11 @@ public:
 	bool isDirty() const;
 
 	void setBounds(double minX_mm, double maxX_mm, double minY_mm, double maxY_mm);
+
+	void addLayout(const cSpidercamScanArea::experimentLayout_t& layout);
+	void replaceLayout(const cSpidercamScanArea::experimentLayout_t& original_layout, const cSpidercamScanArea::experimentLayout_t& new_layout);
+
+	const std::vector<cSpidercamScanArea::experimentLayout_t>& getLayouts() const;
 
 	void load(const QString& layout_filename);
 	void save(const QString& layout_filename);

@@ -41,8 +41,11 @@ public:
 	const std::string& getFileName() const;
 	void setFileName(const std::string& filename);
 
+	const std::string& getExperimentName() const;
+	void setExperimentName(const std::string& name);
+
 	const std::string& getLayoutName() const;
-	void setLayoutName(const std::string& filename);
+	void setLayoutName(const std::string& name);
 
 	bool isDirty() const;
 
@@ -57,6 +60,9 @@ public:
 
 	bool empty() const;
 	std::size_t size() const;
+
+	const cExperimentMetaInfo& getMetaData() const;
+	cExperimentMetaInfo& getMetaData();
 
 	cExperimentCtrlInfo* const getController() const;
 	void setController(cExperimentCtrlInfo* controller);
@@ -94,9 +100,10 @@ private:
 	std::filesystem::path	mExperimentPath;
 	std::string	mFileName;
 
-	std::string	mLayoutName;
-
 	bool mDirty = false;
+
+	std::string	mExperimentName;
+	std::string	mLayoutName;
 
 	cExperimentMetaInfo mMetaInfo;
 

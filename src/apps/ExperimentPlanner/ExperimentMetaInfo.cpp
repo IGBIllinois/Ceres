@@ -42,8 +42,13 @@ void cExperimentMetaInfo::clear()
 
 	mFieldDesign.clear();
 
-	mPlantingDate.clear();
-	mTargetHarvestDate.clear();
+    mPlantingDay.clear();
+    mPlantingMonth.clear();
+    mPlantingYear.clear();
+
+    mTargetHarvestDay.clear();
+    mTargetHarvestMonth.clear();
+    mTargetHarvestYear.clear();
 
 	mPermitInfo.clear();
 }
@@ -98,14 +103,52 @@ const std::string& cExperimentMetaInfo::getFieldDesign() const
 	return mFieldDesign;
 }
 
-const std::string& cExperimentMetaInfo::getPlantingDate() const
+std::string cExperimentMetaInfo::getPlantingDate_ymd() const
 {
-	return mPlantingDate;
+    std::string date = mPlantingYear;
+    date += "/" + mPlantingMonth;
+    date += "/" + mPlantingDay;
+
+    return date;
 }
 
-const std::string& cExperimentMetaInfo::getTargetHarvestDate() const
+const std::string& cExperimentMetaInfo::getPlantingDay() const
 {
-	return mTargetHarvestDate;
+	return mPlantingDay;
+}
+
+const std::string& cExperimentMetaInfo::getPlantingMonth() const
+{
+    return mPlantingMonth;
+}
+
+const std::string& cExperimentMetaInfo::getPlantingYear() const
+{
+    return mPlantingYear;
+}
+
+std::string cExperimentMetaInfo::getTargetHarvestDate_ymd() const
+{
+    std::string date = mTargetHarvestYear;
+    date += "/" + mTargetHarvestMonth;
+    date += "/" + mTargetHarvestDay;
+
+    return date;
+}
+
+const std::string& cExperimentMetaInfo::getTargetHarvestDay() const
+{
+	return mTargetHarvestDay;
+}
+
+const std::string& cExperimentMetaInfo::getTargetHarvestMonth() const
+{
+    return mTargetHarvestMonth;
+}
+
+const std::string& cExperimentMetaInfo::getTargetHarvestYear() const
+{
+    return mTargetHarvestYear;
 }
 
 const std::string& cExperimentMetaInfo::getPermitInfo() const
@@ -207,48 +250,40 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
         }
     }
 
-    std::string month;
-    std::string day;
-    std::string year;
-
     if (jdoc.contains("planting date (m/d/y)"))
     {
         std::string date = jdoc["planting date (m/d/y)"];
-        std::tie(month, day, year) = date_split(date);
+        std::tie(mPlantingMonth, mPlantingDay, mPlantingYear) = date_split(date);
     }
 
     if (jdoc.contains("planting date (d/m/y)"))
     {
         std::string date = jdoc["planting date (d/m/y)"];
-        std::tie(day, month, year) = date_split(date);
+        std::tie(mPlantingDay, mPlantingMonth, mPlantingYear) = date_split(date);
     }
 
     if (jdoc.contains("planting date (y/m/d)"))
     {
         std::string date = jdoc["planting date (y/m/d)"];
-        std::tie(year, month, day) = date_split(date);
+        std::tie(mPlantingYear, mPlantingMonth, mPlantingDay) = date_split(date);
     }
-
-    month.clear();
-    day.clear();
-    year.clear();
 
     if (jdoc.contains("target harvest date (m/d/y)"))
     {
         std::string date = jdoc["target harvest date (m/d/y)"];
-        std::tie(month, day, year) = date_split(date);
+        std::tie(mTargetHarvestMonth, mTargetHarvestDay, mTargetHarvestYear) = date_split(date);
     }
 
     if (jdoc.contains("target harvest date (d/m/y)"))
     {
         std::string date = jdoc["target harvest date (d/m/y)"];
-        std::tie(day, month, year) = date_split(date);
+        std::tie(mTargetHarvestDay, mTargetHarvestMonth, mTargetHarvestYear) = date_split(date);
     }
 
     if (jdoc.contains("target harvest date (y/m/d)"))
     {
         std::string date = jdoc["target harvest date (y/m/d)"];
-        std::tie(year, month, day) = date_split(date);
+        std::tie(mTargetHarvestYear, mTargetHarvestMonth, mTargetHarvestDay) = date_split(date);
     }
 }
 

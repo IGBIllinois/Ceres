@@ -2,8 +2,6 @@
 #include "FieldLayoutWidget.hpp"
 #include "FieldLayoutDlg.hpp"
 
-#include "Spidercam/SpidercamScanArea.hpp"
-
 #include <QLayout>
 #include <QContextMenuEvent>
 
@@ -39,6 +37,23 @@ void cFieldLayoutWidget::setBounds(double minX_mm, double maxX_mm, double minY_m
     if (maxY_mm < minY_mm) std::swap(minY_mm, maxY_mm);
 
     mpScanArea->updateBounds(minX_mm, maxX_mm, minY_mm, maxY_mm);
+}
+
+void cFieldLayoutWidget::addLayout(const cSpidercamScanArea::experimentLayout_t& layout)
+{
+    mpScanArea->addLayout(layout);
+    mDirty = true;
+}
+
+void cFieldLayoutWidget::replaceLayout(const cSpidercamScanArea::experimentLayout_t& original_layout, const cSpidercamScanArea::experimentLayout_t& new_layout)
+{
+    mpScanArea->replaceLayout(original_layout, new_layout);
+    mDirty |= new_layout != original_layout;
+}
+
+const std::vector<cSpidercamScanArea::experimentLayout_t>& cFieldLayoutWidget::getLayouts() const
+{
+    return mpScanArea->getLayouts();
 }
 
 void cFieldLayoutWidget::clearRecordingPath()

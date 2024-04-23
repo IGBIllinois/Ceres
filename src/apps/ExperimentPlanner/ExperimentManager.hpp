@@ -23,13 +23,16 @@ public:
 	const cExperimentTreeItem* experiments() const;
 
 signals:
-	void openExperiment();
+	void loadExperiment(const QString& file_name);
 
 public slots:
 	void reloadExperiments(QString path);
 
 protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;
+
+private slots:
+	void openExperiment();
 
 private:
 	void loadExperiments();

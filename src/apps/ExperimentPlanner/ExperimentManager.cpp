@@ -56,6 +56,18 @@ void cExperimentManager::contextMenuEvent(QContextMenuEvent* event)
     contextMenu.exec(event->globalPos());
 }
 
+void cExperimentManager::openExperiment()
+{
+    auto pItem = dynamic_cast<cExperimentTreeItem*>(currentItem());
+    if (!pItem)
+        return;
+
+    auto path = pItem->getExperimentFile();
+
+    QString filename = QString::fromStdString(path.string());
+
+    emit loadExperiment(filename);
+}
 
 const cExperimentTreeItem* cExperimentManager::experiments() const
 {

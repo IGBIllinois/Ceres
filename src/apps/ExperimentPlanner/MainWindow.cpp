@@ -10,6 +10,7 @@
 #include "ExperimentSteps.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
+#include "ExperimentFieldLayoutDlg.hpp"
 
 #include "RappFieldBoundary.hpp"
 #include "FieldBoundaryDlg.hpp"
@@ -75,64 +76,6 @@ void cMainWindow::initialize()
 }
 
 //-----------------------------------------------------------------------------
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
-{
-    QString msg = "Loading experiment \"";
-    msg += experiment.text(0);
-    msg += "\" from file ";
-    msg += experiment.getFilename();
-    onStatusUpdate(msg);
-
-    std::string name = experiment.text(0).toStdString();
-    auto expDoc = experiment.getExperimentDocument();
-
-    return true;
-}
-
-bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
-{
-    using namespace nlohmann;
-
-    std::ifstream in;
-    in.open(experiment_file);
-
-    if (!in.is_open())
-    {
-        throw std::invalid_argument("Could not open file.");
-    }
-
-    nlohmann::json jsonDoc;
-    std::string name;
-
-    try
-    {
-        in >> jsonDoc;
-
-        name = jsonDoc["experiment_name"];
-    }
-    catch (const detail::exception& e)
-    {
-        QString msg = "Failed to loading experiment file: ";
-        msg += QString::fromStdString(experiment_file.string());
-        onWarningMessage("File Error", msg);
-
-        return false;
-    }
-
-
-    QString msg = "Loading experiment \"";
-    msg += QString::fromStdString(name);
-    msg += "\" from file ";
-    msg += QString::fromStdString(experiment_file.string());
-    onStatusUpdate(msg);
-
-    return true;
-}
-
 void cMainWindow::onStatusUpdate(QString msg)
 {
     if (statusBar())
@@ -170,6 +113,8 @@ void cMainWindow::createMainMenu()
     mpPreferencesMenu = mpUI->menuBar->addMenu(tr("&Preferences"));
     mpViewMenu = mpUI->menuBar->addMenu(tr("&View"));
     mpHelpMenu = mpUI->menuBar->addMenu(tr("&Help"));
+
+    mpEditMenu->setDisabled(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -221,9 +166,26 @@ void cMainWindow::createSubMenusAndActions()
     //
     // Build the Edit Sub Menu
     //
-    pMenuItem = new QAction(tr("&Edit Experiment Meta Data..."), this);
+    pMenuItem = new QAction(tr("Edit Experiment Meta Data..."), this);
     pMenuItem->setStatusTip(tr("Edit the experiment meta information..."));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditExperimentMetaInfo);
+    mpEditMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Edit Experiment Controller Information..."), this);
+    pMenuItem->setStatusTip(tr("Edit the experiment controller information..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditExperimentCtrlInfo);
+    mpEditMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Edit Experiment Sensor Information..."), this);
+    pMenuItem->setStatusTip(tr("Edit the experiment sensor information..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditExperimentSernsorInfo);
+    mpEditMenu->addAction(pMenuItem);
+
+    mpEditMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Add Experiment To Layout..."), this);
+    pMenuItem->setStatusTip(tr("Adds the experiment to the field layout..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditAddExperimentToLayout);
     mpEditMenu->addAction(pMenuItem);
 
     //
@@ -286,6 +248,7 @@ void cMainWindow::createDockWindows()
     QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
+    connect(mpExperiments, &cExperimentManager::loadExperiment, this, &cMainWindow::onOpenExperiment);
 
     dock->setWidget(mpExperiments);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
@@ -337,6 +300,11 @@ void cMainWindow::doSaveCheck()
             return;
         }
     }
+
+    if (mpFieldLayout->isDirty())
+    {
+        mpFieldLayout->save(mFieldLayoutFile);
+    }
 }
 
 
@@ -350,46 +318,66 @@ void cMainWindow::onFileNewExperiment_Blank()
     mExperimentFile.clearSteps();
 
     mpExpDesign->loadExperiment(mExperimentFile);
+
+    mpEditMenu->setDisabled(false);
 }
 
 void cMainWindow::onFileNewExperiment_GPS()
 {
     doSaveCheck();
 
-    mExperimentFile.clearSteps();
-}
-
-void cMainWindow::onFileOpenExperiment()
-{
-    doSaveCheck();
-
-    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
-
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Experiment File"), defaultDirectory,
-        "Experiment Files (*.json)");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), "",
+        "GPS Files (*.csv)");
 
     if (fileName.isEmpty())
         return;
 
     mExperimentFile.clear();
 
-    mExperimentFile.open(fileName.toStdString());
+    mExperimentFile.clearSteps();
 
-    QString title = "RAPP Plot Mapper - ";
-    title += fileName;
-    setWindowTitle(title);
+    mpEditMenu->setDisabled(false);
+}
 
-    mpExpDesign->loadExperiment(mExperimentFile);
+void cMainWindow::onFileOpenExperiment()
+{
+    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Experiment File"), defaultDirectory,
+        "Experiment Files (*.json)");
+
+    onOpenExperiment(fileName);
 }
 
 void cMainWindow::onFileSaveExperimentFile()
 {
-
+    if (mExperimentFile.isDirty())
+    {
+        if (mExperimentFile.getFileName().empty())
+            onFileSaveAsExperimentFile();
+        else
+            mExperimentFile.save();
+    }
 }
 
 void cMainWindow::onFileSaveAsExperimentFile()
 {
+    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
 
+    if (!mExperimentFile.getFileName().empty())
+        defaultDirectory = QString::fromStdString(mExperimentFile.getFileName());
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Experiment File"), defaultDirectory,
+        "Experiment Files (*.json)");
+
+    if (fileName.isEmpty())
+        return;
+
+    mExperimentFile.save_as(fileName.toStdString());
+
+    QString title = "RAPP Plot Mapper - ";
+    title += fileName;
+    setWindowTitle(title);
 }
 
 
@@ -398,9 +386,38 @@ void cMainWindow::onFileSaveAsExperimentFile()
  *******************************************************************/
 void cMainWindow::onEditExperimentMetaInfo()
 {
-    cExperimentMetaInfoDlg dlg(this);
+    cExperimentMetaInfoDlg dlg(mExperimentFile.getMetaData(), this);
 
     dlg.exec();
+}
+
+void cMainWindow::onEditExperimentCtrlInfo()
+{
+
+}
+
+void cMainWindow::onEditExperimentSernsorInfo()
+{
+
+}
+
+void cMainWindow::onEditAddExperimentToLayout()
+{
+    cExperimentFieldLayoutDlg dlg(*mpFieldLayout, this);
+
+    dlg.setExperiment(mExperimentFile);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    auto original = dlg.getOriginalLayout();
+    auto new_layout = dlg.getLayout();
+
+    mpFieldLayout->replaceLayout(original, new_layout);
+
+    mExperimentFile.setLayoutName(new_layout.caption.label.toStdString());
 }
 
 /********************************************************************
@@ -420,15 +437,14 @@ void cMainWindow::onPreferenceDefaultExperimentDirectory()
 
 void cMainWindow::onPreferenceDefaultFieldLayoutFile()
 {
-    QString defaultFile = mSettings.value("Defaults/fieldLayoutFile").toString();
-
-    QString layoutFile = QFileDialog::getOpenFileName(this, tr("Select the Field Layout File..."), defaultFile,
+    QString layoutFile = QFileDialog::getOpenFileName(this, tr("Select the Field Layout File..."), mFieldLayoutFile,
         tr("Field Layout (*.json)"));
 
     if (layoutFile.isEmpty())
         return;
 
     mSettings.setValue("Defaults/fieldLayoutFile", layoutFile);
+    mFieldLayoutFile = layoutFile;
 }
 
 void cMainWindow::onPreferenceDefaultPlotSplitDirectory()
@@ -480,6 +496,29 @@ void cMainWindow::onPreferenceDefaultFieldBoundaries()
  *******************************************************************/
 void cMainWindow::onHelpAbout()
 {
+}
+
+/********************************************************************
+ * General Purpose Slots
+ *******************************************************************/
+void cMainWindow::onOpenExperiment(const QString& filename)
+{
+    if (filename.isEmpty())
+        return;
+
+    doSaveCheck();
+
+    mExperimentFile.clear();
+
+    mExperimentFile.open(filename.toStdString());
+
+    QString title = "RAPP Plot Mapper - ";
+    title += filename;
+    setWindowTitle(title);
+
+    mpExpDesign->loadExperiment(mExperimentFile);
+
+    mpEditMenu->setDisabled(false);
 }
 
 //-----------------------------------------------------------------------------
