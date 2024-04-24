@@ -27,10 +27,10 @@ namespace fs = std::filesystem;
  *
  ********************************************************************/
 
-cExerimentStep::~cExerimentStep()
+cExperimentStep::~cExperimentStep()
 {}
 
-bool cExerimentStep::isDirty() const
+bool cExperimentStep::isDirty() const
 {
 	return mDirty;
 }
@@ -43,12 +43,12 @@ bool cExerimentStep::isDirty() const
  *
  ********************************************************************/
 
-cConnectedItem* cExerimentStep_Delay::graphicsItem() const
+cConnectedItem* cExperimentStep_Delay::graphicsItem() const
 {
 	auto step = new cProcessStep();
-	connect(step, &cProcessStep::editStep, this, &cExerimentStep_Delay::onEdit);
-	connect(this, &cExerimentStep_Delay::onDescriptionChange, step, &cProcessStep::setSubHeading1);
-	connect(this, &cExerimentStep_Delay::onCommentChange, step, &cProcessStep::setSubHeading2);
+	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Delay::onEdit);
+	connect(this, &cExperimentStep_Delay::onDescriptionChange, step, &cProcessStep::setSubHeading1);
+	connect(this, &cExperimentStep_Delay::onCommentChange, step, &cProcessStep::setSubHeading2);
 
 	step->setTitle("Delay");
 
@@ -61,7 +61,7 @@ cConnectedItem* cExerimentStep_Delay::graphicsItem() const
 	return step;
 }
 
-void cExerimentStep_Delay::load(const nlohmann::json& jdoc)
+void cExperimentStep_Delay::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
 
@@ -80,7 +80,7 @@ void cExerimentStep_Delay::load(const nlohmann::json& jdoc)
 		mRecording = jdoc["record"];
 }
 
-nlohmann::json cExerimentStep_Delay::save()
+nlohmann::json cExperimentStep_Delay::save()
 {
 	nlohmann::json entry;
 
@@ -107,7 +107,7 @@ nlohmann::json cExerimentStep_Delay::save()
 	return entry;
 }
 
-void cExerimentStep_Delay::onEdit()
+void cExperimentStep_Delay::onEdit()
 {
 	cDelayStepInfoDlg dlg;
 
@@ -158,7 +158,7 @@ void cExerimentStep_Delay::onEdit()
 	emit onCommentChange(comment);
 }
 
-QString cExerimentStep_Delay::generateDescription() const
+QString cExperimentStep_Delay::generateDescription() const
 {
 	QString description = "Delay for ";
 
@@ -210,7 +210,7 @@ QString cExerimentStep_Delay::generateDescription() const
 	return description;
 }
 
-QString cExerimentStep_Delay::generateComment() const
+QString cExperimentStep_Delay::generateComment() const
 {
 	if (mRecording)
 		return QString("Recording: On");
@@ -225,7 +225,7 @@ QString cExerimentStep_Delay::generateComment() const
  *
  ********************************************************************/
 
-cConnectedItem* cExerimentStep_Pause::graphicsItem() const
+cConnectedItem* cExperimentStep_Pause::graphicsItem() const
 {
 	auto step = new cIoStep();
 	step->setReadOnly(true);
@@ -234,12 +234,12 @@ cConnectedItem* cExerimentStep_Pause::graphicsItem() const
 	return step;
 }
 
-void cExerimentStep_Pause::load(const nlohmann::json& jdoc)
+void cExperimentStep_Pause::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
 }
 
-nlohmann::json cExerimentStep_Pause::save()
+nlohmann::json cExperimentStep_Pause::save()
 {
 	nlohmann::json entry;
 
@@ -255,25 +255,25 @@ nlohmann::json cExerimentStep_Pause::save()
  *
  ********************************************************************/
 
-const std::optional<int>& cExerimentStep_Movement::getX_mm() const { return mX_mm; }
-const std::optional<int>& cExerimentStep_Movement::getY_mm() const { return mY_mm; }
-const std::optional<int>& cExerimentStep_Movement::getZ_mm() const { return mZ_mm; }
+const std::optional<int>& cExperimentStep_Movement::getX_mm() const { return mX_mm; }
+const std::optional<int>& cExperimentStep_Movement::getY_mm() const { return mY_mm; }
+const std::optional<int>& cExperimentStep_Movement::getZ_mm() const { return mZ_mm; }
 
-int cExerimentStep_Movement::getSpeed_mmps() const { return mSpeed_mmps; }
+int cExperimentStep_Movement::getSpeed_mmps() const { return mSpeed_mmps; }
 
-const std::optional<double>& cExerimentStep_Movement::getPan_deg() const { return mPan_deg; }
-const std::optional<double>& cExerimentStep_Movement::getTilt_deg() const { return mTilt_deg; }
-const std::optional<double>& cExerimentStep_Movement::getRoll_deg() const { return mRoll_deg; }
+const std::optional<double>& cExperimentStep_Movement::getPan_deg() const { return mPan_deg; }
+const std::optional<double>& cExperimentStep_Movement::getTilt_deg() const { return mTilt_deg; }
+const std::optional<double>& cExperimentStep_Movement::getRoll_deg() const { return mRoll_deg; }
 
-bool cExerimentStep_Movement::isRecording() const { return mRecording; }
+bool cExperimentStep_Movement::isRecording() const { return mRecording; }
 
-cConnectedItem* cExerimentStep_Movement::graphicsItem() const
+cConnectedItem* cExperimentStep_Movement::graphicsItem() const
 {
 	auto step = new cProcessStep();
-	connect(step, &cProcessStep::editStep, this, &cExerimentStep_Movement::onEdit);
-	connect(this, &cExerimentStep_Movement::onMovementTextChange, step, &cProcessStep::setSubHeading1);
-	connect(this, &cExerimentStep_Movement::onOrientationTextChange, step, &cProcessStep::setSubHeading2);
-	connect(this, &cExerimentStep_Movement::onCommentChange, step, &cProcessStep::setSubHeading3);
+	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Movement::onEdit);
+	connect(this, &cExperimentStep_Movement::onMovementTextChange, step, &cProcessStep::setSubHeading1);
+	connect(this, &cExperimentStep_Movement::onOrientationTextChange, step, &cProcessStep::setSubHeading2);
+	connect(this, &cExperimentStep_Movement::onCommentChange, step, &cProcessStep::setSubHeading3);
 
 	step->setTitle("Movement");
 
@@ -289,7 +289,7 @@ cConnectedItem* cExerimentStep_Movement::graphicsItem() const
 	return step;
 }
 
-void cExerimentStep_Movement::load(const nlohmann::json& jdoc)
+void cExperimentStep_Movement::load(const nlohmann::json& jdoc)
 {
 	auto pos = jdoc["position"];
 
@@ -350,7 +350,7 @@ void cExerimentStep_Movement::load(const nlohmann::json& jdoc)
 	mRecording = jdoc["record"];
 }
 
-nlohmann::json cExerimentStep_Movement::save()
+nlohmann::json cExperimentStep_Movement::save()
 {
 	nlohmann::json entry;
 
@@ -362,7 +362,7 @@ nlohmann::json cExerimentStep_Movement::save()
 }
 
 
-void cExerimentStep_Movement::onEdit()
+void cExperimentStep_Movement::onEdit()
 {
 	cMovementStepInfoDlg dlg;
 
@@ -455,7 +455,7 @@ void cExerimentStep_Movement::onEdit()
 	mRecording = recording;
 }
 
-QString cExerimentStep_Movement::generateMovementDescription() const
+QString cExperimentStep_Movement::generateMovementDescription() const
 {
 	QString description;
 
@@ -493,7 +493,7 @@ QString cExerimentStep_Movement::generateMovementDescription() const
 	return description;
 }
 
-QString cExerimentStep_Movement::generateOrientationDescription() const
+QString cExperimentStep_Movement::generateOrientationDescription() const
 {
 	QString description;
 
@@ -538,7 +538,7 @@ QString cExerimentStep_Movement::generateOrientationDescription() const
 	return description;
 }
 
-QString cExerimentStep_Movement::generateComment() const
+QString cExperimentStep_Movement::generateComment() const
 {
 	if (mRecording)
 		return QString("Recording: On");

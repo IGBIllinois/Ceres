@@ -186,21 +186,21 @@ void cExperimentFile::open(const std::string& file_name)
 
 		for (const auto& entry : steps)
 		{
-			cExerimentStep* step = nullptr;
+			cExperimentStep* step = nullptr;
 
 			std::string type = entry["type"];
 
 			if (type == "delay")
 			{
-				step = new cExerimentStep_Delay();
+				step = new cExperimentStep_Delay();
 			}
 			else if (type == "pause")
 			{
-				step = new cExerimentStep_Pause();
+				step = new cExperimentStep_Pause();
 			}
 			else if (type == "movement")
 			{
-				step = new cExerimentStep_Movement();
+				step = new cExperimentStep_Movement();
 			}
 
 			step->load(entry);
@@ -337,9 +337,9 @@ cExperimentCtrlInfo* const cExperimentFile::getController() const
 	return mpController.get();
 }
 
-void cExperimentFile::setController(cExperimentCtrlInfo* controller)
+void cExperimentFile::setController(std::unique_ptr<cExperimentCtrlInfo> controller)
 {
-	mpController.reset(controller);
+	mpController = std::move(controller);
 }
 
 const std::vector<cExperimentSensorInfo*>& cExperimentFile::getSensors() const
@@ -347,13 +347,13 @@ const std::vector<cExperimentSensorInfo*>& cExperimentFile::getSensors() const
 	return mSensors;
 }
 
-void cExperimentFile::addSensor(cExperimentSensorInfo* sensor)
+void cExperimentFile::addSensor(std::unique_ptr<cExperimentSensorInfo> sensor)
 {
-	mSensors.push_back(sensor);
+	mSensors.push_back(sensor.release());
 }
 
-const cExerimentStep& cExperimentFile::front() const { return *(mSteps.front()); }
-cExerimentStep& cExperimentFile::front() { return *(mSteps.front()); }
+const cExperimentStep& cExperimentFile::front() const { return *(mSteps.front()); }
+cExperimentStep& cExperimentFile::front() { return *(mSteps.front()); }
 
 
 cExperimentFile::iterator cExperimentFile::begin() { return mSteps.begin(); }
@@ -414,7 +414,13 @@ void cExperimentFile::remove(const std::string& name)
 }
 */
 
-const cExerimentStep& cExperimentFile::operator[](int index) const
+void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)
+{
+	mSteps.push_back(step.get());
+	step.release();
+}
+
+const cExperimentStep& cExperimentFile::operator[](int index) const
 {
 	if (index < 0)
 		return *(mSteps.front());
@@ -427,7 +433,7 @@ const cExerimentStep& cExperimentFile::operator[](int index) const
 	return *(*it);
 }
 
-cExerimentStep& cExperimentFile::operator[](int index)
+cExperimentStep& cExperimentFile::operator[](int index)
 {
 	if (index < 0)
 		return *(mSteps.front());

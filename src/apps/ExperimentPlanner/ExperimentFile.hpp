@@ -23,13 +23,13 @@ class QButton;
 QT_END_NAMESPACE
 
 // Forward Declarations
-class cExerimentStep;
+class cExperimentStep;
 
 
 class cExperimentFile
 {
 public:
-	typedef std::list<cExerimentStep*> Experiment_t;
+	typedef std::list<cExperimentStep*> Experiment_t;
 
 	typedef Experiment_t::iterator			iterator;
 	typedef Experiment_t::const_iterator	const_iterator;
@@ -65,15 +65,15 @@ public:
 	cExperimentMetaInfo& getMetaData();
 
 	cExperimentCtrlInfo* const getController() const;
-	void setController(cExperimentCtrlInfo* controller);
+	void setController(std::unique_ptr<cExperimentCtrlInfo> controller);
 
 	const std::vector<cExperimentSensorInfo*>& getSensors() const;
-	void addSensor(cExperimentSensorInfo* sensor);
+	void addSensor(std::unique_ptr<cExperimentSensorInfo> sensor);
 
 	//	bool contains(const std::string& name);
 
-	const cExerimentStep& front() const;
-	cExerimentStep& front();
+	const cExperimentStep& front() const;
+	cExperimentStep& front();
 
 	iterator		begin();
 	iterator		end();
@@ -81,17 +81,17 @@ public:
 	const_iterator	begin() const;
 	const_iterator	end() const;
 
-	void insertBefore(int index, cExerimentStep* step);
-	void insertAfter(int index, cExerimentStep* step);
+	void insertBefore(int index, cExperimentStep* step);
+	void insertAfter(int index, cExperimentStep* step);
 
 //	const_iterator	find(const std::string& name) const;
 //	iterator		find(const std::string& name);
 
-//	cPlotConfigScan& add(const std::string& name);
+	void appendStep(std::unique_ptr<cExperimentStep> step);
 //	void remove(const std::string& name);
 
-	const cExerimentStep& operator[](int index) const;
-	cExerimentStep& operator[](int index);
+	const cExperimentStep& operator[](int index) const;
+	cExperimentStep& operator[](int index);
 
 private:
 	void buildDocument(nlohmann::json& jdoc);
@@ -111,7 +111,7 @@ private:
 
 	std::vector<cExperimentSensorInfo*> mSensors;
 
-	std::list<cExerimentStep*> mSteps;
+	std::list<cExperimentStep*> mSteps;
 };
 
 

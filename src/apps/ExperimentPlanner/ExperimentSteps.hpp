@@ -19,11 +19,11 @@ class cExperimentFile;
 class cConnectedItem;
 
 
-class cExerimentStep
+class cExperimentStep
 {
 public:
-	cExerimentStep() = default;
-	virtual ~cExerimentStep();
+	cExperimentStep() = default;
+	virtual ~cExperimentStep();
 
 	bool isDirty() const;
 
@@ -42,12 +42,12 @@ protected:
 /// <summary>
 /// Experiment Step: Simple Time Delay
 /// </summary>
-class cExerimentStep_Delay : public QObject, public cExerimentStep
+class cExperimentStep_Delay : public QObject, public cExperimentStep
 {
 	Q_OBJECT
 
 public:
-	cExerimentStep_Delay() = default;
+	cExperimentStep_Delay() = default;
 
 	cConnectedItem* graphicsItem() const override;
 
@@ -76,12 +76,12 @@ private:
 /// <summary>
 /// Experiment Step: Pause for User Input
 /// </summary>
-class cExerimentStep_Pause : public QObject, public cExerimentStep
+class cExperimentStep_Pause : public QObject, public cExperimentStep
 {
 	Q_OBJECT
 
 public:
-	cExerimentStep_Pause() = default;
+	cExperimentStep_Pause() = default;
 
 	cConnectedItem* graphicsItem() const override;
 
@@ -93,12 +93,12 @@ protected:
 /// <summary>
 /// Experiment Step: Controls SpiderCam Movement
 /// </summary>
-class cExerimentStep_Movement : public QObject, public cExerimentStep
+class cExperimentStep_Movement : public QObject, public cExperimentStep
 {
 	Q_OBJECT
 
 public:
-	cExerimentStep_Movement() = default;
+	cExperimentStep_Movement() = default;
 
 	const std::optional<int>& getX_mm() const;
 	const std::optional<int>& getY_mm() const;
