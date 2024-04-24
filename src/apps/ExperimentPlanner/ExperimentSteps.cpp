@@ -43,6 +43,37 @@ bool cExperimentStep::isDirty() const
  *
  ********************************************************************/
 
+double cExperimentStep_Delay::getWaitTime_sec() const { return mWaitTime_sec; }
+const std::optional<int>& cExperimentStep_Delay::getWaitTime_min() const { return mWaitTime_min; }
+const std::optional<int>& cExperimentStep_Delay::getWaitTime_hr() const { return mWaitTime_hr; }
+
+bool cExperimentStep_Delay::isRecording() const { return mRecording; }
+
+void cExperimentStep_Delay::setWaitTime_sec(double sec)
+{
+	mDirty |= mWaitTime_sec != sec;
+	mWaitTime_sec = sec;
+}
+
+void cExperimentStep_Delay::setWaitTime_min(int min)
+{
+	mDirty |= mWaitTime_min != min;
+	mWaitTime_min = min;
+}
+
+void cExperimentStep_Delay::setWaitTime_hr(int hr)
+{
+
+	mDirty |= mWaitTime_hr != hr;
+	mWaitTime_hr = hr;
+}
+
+void cExperimentStep_Delay::setRecording(bool recording)
+{
+	mDirty |= mRecording != recording;
+	mRecording = recording;
+}
+
 cConnectedItem* cExperimentStep_Delay::graphicsItem() const
 {
 	auto step = new cProcessStep();
@@ -266,6 +297,54 @@ const std::optional<double>& cExperimentStep_Movement::getTilt_deg() const { ret
 const std::optional<double>& cExperimentStep_Movement::getRoll_deg() const { return mRoll_deg; }
 
 bool cExperimentStep_Movement::isRecording() const { return mRecording; }
+
+void cExperimentStep_Movement::setX_mm(int x_mm)
+{
+	mDirty |= mX_mm != x_mm;
+	mX_mm = x_mm;
+}
+
+void cExperimentStep_Movement::setY_mm(int y_mm)
+{
+	mDirty |= mY_mm != y_mm;
+	mY_mm = y_mm;
+}
+
+void cExperimentStep_Movement::setZ_mm(int z_mm)
+{
+	mDirty |= mZ_mm != z_mm;
+	mZ_mm = z_mm;
+}
+
+void cExperimentStep_Movement::setSpeed_mmps(int speed_mmps)
+{
+	mDirty |= mSpeed_mmps != speed_mmps;
+	mSpeed_mmps = speed_mmps;
+}
+
+void cExperimentStep_Movement::setPan_deg(double pan_deg)
+{
+	mDirty |= mPan_deg != pan_deg;
+	mPan_deg = pan_deg;
+}
+
+void cExperimentStep_Movement::setTilt_deg(double tilt_deg)
+{
+	mDirty |= mTilt_deg != tilt_deg;
+	mTilt_deg = tilt_deg;
+}
+
+void cExperimentStep_Movement::setRoll_deg(double roll_deg)
+{
+	mDirty |= mRoll_deg != roll_deg;
+	mRoll_deg = roll_deg;
+}
+
+void cExperimentStep_Movement::setRecording(bool recording)
+{
+	mDirty |= mRecording != recording;
+	mRecording = recording;
+}
 
 cConnectedItem* cExperimentStep_Movement::graphicsItem() const
 {
