@@ -37,6 +37,8 @@ void cExperimentMetaInfoDlg::createControls()
 	QFontMetrics fm(font);
 	int pixelsHigh = fm.height();
 
+	mpTitle = new QLineEdit(this);
+
 	mpPrincipalInvestigator = new QLineEdit(this);
 	if (!mInfo.getPrincipalInvestigator().empty())
 		mpPrincipalInvestigator->setText(QString::fromStdString(mInfo.getPrincipalInvestigator()));
@@ -52,7 +54,7 @@ void cExperimentMetaInfoDlg::createControls()
 
 		for (std::size_t i = 1; i < researchers.size(); ++i)
 		{
-			text += ", ";
+			text += "\n";
 			text += QString::fromStdString(researchers[i]);
 		}
 
@@ -85,7 +87,8 @@ void cExperimentMetaInfoDlg::createControls()
 	if (!mInfo.getCultivar().empty())
 		mpCultivar->setText(QString::fromStdString(mInfo.getCultivar()));
 
-	mpEvents = new QLineEdit(this);
+	mpEvents = new QPlainTextEdit(this);
+	mpEvents->setMaximumHeight(pixelsHigh * 4);
 	if (mInfo.getEvents().size() > 0)
 	{
 		QString text;
@@ -95,11 +98,11 @@ void cExperimentMetaInfoDlg::createControls()
 
 		for (std::size_t i = 1; i < events.size(); ++i)
 		{
-			text += ", ";
+			text += "\n ";
 			text += QString::fromStdString(events[i]);
 		}
 
-		mpEvents->setText(text);
+		mpEvents->setPlainText(text);
 	}
 
 	mpConstructName = new QLineEdit(this);
@@ -117,11 +120,11 @@ void cExperimentMetaInfoDlg::createControls()
 
 		for (std::size_t i = 1; i < treatments.size(); ++i)
 		{
-			text += ", ";
+			text += "\n ";
 			text += QString::fromStdString(treatments[i]);
 		}
 
-		mpEvents->setText(text);
+		mpTreatments->setPlainText(text);
 	}
 
 	mpFieldDesign = new QLineEdit(this);
@@ -183,6 +186,15 @@ void cExperimentMetaInfoDlg::createLayout()
 	QGridLayout* pGridLayout = nullptr;
 
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
+
+	QHBoxLayout* pTitleLayout = new QHBoxLayout();
+	pText = new QLabel("Experiment Title");
+	pTitleLayout->addWidget(pText);
+	pTitleLayout->addWidget(mpTitle, 1);
+
+	pMainLayout->addLayout(pTitleLayout);
+
+	pMainLayout->addSpacing(10);
 
 	pGroupBox = new QGroupBox(tr("General Information"));
 	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -291,21 +303,103 @@ void cExperimentMetaInfoDlg::createLayout()
 	setLayout(pMainLayout);
 }
 
+std::string cExperimentMetaInfoDlg::getExperimentTitle() const
+{
+	return mpTitle->text().toStdString();
+}
+
+void cExperimentMetaInfoDlg::setExperimentTitle(const std::string& title)
+{
+	mpTitle->setText(QString::fromStdString(title));
+}
+
 void cExperimentMetaInfoDlg::accept()
 {
 	apply();
 	QDialog::accept();
 }
 
-void cExperimentMetaInfoDlg::reject()
-{
-	QDialog::reject();
-}
-
 void cExperimentMetaInfoDlg::apply()
 {
-	std::string pi = mpPrincipalInvestigator->text().toStdString();
-//	mInfo.set
+	std::string str;
+	QString text;
+	std::vector<std::string> list;
+
+	str = mpPrincipalInvestigator->text().toStdString();
+	mInfo.setPrincipalInvestigator(str);
+
+	text = mpResearchers->toPlainText();
+	auto text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+
+	list.clear();
+	for (auto entry : text_list)
+	{
+		list.push_back(entry.trimmed().toStdString());
+	}
+	mInfo.setResearchers(list);
+
+	text = mpComments->toPlainText();
+	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+
+	list.clear();
+	for (auto entry : text_list)
+	{
+		list.push_back(entry.trimmed().toStdString());
+	}
+	mInfo.setComments(list);
+
+	str = mpSpecies->text().toStdString();
+	mInfo.setSpecies(str);
+
+	str = mpCultivar->text().toStdString();
+	mInfo.setCultivar(str);
+
+	text = mpEvents->toPlainText();
+	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+
+	list.clear();
+	for (auto entry : text_list)
+	{
+		list.push_back(entry.trimmed().toStdString());
+	}
+	mInfo.setEvents(list);
+
+	str = mpConstructName->text().toStdString();
+	mInfo.setConstructName(str);
+
+	text = mpTreatments->toPlainText();
+	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+
+	list.clear();
+	for (auto entry : text_list)
+	{
+		list.push_back(entry.trimmed().toStdString());
+	}
+	mInfo.setTreatments(list);
+
+	str = mpFieldDesign->text().toStdString();
+	mInfo.setFieldDesign(str);
+
+	int m = mpPlantingMonth->currentIndex() + 4;
+	mInfo.setPlantingMonth(std::to_string(m));
+
+	str = mpPlantingDay->text().toStdString();
+	mInfo.setPlantingDay(str);
+	
+	str = mpPlantingYear->currentText().toStdString();
+	mInfo.setPlantingYear(str);
+
+	m = mpTargetHarvestMonth->currentIndex() + 5;
+	mInfo.setTargetHarvestMonth(std::to_string(m));
+
+	str = mpTargetHarvestDay->text().toStdString();
+	mInfo.setTargetHarvestDay(str);
+
+	str = mpTargetHarvestYear->currentText().toStdString();
+	mInfo.setTargetHarvestYear(str);
+
+	str = mpPermitInfo->text().toStdString();
+	mInfo.setPermitInfo(str);
 }
 
 

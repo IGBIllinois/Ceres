@@ -59,6 +59,7 @@ const std::vector<cSpidercamScanArea::experimentLayout_t>& cFieldLayoutWidget::g
 void cFieldLayoutWidget::clearRecordingPath()
 {
     mpScanArea->clearRecordedPath();
+    mpScanArea->repaint();
 }
 
 void cFieldLayoutWidget::drawRecordingPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm)

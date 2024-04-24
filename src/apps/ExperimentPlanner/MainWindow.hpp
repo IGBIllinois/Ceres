@@ -86,6 +86,7 @@ private slots:
 // Helper slots
 private slots:
     void onOpenExperiment(const QString& filename);
+    void onExperimentChange();
 
 protected:
     void closeEvent(QCloseEvent* event) override;

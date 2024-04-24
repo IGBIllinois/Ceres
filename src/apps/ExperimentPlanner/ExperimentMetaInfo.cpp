@@ -156,6 +156,104 @@ const std::string& cExperimentMetaInfo::getPermitInfo() const
 	return mPermitInfo;
 }
 
+
+void cExperimentMetaInfo::setPrincipalInvestigator(const std::string& pi)
+{
+    mDirty |= mPrincipalInvestigator != pi;
+    mPrincipalInvestigator = pi;
+}
+
+void cExperimentMetaInfo::setResearchers(const std::vector<std::string>& researchers)
+{
+    mDirty |= mResearchers != researchers;
+    mResearchers = researchers;
+}
+
+void cExperimentMetaInfo::setComments(const std::vector<std::string>& comments)
+{
+    mDirty |= mComments != comments;
+    mComments = comments;
+}
+
+void cExperimentMetaInfo::setSpecies(const std::string& species)
+{
+    mDirty |= mSpecies != species;
+    mSpecies = species;
+}
+
+void cExperimentMetaInfo::setCultivar(const std::string& cultivar)
+{
+    mDirty |= mCultivar != cultivar;
+    mCultivar = cultivar;
+}
+
+void cExperimentMetaInfo::setEvents(const std::vector<std::string>& events)
+{
+    mDirty |= mEvents != events;
+    mEvents = events;
+}
+
+void cExperimentMetaInfo::setConstructName(const std::string& construct)
+{
+    mDirty |= mConstructName != construct;
+    mConstructName = construct;
+}
+
+void cExperimentMetaInfo::setTreatments(const std::vector<std::string>& treatments)
+{
+    mDirty |= mTreatments != treatments;
+    mTreatments = treatments;
+}
+
+void cExperimentMetaInfo::setFieldDesign(const std::string& design)
+{
+    mDirty |= mFieldDesign != design;
+    mFieldDesign = design;
+}
+
+void cExperimentMetaInfo::setPlantingDay(const std::string& day)
+{
+    mDirty |= mPlantingDay != day;
+    mPlantingDay = day;
+}
+
+void cExperimentMetaInfo::setPlantingMonth(const std::string& month)
+{
+    mDirty |= mPlantingMonth != month;
+    mPlantingMonth = month;
+}
+
+void cExperimentMetaInfo::setPlantingYear(const std::string& year)
+{
+    mDirty |= mPlantingYear != year;
+    mPlantingYear = year;
+}
+
+void cExperimentMetaInfo::setTargetHarvestDay(const std::string& day)
+{
+    mDirty |= mTargetHarvestDay != day;
+    mTargetHarvestDay = day;
+}
+
+void cExperimentMetaInfo::setTargetHarvestMonth(const std::string& month)
+{
+    mDirty |= mTargetHarvestMonth != month;
+    mTargetHarvestMonth = month;
+}
+
+void cExperimentMetaInfo::setTargetHarvestYear(const std::string& year)
+{
+    mDirty |= mTargetHarvestYear != year;
+    mTargetHarvestYear = year;
+}
+
+void cExperimentMetaInfo::setPermitInfo(const std::string& info)
+{
+    mDirty |= mPermitInfo != info;
+    mPermitInfo = info;
+}
+
+
 void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
 {
     if (jdoc.contains("principal investigator"))

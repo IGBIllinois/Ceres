@@ -2,6 +2,8 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "CreateExperimentFromGpsDlg.hpp"
+
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
 #include "FieldLayoutWidget.hpp"
@@ -315,6 +317,12 @@ void cMainWindow::onFileNewExperiment_Blank()
 {
     doSaveCheck();
 
+    if (!mExperimentFile.getController())
+    {
+        std::unique_ptr<cExperimentCtrlInfo> ctrl = std::make_unique<cExperimentCtrlInfo_SpiderCam>();
+        mExperimentFile.setController(std::move(ctrl));
+    }
+
     mExperimentFile.clearSteps();
 
     mpExpDesign->loadExperiment(mExperimentFile);
@@ -332,9 +340,44 @@ void cMainWindow::onFileNewExperiment_GPS()
     if (fileName.isEmpty())
         return;
 
-    mExperimentFile.clear();
+    std::ifstream gps_file;
+    gps_file.open(fileName.toStdString());
 
-    mExperimentFile.clearSteps();
+    if (!gps_file.is_open())
+    {
+        QString msg = "Could not open file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "File Error", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::string test;
+    gps_file >> test;
+    gps_file.close();
+
+    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    {
+        QString msg = "Invalid GPS file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "Invalid File", msg);
+        msg_box.exec();
+        return;
+    }
+
+    cCreateExperimentFromGpsDlg dlg(mExperimentFile, fileName, this);
+
+    connect(&dlg, &cCreateExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        mExperimentFile.clear();
+        return;
+    }
 
     mpEditMenu->setDisabled(false);
 }
@@ -388,7 +431,14 @@ void cMainWindow::onEditExperimentMetaInfo()
 {
     cExperimentMetaInfoDlg dlg(mExperimentFile.getMetaData(), this);
 
-    dlg.exec();
+    dlg.setExperimentTitle(mExperimentFile.getExperimentName());
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    mExperimentFile.setExperimentName(dlg.getExperimentTitle());
 }
 
 void cMainWindow::onEditExperimentCtrlInfo()
@@ -519,6 +569,12 @@ void cMainWindow::onOpenExperiment(const QString& filename)
     mpExpDesign->loadExperiment(mExperimentFile);
 
     mpEditMenu->setDisabled(false);
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::onExperimentChange()
+{
+    mpExpDesign->loadExperiment(mExperimentFile);
 }
 
 //-----------------------------------------------------------------------------

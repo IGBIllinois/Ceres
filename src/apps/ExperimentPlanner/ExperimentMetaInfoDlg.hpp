@@ -23,9 +23,11 @@ public:
 	cExperimentMetaInfoDlg(cExperimentMetaInfo& info, QWidget* parent = nullptr);
 	virtual ~cExperimentMetaInfoDlg();
 
+	std::string getExperimentTitle() const;
+	void setExperimentTitle(const std::string& title);
+
 private slots:
 	void accept() override;
-	void reject() override;
 	void apply();
 
 private:
@@ -35,13 +37,15 @@ private:
 private:
 	cExperimentMetaInfo& mInfo;
 
+	QLineEdit* mpTitle = nullptr;
+
 	QLineEdit* mpPrincipalInvestigator = nullptr;
 	QPlainTextEdit* mpResearchers = nullptr;
 	QPlainTextEdit* mpComments = nullptr;
 
 	QLineEdit* mpSpecies = nullptr;
 	QLineEdit* mpCultivar = nullptr;
-	QLineEdit* mpEvents = nullptr;
+	QPlainTextEdit* mpEvents = nullptr;
 	QLineEdit* mpConstructName = nullptr;
 	QPlainTextEdit* mpTreatments = nullptr;
 

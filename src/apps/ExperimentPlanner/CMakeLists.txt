@@ -85,6 +85,11 @@ PRIVATE
     ExperimentSteps.hpp
     ExperimentSteps.cpp
 
+    GpsFileReader.hpp
+    GpsFileReader.cpp
+    CreateExperimentFromGpsDlg.hpp
+    CreateExperimentFromGpsDlg.cpp
+
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp
 

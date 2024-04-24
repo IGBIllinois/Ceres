@@ -42,13 +42,27 @@ public:
 	const std::string& getPermitInfo() const;
 
 
+	void setPrincipalInvestigator(const std::string& pi);
+	void setResearchers(const std::vector<std::string>& researchers);
+	void setComments(const std::vector<std::string>& comments);
 
-	void setSavePlotsInSingleFile(bool option);
-	void setSaveFrameIds(bool option);
-	void setSavePixelInfo(bool option);
+	void setSpecies(const std::string& species);
+	void setCultivar(const std::string& cultivar);
+	void setEvents(const std::vector<std::string>& events);
+	void setConstructName(const std::string& construct);
+	void setTreatments(const std::vector<std::string>& treatments);
 
-	void setSavePlyFiles(bool option);
-	void setPlysUseBinaryFormat(bool option);
+	void setFieldDesign(const std::string& design);
+
+	void setPlantingDay(const std::string& day);
+	void setPlantingMonth(const std::string& month);
+	void setPlantingYear(const std::string& year);
+
+	void setTargetHarvestDay(const std::string& day);
+	void setTargetHarvestMonth(const std::string& month);
+	void setTargetHarvestYear(const std::string& year);
+
+	void setPermitInfo(const std::string& info);
 
 protected:
 	void load(const nlohmann::json& jdoc);
