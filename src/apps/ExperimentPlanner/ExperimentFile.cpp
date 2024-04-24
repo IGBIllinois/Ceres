@@ -416,8 +416,12 @@ void cExperimentFile::remove(const std::string& name)
 
 void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)
 {
-	mSteps.push_back(step.get());
-	step.release();
+	if (step)
+	{
+		mSteps.push_back(step.get());
+		step.release();
+		mDirty = true;;
+	}
 }
 
 const cExperimentStep& cExperimentFile::operator[](int index) const
