@@ -1,0 +1,53 @@
+
+#pragma once
+
+#include "ExperimentFile.hpp"
+
+#include <QDialog>
+
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QAbstractButton;
+class QStackedLayout;
+class QPushButton;
+class QLineEdit;
+class QCheckBox;
+class QLabel;
+class QTabWidget;
+class QComboBox;
+QT_END_NAMESPACE
+
+
+class cExperimentSensorInfoDlg : public QDialog
+{
+	Q_OBJECT
+
+public:
+	cExperimentSensorInfoDlg(cExperimentFile& info, QWidget* parent = nullptr);
+	virtual ~cExperimentSensorInfoDlg();
+
+private slots:
+	void accept() override;
+	void onControllerChange(const QString& text);
+
+private:
+	void createControls();
+	void createLayout();
+
+private:
+	cExperimentFile& mInfo;
+
+	std::vector<cExperimentSensorInfo*> mSensors;
+
+	QComboBox* mpController = nullptr;
+
+	QStackedLayout* mpControllerPanels = nullptr;
+
+	QWidget* mpCP_Dummy = nullptr;
+
+	QWidget* mpCP_SpiderCam = nullptr;
+
+	/** SpiderCam Info**/
+	QLineEdit* mpSC_UpdateInterval_ms = nullptr;
+	QLineEdit* mpSC_PositionTolerance_cm = nullptr;
+};
