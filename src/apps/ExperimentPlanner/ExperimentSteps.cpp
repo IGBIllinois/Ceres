@@ -55,13 +55,13 @@ void cExperimentStep_Delay::setWaitTime_sec(double sec)
 	mWaitTime_sec = sec;
 }
 
-void cExperimentStep_Delay::setWaitTime_min(int min)
+void cExperimentStep_Delay::setWaitTime_min(const std::optional<int>& min)
 {
 	mDirty |= mWaitTime_min != min;
 	mWaitTime_min = min;
 }
 
-void cExperimentStep_Delay::setWaitTime_hr(int hr)
+void cExperimentStep_Delay::setWaitTime_hr(const std::optional<int>& hr)
 {
 
 	mDirty |= mWaitTime_hr != hr;
@@ -162,8 +162,7 @@ void cExperimentStep_Delay::onEdit()
 		if (dlg.hours() > 0)
 			hours = dlg.hours();
 	}
-	mDirty = mWaitTime_hr != hours;
-	mWaitTime_hr = hours;
+	setWaitTime_hr(hours);
 
 	std::optional<int> minutes;
 	if (dlg.hasMinutes())
@@ -171,16 +170,13 @@ void cExperimentStep_Delay::onEdit()
 		if (dlg.minutes() > 0)
 			minutes = dlg.minutes();
 	}
-	mDirty = mWaitTime_min != minutes;
-	mWaitTime_min = minutes;
+	setWaitTime_min(minutes);
 
 	double seconds = dlg.seconds();
-	mDirty = mWaitTime_sec != seconds;
-	mWaitTime_sec = seconds;
+	setWaitTime_sec(seconds);
 
 	bool record = dlg.recording();
-	mDirty = mRecording != record;
-	mRecording = record;
+	setRecording(record);
 
 	auto description = generateDescription();
 	emit onDescriptionChange(description);
@@ -276,6 +272,8 @@ nlohmann::json cExperimentStep_Pause::save()
 
 	entry["type"] = "pause";
 
+	mDirty = false;
+
 	return entry;
 }
 
@@ -298,19 +296,19 @@ const std::optional<double>& cExperimentStep_Movement::getRoll_deg() const { ret
 
 bool cExperimentStep_Movement::isRecording() const { return mRecording; }
 
-void cExperimentStep_Movement::setX_mm(int x_mm)
+void cExperimentStep_Movement::setX_mm(const std::optional<int>& x_mm)
 {
 	mDirty |= mX_mm != x_mm;
 	mX_mm = x_mm;
 }
 
-void cExperimentStep_Movement::setY_mm(int y_mm)
+void cExperimentStep_Movement::setY_mm(const std::optional<int>& y_mm)
 {
 	mDirty |= mY_mm != y_mm;
 	mY_mm = y_mm;
 }
 
-void cExperimentStep_Movement::setZ_mm(int z_mm)
+void cExperimentStep_Movement::setZ_mm(const std::optional<int>& z_mm)
 {
 	mDirty |= mZ_mm != z_mm;
 	mZ_mm = z_mm;
@@ -322,19 +320,19 @@ void cExperimentStep_Movement::setSpeed_mmps(int speed_mmps)
 	mSpeed_mmps = speed_mmps;
 }
 
-void cExperimentStep_Movement::setPan_deg(double pan_deg)
+void cExperimentStep_Movement::setPan_deg(const std::optional<double>& pan_deg)
 {
 	mDirty |= mPan_deg != pan_deg;
 	mPan_deg = pan_deg;
 }
 
-void cExperimentStep_Movement::setTilt_deg(double tilt_deg)
+void cExperimentStep_Movement::setTilt_deg(const std::optional<double>& tilt_deg)
 {
 	mDirty |= mTilt_deg != tilt_deg;
 	mTilt_deg = tilt_deg;
 }
 
-void cExperimentStep_Movement::setRoll_deg(double roll_deg)
+void cExperimentStep_Movement::setRoll_deg(const std::optional<double>& roll_deg)
 {
 	mDirty |= mRoll_deg != roll_deg;
 	mRoll_deg = roll_deg;
@@ -379,6 +377,7 @@ void cExperimentStep_Movement::load(const nlohmann::json& jdoc)
 	else if (pos.contains("x (m)"))
 	{
 		mX_mm = static_cast<uint32_t>(pos["x (m)"].get<double>() * nConstants::M_TO_MM);
+		mUsingMeters = true;
 	}
 
 	if (pos.contains("y (mm)"))
@@ -388,6 +387,7 @@ void cExperimentStep_Movement::load(const nlohmann::json& jdoc)
 	else if (pos.contains("y (m)"))
 	{
 		mY_mm = static_cast<uint32_t>(pos["y (m)"].get<double>() * nConstants::M_TO_MM);
+		mUsingMeters = true;
 	}
 
 	if (pos.contains("z (mm)"))
@@ -397,15 +397,17 @@ void cExperimentStep_Movement::load(const nlohmann::json& jdoc)
 	else if (pos.contains("z (m)"))
 	{
 		mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
+		mUsingMeters = true;
 	}
 
-	if (pos.contains("speed (mm/s)"))
+	if (jdoc.contains("speed (mm/s)"))
 	{
 		mSpeed_mmps = jdoc["speed (mm/s)"].get<int>();
 	}
 	else
 	{
 		mSpeed_mmps = static_cast<uint32_t>(jdoc["speed (m/s)"].get<double>() * nConstants::M_TO_MM);
+		mUsingMps = true;
 	}
 
 	if (jdoc.contains("pan"))
@@ -426,6 +428,15 @@ void cExperimentStep_Movement::load(const nlohmann::json& jdoc)
 		mTilt_deg = jdoc["tilt (deg)"];
 	}
 
+	if (jdoc.contains("roll"))
+	{
+		mRoll_deg = jdoc["roll"];
+	}
+	else if (jdoc.contains("roll (deg)"))
+	{
+		mRoll_deg = jdoc["roll (deg)"];
+	}
+
 	mRecording = jdoc["record"];
 }
 
@@ -435,7 +446,51 @@ nlohmann::json cExperimentStep_Movement::save()
 
 	entry["type"] = "movement";
 
+	nlohmann::json pos;
+
+	if (mX_mm.has_value())
+	{
+		if (mUsingMeters)
+			pos["x (m)"] = mX_mm.value() * nConstants::MM_TO_M;
+		else
+			pos["x (mm)"] = mX_mm.value();
+	}
+
+	if (mY_mm.has_value())
+	{
+		if (mUsingMeters)
+			pos["y (m)"] = mY_mm.value() * nConstants::MM_TO_M;
+		else
+			pos["y (mm)"] = mY_mm.value();
+	}
+
+	if (mZ_mm.has_value())
+	{
+		if (mUsingMeters)
+			pos["z (m)"] = mZ_mm.value() * nConstants::MM_TO_M;
+		else
+			pos["z (mm)"] = mZ_mm.value();
+	}
+
+	entry["position"] = pos;
+
+	if (mUsingMps)
+		entry["speed (m/s)"] = mSpeed_mmps * nConstants::MM_TO_M;
+	else
+		entry["speed (mm/s)"] = mSpeed_mmps;
+
+	if (mPan_deg.has_value())
+		entry["pan (deg)"] = mPan_deg.value();
+
+	if (mTilt_deg.has_value())
+		entry["tilt (deg)"] = mTilt_deg.value();
+
+	if (mRoll_deg.has_value())
+		entry["roll (deg)"] = mRoll_deg.value();
+
 	entry["record"] = mRecording;
+
+	mDirty = false;
 
 	return entry;
 }
@@ -480,8 +535,7 @@ void cExperimentStep_Movement::onEdit()
 		if (dlg.x_mm() > 0)
 			x_mm = dlg.x_mm();
 	}
-	mDirty = mX_mm != x_mm;
-	mX_mm = x_mm;
+	setX_mm(x_mm);
 
 	std::optional<int> y_mm;
 	if (dlg.hasY())
@@ -489,8 +543,7 @@ void cExperimentStep_Movement::onEdit()
 		if (dlg.y_mm() > 0)
 			y_mm = dlg.y_mm();
 	}
-	mDirty = mY_mm != y_mm;
-	mY_mm = y_mm;
+	setY_mm(y_mm);
 
 	std::optional<int> z_mm;
 	if (dlg.hasZ())
@@ -498,40 +551,34 @@ void cExperimentStep_Movement::onEdit()
 		if (dlg.z_mm() > 0)
 			z_mm = dlg.z_mm();
 	}
-	mDirty = mZ_mm != z_mm;
-	mZ_mm = z_mm;
+	setZ_mm(z_mm);
 
 	int speed_mmps = dlg.speed_mmps();
-	mDirty = mSpeed_mmps != speed_mmps;
-	mSpeed_mmps = speed_mmps;
+	setSpeed_mmps(speed_mmps);
 
 	std::optional<int> pan_deg;
 	if (dlg.hasPan())
 	{
 		pan_deg = dlg.pan_deg();
 	}
-	mDirty = mPan_deg != pan_deg;
-	mPan_deg = pan_deg;
+	setPan_deg(pan_deg);
 
 	std::optional<int> tilt_deg;
 	if (dlg.hasTilt())
 	{
 		tilt_deg = dlg.tilt_deg();
 	}
-	mDirty = mTilt_deg != tilt_deg;
-	mTilt_deg = tilt_deg;
+	setTilt_deg(tilt_deg);
 
 	std::optional<int> roll_deg;
 	if (dlg.hasRoll())
 	{
 		roll_deg = dlg.roll_deg();
 	}
-	mDirty = mRoll_deg != roll_deg;
-	mRoll_deg = roll_deg;
+	setRoll_deg(roll_deg);
 
 	bool recording = dlg.recording();
-	mDirty = mRecording != recording;
-	mRecording = recording;
+	setRecording(recording);
 }
 
 QString cExperimentStep_Movement::generateMovementDescription() const

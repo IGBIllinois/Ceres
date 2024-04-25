@@ -141,6 +141,8 @@ void cExperimentMetaInfoDlg::createControls()
 	mpPlantingMonth->addItem("June");
 	mpPlantingMonth->addItem("July");
 	mpPlantingMonth->addItem("August");
+	mpPlantingMonth->setEditable(false);
+
 
 	if (!mInfo.getPlantingMonth().empty())
 	{
@@ -151,6 +153,7 @@ void cExperimentMetaInfoDlg::createControls()
 	mpPlantingYear = new QComboBox(this);
 	mpPlantingYear->addItem("2024");
 	mpPlantingYear->addItem("2025");
+
 
 	mpTargetHarvestDay = new QLineEdit(this);
 	mpTargetHarvestDay->setValidator(new QIntValidator(1, 31));
@@ -163,6 +166,7 @@ void cExperimentMetaInfoDlg::createControls()
 	mpTargetHarvestMonth->addItem("August");
 	mpTargetHarvestMonth->addItem("Sept");
 	mpTargetHarvestMonth->addItem("Oct");
+	mpTargetHarvestMonth->setEditable(false);
 
 	if (!mInfo.getTargetHarvestMonth().empty())
 	{

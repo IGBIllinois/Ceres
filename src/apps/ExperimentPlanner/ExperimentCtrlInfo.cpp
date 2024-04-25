@@ -47,23 +47,41 @@ std::string cExperimentCtrlInfo_SpiderCam::getType() const { return type(); }
 void cExperimentCtrlInfo_SpiderCam::clear()
 {}
 
+int cExperimentCtrlInfo_SpiderCam::getUpdateInterval_ms() const
+{
+	return mUpdateInterval_ms;
+}
+
+float cExperimentCtrlInfo_SpiderCam::getPositionTolerance_cm() const
+{
+	return mPositionTolerance_cm;
+}
+
+void cExperimentCtrlInfo_SpiderCam::setUpdateInterval_ms(int updateInterval_ms)
+{
+	mDirty |= mUpdateInterval_ms != updateInterval_ms;
+	mUpdateInterval_ms = updateInterval_ms;
+}
+
+void cExperimentCtrlInfo_SpiderCam::setPositionTolerance_cm(float positionTolerance_cm)
+{
+	mDirty |= mPositionTolerance_cm != positionTolerance_cm;
+	mPositionTolerance_cm = positionTolerance_cm;
+}
+
 void cExperimentCtrlInfo_SpiderCam::load(const nlohmann::json& jdoc)
-{}
+{
+	if (jdoc.contains("update interval (ms)"))
+		mUpdateInterval_ms = jdoc["update interval (ms)"];
+
+	if (jdoc.contains("position tolerance (cm)"))
+		mPositionTolerance_cm = jdoc["position tolerance (cm)"];
+}
 
 void cExperimentCtrlInfo_SpiderCam::save(nlohmann::json& jdoc)
 {
 	nlohmann::json spidercam;
 
-	spidercam["c2_ip"] = "172.16.144.144";
-	spidercam["c3_ip"] = "172.16.1.3";
-	spidercam["port"] = 10203;
-	spidercam["min X position (m)"] = 12.4;
-	spidercam["max X position (m)"] = 178.0;
-	spidercam["min Y position (m)"] = 12.3;
-	spidercam["max Y position (m)"] = 177.8;
-	spidercam["min height (m)"] = 1.0;
-	spidercam["max height (m)"] = 9.0;
-	spidercam["max speed (m/s)"] = 2.0;
 	spidercam["update interval (ms)"] = 250;
 	spidercam["position tolerance (cm)"] = 1.0;
 

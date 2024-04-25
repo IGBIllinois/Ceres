@@ -26,6 +26,7 @@ signals:
 	void loadExperiment(const QString& file_name);
 
 public slots:
+	void reloadExperiments();
 	void reloadExperiments(QString path);
 
 protected:

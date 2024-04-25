@@ -61,6 +61,8 @@ PRIVATE
 #
     ExperimentMetaInfoDlg.hpp
     ExperimentMetaInfoDlg.cpp
+    ExperimentCtrlInfoDlg.hpp
+    ExperimentCtrlInfoDlg.cpp
 
     DelayStepInfoDlg.hpp
     DelayStepInfoDlg.cpp

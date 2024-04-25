@@ -32,10 +32,14 @@ signals:
 	void clearPaths();
 	void drawPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
 	void experimentChanged();
+	void saveExperiment();
 
 private slots:
 	void accept() override;
 	void generate();
+	void onMetaInfoUpdate();
+	void onControllerUpdate();
+	void onSensorUpdate();
 
 	void onShowPath();
 
@@ -48,6 +52,10 @@ private:
 
 	QLineEdit* mpTitle = nullptr;
 
+	QPushButton* mpMetaInfo = nullptr;
+	QPushButton* mpCtrlInfo = nullptr;
+	QPushButton* mpSensorInfo = nullptr;
+
 	uint32_t mStartIndex = 0;
 	uint32_t mEndIndex = 0;
 
@@ -58,4 +66,24 @@ private:
 
 	QPushButton* mpClearPath = nullptr;
 	QPushButton* mpShowPath = nullptr;
+
+	QCheckBox* mpInverseDirection = nullptr;
+	QCheckBox* mpUseIntermediatePoints = nullptr;
+
+	QLineEdit* mpTravelHeight_m = nullptr;
+	QLineEdit* mpTravelVerticalSpeed_mmps = nullptr;
+	QLineEdit* mpTravelSpeed_mmps = nullptr;
+
+	QLineEdit* mpBeginningOffset_m = nullptr;
+	QLineEdit* mpEndingOffset_m = nullptr;
+
+	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
+	QLineEdit* mpMeasurementHeight_m = nullptr;
+	QLineEdit* mpMeasurementSpeed_mmps = nullptr;
+	QLineEdit* mpEndMeasurementDelay_sec = nullptr;
+
+	QLineEdit* mpSafeHeight_m = nullptr;
+	QLineEdit* mpSafeVerticalSpeed_mmps = nullptr;
+
+	QPushButton* mpSaveAs = nullptr;
 };

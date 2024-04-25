@@ -12,6 +12,8 @@
 #include "ExperimentSteps.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
+#include "ExperimentCtrlInfoDlg.hpp"
+
 #include "ExperimentFieldLayoutDlg.hpp"
 
 #include "RappFieldBoundary.hpp"
@@ -370,6 +372,7 @@ void cMainWindow::onFileNewExperiment_GPS()
     connect(&dlg, &cCreateExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
     connect(&dlg, &cCreateExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateExperimentFromGpsDlg::saveExperiment, this, &cMainWindow::onFileSaveAsExperimentFile);
 
     auto result = dlg.exec();
 
@@ -421,6 +424,8 @@ void cMainWindow::onFileSaveAsExperimentFile()
     QString title = "RAPP Plot Mapper - ";
     title += fileName;
     setWindowTitle(title);
+
+    mpExperiments->reloadExperiments();
 }
 
 
@@ -443,6 +448,8 @@ void cMainWindow::onEditExperimentMetaInfo()
 
 void cMainWindow::onEditExperimentCtrlInfo()
 {
+    cExperimentCtrlInfoDlg dlg(mExperimentFile, this);
+    dlg.exec();
 
 }
 
@@ -580,11 +587,10 @@ void cMainWindow::onExperimentChange()
 //-----------------------------------------------------------------------------
 void cMainWindow::closeEvent(QCloseEvent* event)
 {
-/*
-    if (mPlotData.isDirty())
+    if (mExperimentFile.isDirty())
     {
         QMessageBox msgBox;
-        msgBox.setText("The plot configuration file has been modified.");
+        msgBox.setText("The experiment file has been modified.");
         msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Save);
@@ -592,7 +598,7 @@ void cMainWindow::closeEvent(QCloseEvent* event)
 
         if (ret == QMessageBox::Save)
         {
-            onFileSavePlotConfigFile();
+            onFileSaveExperimentFile();
         }
         else if (ret == QMessageBox::Cancel)
         {
@@ -600,7 +606,6 @@ void cMainWindow::closeEvent(QCloseEvent* event)
             return;
         }
     }
-*/
 
 //    mSettings.setValue("mainWindow/geometry", saveGeometry());
 //    mSettings.setValue("mainWindow/windowState", saveState());

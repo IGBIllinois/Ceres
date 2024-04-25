@@ -38,6 +38,12 @@ cExperimentManager::cExperimentManager(const QString& path, QWidget* parent)
     loadExperiments();
 }
 
+void cExperimentManager::reloadExperiments()
+{
+    clear();
+    loadExperiments();
+}
+
 void cExperimentManager::reloadExperiments(QString path)
 {
     mExperimentPath = path.toStdString();

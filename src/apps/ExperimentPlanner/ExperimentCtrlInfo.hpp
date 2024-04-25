@@ -58,9 +58,19 @@ public:
 
 	void clear() override;
 
+	int getUpdateInterval_ms() const;
+	float getPositionTolerance_cm() const;
+
+	void setUpdateInterval_ms(int updateInterval_ms);
+	void setPositionTolerance_cm(float positionTolerance_cm);
+
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
+
+private:
+	int mUpdateInterval_ms = 250;
+	float mPositionTolerance_cm = 1.0;
 };
 
 

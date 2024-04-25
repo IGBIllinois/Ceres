@@ -56,8 +56,8 @@ public:
 	bool isRecording() const;
 
 	void setWaitTime_sec(double sec);
-	void setWaitTime_min(int min);
-	void setWaitTime_hr(int hr);
+	void setWaitTime_min(const std::optional<int>& min);
+	void setWaitTime_hr(const std::optional<int>& hr);
 
 	void setRecording(bool recording);
 
@@ -124,15 +124,15 @@ public:
 
 	bool isRecording() const;
 
-	void setX_mm(int x_mm);
-	void setY_mm(int y_mm);
-	void setZ_mm(int z_mm);
+	void setX_mm(const std::optional<int>& x_mm);
+	void setY_mm(const std::optional<int>& y_mm);
+	void setZ_mm(const std::optional<int>& z_mm);
 
 	void setSpeed_mmps(int speed_mmps);
 
-	void setPan_deg(double pan_deg);
-	void setTilt_deg(double tilt_deg);
-	void setRoll_deg(double roll_deg);
+	void setPan_deg(const std::optional<double>& pan_deg);
+	void setTilt_deg(const std::optional<double>& tilt_deg);
+	void setRoll_deg(const std::optional<double>& roll_deg);
 
 	void setRecording(bool recording);
 
@@ -167,6 +167,9 @@ private:
 	std::optional<double> mPan_deg;
 	std::optional<double> mTilt_deg;
 	std::optional<double> mRoll_deg;
+
+	bool mUsingMeters = false;
+	bool mUsingMps = false;
 };
 
 
