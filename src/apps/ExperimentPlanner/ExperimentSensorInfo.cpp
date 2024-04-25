@@ -64,7 +64,7 @@ void cExperimentSensorInfo_Ouster::save(nlohmann::json& jdoc)
 	azimuth_window.push_back(225.0);
 	ouster["azimuth window"] = azimuth_window;
 
-	ouster["mode"] = "2048x10";
+	ouster["mode"] = "1024x10";
 
 	jdoc[type()] = ouster;
 
@@ -91,8 +91,6 @@ void cExperimentSensorInfo_Septentrio::save(nlohmann::json& jdoc)
 	ssnx["Manufacturer"] = "Septentrio";
 	ssnx["Model"] = "Altus-NR3";
 	ssnx["Serial Number"] = "6106326";
-	ssnx["host"] = "172.16.1.3";
-	ssnx["port"] = 10000;
 
 	jdoc[type()] = ssnx;
 

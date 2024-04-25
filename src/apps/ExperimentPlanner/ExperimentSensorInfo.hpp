@@ -59,6 +59,15 @@ public:
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
+
+private:
+/*
+	"Manufacturer": "OUSTER",
+	"Model" : "OS0-128",
+	"Serial Number" : "992037000167",
+	"azimuth window" : [135.0, 225.0] ,
+	"mode" : "2048x10"
+*/
 };
 
 
@@ -75,6 +84,13 @@ public:
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
+
+private:
+/*
+	"Manufacturer": "Septentrio",
+	"Model": "Altus-NR3",
+	"Serial Number": "6106326"
+*/
 };
 
 
@@ -91,6 +107,11 @@ public:
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
+
+	int mDefaultCameraId = -1;
+	int mDefaultImageWidth = 1;
+	int mDefaultImageHeight = 1;
+	int mDefaultFrameRate_fps = -1;
 };
 
 
