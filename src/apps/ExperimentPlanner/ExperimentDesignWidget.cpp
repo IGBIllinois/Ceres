@@ -41,16 +41,18 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
     cTerminal* start = new cStartTerminal();
     mScene.addItem(start);
 
-    cFlowArrow* arrow = new cFlowArrow();
+    cFlowArrow* arrow = new cFlowArrow(0);
     arrow->setTopPoint(start->getBottomPoint());
     mScene.addItem(arrow);
 
     int x1_mm = 0;
     int y1_mm = 0;
 
+    int id = 0;
+
     for (auto step : experiment)
     {
-        auto item = step->graphicsItem();
+        auto item = step->graphicsItem(id);
         item->setTopPoint(arrow->getBottomPoint());
         mScene.addItem(item);
 
@@ -78,7 +80,8 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
             }
         }
 
-        arrow = new cFlowArrow();
+        ++id;
+        arrow = new cFlowArrow(id);
         arrow->setTopPoint(item->getBottomPoint());
         mScene.addItem(arrow);
     }

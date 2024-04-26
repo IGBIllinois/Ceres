@@ -20,12 +20,17 @@ QT_END_NAMESPACE
 class cConnectedItem : public QGraphicsItem
 {
 public:
-	explicit cConnectedItem(QGraphicsItem* parent = nullptr);
+	explicit cConnectedItem(const int id, QGraphicsItem* parent = nullptr);
+
+	const int getID() const;
 
 	void setTopPoint(int x, int y);
 	virtual void setTopPoint(QPoint p) = 0;
 
 	virtual QPoint getBottomPoint() const = 0;
+
+private:
+	const int mID;
 };
 
 
@@ -35,12 +40,15 @@ class cFlowArrow : public QObject, public cConnectedItem
 	Q_OBJECT
 
 public:
-	explicit cFlowArrow(QGraphicsItem* parent = nullptr);
+	explicit cFlowArrow(const int id, QGraphicsItem* parent = nullptr);
 
 	void setTopPoint(int x, int y);
 	void setTopPoint(QPoint p);
 
 	QPoint getBottomPoint() const;
+
+signals:
+	void insertBefore(int id);
 
 public slots:
 	void setScale(int scale);
@@ -54,6 +62,9 @@ public:
 
 protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+
+private slots:
+	void onInsert();
 
 private:
 	QPoint mTop;
@@ -81,8 +92,8 @@ class cTerminal : public QObject, public cConnectedItem
 	Q_OBJECT
 
 public:
-	explicit cTerminal(QGraphicsItem* parent = nullptr);
-	explicit cTerminal(const QString& text, QGraphicsItem* parent = nullptr);
+	explicit cTerminal(const int id, QGraphicsItem* parent = nullptr);
+	explicit cTerminal(const int id, const QString& text, QGraphicsItem* parent = nullptr);
 
 	const QString& text() const;
 	void setText(const QString& text);
@@ -154,8 +165,8 @@ class cProcessStep : public QObject, public cConnectedItem
 	Q_OBJECT
 
 public:
-	explicit cProcessStep(QGraphicsItem* parent = nullptr);
-	explicit cProcessStep(const QString& text, QGraphicsItem* parent = nullptr);
+	explicit cProcessStep(const int id, QGraphicsItem* parent = nullptr);
+	explicit cProcessStep(const int id, const QString& text, QGraphicsItem* parent = nullptr);
 
 	const QString& title() const;
 
@@ -166,6 +177,8 @@ public:
 
 signals:
 	void editStep();
+	void insertBefore(int id);
+	void insertAfter(int id);
 
 public slots:
 	void setTitle(const QString& title);
@@ -184,6 +197,10 @@ public:
 
 protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+
+private slots:
+	void onInsertBefore();
+	void onInsertAfter();
 
 private:
 	void recomputeBoxSize();
@@ -221,8 +238,8 @@ class cIoStep : public QObject, public cConnectedItem
 		Q_OBJECT
 
 public:
-	explicit cIoStep(QGraphicsItem* parent = nullptr);
-	explicit cIoStep(const QString& text, QGraphicsItem* parent = nullptr);
+	explicit cIoStep(const int id, QGraphicsItem* parent = nullptr);
+	explicit cIoStep(const int id, const QString& text, QGraphicsItem* parent = nullptr);
 
 	const QString& title() const;
 
@@ -236,6 +253,8 @@ public:
 
 signals:
 	void editStep();
+	void insertBefore(int id);
+	void insertAfter(int id);
 
 public slots:
 	void setTitle(const QString& title);
@@ -254,6 +273,10 @@ public:
 
 protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+
+private slots:
+	void onInsertBefore();
+	void onInsertAfter();
 
 private:
 	void recomputeBoxSize();

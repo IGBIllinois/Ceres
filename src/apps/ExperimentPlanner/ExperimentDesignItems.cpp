@@ -11,10 +11,16 @@
 #include <QGraphicsSceneContextMenuEvent>
 
 #include <algorithm>
+#include <limits>
 
 
-cConnectedItem::cConnectedItem(QGraphicsItem* parent) : QGraphicsItem(parent)
+cConnectedItem::cConnectedItem(const int id, QGraphicsItem* parent) : QGraphicsItem(parent), mID(id)
 {}
+
+const int cConnectedItem::getID() const
+{
+	return mID;
+}
 
 void cConnectedItem::setTopPoint(int x, int y)
 {
@@ -28,7 +34,7 @@ void cConnectedItem::setTopPoint(int x, int y)
  *
  ********************************************************************/
 
-cFlowArrow::cFlowArrow(QGraphicsItem* parent) : cConnectedItem(parent)
+cFlowArrow::cFlowArrow(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {}
 
 void cFlowArrow::setTopPoint(int x, int y)
@@ -113,11 +119,16 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	QMenu contextMenu(widget);
 
 	QAction step("Insert Step...");
-	//	connect(&open, &QAction::triggered, this, &cExperimentManager::openExperiment);
+	connect(&step, &QAction::triggered, this, &cFlowArrow::onInsert);
 	contextMenu.addAction(&step);
 
 	contextMenu.exec(event->screenPos());
 };
+
+void cFlowArrow::onInsert()
+{
+	emit insertBefore(getID());
+}
 
 
 /********************************************************************
@@ -126,7 +137,7 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
  * 
  ********************************************************************/
 
-cTerminal::cTerminal(QGraphicsItem* parent) : cConnectedItem(parent)
+cTerminal::cTerminal(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {
 	QFontMetrics fm(mFont);
 
@@ -144,7 +155,7 @@ cTerminal::cTerminal(QGraphicsItem* parent) : cConnectedItem(parent)
 	mBottom.setY(mScale * mBoxHeight / 2);
 }
 
-cTerminal::cTerminal(const QString& text, QGraphicsItem* parent) : cConnectedItem(parent)
+cTerminal::cTerminal(const int id, const QString& text, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {
 	setText(text);
 
@@ -271,7 +282,7 @@ void cTerminal::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 
 cStartTerminal::cStartTerminal(QGraphicsItem* parent)
-	: cTerminal("Start", parent)
+	: cTerminal(0, "Start", parent)
 {}
 
 void cStartTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
@@ -287,7 +298,7 @@ void cStartTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 };
 
 cEndTerminal::cEndTerminal(QGraphicsItem* parent)
-	: cTerminal("End", parent)
+	: cTerminal(std::numeric_limits<int>::max(), "End", parent)
 {}
 
 void cEndTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
@@ -309,13 +320,13 @@ void cEndTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
  *
  ********************************************************************/
 
-cProcessStep::cProcessStep(QGraphicsItem* parent) : cConnectedItem(parent)
+cProcessStep::cProcessStep(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
 }
 
-cProcessStep::cProcessStep(const QString& text, QGraphicsItem* parent)
+cProcessStep::cProcessStep(const int id, const QString& text, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {
 	setTitle(text);
 
@@ -476,7 +487,8 @@ void cProcessStep::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 	QPoint p1 = mTop;
 	p1.setX(mTop.x() - (mScale * mBoxWidth / 2));
 
-	painter->drawRoundRect(p1.x(), p1.y(), mScale * mBoxWidth, mScale * mBoxHeight, 10, 10);
+//	painter->drawRoundRect(p1.x(), p1.y(), mScale * mBoxWidth, mScale * mBoxHeight, 10, 10);
+	painter->drawRect(p1.x(), p1.y(), static_cast<int>(mScale * mBoxWidth), static_cast<int>(mScale * mBoxHeight));
 
 	painter->setFont(mFont);
 
@@ -555,14 +567,24 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	contextMenu.addSeparator();
 
 	QAction before("Insert Step Before...");
-	//	connect(&open, &QAction::triggered, this, &cProcessStep::openExperiment);
+	connect(&before, &QAction::triggered, this, &cProcessStep::onInsertBefore);
 	contextMenu.addAction(&before);
 
 	QAction after("Insert Step After...");
-	//	connect(&open, &QAction::triggered, this, &cProcessStep::openExperiment);
+	connect(&after, &QAction::triggered, this, &cProcessStep::onInsertAfter);
 	contextMenu.addAction(&after);
 
 	contextMenu.exec(event->screenPos());
+}
+
+void cProcessStep::onInsertBefore()
+{
+	emit insertBefore(getID());
+}
+
+void cProcessStep::onInsertAfter()
+{
+	emit insertAfter(getID());
 }
 
 
@@ -572,13 +594,13 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
  *
  ********************************************************************/
 
-cIoStep::cIoStep(QGraphicsItem* parent) : cConnectedItem(parent)
+cIoStep::cIoStep(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
 }
 
-cIoStep::cIoStep(const QString& text, QGraphicsItem* parent)
+cIoStep::cIoStep(const int id, const QString& text, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {
 	setTitle(text);
 
@@ -845,13 +867,24 @@ void cIoStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	}
 
 	QAction before("Insert Step Before...");
-	//	connect(&open, &QAction::triggered, this, &cIoStep::openExperiment);
+	connect(&before, &QAction::triggered, this, &cIoStep::onInsertBefore);
 	contextMenu.addAction(&before);
 
 	QAction after("Insert Step After...");
-	//	connect(&open, &QAction::triggered, this, &cIoStep::openExperiment);
+	connect(&after, &QAction::triggered, this, &cIoStep::onInsertAfter);
 	contextMenu.addAction(&after);
 
 	contextMenu.exec(event->screenPos());
 }
+
+void cIoStep::onInsertBefore()
+{
+	emit insertBefore(getID());
+}
+
+void cIoStep::onInsertAfter()
+{
+	emit insertAfter(getID());
+}
+
 
