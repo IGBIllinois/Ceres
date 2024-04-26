@@ -74,9 +74,9 @@ void cExperimentStep_Delay::setRecording(bool recording)
 	mRecording = recording;
 }
 
-cConnectedItem* cExperimentStep_Delay::graphicsItem() const
+cConnectedItem* cExperimentStep_Delay::graphicsItem(const int id) const
 {
-	auto step = new cProcessStep();
+	auto step = new cProcessStep(id);
 	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Delay::onEdit);
 	connect(this, &cExperimentStep_Delay::onDescriptionChange, step, &cProcessStep::setSubHeading1);
 	connect(this, &cExperimentStep_Delay::onCommentChange, step, &cProcessStep::setSubHeading2);
@@ -252,9 +252,9 @@ QString cExperimentStep_Delay::generateComment() const
  *
  ********************************************************************/
 
-cConnectedItem* cExperimentStep_Pause::graphicsItem() const
+cConnectedItem* cExperimentStep_Pause::graphicsItem(const int id) const
 {
-	auto step = new cIoStep();
+	auto step = new cIoStep(id);
 	step->setReadOnly(true);
 	step->setTitle("Wait for User OK to Advance...");
 
@@ -344,9 +344,9 @@ void cExperimentStep_Movement::setRecording(bool recording)
 	mRecording = recording;
 }
 
-cConnectedItem* cExperimentStep_Movement::graphicsItem() const
+cConnectedItem* cExperimentStep_Movement::graphicsItem(const int id) const
 {
-	auto step = new cProcessStep();
+	auto step = new cProcessStep(id);
 	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Movement::onEdit);
 	connect(this, &cExperimentStep_Movement::onMovementTextChange, step, &cProcessStep::setSubHeading1);
 	connect(this, &cExperimentStep_Movement::onOrientationTextChange, step, &cProcessStep::setSubHeading2);

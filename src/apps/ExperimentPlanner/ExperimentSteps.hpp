@@ -27,7 +27,7 @@ public:
 
 	bool isDirty() const;
 
-	virtual cConnectedItem* graphicsItem() const = 0;
+	virtual cConnectedItem* graphicsItem(const int id) const = 0;
 
 protected:
 	virtual void load(const nlohmann::json& jdoc) = 0;
@@ -61,7 +61,7 @@ public:
 
 	void setRecording(bool recording);
 
-	cConnectedItem* graphicsItem() const override;
+	cConnectedItem* graphicsItem(const int id) const override;
 
 signals:
 	void onDescriptionChange(const QString& desc);
@@ -95,7 +95,7 @@ class cExperimentStep_Pause : public QObject, public cExperimentStep
 public:
 	cExperimentStep_Pause() = default;
 
-	cConnectedItem* graphicsItem() const override;
+	cConnectedItem* graphicsItem(const int id) const override;
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
@@ -136,7 +136,7 @@ public:
 
 	void setRecording(bool recording);
 
-	cConnectedItem* graphicsItem() const override;
+	cConnectedItem* graphicsItem(const int id) const override;
 
 signals:
 	void onMovementTextChange(const QString& desc);

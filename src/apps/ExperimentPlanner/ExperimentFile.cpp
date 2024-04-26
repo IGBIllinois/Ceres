@@ -362,57 +362,45 @@ cExperimentFile::iterator cExperimentFile::end() { return mSteps.end(); }
 cExperimentFile::const_iterator	cExperimentFile::begin() const { return mSteps.cbegin(); }
 cExperimentFile::const_iterator	cExperimentFile::end() const { return mSteps.cend(); }
 
-/*
-cExperimentFile::const_iterator cExperimentFile::find(const std::string& name) const
+void cExperimentFile::insertBefore(int index, cExperimentStep* step)
 {
-	for (auto it = mScans.cbegin(); it != mScans.cend(); ++it)
+	if (index <= 0)
 	{
-		if (it->getExperimentName() == name)
-			return it;
+		mSteps.push_front(step);
+		return;
 	}
 
-	return mScans.cend();
-}
-*/
-
-/*
-cExperimentFile::iterator cExperimentFile::find(const std::string& name)
-{
-	for (auto it = mScans.begin(); it != mScans.end(); ++it)
+	if (index >= mSteps.size())
 	{
-		if (it->getExperimentName() == name)
-			return it;
+		mSteps.push_back(step);
+		return;
 	}
 
-	return mScans.end();
-}
-*/
+	auto it = mSteps.begin();
+	std::advance(it, index);
 
-/*
-cPlotConfigScan& cExperimentFile::add(const std::string& name)
+	mSteps.insert(it, step);
+}
+
+void cExperimentFile::insertAfter(int index, cExperimentStep* step)
 {
-	for (auto& scan : mScans)
+	if (index <= 0)
 	{
-		if (scan.getExperimentName() == name)
-			return scan;
+		mSteps.push_front(step);
+		return;
 	}
 
-	cPlotConfigScan scan;
+	if (index >= mSteps.size())
+	{
+		mSteps.push_back(step);
+		return;
+	}
 
-	scan.setExperimentName(name);
+	auto it = mSteps.begin();
+	std::advance(it, index);
 
-	mScans.push_back(std::move(scan));
-
-	return mScans.back();
+	mSteps.insert(it, step);
 }
-*/
-
-/*
-void cExperimentFile::remove(const std::string& name)
-{
-
-}
-*/
 
 void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)
 {

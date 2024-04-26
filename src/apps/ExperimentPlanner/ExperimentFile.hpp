@@ -70,8 +70,6 @@ public:
 	const std::vector<cExperimentSensorInfo*>& getSensors() const;
 	void addSensor(std::unique_ptr<cExperimentSensorInfo> sensor);
 
-	//	bool contains(const std::string& name);
-
 	const cExperimentStep& front() const;
 	cExperimentStep& front();
 
@@ -84,11 +82,7 @@ public:
 	void insertBefore(int index, cExperimentStep* step);
 	void insertAfter(int index, cExperimentStep* step);
 
-//	const_iterator	find(const std::string& name) const;
-//	iterator		find(const std::string& name);
-
 	void appendStep(std::unique_ptr<cExperimentStep> step);
-//	void remove(const std::string& name);
 
 	const cExperimentStep& operator[](int index) const;
 	cExperimentStep& operator[](int index);
