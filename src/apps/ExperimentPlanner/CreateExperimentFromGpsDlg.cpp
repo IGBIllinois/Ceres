@@ -7,6 +7,7 @@
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
+#include "ExperimentSensorInfoDlg.hpp"
 
 #include <QLabel>
 #include <QLayout>
@@ -339,7 +340,8 @@ void cCreateExperimentFromGpsDlg::onControllerUpdate()
 
 void cCreateExperimentFromGpsDlg::onSensorUpdate()
 {
-
+	cExperimentSensorInfoDlg dlg(mInfo, this);
+	dlg.exec();
 }
 
 void cCreateExperimentFromGpsDlg::generate()

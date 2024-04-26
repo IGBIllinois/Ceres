@@ -17,6 +17,7 @@ QT_END_NAMESPACE
 // Forward Declarations
 class cExperimentFile;
 class cConnectedItem;
+class cBaseStep;
 
 
 class cExperimentStep
@@ -27,7 +28,8 @@ public:
 
 	bool isDirty() const;
 
-	virtual cConnectedItem* graphicsItem(const int id) const = 0;
+	virtual cBaseStep* graphicsItem(const int id) const = 0;
+//	virtual cConnectedItem* graphicsItem(const int id) const = 0;
 
 protected:
 	virtual void load(const nlohmann::json& jdoc) = 0;
@@ -61,18 +63,19 @@ public:
 
 	void setRecording(bool recording);
 
-	cConnectedItem* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id) const override;
+//	cConnectedItem* graphicsItem(const int id) const override;
 
 signals:
 	void onDescriptionChange(const QString& desc);
 	void onCommentChange(const QString& comment);
 
+public slots:
+	void onEdit();
+
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	nlohmann::json save() override;
-
-private slots:
-	void onEdit();
 
 private:
 	QString generateDescription() const;
@@ -95,7 +98,8 @@ class cExperimentStep_Pause : public QObject, public cExperimentStep
 public:
 	cExperimentStep_Pause() = default;
 
-	cConnectedItem* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id) const override;
+//	cConnectedItem* graphicsItem(const int id) const override;
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
@@ -136,19 +140,20 @@ public:
 
 	void setRecording(bool recording);
 
-	cConnectedItem* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id) const override;
+//	cConnectedItem* graphicsItem(const int id) const override;
 
 signals:
 	void onMovementTextChange(const QString& desc);
 	void onOrientationTextChange(const QString& desc);
 	void onCommentChange(const QString& comment);
 
+public slots:
+	void onEdit();
+
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	nlohmann::json save() override;
-
-private slots:
-	void onEdit();
 
 private:
 	QString generateMovementDescription() const;

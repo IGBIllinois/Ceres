@@ -25,6 +25,10 @@ QT_END_NAMESPACE
 // Forward Declarations
 class cExperimentStep;
 
+std::shared_ptr<cExperimentSensorInfo> createSensor(std::string type);
+
+enum eExperimentStep {delay, pause, movement};
+
 
 class cExperimentFile
 {
@@ -67,20 +71,23 @@ public:
 	cExperimentCtrlInfo* const getController() const;
 	void setController(std::unique_ptr<cExperimentCtrlInfo> controller);
 
-	const std::vector<cExperimentSensorInfo*>& getSensors() const;
-	void addSensor(std::unique_ptr<cExperimentSensorInfo> sensor);
+	const std::vector<std::shared_ptr<cExperimentSensorInfo>>& getSensors() const;
+	void setSensors(const std::vector<std::shared_ptr<cExperimentSensorInfo>>& sensors);
+	void addSensor(std::shared_ptr<cExperimentSensorInfo> sensor);
 
 	const cExperimentStep& front() const;
 	cExperimentStep& front();
 
-	iterator		begin();
-	iterator		end();
+	iterator  begin();
+	iterator  end();
 
 	const_iterator	begin() const;
 	const_iterator	end() const;
 
 	void insertBefore(int index, cExperimentStep* step);
 	void insertAfter(int index, cExperimentStep* step);
+
+	void removeStep(int index);
 
 	void appendStep(std::unique_ptr<cExperimentStep> step);
 
@@ -103,7 +110,7 @@ private:
 
 	std::unique_ptr<cExperimentCtrlInfo> mpController;
 
-	std::vector<cExperimentSensorInfo*> mSensors;
+	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensors;
 
 	std::list<cExperimentStep*> mSteps;
 };

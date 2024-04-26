@@ -1,5 +1,6 @@
 
 #include "ExperimentDesignItems.hpp"
+#include "ExperimentFile.hpp"
 
 #include <QMenu>
 #include <QAction>
@@ -118,16 +119,34 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	auto widget = event->widget();
 	QMenu contextMenu(widget);
 
-	QAction step("Insert Step...");
-	connect(&step, &QAction::triggered, this, &cFlowArrow::onInsert);
-	contextMenu.addAction(&step);
+	QAction delayStep("Insert Delay Step...");
+	connect(&delayStep, &QAction::triggered, this, &cFlowArrow::onInsertDelay);
+	contextMenu.addAction(&delayStep);
+
+	QAction pauseStep("Insert Pause Step...");
+	connect(&pauseStep, &QAction::triggered, this, &cFlowArrow::onInsertPause);
+	contextMenu.addAction(&pauseStep);
+
+	QAction movementStep("Insert Movement Step...");
+	connect(&movementStep, &QAction::triggered, this, &cFlowArrow::onInsertMovement);
+	contextMenu.addAction(&movementStep);
 
 	contextMenu.exec(event->screenPos());
 };
 
-void cFlowArrow::onInsert()
+void cFlowArrow::onInsertDelay()
 {
-	emit insertBefore(getID());
+	emit insertBefore(getID(), eExperimentStep::delay);
+}
+
+void cFlowArrow::onInsertPause()
+{
+	emit insertBefore(getID(), eExperimentStep::pause);
+}
+
+void cFlowArrow::onInsertMovement()
+{
+	emit insertBefore(getID(), eExperimentStep::movement);
 }
 
 
@@ -287,6 +306,7 @@ cStartTerminal::cStartTerminal(QGraphicsItem* parent)
 
 void cStartTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
+/*
 	auto widget = event->widget();
 	QMenu contextMenu(widget);
 
@@ -295,6 +315,7 @@ void cStartTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	contextMenu.addAction(&open);
 
 	contextMenu.exec(event->screenPos());
+*/
 };
 
 cEndTerminal::cEndTerminal(QGraphicsItem* parent)
@@ -303,6 +324,7 @@ cEndTerminal::cEndTerminal(QGraphicsItem* parent)
 
 void cEndTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
+/*
 	auto widget = event->widget();
 	QMenu contextMenu(widget);
 
@@ -311,7 +333,12 @@ void cEndTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	contextMenu.addAction(&open);
 
 	contextMenu.exec(event->screenPos());
+*/
 };
+
+
+cBaseStep::cBaseStep(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent) 
+{}
 
 
 /********************************************************************
@@ -320,13 +347,13 @@ void cEndTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
  *
  ********************************************************************/
 
-cProcessStep::cProcessStep(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
+cProcessStep::cProcessStep(const int id, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
 }
 
-cProcessStep::cProcessStep(const int id, const QString& text, QGraphicsItem* parent) : cConnectedItem(id, parent)
+cProcessStep::cProcessStep(const int id, const QString& text, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
 {
 	setTitle(text);
 
@@ -566,25 +593,77 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
 	contextMenu.addSeparator();
 
-	QAction before("Insert Step Before...");
-	connect(&before, &QAction::triggered, this, &cProcessStep::onInsertBefore);
-	contextMenu.addAction(&before);
 
-	QAction after("Insert Step After...");
-	connect(&after, &QAction::triggered, this, &cProcessStep::onInsertAfter);
-	contextMenu.addAction(&after);
+	QMenu* beforeMenu = contextMenu.addMenu(tr("Insert Step Before..."));
+
+	QAction beforeDelay("Delay");
+	connect(&beforeDelay, &QAction::triggered, this, &cProcessStep::onInsertBefore_Delay);
+	beforeMenu->addAction(&beforeDelay);
+
+	QAction beforePause("Pause");
+	connect(&beforePause, &QAction::triggered, this, &cProcessStep::onInsertBefore_Pause);
+	beforeMenu->addAction(&beforePause);
+
+	QAction beforeMovement("Movement");
+	connect(&beforeMovement, &QAction::triggered, this, &cProcessStep::onInsertBefore_Movement);
+	beforeMenu->addAction(&beforeMovement);
+
+	QMenu* afterMenu = contextMenu.addMenu(tr("Insert Step After..."));
+
+	QAction afterDelay("Delay");
+	connect(&afterDelay, &QAction::triggered, this, &cProcessStep::onInsertAfter_Delay);
+	afterMenu->addAction(&afterDelay);
+
+	QAction afterPause("Pause");
+	connect(&afterPause, &QAction::triggered, this, &cProcessStep::onInsertAfter_Pause);
+	afterMenu->addAction(&afterPause);
+
+	QAction afterMovement("Movement");
+	connect(&afterMovement, &QAction::triggered, this, &cProcessStep::onInsertAfter_Movement);
+	afterMenu->addAction(&afterMovement);
+
+	contextMenu.addSeparator();
+
+	QAction erase("Delete Step");
+	connect(&erase, &QAction::triggered, this, &cProcessStep::onDeleteStep);
+	contextMenu.addAction(&erase);
 
 	contextMenu.exec(event->screenPos());
 }
 
-void cProcessStep::onInsertBefore()
+void cProcessStep::onInsertBefore_Delay()
 {
-	emit insertBefore(getID());
+	emit insertBefore(getID(), eExperimentStep::delay);
 }
 
-void cProcessStep::onInsertAfter()
+void cProcessStep::onInsertBefore_Pause()
 {
-	emit insertAfter(getID());
+	emit insertBefore(getID(), eExperimentStep::pause);
+}
+
+void cProcessStep::onInsertBefore_Movement()
+{
+	emit insertBefore(getID(), eExperimentStep::movement);
+}
+
+void cProcessStep::onInsertAfter_Delay()
+{
+	emit insertAfter(getID(), eExperimentStep::delay);
+}
+
+void cProcessStep::onInsertAfter_Pause()
+{
+	emit insertAfter(getID(), eExperimentStep::pause);
+}
+
+void cProcessStep::onInsertAfter_Movement()
+{
+	emit insertAfter(getID(), eExperimentStep::movement);
+}
+
+void cProcessStep::onDeleteStep()
+{
+	emit deleteStep(getID());
 }
 
 
@@ -594,13 +673,13 @@ void cProcessStep::onInsertAfter()
  *
  ********************************************************************/
 
-cIoStep::cIoStep(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
+cIoStep::cIoStep(const int id, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
 }
 
-cIoStep::cIoStep(const int id, const QString& text, QGraphicsItem* parent) : cConnectedItem(id, parent)
+cIoStep::cIoStep(const int id, const QString& text, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
 {
 	setTitle(text);
 
@@ -866,25 +945,59 @@ void cIoStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 		contextMenu.addSeparator();
 	}
 
-	QAction before("Insert Step Before...");
-	connect(&before, &QAction::triggered, this, &cIoStep::onInsertBefore);
-	contextMenu.addAction(&before);
 
-	QAction after("Insert Step After...");
-	connect(&after, &QAction::triggered, this, &cIoStep::onInsertAfter);
-	contextMenu.addAction(&after);
+	QMenu* beforeMenu = contextMenu.addMenu(tr("Insert Step Before..."));
+
+	QAction beforeDelay("Delay");
+	connect(&beforeDelay, &QAction::triggered, this, &cIoStep::onInsertBefore_Delay);
+	beforeMenu->addAction(&beforeDelay);
+
+	QAction beforeMovement("Movement");
+	connect(&beforeMovement, &QAction::triggered, this, &cIoStep::onInsertBefore_Movement);
+	beforeMenu->addAction(&beforeMovement);
+
+	QMenu* afterMenu = contextMenu.addMenu(tr("Insert Step After..."));
+
+	QAction afterDelay("Delay");
+	connect(&afterDelay, &QAction::triggered, this, &cIoStep::onInsertAfter_Delay);
+	afterMenu->addAction(&afterDelay);
+
+	QAction afterMovement("Movement");
+	connect(&afterMovement, &QAction::triggered, this, &cIoStep::onInsertAfter_Movement);
+	afterMenu->addAction(&afterMovement);
+
+	contextMenu.addSeparator();
+
+	QAction erase("Delete Step");
+	connect(&erase, &QAction::triggered, this, &cIoStep::onDeleteStep);
+	contextMenu.addAction(&erase);
 
 	contextMenu.exec(event->screenPos());
 }
 
-void cIoStep::onInsertBefore()
+void cIoStep::onInsertBefore_Delay()
 {
-	emit insertBefore(getID());
+	emit insertBefore(getID(), eExperimentStep::delay);
 }
 
-void cIoStep::onInsertAfter()
+void cIoStep::onInsertBefore_Movement()
 {
-	emit insertAfter(getID());
+	emit insertBefore(getID(), eExperimentStep::movement);
+}
+
+void cIoStep::onInsertAfter_Delay()
+{
+	emit insertAfter(getID(), eExperimentStep::delay);
+}
+
+void cIoStep::onInsertAfter_Movement()
+{
+	emit insertAfter(getID(), eExperimentStep::movement);
+}
+
+void cIoStep::onDeleteStep()
+{
+	emit deleteStep(getID());
 }
 
 

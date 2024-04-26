@@ -215,10 +215,10 @@ sSensorWidgets hyspex::create_sensor(const nlohmann::json& sensorInfo,
 {
     std::string sensor = sensorInfo["sensor"];
 
-    if (sensor == "VNIR-3000N")
+    if (sensor == vnir_3000N_id)
         return create_vnir_3000N_sensor(sensorInfo, no_visualization);
 
-    if (sensor == "SWIR-384")
+    if (sensor == swir_384_id)
         return create_swir_384_sensor(sensorInfo, no_visualization);
 
     return sSensorWidgets();
@@ -234,14 +234,14 @@ bool hyspex::remove_sensor(sSensorWidgets widgets)
 cSensorPropertyPage* hyspex::create_sensor_property_page(const std::string& model, uint32_t version,
     const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
-    if (model == "VNIR-3000N")
+    if (model == vnir_3000N_id)
     {
         auto page = new cHySpexVNIR_3000N_PropertyPage_Remote();
         page->initialize(remote_ip_address, port, false, local_ip_address);
         return page;
     }
 
-    if (model == "SWIR-384")
+    if (model == swir_384_id)
     {
         auto page = new cHySpexSWIR_384_PropertyPage_Remote();
         page->initialize(remote_ip_address, port, false, local_ip_address);

@@ -13,6 +13,7 @@
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
+#include "ExperimentSensorInfoDlg.hpp"
 
 #include "ExperimentFieldLayoutDlg.hpp"
 
@@ -75,6 +76,10 @@ void cMainWindow::initialize()
     mpExpDesign = new cExperimentDesignWidget(this);
     connect(mpExpDesign, &cExperimentDesignWidget::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(mpExpDesign, &cExperimentDesignWidget::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+
+    connect(mpExpDesign, &cExperimentDesignWidget::insertBefore, this, &cMainWindow::onInsertStepBefore);
+    connect(mpExpDesign, &cExperimentDesignWidget::insertAfter, this, &cMainWindow::onInsertStepAfter);
+    connect(mpExpDesign, &cExperimentDesignWidget::deleteStep, this, &cMainWindow::onDeleteStep);
 
     setCentralWidget(mpExpDesign);
 }
@@ -450,12 +455,12 @@ void cMainWindow::onEditExperimentCtrlInfo()
 {
     cExperimentCtrlInfoDlg dlg(mExperimentFile, this);
     dlg.exec();
-
 }
 
 void cMainWindow::onEditExperimentSernsorInfo()
 {
-
+    cExperimentSensorInfoDlg dlg(mExperimentFile, this);
+    dlg.exec();
 }
 
 void cMainWindow::onEditAddExperimentToLayout()
@@ -582,6 +587,73 @@ void cMainWindow::onOpenExperiment(const QString& filename)
 void cMainWindow::onExperimentChange()
 {
     mpExpDesign->loadExperiment(mExperimentFile);
+}
+
+void cMainWindow::onInsertStepBefore(int id, int type)
+{
+    switch (type)
+    {
+    case eExperimentStep::delay:
+    {
+        auto* pStep = new cExperimentStep_Delay();
+        pStep->onEdit();
+        mExperimentFile.insertBefore(id, pStep);
+        break;
+    }
+    case eExperimentStep::pause:
+    {
+        auto* pStep = new cExperimentStep_Pause();
+        mExperimentFile.insertBefore(id, pStep);
+        break;
+    }
+    case eExperimentStep::movement:
+    {
+        auto* pStep = new cExperimentStep_Movement();
+        pStep->onEdit();
+        mExperimentFile.insertBefore(id, pStep);
+        break;
+    }
+    default:
+        return;
+    }
+
+    mpExpDesign->loadExperiment(mExperimentFile);
+}
+
+void cMainWindow::onInsertStepAfter(int id, int type)
+{
+    switch (type)
+    {
+    case eExperimentStep::delay:
+    {
+        auto* pStep = new cExperimentStep_Delay();
+        pStep->onEdit();
+        mExperimentFile.insertAfter(id, pStep);
+        break;
+    }
+    case eExperimentStep::pause:
+    {
+        auto* pStep = new cExperimentStep_Pause();
+        mExperimentFile.insertAfter(id, pStep);
+        break;
+    }
+    case eExperimentStep::movement:
+    {
+        auto* pStep = new cExperimentStep_Movement();
+        pStep->onEdit();
+        mExperimentFile.insertAfter(id, pStep);
+        break;
+    }
+    default:
+        return;
+    }
+
+    mpExpDesign->loadExperiment(mExperimentFile);
+}
+
+void cMainWindow::onDeleteStep(int id)
+{
+
 }
 
 //-----------------------------------------------------------------------------

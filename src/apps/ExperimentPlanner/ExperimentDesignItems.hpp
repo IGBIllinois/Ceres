@@ -48,7 +48,7 @@ public:
 	QPoint getBottomPoint() const;
 
 signals:
-	void insertBefore(int id);
+	void insertBefore(int id, int type);
 
 public slots:
 	void setScale(int scale);
@@ -64,7 +64,9 @@ protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private slots:
-	void onInsert();
+	void onInsertDelay();
+	void onInsertPause();
+	void onInsertMovement();
 
 private:
 	QPoint mTop;
@@ -159,9 +161,22 @@ protected:
  *
  ********************************************************************/
 
-class cProcessStep : public QObject, public cConnectedItem
+class cBaseStep : public QObject, public cConnectedItem
 {
 	Q_INTERFACES(QGraphicsItem)
+	Q_OBJECT
+
+public:
+	explicit cBaseStep(const int id, QGraphicsItem* parent = nullptr);
+
+signals:
+	void insertBefore(int id, int type);
+	void insertAfter(int id, int type);
+	void deleteStep(int id);
+};
+
+class cProcessStep : public cBaseStep
+{
 	Q_OBJECT
 
 public:
@@ -177,8 +192,6 @@ public:
 
 signals:
 	void editStep();
-	void insertBefore(int id);
-	void insertAfter(int id);
 
 public slots:
 	void setTitle(const QString& title);
@@ -199,8 +212,15 @@ protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private slots:
-	void onInsertBefore();
-	void onInsertAfter();
+	void onInsertBefore_Delay();
+	void onInsertBefore_Pause();
+	void onInsertBefore_Movement();
+
+	void onInsertAfter_Delay();
+	void onInsertAfter_Pause();
+	void onInsertAfter_Movement();
+
+	void onDeleteStep();
 
 private:
 	void recomputeBoxSize();
@@ -232,10 +252,9 @@ private:
  *
  ********************************************************************/
 
-class cIoStep : public QObject, public cConnectedItem
+class cIoStep : public cBaseStep
 {
-	Q_INTERFACES(QGraphicsItem)
-		Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit cIoStep(const int id, QGraphicsItem* parent = nullptr);
@@ -253,8 +272,6 @@ public:
 
 signals:
 	void editStep();
-	void insertBefore(int id);
-	void insertAfter(int id);
 
 public slots:
 	void setTitle(const QString& title);
@@ -275,8 +292,13 @@ protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private slots:
-	void onInsertBefore();
-	void onInsertAfter();
+	void onInsertBefore_Delay();
+	void onInsertBefore_Movement();
+
+	void onInsertAfter_Delay();
+	void onInsertAfter_Movement();
+
+	void onDeleteStep();
 
 private:
 	void recomputeBoxSize();

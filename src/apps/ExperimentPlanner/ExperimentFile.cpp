@@ -16,6 +16,20 @@
 
 namespace fs = std::filesystem;
 
+
+std::shared_ptr<cExperimentSensorInfo> createSensor(std::string type)
+{
+	if (type == cExperimentSensorInfo_Dummy::type())				return std::make_shared<cExperimentSensorInfo_Dummy>();
+	if (type == cExperimentSensorInfo_Ouster::type())				return std::make_shared<cExperimentSensorInfo_Ouster>();
+	if (type == cExperimentSensorInfo_Septentrio::type())			return std::make_shared<cExperimentSensorInfo_Septentrio>();
+	if (type == cExperimentSensorInfo_AxisCommunications::type())	return std::make_shared<cExperimentSensorInfo_AxisCommunications>();
+	if (type == cExperimentSensorInfo_VNIR3000N::type())			return std::make_shared<cExperimentSensorInfo_VNIR3000N>();
+	if (type == cExperimentSensorInfo_SWIR384::type())				return std::make_shared<cExperimentSensorInfo_SWIR384>();
+
+	return std::shared_ptr<cExperimentSensorInfo>();
+}
+
+
 cExperimentFile::cExperimentFile()
 {
 }
@@ -89,11 +103,6 @@ void cExperimentFile::clear()
 
 	mMetaInfo.clear();
 	mpController.reset();
-
-	for (auto sensor : mSensors)
-	{
-		delete sensor;
-	}
 	mSensors.clear();
 
 	clearSteps();
@@ -158,26 +167,18 @@ void cExperimentFile::open(const std::string& file_name)
 
 	auto sensors = configDoc["sensors"];
 
-	cExperimentSensorInfo* pSensor = nullptr;
+	std::shared_ptr<cExperimentSensorInfo> pSensor;
 	for (std::string sensor : sensors)
 	{
-		if (sensor == cExperimentSensorInfo_Ouster::type())
-		{
-			pSensor = new cExperimentSensorInfo_Ouster();
-		}
-		else if (sensor == cExperimentSensorInfo_Septentrio::type())
-		{
-			pSensor = new cExperimentSensorInfo_Septentrio();
-		}
-		else
-		{
-			pSensor = new cExperimentSensorInfo_Dummy();
-		}
+		pSensor = createSensor(sensor);
+
+		if (!pSensor)
+			continue;
 
 		if (configDoc.contains(pSensor->getType()))
 			pSensor->load(configDoc[pSensor->getType()]);
 
-		mSensors.push_back(pSensor);
+		mSensors.push_back(std::move(pSensor));
 	}
 
 	if (configDoc.contains("experiment"))
@@ -309,19 +310,6 @@ std::size_t cExperimentFile::size() const
 	return mSteps.size();
 }
 
-/*
-bool cExperimentFile::contains(const std::string& name)
-{
-	for (const auto& scan : mScans)
-	{
-		if (scan.getExperimentName() == name)
-			return true;
-	}
-
-	return false;
-}
-*/
-
 const cExperimentMetaInfo& cExperimentFile::getMetaData() const
 {
 	return mMetaInfo;
@@ -339,17 +327,25 @@ cExperimentCtrlInfo* const cExperimentFile::getController() const
 
 void cExperimentFile::setController(std::unique_ptr<cExperimentCtrlInfo> controller)
 {
+	mDirty |= mpController != controller;
 	mpController = std::move(controller);
 }
 
-const std::vector<cExperimentSensorInfo*>& cExperimentFile::getSensors() const
+const std::vector<std::shared_ptr<cExperimentSensorInfo>>& cExperimentFile::getSensors() const
 {
 	return mSensors;
 }
 
-void cExperimentFile::addSensor(std::unique_ptr<cExperimentSensorInfo> sensor)
+void cExperimentFile::setSensors(const std::vector<std::shared_ptr<cExperimentSensorInfo>>& sensors)
 {
-	mSensors.push_back(sensor.release());
+	mDirty |= mSensors != sensors;
+	mSensors = sensors;
+}
+
+void cExperimentFile::addSensor(std::shared_ptr<cExperimentSensorInfo> sensor)
+{
+	mSensors.push_back(sensor);
+	mDirty = true;
 }
 
 const cExperimentStep& cExperimentFile::front() const { return *(mSteps.front()); }
@@ -384,6 +380,8 @@ void cExperimentFile::insertBefore(int index, cExperimentStep* step)
 
 void cExperimentFile::insertAfter(int index, cExperimentStep* step)
 {
+	++index;
+
 	if (index <= 0)
 	{
 		mSteps.push_front(step);
@@ -400,6 +398,11 @@ void cExperimentFile::insertAfter(int index, cExperimentStep* step)
 	std::advance(it, index);
 
 	mSteps.insert(it, step);
+}
+
+void cExperimentFile::removeStep(int index)
+{
+
 }
 
 void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)

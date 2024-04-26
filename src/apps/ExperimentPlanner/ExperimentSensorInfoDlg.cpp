@@ -6,6 +6,7 @@
 #include <QLayout>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QIcon>
 #include <QPushButton>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -15,15 +16,6 @@
 #include <QTabWidget>
 
 #include <algorithm>
-
-namespace
-{
-	constexpr int DUMMY = 0;
-	constexpr int SPIDERCAM = DUMMY + 1;
-
-	const QString CONTROLLER_DUMMY = "Dummy";
-	const QString CONTROLLER_SPIDERCAM = "SpiderCam";
-}
 
 
 cExperimentSensorInfoDlg::cExperimentSensorInfoDlg(cExperimentFile& info, QWidget* parent)
@@ -43,32 +35,28 @@ cExperimentSensorInfoDlg::~cExperimentSensorInfoDlg()
 
 void cExperimentSensorInfoDlg::createControls()
 {
-	QFont font;
-	QFontMetrics fm(font);
-	int pixelsHigh = fm.height();
+	mpAddSensor = new QPushButton(QIcon(":/ripe.illinois.edu/plus.png"), "", this);
+	connect(mpAddSensor, &QPushButton::pressed, this, &cExperimentSensorInfoDlg::onAddSensor);
+
+	mpRemoveSensor = new QPushButton(QIcon(":/ripe.illinois.edu/minus.png"), "", this);
+	connect(mpRemoveSensor, &QPushButton::pressed, this, &cExperimentSensorInfoDlg::onRemoveSensor);
 
 	mSensors = mInfo.getSensors();
 
-	mpController = new QComboBox(this);
-	mpController->addItem(CONTROLLER_DUMMY);
-	mpController->addItem(CONTROLLER_SPIDERCAM);
+	mpSensorTabs = new QTabWidget(this);
 
-	mpController->setEditable(false);
-	connect(mpController, &QComboBox::currentTextChanged, this, &cExperimentSensorInfoDlg::onControllerChange);
+	for (auto& sensor : mSensors)
+	{
+		mpSensorTabs->addTab(sensor->widget(), sensor->getName());
+	}
 
-	mpControllerPanels = new QStackedLayout();
-
-	mpCP_Dummy = new QWidget(this);
-
-	mpCP_SpiderCam = new QWidget(this);
-
-	mpSC_UpdateInterval_ms = new QLineEdit(this);
-	mpSC_UpdateInterval_ms->setValidator(new QIntValidator(200, 1000));
-	mpSC_UpdateInterval_ms->setText("250");
-
-	mpSC_PositionTolerance_cm = new QLineEdit(this);
-	mpSC_PositionTolerance_cm->setValidator(new QDoubleValidator(1.0, 100.0, 1));
-	mpSC_PositionTolerance_cm->setText("1.0");
+	if (mSensors.size() == 1)
+	{
+		if (mSensors.front()->getType() == cExperimentSensorInfo_Dummy::type())
+		{
+			mpRemoveSensor->setDisabled(true);
+		}
+	}
 }
 
 void cExperimentSensorInfoDlg::createLayout()
@@ -79,47 +67,215 @@ void cExperimentSensorInfoDlg::createLayout()
 
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
 
-	QHBoxLayout* pTitleLayout = new QHBoxLayout();
-	pText = new QLabel("Controller Type");
-	pTitleLayout->addWidget(pText);
-	pTitleLayout->addWidget(mpController);
+	QHBoxLayout* pLayout = new QHBoxLayout();
 
-	pMainLayout->addLayout(pTitleLayout);
+	pLayout->addStretch(1);
+	pLayout->addWidget(mpAddSensor);
+	pLayout->addWidget(mpRemoveSensor);
 
-	pMainLayout->addSpacing(10);
+	pMainLayout->addLayout(pLayout);
 
-	/** Dummy Panel **/
-	QVBoxLayout* pDummyInfo = new QVBoxLayout();
-
-	pText = new QLabel("No Parameters");
-	pDummyInfo->addWidget(pText, 0);
-
-	mpCP_Dummy->setLayout(pDummyInfo);
-
-	mpControllerPanels->insertWidget(DUMMY, mpCP_Dummy);
-
-	/** SpiderCam Panel **/
-	QGridLayout* pScInfo = new QGridLayout();
-
-	pText = new QLabel("Update Interval (ms)");
-	pScInfo->addWidget(pText, 0, 0);
-	pScInfo->addWidget(mpSC_UpdateInterval_ms, 0, 1);
-
-	pText = new QLabel("Position Tolerance (cm)");
-	pScInfo->addWidget(pText, 1, 0);
-	pScInfo->addWidget(mpSC_PositionTolerance_cm, 1, 1);
-
-	mpCP_SpiderCam->setLayout(pScInfo);
-
-	mpControllerPanels->insertWidget(SPIDERCAM, mpCP_SpiderCam);
-
-	pMainLayout->addLayout(mpControllerPanels);
+	pMainLayout->addWidget(mpSensorTabs);
 
 	pMainLayout->addSpacing(10);
 
+	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+		| QDialogButtonBox::Cancel | QDialogButtonBox::Apply | QDialogButtonBox::Reset);
+
+	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+	connect(buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &cExperimentSensorInfoDlg::apply);
+	connect(buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &cExperimentSensorInfoDlg::reset);
+
+	pMainLayout->addWidget(buttonBox);
+
+	setLayout(pMainLayout);
+}
+
+void cExperimentSensorInfoDlg::accept()
+{
+	for (int i = 0; i < mpSensorTabs->count(); ++i)
+	{
+		auto* pWidget = static_cast<cSensorWidget*>(mpSensorTabs->widget(i));
+		if (pWidget)
+			pWidget->accept();
+	}
+
+	mInfo.setSensors(mSensors);
+
+	QDialog::accept();
+}
+
+void cExperimentSensorInfoDlg::apply()
+{
+	auto* pWidget = static_cast<cSensorWidget*>(mpSensorTabs->currentWidget());
+	if (pWidget)
+		pWidget->accept();
+}
+
+void cExperimentSensorInfoDlg::reset()
+{
+	auto* pWidget = static_cast<cSensorWidget*>(mpSensorTabs->currentWidget());
+	if (pWidget)
+		pWidget->reset();
+}
+
+void cExperimentSensorInfoDlg::onAddSensor()
+{
+	cSensorSelectDlg::sensor_info_t sensors;
+	sensors.emplace_back(cSensorSelectDlg::sSensorInfo(cExperimentSensorInfo_Ouster::type(), "Ouster LiDAR" ));
+	sensors.emplace_back(cSensorSelectDlg::sSensorInfo(cExperimentSensorInfo_Septentrio::type(), "Septentrio GPS"));
+	sensors.emplace_back(cSensorSelectDlg::sSensorInfo(cExperimentSensorInfo_AxisCommunications::type(), "Axis Communications Webcam"));
+	sensors.emplace_back(cSensorSelectDlg::sSensorInfo(cExperimentSensorInfo_VNIR3000N::type(), "HySpex VNIR-3000N"));
+	sensors.emplace_back(cSensorSelectDlg::sSensorInfo(cExperimentSensorInfo_SWIR384::type(), "HySpex SWIR-384"));
+
+	// Remove any sensor already in the list
+	for (const auto& sensor : sensors)
+	{
+		for (auto it = mSensors.begin(); it != mSensors.end(); ++it)
+		{
+			if ((*it)->getType() == sensor.type)
+			{
+				mSensors.erase(it);
+				break;
+			}
+		}
+	}
+
+	cSensorSelectDlg dlg("Add Sensors", this);
+	dlg.initialize(sensors);
+
+	auto result = dlg.exec();
+
+	if (result == QDialog::Rejected)
+		return;
+
+	auto sensors_to_add = dlg.selectedSensors();
+
+	if (sensors_to_add.empty()) return;
+
+	if (mSensors.size() == 1)
+	{
+		if (mSensors.front()->getType() == cExperimentSensorInfo_Dummy::type())
+		{
+			mpSensorTabs->removeTab(0);
+		}
+	}
+
+	for (const auto& sensor : sensors_to_add)
+	{
+		auto pSensor = createSensor(sensor.type);
+		mpSensorTabs->addTab(pSensor->widget(), pSensor->getName());
+		mSensors.push_back(pSensor);
+	}
+}
+
+void cExperimentSensorInfoDlg::onRemoveSensor()
+{
+	cSensorSelectDlg::sensor_info_t sensors; 
+	for (const auto& sensor : mSensors)
+	{
+		sensors.emplace_back(cSensorSelectDlg::sSensorInfo(sensor->getType(), sensor->getName()));
+	}
+
+	cSensorSelectDlg dlg(" Remove Sensors ", this);
+	dlg.initialize(sensors);
+
+	auto result = dlg.exec();
+
+	if (result == QDialog::Rejected)
+		return;
+
+	auto sensors_to_remove = dlg.selectedSensors();
+
+	// Remove the tab widgets
+	for (const auto& sensor : sensors_to_remove)
+	{
+		for (int i = 0; i < mpSensorTabs->count(); ++i)
+		{
+			if (mpSensorTabs->tabText(i) == sensor.description)
+			{
+				mpSensorTabs->removeTab(i);
+				break;
+			}
+		}
+	}
+
+	// Remove the sensor
+	for (const auto& sensor_to_remove : sensors_to_remove)
+	{
+		for (auto it = mSensors.begin(); it != mSensors.end(); ++it)
+		{
+			if ((*it)->getType() == sensor_to_remove.type)
+			{
+				mSensors.erase(it);
+				break;
+			}
+		}
+	}
+
+	if (mSensors.empty())
+	{
+		auto sensor = std::make_shared<cExperimentSensorInfo_Dummy>();
+		mpSensorTabs->addTab(sensor->widget(), sensor->getName());
+
+		mSensors.push_back(sensor);
+	}
+
+	if (mSensors.size() == 1)
+	{
+		if (mSensors.front()->getType() == cExperimentSensorInfo_Dummy::type())
+		{
+			mpRemoveSensor->setDisabled(true);
+		}
+	}
+}
+
+
+/*
+ *  Selections Dialog
+ */
+cSensorSelectDlg::cSensorSelectDlg(const QString& title, QWidget* parent)
+	:
+	QDialog(parent)
+{
+	setWindowTitle(title);
+}
+
+cSensorSelectDlg::~cSensorSelectDlg()
+{}
+
+void cSensorSelectDlg::initialize(const sensor_info_t& sensors)
+{
+	mSensorInfo = sensors;
+
+	mpSensors = new QTreeWidget(this);
+	mpSensors->setColumnCount(1);
+	mpSensors->setHeaderLabel("Possible Sensors");
+	mpSensors->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+	mpSensors->setSelectionBehavior(QAbstractItemView::SelectItems);
+	mpSensors->setSelectionMode(QAbstractItemView::MultiSelection);
+
+	auto n = sensors.size();
+
+	QList<QTreeWidgetItem*> items;
+	for (int i = 0; i < n; ++i)
+	{
+		auto* item = new QTreeWidgetItem(mpSensors);
+		item->setText(0, sensors[i].description);
+		items.append(item);
+	}
+
+	mpSensors->insertTopLevelItems(0, items);
+
+	QVBoxLayout* pMainLayout = new QVBoxLayout();
+
+	pMainLayout->addWidget(mpSensors);
 
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
 		| QDialogButtonBox::Cancel);
+
+	buttonBox->button(QDialogButtonBox::Ok)->setText(windowTitle());
 
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -129,25 +285,30 @@ void cExperimentSensorInfoDlg::createLayout()
 	setLayout(pMainLayout);
 }
 
-void cExperimentSensorInfoDlg::accept()
+const cSensorSelectDlg::sensor_info_t& cSensorSelectDlg::selectedSensors()
 {
-	auto index = mpController->currentIndex();
+	return mSensorInfo;
+}
 
+void cSensorSelectDlg::accept()
+{
+	sensor_info_t selected_sensor;
+	auto items = mpSensors->selectedItems();
+	for (const auto item : items)
+	{
+		for (const auto& sensor : mSensorInfo)
+		{
+			if (sensor.description == item->text(0))
+			{
+				selected_sensor.push_back(sensor);
+			}
+		}
+	}
+
+	mSensorInfo = selected_sensor;
 
 	QDialog::accept();
 }
 
-void cExperimentSensorInfoDlg::onControllerChange(const QString& text)
-{
-	if (text == CONTROLLER_DUMMY)
-	{
-		mpControllerPanels->setCurrentIndex(DUMMY);
-		return;
-	}
 
-	if (text == CONTROLLER_SPIDERCAM)
-	{
-		mpControllerPanels->setCurrentIndex(SPIDERCAM);
-		return;
-	}
-}
+

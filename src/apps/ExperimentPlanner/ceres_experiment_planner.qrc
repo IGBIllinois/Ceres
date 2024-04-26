@@ -9,5 +9,7 @@
         <file alias="two_button.png">./Resources/Images/button_two.png</file>
         <file alias="three_button.png">./Resources/Images/button_three.png</file>
         <file alias="four_button.png">./Resources/Images/button_four.png</file>
+        <file alias="plus.png">./Resources/Images/plus.png</file>
+        <file alias="minus.png">./Resources/Images/minus.png</file>
     </qresource>
 </RCC>

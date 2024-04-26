@@ -87,6 +87,9 @@ private slots:
 private slots:
     void onOpenExperiment(const QString& filename);
     void onExperimentChange();
+    void onInsertStepBefore(int id, int type);
+    void onInsertStepAfter(int id, int type);
+    void onDeleteStep(int id);
 
 protected:
     void closeEvent(QCloseEvent* event) override;

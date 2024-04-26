@@ -3,9 +3,18 @@
 
 #include <nlohmann/json.hpp>
 
+#include <QWidget>
+#include <QString>
+
 #include <string>
 #include <vector>
 
+class cSensorWidget : public QWidget
+{
+public:
+	virtual void accept() = 0;
+	virtual void reset() = 0;
+};
 
 class cExperimentSensorInfo
 {
@@ -18,6 +27,9 @@ public:
 	bool isDirty() const;
 
 	virtual std::string getType() const = 0;
+
+	virtual QString getName() const = 0;
+	virtual cSensorWidget* widget() = 0;
 
 protected:
 	virtual void load(const nlohmann::json& jdoc) = 0;
@@ -40,6 +52,9 @@ public:
 
 	std::string getType() const override;
 
+	QString getName() const override;
+	cSensorWidget* widget() override;
+
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
@@ -56,12 +71,27 @@ public:
 
 	std::string getType() const override;
 
+	const std::string& getManufacturer() const;
+	const std::string& getModel() const;
+	const std::string& getSerialNumber() const;
+
+	const std::string& getMode() const;
+	void setMode(const std::string& mode);
+
+	QString getName() const override;
+	cSensorWidget* widget() override;
+
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
 
 private:
-/*
+	std::string mManufacturer;
+	std::string mModel;
+	std::string mSerialNumber;
+	std::string mMode;
+
+	/*
 	"Manufacturer": "OUSTER",
 	"Model" : "OS0-128",
 	"Serial Number" : "992037000167",
@@ -81,16 +111,21 @@ public:
 
 	std::string getType() const override;
 
+	const std::string& getManufacturer() const;
+	const std::string& getModel() const;
+	const std::string& getSerialNumber() const;
+
+	QString getName() const override;
+	cSensorWidget* widget() override;
+
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
 
 private:
-/*
-	"Manufacturer": "Septentrio",
-	"Model": "Altus-NR3",
-	"Serial Number": "6106326"
-*/
+	std::string mManufacturer;
+	std::string mModel;
+	std::string mSerialNumber;
 };
 
 
@@ -104,14 +139,90 @@ public:
 
 	std::string getType() const override;
 
+	const std::string& getManufacturer() const;
+	const std::string& getModel() const;
+	const std::string& getSerialNumber() const;
+
+	int getCameraId() const;
+	int getImageWidth() const;
+	int getImageHeight() const;
+	int getFrameRate_fps() const;
+
+	void setCameraId(int id);
+	void setImageSize(int width, int height);
+	void setFrameRate_fps(int fps);
+
+	QString getName() const override;
+	cSensorWidget* widget() override;
+
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	void save(nlohmann::json& jdoc) override;
 
-	int mDefaultCameraId = -1;
-	int mDefaultImageWidth = 1;
-	int mDefaultImageHeight = 1;
-	int mDefaultFrameRate_fps = -1;
+	std::string mManufacturer;
+	std::string mModel;
+	std::string mSerialNumber;
+
+	int mCameraId = 1;
+	int mImageWidth = 640;
+	int mImageHeight = 480;
+	int mFrameRate_fps = 1;
+};
+
+
+class cExperimentSensorInfo_VNIR3000N : public cExperimentSensorInfo
+{
+public:
+	cExperimentSensorInfo_VNIR3000N();
+	virtual ~cExperimentSensorInfo_VNIR3000N();
+
+	static const char* type();
+
+	std::string getType() const override;
+
+	const std::string& getManufacturer() const;
+	const std::string& getModel() const;
+	const std::string& getSerialNumber() const;
+
+	QString getName() const override;
+	cSensorWidget* widget() override;
+
+protected:
+	void load(const nlohmann::json& jdoc) override;
+	void save(nlohmann::json& jdoc) override;
+
+private:
+	std::string mManufacturer;
+	std::string mModel;
+	std::string mSerialNumber;
+};
+
+
+class cExperimentSensorInfo_SWIR384 : public cExperimentSensorInfo
+{
+public:
+	cExperimentSensorInfo_SWIR384();
+	virtual ~cExperimentSensorInfo_SWIR384();
+
+	static const char* type();
+
+	std::string getType() const override;
+
+	const std::string& getManufacturer() const;
+	const std::string& getModel() const;
+	const std::string& getSerialNumber() const;
+
+	QString getName() const override;
+	cSensorWidget* widget() override;
+
+protected:
+	void load(const nlohmann::json& jdoc) override;
+	void save(nlohmann::json& jdoc) override;
+
+private:
+	std::string mManufacturer;
+	std::string mModel;
+	std::string mSerialNumber;
 };
 
 

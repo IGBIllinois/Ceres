@@ -42,6 +42,7 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
     mScene.addItem(start);
 
     cFlowArrow* arrow = new cFlowArrow(0);
+    connect(arrow, &cFlowArrow::insertBefore, this, &cExperimentDesignWidget::insertBefore);
     arrow->setTopPoint(start->getBottomPoint());
     mScene.addItem(arrow);
 
@@ -53,6 +54,9 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
     for (auto step : experiment)
     {
         auto item = step->graphicsItem(id);
+        connect(item, &cBaseStep::insertBefore, this, &cExperimentDesignWidget::insertBefore);
+        connect(item, &cBaseStep::insertAfter, this, &cExperimentDesignWidget::insertAfter);
+        connect(item, &cBaseStep::deleteStep, this, &cExperimentDesignWidget::deleteStep);
         item->setTopPoint(arrow->getBottomPoint());
         mScene.addItem(item);
 
@@ -82,6 +86,7 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
 
         ++id;
         arrow = new cFlowArrow(id);
+        connect(arrow, &cFlowArrow::insertBefore, this, &cExperimentDesignWidget::insertBefore);
         arrow->setTopPoint(item->getBottomPoint());
         mScene.addItem(arrow);
     }

@@ -74,7 +74,8 @@ void cExperimentStep_Delay::setRecording(bool recording)
 	mRecording = recording;
 }
 
-cConnectedItem* cExperimentStep_Delay::graphicsItem(const int id) const
+//cConnectedItem* cExperimentStep_Delay::graphicsItem(const int id) const
+cBaseStep* cExperimentStep_Delay::graphicsItem(const int id) const
 {
 	auto step = new cProcessStep(id);
 	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Delay::onEdit);
@@ -252,7 +253,8 @@ QString cExperimentStep_Delay::generateComment() const
  *
  ********************************************************************/
 
-cConnectedItem* cExperimentStep_Pause::graphicsItem(const int id) const
+//cConnectedItem* cExperimentStep_Pause::graphicsItem(const int id) const
+cBaseStep* cExperimentStep_Pause::graphicsItem(const int id) const
 {
 	auto step = new cIoStep(id);
 	step->setReadOnly(true);
@@ -344,7 +346,8 @@ void cExperimentStep_Movement::setRecording(bool recording)
 	mRecording = recording;
 }
 
-cConnectedItem* cExperimentStep_Movement::graphicsItem(const int id) const
+//cConnectedItem* cExperimentStep_Movement::graphicsItem(const int id) const
+cBaseStep* cExperimentStep_Movement::graphicsItem(const int id) const
 {
 	auto step = new cProcessStep(id);
 	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Movement::onEdit);

@@ -35,6 +35,9 @@ public:
 signals:
     void clearPaths();
     void drawPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
+    void insertBefore(int id, int type);
+    void insertAfter(int id, int type);
+    void deleteStep(int id);
 
 public slots:
     void setPen(const QPen &pen);
