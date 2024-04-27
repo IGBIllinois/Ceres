@@ -71,7 +71,7 @@ signals:
 	void onCommentChange(const QString& comment);
 
 public slots:
-	void onEdit();
+	bool onEdit();
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
@@ -149,7 +149,7 @@ signals:
 	void onCommentChange(const QString& comment);
 
 public slots:
-	void onEdit();
+	bool onEdit();
 
 protected:
 	void load(const nlohmann::json& jdoc) override;

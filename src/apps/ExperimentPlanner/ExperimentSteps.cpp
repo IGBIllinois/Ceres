@@ -139,7 +139,7 @@ nlohmann::json cExperimentStep_Delay::save()
 	return entry;
 }
 
-void cExperimentStep_Delay::onEdit()
+bool cExperimentStep_Delay::onEdit()
 {
 	cDelayStepInfoDlg dlg;
 
@@ -155,7 +155,7 @@ void cExperimentStep_Delay::onEdit()
 	auto result = dlg.exec();
 
 	if (result == QDialog::Rejected)
-		return;
+		return false;
 
 	std::optional<int> hours;
 	if (dlg.hasHours())
@@ -184,6 +184,8 @@ void cExperimentStep_Delay::onEdit()
 
 	auto comment = generateComment();
 	emit onCommentChange(comment);
+
+	return true;
 }
 
 QString cExperimentStep_Delay::generateDescription() const
@@ -499,7 +501,7 @@ nlohmann::json cExperimentStep_Movement::save()
 }
 
 
-void cExperimentStep_Movement::onEdit()
+bool cExperimentStep_Movement::onEdit()
 {
 	cMovementStepInfoDlg dlg;
 
@@ -530,7 +532,7 @@ void cExperimentStep_Movement::onEdit()
 	auto result = dlg.exec();
 
 	if (result == QDialog::Rejected)
-		return;
+		return false;
 
 	std::optional<int> x_mm;
 	if (dlg.hasX())
@@ -582,6 +584,8 @@ void cExperimentStep_Movement::onEdit()
 
 	bool recording = dlg.recording();
 	setRecording(recording);
+
+	return true;
 }
 
 QString cExperimentStep_Movement::generateMovementDescription() const

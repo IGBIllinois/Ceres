@@ -87,7 +87,7 @@ public:
 	void insertBefore(int index, cExperimentStep* step);
 	void insertAfter(int index, cExperimentStep* step);
 
-	void removeStep(int index);
+	bool removeStep(int index);
 
 	void appendStep(std::unique_ptr<cExperimentStep> step);
 

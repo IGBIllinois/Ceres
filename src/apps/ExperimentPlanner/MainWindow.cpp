@@ -596,7 +596,11 @@ void cMainWindow::onInsertStepBefore(int id, int type)
     case eExperimentStep::delay:
     {
         auto* pStep = new cExperimentStep_Delay();
-        pStep->onEdit();
+        if (!pStep->onEdit())
+        {
+            delete pStep;
+            return;
+        }
         mExperimentFile.insertBefore(id, pStep);
         break;
     }
@@ -609,7 +613,11 @@ void cMainWindow::onInsertStepBefore(int id, int type)
     case eExperimentStep::movement:
     {
         auto* pStep = new cExperimentStep_Movement();
-        pStep->onEdit();
+        if (!pStep->onEdit())
+        {
+            delete pStep;
+            return;
+        }
         mExperimentFile.insertBefore(id, pStep);
         break;
     }
@@ -627,7 +635,11 @@ void cMainWindow::onInsertStepAfter(int id, int type)
     case eExperimentStep::delay:
     {
         auto* pStep = new cExperimentStep_Delay();
-        pStep->onEdit();
+        if (!pStep->onEdit())
+        {
+            delete pStep;
+            return;
+        }
         mExperimentFile.insertAfter(id, pStep);
         break;
     }
@@ -640,7 +652,11 @@ void cMainWindow::onInsertStepAfter(int id, int type)
     case eExperimentStep::movement:
     {
         auto* pStep = new cExperimentStep_Movement();
-        pStep->onEdit();
+        if (!pStep->onEdit())
+        {
+            delete pStep;
+            return;
+        }
         mExperimentFile.insertAfter(id, pStep);
         break;
     }
@@ -653,7 +669,17 @@ void cMainWindow::onInsertStepAfter(int id, int type)
 
 void cMainWindow::onDeleteStep(int id)
 {
+    QMessageBox msgBox;
+    msgBox.setText("Are you sure you want to delete the experiment step?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    int ret = msgBox.exec();
 
+    if (ret == QMessageBox::Yes)
+    {
+        if (mExperimentFile.removeStep(id))
+            mpExpDesign->loadExperiment(mExperimentFile);
+    }
 }
 
 //-----------------------------------------------------------------------------

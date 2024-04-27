@@ -400,9 +400,19 @@ void cExperimentFile::insertAfter(int index, cExperimentStep* step)
 	mSteps.insert(it, step);
 }
 
-void cExperimentFile::removeStep(int index)
+bool cExperimentFile::removeStep(int index)
 {
+	if ((index < 0) || (index >= mSteps.size()))
+	{
+		return false;
+	}
 
+	auto it = mSteps.begin();
+	std::advance(it, index);
+
+	mSteps.erase(it);
+
+	return true;
 }
 
 void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)
@@ -411,7 +421,7 @@ void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)
 	{
 		mSteps.push_back(step.get());
 		step.release();
-		mDirty = true;;
+		mDirty = true;
 	}
 }
 
