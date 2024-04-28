@@ -59,13 +59,13 @@ void cGpsFileReader::loadFromFile(const std::string& filename)
 		auto elevation_ft = std::stod(val);
 		val.clear();
 
-//		rfm::rappPoint_t rapp_point = rfb::fromStatePlane(northing_ft, easting_ft, elevation_ft);
+		rfm::rappPoint_t rapp_point = rfb::fromStatePlane(northing_ft, easting_ft, elevation_ft);
 
 		sSpiderCamPosition_t point;
 		point.label = label;
-		point.x_m = northing_ft;	// rapp_point.x_mm* nConstants::MM_TO_M;
-		point.y_m = easting_ft;		// rapp_point.y_mm* nConstants::MM_TO_M;
-		point.z_m = elevation_ft;	// rapp_point.z_mm* nConstants::MM_TO_M;
+		point.x_m = rapp_point.x_mm * nConstants::MM_TO_M;
+		point.y_m = rapp_point.y_mm * nConstants::MM_TO_M;
+		point.z_m = rapp_point.z_mm * nConstants::MM_TO_M;
 
 		mPoints.emplace_back(point);
 	}
