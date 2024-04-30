@@ -154,6 +154,11 @@ void cCreateExperimentFromGpsDlg::createControls()
 	mpMeasurementHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
 	mpMeasurementHeight_m->setText("5.0");
 
+	mpHeightReference = new QComboBox(this);
+	mpHeightReference->setEditable(false);
+	mpHeightReference->addItem("SpiderCam");
+	mpHeightReference->addItem("AGL");
+
 	mpMeasurementSpeed_mmps = new QLineEdit(this);
 	mpMeasurementSpeed_mmps->setValidator(new QIntValidator(0, 1000));
 	mpMeasurementSpeed_mmps->setText("450");
@@ -255,7 +260,14 @@ void cCreateExperimentFromGpsDlg::createLayout()
 
 	pText = new QLabel("Measurement Height (m)");
 	pGridLayout->addWidget(pText, 2, 0);
-	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
+
+	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
+	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
+	pMeasurementLayout->addWidget(mpHeightReference);
+	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
+
+//	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
+
 
 	pText = new QLabel("Measurement Speed (mm/s)");
 	pGridLayout->addWidget(pText, 2, 3);
@@ -385,20 +397,25 @@ void cCreateExperimentFromGpsDlg::generate()
 
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
+	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
 
 	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
 	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+	auto h2 = mpModel->data(endIndex.siblingAtColumn(3)).toFloat();
 
 	if (mpInverseDirection->isChecked())
 	{
 		std::swap(x1, x2);
 		std::swap(y1, y2);
+		std::swap(h1, h2);
 	}
 
 	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
 	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
+	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
 	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
 	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
+	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
 
 	int dx_mm = x2_mm - x1_mm;
 	int dy_mm = y2_mm - y1_mm;
@@ -417,7 +434,12 @@ void cCreateExperimentFromGpsDlg::generate()
 		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 
 		step = std::make_unique<cExperimentStep_Movement>();
-		step->setZ_mm(z_mm);
+
+		if (mpHeightReference->currentIndex() == 1)
+			step->setZ_mm(z_mm + h1_mm);
+		else
+			step->setZ_mm(z_mm);
+
 		step->setSpeed_mmps(speed_mmps);
 		mInfo.appendStep(std::move(step));
 
@@ -475,7 +497,12 @@ void cCreateExperimentFromGpsDlg::generate()
 		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 
 		step = std::make_unique<cExperimentStep_Movement>();
-		step->setZ_mm(z_mm);
+
+		if (mpHeightReference->currentIndex() == 1)
+			step->setZ_mm(z_mm + h1_mm);
+		else
+			step->setZ_mm(z_mm);
+
 		step->setSpeed_mmps(speed_mmps);
 		mInfo.appendStep(std::move(step));
 
@@ -509,6 +536,13 @@ void cCreateExperimentFromGpsDlg::generate()
 		step = std::make_unique<cExperimentStep_Movement>();
 		step->setX_mm(x_mm);
 		step->setY_mm(y_mm);
+
+		if ((mpHeightReference->currentIndex() == 1) &&
+			((z_mm + h1_mm) != (z_mm + h2_mm)))
+		{
+			step->setZ_mm(z_mm + h2_mm);
+		}
+
 		step->setSpeed_mmps(speed_mmps);
 		step->setRecording(true);
 		mInfo.appendStep(std::move(step));
