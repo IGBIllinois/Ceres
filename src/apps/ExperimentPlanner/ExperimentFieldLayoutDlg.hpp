@@ -32,6 +32,7 @@ public:
 
 private slots:
 	void onNewLayout();
+	void onLayoutChange(const QString& text);
 	void accept() override;
 
 private:

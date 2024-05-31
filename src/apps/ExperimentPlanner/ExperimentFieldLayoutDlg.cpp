@@ -161,6 +161,16 @@ void cExperimentFieldLayoutDlg::onNewLayout()
 	mpPlotLayouts->setCurrentText(mOriginalLayout.caption.label);
 }
 
+void cExperimentFieldLayoutDlg::onLayoutChange(const QString& text)
+{
+	auto layout = mFieldWidget.findLayout(text);
+
+	if (layout)
+	{
+		mOriginalLayout = layout;
+	}
+}
+
 void cExperimentFieldLayoutDlg::accept()
 {
 	if (mOriginalLayout.caption.label.isEmpty())
@@ -203,11 +213,11 @@ void cExperimentFieldLayoutDlg::accept()
 void cExperimentFieldLayoutDlg::createControls()
 {
 	mpPlotLayouts = new QComboBox(this);
+	connect(mpPlotLayouts, &QComboBox::currentTextChanged, this, &cExperimentFieldLayoutDlg::onLayoutChange);
 
 	for (const auto& entry : mFieldWidget.getLayouts())
 	{
 		mpPlotLayouts->addItem(entry.caption.label);
-
 	}
 
 	mpNewPlotLayout = new QPushButton("New", this);

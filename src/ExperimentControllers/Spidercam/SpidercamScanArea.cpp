@@ -55,6 +55,11 @@ bool cSpidercamScanArea::experimentLayout_t::operator==(const QString& label) co
 	return caption.label == label;
 }
 
+cSpidercamScanArea::experimentLayout_t::operator bool() const
+{
+	return (height_mm != 0) && (width_mm != 0);
+}
+
 cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 :
 	QWidget(parent)

@@ -51,6 +51,21 @@ void cFieldLayoutWidget::replaceLayout(const cSpidercamScanArea::experimentLayou
     mDirty |= new_layout != original_layout;
 }
 
+cSpidercamScanArea::experimentLayout_t cFieldLayoutWidget::findLayout(const QString& label)
+{
+    const std::vector<cSpidercamScanArea::experimentLayout_t>& layouts = mpScanArea->getLayouts();
+
+    for (auto layout : layouts)
+    {
+        if (layout.caption.label == label)
+        {
+            return layout;
+        }
+    }
+
+   return cSpidercamScanArea::experimentLayout_t();
+}
+
 const std::vector<cSpidercamScanArea::experimentLayout_t>& cFieldLayoutWidget::getLayouts() const
 {
     return mpScanArea->getLayouts();

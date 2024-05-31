@@ -68,6 +68,8 @@ public:
         bool operator==(const experimentLayout_t& rhs) const;
         bool operator!=(const experimentLayout_t& rhs) const;
         bool operator==(const QString& label) const;
+
+        operator bool() const;
     };
 
 public:

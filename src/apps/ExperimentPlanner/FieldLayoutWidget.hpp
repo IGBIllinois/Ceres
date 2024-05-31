@@ -31,6 +31,8 @@ public:
 	void addLayout(const cSpidercamScanArea::experimentLayout_t& layout);
 	void replaceLayout(const cSpidercamScanArea::experimentLayout_t& original_layout, const cSpidercamScanArea::experimentLayout_t& new_layout);
 
+	cSpidercamScanArea::experimentLayout_t findLayout(const QString& label);
+
 	const std::vector<cSpidercamScanArea::experimentLayout_t>& getLayouts() const;
 
 	void load(const QString& layout_filename);
