@@ -24,7 +24,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QSound>
-
+#include <QMdiArea>
 
 #include <cassert>
 #include <sstream>
@@ -82,6 +82,9 @@ void cMainWindow::initialize()
     connect(mpExpDesign, &cExperimentDesignWidget::deleteStep, this, &cMainWindow::onDeleteStep);
 
     setCentralWidget(mpExpDesign);
+
+//    QMdiArea* mdiArea = new QMdiArea(this);
+//    setCentralWidget(mdiArea);
 }
 
 //-----------------------------------------------------------------------------
@@ -341,7 +344,9 @@ void cMainWindow::onFileNewExperiment_GPS()
 {
     doSaveCheck();
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), "",
+    QString defaultDirectory = mSettings.value("Defaults/gpsFiles").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), defaultDirectory,
         "GPS Files (*.csv)");
 
     if (fileName.isEmpty())
@@ -371,6 +376,12 @@ void cMainWindow::onFileNewExperiment_GPS()
         msg_box.exec();
         return;
     }
+
+    std::filesystem::path file_name = fileName.toStdString();
+
+    std::filesystem::path directory = file_name.parent_path();
+
+    mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
 
     cCreateExperimentFromGpsDlg dlg(mExperimentFile, fileName, this);
 

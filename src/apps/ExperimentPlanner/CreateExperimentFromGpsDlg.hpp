@@ -40,6 +40,8 @@ private slots:
 	void onMetaInfoUpdate();
 	void onControllerUpdate();
 	void onSensorUpdate();
+	void onUnitChange(const QString& text);
+	void onHasSubScans(int state);
 
 	void onShowPath();
 
@@ -48,6 +50,8 @@ private:
 	void createLayout();
 
 private:
+	double mConversionFactor = 1.0;
+
 	cExperimentFile& mInfo;
 
 	QLineEdit* mpTitle = nullptr;
@@ -68,7 +72,6 @@ private:
 	QPushButton* mpShowPath = nullptr;
 
 	QCheckBox* mpInverseDirection = nullptr;
-	QCheckBox* mpUseIntermediatePoints = nullptr;
 
 	QLineEdit* mpTravelHeight_m = nullptr;
 	QLineEdit* mpTravelVerticalSpeed_mmps = nullptr;
@@ -85,6 +88,17 @@ private:
 
 	QLineEdit* mpSafeHeight_m = nullptr;
 	QLineEdit* mpSafeVerticalSpeed_mmps = nullptr;
+
+	QCheckBox* mpHasSubScans = nullptr;
+	QLineEdit* mpNumOfScans = nullptr;
+	QComboBox* mpSubScanOrientation = nullptr;
+	QComboBox* mpUnits = nullptr;
+
+	QLabel* mpSubScanSeparationLabel = nullptr;
+	QLineEdit* mpSubScanSeparation = nullptr;
+
+	QCheckBox* mpFastMode = nullptr;
+
 
 	QPushButton* mpSaveAs = nullptr;
 };

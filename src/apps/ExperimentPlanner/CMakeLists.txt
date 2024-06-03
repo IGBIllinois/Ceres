@@ -93,6 +93,8 @@ PRIVATE
     GpsFileReader.cpp
     CreateExperimentFromGpsDlg.hpp
     CreateExperimentFromGpsDlg.cpp
+    CreateExperimentFromPlotInfoDlg.hpp
+    CreateExperimentFromPlotInfoDlg.cpp
 
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp
@@ -110,6 +112,9 @@ PRIVATE
 
     FieldLayoutWidget.hpp
     FieldLayoutWidget.cpp
+
+    ScanPreviewWidget.hpp
+    ScanPreviewWidget.cpp
 
     MainWindow.hpp
     MainWindow.cpp

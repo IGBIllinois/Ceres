@@ -1,4 +1,4 @@
-
+﻿
 #include "CreateExperimentFromGpsDlg.hpp"
 #include "GpsFileReader.hpp"
 #include "Constants.hpp"
@@ -30,6 +30,15 @@
 #include <algorithm>
 #include <memory>
 
+namespace
+{
+	const QString SCAN_SEPARATION_TEXT = "Separation (";
+
+	const QString WEST_TO_EAST = "West to East";
+	const QString EAST_TO_WEST = "East to West";
+	const QString NORTH_TO_SOUTH = "North to South";
+	const QString SOUTH_TO_NORTH = "South to North";
+}
 
 cCreateExperimentFromGpsDlg::cCreateExperimentFromGpsDlg(cExperimentFile& info, const QString& filename, QWidget* parent)
 :
@@ -124,7 +133,6 @@ void cCreateExperimentFromGpsDlg::createControls()
 	connect(mpShowPath, &QPushButton::pressed, this, &cCreateExperimentFromGpsDlg::onShowPath);
 
 	mpInverseDirection = new QCheckBox("Inverse Direction", this);
-	mpUseIntermediatePoints = new QCheckBox("Use Intermediate Points", this);
 
 	mpTravelHeight_m = new QLineEdit(this);
 	mpTravelHeight_m->setValidator(new QDoubleValidator(5.0, 10.0, 3));
@@ -174,6 +182,47 @@ void cCreateExperimentFromGpsDlg::createControls()
 	mpSafeVerticalSpeed_mmps = new QLineEdit(this);
 	mpSafeVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
 	mpSafeVerticalSpeed_mmps->setText("250");
+
+
+	mpHasSubScans = new QCheckBox("Has Adjacent Scans", this);
+	connect(mpHasSubScans, &QCheckBox::stateChanged, this, &cCreateExperimentFromGpsDlg::onHasSubScans);
+
+	mpNumOfScans = new QLineEdit(this);
+	mpNumOfScans->setValidator(new QIntValidator(1, 10));
+	mpNumOfScans->setEnabled(false);
+	mpNumOfScans->setText("1");
+
+	mpSubScanOrientation = new QComboBox(this);
+	mpSubScanOrientation->setEditable(false);
+	mpSubScanOrientation->addItem(NORTH_TO_SOUTH);
+	mpSubScanOrientation->addItem(SOUTH_TO_NORTH);
+	mpSubScanOrientation->addItem(EAST_TO_WEST);
+	mpSubScanOrientation->addItem(WEST_TO_EAST);
+	mpSubScanOrientation->setEnabled(false);
+//	connect(mpSubScanOrientation, &QComboBox::currentTextChanged, this, &cCreateExperimentFromGpsDlg::onSubOrientationChange);
+
+	mpUnits = new QComboBox(this);
+	mpUnits->setEditable(false);
+	mpUnits->addItem("Meters");
+	mpUnits->addItem("Millimeters");
+	mpUnits->addItem("Feet");
+	mpUnits->addItem("Inches");
+	mpUnits->setEnabled(false);
+	connect(mpUnits, &QComboBox::currentTextChanged, this, &cCreateExperimentFromGpsDlg::onUnitChange);
+
+	mpSubScanSeparationLabel = new QLabel(SCAN_SEPARATION_TEXT + "m)", this);
+	mpSubScanSeparation = new QLineEdit(this);
+	mpSubScanSeparation->setValidator(new QDoubleValidator(0, 100.0, 3));
+	mpSubScanSeparation->setText("0");
+	mpSubScanSeparation->setEnabled(false);
+
+	QString label = "Fast Mode (";
+	label += QChar(0x2191);
+	label += QChar(0x2193);
+	label += QChar(0x2191);
+	label += ")";
+
+	mpFastMode = new QCheckBox(label, this);
 }
 
 void cCreateExperimentFromGpsDlg::createLayout()
@@ -214,7 +263,6 @@ void cCreateExperimentFromGpsDlg::createLayout()
 	QHBoxLayout* pOptionsLayout = new QHBoxLayout();
 	pOptionsLayout->addStretch(1);
 	pOptionsLayout->addWidget(mpInverseDirection);
-	pOptionsLayout->addWidget(mpUseIntermediatePoints);
 	pOptionsLayout->addStretch(1);
 
 	pMainLayout->addLayout(pOptionsLayout);
@@ -307,6 +355,43 @@ void cCreateExperimentFromGpsDlg::createLayout()
 	pMainLayout->addSpacing(10);
 
 
+	pGroupBox = new QGroupBox(tr("Sub Scan Information"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	QHBoxLayout* pHSubLayout = new QHBoxLayout();
+	pHSubLayout->addWidget(mpHasSubScans);
+	pText = new QLabel("Number of Scans: ");
+	pHSubLayout->addWidget(pText);
+	pHSubLayout->addWidget(mpNumOfScans);
+	pHSubLayout->addSpacing(10);
+	pHSubLayout->addWidget(mpSubScanOrientation);
+	pHSubLayout->addSpacing(10);
+	pHSubLayout->addWidget(mpFastMode);
+
+	pHSubLayout->addWidget(mpSubScanSeparationLabel);
+	pHSubLayout->addWidget(mpSubScanSeparation);
+	pHSubLayout->addSpacing(10);
+	pHSubLayout->addWidget(mpUnits);
+
+	pGroupBox->setLayout(pHSubLayout);
+	//	pVSubLayout->addLayout(pHSubLayout);
+
+/*
+	pHSubLayout = new QHBoxLayout();
+	pHSubLayout->addWidget(mpSubScanSeperationLabel);
+	pHSubLayout->addWidget(mpSubScanSeperation);
+	pHSubLayout->addSpacing(10);
+	pHSubLayout->addWidget(mpUnits);
+//	pHSubLayout->addSpacing(10);
+//	pHSubLayout->addWidget(mpFastMode);
+	pVSubLayout->addLayout(pHSubLayout);
+
+	pGroupBox->setLayout(pVSubLayout);
+*/
+
+	pMainLayout->addWidget(pGroupBox);
+
+
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
 		| QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
 
@@ -354,6 +439,61 @@ void cCreateExperimentFromGpsDlg::onSensorUpdate()
 {
 	cExperimentSensorInfoDlg dlg(mInfo, this);
 	dlg.exec();
+}
+
+void cCreateExperimentFromGpsDlg::onUnitChange(const QString& text)
+{
+	double separation = mpSubScanSeparation->text().toDouble() * mConversionFactor;
+
+	switch (mpUnits->currentIndex())
+	{
+	case 0:
+		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "m)");
+
+		mConversionFactor = nConstants::M_TO_MM;
+		break;
+	case 1:
+		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "mm)");
+
+		mConversionFactor = 1.0;
+		break;
+	case 2:
+		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "ft)");
+
+		mConversionFactor = nConstants::FT_TO_MM;
+		break;
+	case 3:
+		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "in)");
+
+		mConversionFactor = nConstants::IN_TO_MM;
+		break;
+	}
+
+	separation /= mConversionFactor;
+
+	mpSubScanSeparation->setText(QString::number(separation));
+}
+
+
+void cCreateExperimentFromGpsDlg::onHasSubScans(int state)
+{
+	if (state == Qt::Checked)
+	{
+		mpNumOfScans->setEnabled(true);
+		mpSubScanOrientation->setEnabled(true);
+		mpUnits->setEnabled(true);
+		mpSubScanSeparation->setEnabled(true);
+		mpFastMode->setEnabled(true);
+
+	}
+	else
+	{
+		mpNumOfScans->setEnabled(false);
+		mpSubScanOrientation->setEnabled(false);
+		mpUnits->setEnabled(false);
+		mpSubScanSeparation->setEnabled(false);
+		mpFastMode->setEnabled(false);
+	}
 }
 
 void cCreateExperimentFromGpsDlg::generate()
@@ -421,6 +561,20 @@ void cCreateExperimentFromGpsDlg::generate()
 	int dy_mm = y2_mm - y1_mm;
 
 	speed_mmps = mpTravelSpeed_mmps->text().toInt();
+
+	bool mFastMode = false;
+
+	int numOfScans = 1;
+	double separation_mm = 0.0;
+
+	if (mpHasSubScans->isChecked())
+	{
+		numOfScans = mpNumOfScans->text().toInt();
+//		QComboBox* mpSubScanOrientation = nullptr;
+		separation_mm = mpSubScanSeparation->text().toDouble() * mConversionFactor;
+		mFastMode = mpFastMode->isChecked();
+	}
+
 
 	if ((dx_mm == 0) && (dy_mm == 0))
 	{
@@ -592,4 +746,40 @@ void cCreateExperimentFromGpsDlg::onShowPath()
 	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
 
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+
+
+	if (mpHasSubScans->isChecked())
+	{
+		int separation_mm = static_cast<int>(mpSubScanSeparation->text().toDouble() * mConversionFactor);
+
+		int numOfScans = mpNumOfScans->text().toInt();
+
+		int orientation = mpSubScanOrientation->currentIndex();
+
+		for (int i = 1; i < numOfScans; ++i)
+		{
+			switch (orientation)
+			{
+			case 0:
+				x1_mm += separation_mm;
+				x2_mm += separation_mm;
+				break;
+			case 1:
+				x1_mm -= separation_mm;
+				x2_mm -= separation_mm;
+				break;
+			case 2:
+				y1_mm -= separation_mm;
+				y2_mm -= separation_mm;
+				break;
+			case 3:
+				y1_mm += separation_mm;
+				y2_mm += separation_mm;
+				break;
+			}
+
+			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+		}
+	}
+
 }
