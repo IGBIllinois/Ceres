@@ -253,6 +253,27 @@ void cExperimentMetaInfo::setPermitInfo(const std::string& info)
     mPermitInfo = info;
 }
 
+bool cExperimentMetaInfo::operator!=(const cExperimentMetaInfo& rhs) const
+{
+    return (mDirty != rhs.mDirty) ||
+        (mPrincipalInvestigator != rhs.mPrincipalInvestigator) ||
+        (mResearchers != rhs.mResearchers) ||
+        (mComments != rhs.mComments) ||
+        (mSpecies != rhs.mSpecies) ||
+        (mCultivar != rhs.mCultivar) ||
+        (mEvents != rhs.mEvents) ||
+        (mConstructName != rhs.mConstructName) ||
+        (mTreatments != rhs.mTreatments) ||
+        (mFieldDesign != rhs.mFieldDesign) ||
+        (mPlantingDay != rhs.mPlantingDay) ||
+        (mPlantingMonth != rhs.mPlantingMonth) ||
+        (mPlantingYear != rhs.mPlantingYear) ||
+        (mTargetHarvestDay != rhs.mTargetHarvestDay) ||
+        (mTargetHarvestMonth != rhs.mTargetHarvestMonth) ||
+        (mTargetHarvestYear != rhs.mTargetHarvestYear) ||
+        (mPermitInfo != rhs.mPermitInfo);
+}
+
 
 void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
 {

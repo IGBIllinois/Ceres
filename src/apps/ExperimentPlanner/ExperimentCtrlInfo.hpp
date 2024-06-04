@@ -5,7 +5,10 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
+class cExperimentCtrlInfo;
+std::unique_ptr<cExperimentCtrlInfo> copy(const std::unique_ptr<cExperimentCtrlInfo>& rhs);
 
 class cExperimentCtrlInfo
 {
@@ -36,6 +39,8 @@ public:
 	cExperimentCtrlInfo_Dummy();
 	virtual ~cExperimentCtrlInfo_Dummy();
 
+	cExperimentCtrlInfo_Dummy(const cExperimentCtrlInfo_Dummy& rhs);
+
 	static const char* type();
 
 	std::string getType() const override;
@@ -51,6 +56,8 @@ class cExperimentCtrlInfo_SpiderCam : public cExperimentCtrlInfo
 public:
 	cExperimentCtrlInfo_SpiderCam();
 	virtual ~cExperimentCtrlInfo_SpiderCam();
+
+	cExperimentCtrlInfo_SpiderCam(const cExperimentCtrlInfo_SpiderCam& rhs);
 
 	static const char* type();
 

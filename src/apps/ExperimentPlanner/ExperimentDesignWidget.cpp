@@ -60,7 +60,7 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
         item->setTopPoint(arrow->getBottomPoint());
         mScene.addItem(item);
 
-        auto movement = dynamic_cast<cExperimentStep_Movement*>(step);
+        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
 
         if (movement)
         {

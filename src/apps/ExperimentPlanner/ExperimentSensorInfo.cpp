@@ -18,6 +18,19 @@
 #include <QIntValidator>
 
 
+std::shared_ptr<cExperimentSensorInfo> createSensor(std::string type)
+{
+	if (type == cExperimentSensorInfo_Dummy::type())				return std::make_shared<cExperimentSensorInfo_Dummy>();
+	if (type == cExperimentSensorInfo_Ouster::type())				return std::make_shared<cExperimentSensorInfo_Ouster>();
+	if (type == cExperimentSensorInfo_Septentrio::type())			return std::make_shared<cExperimentSensorInfo_Septentrio>();
+	if (type == cExperimentSensorInfo_AxisCommunications::type())	return std::make_shared<cExperimentSensorInfo_AxisCommunications>();
+	if (type == cExperimentSensorInfo_VNIR3000N::type())			return std::make_shared<cExperimentSensorInfo_VNIR3000N>();
+	if (type == cExperimentSensorInfo_SWIR384::type())				return std::make_shared<cExperimentSensorInfo_SWIR384>();
+
+	return std::shared_ptr<cExperimentSensorInfo>();
+}
+
+
 cExperimentSensorInfo::~cExperimentSensorInfo()
 {}
 

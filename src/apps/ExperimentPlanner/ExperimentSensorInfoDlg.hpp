@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ExperimentFile.hpp"
+#include "ExperimentSensorInfo.hpp"
 
 #include <QDialog>
 
@@ -15,8 +15,10 @@ class QCheckBox;
 class QLabel;
 class QTabWidget;
 class QComboBox;
+class QTreeWidget;
 QT_END_NAMESPACE
 
+#include <vector>
 #include <memory>
 
 class cExperimentSensorInfoDlg : public QDialog
@@ -24,8 +26,10 @@ class cExperimentSensorInfoDlg : public QDialog
 	Q_OBJECT
 
 public:
-	cExperimentSensorInfoDlg(cExperimentFile& info, QWidget* parent = nullptr);
+	cExperimentSensorInfoDlg(const std::vector<std::shared_ptr<cExperimentSensorInfo>>& info, QWidget* parent = nullptr);
 	virtual ~cExperimentSensorInfoDlg();
+
+	const std::vector<std::shared_ptr<cExperimentSensorInfo>>& getSensorInfo() const;
 
 private slots:
 	void accept() override;
@@ -40,8 +44,6 @@ private:
 	void createLayout();
 
 private:
-	cExperimentFile& mInfo;
-
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensors;
 
 	QTabWidget* mpSensorTabs = nullptr;

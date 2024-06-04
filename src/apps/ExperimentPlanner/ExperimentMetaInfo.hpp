@@ -64,6 +64,8 @@ public:
 
 	void setPermitInfo(const std::string& info);
 
+	bool operator!=(const cExperimentMetaInfo& rhs) const;
+
 protected:
 	void load(const nlohmann::json& jdoc);
 	void save(nlohmann::json& jdoc);

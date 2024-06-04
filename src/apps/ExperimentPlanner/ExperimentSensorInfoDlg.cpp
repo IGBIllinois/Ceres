@@ -14,17 +14,20 @@
 #include <QLineEdit>
 #include <QIntValidator>
 #include <QTabWidget>
+#include <QTreeWidget>
 
 #include <algorithm>
 
 
-cExperimentSensorInfoDlg::cExperimentSensorInfoDlg(cExperimentFile& info, QWidget* parent)
+cExperimentSensorInfoDlg::cExperimentSensorInfoDlg(const std::vector<std::shared_ptr<cExperimentSensorInfo>>& info, QWidget* parent)
 :
-	mInfo(info), QDialog(parent)
+	QDialog(parent)
 {
 	setWindowTitle("Experiment Sensors");
 
 	setMinimumWidth(350);
+
+	mSensors = info;
 
 	createControls();
 	createLayout();
@@ -33,6 +36,11 @@ cExperimentSensorInfoDlg::cExperimentSensorInfoDlg(cExperimentFile& info, QWidge
 cExperimentSensorInfoDlg::~cExperimentSensorInfoDlg()
 {}
 
+const std::vector<std::shared_ptr<cExperimentSensorInfo>>& cExperimentSensorInfoDlg::getSensorInfo() const
+{
+	return mSensors;
+}
+
 void cExperimentSensorInfoDlg::createControls()
 {
 	mpAddSensor = new QPushButton(QIcon(":/ripe.illinois.edu/plus.png"), "", this);
@@ -40,8 +48,6 @@ void cExperimentSensorInfoDlg::createControls()
 
 	mpRemoveSensor = new QPushButton(QIcon(":/ripe.illinois.edu/minus.png"), "", this);
 	connect(mpRemoveSensor, &QPushButton::pressed, this, &cExperimentSensorInfoDlg::onRemoveSensor);
-
-	mSensors = mInfo.getSensors();
 
 	mpSensorTabs = new QTabWidget(this);
 
@@ -100,8 +106,6 @@ void cExperimentSensorInfoDlg::accept()
 		if (pWidget)
 			pWidget->accept();
 	}
-
-	mInfo.setSensors(mSensors);
 
 	QDialog::accept();
 }

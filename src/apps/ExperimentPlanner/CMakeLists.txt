@@ -72,6 +72,9 @@ PRIVATE
     MovementStepInfoDlg.hpp
     MovementStepInfoDlg.cpp
 
+    ExperimentDesignMdiChild.hpp
+    ExperimentDesignMdiChild.cpp
+
     ExperimentDesignWidget.hpp
     ExperimentDesignWidget.cpp
 

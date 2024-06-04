@@ -26,6 +26,7 @@ public:
 	cExperimentCtrlInfoDlg(cExperimentFile& info, QWidget* parent = nullptr);
 	virtual ~cExperimentCtrlInfoDlg();
 
+
 private slots:
 	void accept() override;
 	void onControllerChange(const QString& text);

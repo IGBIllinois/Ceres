@@ -17,26 +17,30 @@
 namespace fs = std::filesystem;
 
 
-std::shared_ptr<cExperimentSensorInfo> createSensor(std::string type)
-{
-	if (type == cExperimentSensorInfo_Dummy::type())				return std::make_shared<cExperimentSensorInfo_Dummy>();
-	if (type == cExperimentSensorInfo_Ouster::type())				return std::make_shared<cExperimentSensorInfo_Ouster>();
-	if (type == cExperimentSensorInfo_Septentrio::type())			return std::make_shared<cExperimentSensorInfo_Septentrio>();
-	if (type == cExperimentSensorInfo_AxisCommunications::type())	return std::make_shared<cExperimentSensorInfo_AxisCommunications>();
-	if (type == cExperimentSensorInfo_VNIR3000N::type())			return std::make_shared<cExperimentSensorInfo_VNIR3000N>();
-	if (type == cExperimentSensorInfo_SWIR384::type())				return std::make_shared<cExperimentSensorInfo_SWIR384>();
-
-	return std::shared_ptr<cExperimentSensorInfo>();
-}
-
-
-cExperimentFile::cExperimentFile()
-{
-}
 
 cExperimentFile::~cExperimentFile()
 {
 	clear();
+}
+
+cExperimentFile& cExperimentFile::operator=(const cExperimentFile& rhs)
+{
+	mExperimentPath = rhs.mExperimentPath;
+	mFileName = rhs.mFileName;
+
+	mDirty = rhs.mDirty;
+
+	mExperimentName = rhs.mExperimentName;
+	mLayoutName = mLayoutName;
+
+	mMetaInfo = rhs.mMetaInfo;
+
+	mpController = copy(rhs.mpController);
+
+	mSensors = rhs.mSensors;
+	mSteps = rhs.mSteps;
+
+	return *this;
 }
 
 
@@ -112,10 +116,10 @@ void cExperimentFile::clear()
 
 void cExperimentFile::clearSteps()
 {
-	for (auto step : mSteps)
-	{
-		delete step;
-	}
+//	for (auto step : mSteps)
+//	{
+//		delete step;
+//	}
 	mSteps.clear();
 }
 
@@ -187,21 +191,21 @@ void cExperimentFile::open(const std::string& file_name)
 
 		for (const auto& entry : steps)
 		{
-			cExperimentStep* step = nullptr;
+			std::shared_ptr<cExperimentStep> step;
 
 			std::string type = entry["type"];
 
 			if (type == "delay")
 			{
-				step = new cExperimentStep_Delay();
+				step = std::make_shared<cExperimentStep_Delay>();
 			}
 			else if (type == "pause")
 			{
-				step = new cExperimentStep_Pause();
+				step = std::make_shared<cExperimentStep_Pause>();
 			}
 			else if (type == "movement")
 			{
-				step = new cExperimentStep_Movement();
+				step = std::make_shared<cExperimentStep_Movement>();
 			}
 
 			step->load(entry);
@@ -320,6 +324,13 @@ cExperimentMetaInfo& cExperimentFile::getMetaData()
 	return mMetaInfo;
 }
 
+void cExperimentFile::setMetaData(const cExperimentMetaInfo& meta_info)
+{
+	mDirty |= mMetaInfo != meta_info;
+	mMetaInfo = meta_info;
+}
+
+
 cExperimentCtrlInfo* const cExperimentFile::getController() const
 {
 	return mpController.get();
@@ -358,46 +369,46 @@ cExperimentFile::iterator cExperimentFile::end() { return mSteps.end(); }
 cExperimentFile::const_iterator	cExperimentFile::begin() const { return mSteps.cbegin(); }
 cExperimentFile::const_iterator	cExperimentFile::end() const { return mSteps.cend(); }
 
-void cExperimentFile::insertBefore(int index, cExperimentStep* step)
+void cExperimentFile::insertBefore(int index, std::unique_ptr<cExperimentStep> step)
 {
 	if (index <= 0)
 	{
-		mSteps.push_front(step);
+		mSteps.push_front(std::move(step));
 		return;
 	}
 
 	if (index >= mSteps.size())
 	{
-		mSteps.push_back(step);
+		mSteps.push_back(std::move(step));
 		return;
 	}
 
 	auto it = mSteps.begin();
 	std::advance(it, index);
 
-	mSteps.insert(it, step);
+	mSteps.insert(it, std::move(step));
 }
 
-void cExperimentFile::insertAfter(int index, cExperimentStep* step)
+void cExperimentFile::insertAfter(int index, std::unique_ptr<cExperimentStep> step)
 {
 	++index;
 
 	if (index <= 0)
 	{
-		mSteps.push_front(step);
+		mSteps.push_front(std::move(step));
 		return;
 	}
 
 	if (index >= mSteps.size())
 	{
-		mSteps.push_back(step);
+		mSteps.push_back(std::move(step));
 		return;
 	}
 
 	auto it = mSteps.begin();
 	std::advance(it, index);
 
-	mSteps.insert(it, step);
+	mSteps.insert(it, std::move(step));
 }
 
 bool cExperimentFile::removeStep(int index)
@@ -419,8 +430,9 @@ void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)
 {
 	if (step)
 	{
-		mSteps.push_back(step.get());
-		step.release();
+		std::shared_ptr<cExperimentStep> shared = std::move(step);
+		mSteps.push_back(shared);
+//		step.release();
 		mDirty = true;
 	}
 }

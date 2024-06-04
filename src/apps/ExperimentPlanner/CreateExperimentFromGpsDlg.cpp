@@ -40,13 +40,11 @@ namespace
 	const QString SOUTH_TO_NORTH = "South to North";
 }
 
-cCreateExperimentFromGpsDlg::cCreateExperimentFromGpsDlg(cExperimentFile& info, const QString& filename, QWidget* parent)
+cCreateExperimentFromGpsDlg::cCreateExperimentFromGpsDlg(const QString& filename, QWidget* parent)
 :
-	mInfo(info), QDialog(parent)
+	QDialog(parent)
 {
 	setWindowTitle("Create Experiment");
-
-//	mInfo.clearSteps();
 
 	setMinimumWidth(550);
 
@@ -417,7 +415,7 @@ void cCreateExperimentFromGpsDlg::accept()
 
 void cCreateExperimentFromGpsDlg::onMetaInfoUpdate()
 {
-	cExperimentMetaInfoDlg dlg(mInfo.getMetaData(), this);
+	cExperimentMetaInfoDlg dlg(mMetaInfo, this);
 
 	dlg.setExperimentTitle(mpTitle->text().toStdString());
 
@@ -431,14 +429,20 @@ void cCreateExperimentFromGpsDlg::onMetaInfoUpdate()
 
 void cCreateExperimentFromGpsDlg::onControllerUpdate()
 {
-	cExperimentCtrlInfoDlg dlg(mInfo, this);
-	dlg.exec();
+//	cExperimentCtrlInfoDlg dlg(mInfo, this);
+//	auto result = dlg.exec();
 }
 
 void cCreateExperimentFromGpsDlg::onSensorUpdate()
 {
-	cExperimentSensorInfoDlg dlg(mInfo, this);
-	dlg.exec();
+	cExperimentSensorInfoDlg dlg(mSensorInfo, this);
+	auto result = dlg.exec();
+
+	if (result == QDialog::Accepted)
+	{
+		mSensorInfo.clear();
+		mSensorInfo = dlg.getSensorInfo();
+	}
 }
 
 void cCreateExperimentFromGpsDlg::onUnitChange(const QString& text)
@@ -511,8 +515,6 @@ void cCreateExperimentFromGpsDlg::generate()
 		return;
 	}
 
-	mInfo.setExperimentName(str);
-
 	QModelIndex startIndex = mpStartPosition->currentIndex();
 	QModelIndex endIndex = mpEndPosition->currentIndex();
 
@@ -524,7 +526,11 @@ void cCreateExperimentFromGpsDlg::generate()
 		return;
 	}
 
-	mInfo.clearSteps();
+	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
+		
+	pInfo->setExperimentName(str);
+	pInfo->setMetaData(mMetaInfo);
+	pInfo->setSensors(mSensorInfo);
 
 	// Add preamble...
 	std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
@@ -533,7 +539,7 @@ void cCreateExperimentFromGpsDlg::generate()
 	int speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	step->setZ_mm(z_mm);
 	step->setSpeed_mmps(speed_mmps);
-	mInfo.appendStep(std::move(step));
+	pInfo->appendStep(std::move(step));
 
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
@@ -582,7 +588,7 @@ void cCreateExperimentFromGpsDlg::generate()
 		step->setX_mm(x1_mm);
 		step->setY_mm(y1_mm);
 		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		pInfo->appendStep(std::move(step));
 
 		z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
 		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
@@ -595,7 +601,7 @@ void cCreateExperimentFromGpsDlg::generate()
 			step->setZ_mm(z_mm);
 
 		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		pInfo->appendStep(std::move(step));
 
 		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
 
@@ -603,7 +609,7 @@ void cCreateExperimentFromGpsDlg::generate()
 		{
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
 
 		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
@@ -613,7 +619,7 @@ void cCreateExperimentFromGpsDlg::generate()
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
 			delay->setRecording(true);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
 	}
 	else
@@ -645,7 +651,7 @@ void cCreateExperimentFromGpsDlg::generate()
 		step->setX_mm(x_mm);
 		step->setY_mm(y_mm);
 		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		pInfo->appendStep(std::move(step));
 
 		z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
 		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
@@ -658,7 +664,7 @@ void cCreateExperimentFromGpsDlg::generate()
 			step->setZ_mm(z_mm);
 
 		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		pInfo->appendStep(std::move(step));
 
 		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
 
@@ -666,7 +672,7 @@ void cCreateExperimentFromGpsDlg::generate()
 		{
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
 
 		offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
@@ -699,7 +705,7 @@ void cCreateExperimentFromGpsDlg::generate()
 
 		step->setSpeed_mmps(speed_mmps);
 		step->setRecording(true);
-		mInfo.appendStep(std::move(step));
+		pInfo->appendStep(std::move(step));
 
 		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 
@@ -707,7 +713,7 @@ void cCreateExperimentFromGpsDlg::generate()
 		{
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
 	}
 
@@ -717,11 +723,11 @@ void cCreateExperimentFromGpsDlg::generate()
 	step = std::make_unique<cExperimentStep_Movement>();
 	step->setZ_mm(z_mm);
 	step->setSpeed_mmps(speed_mmps);
-	mInfo.appendStep(std::move(step));
+	pInfo->appendStep(std::move(step));
 
 	mpSaveAs->setEnabled(true);
 
-	emit experimentChanged();
+	emit experimentChanged(pInfo);
 }
 
 void cCreateExperimentFromGpsDlg::onShowPath()

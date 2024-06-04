@@ -383,7 +383,7 @@ void cMainWindow::onFileNewExperiment_GPS()
 
     mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
 
-    cCreateExperimentFromGpsDlg dlg(mExperimentFile, fileName, this);
+    cCreateExperimentFromGpsDlg dlg(fileName, this);
 
     connect(&dlg, &cCreateExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
@@ -470,8 +470,8 @@ void cMainWindow::onEditExperimentCtrlInfo()
 
 void cMainWindow::onEditExperimentSernsorInfo()
 {
-    cExperimentSensorInfoDlg dlg(mExperimentFile, this);
-    dlg.exec();
+//    cExperimentSensorInfoDlg dlg(mExperimentFile, this);
+//    dlg.exec();
 }
 
 void cMainWindow::onEditAddExperimentToLayout()
@@ -595,8 +595,9 @@ void cMainWindow::onOpenExperiment(const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::onExperimentChange()
+void cMainWindow::onExperimentChange(QSharedPointer<cExperimentFile> experiment)
 {
+    mExperimentFile = *experiment;
     mpExpDesign->loadExperiment(mExperimentFile);
 }
 
@@ -606,30 +607,28 @@ void cMainWindow::onInsertStepBefore(int id, int type)
     {
     case eExperimentStep::delay:
     {
-        auto* pStep = new cExperimentStep_Delay();
-        if (!pStep->onEdit())
+        auto step = std::make_unique<cExperimentStep_Delay>();
+        if (!step->onEdit())
         {
-            delete pStep;
             return;
         }
-        mExperimentFile.insertBefore(id, pStep);
+        mExperimentFile.insertBefore(id, std::move(step));
         break;
     }
     case eExperimentStep::pause:
     {
-        auto* pStep = new cExperimentStep_Pause();
-        mExperimentFile.insertBefore(id, pStep);
+        auto step = std::make_unique<cExperimentStep_Pause>();
+        mExperimentFile.insertBefore(id, std::move(step));
         break;
     }
     case eExperimentStep::movement:
     {
-        auto* pStep = new cExperimentStep_Movement();
-        if (!pStep->onEdit())
+        auto step = std::make_unique<cExperimentStep_Movement>();
+        if (!step->onEdit())
         {
-            delete pStep;
             return;
         }
-        mExperimentFile.insertBefore(id, pStep);
+        mExperimentFile.insertBefore(id, std::move(step));
         break;
     }
     default:
@@ -645,30 +644,28 @@ void cMainWindow::onInsertStepAfter(int id, int type)
     {
     case eExperimentStep::delay:
     {
-        auto* pStep = new cExperimentStep_Delay();
-        if (!pStep->onEdit())
+        auto step = std::make_unique<cExperimentStep_Delay>();
+        if (!step->onEdit())
         {
-            delete pStep;
             return;
         }
-        mExperimentFile.insertAfter(id, pStep);
+        mExperimentFile.insertAfter(id, std::move(step));
         break;
     }
     case eExperimentStep::pause:
     {
-        auto* pStep = new cExperimentStep_Pause();
-        mExperimentFile.insertAfter(id, pStep);
+        auto step = std::make_unique<cExperimentStep_Pause>();
+        mExperimentFile.insertAfter(id, std::move(step));
         break;
     }
     case eExperimentStep::movement:
     {
-        auto* pStep = new cExperimentStep_Movement();
-        if (!pStep->onEdit())
+        auto step = std::make_unique<cExperimentStep_Movement>();
+        if (!step->onEdit())
         {
-            delete pStep;
             return;
         }
-        mExperimentFile.insertAfter(id, pStep);
+        mExperimentFile.insertAfter(id, std::move(step));
         break;
     }
     default:

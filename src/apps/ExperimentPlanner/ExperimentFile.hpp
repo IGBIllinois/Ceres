@@ -25,22 +25,22 @@ QT_END_NAMESPACE
 // Forward Declarations
 class cExperimentStep;
 
-std::shared_ptr<cExperimentSensorInfo> createSensor(std::string type);
-
 enum eExperimentStep {delay, pause, movement};
 
 
 class cExperimentFile
 {
 public:
-	typedef std::list<cExperimentStep*> Experiment_t;
+	typedef std::list<std::shared_ptr<cExperimentStep>> Experiment_t;
 
 	typedef Experiment_t::iterator			iterator;
 	typedef Experiment_t::const_iterator	const_iterator;
 
 public:
-	cExperimentFile();
+	cExperimentFile() = default;
 	~cExperimentFile();
+
+	cExperimentFile& operator=(const cExperimentFile& rhs);
 
 	const std::string& getFileName() const;
 	void setFileName(const std::string& filename);
@@ -67,6 +67,7 @@ public:
 
 	const cExperimentMetaInfo& getMetaData() const;
 	cExperimentMetaInfo& getMetaData();
+	void setMetaData(const cExperimentMetaInfo& meta_info);
 
 	cExperimentCtrlInfo* const getController() const;
 	void setController(std::unique_ptr<cExperimentCtrlInfo> controller);
@@ -84,8 +85,8 @@ public:
 	const_iterator	begin() const;
 	const_iterator	end() const;
 
-	void insertBefore(int index, cExperimentStep* step);
-	void insertAfter(int index, cExperimentStep* step);
+	void insertBefore(int index, std::unique_ptr<cExperimentStep> step);
+	void insertAfter(int index, std::unique_ptr<cExperimentStep> step);
 
 	bool removeStep(int index);
 
@@ -112,7 +113,7 @@ private:
 
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensors;
 
-	std::list<cExperimentStep*> mSteps;
+	Experiment_t mSteps;
 };
 
 

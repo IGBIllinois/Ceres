@@ -86,7 +86,7 @@ private slots:
 // Helper slots
 private slots:
     void onOpenExperiment(const QString& filename);
-    void onExperimentChange();
+    void onExperimentChange(QSharedPointer<cExperimentFile> experiment);
     void onInsertStepBefore(int id, int type);
     void onInsertStepAfter(int id, int type);
     void onDeleteStep(int id);

@@ -8,6 +8,13 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
+
+class cExperimentSensorInfo;
+
+std::shared_ptr<cExperimentSensorInfo> createSensor(std::string type);
+
 
 class cSensorWidget : public QWidget
 {

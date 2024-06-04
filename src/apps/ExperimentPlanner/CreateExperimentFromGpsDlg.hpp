@@ -4,6 +4,7 @@
 #include "ExperimentFile.hpp"
 
 #include <QDialog>
+#include <QSharedPointer>
 
 
 // Qt Forward Declaration
@@ -25,13 +26,13 @@ class cCreateExperimentFromGpsDlg : public QDialog
 	Q_OBJECT
 
 public:
-	cCreateExperimentFromGpsDlg(cExperimentFile& info, const QString& filename, QWidget* parent = nullptr);
+	cCreateExperimentFromGpsDlg(const QString& filename, QWidget* parent = nullptr);
 	virtual ~cCreateExperimentFromGpsDlg();
 
 signals:
 	void clearPaths();
 	void drawPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
-	void experimentChanged();
+	void experimentChanged(QSharedPointer<cExperimentFile> experiment);
 	void saveExperiment();
 
 private slots:
@@ -52,7 +53,9 @@ private:
 private:
 	double mConversionFactor = 1.0;
 
-	cExperimentFile& mInfo;
+	cExperimentMetaInfo mMetaInfo;
+	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
+	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;
 
 	QLineEdit* mpTitle = nullptr;
 

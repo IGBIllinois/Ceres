@@ -4,6 +4,23 @@
 #include "Spidercam/SpidercamCtrlFactory.hpp"
 #include "DummyCtrlFactory.hpp"
 
+
+std::unique_ptr<cExperimentCtrlInfo> copy(const std::unique_ptr<cExperimentCtrlInfo>& rhs)
+{
+	if (!rhs)
+		return std::unique_ptr<cExperimentCtrlInfo>();
+
+	auto type = rhs->getType();
+	
+	if (type == cExperimentCtrlInfo_SpiderCam::type())
+	{
+		return std::make_unique<cExperimentCtrlInfo_SpiderCam>(static_cast<cExperimentCtrlInfo_SpiderCam&>(*rhs.get()));
+	}
+
+	return std::make_unique<cExperimentCtrlInfo_Dummy>(static_cast<cExperimentCtrlInfo_Dummy&>(*rhs.get()));
+}
+
+
 cExperimentCtrlInfo::~cExperimentCtrlInfo()
 {}
 
@@ -25,6 +42,11 @@ cExperimentCtrlInfo_Dummy::cExperimentCtrlInfo_Dummy()
 cExperimentCtrlInfo_Dummy::~cExperimentCtrlInfo_Dummy()
 {}
 
+cExperimentCtrlInfo_Dummy::cExperimentCtrlInfo_Dummy(const cExperimentCtrlInfo_Dummy& rhs)
+{
+	mDirty = rhs.mDirty;
+}
+
 const char* cExperimentCtrlInfo_Dummy::type() { return dummy_id; }
 std::string cExperimentCtrlInfo_Dummy::getType() const { return type(); }
 
@@ -40,6 +62,13 @@ cExperimentCtrlInfo_SpiderCam::cExperimentCtrlInfo_SpiderCam()
 
 cExperimentCtrlInfo_SpiderCam::~cExperimentCtrlInfo_SpiderCam()
 {}
+
+cExperimentCtrlInfo_SpiderCam::cExperimentCtrlInfo_SpiderCam(const cExperimentCtrlInfo_SpiderCam& rhs)
+{
+	mDirty = rhs.mDirty;
+	mUpdateInterval_ms = rhs.mUpdateInterval_ms;
+	mPositionTolerance_cm = rhs.mPositionTolerance_cm;
+}
 
 const char* cExperimentCtrlInfo_SpiderCam::type() { return spidercam_id; }
 std::string cExperimentCtrlInfo_SpiderCam::getType() const { return type(); }

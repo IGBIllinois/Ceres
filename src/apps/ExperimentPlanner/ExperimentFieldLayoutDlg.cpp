@@ -52,7 +52,7 @@ void cExperimentFieldLayoutDlg::setExperiment(const cExperimentFile& experiment)
 
 	for (auto step : experiment)
 	{
-		auto movement = dynamic_cast<cExperimentStep_Movement*>(step);
+		auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
 
 		if (movement)
 		{

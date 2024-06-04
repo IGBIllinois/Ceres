@@ -372,8 +372,8 @@ void cCreateExperimentFromPlotInfoDlg::onControllerUpdate()
 
 void cCreateExperimentFromPlotInfoDlg::onSensorUpdate()
 {
-	cExperimentSensorInfoDlg dlg(mInfo, this);
-	dlg.exec();
+//	cExperimentSensorInfoDlg dlg(mInfo, this);
+//	dlg.exec();
 }
 
 void cCreateExperimentFromPlotInfoDlg::generate()
