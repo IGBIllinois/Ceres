@@ -48,9 +48,10 @@ namespace nStringUtils
 	sFilenameAndExtension removeProcessedTimestamp(const std::string& filename);
 
 	/**
-	 * Compacts a filename to a maximum length
+	 * Converts a potential filename to a safe file name
 	 *
-	 * The filename: d:\test\long_file_name.extension -> d:\...\long_file_name
+	 * 	Replaces characters: :, \\, /, <, >, |, ?, *, ", and space
+	 *  with _
 	 */
 	std::string safeFilename(std::string filename);
 
@@ -60,5 +61,19 @@ namespace nStringUtils
 	 * The filename: d:\test\long_file_name.extension -> d:\...\long_file_name
 	 */
 	std::string compactFilename(const std::string& filename, std::size_t max_len);
+
+	/**
+	 * Tests to see in a string ends with a integer.  Optionally returns the integer;
+	 *
+	 * Test_1 will return true with the value set to 1
+	 */
+	bool endsWithInt(const std::string& str, int* pValue = nullptr);
+
+	/**
+	 * Replaces the integer at the end of a string with a new value.
+	 *
+	 * If the string does not end with an integer, the string is left unchanged
+	 */
+	void replaceIntAtEnd(std::string& str, int value);
 
 } // End of Namespace nStringUtils

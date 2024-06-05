@@ -214,3 +214,46 @@ std::string nStringUtils::compactFilename(const std::string& filename, std::size
 
 	return fname;
 }
+
+bool nStringUtils::endsWithInt(const std::string& str, int* pValue)
+{
+	std::string value;
+
+	for (auto it = str.rbegin(); it != str.rend(); ++it)
+	{
+		if (isdigit(*it))
+		{
+			if (value.empty())
+				value = *it;
+			else
+				value.insert(0, 1, *it);
+		}
+		else
+			break;
+	}
+
+	if (pValue && !value.empty())
+	{
+		*pValue = std::stoi(value);
+	}
+
+	return !value.empty();
+}
+
+void nStringUtils::replaceIntAtEnd(std::string& str, int value)
+{
+	auto it = str.rbegin();
+	for (; it != str.rend(); ++it)
+	{
+		if (!isdigit(*it))
+			break;
+	}
+
+	if (it == str.rbegin())
+		return;
+
+	auto offset = std::distance(it, str.rend());
+	str.erase(offset);
+
+	str += std::to_string(value);
+}
