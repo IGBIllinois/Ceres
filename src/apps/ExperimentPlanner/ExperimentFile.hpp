@@ -72,6 +72,7 @@ public:
 	cExperimentCtrlInfo* const getController() const;
 	void setController(std::unique_ptr<cExperimentCtrlInfo> controller);
 
+	void clearSensors();
 	const std::vector<std::shared_ptr<cExperimentSensorInfo>>& getSensors() const;
 	void setSensors(const std::vector<std::shared_ptr<cExperimentSensorInfo>>& sensors);
 	void addSensor(std::shared_ptr<cExperimentSensorInfo> sensor);

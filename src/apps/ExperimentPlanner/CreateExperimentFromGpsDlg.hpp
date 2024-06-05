@@ -33,7 +33,6 @@ signals:
 	void clearPaths();
 	void drawPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
 	void experimentChanged(QSharedPointer<cExperimentFile> experiment);
-	void saveExperiment();
 
 private slots:
 	void accept() override;
@@ -101,7 +100,4 @@ private:
 	QLineEdit* mpSubScanSeparation = nullptr;
 
 	QCheckBox* mpFastMode = nullptr;
-
-
-	QPushButton* mpSaveAs = nullptr;
 };

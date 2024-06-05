@@ -5,6 +5,8 @@
 
 #include "ExperimentFile.hpp"
 
+#include <string>
+
 
 class cExperimentDesignMdiChild : public cExperimentDesignWidget
 {
@@ -14,31 +16,47 @@ public:
     cExperimentDesignMdiChild(QWidget *parent);
 
     void newFile();
-    bool loadFile(const QString &fileName);
-    bool save();
+    void newFile(const cExperimentFile& file);
+    void loadFile(const QString &fileName);
+    void save();
     bool saveAs();
-    bool saveFile(const QString &fileName);
+
     QString userFriendlyCurrentFile();
-    QString currentFile() { return curFile; }
+    QString currentFile();
+
+    const std::string& getFileName() const;
+
+    const std::string& getExperimentTitle() const;
+
+    const cExperimentFile& getExperimentFile() const;
+    void setExperimentFile(const cExperimentFile& file);
+
+    const std::string& getLayoutName() const;
+    void setLayoutName(const std::string& name);
+
+    void editMetaInfo();
+    void editCtrlInfo();
+    void editSensorInfo();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
 
-    // Helper slots
-private slots:
-    void onExperimentChange();
+public slots:
+    void onDefaultExperimentPathChange(const QString& path);
     void onInsertStepBefore(int id, int type);
     void onInsertStepAfter(int id, int type);
     void onDeleteStep(int id);
 
+    // Helper slots
+private slots:
+    void onExperimentChange();
+
 private:
-    bool maybeSave();
+    void newWindowTitle();
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
-    QString curFile;
-    bool isUntitled;
-
+    QString mDefaultPath;
     cExperimentFile mExperimentFile;
 };
 

@@ -342,6 +342,11 @@ void cExperimentFile::setController(std::unique_ptr<cExperimentCtrlInfo> control
 	mpController = std::move(controller);
 }
 
+void cExperimentFile::clearSensors()
+{
+	mSensors.clear();
+}
+
 const std::vector<std::shared_ptr<cExperimentSensorInfo>>& cExperimentFile::getSensors() const
 {
 	return mSensors;

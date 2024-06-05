@@ -150,7 +150,8 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
 
 bool cCtrlDataModelRemote::systemReady() const
 {
-    if (!mConnected)
+ 
+    if (!isConnected())
     {
         QString str = "Not connected to the remote computer!\n";
         str += "Please try to reconnect before running an experiment.";
@@ -363,7 +364,7 @@ void cCtrlDataModelRemote::dataRecordingStateChange(bool record)
 
 bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
 {
-    if (!mConnected)
+    if (!isConnected())
         return false;
 
     bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
@@ -461,6 +462,7 @@ void cCtrlDataModelRemote::startExperiment()
     emit statusMessage(msg);
 }
 
+
 /**********************************************************
  * TCP Socket Methods
  *********************************************************/
@@ -482,7 +484,7 @@ void cCtrlDataModelRemote::disconnected()
         terminateExperiment();
     }
 
-    if (mConnected)
+    if (isConnected())
     {
         QString msg = "Connection to the C4 has been lost!";
         emit errorMessage("Connection Lost", msg);

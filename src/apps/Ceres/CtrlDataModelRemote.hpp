@@ -56,6 +56,9 @@ public:
     bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc) override;
     void startExperiment() override;
 
+    bool isConnected() const;
+    bool inOverrideMode() const;
+
 protected:
     void dataRecordingStateChange(bool record) override;
     void endDataRecording() override;
@@ -116,6 +119,7 @@ private:
 
 private:
     bool mConnected = false;
+    bool mOverrideConnection = false;
     bool mDataFileIsOpen = false;
     bool mExperimentInfoConfirmed = false;
 
@@ -132,3 +136,14 @@ private:
     std::vector<cExperimentStateCreator*> mStateCreators;
 };
 
+
+inline bool cCtrlDataModelRemote::isConnected() const
+{
+    return mConnected || mOverrideConnection;
+}
+
+
+inline bool cCtrlDataModelRemote::inOverrideMode() const
+{
+    return mOverrideConnection;
+}

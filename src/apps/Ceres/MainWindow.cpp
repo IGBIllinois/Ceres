@@ -274,7 +274,7 @@ void cMainWindow::onExperimentLoad()
 
     if (pExperiment->hasExperimentDocument())
     {
-        loadExperiment(*pExperiment);
+        bool result = loadExperiment(*pExperiment);
         return;
     }
 

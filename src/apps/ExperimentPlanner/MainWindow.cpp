@@ -8,6 +8,8 @@
 #include "ExperimentTreeItem.hpp"
 #include "FieldLayoutWidget.hpp"
 #include "ExperimentDesignWidget.hpp"
+#include "ExperimentDesignMdiChild.hpp"
+
 
 #include "ExperimentSteps.hpp"
 
@@ -73,18 +75,10 @@ void cMainWindow::initialize()
 
     createStatusBar();
 
-    mpExpDesign = new cExperimentDesignWidget(this);
-    connect(mpExpDesign, &cExperimentDesignWidget::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
-    connect(mpExpDesign, &cExperimentDesignWidget::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-
-    connect(mpExpDesign, &cExperimentDesignWidget::insertBefore, this, &cMainWindow::onInsertStepBefore);
-    connect(mpExpDesign, &cExperimentDesignWidget::insertAfter, this, &cMainWindow::onInsertStepAfter);
-    connect(mpExpDesign, &cExperimentDesignWidget::deleteStep, this, &cMainWindow::onDeleteStep);
-
-    setCentralWidget(mpExpDesign);
-
-//    QMdiArea* mdiArea = new QMdiArea(this);
-//    setCentralWidget(mdiArea);
+    mpMdiArea = new QMdiArea(this);
+    mpMdiArea->setViewMode(QMdiArea::TabbedView);
+    mpMdiArea->setTabsClosable(true);
+    setCentralWidget(mpMdiArea);
 }
 
 //-----------------------------------------------------------------------------
@@ -122,6 +116,7 @@ void cMainWindow::createMainMenu()
 {
     mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
     mpEditMenu = mpUI->menuBar->addMenu(tr("&Edit"));
+    mpGenerateMenu = mpUI->menuBar->addMenu(tr("&Generate"));
     mpPreferencesMenu = mpUI->menuBar->addMenu(tr("&Preferences"));
     mpViewMenu = mpUI->menuBar->addMenu(tr("&View"));
     mpHelpMenu = mpUI->menuBar->addMenu(tr("&Help"));
@@ -138,17 +133,10 @@ void cMainWindow::createSubMenusAndActions()
     // Build the File Sub Menu
     //
 
-    QMenu* newMenu = mpFileMenu->addMenu(tr("New Experiment File..."));
-
-    pMenuItem = new QAction(tr("Blank"), this);
+    pMenuItem = new QAction(tr("New Experiment File"), this);
     pMenuItem->setStatusTip(tr("Creates a blank experiment file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment_Blank);
-    newMenu->addAction(pMenuItem);
-
-    pMenuItem = new QAction(tr("From GPS data"), this);
-    pMenuItem->setStatusTip(tr("Creates an experiment file from GPS data"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment_GPS);
-    newMenu->addAction(pMenuItem);
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment);
+    mpFileMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Open Experiment File..."), this);
     pMenuItem->setStatusTip(tr("Loads experiment file into memory"));
@@ -165,6 +153,23 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem = new QAction(tr("Save Experiment File As..."), this);
     pMenuItem->setStatusTip(tr("Save the experiment file with a different file name"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveAsExperimentFile);
+    mpFileMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Save All Experiment Files"), this);
+    pMenuItem->setStatusTip(tr("Save all experiment files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveAllExperimentFiles);
+    mpFileMenu->addAction(pMenuItem);
+
+    mpFileMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Close Experiment File"), this);
+    pMenuItem->setStatusTip(tr("Close the experiment file"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileCloseExperimentFile);
+    mpFileMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Close All Experiment Files"), this);
+    pMenuItem->setStatusTip(tr("Close all the experiment files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileCloseAllExperimentFiles);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
@@ -199,6 +204,14 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem->setStatusTip(tr("Adds the experiment to the field layout..."));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditAddExperimentToLayout);
     mpEditMenu->addAction(pMenuItem);
+
+    //
+    // Build the Generate Sub Menu
+    //
+    pMenuItem = new QAction(tr("LiDAR Scans From GPS data"), this);
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS data"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_GPS);
+    mpGenerateMenu->addAction(pMenuItem);
 
     //
     // Build the Preference Sub Menu
@@ -292,58 +305,158 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::doSaveCheck()
+cExperimentDesignMdiChild* cMainWindow::createMdiChild()
 {
-    if (mExperimentFile.isDirty())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("The experiment configuration file has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Save);
-        int ret = msgBox.exec();
+    cExperimentDesignMdiChild* child = new cExperimentDesignMdiChild(this);
+    child->onDefaultExperimentPathChange(mExperimentFilesPath);
 
-        if (ret == QMessageBox::Save)
-        {
-            onFileSaveExperimentFile();
-        }
-        else if (ret == QMessageBox::Cancel)
-        {
-            return;
-        }
-    }
+    mpMdiArea->addSubWindow(child);
 
-    if (mpFieldLayout->isDirty())
-    {
-        mpFieldLayout->save(mFieldLayoutFile);
-    }
+    connect(child, &cExperimentDesignWidget::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(child, &cExperimentDesignWidget::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+
+    connect(this, &cMainWindow::defaultExperimentPathChange, child, &cExperimentDesignMdiChild::onDefaultExperimentPathChange);
+
+    return child;
 }
+
+//-----------------------------------------------------------------------------
 
 
 /********************************************************************
  * Slots associated with "File" menu actions
  *******************************************************************/
-void cMainWindow::onFileNewExperiment_Blank()
+void cMainWindow::onFileNewExperiment()
 {
-    doSaveCheck();
-
-    if (!mExperimentFile.getController())
-    {
-        std::unique_ptr<cExperimentCtrlInfo> ctrl = std::make_unique<cExperimentCtrlInfo_SpiderCam>();
-        mExperimentFile.setController(std::move(ctrl));
-    }
-
-    mExperimentFile.clearSteps();
-
-    mpExpDesign->loadExperiment(mExperimentFile);
+    auto* child = createMdiChild();
+    child->newFile();
+    child->show();
 
     mpEditMenu->setDisabled(false);
 }
 
-void cMainWindow::onFileNewExperiment_GPS()
+void cMainWindow::onFileOpenExperiment()
 {
-    doSaveCheck();
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Experiment File"), mExperimentFilesPath,
+        "Experiment Files (*.json)");
 
+    if (fileName.isEmpty())
+        return;
+
+    onOpenExperiment(fileName);
+}
+
+void cMainWindow::onFileSaveExperimentFile()
+{
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+    child->save();
+}
+
+void cMainWindow::onFileSaveAsExperimentFile()
+{
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    if (child->saveAs())
+        mpExperiments->reloadExperiments();
+}
+
+void cMainWindow::onFileSaveAllExperimentFiles()
+{
+    auto list = mpMdiArea->subWindowList();
+    for (auto* subWindow : list)
+    {
+        auto* child = static_cast<cExperimentDesignMdiChild*>(subWindow->widget());
+        child->save();
+    }
+}
+
+void cMainWindow::onFileCloseExperimentFile()
+{
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    childSubWindow->close();
+}
+
+void cMainWindow::onFileCloseAllExperimentFiles()
+{
+    mpMdiArea->closeAllSubWindows();
+}
+
+
+/********************************************************************
+ * Slots associated with "Edit" menu actions
+ *******************************************************************/
+void cMainWindow::onEditExperimentMetaInfo()
+{
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+    child->editMetaInfo();
+}
+
+void cMainWindow::onEditExperimentCtrlInfo()
+{
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+    child->editCtrlInfo();
+}
+
+void cMainWindow::onEditExperimentSernsorInfo()
+{
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+    child->editSensorInfo();
+}
+
+void cMainWindow::onEditAddExperimentToLayout()
+{
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+    
+    cExperimentFieldLayoutDlg dlg(*mpFieldLayout, this);
+
+    dlg.setExperiment(child->getExperimentFile());
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    auto original = dlg.getOriginalLayout();
+    auto new_layout = dlg.getLayout();
+
+    mpFieldLayout->replaceLayout(original, new_layout);
+
+    child->setLayoutName(new_layout.caption.label.toStdString());
+}
+
+
+/********************************************************************
+ * Slots associated with "Generate" menu actions
+ *******************************************************************/
+void cMainWindow::onGenerateLidarScan_GPS()
+{
     QString defaultDirectory = mSettings.value("Defaults/gpsFiles").toString();
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), defaultDirectory,
@@ -388,109 +501,20 @@ void cMainWindow::onFileNewExperiment_GPS()
     connect(&dlg, &cCreateExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
     connect(&dlg, &cCreateExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
-    connect(&dlg, &cCreateExperimentFromGpsDlg::saveExperiment, this, &cMainWindow::onFileSaveAsExperimentFile);
 
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
     {
-        mExperimentFile.clear();
         return;
     }
 
     mpEditMenu->setDisabled(false);
 }
 
-void cMainWindow::onFileOpenExperiment()
+void cMainWindow::onGenerateLidarScan_PlotInfo()
 {
-    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Experiment File"), defaultDirectory,
-        "Experiment Files (*.json)");
-
-    onOpenExperiment(fileName);
-}
-
-void cMainWindow::onFileSaveExperimentFile()
-{
-    if (mExperimentFile.isDirty())
-    {
-        if (mExperimentFile.getFileName().empty())
-            onFileSaveAsExperimentFile();
-        else
-            mExperimentFile.save();
-    }
-}
-
-void cMainWindow::onFileSaveAsExperimentFile()
-{
-    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
-
-    if (!mExperimentFile.getFileName().empty())
-        defaultDirectory = QString::fromStdString(mExperimentFile.getFileName());
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Experiment File"), defaultDirectory,
-        "Experiment Files (*.json)");
-
-    if (fileName.isEmpty())
-        return;
-
-    mExperimentFile.save_as(fileName.toStdString());
-
-    QString title = "RAPP Plot Mapper - ";
-    title += fileName;
-    setWindowTitle(title);
-
-    mpExperiments->reloadExperiments();
-}
-
-
-/********************************************************************
- * Slots associated with "Edit" menu actions
- *******************************************************************/
-void cMainWindow::onEditExperimentMetaInfo()
-{
-    cExperimentMetaInfoDlg dlg(mExperimentFile.getMetaData(), this);
-
-    dlg.setExperimentTitle(mExperimentFile.getExperimentName());
-
-    auto result = dlg.exec();
-
-    if (result == QDialog::Rejected)
-        return;
-
-    mExperimentFile.setExperimentName(dlg.getExperimentTitle());
-}
-
-void cMainWindow::onEditExperimentCtrlInfo()
-{
-    cExperimentCtrlInfoDlg dlg(mExperimentFile, this);
-    dlg.exec();
-}
-
-void cMainWindow::onEditExperimentSernsorInfo()
-{
-//    cExperimentSensorInfoDlg dlg(mExperimentFile, this);
-//    dlg.exec();
-}
-
-void cMainWindow::onEditAddExperimentToLayout()
-{
-    cExperimentFieldLayoutDlg dlg(*mpFieldLayout, this);
-
-    dlg.setExperiment(mExperimentFile);
-
-    auto result = dlg.exec();
-
-    if (result == QDialog::Rejected)
-        return;
-
-    auto original = dlg.getOriginalLayout();
-    auto new_layout = dlg.getLayout();
-
-    mpFieldLayout->replaceLayout(original, new_layout);
-
-    mExperimentFile.setLayoutName(new_layout.caption.label.toStdString());
 }
 
 /********************************************************************
@@ -506,6 +530,9 @@ void cMainWindow::onPreferenceDefaultExperimentDirectory()
         return;
 
     mSettings.setValue("Defaults/experimentDirectory", directory);
+    mExperimentFilesPath = directory;
+
+    emit defaultExperimentPathChange(mExperimentFilesPath);
 }
 
 void cMainWindow::onPreferenceDefaultFieldLayoutFile()
@@ -530,6 +557,7 @@ void cMainWindow::onPreferenceDefaultPlotSplitDirectory()
         return;
 
     mSettings.setValue("Defaults/plotSplitDirectory", directory);
+    mPlotSplitsPath = directory;
 }
 
 void cMainWindow::onPreferenceDefaultFieldBoundaries()
@@ -579,17 +607,19 @@ void cMainWindow::onOpenExperiment(const QString& filename)
     if (filename.isEmpty())
         return;
 
-    doSaveCheck();
-
-    mExperimentFile.clear();
-
-    mExperimentFile.open(filename.toStdString());
-
-    QString title = "RAPP Plot Mapper - ";
-    title += filename;
-    setWindowTitle(title);
-
-    mpExpDesign->loadExperiment(mExperimentFile);
+    auto list = mpMdiArea->subWindowList();
+    for (auto* subWindow : list)
+    {
+        auto* child = static_cast<cExperimentDesignMdiChild*>(subWindow->widget());
+        if (child->currentFile() == filename)
+        {
+            mpMdiArea->setActiveSubWindow(subWindow);
+            return;
+        }
+    }
+    auto* child = createMdiChild();
+    child->loadFile(filename);
+    child->show();
 
     mpEditMenu->setDisabled(false);
 }
@@ -597,124 +627,48 @@ void cMainWindow::onOpenExperiment(const QString& filename)
 //-----------------------------------------------------------------------------
 void cMainWindow::onExperimentChange(QSharedPointer<cExperimentFile> experiment)
 {
-    mExperimentFile = *experiment;
-    mpExpDesign->loadExperiment(mExperimentFile);
-}
+    if (experiment.isNull()) return;
 
-void cMainWindow::onInsertStepBefore(int id, int type)
-{
-    switch (type)
+    auto filename = experiment->getFileName();
+    auto title = experiment->getExperimentName();
+
+    auto list = mpMdiArea->subWindowList();
+    for (auto* subWindow : list)
     {
-    case eExperimentStep::delay:
-    {
-        auto step = std::make_unique<cExperimentStep_Delay>();
-        if (!step->onEdit())
+        auto* child = static_cast<cExperimentDesignMdiChild*>(subWindow->widget());
+        if ((child->getExperimentTitle() == title) || (child->getFileName() == filename))
         {
+            child->setExperimentFile(*experiment);
+            mpMdiArea->setActiveSubWindow(subWindow);
             return;
         }
-        mExperimentFile.insertBefore(id, std::move(step));
-        break;
     }
-    case eExperimentStep::pause:
-    {
-        auto step = std::make_unique<cExperimentStep_Pause>();
-        mExperimentFile.insertBefore(id, std::move(step));
-        break;
-    }
-    case eExperimentStep::movement:
-    {
-        auto step = std::make_unique<cExperimentStep_Movement>();
-        if (!step->onEdit())
-        {
-            return;
-        }
-        mExperimentFile.insertBefore(id, std::move(step));
-        break;
-    }
-    default:
-        return;
-    }
+    auto* child = createMdiChild();
+    child->newFile(*experiment);
+    child->show();
 
-    mpExpDesign->loadExperiment(mExperimentFile);
+    mpEditMenu->setDisabled(false);
 }
 
-void cMainWindow::onInsertStepAfter(int id, int type)
-{
-    switch (type)
-    {
-    case eExperimentStep::delay:
-    {
-        auto step = std::make_unique<cExperimentStep_Delay>();
-        if (!step->onEdit())
-        {
-            return;
-        }
-        mExperimentFile.insertAfter(id, std::move(step));
-        break;
-    }
-    case eExperimentStep::pause:
-    {
-        auto step = std::make_unique<cExperimentStep_Pause>();
-        mExperimentFile.insertAfter(id, std::move(step));
-        break;
-    }
-    case eExperimentStep::movement:
-    {
-        auto step = std::make_unique<cExperimentStep_Movement>();
-        if (!step->onEdit())
-        {
-            return;
-        }
-        mExperimentFile.insertAfter(id, std::move(step));
-        break;
-    }
-    default:
-        return;
-    }
-
-    mpExpDesign->loadExperiment(mExperimentFile);
-}
-
-void cMainWindow::onDeleteStep(int id)
-{
-    QMessageBox msgBox;
-    msgBox.setText("Are you sure you want to delete the experiment step?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::No);
-    int ret = msgBox.exec();
-
-    if (ret == QMessageBox::Yes)
-    {
-        if (mExperimentFile.removeStep(id))
-            mpExpDesign->loadExperiment(mExperimentFile);
-    }
-}
 
 //-----------------------------------------------------------------------------
 void cMainWindow::closeEvent(QCloseEvent* event)
 {
-    if (mExperimentFile.isDirty())
+    mpMdiArea->closeAllSubWindows();
+    if (mpMdiArea->currentSubWindow()) 
     {
-        QMessageBox msgBox;
-        msgBox.setText("The experiment file has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Save);
-        int ret = msgBox.exec();
-
-        if (ret == QMessageBox::Save)
-        {
-            onFileSaveExperimentFile();
-        }
-        else if (ret == QMessageBox::Cancel)
-        {
-            event->ignore();
-            return;
-        }
+        event->ignore();
+        return;
     }
 
-//    mSettings.setValue("mainWindow/geometry", saveGeometry());
-//    mSettings.setValue("mainWindow/windowState", saveState());
+    if (mpFieldLayout->isDirty())
+    {
+        mpFieldLayout->save(mFieldLayoutFile);
+    }
+
+    mSettings.setValue("mainWindow/geometry", saveGeometry());
+    mSettings.setValue("mainWindow/windowState", saveState());
+
     QMainWindow::closeEvent(event);
 }
 

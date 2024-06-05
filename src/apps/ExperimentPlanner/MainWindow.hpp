@@ -21,6 +21,7 @@ class QMenu;
 class QTextEdit;
 class QLineEdit;
 class QToolBar;
+class QMdiArea;
 QT_END_NAMESPACE
 
 
@@ -29,6 +30,7 @@ class cExperimentManager;
 class cExperimentTreeItem;
 class cFieldLayoutWidget;
 class cExperimentDesignWidget;
+class cExperimentDesignMdiChild;
 
 
 namespace Ui 
@@ -48,6 +50,7 @@ public:
 
 signals:
     void refreshDisplay();
+    void defaultExperimentPathChange(const QString& path);
 
 public slots:
     void onStatusUpdate(QString msg);
@@ -59,11 +62,13 @@ public slots:
 
 // Slots associated with "File" menu actions
 private slots:
-    void onFileNewExperiment_Blank();
-    void onFileNewExperiment_GPS();
+    void onFileNewExperiment();
     void onFileOpenExperiment();
     void onFileSaveExperimentFile();
     void onFileSaveAsExperimentFile();
+    void onFileSaveAllExperimentFiles();
+    void onFileCloseExperimentFile();
+    void onFileCloseAllExperimentFiles();
 
 // Slots associated with "Edit" menu actions
 private slots:
@@ -71,6 +76,11 @@ private slots:
     void onEditExperimentCtrlInfo();
     void onEditExperimentSernsorInfo();
     void onEditAddExperimentToLayout();
+
+    // Slots associated with "Generate" menu actions
+private slots:
+    void onGenerateLidarScan_GPS();
+    void onGenerateLidarScan_PlotInfo();
 
 // Slots associated with "Preference" menu actions
 private slots:
@@ -87,9 +97,6 @@ private slots:
 private slots:
     void onOpenExperiment(const QString& filename);
     void onExperimentChange(QSharedPointer<cExperimentFile> experiment);
-    void onInsertStepBefore(int id, int type);
-    void onInsertStepAfter(int id, int type);
-    void onDeleteStep(int id);
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -102,17 +109,15 @@ private:
     void createStatusBar();
     void createDockWindows();
     void createDataModel(const nlohmann::json& configDoc);
-
-    void doSaveCheck();
+    cExperimentDesignMdiChild* createMdiChild();
 
 private:
     QSettings mSettings;
 
-    cExperimentFile mExperimentFile;
+    QMdiArea* mpMdiArea = nullptr;
 
     cExperimentManager* mpExperiments = nullptr;
     cFieldLayoutWidget* mpFieldLayout = nullptr;
-    cExperimentDesignWidget* mpExpDesign = nullptr;
 
     QString mExperimentFilesPath;
     QString mFieldLayoutFile;
@@ -120,6 +125,7 @@ private:
 
     QMenu* mpFileMenu = nullptr;
     QMenu* mpEditMenu = nullptr;
+    QMenu* mpGenerateMenu = nullptr;
     QMenu* mpPreferencesMenu = nullptr;
     QMenu* mpViewMenu = nullptr;
     QMenu* mpHelpMenu = nullptr;

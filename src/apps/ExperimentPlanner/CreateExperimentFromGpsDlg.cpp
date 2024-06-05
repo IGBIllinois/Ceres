@@ -9,6 +9,8 @@
 #include "ExperimentCtrlInfoDlg.hpp"
 #include "ExperimentSensorInfoDlg.hpp"
 
+#include "StringUtils.hpp"
+
 #include <QLabel>
 #include <QLayout>
 #include <QCheckBox>
@@ -372,20 +374,6 @@ void cCreateExperimentFromGpsDlg::createLayout()
 	pHSubLayout->addWidget(mpUnits);
 
 	pGroupBox->setLayout(pHSubLayout);
-	//	pVSubLayout->addLayout(pHSubLayout);
-
-/*
-	pHSubLayout = new QHBoxLayout();
-	pHSubLayout->addWidget(mpSubScanSeperationLabel);
-	pHSubLayout->addWidget(mpSubScanSeperation);
-	pHSubLayout->addSpacing(10);
-	pHSubLayout->addWidget(mpUnits);
-//	pHSubLayout->addSpacing(10);
-//	pHSubLayout->addWidget(mpFastMode);
-	pVSubLayout->addLayout(pHSubLayout);
-
-	pGroupBox->setLayout(pVSubLayout);
-*/
 
 	pMainLayout->addWidget(pGroupBox);
 
@@ -395,13 +383,9 @@ void cCreateExperimentFromGpsDlg::createLayout()
 
 	buttonBox->button(QDialogButtonBox::Apply)->setText("Generate");
 
-	mpSaveAs = buttonBox->addButton("Save As", QDialogButtonBox::HelpRole);
-	mpSaveAs->setEnabled(false);
-
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 	connect(buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &cCreateExperimentFromGpsDlg::generate);
-	connect(mpSaveAs, &QPushButton::clicked, this, &cCreateExperimentFromGpsDlg::saveExperiment);
 
 	pMainLayout->addWidget(buttonBox);
 
@@ -410,6 +394,7 @@ void cCreateExperimentFromGpsDlg::createLayout()
 
 void cCreateExperimentFromGpsDlg::accept()
 {
+	generate();
 	QDialog::accept();
 }
 
@@ -429,8 +414,12 @@ void cCreateExperimentFromGpsDlg::onMetaInfoUpdate()
 
 void cCreateExperimentFromGpsDlg::onControllerUpdate()
 {
-//	cExperimentCtrlInfoDlg dlg(mInfo, this);
+//	cExperimentCtrlInfoDlg dlg(mExperimentFile, this);
+
 //	auto result = dlg.exec();
+
+//	if (result == QDialog::Rejected)
+//		return;
 }
 
 void cCreateExperimentFromGpsDlg::onSensorUpdate()
@@ -506,8 +495,8 @@ void cCreateExperimentFromGpsDlg::generate()
 	QString text;
 	std::vector<std::string> list;
 
-	str = mpTitle->text().toStdString();
-	if (str.empty())
+	std::string title = mpTitle->text().toStdString();
+	if (title.empty())
 	{
 		QString msg = "The \"Experiment Title\" can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
@@ -527,8 +516,14 @@ void cCreateExperimentFromGpsDlg::generate()
 	}
 
 	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
-		
-	pInfo->setExperimentName(str);
+
+	int startNum = 0;
+	bool hasNumber = nStringUtils::endsWithInt(title, &startNum);
+
+	if (hasNumber)
+		nStringUtils::replaceIntAtEnd(title, startNum++);
+
+	pInfo->setExperimentName(title);
 	pInfo->setMetaData(mMetaInfo);
 	pInfo->setSensors(mSensorInfo);
 
@@ -724,8 +719,6 @@ void cCreateExperimentFromGpsDlg::generate()
 	step->setZ_mm(z_mm);
 	step->setSpeed_mmps(speed_mmps);
 	pInfo->appendStep(std::move(step));
-
-	mpSaveAs->setEnabled(true);
 
 	emit experimentChanged(pInfo);
 }

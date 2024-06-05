@@ -3,91 +3,255 @@
 
 #include "ExperimentSteps.hpp"
 
+#include "ExperimentMetaInfoDlg.hpp"
+#include "ExperimentCtrlInfoDlg.hpp"
+#include "ExperimentSensorInfoDlg.hpp"
+
+#include "StringUtils.hpp"
+
 #include <QtWidgets>
 
 
 cExperimentDesignMdiChild::cExperimentDesignMdiChild(QWidget *parent) : cExperimentDesignWidget(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    isUntitled = true;
+
+    connect(this, &cExperimentDesignWidget::insertBefore, this, &cExperimentDesignMdiChild::onInsertStepBefore);
+    connect(this, &cExperimentDesignWidget::insertAfter, this, &cExperimentDesignMdiChild::onInsertStepAfter);
+    connect(this, &cExperimentDesignWidget::deleteStep, this, &cExperimentDesignMdiChild::onDeleteStep);
+}
+
+void cExperimentDesignMdiChild::newWindowTitle()
+{
+    static int sequenceNumber = 1;
+
+    QString curFile = tr("experiment%1.txt").arg(sequenceNumber++);
+    setWindowTitle(curFile + "[*]");
 }
 
 void cExperimentDesignMdiChild::newFile()
 {
-    static int sequenceNumber = 1;
+    newWindowTitle();
 
-    isUntitled = true;
-    curFile = tr("document%1.txt").arg(sequenceNumber++);
-    setWindowTitle(curFile + "[*]");
+    mExperimentFile.clearSteps();
+
+    loadExperiment(mExperimentFile);
 }
 
-bool cExperimentDesignMdiChild::loadFile(const QString &fileName)
+
+void cExperimentDesignMdiChild::newFile(const cExperimentFile& file)
 {
-    return true;
+    auto filename = file.getFileName();
+    if (filename.empty())
+    {
+        auto title = file.getExperimentName();
+        if (title.empty())
+        {
+            newWindowTitle();
+        }
+        else
+        {
+            QString curFile = QString::fromStdString(title);
+            setWindowTitle(curFile + "[*]");
+        }
+
+    }
+    else
+    {
+        QString curFile = QString::fromStdString(filename);
+        setWindowTitle(curFile + "[*]");
+    }
+
+    mExperimentFile.clearSteps();
+
+    mExperimentFile = file;
+
+    loadExperiment(mExperimentFile);
+
+    onExperimentChange();
 }
 
-bool cExperimentDesignMdiChild::save()
+
+void cExperimentDesignMdiChild::loadFile(const QString &fileName)
 {
-    if (isUntitled) {
-        return saveAs();
-    } else {
-        return saveFile(curFile);
+    if (fileName.isEmpty())
+        return;
+
+    mExperimentFile.clear();
+
+    mExperimentFile.open(fileName.toStdString());
+
+    loadExperiment(mExperimentFile);
+
+    setCurrentFile(QFileInfo(fileName).canonicalFilePath());
+}
+
+void cExperimentDesignMdiChild::save()
+{
+    if (!mExperimentFile.isDirty())
+        return;
+
+    if (mExperimentFile.getFileName().empty())
+    {
+        saveAs();
+    }
+    else
+    {
+        mExperimentFile.save();
+        setWindowModified(false);
     }
 }
 
 bool cExperimentDesignMdiChild::saveAs()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"),
-                                                    curFile);
+    if (mExperimentFile.empty())
+        return true;
+
+    QString defaultDirectory = mDefaultPath;
+
+    if (getFileName().empty())
+    {
+        if (!mExperimentFile.getExperimentName().empty())
+        {
+            QFileInfo path;
+            QString filename = QString::fromStdString(nStringUtils::safeFilename(mExperimentFile.getExperimentName()));
+
+            path.setFile(defaultDirectory, filename);
+
+            defaultDirectory = path.absoluteFilePath();
+        }
+    }
+    else
+        defaultDirectory = QString::fromStdString(getFileName());
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Experiment File"), defaultDirectory,
+        "Experiment Files (*.json)");
+
     if (fileName.isEmpty())
         return false;
 
-    return saveFile(fileName);
-}
+    mExperimentFile.save_as(fileName.toStdString());
 
-bool cExperimentDesignMdiChild::saveFile(const QString &fileName)
-{
-    QString errorMessage;
-
-/*
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    QSaveFile file(fileName);
-    if (file.open(QFile::WriteOnly | QFile::Text)) {
-        QTextStream out(&file);
-        out << toPlainText();
-        if (!file.commit()) {
-            errorMessage = tr("Cannot write file %1:\n%2.")
-                           .arg(QDir::toNativeSeparators(fileName), file.errorString());
-        }
-    } else {
-        errorMessage = tr("Cannot open file %1 for writing:\n%2.")
-                       .arg(QDir::toNativeSeparators(fileName), file.errorString());
-    }
-    QGuiApplication::restoreOverrideCursor();
-
-    if (!errorMessage.isEmpty()) {
-        QMessageBox::warning(this, tr("MDI"), errorMessage);
-        return false;
-    }
-
-    setCurrentFile(fileName);
-*/
+    setCurrentFile(QFileInfo(fileName).canonicalFilePath());
 
     return true;
 }
 
 QString cExperimentDesignMdiChild::userFriendlyCurrentFile()
 {
-    return strippedName(curFile);
+    return strippedName(currentFile());
+}
+
+QString cExperimentDesignMdiChild::currentFile()
+{
+    return QString::fromStdString(mExperimentFile.getFileName());
+}
+
+const std::string& cExperimentDesignMdiChild::getFileName() const
+{
+    return mExperimentFile.getFileName();
+}
+
+const std::string& cExperimentDesignMdiChild::getExperimentTitle() const
+{
+    return mExperimentFile.getExperimentName();
+}
+
+const cExperimentFile& cExperimentDesignMdiChild::getExperimentFile() const
+{
+    return mExperimentFile;
+}
+
+void cExperimentDesignMdiChild::setExperimentFile(const cExperimentFile& file)
+{
+    mExperimentFile = file;
+
+    loadExperiment(mExperimentFile);
+
+    if (mExperimentFile.isDirty())
+        onExperimentChange();
+}
+
+const std::string& cExperimentDesignMdiChild::getLayoutName() const
+{
+    return mExperimentFile.getLayoutName();
+}
+
+void cExperimentDesignMdiChild::setLayoutName(const std::string& name)
+{
+    mExperimentFile.setLayoutName(name);
+}
+
+void cExperimentDesignMdiChild::editMetaInfo()
+{
+    cExperimentMetaInfoDlg dlg(mExperimentFile.getMetaData(), this);
+
+    dlg.setExperimentTitle(mExperimentFile.getExperimentName());
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    mExperimentFile.setExperimentName(dlg.getExperimentTitle());
+
+    onExperimentChange();
+}
+
+void cExperimentDesignMdiChild::editCtrlInfo()
+{
+    cExperimentCtrlInfoDlg dlg(mExperimentFile, this);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    onExperimentChange();
+}
+
+void cExperimentDesignMdiChild::editSensorInfo()
+{
+    auto sensors = mExperimentFile.getSensors();
+    cExperimentSensorInfoDlg dlg(sensors, this);
+    auto result = dlg.exec();
+
+    if (result == QDialog::Accepted)
+    {
+        mExperimentFile.clearSensors();
+        mExperimentFile.setSensors(dlg.getSensorInfo());
+        onExperimentChange();
+    }
 }
 
 void cExperimentDesignMdiChild::closeEvent(QCloseEvent *event)
 {
-    if (maybeSave()) {
-        event->accept();
-    } else {
-        event->ignore();
+    if (mExperimentFile.isDirty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The experiment file has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
+
+        if (ret == QMessageBox::Save)
+        {
+            save();
+        }
+        else if (ret == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
     }
+
+    event->accept();
+}
+
+void cExperimentDesignMdiChild::onDefaultExperimentPathChange(const QString& path)
+{
+    mDefaultPath = path;
 }
 
 void cExperimentDesignMdiChild::onExperimentChange()
@@ -95,6 +259,7 @@ void cExperimentDesignMdiChild::onExperimentChange()
     setWindowModified(mExperimentFile.isDirty());
 }
 
+/*
 bool cExperimentDesignMdiChild::maybeSave()
 {
     if (!mExperimentFile.isDirty())
@@ -102,6 +267,7 @@ bool cExperimentDesignMdiChild::maybeSave()
 
     return false;
 }
+*/
 
 void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
 {
@@ -138,6 +304,7 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
     }
 
     loadExperiment(mExperimentFile);
+    onExperimentChange();
 }
 
 void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
@@ -175,6 +342,7 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
     }
 
     loadExperiment(mExperimentFile);
+    onExperimentChange();
 }
 
 void cExperimentDesignMdiChild::onDeleteStep(int id)
@@ -190,13 +358,11 @@ void cExperimentDesignMdiChild::onDeleteStep(int id)
         if (mExperimentFile.removeStep(id))
             loadExperiment(mExperimentFile);
     }
+    onExperimentChange();
 }
-
 
 void cExperimentDesignMdiChild::setCurrentFile(const QString &fileName)
 {
-    curFile = QFileInfo(fileName).canonicalFilePath();
-    isUntitled = false;
     setWindowModified(false);
     setWindowTitle(userFriendlyCurrentFile() + "[*]");
 }
