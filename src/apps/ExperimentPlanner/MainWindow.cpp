@@ -2,7 +2,9 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "CreateExperimentFromSpiderCamPointDlg.hpp"
 #include "CreateExperimentFromGpsDlg.hpp"
+#include "CreateExperimentFromPlotInfoDlg.hpp"
 
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
@@ -208,9 +210,19 @@ void cMainWindow::createSubMenusAndActions()
     //
     // Build the Generate Sub Menu
     //
+    pMenuItem = new QAction(tr("LiDAR Scans From SpiderCam Point"), this);
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from single SpiderCam point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_SpiderCam_Point);
+    mpGenerateMenu->addAction(pMenuItem);
+
     pMenuItem = new QAction(tr("LiDAR Scans From GPS data"), this);
-    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS data"));
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS (begin/end) data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_GPS);
+    mpGenerateMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("LiDAR Scans From GPS plot data"), this);
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS plot data"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
 
     //
@@ -300,11 +312,6 @@ void cMainWindow::createDockWindows()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::createDataModel(const nlohmann::json& configDoc)
-{
-}
-
-//-----------------------------------------------------------------------------
 cExperimentDesignMdiChild* cMainWindow::createMdiChild()
 {
     cExperimentDesignMdiChild* child = new cExperimentDesignMdiChild(this);
@@ -376,6 +383,8 @@ void cMainWindow::onFileSaveAllExperimentFiles()
         auto* child = static_cast<cExperimentDesignMdiChild*>(subWindow->widget());
         child->save();
     }
+
+    mpExperiments->reloadExperiments();
 }
 
 void cMainWindow::onFileCloseExperimentFile()
@@ -455,6 +464,24 @@ void cMainWindow::onEditAddExperimentToLayout()
 /********************************************************************
  * Slots associated with "Generate" menu actions
  *******************************************************************/
+void cMainWindow::onGenerateLidarScan_SpiderCam_Point()
+{
+    cCreateExperimentFromSpiderCamDlg dlg(this);
+
+    connect(&dlg, &cCreateExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
+}
+
 void cMainWindow::onGenerateLidarScan_GPS()
 {
     QString defaultDirectory = mSettings.value("Defaults/gpsFiles").toString();
@@ -514,7 +541,59 @@ void cMainWindow::onGenerateLidarScan_GPS()
 
 void cMainWindow::onGenerateLidarScan_PlotInfo()
 {
+    QString defaultDirectory = mSettings.value("Defaults/gpsFiles").toString();
 
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), defaultDirectory,
+        "GPS Files (*.csv)");
+
+    if (fileName.isEmpty())
+        return;
+
+    std::ifstream gps_file;
+    gps_file.open(fileName.toStdString());
+
+    if (!gps_file.is_open())
+    {
+        QString msg = "Could not open file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "File Error", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::string test;
+    gps_file >> test;
+    gps_file.close();
+
+    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    {
+        QString msg = "Invalid GPS file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "Invalid File", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::filesystem::path file_name = fileName.toStdString();
+
+    std::filesystem::path directory = file_name.parent_path();
+
+    mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
+
+    cCreateExperimentFromPlotInfoDlg dlg(fileName, this);
+
+    connect(&dlg, &cCreateExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
 }
 
 /********************************************************************
@@ -636,7 +715,8 @@ void cMainWindow::onExperimentChange(QSharedPointer<cExperimentFile> experiment)
     for (auto* subWindow : list)
     {
         auto* child = static_cast<cExperimentDesignMdiChild*>(subWindow->widget());
-        if ((child->getExperimentTitle() == title) || (child->getFileName() == filename))
+        if ((!title.empty() && (child->getExperimentTitle() == title))
+            || (!filename.empty() && (child->getFileName() == filename)))
         {
             child->setExperimentFile(*experiment);
             mpMdiArea->setActiveSubWindow(subWindow);
@@ -663,7 +743,22 @@ void cMainWindow::closeEvent(QCloseEvent* event)
 
     if (mpFieldLayout->isDirty())
     {
-        mpFieldLayout->save(mFieldLayoutFile);
+        QMessageBox msgBox;
+        msgBox.setText("The field layout file has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
+
+        if (ret == QMessageBox::Save)
+        {
+            mpFieldLayout->save(mFieldLayoutFile);
+        }
+        else if (ret == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
     }
 
     mSettings.setValue("mainWindow/geometry", saveGeometry());

@@ -9,6 +9,7 @@
 
 class cExperimentCtrlInfo;
 std::unique_ptr<cExperimentCtrlInfo> copy(const std::unique_ptr<cExperimentCtrlInfo>& rhs);
+std::unique_ptr<cExperimentCtrlInfo> copy(const cExperimentCtrlInfo* rhs);
 
 class cExperimentCtrlInfo
 {

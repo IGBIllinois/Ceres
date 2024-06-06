@@ -45,6 +45,9 @@ public slots:
     void setAntialiased(bool antialiased);
     void setTransformed(bool transformed);
 
+protected:
+    void redrawPath(const cExperimentFile& experiment);
+
 private:
     QGraphicsScene mScene;
     QPen    mPen;

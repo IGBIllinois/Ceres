@@ -10,7 +10,7 @@
 #include "StringUtils.hpp"
 
 #include <QtWidgets>
-
+#include <QWindowStateChangeEvent>
 
 cExperimentDesignMdiChild::cExperimentDesignMdiChild(QWidget *parent) : cExperimentDesignWidget(parent)
 {
@@ -200,13 +200,14 @@ void cExperimentDesignMdiChild::editMetaInfo()
 
 void cExperimentDesignMdiChild::editCtrlInfo()
 {
-    cExperimentCtrlInfoDlg dlg(mExperimentFile, this);
+    cExperimentCtrlInfoDlg dlg(mExperimentFile.getController(), this);
 
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
         return;
 
+    mExperimentFile.setController(std::move(dlg.getControllerInfo()));
     onExperimentChange();
 }
 
@@ -246,7 +247,25 @@ void cExperimentDesignMdiChild::closeEvent(QCloseEvent *event)
         }
     }
 
+    if (hasFocus())
+    {
+        emit clearPaths();
+    }
+
     event->accept();
+}
+
+void cExperimentDesignMdiChild::focusInEvent(QFocusEvent* event)
+{
+    if (event)
+    {
+        if (event->gotFocus())
+        {
+            redrawPath(mExperimentFile);
+        }
+    }
+
+    cExperimentDesignWidget::focusInEvent(event);
 }
 
 void cExperimentDesignMdiChild::onDefaultExperimentPathChange(const QString& path)
@@ -258,16 +277,6 @@ void cExperimentDesignMdiChild::onExperimentChange()
 {
     setWindowModified(mExperimentFile.isDirty());
 }
-
-/*
-bool cExperimentDesignMdiChild::maybeSave()
-{
-    if (!mExperimentFile.isDirty())
-        return true;
-
-    return false;
-}
-*/
 
 void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
 {

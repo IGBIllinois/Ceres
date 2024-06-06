@@ -99,6 +99,8 @@ void cFieldLayoutWidget::save(const QString& layout_filename)
         return;
 
     mpScanArea->saveLayout(layout_filename.toStdString());
+
+    mDirty = false;
 }
 
 void cFieldLayoutWidget::contextMenuEvent(QContextMenuEvent* event)

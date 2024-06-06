@@ -414,12 +414,14 @@ void cCreateExperimentFromGpsDlg::onMetaInfoUpdate()
 
 void cCreateExperimentFromGpsDlg::onControllerUpdate()
 {
-//	cExperimentCtrlInfoDlg dlg(mExperimentFile, this);
+	cExperimentCtrlInfoDlg dlg(mCtrlInfo.get(), this);
 
-//	auto result = dlg.exec();
+	auto result = dlg.exec();
 
-//	if (result == QDialog::Rejected)
-//		return;
+	if (result == QDialog::Rejected)
+		return;
+
+	mCtrlInfo = std::move(dlg.getControllerInfo());
 }
 
 void cCreateExperimentFromGpsDlg::onSensorUpdate()
@@ -515,27 +517,6 @@ void cCreateExperimentFromGpsDlg::generate()
 		return;
 	}
 
-	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
-
-	int startNum = 0;
-	bool hasNumber = nStringUtils::endsWithInt(title, &startNum);
-
-	if (hasNumber)
-		nStringUtils::replaceIntAtEnd(title, startNum++);
-
-	pInfo->setExperimentName(title);
-	pInfo->setMetaData(mMetaInfo);
-	pInfo->setSensors(mSensorInfo);
-
-	// Add preamble...
-	std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
-
-	int z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	int speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
-	step->setZ_mm(z_mm);
-	step->setSpeed_mmps(speed_mmps);
-	pInfo->appendStep(std::move(step));
-
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
@@ -558,169 +539,230 @@ void cCreateExperimentFromGpsDlg::generate()
 	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
 	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
 
+	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
+
 	int dx_mm = x2_mm - x1_mm;
 	int dy_mm = y2_mm - y1_mm;
 
-	speed_mmps = mpTravelSpeed_mmps->text().toInt();
+	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
+	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
+	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
+	int safe_vertical_speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
+
+	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
+	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
+
+
+	/* Grab the info for multiple scans if selected */
+	int startNum = 0;
+	bool hasNumber = nStringUtils::endsWithInt(title, &startNum);
 
 	bool mFastMode = false;
 
 	int numOfScans = 1;
+	int orientation = 0;
 	double separation_mm = 0.0;
 
 	if (mpHasSubScans->isChecked())
 	{
 		numOfScans = mpNumOfScans->text().toInt();
-//		QComboBox* mpSubScanOrientation = nullptr;
+		orientation = mpSubScanOrientation->currentIndex();
 		separation_mm = mpSubScanSeparation->text().toDouble() * mConversionFactor;
 		mFastMode = mpFastMode->isChecked();
 	}
 
 
-	if ((dx_mm == 0) && (dy_mm == 0))
+	for (int scan = 0; scan < numOfScans; ++scan)
 	{
-		step = std::make_unique<cExperimentStep_Movement>();
-		step->setX_mm(x1_mm);
-		step->setY_mm(y1_mm);
-		step->setSpeed_mmps(speed_mmps);
+		QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
+
+		if (hasNumber)
+			nStringUtils::replaceIntAtEnd(title, startNum++);
+
+		pInfo->setExperimentName(title);
+		pInfo->setMetaData(mMetaInfo);
+		pInfo->setController(copy(mCtrlInfo));
+		pInfo->setSensors(mSensorInfo);
+
+		// Add preamble: moving dolly up to a safe travel height...
+		std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
+
+		step->setZ_mm(travel_z_mm);
+		step->setSpeed_mmps(vertical_speed_mmps);
 		pInfo->appendStep(std::move(step));
 
-		z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
-		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
-
-		step = std::make_unique<cExperimentStep_Movement>();
-
-		if (mpHeightReference->currentIndex() == 1)
-			step->setZ_mm(z_mm + h1_mm);
-		else
-			step->setZ_mm(z_mm);
-
-		step->setSpeed_mmps(speed_mmps);
-		pInfo->appendStep(std::move(step));
-
-		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
-
-		if (delay_sec > 0.0)
+		if ((dx_mm == 0) && (dy_mm == 0))
 		{
-			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-			delay->setWaitTime_sec(delay_sec);
-			pInfo->appendStep(std::move(delay));
+			// Moving dolly to the beginning of the measurement scan...
+			step = std::make_unique<cExperimentStep_Movement>();
+			step->setX_mm(x1_mm);
+			step->setY_mm(y1_mm);
+			step->setSpeed_mmps(travel_speed_mmps);
+			pInfo->appendStep(std::move(step));
+
+
+			// Move the dolly to measurement height...
+			step = std::make_unique<cExperimentStep_Movement>();
+
+			if (mpHeightReference->currentIndex() == 1)
+				step->setZ_mm(scan_z_mm + h1_mm);
+			else
+				step->setZ_mm(scan_z_mm);
+
+			step->setSpeed_mmps(vertical_speed_mmps);
+			pInfo->appendStep(std::move(step));
+
+			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
+
+			if (delay_sec > 0.0)
+			{
+				// Add delay for dolly to stabilize...
+				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				delay->setWaitTime_sec(delay_sec);
+				pInfo->appendStep(std::move(delay));
+			}
+
+			delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
+
+			if (delay_sec > 0.0)
+			{
+				// Do measurement...
+				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				delay->setWaitTime_sec(delay_sec);
+				delay->setRecording(true);
+				pInfo->appendStep(std::move(delay));
+			}
+		}
+		else
+		{
+			int x_mm = 0;
+			int y_mm = 0;
+
+			if (std::abs(dx_mm) < 500)
+			{
+				x_mm = (x2_mm + x1_mm) / 2;
+
+				if (y1_mm > y2_mm)
+					y_mm = y1_mm + start_offset_mm;
+				else
+					y_mm = y1_mm - start_offset_mm;
+			}
+			else if (std::abs(dy_mm) < 500)
+			{
+				if (x1_mm > x2_mm)
+					x_mm = x1_mm + start_offset_mm;
+				else
+					x_mm = x1_mm - start_offset_mm;
+
+				y_mm = (y2_mm + y1_mm) / 2;
+			}
+
+			// Moving dolly to the beginning of the measurement scan...
+			step = std::make_unique<cExperimentStep_Movement>();
+			step->setX_mm(x_mm);
+			step->setY_mm(y_mm);
+			step->setSpeed_mmps(travel_speed_mmps);
+			pInfo->appendStep(std::move(step));
+
+			// Move the dolly to measurement height...
+			step = std::make_unique<cExperimentStep_Movement>();
+
+			if (mpHeightReference->currentIndex() == 1)
+				step->setZ_mm(scan_z_mm + h1_mm);
+			else
+				step->setZ_mm(scan_z_mm);
+
+			step->setSpeed_mmps(vertical_speed_mmps);
+			pInfo->appendStep(std::move(step));
+
+			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
+
+			if (delay_sec > 0.0)
+			{
+				// Add delay for dolly to stabilize...
+				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				delay->setWaitTime_sec(delay_sec);
+				pInfo->appendStep(std::move(delay));
+			}
+
+			if (std::abs(dx_mm) < 500)
+			{
+				if (y1_mm > y2_mm)
+					y_mm = y2_mm - end_offset_mm;
+				else
+					y_mm = y2_mm + end_offset_mm;
+			}
+			else if (std::abs(dy_mm) < 500)
+			{
+				if (x1_mm > x2_mm)
+					x_mm = x2_mm - end_offset_mm;
+				else
+					x_mm = x2_mm + end_offset_mm;
+			}
+
+			// Do measurement...
+			step = std::make_unique<cExperimentStep_Movement>();
+			step->setX_mm(x_mm);
+			step->setY_mm(y_mm);
+
+			if ((mpHeightReference->currentIndex() == 1) &&
+				((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
+			{
+				step->setZ_mm(scan_z_mm + h2_mm);
+			}
+
+			step->setSpeed_mmps(scan_speed_mmps);
+			step->setRecording(true);
+			pInfo->appendStep(std::move(step));
+
+			delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
+
+			if (delay_sec > 0.0)
+			{
+				// Add delay for dolly to stabilize...
+				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				delay->setWaitTime_sec(delay_sec);
+				pInfo->appendStep(std::move(delay));
+			}
 		}
 
-		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
+		// Move dolly to a safe height to park it
+		step = std::make_unique<cExperimentStep_Movement>();
+		step->setZ_mm(safe_z_mm);
+		step->setSpeed_mmps(safe_vertical_speed_mmps);
+		pInfo->appendStep(std::move(step));
 
-		if (delay_sec > 0.0)
+		emit experimentChanged(pInfo);
+
+		switch (orientation)
 		{
-			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-			delay->setWaitTime_sec(delay_sec);
-			delay->setRecording(true);
-			pInfo->appendStep(std::move(delay));
+		case 0:
+			x1_mm += separation_mm;
+			x2_mm += separation_mm;
+			break;
+		case 1:
+			x1_mm -= separation_mm;
+			x2_mm -= separation_mm;
+			break;
+		case 2:
+			y1_mm -= separation_mm;
+			y2_mm -= separation_mm;
+			break;
+		case 3:
+			y1_mm += separation_mm;
+			y2_mm += separation_mm;
+			break;
+		}
+
+		if (mFastMode)
+		{
+			std::swap(x1_mm, x2_mm);
+			std::swap(y1_mm, y2_mm);
+			std::swap(h1_mm, h2_mm);
 		}
 	}
-	else
-	{
-		int x_mm = 0;
-		int y_mm = 0;
-		int offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
-
-		if (std::abs(dx_mm) < 500)
-		{
-			x_mm = (x2_mm + x1_mm) / 2;
-
-			if (y1_mm > y2_mm)
-				y_mm = y1_mm + offset_mm;
-			else
-				y_mm = y1_mm - offset_mm;
-		}
-		else if (std::abs(dy_mm) < 500)
-		{
-			if (x1_mm > x2_mm)
-				x_mm = x1_mm + offset_mm;
-			else
-				x_mm = x1_mm - offset_mm;
-
-			y_mm = (y2_mm + y1_mm) / 2;
-		}
-
-		step = std::make_unique<cExperimentStep_Movement>();
-		step->setX_mm(x_mm);
-		step->setY_mm(y_mm);
-		step->setSpeed_mmps(speed_mmps);
-		pInfo->appendStep(std::move(step));
-
-		z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
-		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
-
-		step = std::make_unique<cExperimentStep_Movement>();
-
-		if (mpHeightReference->currentIndex() == 1)
-			step->setZ_mm(z_mm + h1_mm);
-		else
-			step->setZ_mm(z_mm);
-
-		step->setSpeed_mmps(speed_mmps);
-		pInfo->appendStep(std::move(step));
-
-		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
-
-		if (delay_sec > 0.0)
-		{
-			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-			delay->setWaitTime_sec(delay_sec);
-			pInfo->appendStep(std::move(delay));
-		}
-
-		offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
-		speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
-
-		if (std::abs(dx_mm) < 500)
-		{
-			if (y1_mm > y2_mm)
-				y_mm = y2_mm - offset_mm;
-			else
-				y_mm = y2_mm + offset_mm;
-		}
-		else if (std::abs(dy_mm) < 500)
-		{
-			if (x1_mm > x2_mm)
-				x_mm = x2_mm - offset_mm;
-			else
-				x_mm = x2_mm + offset_mm;
-		}
-
-		step = std::make_unique<cExperimentStep_Movement>();
-		step->setX_mm(x_mm);
-		step->setY_mm(y_mm);
-
-		if ((mpHeightReference->currentIndex() == 1) &&
-			((z_mm + h1_mm) != (z_mm + h2_mm)))
-		{
-			step->setZ_mm(z_mm + h2_mm);
-		}
-
-		step->setSpeed_mmps(speed_mmps);
-		step->setRecording(true);
-		pInfo->appendStep(std::move(step));
-
-		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
-
-		if (delay_sec > 0.0)
-		{
-			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-			delay->setWaitTime_sec(delay_sec);
-			pInfo->appendStep(std::move(delay));
-		}
-	}
-
-	z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
-
-	step = std::make_unique<cExperimentStep_Movement>();
-	step->setZ_mm(z_mm);
-	step->setSpeed_mmps(speed_mmps);
-	pInfo->appendStep(std::move(step));
-
-	emit experimentChanged(pInfo);
 }
 
 void cCreateExperimentFromGpsDlg::onShowPath()

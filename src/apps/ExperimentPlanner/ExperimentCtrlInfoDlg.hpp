@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ExperimentFile.hpp"
+#include "ExperimentCtrlInfo.hpp"
 
 #include <QDialog>
 
@@ -23,9 +23,10 @@ class cExperimentCtrlInfoDlg : public QDialog
 	Q_OBJECT
 
 public:
-	cExperimentCtrlInfoDlg(cExperimentFile& info, QWidget* parent = nullptr);
+	cExperimentCtrlInfoDlg(cExperimentCtrlInfo* info, QWidget* parent = nullptr);
 	virtual ~cExperimentCtrlInfoDlg();
 
+	std::unique_ptr<cExperimentCtrlInfo> getControllerInfo() const;
 
 private slots:
 	void accept() override;
@@ -36,9 +37,7 @@ private:
 	void createLayout();
 
 private:
-	cExperimentFile& mInfo;
-
-	cExperimentCtrlInfo* mpActiveController = nullptr;
+	std::unique_ptr<cExperimentCtrlInfo> mInfo = nullptr;
 
 	QComboBox* mpController = nullptr;
 

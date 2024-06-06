@@ -9,6 +9,8 @@
 #include "ExperimentCtrlInfoDlg.hpp"
 #include "ExperimentSensorInfoDlg.hpp"
 
+#include "StringUtils.hpp"
+
 #include <QLabel>
 #include <QLayout>
 #include <QCheckBox>
@@ -30,14 +32,21 @@
 #include <algorithm>
 #include <memory>
 
+namespace
+{
+	const QString PLOT_LENGTH_TEXT = "Plot Length (";
 
-cCreateExperimentFromPlotInfoDlg::cCreateExperimentFromPlotInfoDlg(cExperimentFile& info, const QString& filename, QWidget* parent)
+	const QString WEST_TO_EAST = "West to East";
+	const QString EAST_TO_WEST = "East to West";
+	const QString NORTH_TO_SOUTH = "North to South";
+	const QString SOUTH_TO_NORTH = "South to North";
+}
+
+cCreateExperimentFromPlotInfoDlg::cCreateExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent)
 :
-	mInfo(info), QDialog(parent)
+	QDialog(parent)
 {
 	setWindowTitle("Create Experiment");
-
-//	mInfo.clearSteps();
 
 	setMinimumWidth(550);
 
@@ -101,6 +110,22 @@ void cCreateExperimentFromPlotInfoDlg::createControls()
 	mpStartPosition->setSortingEnabled(false);
 	mpStartPosition->setFixedWidth(419);
 
+	mpEndPosition = new QTableView(this);
+	mpEndPosition->setModel(mpModel);
+
+	mpEndPosition->verticalHeader()->hide();
+
+	headerView = mpEndPosition->horizontalHeader();
+	headerView->setDefaultAlignment(Qt::AlignHCenter);
+	headerView->setStretchLastSection(false);
+
+	mpEndPosition->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+	mpEndPosition->setSelectionBehavior(QAbstractItemView::SelectRows);
+	mpEndPosition->setSelectionMode(QAbstractItemView::SingleSelection);
+	mpEndPosition->setSortingEnabled(false);
+	mpEndPosition->setFixedWidth(419);
+
+
 	mpClearPath = new QPushButton("Clear Path", this);
 	connect(mpClearPath, &QPushButton::pressed, this, &cCreateExperimentFromPlotInfoDlg::clearPaths);
 
@@ -108,7 +133,6 @@ void cCreateExperimentFromPlotInfoDlg::createControls()
 	connect(mpShowPath, &QPushButton::pressed, this, &cCreateExperimentFromPlotInfoDlg::onShowPath);
 
 	mpInverseDirection = new QCheckBox("Inverse Direction", this);
-	mpUseIntermediatePoints = new QCheckBox("Use Intermediate Points", this);
 
 	mpTravelHeight_m = new QLineEdit(this);
 	mpTravelHeight_m->setValidator(new QDoubleValidator(5.0, 10.0, 3));
@@ -158,6 +182,29 @@ void cCreateExperimentFromPlotInfoDlg::createControls()
 	mpSafeVerticalSpeed_mmps = new QLineEdit(this);
 	mpSafeVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
 	mpSafeVerticalSpeed_mmps->setText("250");
+
+
+	mpPlotOrientation = new QComboBox(this);
+	mpPlotOrientation->setEditable(false);
+	mpPlotOrientation->addItem(NORTH_TO_SOUTH);
+	mpPlotOrientation->addItem(SOUTH_TO_NORTH);
+	mpPlotOrientation->addItem(EAST_TO_WEST);
+	mpPlotOrientation->addItem(WEST_TO_EAST);
+//	connect(mpSubScanOrientation, &QComboBox::currentTextChanged, this, &cCreateExperimentFromPlotInfoDlg::onSubOrientationChange);
+
+	mpUnits = new QComboBox(this);
+	mpUnits->setEditable(false);
+	mpUnits->addItem("Meters");
+	mpUnits->addItem("Millimeters");
+	mpUnits->addItem("Feet");
+	mpUnits->addItem("Inches");
+	connect(mpUnits, &QComboBox::currentTextChanged, this, &cCreateExperimentFromPlotInfoDlg::onUnitChange);
+	mConversionFactor = nConstants::M_TO_MM;
+
+	mpPlotLengthLabel = new QLabel(PLOT_LENGTH_TEXT + "m)", this);
+	mpPlotLength = new QLineEdit(this);
+	mpPlotLength->setValidator(new QDoubleValidator(0, 100.0, 3));
+	mpPlotLength->setText("1");
 }
 
 void cCreateExperimentFromPlotInfoDlg::createLayout()
@@ -212,6 +259,8 @@ void cCreateExperimentFromPlotInfoDlg::createLayout()
 	pPosLayout->addStretch(1);
 	pPosLayout->addWidget(mpStartPosition);
 	pPosLayout->addSpacing(10);
+	pPosLayout->addWidget(mpEndPosition);
+	pPosLayout->addSpacing(10);
 
 	QVBoxLayout* pVSubLayout = new QVBoxLayout();
 	pVSubLayout->addWidget(mpClearPath);
@@ -224,10 +273,24 @@ void cCreateExperimentFromPlotInfoDlg::createLayout()
 	QHBoxLayout* pOptionsLayout = new QHBoxLayout();
 	pOptionsLayout->addStretch(1);
 	pOptionsLayout->addWidget(mpInverseDirection);
-	pOptionsLayout->addWidget(mpUseIntermediatePoints);
 	pOptionsLayout->addStretch(1);
 
 	pMainLayout->addLayout(pOptionsLayout);
+
+	pGroupBox = new QGroupBox(tr("Plot Information"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	QHBoxLayout* pHSubLayout = new QHBoxLayout();
+	pHSubLayout->addWidget(mpPlotLengthLabel);
+	pHSubLayout->addWidget(mpPlotLength);
+	pHSubLayout->addSpacing(10);
+	pHSubLayout->addWidget(mpPlotOrientation);
+	pHSubLayout->addSpacing(10);
+	pHSubLayout->addWidget(mpUnits);
+
+	pGroupBox->setLayout(pHSubLayout);
+
+	pMainLayout->addWidget(pGroupBox);
 
 	pMainLayout->addSpacing(10);
 
@@ -316,19 +379,14 @@ void cCreateExperimentFromPlotInfoDlg::createLayout()
 
 	pMainLayout->addSpacing(10);
 
-
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
 		| QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
 
 	buttonBox->button(QDialogButtonBox::Apply)->setText("Generate");
 
-	mpSaveAs = buttonBox->addButton("Save As", QDialogButtonBox::HelpRole);
-	mpSaveAs->setEnabled(false);
-
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 	connect(buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &cCreateExperimentFromPlotInfoDlg::generate);
-	connect(mpSaveAs, &QPushButton::clicked, this, &cCreateExperimentFromPlotInfoDlg::saveExperiment);
 
 	pMainLayout->addWidget(buttonBox);
 
@@ -347,12 +405,13 @@ void cCreateExperimentFromPlotInfoDlg::createLayout_RightSide(QVBoxLayout* pMain
 
 void cCreateExperimentFromPlotInfoDlg::accept()
 {
+	generate();
 	QDialog::accept();
 }
 
 void cCreateExperimentFromPlotInfoDlg::onMetaInfoUpdate()
 {
-	cExperimentMetaInfoDlg dlg(mInfo.getMetaData(), this);
+	cExperimentMetaInfoDlg dlg(mMetaInfo, this);
 
 	dlg.setExperimentTitle(mpTitle->text().toStdString());
 
@@ -366,15 +425,61 @@ void cCreateExperimentFromPlotInfoDlg::onMetaInfoUpdate()
 
 void cCreateExperimentFromPlotInfoDlg::onControllerUpdate()
 {
-	cExperimentCtrlInfoDlg dlg(mInfo, this);
-	dlg.exec();
+	cExperimentCtrlInfoDlg dlg(mCtrlInfo.get(), this);
+
+	auto result = dlg.exec();
+
+	if (result == QDialog::Rejected)
+		return;
+
+	mCtrlInfo = std::move(dlg.getControllerInfo());
 }
 
 void cCreateExperimentFromPlotInfoDlg::onSensorUpdate()
 {
-//	cExperimentSensorInfoDlg dlg(mInfo, this);
-//	dlg.exec();
+	cExperimentSensorInfoDlg dlg(mSensorInfo, this);
+	auto result = dlg.exec();
+
+	if (result == QDialog::Accepted)
+	{
+		mSensorInfo.clear();
+		mSensorInfo = dlg.getSensorInfo();
+	}
 }
+
+void cCreateExperimentFromPlotInfoDlg::onUnitChange(const QString& text)
+{
+	double length = mpPlotLength->text().toDouble() * mConversionFactor;
+
+	switch (mpUnits->currentIndex())
+	{
+	case 0:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "m)");
+
+		mConversionFactor = nConstants::M_TO_MM;
+		break;
+	case 1:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "mm)");
+
+		mConversionFactor = 1.0;
+		break;
+	case 2:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "ft)");
+
+		mConversionFactor = nConstants::FT_TO_MM;
+		break;
+	case 3:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "in)");
+
+		mConversionFactor = nConstants::IN_TO_MM;
+		break;
+	}
+
+	length /= mConversionFactor;
+
+	mpPlotLength->setText(QString::number(length));
+}
+
 
 void cCreateExperimentFromPlotInfoDlg::generate()
 {
@@ -382,8 +487,8 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 	QString text;
 	std::vector<std::string> list;
 
-	str = mpTitle->text().toStdString();
-	if (str.empty())
+	std::string title = mpTitle->text().toStdString();
+	if (title.empty())
 	{
 		QString msg = "The \"Experiment Title\" can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
@@ -391,11 +496,10 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 		return;
 	}
 
-	mInfo.setExperimentName(str);
-
 	QModelIndex startIndex = mpStartPosition->currentIndex();
+	QModelIndex endIndex = mpEndPosition->currentIndex();
 
-	if (startIndex.row() < 0)
+	if ((startIndex.row() < 0) || (endIndex.row() < 0))
 	{
 		QString msg = "Please select start and end positions.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
@@ -403,178 +507,276 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 		return;
 	}
 
-	mInfo.clearSteps();
-
-	// Add preamble...
-	std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
-
-	int z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	int speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
-	step->setZ_mm(z_mm);
-	step->setSpeed_mmps(speed_mmps);
-	mInfo.appendStep(std::move(step));
-
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
 
+	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
+	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+	auto h2 = mpModel->data(endIndex.siblingAtColumn(3)).toFloat();
+
+	if (mpInverseDirection->isChecked())
+	{
+		std::swap(x1, x2);
+		std::swap(y1, y2);
+		std::swap(h1, h2);
+	}
+
+	QString plot_orientation = mpPlotOrientation->currentText();
+	int plot_length_mm = static_cast<int>(mpPlotLength->text().toDouble() * mConversionFactor);
+
 	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
 	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
 	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
+	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
+	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
+	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
 
-/*
+	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
+
 	int dx_mm = x2_mm - x1_mm;
 	int dy_mm = y2_mm - y1_mm;
 
-	speed_mmps = mpTravelSpeed_mmps->text().toInt();
+	double scan_direction_deg = atan2(dy_mm, dx_mm) * nConstants::RAD_TO_DEG;
+
+	if ((45.0 <= scan_direction_deg) && (scan_direction_deg < 135.0))
+	{
+		// We are scanning east to west
+		if (plot_orientation == EAST_TO_WEST)
+		{
+			y2_mm += plot_length_mm;
+		}
+		else if (plot_orientation == WEST_TO_EAST)
+		{
+			y1_mm -= plot_length_mm;
+		}
+		else if (plot_orientation == NORTH_TO_SOUTH)
+		{
+			x1_mm += (plot_length_mm / 2);
+			x2_mm += (plot_length_mm / 2);
+		}
+		else if (plot_orientation == SOUTH_TO_NORTH)
+		{
+			x1_mm -= (plot_length_mm / 2);
+			x2_mm -= (plot_length_mm / 2);
+		}
+	}
+	else if ((135.0 <= scan_direction_deg) && (scan_direction_deg < 225.0))
+	{
+		// We are scanning north to south
+		if (plot_orientation == NORTH_TO_SOUTH)
+		{
+			x2_mm += plot_length_mm;
+		}
+		else if (plot_orientation == SOUTH_TO_NORTH)
+		{
+			x1_mm -= plot_length_mm;
+		}
+		else if (plot_orientation == EAST_TO_WEST)
+		{
+			y1_mm += (plot_length_mm / 2);
+			y2_mm += (plot_length_mm / 2);
+		}
+		else if (plot_orientation == WEST_TO_EAST)
+		{
+			y1_mm -= (plot_length_mm / 2);
+			y2_mm -= (plot_length_mm / 2);
+		}
+	}
+	else if ((225.0 <= scan_direction_deg) && (scan_direction_deg < 315.0))
+	{
+		// We are scanning west to east
+		if (plot_orientation == WEST_TO_EAST)
+		{
+			y2_mm -= plot_length_mm;
+		}
+		else if (plot_orientation == EAST_TO_WEST)
+		{
+			y1_mm += plot_length_mm;
+		}
+		else if (plot_orientation == NORTH_TO_SOUTH)
+		{
+			x1_mm += (plot_length_mm / 2);
+			x2_mm += (plot_length_mm / 2);
+		}
+		else if (plot_orientation == SOUTH_TO_NORTH)
+		{
+			x1_mm -= (plot_length_mm / 2);
+			x2_mm -= (plot_length_mm / 2);
+		}
+	}
+	else
+	{
+		// We are scanning south to north
+
+	}
+
+	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
+	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
+	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
+	int safe_vertical_speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
+
+	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
+	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
+
+	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
+
+	pInfo->setExperimentName(title);
+	pInfo->setMetaData(mMetaInfo);
+	pInfo->setController(copy(mCtrlInfo));
+	pInfo->setSensors(mSensorInfo);
+
+	// Add preamble: moving dolly up to a safe travel height...
+	std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
+
+	step->setZ_mm(travel_z_mm);
+	step->setSpeed_mmps(vertical_speed_mmps);
+	pInfo->appendStep(std::move(step));
 
 	if ((dx_mm == 0) && (dy_mm == 0))
 	{
+		// Moving dolly to the beginning of the measurement scan...
 		step = std::make_unique<cExperimentStep_Movement>();
 		step->setX_mm(x1_mm);
 		step->setY_mm(y1_mm);
-		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		step->setSpeed_mmps(travel_speed_mmps);
+		pInfo->appendStep(std::move(step));
 
-		z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
-		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 
+		// Move the dolly to measurement height...
 		step = std::make_unique<cExperimentStep_Movement>();
 
 		if (mpHeightReference->currentIndex() == 1)
-			step->setZ_mm(z_mm + h1_mm);
+			step->setZ_mm(scan_z_mm + h1_mm);
 		else
-			step->setZ_mm(z_mm);
+			step->setZ_mm(scan_z_mm);
 
-		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		step->setSpeed_mmps(vertical_speed_mmps);
+		pInfo->appendStep(std::move(step));
 
 		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
 
 		if (delay_sec > 0.0)
 		{
+			// Add delay for dolly to stabilize...
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
 
 		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 
 		if (delay_sec > 0.0)
 		{
+			// Do measurement...
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
 			delay->setRecording(true);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
 	}
 	else
 	{
 		int x_mm = 0;
 		int y_mm = 0;
-		int offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
 
 		if (std::abs(dx_mm) < 500)
 		{
 			x_mm = (x2_mm + x1_mm) / 2;
 
 			if (y1_mm > y2_mm)
-				y_mm = y1_mm + offset_mm;
+				y_mm = y1_mm + start_offset_mm;
 			else
-				y_mm = y1_mm - offset_mm;
+				y_mm = y1_mm - start_offset_mm;
 		}
 		else if (std::abs(dy_mm) < 500)
 		{
 			if (x1_mm > x2_mm)
-				x_mm = x1_mm + offset_mm;
+				x_mm = x1_mm + start_offset_mm;
 			else
-				x_mm = x1_mm - offset_mm;
+				x_mm = x1_mm - start_offset_mm;
 
 			y_mm = (y2_mm + y1_mm) / 2;
 		}
 
+		// Moving dolly to the beginning of the measurement scan...
 		step = std::make_unique<cExperimentStep_Movement>();
 		step->setX_mm(x_mm);
 		step->setY_mm(y_mm);
-		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		step->setSpeed_mmps(travel_speed_mmps);
+		pInfo->appendStep(std::move(step));
 
-		z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
-		speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
-
+		// Move the dolly to measurement height...
 		step = std::make_unique<cExperimentStep_Movement>();
 
 		if (mpHeightReference->currentIndex() == 1)
-			step->setZ_mm(z_mm + h1_mm);
+			step->setZ_mm(scan_z_mm + h1_mm);
 		else
-			step->setZ_mm(z_mm);
+			step->setZ_mm(scan_z_mm);
 
-		step->setSpeed_mmps(speed_mmps);
-		mInfo.appendStep(std::move(step));
+		step->setSpeed_mmps(vertical_speed_mmps);
+		pInfo->appendStep(std::move(step));
 
 		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
 
 		if (delay_sec > 0.0)
 		{
+			// Add delay for dolly to stabilize...
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
-
-		offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
-		speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
 
 		if (std::abs(dx_mm) < 500)
 		{
 			if (y1_mm > y2_mm)
-				y_mm = y2_mm - offset_mm;
+				y_mm = y2_mm - end_offset_mm;
 			else
-				y_mm = y2_mm + offset_mm;
+				y_mm = y2_mm + end_offset_mm;
 		}
 		else if (std::abs(dy_mm) < 500)
 		{
 			if (x1_mm > x2_mm)
-				x_mm = x2_mm - offset_mm;
+				x_mm = x2_mm - end_offset_mm;
 			else
-				x_mm = x2_mm + offset_mm;
+				x_mm = x2_mm + end_offset_mm;
 		}
 
+		// Do measurement...
 		step = std::make_unique<cExperimentStep_Movement>();
 		step->setX_mm(x_mm);
 		step->setY_mm(y_mm);
 
 		if ((mpHeightReference->currentIndex() == 1) &&
-			((z_mm + h1_mm) != (z_mm + h2_mm)))
+			((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
 		{
-			step->setZ_mm(z_mm + h2_mm);
+			step->setZ_mm(scan_z_mm + h2_mm);
 		}
 
-		step->setSpeed_mmps(speed_mmps);
+		step->setSpeed_mmps(scan_speed_mmps);
 		step->setRecording(true);
-		mInfo.appendStep(std::move(step));
+		pInfo->appendStep(std::move(step));
 
 		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 
 		if (delay_sec > 0.0)
 		{
+			// Add delay for dolly to stabilize...
 			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 			delay->setWaitTime_sec(delay_sec);
-			mInfo.appendStep(std::move(delay));
+			pInfo->appendStep(std::move(delay));
 		}
 	}
 
-	z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
-
+	// Move dolly to a safe height to park it
 	step = std::make_unique<cExperimentStep_Movement>();
-	step->setZ_mm(z_mm);
-	step->setSpeed_mmps(speed_mmps);
-	mInfo.appendStep(std::move(step));
+	step->setZ_mm(safe_z_mm);
+	step->setSpeed_mmps(safe_vertical_speed_mmps);
+	pInfo->appendStep(std::move(step));
 
-	mpSaveAs->setEnabled(true);
-
-	emit experimentChanged();
-*/
+	emit experimentChanged(pInfo);
 }
 
 void cCreateExperimentFromPlotInfoDlg::onShowPath()
@@ -583,11 +785,20 @@ void cCreateExperimentFromPlotInfoDlg::onShowPath()
 	if (startIndex.row() < 0)
 		return;
 
+	QModelIndex endIndex   = mpEndPosition->currentIndex();
+	if (endIndex.row() < 0)
+		return;
+
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 
+	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
+	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+
 	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
 	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
+	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
+	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
 
-//	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 }

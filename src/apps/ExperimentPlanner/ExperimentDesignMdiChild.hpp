@@ -40,6 +40,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+    void focusInEvent(QFocusEvent* event) override;
 
 public slots:
     void onDefaultExperimentPathChange(const QString& path);

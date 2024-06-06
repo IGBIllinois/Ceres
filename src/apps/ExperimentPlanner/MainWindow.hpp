@@ -79,6 +79,7 @@ private slots:
 
     // Slots associated with "Generate" menu actions
 private slots:
+    void onGenerateLidarScan_SpiderCam_Point();
     void onGenerateLidarScan_GPS();
     void onGenerateLidarScan_PlotInfo();
 
@@ -108,7 +109,6 @@ private:
     void createToolBars();
     void createStatusBar();
     void createDockWindows();
-    void createDataModel(const nlohmann::json& configDoc);
     cExperimentDesignMdiChild* createMdiChild();
 
 private:

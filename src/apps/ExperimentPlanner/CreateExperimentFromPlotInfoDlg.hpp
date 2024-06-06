@@ -4,6 +4,7 @@
 #include "ExperimentFile.hpp"
 
 #include <QDialog>
+#include <QSharedPointer>
 
 
 // Qt Forward Declaration
@@ -25,14 +26,13 @@ class cCreateExperimentFromPlotInfoDlg : public QDialog
 	Q_OBJECT
 
 public:
-	cCreateExperimentFromPlotInfoDlg(cExperimentFile& info, const QString& filename, QWidget* parent = nullptr);
+	cCreateExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent = nullptr);
 	virtual ~cCreateExperimentFromPlotInfoDlg();
 
 signals:
 	void clearPaths();
 	void drawPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
-	void experimentChanged();
-	void saveExperiment();
+	void experimentChanged(QSharedPointer<cExperimentFile> experiment);
 
 private slots:
 	void accept() override;
@@ -40,6 +40,7 @@ private slots:
 	void onMetaInfoUpdate();
 	void onControllerUpdate();
 	void onSensorUpdate();
+	void onUnitChange(const QString& text);
 
 	void onShowPath();
 
@@ -50,7 +51,11 @@ private:
 	void createLayout_RightSide(QVBoxLayout* pMainLayout);
 
 private:
-	cExperimentFile& mInfo;
+	double mConversionFactor = 1.0;
+
+	cExperimentMetaInfo mMetaInfo;
+	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
+	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;
 
 	QLineEdit* mpTitle = nullptr;
 
@@ -59,8 +64,10 @@ private:
 	QPushButton* mpSensorInfo = nullptr;
 
 	uint32_t mStartIndex = 0;
+	uint32_t mEndIndex = 0;
 
 	QTableView* mpStartPosition = nullptr;
+	QTableView* mpEndPosition = nullptr;
 
 	QAbstractItemModel* mpModel = nullptr;
 
@@ -68,7 +75,6 @@ private:
 	QPushButton* mpShowPath = nullptr;
 
 	QCheckBox* mpInverseDirection = nullptr;
-	QCheckBox* mpUseIntermediatePoints = nullptr;
 
 	QLineEdit* mpTravelHeight_m = nullptr;
 	QLineEdit* mpTravelVerticalSpeed_mmps = nullptr;
@@ -86,5 +92,9 @@ private:
 	QLineEdit* mpSafeHeight_m = nullptr;
 	QLineEdit* mpSafeVerticalSpeed_mmps = nullptr;
 
-	QPushButton* mpSaveAs = nullptr;
+	QLabel* mpPlotLengthLabel = nullptr;
+	QLineEdit* mpPlotLength = nullptr;
+
+	QComboBox* mpPlotOrientation = nullptr;
+	QComboBox* mpUnits = nullptr;
 };

@@ -98,6 +98,43 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
     show();
 }
 
+void cExperimentDesignWidget::redrawPath(const cExperimentFile& experiment)
+{
+    emit clearPaths();
+
+    int x1_mm = 0;
+    int y1_mm = 0;
+
+    int id = 0;
+
+    for (auto step : experiment)
+    {
+        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getX_mm().has_value() && movement->getY_mm().has_value())
+            {
+                if (movement->isRecording())
+                {
+                    int x2_mm = movement->getX_mm().value();
+                    int y2_mm = movement->getY_mm().value();
+
+                    emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+
+                    x1_mm = x2_mm;
+                    y1_mm = y2_mm;
+                }
+                else
+                {
+                    x1_mm = movement->getX_mm().value();
+                    y1_mm = movement->getY_mm().value();
+                }
+            }
+        }
+    }
+}
+
 QSize cExperimentDesignWidget::minimumSizeHint() const
 {
     return QSize(100, 100);

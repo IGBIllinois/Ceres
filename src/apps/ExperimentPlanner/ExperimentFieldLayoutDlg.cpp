@@ -149,16 +149,34 @@ void cExperimentFieldLayoutDlg::onNewLayout()
 		return;
 
 	mOriginalLayout = dlg.getLayout();
+	std::string s2 = mOriginalLayout.caption.label.toStdString();
 
 	mFieldWidget.addLayout(mOriginalLayout);
+	std::string s3 = mOriginalLayout.caption.label.toStdString();
 
 	mpPlotLayouts->clear();
 	for (const auto& entry : mFieldWidget.getLayouts())
 	{
+		auto text = entry.caption.label;
 		mpPlotLayouts->addItem(entry.caption.label);
+		std::string s5 = mOriginalLayout.caption.label.toStdString();
 	}
 
-	mpPlotLayouts->setCurrentText(mOriginalLayout.caption.label);
+	std::string s4 = mOriginalLayout.caption.label.toStdString();
+
+	auto n = mpPlotLayouts->maxCount();
+	for (int i = 0; i < n; ++i)
+	{
+		auto text = mpPlotLayouts->itemText(i);
+		
+		std::string s1 = text.toStdString();
+
+		if (text == mOriginalLayout.caption.label)
+		{
+			mpPlotLayouts->setCurrentIndex(i);
+			break;
+		}
+	}
 }
 
 void cExperimentFieldLayoutDlg::onLayoutChange(const QString& text)

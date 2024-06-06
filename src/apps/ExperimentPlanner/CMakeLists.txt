@@ -94,6 +94,8 @@ PRIVATE
 
     GpsFileReader.hpp
     GpsFileReader.cpp
+    CreateExperimentFromSpiderCamPointDlg.hpp
+    CreateExperimentFromSpiderCamPointDlg.cpp
     CreateExperimentFromGpsDlg.hpp
     CreateExperimentFromGpsDlg.cpp
     CreateExperimentFromPlotInfoDlg.hpp

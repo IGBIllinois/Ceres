@@ -1,6 +1,5 @@
 
 #include "ExperimentCtrlInfoDlg.hpp"
-#include "ExperimentCtrlInfo.hpp"
 
 #include <QLabel>
 #include <QLayout>
@@ -13,6 +12,7 @@
 #include <QLineEdit>
 #include <QIntValidator>
 #include <QPlainTextEdit>
+#include <QStackedLayout>
 
 #include <algorithm>
 
@@ -26,9 +26,9 @@ namespace
 }
 
 
-cExperimentCtrlInfoDlg::cExperimentCtrlInfoDlg(cExperimentFile& info, QWidget* parent)
+cExperimentCtrlInfoDlg::cExperimentCtrlInfoDlg(cExperimentCtrlInfo* info, QWidget* parent)
 :
-	mInfo(info), QDialog(parent)
+	mInfo(copy(info)), QDialog(parent)
 {
 	setWindowTitle("Experiment Controller");
 
@@ -40,6 +40,11 @@ cExperimentCtrlInfoDlg::cExperimentCtrlInfoDlg(cExperimentFile& info, QWidget* p
 
 cExperimentCtrlInfoDlg::~cExperimentCtrlInfoDlg()
 {}
+
+std::unique_ptr<cExperimentCtrlInfo> cExperimentCtrlInfoDlg::getControllerInfo() const
+{
+	return copy(mInfo);
+}
 
 void cExperimentCtrlInfoDlg::createControls()
 {
@@ -68,11 +73,9 @@ void cExperimentCtrlInfoDlg::createControls()
 	mpSC_PositionTolerance_cm->setValidator(new QDoubleValidator(1.0, 100.0, 1));
 	mpSC_PositionTolerance_cm->setText("1.0");
 
-	mpActiveController = mInfo.getController();
-
-	if (mpActiveController)
+	if (mInfo)
 	{
-		std::string name = mpActiveController->getType();
+		std::string name = mInfo->getType();
 
 		if (name == cExperimentCtrlInfo_Dummy::type())
 		{
@@ -83,7 +86,7 @@ void cExperimentCtrlInfoDlg::createControls()
 		{
 			mpController->setCurrentIndex(1);
 
-			auto* controller = static_cast<cExperimentCtrlInfo_SpiderCam*>(mpActiveController);
+			auto* controller = static_cast<cExperimentCtrlInfo_SpiderCam*>(mInfo.get());
 			mpSC_UpdateInterval_ms->setText(QString::number(controller->getUpdateInterval_ms()));
 			mpSC_PositionTolerance_cm->setText(QString::number(controller->getPositionTolerance_cm()));
 		}
@@ -147,9 +150,9 @@ void cExperimentCtrlInfoDlg::createLayout()
 
 	setLayout(pMainLayout);
 
-	if (mpActiveController)
+	if (mInfo)
 	{
-		std::string name = mpActiveController->getType();
+		std::string name = mInfo->getType();
 
 		if (name == cExperimentCtrlInfo_Dummy::type())
 		{
@@ -167,9 +170,9 @@ void cExperimentCtrlInfoDlg::accept()
 {
 	auto index = mpController->currentIndex();
 
-	if (mpActiveController && (index == 1) && (mpActiveController->getType() == cExperimentCtrlInfo_SpiderCam::type()))
+	if (mInfo && (index == 1) && (mInfo->getType() == cExperimentCtrlInfo_SpiderCam::type()))
 	{
-		auto* spidercam = static_cast<cExperimentCtrlInfo_SpiderCam*>(mpActiveController);
+		auto* spidercam = static_cast<cExperimentCtrlInfo_SpiderCam*>(mInfo.get());
 
 		int interval = mpSC_UpdateInterval_ms->text().toInt();
 		spidercam->setUpdateInterval_ms(interval);
@@ -199,7 +202,7 @@ void cExperimentCtrlInfoDlg::accept()
 			break;
 		}
 
-		mInfo.setController(std::move(controller));
+		mInfo = std::move(controller);
 	}
 
 	QDialog::accept();

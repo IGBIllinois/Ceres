@@ -20,6 +20,21 @@ std::unique_ptr<cExperimentCtrlInfo> copy(const std::unique_ptr<cExperimentCtrlI
 	return std::make_unique<cExperimentCtrlInfo_Dummy>(static_cast<cExperimentCtrlInfo_Dummy&>(*rhs.get()));
 }
 
+std::unique_ptr<cExperimentCtrlInfo> copy(const cExperimentCtrlInfo* rhs)
+{
+	if (!rhs)
+		return std::unique_ptr<cExperimentCtrlInfo>();
+
+	auto type = rhs->getType();
+
+	if (type == cExperimentCtrlInfo_SpiderCam::type())
+	{
+		return std::make_unique<cExperimentCtrlInfo_SpiderCam>(*(static_cast<const cExperimentCtrlInfo_SpiderCam*>(rhs)));
+	}
+
+	return std::make_unique<cExperimentCtrlInfo_Dummy>(*(static_cast<const cExperimentCtrlInfo_Dummy*>(rhs)));
+}
+
 
 cExperimentCtrlInfo::~cExperimentCtrlInfo()
 {}
