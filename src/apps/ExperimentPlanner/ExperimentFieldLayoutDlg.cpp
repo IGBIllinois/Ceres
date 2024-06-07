@@ -148,35 +148,18 @@ void cExperimentFieldLayoutDlg::onNewLayout()
 	if (result == QDialog::Rejected)
 		return;
 
-	mOriginalLayout = dlg.getLayout();
-	std::string s2 = mOriginalLayout.caption.label.toStdString();
+	layout = dlg.getLayout();
 
-	mFieldWidget.addLayout(mOriginalLayout);
-	std::string s3 = mOriginalLayout.caption.label.toStdString();
+	mFieldWidget.addLayout(layout);
 
 	mpPlotLayouts->clear();
 	for (const auto& entry : mFieldWidget.getLayouts())
 	{
-		auto text = entry.caption.label;
 		mpPlotLayouts->addItem(entry.caption.label);
-		std::string s5 = mOriginalLayout.caption.label.toStdString();
 	}
 
-	std::string s4 = mOriginalLayout.caption.label.toStdString();
-
-	auto n = mpPlotLayouts->maxCount();
-	for (int i = 0; i < n; ++i)
-	{
-		auto text = mpPlotLayouts->itemText(i);
-		
-		std::string s1 = text.toStdString();
-
-		if (text == mOriginalLayout.caption.label)
-		{
-			mpPlotLayouts->setCurrentIndex(i);
-			break;
-		}
-	}
+	mpPlotLayouts->setCurrentText(layout.caption.label);
+	mOriginalLayout = layout;
 }
 
 void cExperimentFieldLayoutDlg::onLayoutChange(const QString& text)
