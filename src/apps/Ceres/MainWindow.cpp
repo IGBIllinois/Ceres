@@ -340,7 +340,10 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
     {
         in >> jsonDoc;
 
-        name = jsonDoc["experiment_name"];
+        if (jsonDoc.contains("experiment name"))
+            name = jsonDoc["experiment name"];
+        else
+            name = jsonDoc["experiment_name"];
     }
     catch (const detail::exception& e)
     {
@@ -360,6 +363,12 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
 
     if (!mpModel->loadExperiment(name, jsonDoc))
     {
+        QString msg = "Experiment \"";
+        msg += QString::fromStdString(name);
+        msg += "\" from file ";
+        msg += QString::fromStdString(experiment_file.string());
+        msg += " failed to load!";
+        onStatusUpdate(msg);
         return false;
     }
 

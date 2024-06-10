@@ -223,7 +223,10 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
             mPlantingDate = 0;
             mHarvestDate = 0;
 
-            mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
+            if (expDoc.contains("experiment name"))
+                mExperimentTitle = static_cast<std::string>(expDoc["experiment name"]);
+            else
+                mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
 
             if (expDoc.contains("principal investigator"))
             {

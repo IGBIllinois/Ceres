@@ -57,7 +57,6 @@ public:
     void startExperiment() override;
 
     bool isConnected() const;
-    bool inOverrideMode() const;
 
 protected:
     void dataRecordingStateChange(bool record) override;
@@ -119,7 +118,6 @@ private:
 
 private:
     bool mConnected = false;
-    bool mOverrideConnection = false;
     bool mDataFileIsOpen = false;
     bool mExperimentInfoConfirmed = false;
 
@@ -139,11 +137,7 @@ private:
 
 inline bool cCtrlDataModelRemote::isConnected() const
 {
-    return mConnected || mOverrideConnection;
+    return mConnected;
 }
 
 
-inline bool cCtrlDataModelRemote::inOverrideMode() const
-{
-    return mOverrideConnection;
-}
