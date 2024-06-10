@@ -445,16 +445,19 @@ void cExperimentMetaInfo::save(nlohmann::json& jdoc)
         jdoc["construct"] = mConstructName;
     }
 
-    if (jdoc.contains("event number"))
+    if (mEvents.size() == 1)
     {
-        mEvents.push_back(jdoc["event number"]);
+        jdoc["event number"] = mEvents.front();
     }
 
-    if (jdoc.contains("event numbers"))
+    if (mEvents.size() > 1)
     {
-        auto event_numbers = jdoc["event numbers"];
-        for (auto it = event_numbers.begin(); it != event_numbers.end(); ++it)
-            mEvents.push_back(*it);
+        nlohmann::json event_numbers;
+
+        for (auto it = mEvents.begin(); it != mEvents.end(); ++it)
+            event_numbers.push_back(*it);
+
+        jdoc["event numbers"] = event_numbers;
     }
 
     if (!mFieldDesign.empty())
@@ -462,86 +465,52 @@ void cExperimentMetaInfo::save(nlohmann::json& jdoc)
         jdoc["field design"] = mFieldDesign;
     }
 
-    if (jdoc.contains("treatment"))
+    if (mTreatments.size() == 1)
     {
-        mTreatments.push_back(jdoc["treatment"]);
+        jdoc["treatment"] = mTreatments.front();
     }
 
-    if (jdoc.contains("treatments"))
+    if (mTreatments.size() > 1)
     {
-        auto treatments = jdoc["treatments"];
-        if (treatments.is_string())
-        {
-            mTreatments.push_back(treatments);
-        }
-        else if (treatments.is_array())
-        {
-            for (auto it = treatments.begin(); it != treatments.end(); ++it)
-                mTreatments.push_back(*it);
-        }
+        nlohmann::json treatments;
+
+        for (auto it = mTreatments.begin(); it != mTreatments.end(); ++it)
+            treatments.push_back(*it);
+
+        jdoc["treatments"] = treatments;
     }
 
-    if (jdoc.contains("comment"))
+    if (mComments.size() == 1)
     {
-        mComments.push_back(jdoc["comment"]);
+        jdoc["comment"] = mComments.front();
     }
 
-    if (jdoc.contains("comments"))
+    if (mComments.size() > 1)
     {
-        auto comments = jdoc["comments"];
-        if (comments.is_string())
-        {
-            mComments.push_back(comments);
-        }
-        else if (comments.is_array())
-        {
-            for (auto it = comments.begin(); it != comments.end(); ++it)
-                mComments.push_back(*it);
-        }
+        nlohmann::json comments;
+
+        for (auto it = mComments.begin(); it != mComments.end(); ++it)
+            comments.push_back(*it);
+
+        jdoc["comments"] = comments;
     }
 
-    std::string month;
-    std::string day;
-    std::string year;
-
-    if (jdoc.contains("planting date (m/d/y)"))
+    if ( !(mPlantingYear.empty() || mPlantingMonth.empty() || mPlantingDay.empty()))
     {
-        std::string date = jdoc["planting date (m/d/y)"];
-        std::tie(month, day, year) = date_split(date);
+        std::string date = mPlantingYear;
+        date += "/" + mPlantingMonth;
+        date += "/" + mPlantingDay;
+
+        jdoc["planting date (y/m/d)"] = date;
     }
 
-    if (jdoc.contains("planting date (d/m/y)"))
+    if (!(mTargetHarvestYear.empty() || mTargetHarvestMonth.empty() || mTargetHarvestDay.empty()))
     {
-        std::string date = jdoc["planting date (d/m/y)"];
-        std::tie(day, month, year) = date_split(date);
-    }
+        std::string date = mTargetHarvestYear;
+        date += "/" + mTargetHarvestMonth;
+        date += "/" + mTargetHarvestDay;
 
-    if (jdoc.contains("planting date (y/m/d)"))
-    {
-        std::string date = jdoc["planting date (y/m/d)"];
-        std::tie(year, month, day) = date_split(date);
-    }
-
-    month.clear();
-    day.clear();
-    year.clear();
-
-    if (jdoc.contains("target harvest date (m/d/y)"))
-    {
-        std::string date = jdoc["target harvest date (m/d/y)"];
-        std::tie(month, day, year) = date_split(date);
-    }
-
-    if (jdoc.contains("target harvest date (d/m/y)"))
-    {
-        std::string date = jdoc["target harvest date (d/m/y)"];
-        std::tie(day, month, year) = date_split(date);
-    }
-
-    if (jdoc.contains("target harvest date (y/m/d)"))
-    {
-        std::string date = jdoc["target harvest date (y/m/d)"];
-        std::tie(year, month, day) = date_split(date);
+        jdoc["target harvest date (y/m/d)"] = date;
     }
 
     mDirty = false;
