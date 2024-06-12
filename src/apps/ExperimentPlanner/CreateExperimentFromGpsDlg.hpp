@@ -1,10 +1,7 @@
 
 #pragma once
 
-#include "ExperimentFile.hpp"
-
-#include <QDialog>
-#include <QSharedPointer>
+#include "CreateLidarExperimentDlg.hpp"
 
 
 // Qt Forward Declaration
@@ -21,7 +18,7 @@ class QTableView;
 QT_END_NAMESPACE
 
 
-class cCreateExperimentFromGpsDlg : public QDialog
+class cCreateExperimentFromGpsDlg : public cCreateLidarExperimentDlg
 {
 	Q_OBJECT
 
@@ -29,39 +26,16 @@ public:
 	cCreateExperimentFromGpsDlg(const QString& filename, QWidget* parent = nullptr);
 	virtual ~cCreateExperimentFromGpsDlg();
 
-signals:
-	void clearPaths();
-	void drawPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
-	void experimentChanged(QSharedPointer<cExperimentFile> experiment);
 
 private slots:
-	void accept() override;
-	void generate();
-	void onMetaInfoUpdate();
-	void onControllerUpdate();
-	void onSensorUpdate();
-	void onUnitChange(const QString& text);
-	void onHasSubScans(int state);
-
-	void onShowPath();
+	bool generate() override;
+	void onShowPath() override;
 
 private:
-	void createControls();
-	void createLayout();
+	void createControls_PointSelection() override;
+	void createLayout_PointSelection(QVBoxLayout* pMainLayout) override;
 
 private:
-	double mConversionFactor = 1.0;
-
-	cExperimentMetaInfo mMetaInfo;
-	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
-	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;
-
-	QLineEdit* mpTitle = nullptr;
-
-	QPushButton* mpMetaInfo = nullptr;
-	QPushButton* mpCtrlInfo = nullptr;
-	QPushButton* mpSensorInfo = nullptr;
-
 	uint32_t mStartIndex = 0;
 	uint32_t mEndIndex = 0;
 
@@ -70,34 +44,5 @@ private:
 
 	QAbstractItemModel* mpModel = nullptr;
 
-	QPushButton* mpClearPath = nullptr;
-	QPushButton* mpShowPath = nullptr;
-
 	QCheckBox* mpInverseDirection = nullptr;
-
-	QLineEdit* mpTravelHeight_m = nullptr;
-	QLineEdit* mpTravelVerticalSpeed_mmps = nullptr;
-	QLineEdit* mpTravelSpeed_mmps = nullptr;
-
-	QLineEdit* mpBeginningOffset_m = nullptr;
-	QLineEdit* mpEndingOffset_m = nullptr;
-
-	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
-	QLineEdit* mpMeasurementHeight_m = nullptr;
-	QComboBox* mpHeightReference = nullptr;
-	QLineEdit* mpMeasurementSpeed_mmps = nullptr;
-	QLineEdit* mpEndMeasurementDelay_sec = nullptr;
-
-	QLineEdit* mpSafeHeight_m = nullptr;
-	QLineEdit* mpSafeVerticalSpeed_mmps = nullptr;
-
-	QCheckBox* mpHasSubScans = nullptr;
-	QLineEdit* mpNumOfScans = nullptr;
-	QComboBox* mpSubScanOrientation = nullptr;
-	QComboBox* mpUnits = nullptr;
-
-	QLabel* mpSubScanSeparationLabel = nullptr;
-	QLineEdit* mpSubScanSeparation = nullptr;
-
-	QCheckBox* mpFastMode = nullptr;
 };

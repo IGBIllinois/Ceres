@@ -44,10 +44,8 @@ namespace
 
 cCreateExperimentFromPlotInfoDlg::cCreateExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent)
 :
-	QDialog(parent)
+	cCreateLidarExperimentDlg(parent)
 {
-	setWindowTitle("Create Experiment");
-
 	setMinimumWidth(550);
 
 	mpModel = new QStandardItemModel(10, 4, this);
@@ -75,26 +73,14 @@ cCreateExperimentFromPlotInfoDlg::cCreateExperimentFromPlotInfoDlg(const QString
 		}
 	}
 
-	createControls();
-	createLayout();
+	initialize();
 }
 
 cCreateExperimentFromPlotInfoDlg::~cCreateExperimentFromPlotInfoDlg()
 {}
 
-void cCreateExperimentFromPlotInfoDlg::createControls()
+void cCreateExperimentFromPlotInfoDlg::createControls_PointSelection()
 {
-	mpTitle = new QLineEdit(this);
-
-	mpMetaInfo = new QPushButton("Meta Info", this);
-	connect(mpMetaInfo, &QPushButton::pressed, this, &cCreateExperimentFromPlotInfoDlg::onMetaInfoUpdate);
-
-	mpCtrlInfo = new QPushButton("Controller", this);
-	connect(mpCtrlInfo, &QPushButton::pressed, this, &cCreateExperimentFromPlotInfoDlg::onControllerUpdate);
-
-	mpSensorInfo = new QPushButton("Sensors", this);
-	connect(mpSensorInfo, &QPushButton::pressed, this, &cCreateExperimentFromPlotInfoDlg::onSensorUpdate);
-
 	mpStartPosition = new QTableView(this);
 	mpStartPosition->setModel(mpModel);
 
@@ -125,64 +111,7 @@ void cCreateExperimentFromPlotInfoDlg::createControls()
 	mpEndPosition->setSortingEnabled(false);
 	mpEndPosition->setFixedWidth(419);
 
-
-	mpClearPath = new QPushButton("Clear Path", this);
-	connect(mpClearPath, &QPushButton::pressed, this, &cCreateExperimentFromPlotInfoDlg::clearPaths);
-
-	mpShowPath = new QPushButton("Show Path", this);
-	connect(mpShowPath, &QPushButton::pressed, this, &cCreateExperimentFromPlotInfoDlg::onShowPath);
-
 	mpInverseDirection = new QCheckBox("Inverse Direction", this);
-
-	mpTravelHeight_m = new QLineEdit(this);
-	mpTravelHeight_m->setValidator(new QDoubleValidator(5.0, 10.0, 3));
-	mpTravelHeight_m->setText("8.0");
-
-	mpTravelVerticalSpeed_mmps = new QLineEdit(this);
-	mpTravelVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
-	mpTravelVerticalSpeed_mmps->setText("250");
-
-	mpTravelSpeed_mmps = new QLineEdit(this);
-	mpTravelSpeed_mmps->setValidator(new QIntValidator(5, 2000));
-	mpTravelSpeed_mmps->setText("1000");
-
-	mpBeginningOffset_m = new QLineEdit(this);
-	mpBeginningOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpBeginningOffset_m->setText("2.0");
-
-	mpEndingOffset_m = new QLineEdit(this);
-	mpEndingOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpEndingOffset_m->setText("2.0");
-
-	mpStartMeasurementDelay_sec = new QLineEdit(this);
-	mpStartMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
-	mpStartMeasurementDelay_sec->setText("4.0");
-
-	mpMeasurementHeight_m = new QLineEdit(this);
-	mpMeasurementHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpMeasurementHeight_m->setText("5.0");
-
-	mpHeightReference = new QComboBox(this);
-	mpHeightReference->setEditable(false);
-	mpHeightReference->addItem("SpiderCam");
-	mpHeightReference->addItem("AGL");
-
-	mpMeasurementSpeed_mmps = new QLineEdit(this);
-	mpMeasurementSpeed_mmps->setValidator(new QIntValidator(0, 1000));
-	mpMeasurementSpeed_mmps->setText("450");
-
-	mpEndMeasurementDelay_sec = new QLineEdit(this);
-	mpEndMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
-	mpEndMeasurementDelay_sec->setText("1.0");
-
-	mpSafeHeight_m = new QLineEdit(this);
-	mpSafeHeight_m->setValidator(new QDoubleValidator(5.0, 10.0, 3));
-	mpSafeHeight_m->setText("8.0");
-
-	mpSafeVerticalSpeed_mmps = new QLineEdit(this);
-	mpSafeVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
-	mpSafeVerticalSpeed_mmps->setText("250");
-
 
 	mpPlotOrientation = new QComboBox(this);
 	mpPlotOrientation->setEditable(false);
@@ -207,53 +136,16 @@ void cCreateExperimentFromPlotInfoDlg::createControls()
 	mpPlotLength->setText("1");
 }
 
-void cCreateExperimentFromPlotInfoDlg::createLayout()
+void cCreateExperimentFromPlotInfoDlg::createControls_SubScanInfo()
 {
-/*
+	/* We don't support sub plots */
+}
+
+void cCreateExperimentFromPlotInfoDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
+{
 	QLabel* pText = nullptr;
 	QGroupBox* pGroupBox = nullptr;
 	QGridLayout* pGridLayout = nullptr;
-	QHBoxLayout* pHSubLayout = nullptr;
-	QVBoxLayout* pVSubLayout = nullptr;
-
-	QVBoxLayout* pMainLayout = new QVBoxLayout();
-
-	QHBoxLayout* pSideBySideLayout = new QHBoxLayout();
-
-	QVBoxLayout* pLeftLayout = new QVBoxLayout();
-	createLayout_LeftSide(pLeftLayout);
-
-	QVBoxLayout* pRightLayout = new QVBoxLayout();
-	createLayout_RightSide(pRightLayout);
-
-	pSideBySideLayout->addLayout(pLeftLayout);
-
-	//	pSideBySideLayout->addStrut(1);
-
-	pSideBySideLayout->addLayout(pRightLayout);
-
-	pMainLayout->addLayout(pSideBySideLayout);
-
-	pMainLayout->addSpacing(20);
-*/
-
-	QLabel* pText = nullptr;
-	QGroupBox* pGroupBox = nullptr;
-	QGridLayout* pGridLayout = nullptr;
-
-	QVBoxLayout* pMainLayout = new QVBoxLayout();
-
-	QHBoxLayout* pTitleLayout = new QHBoxLayout();
-	pText = new QLabel("Experiment Title");
-	pTitleLayout->addWidget(pText);
-	pTitleLayout->addWidget(mpTitle, 1);
-	pTitleLayout->addWidget(mpMetaInfo);
-	pTitleLayout->addWidget(mpCtrlInfo);
-	pTitleLayout->addWidget(mpSensorInfo);
-
-	pMainLayout->addLayout(pTitleLayout);
-
-	pMainLayout->addSpacing(10);
 
 	QHBoxLayout* pPosLayout = new QHBoxLayout();
 	pPosLayout->addStretch(1);
@@ -293,158 +185,11 @@ void cCreateExperimentFromPlotInfoDlg::createLayout()
 	pMainLayout->addWidget(pGroupBox);
 
 	pMainLayout->addSpacing(10);
-
-	pGroupBox = new QGroupBox(tr("Preamble Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	pGridLayout = new QGridLayout();
-	pGridLayout->setColumnMinimumWidth(2, 10);
-
-	pText = new QLabel("Travel Height (m)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpTravelHeight_m, 0, 1);
-
-	pText = new QLabel("Vertical Speed (mm/s)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpTravelVerticalSpeed_mmps, 0, 4);
-
-	pText = new QLabel("Travel Speed (mm/s)");
-	pGridLayout->addWidget(pText, 0, 6);
-	pGridLayout->addWidget(mpTravelSpeed_mmps, 0, 7);
-
-	pGroupBox->setLayout(pGridLayout);
-	pMainLayout->addWidget(pGroupBox);
-
-	pMainLayout->addSpacing(10);
-
-	pGroupBox = new QGroupBox(tr("Measurement Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	pGridLayout = new QGridLayout();
-	pGridLayout->setColumnMinimumWidth(2, 10);
-
-	pText = new QLabel("Start Offset (m)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpBeginningOffset_m, 0, 1);
-
-	pText = new QLabel("Start Delay (sec)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 4);
-
-	pText = new QLabel("Measurement Height (m)");
-	pGridLayout->addWidget(pText, 2, 0);
-
-	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
-	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
-	pMeasurementLayout->addWidget(mpHeightReference);
-	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
-
-//	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
-
-
-	pText = new QLabel("Measurement Speed (mm/s)");
-	pGridLayout->addWidget(pText, 2, 3);
-	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 2, 4);
-
-	pText = new QLabel("End Delay (sec)");
-	pGridLayout->addWidget(pText, 4, 0);
-	pGridLayout->addWidget(mpEndMeasurementDelay_sec, 4, 1);
-
-	pText = new QLabel("End Offset (m)");
-	pGridLayout->addWidget(pText, 4, 3);
-	pGridLayout->addWidget(mpEndingOffset_m, 4, 4);
-
-	pGroupBox->setLayout(pGridLayout);
-	pMainLayout->addWidget(pGroupBox);
-
-	pMainLayout->addSpacing(10);
-
-
-	pGroupBox = new QGroupBox(tr("Postamble Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	pGridLayout = new QGridLayout();
-	pGridLayout->setColumnMinimumWidth(2, 10);
-
-	pText = new QLabel("Safe Height (m)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpSafeHeight_m, 0, 1);
-
-	pText = new QLabel("Vertical Speed (mm/s)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpSafeVerticalSpeed_mmps, 0, 4);
-
-	pGroupBox->setLayout(pGridLayout);
-	pMainLayout->addWidget(pGroupBox);
-
-	pMainLayout->addSpacing(10);
-
-	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-		| QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
-
-	buttonBox->button(QDialogButtonBox::Apply)->setText("Generate");
-
-	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-	connect(buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &cCreateExperimentFromPlotInfoDlg::generate);
-
-	pMainLayout->addWidget(buttonBox);
-
-	setLayout(pMainLayout);
 }
 
-void cCreateExperimentFromPlotInfoDlg::createLayout_LeftSide(QVBoxLayout* pMainLayout)
+void cCreateExperimentFromPlotInfoDlg::createLayout_SubScanInfo(QVBoxLayout* pMainLayout)
 {
-
-}
-
-void cCreateExperimentFromPlotInfoDlg::createLayout_RightSide(QVBoxLayout* pMainLayout)
-{
-
-}
-
-void cCreateExperimentFromPlotInfoDlg::accept()
-{
-	generate();
-	QDialog::accept();
-}
-
-void cCreateExperimentFromPlotInfoDlg::onMetaInfoUpdate()
-{
-	cExperimentMetaInfoDlg dlg(mMetaInfo, this);
-
-	dlg.setExperimentTitle(mpTitle->text().toStdString());
-
-	auto result = dlg.exec();
-
-	if (result == QDialog::Rejected)
-		return;
-
-	mpTitle->setText(QString::fromStdString(dlg.getExperimentTitle()));
-}
-
-void cCreateExperimentFromPlotInfoDlg::onControllerUpdate()
-{
-	cExperimentCtrlInfoDlg dlg(mCtrlInfo.get(), this);
-
-	auto result = dlg.exec();
-
-	if (result == QDialog::Rejected)
-		return;
-
-	mCtrlInfo = std::move(dlg.getControllerInfo());
-}
-
-void cCreateExperimentFromPlotInfoDlg::onSensorUpdate()
-{
-	cExperimentSensorInfoDlg dlg(mSensorInfo, this);
-	auto result = dlg.exec();
-
-	if (result == QDialog::Accepted)
-	{
-		mSensorInfo.clear();
-		mSensorInfo = dlg.getSensorInfo();
-	}
+	/* We don't support sub plots */
 }
 
 void cCreateExperimentFromPlotInfoDlg::onUnitChange(const QString& text)
@@ -481,7 +226,7 @@ void cCreateExperimentFromPlotInfoDlg::onUnitChange(const QString& text)
 }
 
 
-void cCreateExperimentFromPlotInfoDlg::generate()
+bool cCreateExperimentFromPlotInfoDlg::generate()
 {
 	std::string str;
 	QString text;
@@ -493,7 +238,7 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 		QString msg = "The \"Experiment Title\" can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
-		return;
+		return false;
 	}
 
 	QModelIndex startIndex = mpStartPosition->currentIndex();
@@ -504,7 +249,7 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 		QString msg = "Please select start and end positions.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
-		return;
+		return false;
 	}
 
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
@@ -535,6 +280,44 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
+
+	std::optional<double> tilt_deg;
+	std::optional<double> safe_tilt_deg;
+	if (!mpGimbleTilt_deg->text().isEmpty())
+	{
+		double value = mpGimbleTilt_deg->text().toDouble();
+		if (value != 0.0)
+		{
+			tilt_deg = value;
+			safe_tilt_deg = 0.0;
+		}
+	}
+
+	std::optional<double> pan_deg;
+	if (!mpGimblePan_deg->text().isEmpty())
+	{
+		double value = mpGimblePan_deg->text().toDouble();
+		if (value != 0.0)
+			pan_deg = value;
+	}
+
+	std::optional<double> roll_deg;
+	std::optional<double> safe_roll_deg;
+	if (!mpGimbleRoll_deg->text().isEmpty())
+	{
+		double value = mpGimbleRoll_deg->text().toDouble();
+		if (value != 0.0)
+		{
+			roll_deg = value;
+			safe_roll_deg = 0.0;
+		}
+	}
+
+	if (!mpSensorOffset_mm->text().isEmpty())
+	{
+		int sensor_offset_mm = mpSensorOffset_mm->text().toInt();
+		scan_z_mm += sensor_offset_mm;
+	}
 
 	int dx_mm = x2_mm - x1_mm;
 	int dy_mm = y2_mm - y1_mm;
@@ -654,6 +437,11 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 			step->setZ_mm(scan_z_mm);
 
 		step->setSpeed_mmps(vertical_speed_mmps);
+
+		step->setTilt_deg(tilt_deg);
+		step->setRoll_deg(roll_deg);
+		step->setPan_deg(pan_deg);
+
 		pInfo->appendStep(std::move(step));
 
 		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
@@ -717,6 +505,11 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 			step->setZ_mm(scan_z_mm);
 
 		step->setSpeed_mmps(vertical_speed_mmps);
+
+		step->setTilt_deg(tilt_deg);
+		step->setRoll_deg(roll_deg);
+		step->setPan_deg(pan_deg);
+
 		pInfo->appendStep(std::move(step));
 
 		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
@@ -774,9 +567,13 @@ void cCreateExperimentFromPlotInfoDlg::generate()
 	step = std::make_unique<cExperimentStep_Movement>();
 	step->setZ_mm(safe_z_mm);
 	step->setSpeed_mmps(safe_vertical_speed_mmps);
+	step->setTilt_deg(safe_tilt_deg);
+	step->setRoll_deg(safe_roll_deg);
 	pInfo->appendStep(std::move(step));
 
 	emit experimentChanged(pInfo);
+
+	return true;
 }
 
 void cCreateExperimentFromPlotInfoDlg::onShowPath()

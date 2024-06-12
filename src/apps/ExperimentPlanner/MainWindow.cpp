@@ -336,6 +336,8 @@ cExperimentDesignMdiChild* cMainWindow::createMdiChild()
     connect(child, &cExperimentDesignWidget::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(child, &cExperimentDesignWidget::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
 
+    connect(child, &cExperimentDesignMdiChild::experimentListNeedsUpdate, this, &cMainWindow::onExperimentListUpdateNeeded);
+
     connect(this, &cMainWindow::defaultExperimentPathChange, child, &cExperimentDesignMdiChild::onDefaultExperimentPathChange);
 
     return child;
@@ -385,8 +387,7 @@ void cMainWindow::onFileSaveAsExperimentFile()
 
     auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
 
-    if (child->saveAs())
-        mpExperiments->reloadExperiments();
+    child->saveAs();
 }
 
 void cMainWindow::onFileSaveAllExperimentFiles()
@@ -397,8 +398,6 @@ void cMainWindow::onFileSaveAllExperimentFiles()
         auto* child = static_cast<cExperimentDesignMdiChild*>(subWindow->widget());
         child->save();
     }
-
-    mpExperiments->reloadExperiments();
 }
 
 void cMainWindow::onFileCloseExperimentFile()
@@ -766,6 +765,11 @@ void cMainWindow::onExperimentChange(QSharedPointer<cExperimentFile> experiment)
     mpEditMenu->setDisabled(false);
 }
 
+//-----------------------------------------------------------------------------
+void cMainWindow::onExperimentListUpdateNeeded()
+{
+    mpExperiments->reloadExperiments();
+}
 
 //-----------------------------------------------------------------------------
 void cMainWindow::closeEvent(QCloseEvent* event)

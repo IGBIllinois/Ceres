@@ -61,6 +61,7 @@ namespace rfb
 
 	bool withinBoundary(const rfm::planePoint_t& point);
 	bool withinBoundary(const rfm::rappPoint_t& point);
+	bool withinBoundary(const std::int32_t x_mm, const std::int32_t y_mm);
 
 	rfm::rappPoint_t toRappCoordinates(const rfm::planePoint_t& point);
 	rfm::rappPoint_t fromStatePlane( double northing_ft, const double easting_ft, const double elevation_ft);

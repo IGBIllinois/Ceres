@@ -213,6 +213,11 @@ bool cSpidercamExperimentState_Movement::initialize()
 		mTilt_deg = mController.getLastKnownPosition().tilt_deg;
 	}
 
+	if (mRoll_NeedsInitialization)
+	{
+		mRoll_deg = mController.getLastKnownPosition().roll_gimbal_deg;
+	}
+
 	return true;
 }
 

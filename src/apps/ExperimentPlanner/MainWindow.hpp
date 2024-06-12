@@ -101,6 +101,7 @@ private slots:
 private slots:
     void onOpenExperiment(const QString& filename);
     void onExperimentChange(QSharedPointer<cExperimentFile> experiment);
+    void onExperimentListUpdateNeeded();
 
 protected:
     void closeEvent(QCloseEvent* event) override;

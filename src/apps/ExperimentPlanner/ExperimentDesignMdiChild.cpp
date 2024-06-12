@@ -102,10 +102,10 @@ void cExperimentDesignMdiChild::save()
     }
 }
 
-bool cExperimentDesignMdiChild::saveAs()
+void cExperimentDesignMdiChild::saveAs()
 {
     if (mExperimentFile.empty())
-        return true;
+        return;
 
     QString defaultDirectory = mDefaultPath;
 
@@ -128,13 +128,15 @@ bool cExperimentDesignMdiChild::saveAs()
         "Experiment Files (*.json)");
 
     if (fileName.isEmpty())
-        return false;
+        return;
 
     mExperimentFile.save_as(fileName.toStdString());
 
     setCurrentFile(QFileInfo(fileName).canonicalFilePath());
 
-    return true;
+    emit experimentListNeedsUpdate();
+
+    return;
 }
 
 QString cExperimentDesignMdiChild::userFriendlyCurrentFile()

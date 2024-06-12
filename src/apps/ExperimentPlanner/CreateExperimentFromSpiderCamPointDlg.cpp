@@ -1,6 +1,5 @@
 ﻿
 #include "CreateExperimentFromSpiderCamPointDlg.hpp"
-#include "GpsFileReader.hpp"
 #include "Constants.hpp"
 
 #include "ExperimentSteps.hpp"
@@ -8,6 +7,9 @@
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
 #include "ExperimentSensorInfoDlg.hpp"
+
+#include "RappGroundModel.hpp"
+#include "RappFieldBoundary.hpp"
 
 #include "StringUtils.hpp"
 
@@ -50,32 +52,18 @@ namespace
 
 cCreateExperimentFromSpiderCamDlg::cCreateExperimentFromSpiderCamDlg(QWidget* parent)
 :
-	QDialog(parent)
+	cCreateLidarExperimentDlg(parent)
 {
-	setWindowTitle("Create Experiment");
-
 	setMinimumWidth(550);
 
-	createControls();
-	createLayout();
+	initialize();
 }
 
 cCreateExperimentFromSpiderCamDlg::~cCreateExperimentFromSpiderCamDlg()
 {}
 
-void cCreateExperimentFromSpiderCamDlg::createControls()
+void cCreateExperimentFromSpiderCamDlg::createControls_PointSelection()
 {
-	mpTitle = new QLineEdit(this);
-
-	mpMetaInfo = new QPushButton("Meta Info", this);
-	connect(mpMetaInfo, &QPushButton::pressed, this, &cCreateExperimentFromSpiderCamDlg::onMetaInfoUpdate);
-
-	mpCtrlInfo = new QPushButton("Controller", this);
-	connect(mpCtrlInfo, &QPushButton::pressed, this, &cCreateExperimentFromSpiderCamDlg::onControllerUpdate);
-
-	mpSensorInfo = new QPushButton("Sensors", this);
-	connect(mpSensorInfo, &QPushButton::pressed, this, &cCreateExperimentFromSpiderCamDlg::onSensorUpdate);
-
 	mpStartX_mm = new QLineEdit(this);
 	mpStartX_mm->setValidator(new QIntValidator(10000, 190000));
 
@@ -103,127 +91,13 @@ void cCreateExperimentFromSpiderCamDlg::createControls()
 	mpScanUnits->setCurrentIndex(2);
 	mScanConversionFactor = nConstants::FT_TO_MM;
 	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateExperimentFromSpiderCamDlg::onScanUnitChange);
-
-
-	mpClearPath = new QPushButton("Clear Path", this);
-	connect(mpClearPath, &QPushButton::pressed, this, &cCreateExperimentFromSpiderCamDlg::clearPaths);
-
-	mpShowPath = new QPushButton("Show Path", this);
-	connect(mpShowPath, &QPushButton::pressed, this, &cCreateExperimentFromSpiderCamDlg::onShowPath);
-
-	mpTravelHeight_m = new QLineEdit(this);
-	mpTravelHeight_m->setValidator(new QDoubleValidator(5.0, 10.0, 3));
-	mpTravelHeight_m->setText("8.0");
-
-	mpHeightReference = new QComboBox(this);
-	mpHeightReference->setEditable(false);
-	mpHeightReference->addItem("SpiderCam");
-	mpHeightReference->addItem("AGL");
-
-	mpTravelVerticalSpeed_mmps = new QLineEdit(this);
-	mpTravelVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
-	mpTravelVerticalSpeed_mmps->setText("250");
-
-	mpTravelSpeed_mmps = new QLineEdit(this);
-	mpTravelSpeed_mmps->setValidator(new QIntValidator(5, 2000));
-	mpTravelSpeed_mmps->setText("1000");
-
-	mpBeginningOffset_m = new QLineEdit(this);
-	mpBeginningOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpBeginningOffset_m->setText("2.0");
-
-	mpEndingOffset_m = new QLineEdit(this);
-	mpEndingOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpEndingOffset_m->setText("2.0");
-
-	mpStartMeasurementDelay_sec = new QLineEdit(this);
-	mpStartMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
-	mpStartMeasurementDelay_sec->setText("4.0");
-
-	mpMeasurementHeight_m = new QLineEdit(this);
-	mpMeasurementHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpMeasurementHeight_m->setText("5.0");
-
-	mpMeasurementSpeed_mmps = new QLineEdit(this);
-	mpMeasurementSpeed_mmps->setValidator(new QIntValidator(0, 1000));
-	mpMeasurementSpeed_mmps->setText("450");
-
-	mpEndMeasurementDelay_sec = new QLineEdit(this);
-	mpEndMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
-	mpEndMeasurementDelay_sec->setText("1.0");
-
-	mpSafeHeight_m = new QLineEdit(this);
-	mpSafeHeight_m->setValidator(new QDoubleValidator(5.0, 10.0, 3));
-	mpSafeHeight_m->setText("8.0");
-
-	mpSafeVerticalSpeed_mmps = new QLineEdit(this);
-	mpSafeVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
-	mpSafeVerticalSpeed_mmps->setText("250");
-
-
-	mpHasSubScans = new QCheckBox("Has Adjacent Scans", this);
-	connect(mpHasSubScans, &QCheckBox::stateChanged, this, &cCreateExperimentFromSpiderCamDlg::onHasSubScans);
-
-	mpNumOfScans = new QLineEdit(this);
-	mpNumOfScans->setValidator(new QIntValidator(1, 10));
-	mpNumOfScans->setEnabled(false);
-	mpNumOfScans->setText("1");
-
-	mpSubScanOrientation = new QComboBox(this);
-	mpSubScanOrientation->setEditable(false);
-	mpSubScanOrientation->addItem(NORTH_TO_SOUTH);
-	mpSubScanOrientation->addItem(SOUTH_TO_NORTH);
-	mpSubScanOrientation->addItem(EAST_TO_WEST);
-	mpSubScanOrientation->addItem(WEST_TO_EAST);
-	mpSubScanOrientation->setEnabled(false);
-//	connect(mpSubScanOrientation, &QComboBox::currentTextChanged, this, &cCreateExperimentFromGpsDlg::onSubOrientationChange);
-
-	 // default to inches
-	mpSubScanSeparationLabel = new QLabel(SCAN_SEPARATION_TEXT + "in)", this);
-	mpSubScanSeparation = new QLineEdit(this);
-	mpSubScanSeparation->setValidator(new QDoubleValidator(0, 100.0, 3));
-	mpSubScanSeparation->setText("0");
-	mpSubScanSeparation->setEnabled(false);
-
-	mpSubScanUnits = new QComboBox(this);
-	mpSubScanUnits->setEditable(false);
-	mpSubScanUnits->addItem("Meters");
-	mpSubScanUnits->addItem("Millimeters");
-	mpSubScanUnits->addItem("Feet");
-	mpSubScanUnits->addItem("Inches");
-	mpSubScanUnits->setEnabled(false);
-	mpSubScanUnits->setCurrentIndex(3);
-	mSubScanConversionFactor = nConstants::IN_TO_MM;
-	connect(mpSubScanUnits, &QComboBox::currentTextChanged, this, &cCreateExperimentFromSpiderCamDlg::onSubScanUnitChange);
-
-	QString label = "Fast Mode (";
-	label += QChar(0x2191);
-	label += QChar(0x2193);
-	label += QChar(0x2191);
-	label += ")";
-
-	mpFastMode = new QCheckBox(label, this);
 }
 
-void cCreateExperimentFromSpiderCamDlg::createLayout()
+void cCreateExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
 {
 	QLabel* pText = nullptr;
 	QGroupBox* pGroupBox = nullptr;
 	QGridLayout* pGridLayout = nullptr;
-
-	QVBoxLayout* pMainLayout = new QVBoxLayout();
-
-	QHBoxLayout* pTitleLayout = new QHBoxLayout();
-	pText = new QLabel("Experiment Title");
-	pTitleLayout->addWidget(pText);
-	pTitleLayout->addWidget(mpTitle, 1);
-	pTitleLayout->addWidget(mpMetaInfo);
-	pTitleLayout->addWidget(mpCtrlInfo);
-	pTitleLayout->addWidget(mpSensorInfo);
-
-	pMainLayout->addLayout(pTitleLayout);
-
-	pMainLayout->addSpacing(10);
 
 	QHBoxLayout* pPosLayout = new QHBoxLayout();
 
@@ -255,170 +129,6 @@ void cCreateExperimentFromSpiderCamDlg::createLayout()
 	pMainLayout->addLayout(pPosLayout);
 
 	pMainLayout->addSpacing(10);
-
-	pGroupBox = new QGroupBox(tr("Preamble Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	pGridLayout = new QGridLayout();
-	pGridLayout->setColumnMinimumWidth(2, 10);
-
-	pText = new QLabel("Travel Height (m)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpTravelHeight_m, 0, 1);
-
-	pText = new QLabel("Vertical Speed (mm/s)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpTravelVerticalSpeed_mmps, 0, 4);
-
-	pText = new QLabel("Travel Speed (mm/s)");
-	pGridLayout->addWidget(pText, 0, 6);
-	pGridLayout->addWidget(mpTravelSpeed_mmps, 0, 7);
-
-	pGroupBox->setLayout(pGridLayout);
-	pMainLayout->addWidget(pGroupBox);
-
-	pMainLayout->addSpacing(10);
-
-	pGroupBox = new QGroupBox(tr("Measurement Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	pGridLayout = new QGridLayout();
-	pGridLayout->setColumnMinimumWidth(2, 10);
-
-	pText = new QLabel("Start Offset (m)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpBeginningOffset_m, 0, 1);
-
-	pText = new QLabel("Start Delay (sec)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 4);
-
-	pText = new QLabel("Measurement Height (m)");
-	pGridLayout->addWidget(pText, 2, 0);
-
-//	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
-	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
-	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
-	pMeasurementLayout->addWidget(mpHeightReference);
-	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
-
-	pText = new QLabel("Measurement Speed (mm/s)");
-	pGridLayout->addWidget(pText, 2, 3);
-	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 2, 4);
-
-	pText = new QLabel("End Delay (sec)");
-	pGridLayout->addWidget(pText, 4, 0);
-	pGridLayout->addWidget(mpEndMeasurementDelay_sec, 4, 1);
-
-	pText = new QLabel("End Offset (m)");
-	pGridLayout->addWidget(pText, 4, 3);
-	pGridLayout->addWidget(mpEndingOffset_m, 4, 4);
-
-	pGroupBox->setLayout(pGridLayout);
-	pMainLayout->addWidget(pGroupBox);
-
-	pMainLayout->addSpacing(10);
-
-
-	pGroupBox = new QGroupBox(tr("Postamble Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	pGridLayout = new QGridLayout();
-	pGridLayout->setColumnMinimumWidth(2, 10);
-
-	pText = new QLabel("Safe Height (m)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpSafeHeight_m, 0, 1);
-
-	pText = new QLabel("Vertical Speed (mm/s)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpSafeVerticalSpeed_mmps, 0, 4);
-
-	pGroupBox->setLayout(pGridLayout);
-	pMainLayout->addWidget(pGroupBox);
-
-	pMainLayout->addSpacing(10);
-
-
-	pGroupBox = new QGroupBox(tr("Sub Scan Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	QHBoxLayout* pHSubLayout = new QHBoxLayout();
-	pHSubLayout->addWidget(mpHasSubScans);
-	pText = new QLabel("Number of Scans: ");
-	pHSubLayout->addWidget(pText);
-	pHSubLayout->addWidget(mpNumOfScans);
-	pHSubLayout->addSpacing(10);
-	pHSubLayout->addWidget(mpSubScanOrientation);
-	pHSubLayout->addSpacing(10);
-	pHSubLayout->addWidget(mpFastMode);
-
-	pHSubLayout->addWidget(mpSubScanSeparationLabel);
-	pHSubLayout->addWidget(mpSubScanSeparation);
-	pHSubLayout->addSpacing(10);
-	pHSubLayout->addWidget(mpSubScanUnits);
-
-	pGroupBox->setLayout(pHSubLayout);
-
-	pMainLayout->addWidget(pGroupBox);
-
-
-	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-		| QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
-
-	buttonBox->button(QDialogButtonBox::Apply)->setText("Generate");
-
-	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-	connect(buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &cCreateExperimentFromSpiderCamDlg::generate);
-
-	pMainLayout->addWidget(buttonBox);
-
-	setLayout(pMainLayout);
-}
-
-void cCreateExperimentFromSpiderCamDlg::accept()
-{
-	generate();
-	QDialog::accept();
-}
-
-void cCreateExperimentFromSpiderCamDlg::onMetaInfoUpdate()
-{
-	cExperimentMetaInfoDlg dlg(mMetaInfo, this);
-
-	dlg.setExperimentTitle(mpTitle->text().toStdString());
-
-	auto result = dlg.exec();
-
-	if (result == QDialog::Rejected)
-		return;
-
-	mpTitle->setText(QString::fromStdString(dlg.getExperimentTitle()));
-}
-
-void cCreateExperimentFromSpiderCamDlg::onControllerUpdate()
-{
-	cExperimentCtrlInfoDlg dlg(mCtrlInfo.get(), this);
-
-	auto result = dlg.exec();
-
-	if (result == QDialog::Rejected)
-		return;
-
-	mCtrlInfo = std::move(dlg.getControllerInfo());
-}
-
-void cCreateExperimentFromSpiderCamDlg::onSensorUpdate()
-{
-	cExperimentSensorInfoDlg dlg(mSensorInfo, this);
-	auto result = dlg.exec();
-
-	if (result == QDialog::Accepted)
-	{
-		mSensorInfo.clear();
-		mSensorInfo = dlg.getSensorInfo();
-	}
 }
 
 void cCreateExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
@@ -454,62 +164,7 @@ void cCreateExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
 	mpScanDistance->setText(QString::number(distance));
 }
 
-void cCreateExperimentFromSpiderCamDlg::onSubScanUnitChange(const QString& text)
-{
-	double separation = mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor;
-
-	switch (mpSubScanUnits->currentIndex())
-	{
-	case 0:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "m)");
-
-		mSubScanConversionFactor = nConstants::M_TO_MM;
-		break;
-	case 1:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "mm)");
-
-		mSubScanConversionFactor = 1.0;
-		break;
-	case 2:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "ft)");
-
-		mSubScanConversionFactor = nConstants::FT_TO_MM;
-		break;
-	case 3:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "in)");
-
-		mSubScanConversionFactor = nConstants::IN_TO_MM;
-		break;
-	}
-
-	separation /= mSubScanConversionFactor;
-
-	mpSubScanSeparation->setText(QString::number(separation));
-}
-
-
-void cCreateExperimentFromSpiderCamDlg::onHasSubScans(int state)
-{
-	if (state == Qt::Checked)
-	{
-		mpNumOfScans->setEnabled(true);
-		mpSubScanOrientation->setEnabled(true);
-		mpSubScanUnits->setEnabled(true);
-		mpSubScanSeparation->setEnabled(true);
-		mpFastMode->setEnabled(true);
-
-	}
-	else
-	{
-		mpNumOfScans->setEnabled(false);
-		mpSubScanOrientation->setEnabled(false);
-		mpSubScanUnits->setEnabled(false);
-		mpSubScanSeparation->setEnabled(false);
-		mpFastMode->setEnabled(false);
-	}
-}
-
-void cCreateExperimentFromSpiderCamDlg::generate()
+bool cCreateExperimentFromSpiderCamDlg::generate()
 {
 	std::string str;
 	QString text;
@@ -521,16 +176,46 @@ void cCreateExperimentFromSpiderCamDlg::generate()
 		QString msg = "The \"Experiment Title\" can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
-		return;
+		return false;
 	}
+
+	if (mpStartX_mm->text().isEmpty() || mpStartY_mm->text().isEmpty()
+		|| mpScanDistance->text().isEmpty())
+	{
+		QString msg = "The SpiderCam position or scan distance can not be blank.";
+		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
+		msg_box.exec();
+		return false;
+	}
+
+	auto* pGroundModel = cRappGroundModel::get();
 
 	int x1_mm = mpStartX_mm->text().toInt();
 	int y1_mm = mpStartY_mm->text().toInt();
+
+	if (!rfb::withinBoundary(x1_mm, y1_mm))
+	{
+		QString msg = "The SpiderCam position must be a valid field position (10,000mm to 190,000mm).";
+		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
+		msg_box.exec();
+		return false;
+	}
+
+	int h1_mm = 0;
+	
+	if (pGroundModel)
+	{
+		h1_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x1_mm, y1_mm));
+
+		if (h1_mm == rfm::INVALID_HEIGHT)
+			h1_mm = 0;
+	}
 
 	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
 
 	int x2_mm = x1_mm;
 	int y2_mm = y1_mm;
+	int h2_mm = h1_mm;
 
 	switch (mpScanOrientation->currentIndex())
 	{
@@ -548,9 +233,55 @@ void cCreateExperimentFromSpiderCamDlg::generate()
 		break;
 	}
 
+	if (pGroundModel)
+	{
+		h2_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x2_mm, y2_mm));
+
+		if (h2_mm == rfm::INVALID_HEIGHT)
+			h2_mm = 0;
+	}
+
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
+
+	std::optional<double> tilt_deg;
+	std::optional<double> safe_tilt_deg;
+	if (!mpGimbleTilt_deg->text().isEmpty())
+	{
+		double value = mpGimbleTilt_deg->text().toDouble();
+		if (value != 0.0)
+		{
+			tilt_deg = value;
+			safe_tilt_deg = 0.0;
+		}
+	}
+
+	std::optional<double> pan_deg;
+	if (!mpGimblePan_deg->text().isEmpty())
+	{
+		double value = mpGimblePan_deg->text().toDouble();
+		if (value != 0.0)
+			pan_deg = value;
+	}
+
+	std::optional<double> roll_deg;
+	std::optional<double> safe_roll_deg;
+	if (!mpGimbleRoll_deg->text().isEmpty())
+	{
+		double value = mpGimbleRoll_deg->text().toDouble();
+		if (value != 0.0)
+		{
+			roll_deg = value;
+			safe_roll_deg = 0.0;
+		}
+	}
+
+	if (!mpSensorOffset_mm->text().isEmpty())
+	{
+		int sensor_offset_mm = mpSensorOffset_mm->text().toInt();
+		scan_z_mm += sensor_offset_mm;
+	}
 
 	int dx_mm = x2_mm - x1_mm;
 	int dy_mm = y2_mm - y1_mm;
@@ -614,8 +345,18 @@ void cCreateExperimentFromSpiderCamDlg::generate()
 
 			// Move the dolly to measurement height...
 			step = std::make_unique<cExperimentStep_Movement>();
-			step->setZ_mm(scan_z_mm);
+
+			if (mpHeightReference->currentIndex() == 1)
+				step->setZ_mm(scan_z_mm + h1_mm);
+			else
+				step->setZ_mm(scan_z_mm);
+
 			step->setSpeed_mmps(vertical_speed_mmps);
+
+			step->setTilt_deg(tilt_deg);
+			step->setRoll_deg(roll_deg);
+			step->setPan_deg(pan_deg);
+
 			pInfo->appendStep(std::move(step));
 
 			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
@@ -672,8 +413,18 @@ void cCreateExperimentFromSpiderCamDlg::generate()
 
 			// Move the dolly to measurement height...
 			step = std::make_unique<cExperimentStep_Movement>();
-			step->setZ_mm(scan_z_mm);
+
+			if (mpHeightReference->currentIndex() == 1)
+				step->setZ_mm(scan_z_mm + h1_mm);
+			else
+				step->setZ_mm(scan_z_mm);
+
 			step->setSpeed_mmps(vertical_speed_mmps);
+
+			step->setTilt_deg(tilt_deg);
+			step->setRoll_deg(roll_deg);
+			step->setPan_deg(pan_deg);
+
 			pInfo->appendStep(std::move(step));
 
 			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
@@ -705,6 +456,13 @@ void cCreateExperimentFromSpiderCamDlg::generate()
 			step = std::make_unique<cExperimentStep_Movement>();
 			step->setX_mm(x_mm);
 			step->setY_mm(y_mm);
+
+			if ((mpHeightReference->currentIndex() == 1) &&
+				((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
+			{
+				step->setZ_mm(scan_z_mm + h2_mm);
+			}
+
 			step->setSpeed_mmps(scan_speed_mmps);
 			step->setRecording(true);
 			pInfo->appendStep(std::move(step));
@@ -724,6 +482,8 @@ void cCreateExperimentFromSpiderCamDlg::generate()
 		step = std::make_unique<cExperimentStep_Movement>();
 		step->setZ_mm(safe_z_mm);
 		step->setSpeed_mmps(safe_vertical_speed_mmps);
+		step->setTilt_deg(safe_tilt_deg);
+		step->setRoll_deg(safe_roll_deg);
 		pInfo->appendStep(std::move(step));
 
 		emit experimentChanged(pInfo);
@@ -754,6 +514,8 @@ void cCreateExperimentFromSpiderCamDlg::generate()
 			std::swap(y1_mm, y2_mm);
 		}
 	}
+
+	return true;
 }
 
 void cCreateExperimentFromSpiderCamDlg::onShowPath()

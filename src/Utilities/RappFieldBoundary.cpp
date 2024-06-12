@@ -100,10 +100,15 @@ bool rfb::withinBoundary(const rfm::planePoint_t& point)
 
 bool rfb::withinBoundary(const rfm::rappPoint_t& point)
 {
-	if ((point.x_mm < minX_mm()) || (point.x_mm > maxX_mm()))
+	return withinBoundary(point.x_mm, point.y_mm);
+}
+
+bool rfb::withinBoundary(const std::int32_t x_mm, const std::int32_t y_mm)
+{
+	if ((x_mm < minX_mm()) || (x_mm > maxX_mm()))
 		return false;
 
-	if ((point.y_mm < minY_mm()) || (point.y_mm > maxY_mm()))
+	if ((y_mm < minY_mm()) || (y_mm > maxY_mm()))
 		return false;
 
 	return true;

@@ -19,7 +19,7 @@ public:
     void newFile(const cExperimentFile& file);
     void loadFile(const QString &fileName);
     void save();
-    bool saveAs();
+    void saveAs();
 
     QString userFriendlyCurrentFile();
     QString currentFile();
@@ -37,6 +37,9 @@ public:
     void editMetaInfo();
     void editCtrlInfo();
     void editSensorInfo();
+
+signals:
+    void experimentListNeedsUpdate();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
