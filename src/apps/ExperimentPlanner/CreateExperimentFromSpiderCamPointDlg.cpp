@@ -115,6 +115,11 @@ void cCreateExperimentFromSpiderCamDlg::createControls()
 	mpTravelHeight_m->setValidator(new QDoubleValidator(5.0, 10.0, 3));
 	mpTravelHeight_m->setText("8.0");
 
+	mpHeightReference = new QComboBox(this);
+	mpHeightReference->setEditable(false);
+	mpHeightReference->addItem("SpiderCam");
+	mpHeightReference->addItem("AGL");
+
 	mpTravelVerticalSpeed_mmps = new QLineEdit(this);
 	mpTravelVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
 	mpTravelVerticalSpeed_mmps->setText("250");
@@ -290,7 +295,12 @@ void cCreateExperimentFromSpiderCamDlg::createLayout()
 
 	pText = new QLabel("Measurement Height (m)");
 	pGridLayout->addWidget(pText, 2, 0);
-	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
+
+//	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
+	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
+	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
+	pMeasurementLayout->addWidget(mpHeightReference);
+	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
 
 	pText = new QLabel("Measurement Speed (mm/s)");
 	pGridLayout->addWidget(pText, 2, 3);

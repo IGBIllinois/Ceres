@@ -86,6 +86,7 @@ private:
 
 	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
 	QLineEdit* mpMeasurementHeight_m = nullptr;
+	QComboBox* mpHeightReference = nullptr;
 	QLineEdit* mpMeasurementSpeed_mmps = nullptr;
 	QLineEdit* mpEndMeasurementDelay_sec = nullptr;
 

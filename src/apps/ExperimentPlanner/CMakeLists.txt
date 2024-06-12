@@ -109,6 +109,23 @@ PRIVATE
     ExperimentTreeItem.hpp
     ExperimentTreeItem.cpp
 
+	FieldUtils.hpp
+	FieldUtils.cpp
+
+	GpsFileReader.hpp
+	GpsFileReader.cpp
+
+	RappTriangle.hpp
+	RappTriangle.cpp
+
+	RappGroundModel.hpp
+	RappGroundModel.cpp
+
+	QuadTree.hpp
+	QuadTree.cpp
+	QuadNode.hpp
+	QuadNode.cpp
+
     FieldBoundaryDlg.hpp
     FieldBoundaryDlg.cpp
 
@@ -152,6 +169,9 @@ target_link_libraries(CeresExperimentPlanner PRIVATE ${Qt}::Multimedia)
 target_link_libraries(CeresExperimentPlanner PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(CeresExperimentPlanner PRIVATE Utilities)
 target_link_libraries(CeresExperimentPlanner PRIVATE ExperimentControllers)
+target_link_libraries(CeresExperimentPlanner PRIVATE ${VTK_LIBRARIES} )
+
+vtk_module_autoinit(TARGETS CeresExperimentPlanner MODULES ${VTK_LIBRARIES})
 
 set_target_properties(CeresExperimentPlanner PROPERTIES FOLDER "Apps")
 

@@ -41,6 +41,13 @@ namespace rfm
 		std::int32_t z_mm = 0;
 	};
 
+	struct sCentroid_t
+	{
+		double x_mm = 0.0;
+		double y_mm = 0.0;
+		double z_mm = 0.0;
+	};
+
 }
 
 

@@ -2,6 +2,8 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "Constants.hpp"
+
 #include "CreateExperimentFromSpiderCamPointDlg.hpp"
 #include "CreateExperimentFromGpsDlg.hpp"
 #include "CreateExperimentFromPlotInfoDlg.hpp"
@@ -23,6 +25,8 @@
 
 #include "RappFieldBoundary.hpp"
 #include "FieldBoundaryDlg.hpp"
+#include "GpsFileReader.hpp"
+#include "FieldUtils.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>
@@ -56,6 +60,11 @@ cMainWindow::cMainWindow(QWidget* parent) :
     mExperimentFilesPath = mSettings.value("Defaults/experimentDirectory", cwd.c_str()).toString();
     mFieldLayoutFile = mSettings.value("Defaults/fieldLayoutFile").toString();
     mPlotSplitsPath = mSettings.value("Defaults/plotSplitDirectory").toString();
+
+    QString fileName = mSettings.value("Defaults/groundMeshFile").toString();
+
+    if (!fileName.isEmpty())
+        LoadGpsData(fileName);
 }
 
 //-----------------------------------------------------------------------------
@@ -231,6 +240,11 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem = new QAction(tr("Default Experiment Directory"), this);
     pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading experiment files"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultExperimentDirectory);
+    mpPreferencesMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Load Ground Data"), this);
+    pMenuItem->setStatusTip(tr("Load the GPS based ground data"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceLoadGroundMesh);
     mpPreferencesMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Default Field Layout File"), this);
@@ -599,6 +613,7 @@ void cMainWindow::onGenerateLidarScan_PlotInfo()
 /********************************************************************
  * Slots associated with "Preference" menu actions
  *******************************************************************/
+
 void cMainWindow::onPreferenceDefaultExperimentDirectory()
 {
     QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
@@ -612,6 +627,27 @@ void cMainWindow::onPreferenceDefaultExperimentDirectory()
     mExperimentFilesPath = directory;
 
     emit defaultExperimentPathChange(mExperimentFilesPath);
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::onPreferenceLoadGroundMesh()
+{
+    QString savedFileName = mSettings.value("Defaults/groundMeshFile").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import Ground Data..."), savedFileName,
+        "GPS CSV Files (*.csv)");
+
+    // Open file
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+
+    // Return on Cancel
+    if (!file.exists())
+        return;
+
+    LoadGpsData(fileName);
+
+    mSettings.setValue("Defaults/groundMeshFile", fileName);
 }
 
 void cMainWindow::onPreferenceDefaultFieldLayoutFile()
@@ -765,5 +801,41 @@ void cMainWindow::closeEvent(QCloseEvent* event)
     mSettings.setValue("mainWindow/windowState", saveState());
 
     QMainWindow::closeEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::LoadGpsData(QString fileName)
+{
+    // Open file
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+
+    // Return on Cancel
+    if (!file.exists())
+        return;
+
+    cGpsFileReader gps;
+    gps.loadFromFile(fileName.toStdString());
+
+    auto points = gps.GetPoints();
+
+    std::vector<rfm::rappPoint_t> rapp_points;
+
+    for (const auto& point : points)
+    {
+        std::int32_t x_mm = point.x_m * nConstants::M_TO_MM;
+        std::int32_t y_mm = point.y_m * nConstants::M_TO_MM;
+        std::int32_t z_mm = point.z_m * nConstants::M_TO_MM;
+
+        rapp_points.emplace_back(x_mm , y_mm , z_mm);
+    }
+
+    mData.addGroundPoints(rapp_points);
+
+    auto data = mData.getGroundPoints();
+    auto mesh = computeGroundMesh(data);
+
+    mData.clearGroundMesh();
+    mData.addMeshData(mesh);
 }
 

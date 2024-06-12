@@ -3,6 +3,8 @@
 
 #include "ExperimentFile.hpp"
 
+#include "RappGroundModel.hpp"
+
 #include <vector>
 #include <filesystem>
 
@@ -86,6 +88,7 @@ private slots:
 // Slots associated with "Preference" menu actions
 private slots:
     void onPreferenceDefaultExperimentDirectory();
+    void onPreferenceLoadGroundMesh();
     void onPreferenceDefaultFieldLayoutFile();
     void onPreferenceDefaultPlotSplitDirectory();
     void onPreferenceDefaultFieldBoundaries();
@@ -112,6 +115,11 @@ private:
     cExperimentDesignMdiChild* createMdiChild();
 
 private:
+    void LoadGpsData(QString fileName);
+
+private:
+    cRappGroundModel mData;
+
     QSettings mSettings;
 
     QMdiArea* mpMdiArea = nullptr;
