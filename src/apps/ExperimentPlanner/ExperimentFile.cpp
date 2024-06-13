@@ -1,6 +1,7 @@
 
 #include "ExperimentFile.hpp"
 #include "ExperimentSteps.hpp"
+#include "ExperimentSteps_HySpex.hpp"
 
 #include <QLayout>
 #include <QPushButton>
@@ -195,22 +196,16 @@ void cExperimentFile::open(const std::string& file_name)
 
 			std::string type = entry["type"];
 
-			if (type == "delay")
-			{
-				step = std::make_shared<cExperimentStep_Delay>();
-			}
-			else if (type == "pause")
-			{
-				step = std::make_shared<cExperimentStep_Pause>();
-			}
-			else if (type == "movement")
-			{
-				step = std::make_shared<cExperimentStep_Movement>();
-			}
+			step = basic::create_step(type);
 
-			step->load(entry);
+			if (!step)
+				step = hyspex::create_step(type, entry);
 
-			mSteps.push_back(step);
+			if (step)
+			{
+				step->load(entry);
+				mSteps.push_back(step);
+			}
 		}
 	}
 }

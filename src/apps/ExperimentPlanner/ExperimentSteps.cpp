@@ -20,6 +20,20 @@
 
 namespace fs = std::filesystem;
 
+std::shared_ptr<cExperimentStep> basic::create_step(const std::string& type)
+{
+	if (type == "delay")
+		return std::make_shared<cExperimentStep_Delay>();
+	
+	if (type == "pause")
+		return std::make_shared<cExperimentStep_Pause>();
+
+	if (type == "movement")
+		return std::make_shared<cExperimentStep_Movement>();
+
+	return std::shared_ptr<cExperimentStep>();
+}
+
 
 /********************************************************************
  *

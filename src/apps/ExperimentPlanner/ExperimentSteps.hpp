@@ -18,7 +18,12 @@ QT_END_NAMESPACE
 class cExperimentFile;
 class cConnectedItem;
 class cBaseStep;
+class cExperimentStep;
 
+namespace basic
+{
+	std::shared_ptr<cExperimentStep> create_step(const std::string& type);
+}
 
 class cExperimentStep
 {

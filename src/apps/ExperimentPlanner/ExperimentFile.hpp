@@ -25,7 +25,7 @@ QT_END_NAMESPACE
 // Forward Declarations
 class cExperimentStep;
 
-enum eExperimentStep {delay, pause, movement};
+enum eExperimentStep {delay, pause, movement, hyspex_command};
 
 
 class cExperimentFile

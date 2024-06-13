@@ -8,6 +8,7 @@
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
 #include "ExperimentSensorInfoDlg.hpp"
+#include "ExperimentSensorInfo.hpp"
 
 #include "StringUtils.hpp"
 
@@ -53,6 +54,9 @@ cCreateLidarExperimentDlg::cCreateLidarExperimentDlg(QWidget* parent)
 	QDialog(parent)
 {
 	setWindowTitle("Create LiDAR Experiment");
+
+	mCtrlInfo = std::make_unique<cExperimentCtrlInfo_SpiderCam>();
+	mSensorInfo.push_back(std::make_shared<cExperimentSensorInfo_Ouster>());
 }
 
 cCreateLidarExperimentDlg::~cCreateLidarExperimentDlg()

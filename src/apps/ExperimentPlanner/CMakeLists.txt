@@ -91,9 +91,12 @@ PRIVATE
     ExperimentSensorInfo.cpp
     ExperimentSteps.hpp
     ExperimentSteps.cpp
+    ExperimentSteps_HySpex.hpp
+    ExperimentSteps_HySpex.cpp
 
     GpsFileReader.hpp
     GpsFileReader.cpp
+	
     CreateLidarExperimentDlg.hpp
     CreateLidarExperimentDlg.cpp
     CreateExperimentFromSpiderCamPointDlg.hpp
@@ -102,6 +105,9 @@ PRIVATE
     CreateExperimentFromGpsDlg.cpp
     CreateExperimentFromPlotInfoDlg.hpp
     CreateExperimentFromPlotInfoDlg.cpp
+
+    CreateHyperspectralExperimentDlg.hpp
+    CreateHyperspectralExperimentDlg.cpp
 
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp
