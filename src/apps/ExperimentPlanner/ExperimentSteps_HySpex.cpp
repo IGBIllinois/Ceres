@@ -41,7 +41,19 @@ std::shared_ptr<cExperimentStep> hyspex::create_step(const std::string& type, co
 
 	if (type == "SWIR-384")
 	{
+		if (info.contains("command"))
+		{
+			std::string command = info["command"];
 
+			if (command == "open shutter")
+				return std::make_shared<cExperimentStep_HySpex_Command>("SWIR-384", "open shutter");
+
+			if (command == "close shutter")
+				return std::make_shared<cExperimentStep_HySpex_Command>("SWIR-384", "close shutter");
+
+			if (command == "background")
+				return std::make_shared<cExperimentStep_HySpex_Command>("SWIR-384", "background");
+		}
 	}
 
 	return std::shared_ptr<cExperimentStep>();

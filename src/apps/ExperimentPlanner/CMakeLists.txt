@@ -78,6 +78,9 @@ PRIVATE
     ExperimentDesignWidget.hpp
     ExperimentDesignWidget.cpp
 
+    HySpexCommandDlg.hpp
+    HySpexCommandDlg.cpp
+
     ExperimentDesignItems.hpp
     ExperimentDesignItems.cpp
 

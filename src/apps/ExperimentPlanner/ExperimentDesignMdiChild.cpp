@@ -2,10 +2,13 @@
 #include "ExperimentDesignMdiChild.hpp"
 
 #include "ExperimentSteps.hpp"
+#include "ExperimentSteps_HySpex.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
 #include "ExperimentSensorInfoDlg.hpp"
+
+#include "HySpexCommandDlg.hpp"
 
 #include "StringUtils.hpp"
 
@@ -310,6 +313,52 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
         mExperimentFile.insertBefore(id, std::move(step));
         break;
     }
+    case eExperimentStep::hyspex_command:
+    {
+        cHySpexCommandDlg dlg(this);
+
+        auto result = dlg.exec();
+
+        if (result == QDialog::Rejected)
+            return;
+
+        std::string camera_type;
+
+        switch (dlg.getCameraType())
+        {
+        case cHySpexCommandDlg::eCameraType::eVNIR_3000N:
+            camera_type = "VNIR-3000N";
+            break;
+        case cHySpexCommandDlg::eCameraType::eSWIR_384:
+            camera_type = "SWIR-384";
+            break;
+        default:
+            return;
+        }
+
+
+        std::string command;
+
+        switch (dlg.getCommand())
+        {
+        case cHySpexCommandDlg::eCommandType::eOPEN_SHUTTER:
+            command = "open shutter";
+            break;
+        case cHySpexCommandDlg::eCommandType::eCLOSE_SHUTTER:
+            command = "close shutter";
+            break;
+        case cHySpexCommandDlg::eCommandType::eBACKGROUND:
+            command = "background";
+            break;
+        default:
+            return;
+        }
+
+        std::unique_ptr<cExperimentStep_HySpex_Command> step = std::make_unique<cExperimentStep_HySpex_Command>(camera_type, command);
+
+        mExperimentFile.insertBefore(id, std::move(step));
+        break;
+    }
     default:
         return;
     }
@@ -345,6 +394,52 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
         {
             return;
         }
+        mExperimentFile.insertAfter(id, std::move(step));
+        break;
+    }
+    case eExperimentStep::hyspex_command:
+    {
+        cHySpexCommandDlg dlg(this);
+
+        auto result = dlg.exec();
+
+        if (result == QDialog::Rejected)
+            return;
+
+        std::string camera_type;
+
+        switch (dlg.getCameraType())
+        {
+        case cHySpexCommandDlg::eCameraType::eVNIR_3000N:
+            camera_type = "VNIR-3000N";
+            break;
+        case cHySpexCommandDlg::eCameraType::eSWIR_384:
+            camera_type = "SWIR-384";
+            break;
+        default:
+            return;
+        }
+
+
+        std::string command;
+
+        switch (dlg.getCommand())
+        {
+        case cHySpexCommandDlg::eCommandType::eOPEN_SHUTTER:
+            command = "open shutter";
+            break;
+        case cHySpexCommandDlg::eCommandType::eCLOSE_SHUTTER:
+            command = "close shutter";
+            break;
+        case cHySpexCommandDlg::eCommandType::eBACKGROUND:
+            command = "background";
+            break;
+        default:
+            return;
+        }
+
+        std::unique_ptr<cExperimentStep_HySpex_Command> step = std::make_unique<cExperimentStep_HySpex_Command>(camera_type, command);
+
         mExperimentFile.insertAfter(id, std::move(step));
         break;
     }

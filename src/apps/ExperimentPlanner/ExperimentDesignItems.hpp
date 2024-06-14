@@ -67,6 +67,7 @@ private slots:
 	void onInsertDelay();
 	void onInsertPause();
 	void onInsertMovement();
+	void onInsertHySpexCommand();
 
 private:
 	QPoint mTop;
@@ -215,10 +216,12 @@ private slots:
 	void onInsertBefore_Delay();
 	void onInsertBefore_Pause();
 	void onInsertBefore_Movement();
+	void onInsertBefore_HySpexCommand();
 
 	void onInsertAfter_Delay();
 	void onInsertAfter_Pause();
 	void onInsertAfter_Movement();
+	void onInsertAfter_HySpexCommand();
 
 	void onDeleteStep();
 

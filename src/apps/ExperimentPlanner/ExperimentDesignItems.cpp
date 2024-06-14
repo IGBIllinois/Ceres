@@ -131,6 +131,10 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	connect(&movementStep, &QAction::triggered, this, &cFlowArrow::onInsertMovement);
 	contextMenu.addAction(&movementStep);
 
+	QAction commandStep("Insert HySpex Command Step...");
+	connect(&commandStep, &QAction::triggered, this, &cFlowArrow::onInsertHySpexCommand);
+	contextMenu.addAction(&commandStep);
+
 	contextMenu.exec(event->screenPos());
 };
 
@@ -147,6 +151,11 @@ void cFlowArrow::onInsertPause()
 void cFlowArrow::onInsertMovement()
 {
 	emit insertBefore(getID(), eExperimentStep::movement);
+}
+
+void cFlowArrow::onInsertHySpexCommand()
+{
+	emit insertBefore(getID(), eExperimentStep::hyspex_command);
 }
 
 
@@ -608,6 +617,10 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	connect(&beforeMovement, &QAction::triggered, this, &cProcessStep::onInsertBefore_Movement);
 	beforeMenu->addAction(&beforeMovement);
 
+	QAction beforeCommand("HySpex Command");
+	connect(&beforeCommand, &QAction::triggered, this, &cProcessStep::onInsertBefore_HySpexCommand);
+	beforeMenu->addAction(&beforeCommand);
+
 	QMenu* afterMenu = contextMenu.addMenu(tr("Insert Step After..."));
 
 	QAction afterDelay("Delay");
@@ -621,6 +634,10 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	QAction afterMovement("Movement");
 	connect(&afterMovement, &QAction::triggered, this, &cProcessStep::onInsertAfter_Movement);
 	afterMenu->addAction(&afterMovement);
+
+	QAction afterCommand("HySpex Command");
+	connect(&afterCommand, &QAction::triggered, this, &cProcessStep::onInsertAfter_HySpexCommand);
+	afterMenu->addAction(&afterCommand);
 
 	contextMenu.addSeparator();
 
@@ -646,6 +663,11 @@ void cProcessStep::onInsertBefore_Movement()
 	emit insertBefore(getID(), eExperimentStep::movement);
 }
 
+void cProcessStep::onInsertBefore_HySpexCommand()
+{
+	emit insertBefore(getID(), eExperimentStep::hyspex_command);
+}
+
 void cProcessStep::onInsertAfter_Delay()
 {
 	emit insertAfter(getID(), eExperimentStep::delay);
@@ -659,6 +681,11 @@ void cProcessStep::onInsertAfter_Pause()
 void cProcessStep::onInsertAfter_Movement()
 {
 	emit insertAfter(getID(), eExperimentStep::movement);
+}
+
+void cProcessStep::onInsertAfter_HySpexCommand()
+{
+	emit insertAfter(getID(), eExperimentStep::hyspex_command);
 }
 
 void cProcessStep::onDeleteStep()

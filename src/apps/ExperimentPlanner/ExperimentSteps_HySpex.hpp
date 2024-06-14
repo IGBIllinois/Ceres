@@ -37,6 +37,7 @@ class cExperimentStep_HySpex_Command : public QObject, public cExperimentStep
 	Q_OBJECT
 
 public:
+	cExperimentStep_HySpex_Command() = delete;
 	cExperimentStep_HySpex_Command(std::string_view camera_model, std::string_view command);
 
 	cBaseStep* graphicsItem(const int id) const override;
