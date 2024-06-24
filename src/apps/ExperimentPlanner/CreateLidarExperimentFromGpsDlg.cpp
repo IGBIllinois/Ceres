@@ -1,5 +1,5 @@
 ﻿
-#include "CreateExperimentFromGpsDlg.hpp"
+#include "CreateLidarExperimentFromGpsDlg.hpp"
 #include "GpsFileReader.hpp"
 #include "Constants.hpp"
 
@@ -42,7 +42,7 @@ namespace
 	const QString SOUTH_TO_NORTH = "South to North";
 }
 
-cCreateExperimentFromGpsDlg::cCreateExperimentFromGpsDlg(const QString& filename, QWidget* parent)
+cCreateLidarExperimentFromGpsDlg::cCreateLidarExperimentFromGpsDlg(const QString& filename, QWidget* parent)
 :
 	cCreateLidarExperimentDlg(parent)
 {
@@ -76,10 +76,10 @@ cCreateExperimentFromGpsDlg::cCreateExperimentFromGpsDlg(const QString& filename
 	initialize();
 }
 
-cCreateExperimentFromGpsDlg::~cCreateExperimentFromGpsDlg()
+cCreateLidarExperimentFromGpsDlg::~cCreateLidarExperimentFromGpsDlg()
 {}
 
-void cCreateExperimentFromGpsDlg::createControls_PointSelection()
+void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 {
 	mpStartPosition = new QTableView(this);
 	mpStartPosition->setModel(mpModel);
@@ -113,15 +113,15 @@ void cCreateExperimentFromGpsDlg::createControls_PointSelection()
 
 
 	mpClearPath = new QPushButton("Clear Path", this);
-	connect(mpClearPath, &QPushButton::pressed, this, &cCreateExperimentFromGpsDlg::clearPaths);
+	connect(mpClearPath, &QPushButton::pressed, this, &cCreateLidarExperimentFromGpsDlg::clearPaths);
 
 	mpShowPath = new QPushButton("Show Path", this);
-	connect(mpShowPath, &QPushButton::pressed, this, &cCreateExperimentFromGpsDlg::onShowPath);
+	connect(mpShowPath, &QPushButton::pressed, this, &cCreateLidarExperimentFromGpsDlg::onShowPath);
 
 	mpInverseDirection = new QCheckBox("Inverse Direction", this);
 }
 
-void cCreateExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
+void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
 {
 	QLabel* pText = nullptr;
 	QGroupBox* pGroupBox = nullptr;
@@ -152,7 +152,7 @@ void cCreateExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* pMain
 	pMainLayout->addSpacing(10);
 }
 
-bool cCreateExperimentFromGpsDlg::generate()
+bool cCreateLidarExperimentFromGpsDlg::generate()
 {
 	std::string str;
 	QString text;
@@ -478,7 +478,7 @@ bool cCreateExperimentFromGpsDlg::generate()
 	return true;
 }
 
-void cCreateExperimentFromGpsDlg::onShowPath()
+void cCreateLidarExperimentFromGpsDlg::onShowPath()
 {
 	QModelIndex startIndex = mpStartPosition->currentIndex();
 	if (startIndex.row() < 0)

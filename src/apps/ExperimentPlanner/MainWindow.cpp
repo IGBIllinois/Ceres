@@ -4,9 +4,9 @@
 
 #include "Constants.hpp"
 
-#include "CreateExperimentFromSpiderCamPointDlg.hpp"
-#include "CreateExperimentFromGpsDlg.hpp"
-#include "CreateExperimentFromPlotInfoDlg.hpp"
+#include "CreateLidarExperimentFromSpiderCamPointDlg.hpp"
+#include "CreateLidarExperimentFromGpsDlg.hpp"
+#include "CreateLidarExperimentFromPlotInfoDlg.hpp"
 
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
@@ -224,12 +224,12 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_SpiderCam_Point);
     mpGenerateMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("LiDAR Scans From GPS data"), this);
+    pMenuItem = new QAction(tr("LiDAR Scans From GPS data (Machine Planted)"), this);
     pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS (begin/end) data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_GPS);
     mpGenerateMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("LiDAR Scans From GPS plot data"), this);
+    pMenuItem = new QAction(tr("LiDAR Scans From GPS plot data (Hand Planted)"), this);
     pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS plot data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
@@ -479,11 +479,11 @@ void cMainWindow::onEditAddExperimentToLayout()
  *******************************************************************/
 void cMainWindow::onGenerateLidarScan_SpiderCam_Point()
 {
-    cCreateExperimentFromSpiderCamDlg dlg(this);
+    cCreateLidarExperimentFromSpiderCamDlg dlg(this);
 
-    connect(&dlg, &cCreateExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
-    connect(&dlg, &cCreateExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
 
     auto result = dlg.exec();
 
@@ -536,11 +536,11 @@ void cMainWindow::onGenerateLidarScan_GPS()
 
     mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
 
-    cCreateExperimentFromGpsDlg dlg(fileName, this);
+    cCreateLidarExperimentFromGpsDlg dlg(fileName, this);
 
-    connect(&dlg, &cCreateExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
-    connect(&dlg, &cCreateExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateLidarExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateLidarExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateLidarExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
 
     auto result = dlg.exec();
 
@@ -593,11 +593,11 @@ void cMainWindow::onGenerateLidarScan_PlotInfo()
 
     mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
 
-    cCreateExperimentFromPlotInfoDlg dlg(fileName, this);
+    cCreateLidarExperimentFromPlotInfoDlg dlg(fileName, this);
 
-    connect(&dlg, &cCreateExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
-    connect(&dlg, &cCreateExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateLidarExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateLidarExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateLidarExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
 
     auto result = dlg.exec();
 

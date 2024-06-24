@@ -102,12 +102,12 @@ PRIVATE
 	
     CreateLidarExperimentDlg.hpp
     CreateLidarExperimentDlg.cpp
-    CreateExperimentFromSpiderCamPointDlg.hpp
-    CreateExperimentFromSpiderCamPointDlg.cpp
-    CreateExperimentFromGpsDlg.hpp
-    CreateExperimentFromGpsDlg.cpp
-    CreateExperimentFromPlotInfoDlg.hpp
-    CreateExperimentFromPlotInfoDlg.cpp
+    CreateLidarExperimentFromSpiderCamPointDlg.hpp
+    CreateLidarExperimentFromSpiderCamPointDlg.cpp
+    CreateLidarExperimentFromGpsDlg.hpp
+    CreateLidarExperimentFromGpsDlg.cpp
+    CreateLidarExperimentFromPlotInfoDlg.hpp
+    CreateLidarExperimentFromPlotInfoDlg.cpp
 
     CreateHyperspectralExperimentDlg.hpp
     CreateHyperspectralExperimentDlg.cpp

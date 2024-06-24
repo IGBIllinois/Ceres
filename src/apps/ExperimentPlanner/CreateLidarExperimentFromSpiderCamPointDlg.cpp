@@ -1,5 +1,5 @@
 ﻿
-#include "CreateExperimentFromSpiderCamPointDlg.hpp"
+#include "CreateLidarExperimentFromSpiderCamPointDlg.hpp"
 #include "Constants.hpp"
 
 #include "ExperimentSteps.hpp"
@@ -50,7 +50,7 @@ namespace
 	constexpr int SCAN_SOUTH_TO_NORTH = 3;
 }
 
-cCreateExperimentFromSpiderCamDlg::cCreateExperimentFromSpiderCamDlg(QWidget* parent)
+cCreateLidarExperimentFromSpiderCamDlg::cCreateLidarExperimentFromSpiderCamDlg(QWidget* parent)
 :
 	cCreateLidarExperimentDlg(parent)
 {
@@ -59,10 +59,10 @@ cCreateExperimentFromSpiderCamDlg::cCreateExperimentFromSpiderCamDlg(QWidget* pa
 	initialize();
 }
 
-cCreateExperimentFromSpiderCamDlg::~cCreateExperimentFromSpiderCamDlg()
+cCreateLidarExperimentFromSpiderCamDlg::~cCreateLidarExperimentFromSpiderCamDlg()
 {}
 
-void cCreateExperimentFromSpiderCamDlg::createControls_PointSelection()
+void cCreateLidarExperimentFromSpiderCamDlg::createControls_PointSelection()
 {
 	mpStartX_mm = new QLineEdit(this);
 	mpStartX_mm->setValidator(new QIntValidator(10000, 190000));
@@ -90,10 +90,10 @@ void cCreateExperimentFromSpiderCamDlg::createControls_PointSelection()
 	mpScanUnits->addItem("Inches");
 	mpScanUnits->setCurrentIndex(2);
 	mScanConversionFactor = nConstants::FT_TO_MM;
-	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateExperimentFromSpiderCamDlg::onScanUnitChange);
+	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateLidarExperimentFromSpiderCamDlg::onScanUnitChange);
 }
 
-void cCreateExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
+void cCreateLidarExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
 {
 	QLabel* pText = nullptr;
 	QGroupBox* pGroupBox = nullptr;
@@ -131,7 +131,7 @@ void cCreateExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout*
 	pMainLayout->addSpacing(10);
 }
 
-void cCreateExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
+void cCreateLidarExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
 {
 	double distance = mpScanDistance->text().toDouble() * mScanConversionFactor;
 
@@ -164,7 +164,7 @@ void cCreateExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
 	mpScanDistance->setText(QString::number(distance));
 }
 
-bool cCreateExperimentFromSpiderCamDlg::generate()
+bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 {
 	std::string str;
 	QString text;
@@ -518,7 +518,7 @@ bool cCreateExperimentFromSpiderCamDlg::generate()
 	return true;
 }
 
-void cCreateExperimentFromSpiderCamDlg::onShowPath()
+void cCreateLidarExperimentFromSpiderCamDlg::onShowPath()
 {
 	int x1_mm = mpStartX_mm->text().toInt();
 	int y1_mm = mpStartY_mm->text().toInt();

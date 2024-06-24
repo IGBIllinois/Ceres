@@ -18,13 +18,13 @@ class QTableView;
 QT_END_NAMESPACE
 
 
-class cCreateExperimentFromSpiderCamDlg : public cCreateLidarExperimentDlg
+class cCreateLidarExperimentFromSpiderCamDlg : public cCreateLidarExperimentDlg
 {
 	Q_OBJECT
 
 public:
-	cCreateExperimentFromSpiderCamDlg(QWidget* parent = nullptr);
-	virtual ~cCreateExperimentFromSpiderCamDlg();
+	cCreateLidarExperimentFromSpiderCamDlg(QWidget* parent = nullptr);
+	virtual ~cCreateLidarExperimentFromSpiderCamDlg();
 
 
 private slots:

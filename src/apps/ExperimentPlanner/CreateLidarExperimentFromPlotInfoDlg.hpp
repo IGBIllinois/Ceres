@@ -18,13 +18,13 @@ class QTableView;
 QT_END_NAMESPACE
 
 
-class cCreateExperimentFromPlotInfoDlg : public cCreateLidarExperimentDlg
+class cCreateLidarExperimentFromPlotInfoDlg : public cCreateLidarExperimentDlg
 {
 	Q_OBJECT
 
 public:
-	cCreateExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent = nullptr);
-	virtual ~cCreateExperimentFromPlotInfoDlg();
+	cCreateLidarExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent = nullptr);
+	virtual ~cCreateLidarExperimentFromPlotInfoDlg();
 
 private slots:
 	bool generate();

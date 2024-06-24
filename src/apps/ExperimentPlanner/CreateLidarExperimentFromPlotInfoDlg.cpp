@@ -1,5 +1,5 @@
 
-#include "CreateExperimentFromPlotInfoDlg.hpp"
+#include "CreateLidarExperimentFromPlotInfoDlg.hpp"
 #include "GpsFileReader.hpp"
 #include "Constants.hpp"
 
@@ -42,7 +42,7 @@ namespace
 	const QString SOUTH_TO_NORTH = "South to North";
 }
 
-cCreateExperimentFromPlotInfoDlg::cCreateExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent)
+cCreateLidarExperimentFromPlotInfoDlg::cCreateLidarExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent)
 :
 	cCreateLidarExperimentDlg(parent)
 {
@@ -76,10 +76,10 @@ cCreateExperimentFromPlotInfoDlg::cCreateExperimentFromPlotInfoDlg(const QString
 	initialize();
 }
 
-cCreateExperimentFromPlotInfoDlg::~cCreateExperimentFromPlotInfoDlg()
+cCreateLidarExperimentFromPlotInfoDlg::~cCreateLidarExperimentFromPlotInfoDlg()
 {}
 
-void cCreateExperimentFromPlotInfoDlg::createControls_PointSelection()
+void cCreateLidarExperimentFromPlotInfoDlg::createControls_PointSelection()
 {
 	mpStartPosition = new QTableView(this);
 	mpStartPosition->setModel(mpModel);
@@ -127,7 +127,7 @@ void cCreateExperimentFromPlotInfoDlg::createControls_PointSelection()
 	mpUnits->addItem("Millimeters");
 	mpUnits->addItem("Feet");
 	mpUnits->addItem("Inches");
-	connect(mpUnits, &QComboBox::currentTextChanged, this, &cCreateExperimentFromPlotInfoDlg::onUnitChange);
+	connect(mpUnits, &QComboBox::currentTextChanged, this, &cCreateLidarExperimentFromPlotInfoDlg::onUnitChange);
 	mConversionFactor = nConstants::M_TO_MM;
 
 	mpPlotLengthLabel = new QLabel(PLOT_LENGTH_TEXT + "m)", this);
@@ -136,12 +136,12 @@ void cCreateExperimentFromPlotInfoDlg::createControls_PointSelection()
 	mpPlotLength->setText("1");
 }
 
-void cCreateExperimentFromPlotInfoDlg::createControls_SubScanInfo()
+void cCreateLidarExperimentFromPlotInfoDlg::createControls_SubScanInfo()
 {
 	/* We don't support sub plots */
 }
 
-void cCreateExperimentFromPlotInfoDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
+void cCreateLidarExperimentFromPlotInfoDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
 {
 	QLabel* pText = nullptr;
 	QGroupBox* pGroupBox = nullptr;
@@ -187,12 +187,12 @@ void cCreateExperimentFromPlotInfoDlg::createLayout_PointSelection(QVBoxLayout* 
 	pMainLayout->addSpacing(10);
 }
 
-void cCreateExperimentFromPlotInfoDlg::createLayout_SubScanInfo(QVBoxLayout* pMainLayout)
+void cCreateLidarExperimentFromPlotInfoDlg::createLayout_SubScanInfo(QVBoxLayout* pMainLayout)
 {
 	/* We don't support sub plots */
 }
 
-void cCreateExperimentFromPlotInfoDlg::onUnitChange(const QString& text)
+void cCreateLidarExperimentFromPlotInfoDlg::onUnitChange(const QString& text)
 {
 	double length = mpPlotLength->text().toDouble() * mConversionFactor;
 
@@ -226,7 +226,7 @@ void cCreateExperimentFromPlotInfoDlg::onUnitChange(const QString& text)
 }
 
 
-bool cCreateExperimentFromPlotInfoDlg::generate()
+bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 {
 	std::string str;
 	QString text;
@@ -576,7 +576,7 @@ bool cCreateExperimentFromPlotInfoDlg::generate()
 	return true;
 }
 
-void cCreateExperimentFromPlotInfoDlg::onShowPath()
+void cCreateLidarExperimentFromPlotInfoDlg::onShowPath()
 {
 	QModelIndex startIndex = mpStartPosition->currentIndex();
 	if (startIndex.row() < 0)
