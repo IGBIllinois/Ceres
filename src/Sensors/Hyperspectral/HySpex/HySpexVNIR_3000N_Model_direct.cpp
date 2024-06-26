@@ -348,6 +348,11 @@ void cHySpexVNIR_3000N_Model_direct::update()
     }
 }
 
+void cHySpexVNIR_3000N_Model_direct::dataRecordingStateChange(bool record)
+{
+    cHySpexVNIR_3000N_Model::dataRecordingStateChange(record);
+}
+
 void cHySpexVNIR_3000N_Model_direct::enableDataRecording(cBlockDataFileWriter& file)
 {
     mCamera->openShutter();

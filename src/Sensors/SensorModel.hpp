@@ -135,7 +135,7 @@ public slots:
     /*
      * Toggles the recording state of the sensor.
      */
-    void dataRecordingStateChange(bool record);
+    virtual void dataRecordingStateChange(bool record);
 
 signals:
     void statusMessage(QString msg);

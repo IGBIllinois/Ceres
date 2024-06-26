@@ -33,6 +33,8 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
     bool initialize() override;
 
+    void dataRecordingStateChange(bool record) override;
+
     void enableDataRecording(cBlockDataFileWriter& file) override;
     void disableDataRecording() override;
 
