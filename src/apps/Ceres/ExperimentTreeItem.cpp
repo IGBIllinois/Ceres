@@ -23,7 +23,14 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const std::filesys
 
     nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
 
-    if (!jsonDoc.contains("experiment_name"))
+    std::string exp_name;
+    if (jsonDoc.contains("experiment name"))
+        exp_name = jsonDoc["experiment name"];
+
+    if (jsonDoc.contains("experiment_name"))
+        exp_name = jsonDoc["experiment_name"];
+
+    if (exp_name.empty())
     {
         if (!in.is_open())
         {
@@ -31,7 +38,7 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const std::filesys
         }
     }
 
-    QString name = static_cast<std::string>(jsonDoc["experiment_name"]).c_str();
+    QString name = QString::fromStdString(exp_name);
     setText(0, name);
 
     mExperimentFile = experiment_file;
@@ -63,7 +70,13 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const std::fil
 
     nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
 
-    QString name = static_cast<std::string>(jsonDoc["experiment_name"]).c_str();
+    std::string exp_name;
+    if (jsonDoc.contains("experiment name"))
+        exp_name = jsonDoc["experiment name"];
+    else
+        exp_name = jsonDoc["experiment_name"];
+
+    QString name = QString::fromStdString(exp_name);
     setText(0, name);
 
     mExperimentFile = experiment_file;

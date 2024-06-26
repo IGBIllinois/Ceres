@@ -234,6 +234,8 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
 
+    mpGenerateMenu->addSeparator();
+
     //
     // Build the Preference Sub Menu
     //
