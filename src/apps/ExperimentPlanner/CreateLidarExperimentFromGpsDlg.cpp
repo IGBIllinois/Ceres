@@ -40,6 +40,11 @@ namespace
 	const QString EAST_TO_WEST = "East to West";
 	const QString NORTH_TO_SOUTH = "North to South";
 	const QString SOUTH_TO_NORTH = "South to North";
+
+	constexpr int SUB_SCAN_NORTH_TO_SOUTH = 0;
+	constexpr int SUB_SCAN_SOUTH_TO_NORTH = 1;
+	constexpr int SUB_SCAN_EAST_TO_WEST = 2;
+	constexpr int SUB_SCAN_WEST_TO_EAST = 3;
 }
 
 cCreateLidarExperimentFromGpsDlg::cCreateLidarExperimentFromGpsDlg(const QString& filename, QWidget* parent)
@@ -258,18 +263,51 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 	int startNum = 0;
 	bool hasNumber = nStringUtils::endsWithInt(title, &startNum);
 
-	bool mFastMode = false;
+	bool fastMode = false;
 
 	int numOfScans = 1;
 	int orientation = 0;
 	double separation_mm = 0.0;
+	int lateral_offset_mm = 0;
 
 	if (mpHasSubScans->isChecked())
 	{
 		numOfScans = mpNumOfScans->text().toInt();
 		orientation = mpSubScanOrientation->currentIndex();
 		separation_mm = mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor;
-		mFastMode = mpFastMode->isChecked();
+		fastMode = mpFastMode->isChecked();
+
+		if (mpScanCenterOnly->isChecked() && (numOfScans > 1))
+		{
+			double middle_offset_mm = (separation_mm * numOfScans) / 2.0;
+
+			switch (orientation)
+			{
+			case SUB_SCAN_NORTH_TO_SOUTH:
+				lateral_offset_mm = static_cast<int>(middle_offset_mm);
+				break;
+
+			case SUB_SCAN_SOUTH_TO_NORTH:
+				lateral_offset_mm = -1 * static_cast<int>(middle_offset_mm);
+				break;
+
+			case SUB_SCAN_EAST_TO_WEST:
+				lateral_offset_mm = -1 * static_cast<int>(middle_offset_mm);
+				break;
+
+			case SUB_SCAN_WEST_TO_EAST:
+				lateral_offset_mm = static_cast<int>(middle_offset_mm);
+				break;
+			}
+
+			separation_mm = 0.0;
+			numOfScans = 1;
+		}
+		
+		if (mpScanInsideRows->isChecked() && (numOfScans > 1))
+		{
+
+		}
 	}
 
 
@@ -347,6 +385,7 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 			if (std::abs(dx_mm) < 500)
 			{
 				x_mm = (x2_mm + x1_mm) / 2;
+				x_mm += lateral_offset_mm;
 
 				if (y1_mm > y2_mm)
 					y_mm = y1_mm + start_offset_mm;
@@ -361,6 +400,7 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 					x_mm = x1_mm - start_offset_mm;
 
 				y_mm = (y2_mm + y1_mm) / 2;
+				y_mm += lateral_offset_mm;
 			}
 
 			// Moving dolly to the beginning of the measurement scan...
@@ -449,25 +489,28 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 
 		switch (orientation)
 		{
-		case 0:
+		case SUB_SCAN_NORTH_TO_SOUTH:
 			x1_mm += separation_mm;
 			x2_mm += separation_mm;
 			break;
-		case 1:
+
+		case SUB_SCAN_SOUTH_TO_NORTH:
 			x1_mm -= separation_mm;
 			x2_mm -= separation_mm;
 			break;
-		case 2:
+
+		case SUB_SCAN_EAST_TO_WEST:
 			y1_mm -= separation_mm;
 			y2_mm -= separation_mm;
 			break;
-		case 3:
+
+		case SUB_SCAN_WEST_TO_EAST:
 			y1_mm += separation_mm;
 			y2_mm += separation_mm;
 			break;
 		}
 
-		if (mFastMode)
+		if (fastMode)
 		{
 			std::swap(x1_mm, x2_mm);
 			std::swap(y1_mm, y2_mm);
@@ -514,19 +557,22 @@ void cCreateLidarExperimentFromGpsDlg::onShowPath()
 		{
 			switch (orientation)
 			{
-			case 0:
+			case SUB_SCAN_NORTH_TO_SOUTH:
 				x1_mm += separation_mm;
 				x2_mm += separation_mm;
 				break;
-			case 1:
+
+			case SUB_SCAN_SOUTH_TO_NORTH:
 				x1_mm -= separation_mm;
 				x2_mm -= separation_mm;
 				break;
-			case 2:
+
+			case SUB_SCAN_EAST_TO_WEST:
 				y1_mm -= separation_mm;
 				y2_mm -= separation_mm;
 				break;
-			case 3:
+
+			case SUB_SCAN_WEST_TO_EAST:
 				y1_mm += separation_mm;
 				y2_mm += separation_mm;
 				break;

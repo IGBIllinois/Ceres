@@ -123,7 +123,7 @@ void cCreateLidarExperimentDlg::createControls_Measurement()
 
 	mpMeasurementHeight_m = new QLineEdit(this);
 	mpMeasurementHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpMeasurementHeight_m->setText("5.0");
+	mpMeasurementHeight_m->setText("4.0");
 
 	mpHeightReference = new QComboBox(this);
 	mpHeightReference->setEditable(false);
@@ -210,6 +210,17 @@ void cCreateLidarExperimentDlg::createControls_SubScanInfo()
 	label += ")";
 
 	mpFastMode = new QCheckBox(label, this);
+
+	mpScanEveryRow = new QRadioButton("Scan Every Row", this);
+	mpScanEveryRow->setChecked(true);
+	mpScanEveryRow->setEnabled(false);
+
+	mpScanCenterOnly = new QRadioButton("Scan Center Only", this);
+	mpScanCenterOnly->setEnabled(false);
+
+	mpScanInsideRows = new QRadioButton("Scan Inside Rows", this);
+	mpScanInsideRows->setEnabled(false);
+
 }
 
 void cCreateLidarExperimentDlg::createLayout()
@@ -380,12 +391,14 @@ void cCreateLidarExperimentDlg::createLayout_Postamble(QVBoxLayout* pMainLayout)
 	pMainLayout->addSpacing(10);
 }
 
-void cCreateLidarExperimentDlg::createLayout_SubScanInfo(QVBoxLayout * pMainLayout)
+void cCreateLidarExperimentDlg::createLayout_SubScanInfo(QVBoxLayout* pMainLayout)
 {
 	QLabel* pText = nullptr;
 
 	QGroupBox* pGroupBox = new QGroupBox(tr("Sub Scan Information"));
 	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	QVBoxLayout* pVSubLayout = new QVBoxLayout();
 
 	QHBoxLayout* pHSubLayout = new QHBoxLayout();
 	pHSubLayout->addWidget(mpHasSubScans);
@@ -402,7 +415,17 @@ void cCreateLidarExperimentDlg::createLayout_SubScanInfo(QVBoxLayout * pMainLayo
 	pHSubLayout->addSpacing(10);
 	pHSubLayout->addWidget(mpSubScanUnits);
 
-	pGroupBox->setLayout(pHSubLayout);
+	pVSubLayout->addLayout(pHSubLayout);
+
+	pHSubLayout = new QHBoxLayout();
+	pHSubLayout->addWidget(mpScanEveryRow);
+	pHSubLayout->addWidget(mpScanCenterOnly);
+	pHSubLayout->addWidget(mpScanInsideRows);
+	pHSubLayout->addStretch(1);
+
+	pVSubLayout->addLayout(pHSubLayout);
+
+	pGroupBox->setLayout(pVSubLayout);
 
 	pMainLayout->addWidget(pGroupBox);
 }
@@ -496,6 +519,9 @@ void cCreateLidarExperimentDlg::onHasSubScans(int state)
 		mpSubScanUnits->setEnabled(true);
 		mpSubScanSeparation->setEnabled(true);
 		mpFastMode->setEnabled(true);
+		mpScanEveryRow->setEnabled(true);
+		mpScanCenterOnly->setEnabled(true);
+		mpScanInsideRows->setEnabled(true);
 
 	}
 	else
@@ -505,6 +531,9 @@ void cCreateLidarExperimentDlg::onHasSubScans(int state)
 		mpSubScanUnits->setEnabled(false);
 		mpSubScanSeparation->setEnabled(false);
 		mpFastMode->setEnabled(false);
+		mpScanEveryRow->setEnabled(false);
+		mpScanCenterOnly->setEnabled(false);
+		mpScanInsideRows->setEnabled(false);
 	}
 }
 

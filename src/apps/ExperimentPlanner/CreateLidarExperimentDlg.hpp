@@ -12,6 +12,7 @@ QT_BEGIN_NAMESPACE
 class QAbstractButton;
 class QPushButton;
 class QLineEdit;
+class QRadioButton;
 class QCheckBox;
 class QLabel;
 class QPlainTextEdit;
@@ -119,4 +120,8 @@ protected:
 	QLineEdit* mpSubScanSeparation = nullptr;
 
 	QCheckBox* mpFastMode = nullptr;
+
+	QRadioButton* mpScanEveryRow = nullptr;
+	QRadioButton* mpScanCenterOnly = nullptr;
+	QRadioButton* mpScanInsideRows = nullptr;
 };
