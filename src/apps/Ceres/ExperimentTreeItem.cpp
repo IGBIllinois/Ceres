@@ -32,10 +32,8 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const std::filesys
 
     if (exp_name.empty())
     {
-        if (!in.is_open())
-        {
-            throw std::invalid_argument("File is not an experiment file.");
-        }
+        in.close();
+        throw std::invalid_argument("File is not an experiment file.");
     }
 
     QString name = QString::fromStdString(exp_name);
