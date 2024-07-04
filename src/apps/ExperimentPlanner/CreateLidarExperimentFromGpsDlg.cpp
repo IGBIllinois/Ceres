@@ -279,7 +279,7 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 
 		if (mpScanCenterOnly->isChecked() && (numOfScans > 1))
 		{
-			double middle_offset_mm = (separation_mm * numOfScans) / 2.0;
+			double middle_offset_mm = (separation_mm * (numOfScans-1)) / 2.0;
 
 			switch (orientation)
 			{
@@ -304,9 +304,32 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 			numOfScans = 1;
 		}
 		
-		if (mpScanInsideRows->isChecked() && (numOfScans > 1))
+		if (mpScanInsideRows->isChecked() && (numOfScans > 2))
 		{
+			numOfScans -= 2;
 
+			switch (orientation)
+			{
+			case SUB_SCAN_NORTH_TO_SOUTH:
+				x1_mm += separation_mm;
+				x2_mm += separation_mm;
+				break;
+
+			case SUB_SCAN_SOUTH_TO_NORTH:
+				x1_mm -= separation_mm;
+				x2_mm -= separation_mm;
+				break;
+
+			case SUB_SCAN_EAST_TO_WEST:
+				y1_mm -= separation_mm;
+				y2_mm -= separation_mm;
+				break;
+
+			case SUB_SCAN_WEST_TO_EAST:
+				y1_mm += separation_mm;
+				y2_mm += separation_mm;
+				break;
+			}
 		}
 	}
 

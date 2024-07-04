@@ -175,6 +175,7 @@ void cCreateLidarExperimentDlg::createControls_SubScanInfo()
 	mpNumOfScans->setValidator(new QIntValidator(1, 10));
 	mpNumOfScans->setEnabled(false);
 	mpNumOfScans->setText("1");
+	connect(mpNumOfScans, &QLineEdit::editingFinished, this, &cCreateLidarExperimentDlg::onNumSubScansChanged);
 
 	mpSubScanOrientation = new QComboBox(this);
 	mpSubScanOrientation->setEditable(false);
@@ -520,8 +521,12 @@ void cCreateLidarExperimentDlg::onHasSubScans(int state)
 		mpSubScanSeparation->setEnabled(true);
 		mpFastMode->setEnabled(true);
 		mpScanEveryRow->setEnabled(true);
-		mpScanCenterOnly->setEnabled(true);
-		mpScanInsideRows->setEnabled(true);
+
+		int num = mpNumOfScans->text().toInt();
+		if (num > 1)
+			mpScanCenterOnly->setEnabled(true);
+		if (num > 2)
+			mpScanInsideRows->setEnabled(true);
 
 	}
 	else
@@ -535,6 +540,23 @@ void cCreateLidarExperimentDlg::onHasSubScans(int state)
 		mpScanCenterOnly->setEnabled(false);
 		mpScanInsideRows->setEnabled(false);
 	}
+}
+
+void cCreateLidarExperimentDlg::onNumSubScansChanged()
+{
+	if (!mpHasSubScans->isChecked())
+		return;
+
+	int num = mpNumOfScans->text().toInt();
+	if (num > 1)
+		mpScanCenterOnly->setEnabled(true);
+	else
+		mpScanCenterOnly->setEnabled(false);
+
+	if (num > 2)
+		mpScanInsideRows->setEnabled(true);
+	else
+		mpScanInsideRows->setEnabled(false);
 }
 
 

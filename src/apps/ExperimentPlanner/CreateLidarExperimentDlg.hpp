@@ -48,6 +48,7 @@ private slots:
 	void onSensorUpdate();
 	void onSubScanUnitChange(const QString& text);
 	void onHasSubScans(int state);
+	void onNumSubScansChanged();
 
 protected:
 	void createControls();
