@@ -85,6 +85,12 @@ private slots:
     void onGenerateLidarScan_GPS();
     void onGenerateLidarScan_PlotInfo();
 
+    void onGenerateHyperspectralRefScan_SpiderCam_Point();
+    void onGenerateHyperspectralRefScan_GPS();
+
+    void onGenerateHyperspectralScan_SpiderCam_Point();
+    void onGenerateHyperspectralScan_GPS();
+
 // Slots associated with "Preference" menu actions
 private slots:
     void onPreferenceDefaultExperimentDirectory();

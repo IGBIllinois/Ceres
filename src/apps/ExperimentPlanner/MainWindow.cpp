@@ -8,6 +8,9 @@
 #include "CreateLidarExperimentFromGpsDlg.hpp"
 #include "CreateLidarExperimentFromPlotInfoDlg.hpp"
 
+#include "CreateHyperspectralReferenceExperimentFromSpiderCamPointDlg.hpp"
+#include "CreateHyperspectralReferenceExperimentFromGpsDlg.hpp"
+
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
 #include "FieldLayoutWidget.hpp"
@@ -235,6 +238,28 @@ void cMainWindow::createSubMenusAndActions()
     mpGenerateMenu->addAction(pMenuItem);
 
     mpGenerateMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Hyperspectral Reference Scan From SpiderCam Point"), this);
+    pMenuItem->setStatusTip(tr("Creates hyperspectral reference experiment file(s) from single SpiderCam point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralRefScan_SpiderCam_Point);
+    mpGenerateMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Hyperspectral Reference Scan From GPS Point"), this);
+    pMenuItem->setStatusTip(tr("Creates hyperspectral reference experiment file(s) from single GPS point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralRefScan_GPS);
+    mpGenerateMenu->addAction(pMenuItem);
+
+    mpGenerateMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Hyperspectral Scan From SpiderCam Point"), this);
+    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from single SpiderCam point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_SpiderCam_Point);
+    mpGenerateMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Hyperspectral Scan From GPS Points"), this);
+    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from GPS plot point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_GPS);
+    mpGenerateMenu->addAction(pMenuItem);
 
     //
     // Build the Preference Sub Menu
@@ -609,6 +634,39 @@ void cMainWindow::onGenerateLidarScan_PlotInfo()
     }
 
     mpEditMenu->setDisabled(false);
+}
+
+void cMainWindow::onGenerateHyperspectralRefScan_SpiderCam_Point()
+{
+    cCreateHyperspectralReferenceExperimentFromSpiderCamDlg dlg(this);
+
+    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
+}
+
+void cMainWindow::onGenerateHyperspectralRefScan_GPS()
+{
+
+}
+
+void cMainWindow::onGenerateHyperspectralScan_SpiderCam_Point()
+{
+
+}
+
+void cMainWindow::onGenerateHyperspectralScan_GPS()
+{
+
 }
 
 /********************************************************************
