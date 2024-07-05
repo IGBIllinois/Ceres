@@ -82,9 +82,6 @@ void cCreateHyperspectralReferenceExperimentDlg::createControls_TitleInfo()
 {
 	mpTitle = new QLineEdit(this);
 
-	mpMetaInfo = new QPushButton("Meta Info", this);
-	connect(mpMetaInfo, &QPushButton::pressed, this, &cCreateHyperspectralReferenceExperimentDlg::onMetaInfoUpdate);
-
 	mpCtrlInfo = new QPushButton("Controller", this);
 	connect(mpCtrlInfo, &QPushButton::pressed, this, &cCreateHyperspectralReferenceExperimentDlg::onControllerUpdate);
 
@@ -113,14 +110,14 @@ void cCreateHyperspectralReferenceExperimentDlg::createControls_Measurement()
 	mpStartMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
 	mpStartMeasurementDelay_sec->setText("4.0");
 
-	mpMeasurementHeight_m = new QLineEdit(this);
-	mpMeasurementHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpMeasurementHeight_m->setText("5.0");
+	mpReferenceHeight_m = new QLineEdit(this);
+	mpReferenceHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
+	mpReferenceHeight_m->setText("0.5");
 
-	mpHeightReference = new QComboBox(this);
-	mpHeightReference->setEditable(false);
-	mpHeightReference->addItem("SpiderCam");
-	mpHeightReference->addItem("AGL");
+	mpLensFocalDistance = new QComboBox(this);
+	mpLensFocalDistance->setEditable(false);
+	mpLensFocalDistance->addItem("1 m", static_cast<int>(1.0 * nConstants::M_TO_MM));
+	mpLensFocalDistance->addItem("3 m", static_cast<int>(3.0 * nConstants::M_TO_MM));
 
 	mpMeasurementTime_sec = new QLineEdit(this);
 	mpMeasurementTime_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
@@ -152,6 +149,8 @@ void cCreateHyperspectralReferenceExperimentDlg::createControls_Postamble()
 	mpSafeVerticalSpeed_mmps = new QLineEdit(this);
 	mpSafeVerticalSpeed_mmps->setValidator(new QIntValidator(5, 2000));
 	mpSafeVerticalSpeed_mmps->setText("250");
+
+	mpGeneratePlacementExperiment = new QCheckBox("Generate Placement Experiment", this);
 }
 
 void cCreateHyperspectralReferenceExperimentDlg::createLayout()
@@ -189,7 +188,6 @@ void cCreateHyperspectralReferenceExperimentDlg::createLayout_TitleInfo(QVBoxLay
 	pText = new QLabel("Experiment Title");
 	pTitleLayout->addWidget(pText);
 	pTitleLayout->addWidget(mpTitle, 1);
-	pTitleLayout->addWidget(mpMetaInfo);
 	pTitleLayout->addWidget(mpCtrlInfo);
 	pTitleLayout->addWidget(mpSensorInfo);
 
@@ -237,21 +235,26 @@ void cCreateHyperspectralReferenceExperimentDlg::createLayout_Measurement(QVBoxL
 	pGridLayout->setColumnMinimumWidth(2, 10);
 
 	pText = new QLabel("Start Delay (sec)");
+	pGridLayout->addWidget(pText, 0, 0);
+	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 1);
+
+	pText = new QLabel("Reference Height AGL (m)");
 	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 4);
+	pGridLayout->addWidget(mpReferenceHeight_m, 0, 4);
 
-	pText = new QLabel("Measurement Height (m)");
-	pGridLayout->addWidget(pText, 2, 0);
+//	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
+//	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
+//	pMeasurementLayout->addWidget(mpHeightReference);
+//	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
 
-	//	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
-	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
-	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
-	pMeasurementLayout->addWidget(mpHeightReference);
-	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
+	pText = new QLabel("Lens Focal Distance");
+	pGridLayout->addWidget(pText, 0, 6);
+	pGridLayout->addWidget(mpLensFocalDistance, 0, 7);
+
 
 	pText = new QLabel("Measurement Time (sec)");
-	pGridLayout->addWidget(pText, 4, 0);
-	pGridLayout->addWidget(mpMeasurementTime_sec, 4, 1);
+	pGridLayout->addWidget(pText, 0, 9);
+	pGridLayout->addWidget(mpMeasurementTime_sec, 0, 10);
 
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);
@@ -303,6 +306,8 @@ void cCreateHyperspectralReferenceExperimentDlg::createLayout_Postamble(QVBoxLay
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpSafeVerticalSpeed_mmps, 0, 4);
 
+	pGridLayout->addWidget(mpGeneratePlacementExperiment, 0, 6);
+
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);
 
@@ -315,20 +320,6 @@ void cCreateHyperspectralReferenceExperimentDlg::accept()
 		return;
 
 	QDialog::accept();
-}
-
-void cCreateHyperspectralReferenceExperimentDlg::onMetaInfoUpdate()
-{
-	cExperimentMetaInfoDlg dlg(mMetaInfo, this);
-
-	dlg.setExperimentTitle(mpTitle->text().toStdString());
-
-	auto result = dlg.exec();
-
-	if (result == QDialog::Rejected)
-		return;
-
-	mpTitle->setText(QString::fromStdString(dlg.getExperimentTitle()));
 }
 
 void cCreateHyperspectralReferenceExperimentDlg::onControllerUpdate()

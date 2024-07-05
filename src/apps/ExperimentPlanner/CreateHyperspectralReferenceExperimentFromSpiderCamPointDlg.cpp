@@ -64,34 +64,11 @@ cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::~cCreateHyperspectralRe
 
 void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createControls_PointSelection()
 {
-	mpStartX_mm = new QLineEdit(this);
-	mpStartX_mm->setValidator(new QIntValidator(10000, 190000));
+	mpRefPosX_mm = new QLineEdit(this);
+	mpRefPosX_mm->setValidator(new QIntValidator(10000, 190000));
 
-	mpStartY_mm = new QLineEdit(this);
-	mpStartY_mm->setValidator(new QIntValidator(10000, 190000));
-
-	// default to feet
-	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
-	mpScanDistance = new QLineEdit(this);
-	mpScanDistance->setValidator(new QDoubleValidator(0, 10000.0, 3));
-	mpScanDistance->setText("0");
-
-	mpScanOrientation = new QComboBox(this);
-	mpScanOrientation->setEditable(false);
-	mpScanOrientation->addItem(WEST_TO_EAST);
-	mpScanOrientation->addItem(EAST_TO_WEST);
-	mpScanOrientation->addItem(NORTH_TO_SOUTH);
-	mpScanOrientation->addItem(SOUTH_TO_NORTH);
-
-	mpScanUnits = new QComboBox(this);
-	mpScanUnits->setEditable(false);
-	mpScanUnits->addItem("Meters");
-	mpScanUnits->addItem("Millimeters");
-	mpScanUnits->addItem("Feet");
-	mpScanUnits->addItem("Inches");
-	mpScanUnits->setCurrentIndex(2);
-	mScanConversionFactor = nConstants::FT_TO_MM;
-	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onScanUnitChange);
+	mpRefPosY_mm = new QLineEdit(this);
+	mpRefPosY_mm->setValidator(new QIntValidator(10000, 190000));
 }
 
 void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -109,60 +86,23 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_Point
 
 	pText = new QLabel("X position (mm)");
 	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpStartX_mm, 0, 1);
+	pGridLayout->addWidget(mpRefPosX_mm, 0, 1);
 	pText = new QLabel("Y position (mm)");
 	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpStartY_mm, 0, 4);
-	pGridLayout->addWidget(mpScanDistanceLabel, 2, 0);
-	pGridLayout->addWidget(mpScanDistance, 2, 1);
-	pGridLayout->addWidget(mpScanOrientation, 2, 3);
-	pGridLayout->addWidget(mpScanUnits, 2, 4);
+	pGridLayout->addWidget(mpRefPosY_mm, 0, 4);
 	pPosLayout->addLayout(pGridLayout);
 
 	pPosLayout->addStretch(1);
 
-	QVBoxLayout* pVSubLayout = new QVBoxLayout();
-	pVSubLayout->addWidget(mpClearPath);
-	pVSubLayout->addWidget(mpShowPath);
-	pPosLayout->addLayout(pVSubLayout);
-	pPosLayout->addStretch(1);
+//	QVBoxLayout* pVSubLayout = new QVBoxLayout();
+//	pVSubLayout->addWidget(mpClearPath);
+//	pVSubLayout->addWidget(mpShowPath);
+//	pPosLayout->addLayout(pVSubLayout);
+//	pPosLayout->addStretch(1);
 
 	pMainLayout->addLayout(pPosLayout);
 
 	pMainLayout->addSpacing(10);
-}
-
-void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
-{
-	double distance = mpScanDistance->text().toDouble() * mScanConversionFactor;
-
-	switch (mpScanUnits->currentIndex())
-	{
-	case 0:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "m)");
-
-		mScanConversionFactor = nConstants::M_TO_MM;
-		break;
-	case 1:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "mm)");
-
-		mScanConversionFactor = 1.0;
-		break;
-	case 2:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "ft)");
-
-		mScanConversionFactor = nConstants::FT_TO_MM;
-		break;
-	case 3:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "in)");
-
-		mScanConversionFactor = nConstants::IN_TO_MM;
-		break;
-	}
-
-	distance /= mScanConversionFactor;
-
-	mpScanDistance->setText(QString::number(distance));
 }
 
 bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
@@ -180,10 +120,9 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		return false;
 	}
 
-	if (mpStartX_mm->text().isEmpty() || mpStartY_mm->text().isEmpty()
-		|| mpScanDistance->text().isEmpty())
+	if (mpRefPosX_mm->text().isEmpty() || mpRefPosY_mm->text().isEmpty())
 	{
-		QString msg = "The SpiderCam position or scan distance can not be blank.";
+		QString msg = "The SpiderCam position can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
@@ -191,8 +130,8 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 
 	auto* pGroundModel = cRappGroundModel::get();
 
-	int x1_mm = mpStartX_mm->text().toInt();
-	int y1_mm = mpStartY_mm->text().toInt();
+	int x1_mm = mpRefPosX_mm->text().toInt();
+	int y1_mm = mpRefPosY_mm->text().toInt();
 
 	if (!rfb::withinBoundary(x1_mm, y1_mm))
 	{
@@ -212,38 +151,10 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 			h1_mm = 0;
 	}
 
-	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
-
-	int x2_mm = x1_mm;
-	int y2_mm = y1_mm;
-	int h2_mm = h1_mm;
-
-	switch (mpScanOrientation->currentIndex())
-	{
-	case SCAN_WEST_TO_EAST:
-		y2_mm += distance_mm;
-		break;
-	case SCAN_EAST_TO_WEST:
-		y2_mm -= distance_mm;
-		break;
-	case SCAN_NORTH_TO_SOUTH:
-		x2_mm += distance_mm;
-		break;
-	case SCAN_SOUTH_TO_NORTH:
-		x2_mm -= distance_mm;
-		break;
-	}
-
-	if (pGroundModel)
-	{
-		h2_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x2_mm, y2_mm));
-
-		if (h2_mm == rfm::INVALID_HEIGHT)
-			h2_mm = 0;
-	}
-
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	int scan_z_mm = static_cast<int>(mpReferenceHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	scan_z_mm += mpLensFocalDistance->currentData().toInt();
+
 	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
 
 	std::optional<double> tilt_deg;
@@ -284,38 +195,81 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		scan_z_mm += sensor_offset_mm;
 	}
 
-	int dx_mm = x2_mm - x1_mm;
-	int dy_mm = y2_mm - y1_mm;
-
 	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
-	int scan_speed_mmps = 0;
 	int safe_vertical_speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
 
-	int start_offset_mm = 0;
-	int end_offset_mm = 0;
+	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
+	pInfo->setExperimentName(title);
+	pInfo->setController(copy(mCtrlInfo));
+	pInfo->setSensors(mSensorInfo);
 
-	/* Grab the info for multiple scans if selected */
-	int startNum = 0;
-	bool hasNumber = nStringUtils::endsWithInt(title, &startNum);
+	// Add preamble: moving dolly up to a safe travel height...
+	std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
 
-	bool mFastMode = false;
+	step->setZ_mm(travel_z_mm);
+	step->setSpeed_mmps(vertical_speed_mmps);
+	pInfo->appendStep(std::move(step));
 
-	int numOfScans = 1;
-	int orientation = 0;
-	double separation_mm = 0.0;
+	// Moving dolly to the beginning of the measurement scan...
+	step = std::make_unique<cExperimentStep_Movement>();
+	step->setX_mm(x1_mm);
+	step->setY_mm(y1_mm);
+	step->setSpeed_mmps(travel_speed_mmps);
+	pInfo->appendStep(std::move(step));
 
+	// Move the dolly to measurement height...
+	step = std::make_unique<cExperimentStep_Movement>();
 
-	for (int scan = 0; scan < numOfScans; ++scan)
+	step->setZ_mm(scan_z_mm + h1_mm);
+
+	step->setSpeed_mmps(vertical_speed_mmps);
+
+	step->setTilt_deg(tilt_deg);
+	step->setRoll_deg(roll_deg);
+	step->setPan_deg(pan_deg);
+
+	pInfo->appendStep(std::move(step));
+
+	float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
+
+	if (delay_sec > 0.0)
 	{
+		// Add delay for dolly to stabilize...
+		std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+		delay->setWaitTime_sec(delay_sec);
+		pInfo->appendStep(std::move(delay));
+	}
+
+	float measurement_time_sec = mpMeasurementTime_sec->text().toFloat();
+
+	if (measurement_time_sec > 0.0)
+	{
+		// Do measurement...
+		std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+		delay->setWaitTime_sec(measurement_time_sec);
+		delay->setRecording(true);
+		pInfo->appendStep(std::move(delay));
+	}
+
+	// Move dolly to a safe height to park it
+	step = std::make_unique<cExperimentStep_Movement>();
+	step->setZ_mm(safe_z_mm);
+	step->setSpeed_mmps(safe_vertical_speed_mmps);
+	step->setTilt_deg(safe_tilt_deg);
+	step->setRoll_deg(safe_roll_deg);
+	pInfo->appendStep(std::move(step));
+
+	emit experimentChanged(pInfo);
+
+	if (mpGeneratePlacementExperiment->isChecked())
+	{
+		title += " Placement";
+
 		QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
-		if (hasNumber)
-			nStringUtils::replaceIntAtEnd(title, startNum++);
-
 		pInfo->setExperimentName(title);
-		pInfo->setMetaData(mMetaInfo);
 		pInfo->setController(copy(mCtrlInfo));
 		pInfo->setSensors(mSensorInfo);
 
@@ -326,191 +280,33 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		step->setSpeed_mmps(vertical_speed_mmps);
 		pInfo->appendStep(std::move(step));
 
-		if ((dx_mm == 0) && (dy_mm == 0))
-		{
-			// Moving dolly to the beginning of the measurement scan...
-			step = std::make_unique<cExperimentStep_Movement>();
-			step->setX_mm(x1_mm);
-			step->setY_mm(y1_mm);
-			step->setSpeed_mmps(travel_speed_mmps);
-			pInfo->appendStep(std::move(step));
-
-
-			// Move the dolly to measurement height...
-			step = std::make_unique<cExperimentStep_Movement>();
-
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
-
-			step->setSpeed_mmps(vertical_speed_mmps);
-
-			step->setTilt_deg(tilt_deg);
-			step->setRoll_deg(roll_deg);
-			step->setPan_deg(pan_deg);
-
-			pInfo->appendStep(std::move(step));
-
-			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
-
-			if (delay_sec > 0.0)
-			{
-				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				pInfo->appendStep(std::move(delay));
-			}
-
-			delay_sec = mpMeasurementTime_sec->text().toFloat();
-
-			if (delay_sec > 0.0)
-			{
-				// Do measurement...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				delay->setRecording(true);
-				pInfo->appendStep(std::move(delay));
-			}
-		}
-		else
-		{
-			int x_mm = 0;
-			int y_mm = 0;
-
-			if (std::abs(dx_mm) < 500)
-			{
-				x_mm = (x2_mm + x1_mm) / 2;
-
-				if (y1_mm > y2_mm)
-					y_mm = y1_mm + start_offset_mm;
-				else
-					y_mm = y1_mm - start_offset_mm;
-			}
-			else if (std::abs(dy_mm) < 500)
-			{
-				if (x1_mm > x2_mm)
-					x_mm = x1_mm + start_offset_mm;
-				else
-					x_mm = x1_mm - start_offset_mm;
-
-				y_mm = (y2_mm + y1_mm) / 2;
-			}
-
-			// Moving dolly to the beginning of the measurement scan...
-			step = std::make_unique<cExperimentStep_Movement>();
-			step->setX_mm(x_mm);
-			step->setY_mm(y_mm);
-			step->setSpeed_mmps(travel_speed_mmps);
-			pInfo->appendStep(std::move(step));
-
-			// Move the dolly to measurement height...
-			step = std::make_unique<cExperimentStep_Movement>();
-
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
-
-			step->setSpeed_mmps(vertical_speed_mmps);
-
-			step->setTilt_deg(tilt_deg);
-			step->setRoll_deg(roll_deg);
-			step->setPan_deg(pan_deg);
-
-			pInfo->appendStep(std::move(step));
-
-			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
-
-			if (delay_sec > 0.0)
-			{
-				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				pInfo->appendStep(std::move(delay));
-			}
-
-			if (std::abs(dx_mm) < 500)
-			{
-				if (y1_mm > y2_mm)
-					y_mm = y2_mm - end_offset_mm;
-				else
-					y_mm = y2_mm + end_offset_mm;
-			}
-			else if (std::abs(dy_mm) < 500)
-			{
-				if (x1_mm > x2_mm)
-					x_mm = x2_mm - end_offset_mm;
-				else
-					x_mm = x2_mm + end_offset_mm;
-			}
-
-			// Do measurement...
-			step = std::make_unique<cExperimentStep_Movement>();
-			step->setX_mm(x_mm);
-			step->setY_mm(y_mm);
-
-			if ((mpHeightReference->currentIndex() == 1) &&
-				((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
-			{
-				step->setZ_mm(scan_z_mm + h2_mm);
-			}
-
-			step->setSpeed_mmps(scan_speed_mmps);
-			step->setRecording(true);
-			pInfo->appendStep(std::move(step));
-
-			delay_sec = mpMeasurementTime_sec->text().toFloat();
-
-			if (delay_sec > 0.0)
-			{
-				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				pInfo->appendStep(std::move(delay));
-			}
-		}
-
-		// Move dolly to a safe height to park it
+		// Moving dolly to the beginning of the measurement scan...
 		step = std::make_unique<cExperimentStep_Movement>();
-		step->setZ_mm(safe_z_mm);
-		step->setSpeed_mmps(safe_vertical_speed_mmps);
-		step->setTilt_deg(safe_tilt_deg);
-		step->setRoll_deg(safe_roll_deg);
+		step->setX_mm(x1_mm);
+		step->setY_mm(y1_mm);
+		step->setSpeed_mmps(travel_speed_mmps);
+		pInfo->appendStep(std::move(step));
+
+		// Move the dolly to measurement height...
+		step = std::make_unique<cExperimentStep_Movement>();
+
+		step->setZ_mm(scan_z_mm + h1_mm);
+
+		step->setSpeed_mmps(vertical_speed_mmps);
+
+		step->setTilt_deg(tilt_deg);
+		step->setRoll_deg(roll_deg);
+		step->setPan_deg(pan_deg);
+
 		pInfo->appendStep(std::move(step));
 
 		emit experimentChanged(pInfo);
-
-		switch (orientation)
-		{
-		case 0:
-			x1_mm += separation_mm;
-			x2_mm += separation_mm;
-			break;
-		case 1:
-			x1_mm -= separation_mm;
-			x2_mm -= separation_mm;
-			break;
-		case 2:
-			y1_mm -= separation_mm;
-			y2_mm -= separation_mm;
-			break;
-		case 3:
-			y1_mm += separation_mm;
-			y2_mm += separation_mm;
-			break;
-		}
-
-		if (mFastMode)
-		{
-			std::swap(x1_mm, x2_mm);
-			std::swap(y1_mm, y2_mm);
-		}
 	}
 
 	return true;
 }
 
+/*
 void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onShowPath()
 {
 	int x1_mm = mpStartX_mm->text().toInt();
@@ -540,3 +336,4 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onShowPath()
 
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 }
+*/

@@ -29,23 +29,12 @@ public:
 
 private slots:
 	bool generate() override;
-	void onShowPath() override;
-	void onScanUnitChange(const QString& text);
 
 private:
 	void createControls_PointSelection() override;
 	void createLayout_PointSelection(QVBoxLayout* pMainLayout) override;
 
 private:
-	double mScanConversionFactor = 1.0;
-
-	QLineEdit* mpStartX_mm = nullptr;
-	QLineEdit* mpStartY_mm = nullptr;
-
-	QLabel* mpScanDistanceLabel = nullptr;
-	QLineEdit* mpScanDistance = nullptr;
-
-	QComboBox* mpScanOrientation = nullptr;
-
-	QComboBox* mpScanUnits = nullptr;
+	QLineEdit* mpRefPosX_mm = nullptr;
+	QLineEdit* mpRefPosY_mm = nullptr;
 };

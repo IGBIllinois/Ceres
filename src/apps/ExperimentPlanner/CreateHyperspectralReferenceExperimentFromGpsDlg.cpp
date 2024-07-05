@@ -69,28 +69,6 @@ void cCreateHyperspectralReferenceExperimentFromGpsDlg::createControls_PointSele
 
 	mpStartY_mm = new QLineEdit(this);
 	mpStartY_mm->setValidator(new QIntValidator(10000, 190000));
-
-	// default to feet
-	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
-	mpScanDistance = new QLineEdit(this);
-	mpScanDistance->setValidator(new QDoubleValidator(0, 10000.0, 3));
-
-	mpScanOrientation = new QComboBox(this);
-	mpScanOrientation->setEditable(false);
-	mpScanOrientation->addItem(WEST_TO_EAST);
-	mpScanOrientation->addItem(EAST_TO_WEST);
-	mpScanOrientation->addItem(NORTH_TO_SOUTH);
-	mpScanOrientation->addItem(SOUTH_TO_NORTH);
-
-	mpScanUnits = new QComboBox(this);
-	mpScanUnits->setEditable(false);
-	mpScanUnits->addItem("Meters");
-	mpScanUnits->addItem("Millimeters");
-	mpScanUnits->addItem("Feet");
-	mpScanUnits->addItem("Inches");
-	mpScanUnits->setCurrentIndex(2);
-	mScanConversionFactor = nConstants::FT_TO_MM;
-	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralReferenceExperimentFromGpsDlg::onScanUnitChange);
 }
 
 void cCreateHyperspectralReferenceExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -112,56 +90,19 @@ void cCreateHyperspectralReferenceExperimentFromGpsDlg::createLayout_PointSelect
 	pText = new QLabel("Y position (mm)");
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpStartY_mm, 0, 4);
-	pGridLayout->addWidget(mpScanDistanceLabel, 2, 0);
-	pGridLayout->addWidget(mpScanDistance, 2, 1);
-	pGridLayout->addWidget(mpScanOrientation, 2, 3);
-	pGridLayout->addWidget(mpScanUnits, 2, 4);
 	pPosLayout->addLayout(pGridLayout);
 
 	pPosLayout->addStretch(1);
 
-	QVBoxLayout* pVSubLayout = new QVBoxLayout();
-	pVSubLayout->addWidget(mpClearPath);
-	pVSubLayout->addWidget(mpShowPath);
-	pPosLayout->addLayout(pVSubLayout);
-	pPosLayout->addStretch(1);
+//	QVBoxLayout* pVSubLayout = new QVBoxLayout();
+//	pVSubLayout->addWidget(mpClearPath);
+//	pVSubLayout->addWidget(mpShowPath);
+//	pPosLayout->addLayout(pVSubLayout);
+//	pPosLayout->addStretch(1);
 
 	pMainLayout->addLayout(pPosLayout);
 
 	pMainLayout->addSpacing(10);
-}
-
-void cCreateHyperspectralReferenceExperimentFromGpsDlg::onScanUnitChange(const QString& text)
-{
-	double distance = mpScanDistance->text().toDouble() * mScanConversionFactor;
-
-	switch (mpScanUnits->currentIndex())
-	{
-	case 0:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "m)");
-
-		mScanConversionFactor = nConstants::M_TO_MM;
-		break;
-	case 1:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "mm)");
-
-		mScanConversionFactor = 1.0;
-		break;
-	case 2:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "ft)");
-
-		mScanConversionFactor = nConstants::FT_TO_MM;
-		break;
-	case 3:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "in)");
-
-		mScanConversionFactor = nConstants::IN_TO_MM;
-		break;
-	}
-
-	distance /= mScanConversionFactor;
-
-	mpScanDistance->setText(QString::number(distance));
 }
 
 bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
@@ -179,8 +120,7 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 		return false;
 	}
 
-	if (mpStartX_mm->text().isEmpty() || mpStartY_mm->text().isEmpty()
-		|| mpScanDistance->text().isEmpty())
+	if (mpStartX_mm->text().isEmpty() || mpStartY_mm->text().isEmpty())
 	{
 		QString msg = "The SpiderCam position or scan distance can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
@@ -211,27 +151,9 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 			h1_mm = 0;
 	}
 
-	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
-
 	int x2_mm = x1_mm;
 	int y2_mm = y1_mm;
 	int h2_mm = h1_mm;
-
-	switch (mpScanOrientation->currentIndex())
-	{
-	case SCAN_WEST_TO_EAST:
-		y2_mm += distance_mm;
-		break;
-	case SCAN_EAST_TO_WEST:
-		y2_mm -= distance_mm;
-		break;
-	case SCAN_NORTH_TO_SOUTH:
-		x2_mm += distance_mm;
-		break;
-	case SCAN_SOUTH_TO_NORTH:
-		x2_mm -= distance_mm;
-		break;
-	}
 
 	if (pGroundModel)
 	{
@@ -242,7 +164,9 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 	}
 
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	int scan_z_mm = static_cast<int>(mpReferenceHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	scan_z_mm += mpLensFocalDistance->currentData().toInt();
+
 	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
 
 	std::optional<double> tilt_deg;
@@ -314,7 +238,6 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 			nStringUtils::replaceIntAtEnd(title, startNum++);
 
 		pInfo->setExperimentName(title);
-		pInfo->setMetaData(mMetaInfo);
 		pInfo->setController(copy(mCtrlInfo));
 		pInfo->setSensors(mSensorInfo);
 
@@ -338,10 +261,7 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 			// Move the dolly to measurement height...
 			step = std::make_unique<cExperimentStep_Movement>();
 
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
+			step->setZ_mm(scan_z_mm + h1_mm);
 
 			step->setSpeed_mmps(vertical_speed_mmps);
 
@@ -406,10 +326,7 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 			// Move the dolly to measurement height...
 			step = std::make_unique<cExperimentStep_Movement>();
 
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
+			step->setZ_mm(scan_z_mm + h1_mm);
 
 			step->setSpeed_mmps(vertical_speed_mmps);
 
@@ -449,11 +366,7 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 			step->setX_mm(x_mm);
 			step->setY_mm(y_mm);
 
-			if ((mpHeightReference->currentIndex() == 1) &&
-				((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
-			{
-				step->setZ_mm(scan_z_mm + h2_mm);
-			}
+			step->setZ_mm(scan_z_mm + h2_mm);
 
 			step->setSpeed_mmps(scan_speed_mmps);
 			step->setRecording(true);
@@ -510,6 +423,7 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 	return true;
 }
 
+/*
 void cCreateHyperspectralReferenceExperimentFromGpsDlg::onShowPath()
 {
 	int x1_mm = mpStartX_mm->text().toInt();
@@ -539,3 +453,6 @@ void cCreateHyperspectralReferenceExperimentFromGpsDlg::onShowPath()
 
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 }
+*/
+
+

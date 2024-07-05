@@ -38,11 +38,9 @@ signals:
 
 protected slots:
 	virtual bool generate() = 0;
-	virtual void onShowPath() = 0;
 
 private slots:
 	void accept() override;
-	void onMetaInfoUpdate();
 	void onControllerUpdate();
 	void onSensorUpdate();
 
@@ -64,21 +62,14 @@ protected:
 	virtual void createLayout_Postamble(QVBoxLayout* pMainLayout);
 
 protected:
-	double mSubScanConversionFactor = 1.0;
-
-	cExperimentMetaInfo mMetaInfo;
 	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;
 
 	/* Title Info */
 	QLineEdit* mpTitle = nullptr;
 
-	QPushButton* mpMetaInfo = nullptr;
 	QPushButton* mpCtrlInfo = nullptr;
 	QPushButton* mpSensorInfo = nullptr;
-
-	QPushButton* mpClearPath = nullptr;
-	QPushButton* mpShowPath = nullptr;
 
 	/* Measurement Preamble */
 	QLineEdit* mpTravelHeight_m = nullptr;
@@ -87,8 +78,8 @@ protected:
 
 	/* Measurement */
 	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
-	QLineEdit* mpMeasurementHeight_m = nullptr;
-	QComboBox* mpHeightReference = nullptr;
+	QLineEdit* mpReferenceHeight_m = nullptr;
+	QComboBox* mpLensFocalDistance = nullptr;
 	QLineEdit* mpMeasurementTime_sec = nullptr;
 
 	/* Gimble Orientation */
@@ -100,4 +91,6 @@ protected:
 	/* Postamble */
 	QLineEdit* mpSafeHeight_m = nullptr;
 	QLineEdit* mpSafeVerticalSpeed_mmps = nullptr;
+
+	QCheckBox* mpGeneratePlacementExperiment = nullptr;
 };

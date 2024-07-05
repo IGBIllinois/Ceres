@@ -29,8 +29,6 @@ public:
 
 private slots:
 	bool generate() override;
-	void onShowPath() override;
-	void onScanUnitChange(const QString& text);
 
 private:
 	void createControls_PointSelection() override;
@@ -41,11 +39,4 @@ private:
 
 	QLineEdit* mpStartX_mm = nullptr;
 	QLineEdit* mpStartY_mm = nullptr;
-
-	QLabel* mpScanDistanceLabel = nullptr;
-	QLineEdit* mpScanDistance = nullptr;
-
-	QComboBox* mpScanOrientation = nullptr;
-
-	QComboBox* mpScanUnits = nullptr;
 };
