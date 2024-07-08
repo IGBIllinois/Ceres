@@ -115,6 +115,8 @@ PRIVATE
     CreateHyperspectralExperimentFromSpiderCamPointDlg.cpp
     CreateHyperspectralExperimentFromGpsDlg.hpp
     CreateHyperspectralExperimentFromGpsDlg.cpp
+    CreateHyperspectralExperimentFromPlotInfoDlg.hpp
+    CreateHyperspectralExperimentFromPlotInfoDlg.cpp
 	
     CreateHyperspectralReferenceExperimentDlg.hpp
     CreateHyperspectralReferenceExperimentDlg.cpp

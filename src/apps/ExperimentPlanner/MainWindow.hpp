@@ -90,6 +90,7 @@ private slots:
 
     void onGenerateHyperspectralScan_SpiderCam_Point();
     void onGenerateHyperspectralScan_GPS();
+    void onGenerateHyperspectralScan_PlotInfo();
 
 // Slots associated with "Preference" menu actions
 private slots:

@@ -1,5 +1,6 @@
 ﻿
 #include "CreateHyperspectralExperimentFromGpsDlg.hpp"
+#include "GpsFileReader.hpp"
 #include "Constants.hpp"
 
 #include "ExperimentSteps.hpp"
@@ -36,8 +37,8 @@
 
 namespace
 {
-	const QString SCAN_DISTANCE_TEXT = "Distance (";
-	const QString SCAN_SEPARATION_TEXT = "Separation (";
+	const QString PLOT_LENGTH_TEXT = "Plot Length (";
+	const QString ALLEY_LENGTH_TEXT = "Alley Length (";
 
 	const QString WEST_TO_EAST = "West to East";
 	const QString EAST_TO_WEST = "East to West";
@@ -50,11 +51,36 @@ namespace
 	constexpr int SCAN_SOUTH_TO_NORTH = 3;
 }
 
-cCreateHyperspectralExperimentFromGpsDlg::cCreateHyperspectralExperimentFromGpsDlg(QWidget* parent)
+cCreateHyperspectralExperimentFromGpsDlg::cCreateHyperspectralExperimentFromGpsDlg(const QString& filename, QWidget* parent)
 :
 	cCreateHyperspectralExperimentDlg(parent)
 {
 	setMinimumWidth(550);
+
+	mpModel = new QStandardItemModel(10, 4, this);
+	mpModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
+	mpModel->setHeaderData(1, Qt::Horizontal, tr("X (m)"));
+	mpModel->setHeaderData(2, Qt::Horizontal, tr("Y (m)"));
+	mpModel->setHeaderData(3, Qt::Horizontal, tr("Z (m)"));
+
+	{
+		cGpsFileReader reader;
+		reader.loadFromFile(filename.toStdString());
+		auto points = reader.GetPoints();
+
+		auto n = points.size();
+
+		for (int i = 0; i < n; ++i)
+		{
+			const auto& pos = points[i];
+
+			mpModel->insertRows(i, 1, QModelIndex());
+			mpModel->setData(mpModel->index(i, 0, QModelIndex()), QString::fromStdString(pos.label));
+			mpModel->setData(mpModel->index(i, 1, QModelIndex()), pos.x_m);
+			mpModel->setData(mpModel->index(i, 2, QModelIndex()), pos.y_m);
+			mpModel->setData(mpModel->index(i, 3, QModelIndex()), pos.z_m);
+		}
+	}
 
 	initialize();
 }
@@ -64,33 +90,80 @@ cCreateHyperspectralExperimentFromGpsDlg::~cCreateHyperspectralExperimentFromGps
 
 void cCreateHyperspectralExperimentFromGpsDlg::createControls_PointSelection()
 {
-	mpStartX_mm = new QLineEdit(this);
-	mpStartX_mm->setValidator(new QIntValidator(10000, 190000));
+	mpStartPosition = new QTableView(this);
+	mpStartPosition->setModel(mpModel);
 
-	mpStartY_mm = new QLineEdit(this);
-	mpStartY_mm->setValidator(new QIntValidator(10000, 190000));
+	mpStartPosition->verticalHeader()->hide();
+
+	QHeaderView* headerView = mpStartPosition->horizontalHeader();
+	headerView->setDefaultAlignment(Qt::AlignHCenter);
+	headerView->setStretchLastSection(false);
+
+	mpStartPosition->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+	mpStartPosition->setSelectionBehavior(QAbstractItemView::SelectRows);
+	mpStartPosition->setSelectionMode(QAbstractItemView::SingleSelection);
+	mpStartPosition->setSortingEnabled(false);
+	mpStartPosition->setFixedWidth(419);
+
+	mpEndPosition = new QTableView(this);
+	mpEndPosition->setModel(mpModel);
+
+	mpEndPosition->verticalHeader()->hide();
+
+	headerView = mpEndPosition->horizontalHeader();
+	headerView->setDefaultAlignment(Qt::AlignHCenter);
+	headerView->setStretchLastSection(false);
+
+	mpEndPosition->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+	mpEndPosition->setSelectionBehavior(QAbstractItemView::SelectRows);
+	mpEndPosition->setSelectionMode(QAbstractItemView::SingleSelection);
+	mpEndPosition->setSortingEnabled(false);
+	mpEndPosition->setFixedWidth(419);
+
+	mpClearPath = new QPushButton("Clear Path", this);
+	connect(mpClearPath, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromGpsDlg::clearPaths);
+
+	mpShowPath = new QPushButton("Show Path", this);
+	connect(mpShowPath, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromGpsDlg::onShowPath);
+
+	mpInverseDirection = new QCheckBox("Inverse Direction", this);
 
 	// default to feet
-	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
-	mpScanDistance = new QLineEdit(this);
-	mpScanDistance->setValidator(new QDoubleValidator(0, 10000.0, 3));
+	mpPlotLengthLabel = new QLabel(PLOT_LENGTH_TEXT + "ft)", this);
+	mpPlotLength = new QLineEdit(this);
+	mpPlotLength->setValidator(new QDoubleValidator(1, 10000.0, 3));
+	mpPlotLength->setText("8");
 
-	mpScanOrientation = new QComboBox(this);
-	mpScanOrientation->setEditable(false);
-	mpScanOrientation->addItem(WEST_TO_EAST);
-	mpScanOrientation->addItem(EAST_TO_WEST);
-	mpScanOrientation->addItem(NORTH_TO_SOUTH);
-	mpScanOrientation->addItem(SOUTH_TO_NORTH);
+	mpAlleyLengthLabel = new QLabel(ALLEY_LENGTH_TEXT + "ft)", this);
+	mpAlleyLength = new QLineEdit(this);
+	mpAlleyLength->setValidator(new QDoubleValidator(0, 10000.0, 3));
+	mpAlleyLength->setText("0");
 
-	mpScanUnits = new QComboBox(this);
-	mpScanUnits->setEditable(false);
-	mpScanUnits->addItem("Meters");
-	mpScanUnits->addItem("Millimeters");
-	mpScanUnits->addItem("Feet");
-	mpScanUnits->addItem("Inches");
-	mpScanUnits->setCurrentIndex(2);
-	mScanConversionFactor = nConstants::FT_TO_MM;
-	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralExperimentFromGpsDlg::onScanUnitChange);
+/*
+	mpPlotOrientation = new QComboBox(this);
+	mpPlotOrientation->setEditable(false);
+	mpPlotOrientation->addItem(WEST_TO_EAST);
+	mpPlotOrientation->addItem(EAST_TO_WEST);
+	mpPlotOrientation->addItem(NORTH_TO_SOUTH);
+	mpPlotOrientation->addItem(SOUTH_TO_NORTH);
+*/
+
+	mpPlotUnits = new QComboBox(this);
+	mpPlotUnits->setEditable(false);
+	mpPlotUnits->addItem("Meters");
+	mpPlotUnits->addItem("Millimeters");
+	mpPlotUnits->addItem("Feet");
+	mpPlotUnits->addItem("Inches");
+	mpPlotUnits->setCurrentIndex(2);
+	mPlotConversionFactor = nConstants::FT_TO_MM;
+	connect(mpPlotUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralExperimentFromGpsDlg::onPlotUnitChange);
+
+	mpMeasureFrom = new QGroupBox(this);
+	mpStart = new QRadioButton("Start", mpMeasureFrom);
+	mpCenter = new QRadioButton("Center", mpMeasureFrom);
+	mpEnd = new QRadioButton("End", mpMeasureFrom);
+
+	mpCenter->setChecked(true);
 }
 
 void cCreateHyperspectralExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -102,23 +175,10 @@ void cCreateHyperspectralExperimentFromGpsDlg::createLayout_PointSelection(QVBox
 	QHBoxLayout* pPosLayout = new QHBoxLayout();
 
 	pPosLayout->addStretch(1);
-
-	pGridLayout = new QGridLayout();
-	pGridLayout->setColumnMinimumWidth(2, 10);
-
-	pText = new QLabel("X position (mm)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpStartX_mm, 0, 1);
-	pText = new QLabel("Y position (mm)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpStartY_mm, 0, 4);
-	pGridLayout->addWidget(mpScanDistanceLabel, 2, 0);
-	pGridLayout->addWidget(mpScanDistance, 2, 1);
-	pGridLayout->addWidget(mpScanOrientation, 2, 3);
-	pGridLayout->addWidget(mpScanUnits, 2, 4);
-	pPosLayout->addLayout(pGridLayout);
-
-	pPosLayout->addStretch(1);
+	pPosLayout->addWidget(mpStartPosition);
+	pPosLayout->addSpacing(10);
+	pPosLayout->addWidget(mpEndPosition);
+	pPosLayout->addSpacing(10);
 
 	QVBoxLayout* pVSubLayout = new QVBoxLayout();
 	pVSubLayout->addWidget(mpClearPath);
@@ -128,40 +188,92 @@ void cCreateHyperspectralExperimentFromGpsDlg::createLayout_PointSelection(QVBox
 
 	pMainLayout->addLayout(pPosLayout);
 
+	QHBoxLayout* pOptionsLayout = new QHBoxLayout();
+
+	pOptionsLayout->addStretch(1);
+	pOptionsLayout->addWidget(mpInverseDirection);
+	pOptionsLayout->addStretch(1);
+
+	pMainLayout->addLayout(pOptionsLayout);
+
+	pGroupBox = new QGroupBox(tr("Plot Information"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	pVSubLayout = new QVBoxLayout();
+
+	QHBoxLayout* pPlotLayout = new QHBoxLayout();
+
+	pPlotLayout->addWidget(mpPlotLengthLabel);
+	pPlotLayout->addWidget(mpPlotLength);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpAlleyLengthLabel);
+	pPlotLayout->addWidget(mpAlleyLength);
+	pPlotLayout->addSpacing(10);
+	pText = new QLabel("Units:", this);
+	pPlotLayout->addWidget(pText);
+	pPlotLayout->addWidget(mpPlotUnits);
+	//	pOptionsLayout->addWidget(mpPlotOrientation);
+
+	pVSubLayout->addLayout(pPlotLayout);
+
+	pPlotLayout = new QHBoxLayout();
+	pPlotLayout->addStretch(1);
+	pText = new QLabel("Measure From:", this);
+	pPlotLayout->addWidget(pText);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpStart);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpCenter);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpEnd);
+	pPlotLayout->addStretch(1);
+	pVSubLayout->addLayout(pPlotLayout);
+
+	pGroupBox->setLayout(pVSubLayout);
+
+	pMainLayout->addWidget(pGroupBox);
+
 	pMainLayout->addSpacing(10);
 }
 
-void cCreateHyperspectralExperimentFromGpsDlg::onScanUnitChange(const QString& text)
+void cCreateHyperspectralExperimentFromGpsDlg::onPlotUnitChange(const QString& text)
 {
-	double distance = mpScanDistance->text().toDouble() * mScanConversionFactor;
+	double plot_length = mpPlotLength->text().toDouble() * mPlotConversionFactor;
+	double alley_length = mpAlleyLength->text().toDouble() * mPlotConversionFactor;
 
-	switch (mpScanUnits->currentIndex())
+	switch (mpPlotUnits->currentIndex())
 	{
 	case 0:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "m)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "m)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "m)");
 
-		mScanConversionFactor = nConstants::M_TO_MM;
+		mPlotConversionFactor = nConstants::M_TO_MM;
 		break;
 	case 1:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "mm)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "mm)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "mm)");
 
-		mScanConversionFactor = 1.0;
+		mPlotConversionFactor = 1.0;
 		break;
 	case 2:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "ft)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "ft)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "ft)");
 
-		mScanConversionFactor = nConstants::FT_TO_MM;
+		mPlotConversionFactor = nConstants::FT_TO_MM;
 		break;
 	case 3:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "in)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "in)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "in)");
 
-		mScanConversionFactor = nConstants::IN_TO_MM;
+		mPlotConversionFactor = nConstants::IN_TO_MM;
 		break;
 	}
 
-	distance /= mScanConversionFactor;
+	plot_length /= mPlotConversionFactor;
+	alley_length /= mPlotConversionFactor;
 
-	mpScanDistance->setText(QString::number(distance));
+	mpPlotLength->setText(QString::number(plot_length));
+	mpAlleyLength->setText(QString::number(alley_length));
 }
 
 bool cCreateHyperspectralExperimentFromGpsDlg::generate()
@@ -179,60 +291,60 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 		return false;
 	}
 
-	if (mpStartX_mm->text().isEmpty() || mpStartY_mm->text().isEmpty()
-		|| mpScanDistance->text().isEmpty())
+	QModelIndex startIndex = mpStartPosition->currentIndex();
+	QModelIndex endIndex = mpEndPosition->currentIndex();
+
+	if ((startIndex.row() < 0) || (endIndex.row() < 0))
 	{
-		QString msg = "The SpiderCam position or scan distance can not be blank.";
+		QString msg = "Please select start and end positions.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
 	}
 
-	auto* pGroundModel = cRappGroundModel::get();
+	int plot_length_mm = static_cast<int>(mpPlotLength->text().toDouble() * mPlotConversionFactor);
 
-	int x1_mm = mpStartX_mm->text().toInt();
-	int y1_mm = mpStartY_mm->text().toInt();
-
-	if (!rfb::withinBoundary(x1_mm, y1_mm))
+	if (plot_length_mm <= 0)
 	{
-		QString msg = "The SpiderCam position must be a valid field position (10,000mm to 190,000mm).";
+		QString msg = "Plot length has to be greater than zero!";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
 	}
 
-	int h1_mm = 0;
-	
-	if (pGroundModel)
-	{
-		h1_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x1_mm, y1_mm));
+	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
+	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
+	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
 
-		if (h1_mm == rfm::INVALID_HEIGHT)
-			h1_mm = 0;
+	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
+	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+	auto h2 = mpModel->data(endIndex.siblingAtColumn(3)).toFloat();
+
+	if (mpInverseDirection->isChecked())
+	{
+		std::swap(x1, x2);
+		std::swap(y1, y2);
+		std::swap(h1, h2);
 	}
 
-	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
+	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
+	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
+	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
+	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
+	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
 
-	int x2_mm = x1_mm;
-	int y2_mm = y1_mm;
-	int h2_mm = h1_mm;
+	int distance_mm = static_cast<int>(sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) * nConstants::M_TO_MM);
+	int alley_length_mm = static_cast<int>(mpAlleyLength->text().toDouble() * mPlotConversionFactor);
+	int numMeasurements = distance_mm / (plot_length_mm + alley_length_mm);
 
-	switch (mpScanOrientation->currentIndex())
-	{
-	case SCAN_WEST_TO_EAST:
-		y2_mm += distance_mm;
-		break;
-	case SCAN_EAST_TO_WEST:
-		y2_mm -= distance_mm;
-		break;
-	case SCAN_NORTH_TO_SOUTH:
-		x2_mm += distance_mm;
-		break;
-	case SCAN_SOUTH_TO_NORTH:
-		x2_mm -= distance_mm;
-		break;
-	}
+	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
+	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
 
+	int scan_z_offset_mm = static_cast<int>(mpHeightOffset->text().toDouble() * nConstants::M_TO_MM);
+	scan_z_offset_mm += mpLensFocalDistance->currentData().toInt();
+
+/*
 	if (pGroundModel)
 	{
 		h2_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x2_mm, y2_mm));
@@ -240,10 +352,7 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 		if (h2_mm == rfm::INVALID_HEIGHT)
 			h2_mm = 0;
 	}
-
-	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
+*/
 
 	std::optional<double> tilt_deg;
 	std::optional<double> safe_tilt_deg;
@@ -280,20 +389,36 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 	if (!mpSensorOffset_mm->text().isEmpty())
 	{
 		int sensor_offset_mm = mpSensorOffset_mm->text().toInt();
-		scan_z_mm += sensor_offset_mm;
+		scan_z_offset_mm += sensor_offset_mm;
 	}
-
-	int dx_mm = x2_mm - x1_mm;
-	int dy_mm = y2_mm - y1_mm;
 
 	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
 	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
 	int safe_vertical_speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
 
-	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
-	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
+	int start_offset_mm = 0;
+	
+	int scan_distance_mm = getScanDistance_mm();
 
+	if (mpStart->isChecked())
+	{
+		if (mpInverseDirection->isChecked())
+			start_offset_mm = plot_length_mm - scan_distance_mm;
+		else
+			start_offset_mm = 0;
+	}
+	else if (mpCenter->isChecked())
+	{
+		start_offset_mm = (plot_length_mm / 2) - (scan_distance_mm / 2);
+	}
+	else if (mpEnd->isChecked())
+	{
+		if (mpInverseDirection->isChecked())
+			start_offset_mm = 0;
+		else
+			start_offset_mm = plot_length_mm - scan_distance_mm;
+	}
 
 	/* Grab the info for multiple scans if selected */
 	int startNum = 0;
@@ -302,17 +427,77 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 	bool mFastMode = false;
 
 	int numOfScans = 1;
-	int orientation = 0;
+	eSubScanOrientation orientation = eSubScanOrientation::NORTH_TO_SOUTH;
 	double separation_mm = 0.0;
+	int lateral_offset_mm = 0;
 
 	if (mpHasSubScans->isChecked())
 	{
 		numOfScans = mpNumOfScans->text().toInt();
-		orientation = mpSubScanOrientation->currentIndex();
-		separation_mm = mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor;
+		orientation = getSubScanOrientation();
+		separation_mm = getSubScanSeparation_mm();
 		mFastMode = mpFastMode->isChecked();
+
+		if (mpScanCenterOnly->isChecked() && (numOfScans > 1))
+		{
+			double middle_offset_mm = (separation_mm * (numOfScans - 1)) / 2.0;
+
+			switch (orientation)
+			{
+			case eSubScanOrientation::NORTH_TO_SOUTH:
+				lateral_offset_mm = static_cast<int>(middle_offset_mm);
+				break;
+
+			case eSubScanOrientation::SOUTH_TO_NORTH:
+				lateral_offset_mm = -1 * static_cast<int>(middle_offset_mm);
+				break;
+
+			case eSubScanOrientation::EAST_TO_WEST:
+				lateral_offset_mm = -1 * static_cast<int>(middle_offset_mm);
+				break;
+
+			case eSubScanOrientation::WEST_TO_EAST:
+				lateral_offset_mm = static_cast<int>(middle_offset_mm);
+				break;
+			}
+
+			separation_mm = 0.0;
+			numOfScans = 1;
+		}
+
+		if (mpScanInsideRows->isChecked() && (numOfScans > 2))
+		{
+			numOfScans -= 2;
+
+			switch (orientation)
+			{
+			case eSubScanOrientation::NORTH_TO_SOUTH:
+				x1_mm += separation_mm;
+				x2_mm += separation_mm;
+				break;
+
+			case eSubScanOrientation::SOUTH_TO_NORTH:
+				x1_mm -= separation_mm;
+				x2_mm -= separation_mm;
+				break;
+
+			case eSubScanOrientation::EAST_TO_WEST:
+				y1_mm -= separation_mm;
+				y2_mm -= separation_mm;
+				break;
+
+			case eSubScanOrientation::WEST_TO_EAST:
+				y1_mm += separation_mm;
+				y2_mm += separation_mm;
+				break;
+			}
+		}
 	}
 
+	// We use dx and dy to determine direction of scan
+	int dx_mm = x2_mm - x1_mm;
+	int dy_mm = y2_mm - y1_mm;
+	auto* pGroundModel = cRappGroundModel::get();
 
 	for (int scan = 0; scan < numOfScans; ++scan)
 	{
@@ -346,10 +531,15 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 			// Move the dolly to measurement height...
 			step = std::make_unique<cExperimentStep_Movement>();
 
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
+			if (pGroundModel)
+			{
+				auto h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x1_mm, y1_mm));
+
+				if (h_mm != rfm::INVALID_HEIGHT)
+					h1_mm = h_mm;
+			}
+
+			step->setZ_mm(scan_z_offset_mm + h1_mm);
 
 			step->setSpeed_mmps(vertical_speed_mmps);
 
@@ -388,20 +578,22 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 			if (std::abs(dx_mm) < 500)
 			{
 				x_mm = (x2_mm + x1_mm) / 2;
+				x_mm += lateral_offset_mm;
 
 				if (y1_mm > y2_mm)
-					y_mm = y1_mm + start_offset_mm;
-				else
 					y_mm = y1_mm - start_offset_mm;
+				else
+					y_mm = y1_mm + start_offset_mm;
 			}
 			else if (std::abs(dy_mm) < 500)
 			{
 				if (x1_mm > x2_mm)
-					x_mm = x1_mm + start_offset_mm;
-				else
 					x_mm = x1_mm - start_offset_mm;
+				else
+					x_mm = x1_mm + start_offset_mm;
 
 				y_mm = (y2_mm + y1_mm) / 2;
+				y_mm += lateral_offset_mm;
 			}
 
 			// Moving dolly to the beginning of the measurement scan...
@@ -414,10 +606,15 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 			// Move the dolly to measurement height...
 			step = std::make_unique<cExperimentStep_Movement>();
 
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
+			if (pGroundModel)
+			{
+				auto h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x_mm, y_mm));
+
+				if (h_mm != rfm::INVALID_HEIGHT)
+					h1_mm = h_mm;
+			}
+
+			step->setZ_mm(scan_z_offset_mm + h1_mm);
 
 			step->setSpeed_mmps(vertical_speed_mmps);
 
@@ -437,35 +634,101 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 				pInfo->appendStep(std::move(delay));
 			}
 
-			if (std::abs(dx_mm) < 500)
+			for (int n = 0; n < numMeasurements; ++n)
 			{
-				if (y1_mm > y2_mm)
-					y_mm = y2_mm - end_offset_mm;
-				else
-					y_mm = y2_mm + end_offset_mm;
-			}
-			else if (std::abs(dy_mm) < 500)
-			{
-				if (x1_mm > x2_mm)
-					x_mm = x2_mm - end_offset_mm;
-				else
-					x_mm = x2_mm + end_offset_mm;
-			}
+				if (std::abs(dx_mm) < 500)
+				{
+					if (y1_mm > y2_mm)
+						y_mm -= scan_distance_mm;
+					else
+						y_mm += scan_distance_mm;
+				}
+				else if (std::abs(dy_mm) < 500)
+				{
+					if (x1_mm > x2_mm)
+						x_mm -= scan_distance_mm;
+					else
+						x_mm += scan_distance_mm;
+				}
 
-			// Do measurement...
-			step = std::make_unique<cExperimentStep_Movement>();
-			step->setX_mm(x_mm);
-			step->setY_mm(y_mm);
+				// Do measurement...
+				step = std::make_unique<cExperimentStep_Movement>();
+				step->setX_mm(x_mm);
+				step->setY_mm(y_mm);
 
-			if ((mpHeightReference->currentIndex() == 1) &&
-				((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
-			{
-				step->setZ_mm(scan_z_mm + h2_mm);
+				if (pGroundModel)
+				{
+					auto h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x_mm, y_mm));
+
+					if (h_mm != rfm::INVALID_HEIGHT)
+						h2_mm = h_mm;
+				}
+
+				step->setZ_mm(scan_z_offset_mm + h2_mm);
+
+				step->setSpeed_mmps(scan_speed_mmps);
+				step->setRecording(true);
+				pInfo->appendStep(std::move(step));
+
+				// Advance to the next measurement...
+				if (std::abs(dx_mm) < 500)
+				{
+					if (y1_mm > y2_mm)
+					{
+						y1_mm -= (plot_length_mm + alley_length_mm);
+						y_mm = y1_mm - start_offset_mm;
+
+						if (y_mm <= y2_mm)
+							break;
+					}
+					else
+					{
+						y1_mm += (plot_length_mm + alley_length_mm);
+						y_mm = y1_mm + start_offset_mm;
+
+						if (y_mm >= y2_mm)
+							break;
+					}
+				}
+				else if (std::abs(dy_mm) < 500)
+				{
+					if (x1_mm > x2_mm)
+					{
+						x1_mm -= (plot_length_mm + alley_length_mm);
+						x_mm = x1_mm - start_offset_mm;
+
+						if (x_mm <= x2_mm)
+							break;
+					}
+					else
+					{
+						x1_mm += (plot_length_mm + alley_length_mm);
+						x_mm = x1_mm + start_offset_mm;
+
+						if (x_mm >= x2_mm)
+							break;
+					}
+				}
+
+				// Move to next measurement...
+				step = std::make_unique<cExperimentStep_Movement>();
+				step->setX_mm(x_mm);
+				step->setY_mm(y_mm);
+
+				if (pGroundModel)
+				{
+					auto h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x_mm, y_mm));
+
+					if (h_mm != rfm::INVALID_HEIGHT)
+						h2_mm = h_mm;
+				}
+
+				step->setZ_mm(scan_z_offset_mm + h2_mm);
+
+				step->setSpeed_mmps(scan_speed_mmps);
+				step->setRecording(false);
+				pInfo->appendStep(std::move(step));
 			}
-
-			step->setSpeed_mmps(scan_speed_mmps);
-			step->setRecording(true);
-			pInfo->appendStep(std::move(step));
 
 			delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 
@@ -490,19 +753,19 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 
 		switch (orientation)
 		{
-		case 0:
+		case eSubScanOrientation::NORTH_TO_SOUTH:
 			x1_mm += separation_mm;
 			x2_mm += separation_mm;
 			break;
-		case 1:
+		case eSubScanOrientation::SOUTH_TO_NORTH:
 			x1_mm -= separation_mm;
 			x2_mm -= separation_mm;
 			break;
-		case 2:
+		case eSubScanOrientation::WEST_TO_EAST:
 			y1_mm -= separation_mm;
 			y2_mm -= separation_mm;
 			break;
-		case 3:
+		case eSubScanOrientation::EAST_TO_WEST:
 			y1_mm += separation_mm;
 			y2_mm += separation_mm;
 			break;
@@ -520,14 +783,70 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 
 void cCreateHyperspectralExperimentFromGpsDlg::onShowPath()
 {
-	int x1_mm = mpStartX_mm->text().toInt();
-	int y1_mm = mpStartY_mm->text().toInt();
+	QModelIndex startIndex = mpStartPosition->currentIndex();
+	if (startIndex.row() < 0)
+		return;
 
-	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+	QModelIndex endIndex = mpEndPosition->currentIndex();
+	if (endIndex.row() < 0)
+		return;
 
-	int x2_mm = x1_mm;
-	int y2_mm = y1_mm;
+	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
+	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 
+	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
+	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+
+	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
+	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
+	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
+	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
+
+
+/*
+	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+
+	if (mpHasSubScans->isChecked())
+	{
+		int separation_mm = static_cast<int>(mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor);
+
+		int numOfScans = mpNumOfScans->text().toInt();
+
+		int orientation = mpSubScanOrientation->currentIndex();
+
+		for (int i = 1; i < numOfScans; ++i)
+		{
+			switch (orientation)
+			{
+			case SUB_SCAN_NORTH_TO_SOUTH:
+				x1_mm += separation_mm;
+				x2_mm += separation_mm;
+				break;
+
+			case SUB_SCAN_SOUTH_TO_NORTH:
+				x1_mm -= separation_mm;
+				x2_mm -= separation_mm;
+				break;
+
+			case SUB_SCAN_EAST_TO_WEST:
+				y1_mm -= separation_mm;
+				y2_mm -= separation_mm;
+				break;
+
+			case SUB_SCAN_WEST_TO_EAST:
+				y1_mm += separation_mm;
+				y2_mm += separation_mm;
+				break;
+			}
+
+			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+		}
+	}
+*/
+
+	int distance_mm = 0;
+
+/*
 	switch (mpScanOrientation->currentIndex())
 	{
 	case SCAN_WEST_TO_EAST:
@@ -543,6 +862,7 @@ void cCreateHyperspectralExperimentFromGpsDlg::onShowPath()
 		x2_mm -= distance_mm;
 		break;
 	}
+*/
 
 
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
@@ -550,29 +870,29 @@ void cCreateHyperspectralExperimentFromGpsDlg::onShowPath()
 
 	if (mpHasSubScans->isChecked())
 	{
-		int separation_mm = static_cast<int>(mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor);
+		int separation_mm = getSubScanSeparation_mm();
 
 		int numOfScans = mpNumOfScans->text().toInt();
 
-		int orientation = mpSubScanOrientation->currentIndex();
+		auto orientation = getSubScanOrientation();
 
 		for (int i = 1; i < numOfScans; ++i)
 		{
 			switch (orientation)
 			{
-			case 0:
+			case eSubScanOrientation::NORTH_TO_SOUTH:
 				x1_mm += separation_mm;
 				x2_mm += separation_mm;
 				break;
-			case 1:
+			case eSubScanOrientation::SOUTH_TO_NORTH:
 				x1_mm -= separation_mm;
 				x2_mm -= separation_mm;
 				break;
-			case 2:
+			case eSubScanOrientation::WEST_TO_EAST:
 				y1_mm -= separation_mm;
 				y2_mm -= separation_mm;
 				break;
-			case 3:
+			case eSubScanOrientation::EAST_TO_WEST:
 				y1_mm += separation_mm;
 				y2_mm += separation_mm;
 				break;

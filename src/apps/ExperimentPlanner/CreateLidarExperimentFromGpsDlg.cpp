@@ -247,9 +247,6 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 		scan_z_mm += sensor_offset_mm;
 	}
 
-	int dx_mm = x2_mm - x1_mm;
-	int dy_mm = y2_mm - y1_mm;
-
 	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
 	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
@@ -257,7 +254,6 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 
 	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
 	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
-
 
 	/* Grab the info for multiple scans if selected */
 	int startNum = 0;
@@ -333,6 +329,8 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 		}
 	}
 
+	int dx_mm = x2_mm - x1_mm;
+	int dy_mm = y2_mm - y1_mm;
 
 	for (int scan = 0; scan < numOfScans; ++scan)
 	{
@@ -604,5 +602,4 @@ void cCreateLidarExperimentFromGpsDlg::onShowPath()
 			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 		}
 	}
-
 }

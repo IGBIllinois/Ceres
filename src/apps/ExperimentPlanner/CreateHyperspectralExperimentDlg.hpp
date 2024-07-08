@@ -12,6 +12,7 @@ QT_BEGIN_NAMESPACE
 class QAbstractButton;
 class QPushButton;
 class QLineEdit;
+class QGroupBox;
 class QCheckBox;
 class QLabel;
 class QPlainTextEdit;
@@ -45,8 +46,19 @@ private slots:
 	void onMetaInfoUpdate();
 	void onControllerUpdate();
 	void onSensorUpdate();
+	void onScanUnitChange(const QString& text);
+	void onAskHeightOffset(int state);
 	void onSubScanUnitChange(const QString& text);
 	void onHasSubScans(int state);
+	void onNumSubScansChanged();
+
+protected:
+	enum class eSubScanOrientation {NORTH_TO_SOUTH, SOUTH_TO_NORTH, EAST_TO_WEST, WEST_TO_EAST};
+	eSubScanOrientation getSubScanOrientation() const;
+
+	int getScanDistance_mm() const;
+
+	int getSubScanSeparation_mm() const;
 
 protected:
 	void createControls();
@@ -68,8 +80,6 @@ protected:
 	virtual void createLayout_SubScanInfo(QVBoxLayout* pMainLayout);
 
 protected:
-	double mSubScanConversionFactor = 1.0;
-
 	cExperimentMetaInfo mMetaInfo;
 	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;
@@ -90,12 +100,10 @@ protected:
 	QLineEdit* mpTravelSpeed_mmps = nullptr;
 
 	/* Measurement */
-	QLineEdit* mpBeginningOffset_m = nullptr;
-	QLineEdit* mpEndingOffset_m = nullptr;
-
 	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
-	QLineEdit* mpMeasurementHeight_m = nullptr;
-	QComboBox* mpHeightReference = nullptr;
+	QLineEdit* mpHeightOffset = nullptr;
+	QCheckBox* mpAskForOffset = nullptr;
+	QComboBox* mpLensFocalDistance = nullptr;
 	QLineEdit* mpMeasurementSpeed_mmps = nullptr;
 	QLineEdit* mpEndMeasurementDelay_sec = nullptr;
 
@@ -112,11 +120,25 @@ protected:
 	/* Sub Scan Info */
 	QCheckBox* mpHasSubScans = nullptr;
 	QLineEdit* mpNumOfScans = nullptr;
-	QComboBox* mpSubScanOrientation = nullptr;
-	QComboBox* mpSubScanUnits = nullptr;
+
+	QCheckBox* mpFastMode = nullptr;
+
+	QGroupBox*    mpScanOptions = nullptr;
+	QRadioButton* mpScanEveryRow = nullptr;
+	QRadioButton* mpScanCenterOnly = nullptr;
+	QRadioButton* mpScanInsideRows = nullptr;
+
+private:
+	double mScanConversionFactor = 1.0;
+	double mSubScanConversionFactor = 1.0;
+
+	QLabel* mpScanDistanceLabel = nullptr;
+	QLineEdit* mpScanDistance = nullptr;
+	QComboBox* mpScanUnits = nullptr;
 
 	QLabel* mpSubScanSeparationLabel = nullptr;
 	QLineEdit* mpSubScanSeparation = nullptr;
+	QComboBox* mpSubScanUnits = nullptr;
 
-	QCheckBox* mpFastMode = nullptr;
+	QComboBox* mpSubScanOrientation = nullptr;
 };

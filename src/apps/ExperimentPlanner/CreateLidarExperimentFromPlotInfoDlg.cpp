@@ -119,7 +119,6 @@ void cCreateLidarExperimentFromPlotInfoDlg::createControls_PointSelection()
 	mpPlotOrientation->addItem(SOUTH_TO_NORTH);
 	mpPlotOrientation->addItem(EAST_TO_WEST);
 	mpPlotOrientation->addItem(WEST_TO_EAST);
-//	connect(mpSubScanOrientation, &QComboBox::currentTextChanged, this, &cCreateExperimentFromPlotInfoDlg::onSubOrientationChange);
 
 	mpUnits = new QComboBox(this);
 	mpUnits->setEditable(false);

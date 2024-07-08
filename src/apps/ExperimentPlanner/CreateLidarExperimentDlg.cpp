@@ -527,7 +527,6 @@ void cCreateLidarExperimentDlg::onHasSubScans(int state)
 			mpScanCenterOnly->setEnabled(true);
 		if (num > 2)
 			mpScanInsideRows->setEnabled(true);
-
 	}
 	else
 	{

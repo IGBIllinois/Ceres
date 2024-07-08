@@ -11,6 +11,10 @@
 #include "CreateHyperspectralReferenceExperimentFromSpiderCamPointDlg.hpp"
 #include "CreateHyperspectralReferenceExperimentFromGpsDlg.hpp"
 
+#include "CreateHyperspectralExperimentFromSpiderCamPointDlg.hpp"
+#include "CreateHyperspectralExperimentFromGpsDlg.hpp"
+#include "CreateHyperspectralExperimentFromPlotInfoDlg.hpp"
+
 #include "ExperimentManager.hpp"
 #include "ExperimentTreeItem.hpp"
 #include "FieldLayoutWidget.hpp"
@@ -256,9 +260,14 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_SpiderCam_Point);
     mpGenerateMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("Hyperspectral Scan From GPS Points"), this);
-    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from GPS plot point"));
+    pMenuItem = new QAction(tr("Hyperspectral Scan From GPS Points (Machine Planted)"), this);
+    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from GPS (begin/end) point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_GPS);
+    mpGenerateMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Hyperspectral Scan From GPS plot data (Hand Planted)"), this);
+    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from GPS plot point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
 
     //
@@ -661,12 +670,121 @@ void cMainWindow::onGenerateHyperspectralRefScan_GPS()
 
 void cMainWindow::onGenerateHyperspectralScan_SpiderCam_Point()
 {
-
+//    cCreateHyperspectralExperimentFromSpiderCamPointDlg dlg;
 }
 
 void cMainWindow::onGenerateHyperspectralScan_GPS()
 {
+    QString defaultDirectory = mSettings.value("Defaults/gpsFiles").toString();
 
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), defaultDirectory,
+        "GPS Files (*.csv)");
+
+    if (fileName.isEmpty())
+        return;
+
+    std::ifstream gps_file;
+    gps_file.open(fileName.toStdString());
+
+    if (!gps_file.is_open())
+    {
+        QString msg = "Could not open file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "File Error", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::string test;
+    gps_file >> test;
+    gps_file.close();
+
+    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    {
+        QString msg = "Invalid GPS file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "Invalid File", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::filesystem::path file_name = fileName.toStdString();
+
+    std::filesystem::path directory = file_name.parent_path();
+
+    mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
+
+    cCreateHyperspectralExperimentFromGpsDlg dlg(fileName, this);
+
+    connect(&dlg, &cCreateHyperspectralExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateHyperspectralExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateHyperspectralExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
+}
+
+void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
+{
+    QString defaultDirectory = mSettings.value("Defaults/gpsFiles").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), defaultDirectory,
+        "GPS Files (*.csv)");
+
+    if (fileName.isEmpty())
+        return;
+
+    std::ifstream gps_file;
+    gps_file.open(fileName.toStdString());
+
+    if (!gps_file.is_open())
+    {
+        QString msg = "Could not open file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "File Error", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::string test;
+    gps_file >> test;
+    gps_file.close();
+
+    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    {
+        QString msg = "Invalid GPS file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "Invalid File", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::filesystem::path file_name = fileName.toStdString();
+
+    std::filesystem::path directory = file_name.parent_path();
+
+    mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
+
+    cCreateHyperspectralExperimentFromPlotInfoDlg dlg(fileName, this);
+
+    connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
 }
 
 /********************************************************************

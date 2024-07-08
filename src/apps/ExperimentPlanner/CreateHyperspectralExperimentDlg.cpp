@@ -35,7 +35,7 @@
 
 namespace
 {
-	const QString SCAN_DISTANCE_TEXT = "Distance (";
+	const QString SCAN_DISTANCE_TEXT = "Scan Distance (";
 	const QString SCAN_SEPARATION_TEXT = "Separation (";
 
 	const QString WEST_TO_EAST = "West to East";
@@ -47,6 +47,11 @@ namespace
 	constexpr int SCAN_EAST_TO_WEST = 1;
 	constexpr int SCAN_NORTH_TO_SOUTH = 2;
 	constexpr int SCAN_SOUTH_TO_NORTH = 3;
+
+	constexpr int SUB_SCAN_NORTH_TO_SOUTH = 0;
+	constexpr int SUB_SCAN_SOUTH_TO_NORTH = 1;
+	constexpr int SUB_SCAN_EAST_TO_WEST = 2;
+	constexpr int SUB_SCAN_WEST_TO_EAST = 3;
 }
 
 cCreateHyperspectralExperimentDlg::cCreateHyperspectralExperimentDlg(QWidget* parent)
@@ -62,6 +67,37 @@ cCreateHyperspectralExperimentDlg::cCreateHyperspectralExperimentDlg(QWidget* pa
 
 cCreateHyperspectralExperimentDlg::~cCreateHyperspectralExperimentDlg()
 {}
+
+cCreateHyperspectralExperimentDlg::eSubScanOrientation cCreateHyperspectralExperimentDlg::getSubScanOrientation() const
+{
+	switch (mpSubScanOrientation->currentIndex())
+	{
+	case SUB_SCAN_WEST_TO_EAST:
+		return eSubScanOrientation::WEST_TO_EAST;
+	case SUB_SCAN_EAST_TO_WEST:
+		return eSubScanOrientation::EAST_TO_WEST;
+	case SUB_SCAN_NORTH_TO_SOUTH:
+		return eSubScanOrientation::NORTH_TO_SOUTH;
+	case SUB_SCAN_SOUTH_TO_NORTH:
+		return eSubScanOrientation::SOUTH_TO_NORTH;
+	}
+
+	return eSubScanOrientation::NORTH_TO_SOUTH;
+}
+
+int cCreateHyperspectralExperimentDlg::getScanDistance_mm() const
+{
+	if (mpScanDistance->text().isEmpty()) return 0;
+
+	return static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+}
+
+int cCreateHyperspectralExperimentDlg::getSubScanSeparation_mm() const
+{
+	if (mpSubScanSeparation->text().isEmpty()) return 0;
+
+	return static_cast<int>(mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor);
+}
 
 void cCreateHyperspectralExperimentDlg::initialize()
 {
@@ -110,30 +146,42 @@ void cCreateHyperspectralExperimentDlg::createControls_Preamble()
 
 void cCreateHyperspectralExperimentDlg::createControls_Measurement()
 {
-	mpBeginningOffset_m = new QLineEdit(this);
-	mpBeginningOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpBeginningOffset_m->setText("2.0");
-
-	mpEndingOffset_m = new QLineEdit(this);
-	mpEndingOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpEndingOffset_m->setText("2.0");
-
 	mpStartMeasurementDelay_sec = new QLineEdit(this);
 	mpStartMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
 	mpStartMeasurementDelay_sec->setText("4.0");
 
-	mpMeasurementHeight_m = new QLineEdit(this);
-	mpMeasurementHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpMeasurementHeight_m->setText("5.0");
+	// default to feet
+	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
+	mpScanDistance = new QLineEdit(this);
+	mpScanDistance->setValidator(new QDoubleValidator(0, 10000.0, 3));
+	mpScanDistance->setText("1");
 
-	mpHeightReference = new QComboBox(this);
-	mpHeightReference->setEditable(false);
-	mpHeightReference->addItem("SpiderCam");
-	mpHeightReference->addItem("AGL");
+	mpScanUnits = new QComboBox(this);
+	mpScanUnits->setEditable(false);
+	mpScanUnits->addItem("Meters");
+	mpScanUnits->addItem("Millimeters");
+	mpScanUnits->addItem("Feet");
+	mpScanUnits->addItem("Inches");
+	mpScanUnits->setCurrentIndex(2);
+	mScanConversionFactor = nConstants::FT_TO_MM;
+	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralExperimentDlg::onScanUnitChange);
+
+	mpHeightOffset = new QLineEdit(this);
+	mpHeightOffset->setValidator(new QDoubleValidator(0.0, 10000.0, 3));
+	mpHeightOffset->setText("0.0");
+
+	mpAskForOffset = new QCheckBox("Ask", this);
+	connect(mpAskForOffset, &QCheckBox::stateChanged, this, &cCreateHyperspectralExperimentDlg::onAskHeightOffset);
+
+	mpLensFocalDistance = new QComboBox(this);
+	mpLensFocalDistance->setEditable(false);
+	mpLensFocalDistance->addItem("1 m", static_cast<int>(1.0 * nConstants::M_TO_MM));
+	mpLensFocalDistance->addItem("3 m", static_cast<int>(3.0 * nConstants::M_TO_MM));
+	mpLensFocalDistance->setCurrentIndex(1);
 
 	mpMeasurementSpeed_mmps = new QLineEdit(this);
 	mpMeasurementSpeed_mmps->setValidator(new QIntValidator(0, 1000));
-	mpMeasurementSpeed_mmps->setText("450");
+	mpMeasurementSpeed_mmps->setText("100");
 
 	mpEndMeasurementDelay_sec = new QLineEdit(this);
 	mpEndMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
@@ -176,6 +224,7 @@ void cCreateHyperspectralExperimentDlg::createControls_SubScanInfo()
 	mpNumOfScans->setValidator(new QIntValidator(1, 10));
 	mpNumOfScans->setEnabled(false);
 	mpNumOfScans->setText("1");
+	connect(mpNumOfScans, &QLineEdit::editingFinished, this, &cCreateHyperspectralExperimentDlg::onNumSubScansChanged);
 
 	mpSubScanOrientation = new QComboBox(this);
 	mpSubScanOrientation->setEditable(false);
@@ -211,6 +260,17 @@ void cCreateHyperspectralExperimentDlg::createControls_SubScanInfo()
 	label += ")";
 
 	mpFastMode = new QCheckBox(label, this);
+
+	mpScanOptions = new QGroupBox(this);
+	mpScanEveryRow = new QRadioButton("Scan Every Row", mpScanOptions);
+	mpScanEveryRow->setChecked(true);
+	mpScanEveryRow->setEnabled(false);
+
+	mpScanCenterOnly = new QRadioButton("Scan Center Only", mpScanOptions);
+	mpScanCenterOnly->setEnabled(false);
+
+	mpScanInsideRows = new QRadioButton("Scan Inside Rows", mpScanOptions);
+	mpScanInsideRows->setEnabled(false);
 }
 
 void cCreateHyperspectralExperimentDlg::createLayout()
@@ -296,34 +356,34 @@ void cCreateHyperspectralExperimentDlg::createLayout_Measurement(QVBoxLayout* pM
 	QGridLayout* pGridLayout = new QGridLayout();
 	pGridLayout->setColumnMinimumWidth(2, 10);
 
-	pText = new QLabel("Start Offset (m)");
-	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpBeginningOffset_m, 0, 1);
-
 	pText = new QLabel("Start Delay (sec)");
-	pGridLayout->addWidget(pText, 0, 3);
-	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 4);
-
-	pText = new QLabel("Measurement Height (m)");
-	pGridLayout->addWidget(pText, 2, 0);
-
-	//	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
-	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
-	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
-	pMeasurementLayout->addWidget(mpHeightReference);
-	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
-
-	pText = new QLabel("Measurement Speed (mm/s)");
-	pGridLayout->addWidget(pText, 2, 3);
-	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 2, 4);
+	pGridLayout->addWidget(pText, 0, 0);
+	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 1);
 
 	pText = new QLabel("End Delay (sec)");
-	pGridLayout->addWidget(pText, 4, 0);
-	pGridLayout->addWidget(mpEndMeasurementDelay_sec, 4, 1);
+	pGridLayout->addWidget(pText, 0, 3);
+	pGridLayout->addWidget(mpEndMeasurementDelay_sec, 0, 4);
 
-	pText = new QLabel("End Offset (m)");
-	pGridLayout->addWidget(pText, 4, 3);
-	pGridLayout->addWidget(mpEndingOffset_m, 4, 4);
+	pText = new QLabel("Lens Focal Distance");
+	pGridLayout->addWidget(pText, 0, 6);
+	pGridLayout->addWidget(mpLensFocalDistance, 0, 7);
+
+	pText = new QLabel("Height Offset AGL (m)");
+	pGridLayout->addWidget(pText, 2, 0);
+	QHBoxLayout* pOffsetLayout = new QHBoxLayout();
+	pOffsetLayout->addWidget(mpHeightOffset, 1);
+	pOffsetLayout->addWidget(mpAskForOffset);
+	pGridLayout->addLayout(pOffsetLayout, 2, 1);
+
+	pGridLayout->addWidget(mpScanDistanceLabel, 2, 3);
+	QHBoxLayout* pScanLayout = new QHBoxLayout();
+	pScanLayout->addWidget(mpScanDistance, 1);
+	pScanLayout->addWidget(mpScanUnits);
+	pGridLayout->addLayout(pScanLayout, 2, 4);
+
+	pText = new QLabel("Measurement Speed (mm/s)");
+	pGridLayout->addWidget(pText, 2, 6);
+	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 2, 7);
 
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);
@@ -388,6 +448,8 @@ void cCreateHyperspectralExperimentDlg::createLayout_SubScanInfo(QVBoxLayout * p
 	QGroupBox* pGroupBox = new QGroupBox(tr("Sub Scan Information"));
 	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+	QVBoxLayout* pVSubLayout = new QVBoxLayout();
+
 	QHBoxLayout* pHSubLayout = new QHBoxLayout();
 	pHSubLayout->addWidget(mpHasSubScans);
 	pText = new QLabel("Number of Scans: ");
@@ -403,7 +465,17 @@ void cCreateHyperspectralExperimentDlg::createLayout_SubScanInfo(QVBoxLayout * p
 	pHSubLayout->addSpacing(10);
 	pHSubLayout->addWidget(mpSubScanUnits);
 
-	pGroupBox->setLayout(pHSubLayout);
+	pVSubLayout->addLayout(pHSubLayout);
+
+	pHSubLayout = new QHBoxLayout();
+	pHSubLayout->addWidget(mpScanEveryRow);
+	pHSubLayout->addWidget(mpScanCenterOnly);
+	pHSubLayout->addWidget(mpScanInsideRows);
+	pHSubLayout->addStretch(1);
+
+	pVSubLayout->addLayout(pHSubLayout);
+
+	pGroupBox->setLayout(pVSubLayout);
 
 	pMainLayout->addWidget(pGroupBox);
 }
@@ -454,6 +526,51 @@ void cCreateHyperspectralExperimentDlg::onSensorUpdate()
 	}
 }
 
+void cCreateHyperspectralExperimentDlg::onScanUnitChange(const QString& text)
+{
+	double distance = mpScanDistance->text().toDouble() * mScanConversionFactor;
+
+	switch (mpScanUnits->currentIndex())
+	{
+	case 0:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "m)");
+
+		mScanConversionFactor = nConstants::M_TO_MM;
+		break;
+	case 1:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "mm)");
+
+		mScanConversionFactor = 1.0;
+		break;
+	case 2:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "ft)");
+
+		mScanConversionFactor = nConstants::FT_TO_MM;
+		break;
+	case 3:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "in)");
+
+		mScanConversionFactor = nConstants::IN_TO_MM;
+		break;
+	}
+
+	distance /= mScanConversionFactor;
+
+	mpScanDistance->setText(QString::number(distance));
+}
+
+void cCreateHyperspectralExperimentDlg::onAskHeightOffset(int state)
+{
+	if (state == Qt::Checked)
+	{
+		mpHeightOffset->setEnabled(false);
+	}
+	else
+	{
+		mpHeightOffset->setEnabled(true);
+	}
+}
+
 void cCreateHyperspectralExperimentDlg::onSubScanUnitChange(const QString& text)
 {
 	double separation = mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor;
@@ -487,7 +604,6 @@ void cCreateHyperspectralExperimentDlg::onSubScanUnitChange(const QString& text)
 	mpSubScanSeparation->setText(QString::number(separation));
 }
 
-
 void cCreateHyperspectralExperimentDlg::onHasSubScans(int state)
 {
 	if (state == Qt::Checked)
@@ -497,7 +613,13 @@ void cCreateHyperspectralExperimentDlg::onHasSubScans(int state)
 		mpSubScanUnits->setEnabled(true);
 		mpSubScanSeparation->setEnabled(true);
 		mpFastMode->setEnabled(true);
+		mpScanEveryRow->setEnabled(true);
 
+		int num = mpNumOfScans->text().toInt();
+		if (num > 1)
+			mpScanCenterOnly->setEnabled(true);
+		if (num > 2)
+			mpScanInsideRows->setEnabled(true);
 	}
 	else
 	{
@@ -506,7 +628,27 @@ void cCreateHyperspectralExperimentDlg::onHasSubScans(int state)
 		mpSubScanUnits->setEnabled(false);
 		mpSubScanSeparation->setEnabled(false);
 		mpFastMode->setEnabled(false);
+		mpScanEveryRow->setEnabled(false);
+		mpScanCenterOnly->setEnabled(false);
+		mpScanInsideRows->setEnabled(false);
 	}
+}
+
+void cCreateHyperspectralExperimentDlg::onNumSubScansChanged()
+{
+	if (!mpHasSubScans->isChecked())
+		return;
+
+	int num = mpNumOfScans->text().toInt();
+	if (num > 1)
+		mpScanCenterOnly->setEnabled(true);
+	else
+		mpScanCenterOnly->setEnabled(false);
+
+	if (num > 2)
+		mpScanInsideRows->setEnabled(true);
+	else
+		mpScanInsideRows->setEnabled(false);
 }
 
 

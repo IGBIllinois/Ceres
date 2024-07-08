@@ -9,6 +9,7 @@ QT_BEGIN_NAMESPACE
 class QAbstractButton;
 class QPushButton;
 class QLineEdit;
+class QGroupBox;
 class QCheckBox;
 class QLabel;
 class QPlainTextEdit;
@@ -23,29 +24,44 @@ class cCreateHyperspectralExperimentFromGpsDlg : public cCreateHyperspectralExpe
 	Q_OBJECT
 
 public:
-	cCreateHyperspectralExperimentFromGpsDlg(QWidget* parent = nullptr);
+	cCreateHyperspectralExperimentFromGpsDlg(const QString& filename, QWidget* parent = nullptr);
 	virtual ~cCreateHyperspectralExperimentFromGpsDlg();
 
 
 private slots:
 	bool generate() override;
 	void onShowPath() override;
-	void onScanUnitChange(const QString& text);
+	void onPlotUnitChange(const QString& text);
 
 private:
 	void createControls_PointSelection() override;
 	void createLayout_PointSelection(QVBoxLayout* pMainLayout) override;
 
 private:
-	double mScanConversionFactor = 1.0;
+	double mPlotConversionFactor = 1.0;
 
-	QLineEdit* mpStartX_mm = nullptr;
-	QLineEdit* mpStartY_mm = nullptr;
+	uint32_t mStartIndex = 0;
+	uint32_t mEndIndex = 0;
 
-	QLabel* mpScanDistanceLabel = nullptr;
-	QLineEdit* mpScanDistance = nullptr;
+	QTableView* mpStartPosition = nullptr;
+	QTableView* mpEndPosition = nullptr;
 
-	QComboBox* mpScanOrientation = nullptr;
+	QAbstractItemModel* mpModel = nullptr;
 
-	QComboBox* mpScanUnits = nullptr;
+	QCheckBox* mpInverseDirection = nullptr;
+
+	QLabel* mpPlotLengthLabel = nullptr;
+	QLineEdit* mpPlotLength = nullptr;
+
+	QLabel* mpAlleyLengthLabel = nullptr;
+	QLineEdit* mpAlleyLength = nullptr;
+
+//	QComboBox* mpPlotOrientation = nullptr;
+
+	QComboBox* mpPlotUnits = nullptr;
+
+	QGroupBox*	  mpMeasureFrom = nullptr;
+	QRadioButton* mpStart = nullptr;
+	QRadioButton* mpCenter = nullptr;
+	QRadioButton* mpEnd = nullptr;
 };

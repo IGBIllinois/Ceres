@@ -166,6 +166,7 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::onScanUnitChange(const QStr
 
 bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 {
+#if 0
 	std::string str;
 	QString text;
 	std::vector<std::string> list;
@@ -514,6 +515,7 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 			std::swap(y1_mm, y2_mm);
 		}
 	}
+#endif
 
 	return true;
 }
@@ -550,29 +552,29 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::onShowPath()
 
 	if (mpHasSubScans->isChecked())
 	{
-		int separation_mm = static_cast<int>(mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor);
+		int separation_mm = getSubScanSeparation_mm();
 
 		int numOfScans = mpNumOfScans->text().toInt();
 
-		int orientation = mpSubScanOrientation->currentIndex();
+		auto orientation = getSubScanOrientation();
 
 		for (int i = 1; i < numOfScans; ++i)
 		{
 			switch (orientation)
 			{
-			case 0:
+			case eSubScanOrientation::NORTH_TO_SOUTH:
 				x1_mm += separation_mm;
 				x2_mm += separation_mm;
 				break;
-			case 1:
+			case eSubScanOrientation::SOUTH_TO_NORTH:
 				x1_mm -= separation_mm;
 				x2_mm -= separation_mm;
 				break;
-			case 2:
+			case eSubScanOrientation::EAST_TO_WEST:
 				y1_mm -= separation_mm;
 				y2_mm -= separation_mm;
 				break;
-			case 3:
+			case eSubScanOrientation::WEST_TO_EAST:
 				y1_mm += separation_mm;
 				y2_mm += separation_mm;
 				break;

@@ -32,6 +32,12 @@ namespace
 
         if (mgr.numOfCameras() <= 0)
         {
+            if (!sensorInfo.contains("settings"))
+            {
+                qCritical() << "The \"settings\" entry is missing!";
+                return false;
+            }
+
             std::string settings = sensorInfo["settings"];
 
             qInfo() << "Searching for HySpex Cameras...";
