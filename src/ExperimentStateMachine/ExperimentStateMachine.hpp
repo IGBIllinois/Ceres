@@ -8,10 +8,12 @@
 #include <nlohmann/json.hpp>
 #include <vector>
 #include <mutex>
+#include <memory>
 
 // Forward Declarations
 class cExperimentState;
 class cExperimentStateCreator;
+class cExperimentVariableTable;
 
 
 class cExperimentStateMachine : public QObject
@@ -115,4 +117,6 @@ private:
 
     std::mutex mPendingDeleteMutex;
     std::vector<cExperimentState*> mPendingDelete;
+
+    std::shared_ptr<cExperimentVariableTable> mVariableTable;
 };

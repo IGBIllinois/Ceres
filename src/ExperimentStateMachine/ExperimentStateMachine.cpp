@@ -3,6 +3,7 @@
 #include "ExperimentState.hpp"
 #include "ExperimentStateCreator.hpp"
 #include "BasicExperimentStates.hpp"
+#include "ExperimentVariableTable.hpp"
 
 #include <QThread>
 
@@ -100,6 +101,9 @@ void cExperimentStateMachine::clearExperiment()
     }
 
     mExperimentStates.clear();
+
+    if (mVariableTable)
+        mVariableTable->clear();
 }
 
 cExperimentState* cExperimentStateMachine::createState(const std::string& type, const nlohmann::json& expDoc)
@@ -124,6 +128,7 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
 
     clearExperiment();
 
+    mVariableTable = std::make_shared<cExperimentVariableTable>();
     mExperimentStates.push_back(new cExperimentState_Dummy());
 
     try
@@ -144,6 +149,7 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
 
             if (pState)
             {
+                pState->attachVariableTable(mVariableTable);
                 pState->configure(entry);
                 mExperimentStates.push_back(pState);
             }
@@ -249,6 +255,7 @@ void cExperimentStateMachine::terminateExperiment()
     mRunning = false;
     mPaused = false;
     mExperimentName.clear();
+
     emit experimentStateChanged(eState::TERMINATED);
 }
 

@@ -28,6 +28,13 @@ PRIVATE
     ExperimentStateRemoteInterface.cpp
 
 #
+# A variable table for passing values to difference experiment states
+# within the state machine
+#
+    ExperimentVariableTable.hpp
+    ExperimentVariableTable.cpp
+
+#
 # The Experiment State Machine
 #
 	ExperimentStateMachine.hpp

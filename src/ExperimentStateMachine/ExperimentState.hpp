@@ -4,6 +4,10 @@
 #include <QString>
 
 #include <nlohmann/json.hpp>
+#include <memory>
+
+
+class cExperimentVariableTable;
 
 
 class cExperimentState
@@ -21,6 +25,11 @@ public:
 
 	virtual QString getStatusStr() = 0;
 
+	void attachVariableTable(std::weak_ptr<cExperimentVariableTable> vars)
+	{
+		mVariables = vars;
+	}
+
 	virtual bool configure(const nlohmann::json& stateDoc) = 0;
 	virtual void cleanup() {};
 
@@ -32,6 +41,9 @@ public:
 	virtual void pause() = 0;
 	virtual void stop() = 0;
 	virtual eRESULT finished() = 0;
+
+protected:
+	std::weak_ptr<cExperimentVariableTable> mVariables;
 };
 
 
