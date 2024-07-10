@@ -59,6 +59,13 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
     // Create the HySpex VNIR 3000N model and view...
     cHySpexVNIR_3000N_Model* pModel = nullptr; 
 
+    if (!sensorInfo.contains("protocol"))
+    {
+        qCritical() << "The \"protocol\" entry is missing from the VNIR-3000N sensor section.  ";
+        qCritical() << "Valid values are: direct, net, simulation.";
+        return sSensorWidgets();
+    }
+
     std::string protocol = sensorInfo["protocol"];
 
     if (protocol == "direct")
@@ -141,6 +148,13 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
     // Create the HySpex SWIR 384 model and view...
     cHySpexSWIR_384_Model* pModel = nullptr;
 
+    if (!sensorInfo.contains("protocol"))
+    {
+        qCritical() << "The \"protocol\" entry is missing from the SWIR-384 sensor section.  ";
+        qCritical() << "Valid values are: direct, net.";
+        return sSensorWidgets();
+    }
+
     std::string protocol = sensorInfo["protocol"];
 
     if (protocol == "direct")
@@ -219,6 +233,14 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
 sSensorWidgets hyspex::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
+
+    if (!sensorInfo.contains("sensor"))
+    {
+        qCritical() << "The \"sensor\" entry is missing from the \"hyspex\" sensor section.  ";
+        qCritical() << "Valid values are: VNIR-3000N, SWIR-384.";
+        return sSensorWidgets();
+    }
+
     std::string sensor = sensorInfo["sensor"];
 
     if (sensor == vnir_3000N_id)
