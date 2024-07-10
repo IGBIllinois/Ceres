@@ -120,7 +120,7 @@ void cCreateHyperspectralReferenceExperimentDlg::createControls_Measurement()
 	mpLensFocalDistance->addItem("3 m", static_cast<int>(3.0 * nConstants::M_TO_MM));
 
 	mpMeasurementTime_sec = new QLineEdit(this);
-	mpMeasurementTime_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
+	mpMeasurementTime_sec->setValidator(new QDoubleValidator(0.1, 300.0, 3));
 	mpMeasurementTime_sec->setText("1.0");
 
 	mpGimbleTilt_deg = new QLineEdit(this);

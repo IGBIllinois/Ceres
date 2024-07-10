@@ -3,6 +3,7 @@
 #include "Constants.hpp"
 
 #include "ExperimentSteps.hpp"
+#include "ExperimentSteps_HySpex.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"

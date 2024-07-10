@@ -1,8 +1,11 @@
 ﻿
 #include "CreateHyperspectralReferenceExperimentFromSpiderCamPointDlg.hpp"
+#include "Hyperspectral/HySpex/HySpexFactory.hpp"
+
 #include "Constants.hpp"
 
 #include "ExperimentSteps.hpp"
+#include "ExperimentSteps_HySpex.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -240,6 +243,35 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
 		delay->setWaitTime_sec(delay_sec);
 		pInfo->appendStep(std::move(delay));
+	}
+
+	for (const auto& sensor : mSensorInfo)
+	{
+		if (sensor->getType() == vnir_3000N_id)
+		{
+			// We need to take a background spectra...
+			std::unique_ptr<cExperimentStep_HySpex_Command> close_shutter = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "close shutter");
+			pInfo->appendStep(std::move(close_shutter));
+
+			std::unique_ptr<cExperimentStep_HySpex_Command> background = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "background");
+			pInfo->appendStep(std::move(background));
+
+			std::unique_ptr<cExperimentStep_HySpex_Command> open_shutter = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "open shutter");
+			pInfo->appendStep(std::move(open_shutter));
+		}
+
+		if (sensor->getType() == swir_384_id)
+		{
+			// We need to take a background spectra...
+			std::unique_ptr<cExperimentStep_HySpex_Command> close_shutter = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "close shutter");
+			pInfo->appendStep(std::move(close_shutter));
+
+			std::unique_ptr<cExperimentStep_HySpex_Command> background = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "background");
+			pInfo->appendStep(std::move(background));
+
+			std::unique_ptr<cExperimentStep_HySpex_Command> open_shutter = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "open shutter");
+			pInfo->appendStep(std::move(open_shutter));
+		}
 	}
 
 	float measurement_time_sec = mpMeasurementTime_sec->text().toFloat();
