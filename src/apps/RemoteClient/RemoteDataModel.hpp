@@ -99,12 +99,17 @@ private slots:
     void onExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& species, const std::string& cultivar, const std::string& doc) override;
 
+    void onExperimentTitle(const std::string& title) override;
+    void onExperimentDocument(const std::string& doc) override;
+
     void onPrincipalInvestigator(const std::string& pi) override;
 
     void onStartOfResearcherList() override;
     void onEndOfResearcherList() override;
     void onResearcher(const std::string& researcher) override;
 
+    void onSpecies(const std::string& species) override;
+    void onCultivar(const std::string& cultivar) override;
     void onConstructName(const std::string& name) override;
 
     void onStartOfEventNumberList() override;

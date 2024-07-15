@@ -39,6 +39,20 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
 
         break;
     }
+    case ePacketType::EXPERIMENT_TITLE:
+    {
+        ExperimentTitle_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onExperimentTitle(to_experiment_title_1(packet));
+        break;
+    }
+    case ePacketType::EXPERIMENT_DOCUMENT:
+    {
+        ExperimentDocument_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onExperimentDocument(to_experiment_document_1(packet));
+        break;
+    }
     case ePacketType::START_OF_TREATMENT_LIST:
         onStartOfTreatmentList();
         break;
@@ -70,6 +84,20 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         Researcher_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         onResearcher(to_researcher_1(packet));
+        break;
+    }
+    case ePacketType::SPECIES:
+    {
+        Species_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onSpecies(to_species_1(packet));
+        break;
+    }
+    case ePacketType::CULTIVAR:
+    {
+        Cultivar_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onCultivar(to_cultivar_1(packet));
         break;
     }
     case ePacketType::CONSTRUCT_NAME:

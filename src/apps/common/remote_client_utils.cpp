@@ -109,6 +109,131 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     return pckt_size;
 }
 
+std::string to_experiment_title_1(const ExperimentTitle_1& pckt)
+{
+    return pckt.title();
+}
+
+int encode_experiment_title(const std::string& title, net_buffer& buffer)
+{
+    ExperimentTitle_1 pckt;
+
+    pckt.set_title(title);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_TITLE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
+std::string to_experiment_document_1(const ExperimentDocument_1& pckt)
+{
+    return pckt.document();
+}
+
+int encode_experiment_document(const std::string& doc, net_buffer& buffer)
+{
+    ExperimentDocument_1 pckt;
+
+    pckt.set_document(doc);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_DOCUMENT);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
+std::string to_species_1(const Species_1& pckt)
+{
+    return pckt.species();
+}
+
+int encode_species(const std::string& species, net_buffer& buffer)
+{
+    Species_1 pckt;
+
+    pckt.set_species(species);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SPECIES);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
+std::string to_cultivar_1(const Cultivar_1& pckt)
+{
+    return pckt.cultivar();
+}
+
+int encode_cultivar(const std::string& cultivar, net_buffer& buffer)
+{
+    Cultivar_1 pckt;
+
+    pckt.set_cultivar(cultivar);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::CULTIVAR);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
+
 std::string to_principal_investigator_1(const PrincipalInvestigator_1& pckt)
 {
     return pckt.pi();

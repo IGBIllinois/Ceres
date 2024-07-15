@@ -30,12 +30,17 @@ protected:
         const std::string& researcher, const std::string& species, 
         const std::string& cultivar, const std::string& doc) = 0;
 
+    virtual void onExperimentTitle(const std::string& title) = 0;
+    virtual void onExperimentDocument(const std::string& doc) = 0;
+
     virtual void onPrincipalInvestigator(const std::string& pi) = 0;
 
     virtual void onStartOfResearcherList() = 0;
     virtual void onEndOfResearcherList() = 0;
     virtual void onResearcher(const std::string& researcher) = 0;
 
+    virtual void onSpecies(const std::string& species) = 0;
+    virtual void onCultivar(const std::string& cultivar) = 0;
     virtual void onConstructName(const std::string& name) = 0;
 
     virtual void onStartOfEventNumberList() = 0;

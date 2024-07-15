@@ -60,6 +60,10 @@ enum class ePacketType : uint16_t
 	END_OF_COMMENT_LIST,
 	START_OF_RESEARCHER_LIST,
 	END_OF_RESEARCHER_LIST,
+	EXPERIMENT_TITLE,
+	EXPERIMENT_DOCUMENT,
+	SPECIES,
+	CULTIVAR,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -90,6 +94,18 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
 	const std::string& cultivar, const std::string& doc, net_buffer& buffer);
 int encode_exp_info_data(const std::string& title, const std::string& researcher,
 	const std::string& species, const std::string& cultivar, const std::string& doc, net_buffer& buffer);
+
+std::string to_experiment_title_1(const ExperimentTitle_1& pckt);
+int encode_experiment_title(const std::string& title, net_buffer& buffer);
+
+std::string to_experiment_document_1(const ExperimentDocument_1& pckt);
+int encode_experiment_document(const std::string& doc, net_buffer& buffer);
+
+std::string to_species_1(const Species_1& pckt);
+int encode_species(const std::string& species, net_buffer& buffer);
+
+std::string to_cultivar_1(const Cultivar_1& pckt);
+int encode_cultivar(const std::string& cultivar, net_buffer& buffer);
 
 std::string to_principal_investigator_1(const PrincipalInvestigator_1& pckt);
 int encode_principal_investigator(const std::string& pi, net_buffer& buffer);

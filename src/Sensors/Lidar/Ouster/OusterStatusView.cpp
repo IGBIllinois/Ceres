@@ -88,7 +88,7 @@ void cOusterStatusView::doLayout()
 
 	QGroupBox* modeBox = new QGroupBox("Operating Mode");
 
-	auto* modeLayout = new QHBoxLayout(this);
+	auto* modeLayout = new QHBoxLayout();
 
 	modeLayout->addWidget(mpLidarModeLabel);
 	modeLayout->addWidget(mpLidarMode);

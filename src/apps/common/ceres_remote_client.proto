@@ -43,6 +43,26 @@ message ExperimentInfo_2
 	string species = 5;
 }
 
+message ExperimentTitle_1 
+{
+	string title = 1;
+}
+
+message ExperimentDocument_1 
+{
+	string document = 1;
+}
+
+message Cultivar_1 
+{
+	string cultivar = 1;
+}
+
+message Species_1 
+{
+	string species = 1;
+}
+
 message PrincipalInvestigator_1
 {
 	string pi = 1;

@@ -31,10 +31,13 @@ void cHySpexSWIR_384_StatusView::createWidgets()
 
 void cHySpexSWIR_384_StatusView::doLayout()
 {
-	qInfo() << "Delete old layout...";
-
 	auto old_layout = layout();
-	delete old_layout;
+	if (old_layout)
+	{
+		qInfo() << "Delete old layout...";
+
+		old_layout->deleteLater();
+	}
 
 	auto* mainLayout = new QVBoxLayout(this);
 
@@ -42,7 +45,7 @@ void cHySpexSWIR_384_StatusView::doLayout()
 
 	doStatusLayout(mainLayout);
 
-	auto* infoLayout = new QHBoxLayout(this);
+	auto* infoLayout = new QHBoxLayout();
 
 	doAcqStatusLayout(infoLayout);
 	doLensInfoLayout(infoLayout);
@@ -50,8 +53,6 @@ void cHySpexSWIR_384_StatusView::doLayout()
 	mainLayout->addLayout(infoLayout);
 
 	doPlotLayout(mainLayout);
-
-//	mainLayout->addStretch();
 
 	setLayout(mainLayout);
 }

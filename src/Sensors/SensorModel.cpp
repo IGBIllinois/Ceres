@@ -31,6 +31,8 @@ namespace sensor
             return "BUSY";
         case eStatus::WAITING:
             return "WAITING";
+        case eStatus::PENDING:
+            return "PENDING";
         }
 
         return "UNKNOWN";
@@ -60,6 +62,8 @@ namespace sensor
             return eStatus::BUSY;
         if (str == "WAITING" || str == "waiting")
             return eStatus::WAITING;
+        if (str == "PENDING" || str == "pending")
+            return eStatus::PENDING;
 
         return eStatus::UNKNOWN;
     }

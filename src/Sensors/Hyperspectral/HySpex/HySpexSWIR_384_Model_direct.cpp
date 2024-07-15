@@ -4,6 +4,8 @@
 
 #include <HySpexConnect/hyspex_utils.hpp>
 #include <HySpexConnect/SWIR384.hpp>
+#include <HySpexConnect/HySpexExceptions.hpp>
+
 
 #include <QDebug>
 
@@ -43,19 +45,7 @@ void cHySpexSWIR_384_Model_direct::updateViews()
 
 bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
 {
-    mID = mCamera->getId();
-    mSerialNumber = mCamera->getSerialNumber();
-
-    mCamera->registerNotificationCallback(&cHySpexSWIR_384_Model_direct::handleStatusCallback, this);
-
-    mLenses.clear();
-    auto n = mCamera->getLensCount();
-    for (unsigned int l = 0; l < n; ++l)
-    {
-        mLenses.emplace_back(mCamera->getLensNameFromId(l));
-    }
-
-
+    // Read configuration parameters first...
     try
     {
         auto section = jsonCfg["SWIR-384"];
@@ -75,24 +65,17 @@ bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
-    if (mLens != mCamera->getLensName())
-    {
-        auto n = mCamera->getLensCount();
-        for (unsigned int l = 0; l < n; ++l)
-        {
-            auto lens = mCamera->getLensNameFromId(l);
-            if (lens == mLens)
-            {
-                mCamera->useLensId(l);
-                break;
-            }
-        }
-    }
+    mID = mCamera->getId();
+    mSerialNumber = mCamera->getSerialNumber();
 
-    mLens = mCamera->getLensName();
-    mWorkingDistance_cm = mCamera->getLensWorkingDistance_cm();
-    mFieldOfView_deg = mCamera->getLensFieldOfView_rad() * nConstants::RAD_TO_DEG;
-    emit lensInfoChanged();
+    mCamera->registerNotificationCallback(&cHySpexSWIR_384_Model_direct::handleStatusCallback, this);
+
+    mLenses.clear();
+    auto n = mCamera->getLensCount();
+    for (unsigned int l = 0; l < n; ++l)
+    {
+        mLenses.emplace_back(mCamera->getLensNameFromId(l));
+    }
 
     setStatus(sensor::eStatus::CONFIGURED);
 
@@ -102,6 +85,8 @@ bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
 bool cHySpexSWIR_384_Model_direct::initialize()
 {
     emit statusMessage("Retrieving HySpex SWIR-384 camera configuration...");
+
+    mCamera->resetFramegrabber();
 
     // We need to initialize the connection to the physical camera.
     // This usually requires two calls to init!
@@ -121,10 +106,25 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     switch (mInitStatus)
     {
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_DETECTION:
+        emit statusMessage("HySpex SWIR-384 init pending detection...");
+        setStatus(sensor::eStatus::PENDING);
         break;
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_ELECTRONICS:
+        emit statusMessage("HySpex SWIR-384 init pending electronics...");
+        setStatus(sensor::eStatus::PENDING);
         break;
     case hyspex::InitStatus::HYSPEX_INIT_PENDING_SENSOR:
+        emit statusMessage("HySpex SWIR-384 init pending sensor...");
+        setStatus(sensor::eStatus::PENDING);
+        break;
+    case hyspex::InitStatus::HYSPEX_INIT_PENDING_TRANSPORT:
+        emit statusMessage("HySpex SWIR-384 init pending transport...");
+        setStatus(sensor::eStatus::PENDING);
+        break;
+    case hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED:
+        mCamera->init(mNumBuffersRaw, mNumBufferPreProcessing);
+        emit statusMessage("HySpex SWIR-384 init not started...");
+        setStatus(sensor::eStatus::PENDING);
         break;
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_DETECTION:
     case hyspex::InitStatus::HYSPEX_INIT_FAILED_ELECTRONICS:
@@ -141,6 +141,41 @@ bool cHySpexSWIR_384_Model_direct::initialize()
             return false;
         }
     }
+
+    if (mLens != mCamera->getLensName())
+    {
+        auto n = mCamera->getLensCount();
+
+        for (unsigned int l = 0; l < n; ++l)
+        {
+            auto lens = mCamera->getLensNameFromId(l);
+            if (lens == mLens)
+            {
+                try
+                {
+                    mCamera->useLensId(l);
+                }
+                catch (const HySpexConnect::hyspex_exception& e)
+                {
+                    QString msg = "Error in the setting SWIR-384 lens id: ";
+                    msg.append(e.what());
+                    qCritical() << msg;
+
+                    emit logMessage(logERROR, q_name(), msg);
+
+                    setStatus(sensor::eStatus::FAILED);
+
+                    return false;
+                }
+                break;
+            }
+        }
+    }
+
+    mLens = mCamera->getLensName();
+    mWorkingDistance_cm = mCamera->getLensWorkingDistance_cm();
+    mFieldOfView_deg = mCamera->getLensFieldOfView_rad() * nConstants::RAD_TO_DEG;
+    emit lensInfoChanged();
 
     mWavelengthRangeId = mCamera->getWavelengthRangeId();
 

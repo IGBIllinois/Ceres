@@ -82,6 +82,7 @@ void cHySpexSWIR_384_PropertyPage_Remote::onCurrentState(bool valid,
 
 void cHySpexSWIR_384_PropertyPage_Remote::onLensNames(const std::vector<std::string>& names)
 {
+	mpLenses->clear();
 	for (std::size_t i = 0; i < names.size(); ++i)
 	{
 		mpLenses->addItem(QString::fromStdString(names[i]));

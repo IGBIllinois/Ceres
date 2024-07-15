@@ -506,6 +506,29 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
     emit localLogMessage(logSTATUS, "Remote Client", msg);
 }
 
+void cRemoteDataModel::onExperimentTitle(const std::string& title)
+{
+    mExperimentTitle = title;
+
+    QString msg = "Experiment Info: ";
+    msg += QString::fromStdString(mExperimentTitle);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+}
+
+void cRemoteDataModel::onExperimentDocument(const std::string& doc)
+{
+    mExperimentDoc = doc;
+
+    if (mSerializer.bufferCapacity() < mExperimentDoc.size())
+        mSerializer.setBufferCapacity(mExperimentDoc.size() + 32);
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "ExperimentDoc: ";
+    msg += QString::fromStdString(mExperimentDoc);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
+}
+
 void cRemoteDataModel::onPrincipalInvestigator(const std::string& pi)
 {
     mPrincipalInvestigator = pi;
@@ -532,6 +555,28 @@ void cRemoteDataModel::onResearcher(const std::string& researcher)
 #ifdef LOG_EXPERIMENT_INFO
     QString msg = "Researchers: ";
     msg += QString::fromStdString(researcher);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
+}
+
+void cRemoteDataModel::onSpecies(const std::string& species)
+{
+    mSpecies = species;
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Species: ";
+    msg += QString::fromStdString(mSpecies);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
+}
+
+void cRemoteDataModel::onCultivar(const std::string& cultivar)
+{
+    mCultivar = cultivar;
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Cultivar: ";
+    msg += QString::fromStdString(mCultivar);
     emit localLogMessage(logSTATUS, "Remote Client", msg);
 #endif
 }
@@ -651,7 +696,8 @@ void cRemoteDataModel::onEndOfExperimentInfo()
     emit localLogMessage(logSTATUS, "Remote Client", msg);
 #endif
 
-    sendExperimentInfoReply();
+//    if (!mExperimentTitle.empty())
+        sendExperimentInfoReply();
 }
 
 

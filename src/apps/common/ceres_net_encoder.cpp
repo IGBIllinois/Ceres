@@ -28,12 +28,57 @@ void cCeresNetEncoder::encodeExperimentInfo(const std::string& title, const std:
     }
 }
 
+void cCeresNetEncoder::encodeTitle(const std::string& title)
+{
+    if (encode_experiment_title(title, mBuffer) < 0)
+    {
+        sendData();
+        encode_experiment_title(title, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeDocument(const std::string& doc)
+{
+    if (encode_experiment_document(doc, mBuffer) < 0)
+    {
+        sendData();
+        encode_experiment_document(doc, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeSpecies(const std::string& species)
+{
+    if (encode_species(species, mBuffer) < 0)
+    {
+        sendData();
+        encode_species(species, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeCultivar(const std::string& cultivar)
+{
+    if (encode_cultivar(cultivar, mBuffer) < 0)
+    {
+        sendData();
+        encode_cultivar(cultivar, mBuffer);
+    }
+}
+
 void cCeresNetEncoder::encodePrincipalInvestigator(const std::string& pi)
 {
     if (encode_principal_investigator(pi, mBuffer) < 0)
     {
         sendData();
         encode_principal_investigator(pi, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeResearcher(const std::string& researcher)
+{
+    if (encode_researcher(researcher, mBuffer) < 0)
+    {
+        sendData();
+        encode_researcher(researcher, mBuffer);
     }
 }
 

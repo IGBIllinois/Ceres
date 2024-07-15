@@ -22,7 +22,7 @@
 cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
 :
     cCtrlDataModel(parent),
-    cCeresNetEncoder(4096),
+    cCeresNetEncoder(8192),
     mConnected(false),
     mSocket(parent),
     mpView(nullptr)
@@ -376,6 +376,9 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
     // three times.
     for (int i = 0; i < 3; ++i)
     {
+/*
+ * Code is deprecated as it cause required buffer to grow
+ 
         if (mSpecies.empty())
         {
             if (mResearchers.empty())
@@ -390,6 +393,10 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
             else
                 encodeExperimentInfo(mExperimentTitle, mResearchers[0], mSpecies, mCultivar, mExperimentDoc);
         }
+*/
+
+        encodeTitle(mExperimentTitle);
+        encodeDocument(mExperimentDoc);
 
         if (!mPrincipalInvestigator.empty())
             encodePrincipalInvestigator(mPrincipalInvestigator);
@@ -398,10 +405,20 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
         {
             encodeResearchers(mResearchers);
         }
+        else if (mResearchers.size() == 1)
+        {
+            encodeResearcher(mResearchers[0]);
+        }
+
+        if (!mSpecies.empty())
+            encodeSpecies(mSpecies);
+
+        if (!mCultivar.empty())
+            encodeCultivar(mCultivar);
 
         if (!mConstructName.empty())
             encodeConstructName(mConstructName);
-    
+
         if (!mEventNumbers.empty())
         {
             encodeEventNumbers(mEventNumbers);
