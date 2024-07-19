@@ -230,6 +230,119 @@ void cExperimentDesignMdiChild::editSensorInfo()
     }
 }
 
+
+void cExperimentDesignMdiChild::set_X_Position(int x_mm)
+{
+    if ((x_mm < 10000) || (x_mm > 190000))
+        return;
+
+    for (auto& step : mExperimentFile)
+    {
+        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getX_mm().has_value())
+            {
+                movement->setX_mm(x_mm);
+            }
+        }
+    }
+
+    redrawPath(mExperimentFile);
+
+    onExperimentChange();
+}
+
+void cExperimentDesignMdiChild::set_Y_Position(int y_mm)
+{
+    if ((y_mm < 10000) || (y_mm > 190000))
+        return;
+
+    for (auto& step : mExperimentFile)
+    {
+        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getY_mm().has_value())
+            {
+                movement->setY_mm(y_mm);
+            }
+        }
+    }
+
+    redrawPath(mExperimentFile);
+
+    onExperimentChange();
+}
+
+void cExperimentDesignMdiChild::set_Z_Position(int z_mm)
+{
+    if ((z_mm < 1000) || (z_mm > 10000))
+        return;
+
+    for (auto& step : mExperimentFile)
+    {
+        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getZ_mm().has_value())
+            {
+                movement->setZ_mm(z_mm);
+            }
+        }
+    }
+
+    redrawPath(mExperimentFile);
+
+    onExperimentChange();
+}
+
+void cExperimentDesignMdiChild::shiftPositions(int x_mm, int y_mm, int z_mm)
+{
+    if ((x_mm == 0) && (y_mm == 0) && (z_mm == 0))
+        return;
+
+    for (auto& step : mExperimentFile)
+    {
+        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if ((x_mm != 0) && movement->getX_mm().has_value())
+            {
+                int new_x_mm = movement->getX_mm().value() + x_mm;
+                movement->setX_mm(new_x_mm);
+            }
+
+            if ((y_mm != 0) && movement->getY_mm().has_value())
+            {
+                int new_y_mm = movement->getY_mm().value() + y_mm;
+                movement->setY_mm(new_y_mm);
+            }
+
+            if ((z_mm != 0) && movement->getZ_mm().has_value())
+            {
+                int new_z_mm = movement->getZ_mm().value() + z_mm;
+
+                if (new_z_mm < 1000)
+                    new_z_mm = 1000;
+
+                if (new_z_mm > 10000)
+                    new_z_mm = 10000;
+
+                movement->setZ_mm(new_z_mm);
+            }
+        }
+    }
+
+    redrawPath(mExperimentFile);
+
+    onExperimentChange();
+}
+
 void cExperimentDesignMdiChild::closeEvent(QCloseEvent *event)
 {
     if (mExperimentFile.isDirty())

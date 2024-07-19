@@ -54,6 +54,14 @@ void cMovementStepInfoDlg::createControls()
 	mpRoll_deg->setValidator(new QDoubleValidator(-180.0, 180.0, 1));
 
 	mpRecord = new QCheckBox("Record Data During Movement", this);
+
+	mpSampleXY = new QPushButton("Record X, Y", this);
+	mpSampleXY->setEnabled(false);
+	connect(mpSampleXY, &QPushButton::pressed, this, &cMovementStepInfoDlg::recordXY);
+
+	mpSampleXYZ = new QPushButton("Record X, Y, and Z", this);
+	mpSampleXYZ->setEnabled(false);
+	connect(mpSampleXYZ, &QPushButton::pressed, this, &cMovementStepInfoDlg::recordXYZ);
 }
 
 void cMovementStepInfoDlg::createLayout()
@@ -120,12 +128,22 @@ void cMovementStepInfoDlg::createLayout()
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
 		| QDialogButtonBox::Cancel);
 
+	buttonBox->addButton(mpSampleXY, QDialogButtonBox::ButtonRole::ApplyRole);
+	buttonBox->addButton(mpSampleXYZ, QDialogButtonBox::ButtonRole::ApplyRole);
+
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
 	pMainLayout->addWidget(buttonBox);
 
 	setLayout(pMainLayout);
+}
+
+void cMovementStepInfoDlg::positionUpdated(spidercam::sPosition_1_t pos)
+{
+	mpSampleXY->setEnabled(true);
+	mpSampleXYZ->setEnabled(true);
+
 }
 
 bool cMovementStepInfoDlg::hasX() const
@@ -238,4 +256,8 @@ void cMovementStepInfoDlg::setRecording(bool recording)
 	mpRecord->setChecked(recording);
 }
 
+void cMovementStepInfoDlg::recordXY()
+{}
 
+void cMovementStepInfoDlg::recordXYZ()
+{}

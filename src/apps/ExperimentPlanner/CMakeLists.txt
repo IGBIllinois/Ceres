@@ -66,6 +66,11 @@ PRIVATE
     ExperimentSensorInfoDlg.hpp
     ExperimentSensorInfoDlg.cpp
 
+    NewSpidercamPositionDlg.hpp
+    NewSpidercamPositionDlg.cpp
+    ExperimentShiftDlg.hpp
+    ExperimentShiftDlg.cpp
+
     DelayStepInfoDlg.hpp
     DelayStepInfoDlg.cpp
 

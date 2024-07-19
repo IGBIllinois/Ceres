@@ -27,6 +27,7 @@
 #include <QStandardItemModel>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QRadioButton>
 
 
 #include <algorithm>

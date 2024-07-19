@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include <spidercam/spidercam_com.hpp>
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
@@ -15,6 +17,8 @@ QT_END_NAMESPACE
 
 class cMovementStepInfoDlg : public QDialog
 {
+	Q_OBJECT
+
 public:
 	cMovementStepInfoDlg(QWidget* parent = nullptr);
 	virtual ~cMovementStepInfoDlg();
@@ -53,20 +57,30 @@ public:
 
 	void setRecording(bool recording);
 
+public slots:
+	void positionUpdated(spidercam::sPosition_1_t pos);
+
 private:
 	void createControls();
 	void createLayout();
 
+private slots:
+	void recordXY();
+	void recordXYZ();
+
 private:
-	QLineEdit* mpX_mm;
-	QLineEdit* mpY_mm;
-	QLineEdit* mpZ_mm;
+	QLineEdit* mpX_mm = nullptr;
+	QLineEdit* mpY_mm = nullptr;
+	QLineEdit* mpZ_mm = nullptr;
 
-	QLineEdit* mpSpeed_mmps;
+	QLineEdit* mpSpeed_mmps = nullptr;
 
-	QLineEdit* mpPan_deg;
-	QLineEdit* mpTilt_deg;
-	QLineEdit* mpRoll_deg;
+	QLineEdit* mpPan_deg = nullptr;
+	QLineEdit* mpTilt_deg = nullptr;
+	QLineEdit* mpRoll_deg = nullptr;
 
-	QCheckBox* mpRecord;
+	QCheckBox* mpRecord = nullptr;
+
+	QPushButton* mpSampleXY = nullptr;
+	QPushButton* mpSampleXYZ = nullptr;
 };

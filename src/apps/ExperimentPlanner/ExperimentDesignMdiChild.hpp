@@ -38,6 +38,12 @@ public:
     void editCtrlInfo();
     void editSensorInfo();
 
+    void set_X_Position(int x_mm);
+    void set_Y_Position(int y_mm);
+    void set_Z_Position(int z_mm);
+
+    void shiftPositions(int x_mm, int y_mm, int z_mm);
+
 signals:
     void experimentListNeedsUpdate();
 

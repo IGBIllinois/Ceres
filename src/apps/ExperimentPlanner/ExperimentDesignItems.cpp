@@ -398,58 +398,49 @@ void cProcessStep::setTitle(const QString& title)
 {
 	mTitle = title;
 	recomputeBoxSize();
-	update();
 }
 
 void cProcessStep::setSubHeading1(const QString& heading)
 {
 	mSubHeading1 = heading;
 	recomputeBoxSize();
-	update();
 }
 
 void cProcessStep::setSubHeading2(const QString& heading)
 {
 	mSubHeading2 = heading;
 	recomputeBoxSize();
-	update();
 }
 
 void cProcessStep::setSubHeading3(const QString& heading)
 {
 	mSubHeading3 = heading;
 	recomputeBoxSize();
-	update();
 }
 
 void cProcessStep::setScale(int scale)
 {
 	mScale = scale;
-	update();
 }
 
 void cProcessStep::setPen(const QPen& pen)
 {
 	mPen = pen;
-	update();
 }
 
 void cProcessStep::setBrush(const QBrush& brush)
 {
 	mBrush = brush;
-	update();
 }
 
 void cProcessStep::setFont(const QFont& font)
 {
 	mFont = font;
-	update();
 }
 
 void cProcessStep::setAntialiased(bool antialiased)
 {
 	mAntialiased = antialiased;
-	update();
 }
 
 void cProcessStep::recomputeBoxSize()

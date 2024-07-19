@@ -78,6 +78,10 @@ private slots:
     void onEditExperimentCtrlInfo();
     void onEditExperimentSernsorInfo();
     void onEditAddExperimentToLayout();
+    void onEditMoveExperimentX();
+    void onEditMoveExperimentY();
+    void onEditMoveExperimentZ();
+    void onEditShiftExperiment();
 
     // Slots associated with "Generate" menu actions
 private slots:

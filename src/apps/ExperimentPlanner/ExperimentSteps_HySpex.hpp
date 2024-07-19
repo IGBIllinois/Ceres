@@ -32,7 +32,7 @@ namespace hyspex
 /// 
 /// For example: command could be "open shutter", "close shutter", or "background"
 /// </summary>
-class cExperimentStep_HySpex_Command : public QObject, public cExperimentStep
+class cExperimentStep_HySpex_Command : public cExperimentStep
 {
 	Q_OBJECT
 

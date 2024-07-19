@@ -396,7 +396,6 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
 */
 
         encodeTitle(mExperimentTitle);
-        encodeDocument(mExperimentDoc);
 
         if (!mPrincipalInvestigator.empty())
             encodePrincipalInvestigator(mPrincipalInvestigator);
@@ -446,7 +445,10 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
             encodeComments(mComments);
         }
 
+        encodeDocument(mExperimentDoc);
+
         encodeEndOfExperimentInfo();
+
         sendData();
 
         QTime delayTime = QTime::currentTime().addSecs(5);

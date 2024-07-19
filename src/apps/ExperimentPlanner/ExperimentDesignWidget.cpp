@@ -53,6 +53,8 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
 
     for (auto step : experiment)
     {
+        connect(step.get(), &cExperimentStep::redraw, this, &cExperimentDesignWidget::stepUpdated);
+
         auto item = step->graphicsItem(id);
         connect(item, &cBaseStep::insertBefore, this, &cExperimentDesignWidget::insertBefore);
         connect(item, &cBaseStep::insertAfter, this, &cExperimentDesignWidget::insertAfter);
@@ -169,5 +171,14 @@ void cExperimentDesignWidget::setTransformed(bool transformed)
     update();
 }
 
+void cExperimentDesignWidget::stepUpdated()
+{
+    mScene.update(sceneRect());
+}
+
+void cExperimentDesignWidget::experimentChange(bool changed)
+{
+    setWindowModified(changed);
+}
 
 

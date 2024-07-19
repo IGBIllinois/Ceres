@@ -199,6 +199,8 @@ bool cExperimentStep_Delay::onEdit()
 	auto comment = generateComment();
 	emit onCommentChange(comment);
 
+	emit redraw();
+
 	return true;
 }
 
@@ -598,6 +600,20 @@ bool cExperimentStep_Movement::onEdit()
 
 	bool recording = dlg.recording();
 	setRecording(recording);
+
+	if (isDirty())
+	{
+		auto description = generateMovementDescription();
+		emit onMovementTextChange(description);
+
+		description = generateOrientationDescription();
+		emit onOrientationTextChange(description);
+
+		auto comment = generateComment();
+		emit onCommentChange(comment);
+
+		emit redraw();
+	}
 
 	return true;
 }

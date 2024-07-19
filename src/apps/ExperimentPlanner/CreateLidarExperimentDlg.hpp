@@ -19,6 +19,7 @@ class QPlainTextEdit;
 class QComboBox;
 class QAbstractItemModel;
 class QTableView;
+class QVBoxLayout;
 QT_END_NAMESPACE
 
 

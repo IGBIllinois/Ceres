@@ -44,9 +44,11 @@ public slots:
     void setBrush(const QBrush &brush);
     void setAntialiased(bool antialiased);
     void setTransformed(bool transformed);
+    void stepUpdated();
 
 protected:
     void redrawPath(const cExperimentFile& experiment);
+    void experimentChange(bool changed);
 
 private:
     QGraphicsScene mScene;

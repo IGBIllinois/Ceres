@@ -7,23 +7,15 @@
 
 #include <nlohmann/json.hpp>
 
-#include <QtWidgets>
-#include <QDialog>
-
 #include <filesystem>
 #include <vector>
 #include <list>
 #include <string>
 #include <memory>
 
-
-// Qt Forward Declaration
-QT_BEGIN_NAMESPACE
-class QButton;
-QT_END_NAMESPACE
-
 // Forward Declarations
 class cExperimentStep;
+
 
 enum eExperimentStep {delay, pause, movement, hyspex_command};
 

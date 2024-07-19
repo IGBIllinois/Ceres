@@ -25,8 +25,10 @@ namespace basic
 	std::shared_ptr<cExperimentStep> create_step(const std::string& type);
 }
 
-class cExperimentStep
+class cExperimentStep : public QObject
 {
+	Q_OBJECT
+
 public:
 	cExperimentStep() = default;
 	virtual ~cExperimentStep();
@@ -35,6 +37,9 @@ public:
 
 	virtual cBaseStep* graphicsItem(const int id) const = 0;
 //	virtual cConnectedItem* graphicsItem(const int id) const = 0;
+
+signals:
+	void redraw();
 
 protected:
 	virtual void load(const nlohmann::json& jdoc) = 0;
@@ -49,7 +54,7 @@ protected:
 /// <summary>
 /// Experiment Step: Simple Time Delay
 /// </summary>
-class cExperimentStep_Delay : public QObject, public cExperimentStep
+class cExperimentStep_Delay : public cExperimentStep
 {
 	Q_OBJECT
 
@@ -69,7 +74,6 @@ public:
 	void setRecording(bool recording);
 
 	cBaseStep* graphicsItem(const int id) const override;
-//	cConnectedItem* graphicsItem(const int id) const override;
 
 signals:
 	void onDescriptionChange(const QString& desc);
@@ -96,7 +100,7 @@ private:
 /// <summary>
 /// Experiment Step: Pause for User Input
 /// </summary>
-class cExperimentStep_Pause : public QObject, public cExperimentStep
+class cExperimentStep_Pause : public cExperimentStep
 {
 	Q_OBJECT
 
@@ -104,7 +108,6 @@ public:
 	cExperimentStep_Pause() = default;
 
 	cBaseStep* graphicsItem(const int id) const override;
-//	cConnectedItem* graphicsItem(const int id) const override;
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
@@ -114,7 +117,7 @@ protected:
 /// <summary>
 /// Experiment Step: Controls SpiderCam Movement
 /// </summary>
-class cExperimentStep_Movement : public QObject, public cExperimentStep
+class cExperimentStep_Movement : public cExperimentStep
 {
 	Q_OBJECT
 
@@ -146,7 +149,6 @@ public:
 	void setRecording(bool recording);
 
 	cBaseStep* graphicsItem(const int id) const override;
-//	cConnectedItem* graphicsItem(const int id) const override;
 
 signals:
 	void onMovementTextChange(const QString& desc);

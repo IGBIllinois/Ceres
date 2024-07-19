@@ -21,6 +21,8 @@
 #include "ExperimentDesignWidget.hpp"
 #include "ExperimentDesignMdiChild.hpp"
 
+#include "ExperimentShiftDlg.hpp"
+#include "NewSpidercamPositionDlg.hpp"
 
 #include "ExperimentSteps.hpp"
 
@@ -222,6 +224,31 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem->setStatusTip(tr("Adds the experiment to the field layout..."));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditAddExperimentToLayout);
     mpEditMenu->addAction(pMenuItem);
+
+    mpEditMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Move the Experiment to a X-Position (north/south)..."), this);
+    pMenuItem->setStatusTip(tr("Move (over write) the x-position (north/south) within an experiment..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveExperimentX);
+    mpEditMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Move the Experiment to a Y-Position (east/west)..."), this);
+    pMenuItem->setStatusTip(tr("Move (over write) the y-position (east/west) within an experiment..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveExperimentY);
+    mpEditMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Move the Experiment to a Z-Position (vertical)..."), this);
+    pMenuItem->setStatusTip(tr("Move (over write) the z-position (vertical) within an experiment..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveExperimentZ);
+    mpEditMenu->addAction(pMenuItem);
+
+    mpEditMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Shift Experiment Positions..."), this);
+    pMenuItem->setStatusTip(tr("Shift the positions used in the experiment..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditShiftExperiment);
+    mpEditMenu->addAction(pMenuItem);
+
 
     //
     // Build the Generate Sub Menu
@@ -508,6 +535,59 @@ void cMainWindow::onEditAddExperimentToLayout()
 
     child->setLayoutName(new_layout.caption.label.toStdString());
 }
+
+void cMainWindow::onEditMoveExperimentX()
+{
+    cNewSpidercam_X_PositionDlg dlg;
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    int x_mm = dlg.x_mm();
+
+    child->set_X_Position(x_mm);
+}
+
+void cMainWindow::onEditMoveExperimentY()
+{
+
+}
+
+void cMainWindow::onEditMoveExperimentZ()
+{
+
+}
+
+void cMainWindow::onEditShiftExperiment()
+{
+    cExperimentShiftDlg dlg;
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    int x_mm = dlg.xShift_mm();
+    int y_mm = dlg.yShift_mm();
+    int z_mm = dlg.zShift_mm();
+
+    child->shiftPositions(x_mm, y_mm, z_mm);
+}
+
 
 
 /********************************************************************
