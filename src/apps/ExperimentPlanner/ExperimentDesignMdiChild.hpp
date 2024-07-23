@@ -44,6 +44,8 @@ public:
 
     void shiftPositions(int x_mm, int y_mm, int z_mm);
 
+    void reloadPath();
+
 signals:
     void experimentListNeedsUpdate();
 

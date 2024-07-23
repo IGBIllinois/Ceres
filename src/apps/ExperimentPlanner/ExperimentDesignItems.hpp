@@ -6,6 +6,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QFont>
+#include <Qt>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -28,6 +29,15 @@ public:
 	virtual void setTopPoint(QPoint p) = 0;
 
 	virtual QPoint getBottomPoint() const = 0;
+
+	bool isHighlighted() const;
+	virtual void setHighlighted(bool highlight);
+
+protected:
+	QPoint mTop;
+	QPoint mBottom;
+
+	bool mHighlighted = false;
 
 private:
 	const int mID;
@@ -70,9 +80,6 @@ private slots:
 	void onInsertHySpexCommand();
 
 private:
-	QPoint mTop;
-	QPoint mBottom;
-
 	float mScale = 1.0;
 	int mLineLength = 30;
 	int mArrowHeadSize = 10;
@@ -112,15 +119,14 @@ public slots:
 	void setBrush(const QBrush& brush);
 	void setFont(const QFont& font);
 	void setAntialiased(bool antialiased);
+	void setHighlighted(bool highlight) override;
+
 
 public:
 	QRectF	boundingRect() const override;
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
 private:
-	QPoint mTop;
-	QPoint mBottom;
-
 	QFont mFont;
 
 	QString mText;
@@ -131,6 +137,14 @@ private:
 	float mScale = 1.0;
 	int mBoxWidth = 50;
 	int mBoxHeight = 20;
+
+	QBrush  mBackgroundBrush;
+	QColor  mBackgroundColor;
+	Qt::BrushStyle mBackgroundStyle;
+
+	QBrush  mHighlightBrush;
+	QColor  mHighlightColor;
+	Qt::BrushStyle mHightlightStyle;
 
 	QPen    mPen;
 	QBrush  mBrush;
@@ -174,6 +188,45 @@ signals:
 	void insertBefore(int id, int type);
 	void insertAfter(int id, int type);
 	void deleteStep(int id);
+
+public slots:
+	void setTitle(const QString& title);
+	void setSubHeading1(const QString& heading);
+	void setSubHeading2(const QString& heading);
+	void setSubHeading3(const QString& heading);
+	void setScale(int scale);
+	void setPen(const QPen& pen);
+	void setBrush(const QBrush& brush);
+	void setFont(const QFont& font);
+	void setAntialiased(bool antialiased);
+	void setHighlighted(bool highlight) override;
+
+protected:
+	virtual void recomputeBoxSize() = 0;
+
+protected:
+	QFont mFont;
+
+	QString mTitle;
+	QString mSubHeading1;
+	QString mSubHeading2;
+	QString mSubHeading3;
+
+	float mScale = 1.0;
+	int mBoxWidth = 50;
+	int mBoxHeight = 20;
+
+	QBrush  mBackgroundBrush;
+	QColor  mBackgroundColor;
+	Qt::BrushStyle mBackgroundStyle;
+
+	QBrush  mHighlightBrush;
+	QColor  mHighlightColor;
+	Qt::BrushStyle mHightlightStyle;
+
+	QPen    mPen;
+	QBrush  mBrush;
+	bool    mAntialiased = false;
 };
 
 class cProcessStep : public cBaseStep
@@ -193,17 +246,6 @@ public:
 
 signals:
 	void editStep();
-
-public slots:
-	void setTitle(const QString& title);
-	void setSubHeading1(const QString& heading);
-	void setSubHeading2(const QString& heading);
-	void setSubHeading3(const QString& heading);
-	void setScale(int scale);
-	void setPen(const QPen& pen);
-	void setBrush(const QBrush& brush);
-	void setFont(const QFont& font);
-	void setAntialiased(bool antialiased);
 
 public:
 	QRectF	boundingRect() const override;
@@ -226,26 +268,7 @@ private slots:
 	void onDeleteStep();
 
 private:
-	void recomputeBoxSize();
-
-private:
-	QPoint mTop;
-	QPoint mBottom;
-
-	QFont mFont;
-
-	QString mTitle;
-	QString mSubHeading1;
-	QString mSubHeading2;
-	QString mSubHeading3;
-
-	float mScale = 1.0;
-	int mBoxWidth = 50;
-	int mBoxHeight = 20;
-
-	QPen    mPen;
-	QBrush  mBrush;
-	bool    mAntialiased = false;
+	void recomputeBoxSize() override;
 };
 
 
@@ -276,6 +299,7 @@ public:
 signals:
 	void editStep();
 
+/*
 public slots:
 	void setTitle(const QString& title);
 	void setSubHeading1(const QString& heading);
@@ -286,6 +310,7 @@ public slots:
 	void setBrush(const QBrush& brush);
 	void setFont(const QFont& font);
 	void setAntialiased(bool antialiased);
+*/
 
 public:
 	QRectF	boundingRect() const override;
@@ -304,12 +329,10 @@ private slots:
 	void onDeleteStep();
 
 private:
-	void recomputeBoxSize();
+	void recomputeBoxSize() override;
 
 private:
-	QPoint mTop;
-	QPoint mBottom;
-
+/*
 	QFont mFont;
 
 	QString mTitle;
@@ -322,10 +345,21 @@ private:
 	int mBoxWidth = 50;
 	int mBoxHeight = 20;
 
+	QBrush  mBackgroundBrush;
+	QColor  mBackgroundColor;
+	Qt::BrushStyle mBackgroundStyle;
+
+	QBrush  mHighlightBrush;
+	QColor  mHighlightColor;
+	Qt::BrushStyle mHightlightStyle;
+
 	QPen    mPen;
 	QBrush  mBrush;
 	bool    mAntialiased = false;
-	bool	mAllowEdit = true;
+*/
+	int  mShift = 5;
+
+	bool mAllowEdit = true;
 };
 
 

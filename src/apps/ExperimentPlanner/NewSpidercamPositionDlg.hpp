@@ -25,8 +25,12 @@ private:
 	void createControls();
 	void createLayout();
 
+private slots:
+	void recordX();
+
 private:
-	QLineEdit* mpX_mm;
+	QLineEdit*   mpX_mm = nullptr;
+	QPushButton* mpSampleX = nullptr;
 };
 
 class cNewSpidercam_Y_PositionDlg : public QDialog
@@ -41,8 +45,12 @@ private:
 	void createControls();
 	void createLayout();
 
+private slots:
+	void recordY();
+
 private:
-	QLineEdit* mpY_mm;
+	QLineEdit*   mpY_mm = nullptr;
+	QPushButton* mpSampleY = nullptr;
 };
 
 class cNewSpidercam_Z_PositionDlg : public QDialog
@@ -57,7 +65,11 @@ private:
 	void createControls();
 	void createLayout();
 
+private slots:
+	void recordZ();
+
 private:
-	QLineEdit* mpZ_mm;
+	QLineEdit*   mpZ_mm = nullptr;
+	QPushButton* mpSampleZ = nullptr;
 };
 

@@ -554,16 +554,52 @@ void cMainWindow::onEditMoveExperimentX()
     int x_mm = dlg.x_mm();
 
     child->set_X_Position(x_mm);
+
+    child->reloadPath();
 }
 
 void cMainWindow::onEditMoveExperimentY()
 {
+    cNewSpidercam_Y_PositionDlg dlg;
 
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    int y_mm = dlg.y_mm();
+
+    child->set_Y_Position(y_mm);
+
+    child->reloadPath();
 }
 
 void cMainWindow::onEditMoveExperimentZ()
 {
+    cNewSpidercam_Z_PositionDlg dlg;
 
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    int z_mm = dlg.z_mm();
+
+    child->set_Z_Position(z_mm);
+
+    child->reloadPath();
 }
 
 void cMainWindow::onEditShiftExperiment()
@@ -586,6 +622,8 @@ void cMainWindow::onEditShiftExperiment()
     int z_mm = dlg.zShift_mm();
 
     child->shiftPositions(x_mm, y_mm, z_mm);
+
+    child->reloadPath();
 }
 
 

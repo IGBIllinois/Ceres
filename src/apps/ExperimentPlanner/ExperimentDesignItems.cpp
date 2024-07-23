@@ -28,6 +28,17 @@ void cConnectedItem::setTopPoint(int x, int y)
 	setTopPoint(QPoint(x, y));
 }
 
+bool cConnectedItem::isHighlighted() const
+{
+	return mHighlighted;
+}
+
+void cConnectedItem::setHighlighted(bool highlight)
+{
+	mHighlighted = highlight;
+}
+
+
 
 /********************************************************************
  *
@@ -260,6 +271,11 @@ void cTerminal::setAntialiased(bool antialiased)
 	update();
 }
 
+void cTerminal::setHighlighted(bool highlight)
+{
+	cConnectedItem::setHighlighted(highlight);
+}
+
 QRectF cTerminal::boundingRect() const
 {
 	return QRectF(mTop.x() - (mScale * mBoxWidth / 2), mTop.y(), mScale * mBoxWidth, mScale * mBoxHeight);
@@ -346,8 +362,69 @@ void cEndTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 };
 
 
+/********************************************************************
+ *
+ * Flow Chart Step: Base Step
+ *
+ ********************************************************************/
+
+
 cBaseStep::cBaseStep(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent) 
 {}
+
+void cBaseStep::setTitle(const QString& title)
+{
+	mTitle = title;
+	recomputeBoxSize();
+}
+
+void cBaseStep::setSubHeading1(const QString& heading)
+{
+	mSubHeading1 = heading;
+	recomputeBoxSize();
+}
+
+void cBaseStep::setSubHeading2(const QString& heading)
+{
+	mSubHeading2 = heading;
+	recomputeBoxSize();
+}
+
+void cBaseStep::setSubHeading3(const QString& heading)
+{
+	mSubHeading3 = heading;
+	recomputeBoxSize();
+}
+
+void cBaseStep::setScale(int scale)
+{
+	mScale = scale;
+}
+
+void cBaseStep::setPen(const QPen& pen)
+{
+	mPen = pen;
+}
+
+void cBaseStep::setBrush(const QBrush& brush)
+{
+	mBrush = brush;
+}
+
+void cBaseStep::setFont(const QFont& font)
+{
+	mFont = font;
+}
+
+void cBaseStep::setAntialiased(bool antialiased)
+{
+	mAntialiased = antialiased;
+}
+
+void cBaseStep::setHighlighted(bool highlight)
+{
+	cConnectedItem::setHighlighted(highlight);
+}
 
 
 /********************************************************************
@@ -360,16 +437,23 @@ cProcessStep::cProcessStep(const int id, QGraphicsItem* parent) : cBaseStep(id, 
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
+
+	mBackgroundColor = Qt::white;
+	mBackgroundStyle = Qt::SolidPattern;
+	mBackgroundBrush.setColor(mBackgroundColor);
+	mBackgroundBrush.setStyle(mBackgroundStyle);
+
+	mHighlightColor = Qt::yellow;
+	mHightlightStyle = Qt::Dense2Pattern;
+	mHighlightBrush.setColor(mHighlightColor);
+	mHighlightBrush.setStyle(mHightlightStyle);
 }
 
-cProcessStep::cProcessStep(const int id, const QString& text, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
+cProcessStep::cProcessStep(const int id, const QString& text, QGraphicsItem* parent) : cProcessStep(id, parent) //cConnectedItem(id, parent)
 {
-	setTitle(text);
+	mTitle = text;
 
 	recomputeBoxSize();
-
-	mTop.setY(-mScale * mBoxHeight / 2);
-	mBottom.setY(mScale * mBoxHeight / 2);
 }
 
 const QString& cProcessStep::title() const
@@ -392,55 +476,6 @@ void cProcessStep::setTopPoint(QPoint p)
 QPoint cProcessStep::getBottomPoint() const
 {
 	return mBottom;
-}
-
-void cProcessStep::setTitle(const QString& title)
-{
-	mTitle = title;
-	recomputeBoxSize();
-}
-
-void cProcessStep::setSubHeading1(const QString& heading)
-{
-	mSubHeading1 = heading;
-	recomputeBoxSize();
-}
-
-void cProcessStep::setSubHeading2(const QString& heading)
-{
-	mSubHeading2 = heading;
-	recomputeBoxSize();
-}
-
-void cProcessStep::setSubHeading3(const QString& heading)
-{
-	mSubHeading3 = heading;
-	recomputeBoxSize();
-}
-
-void cProcessStep::setScale(int scale)
-{
-	mScale = scale;
-}
-
-void cProcessStep::setPen(const QPen& pen)
-{
-	mPen = pen;
-}
-
-void cProcessStep::setBrush(const QBrush& brush)
-{
-	mBrush = brush;
-}
-
-void cProcessStep::setFont(const QFont& font)
-{
-	mFont = font;
-}
-
-void cProcessStep::setAntialiased(bool antialiased)
-{
-	mAntialiased = antialiased;
 }
 
 void cProcessStep::recomputeBoxSize()
@@ -695,6 +730,16 @@ cIoStep::cIoStep(const int id, QGraphicsItem* parent) : cBaseStep(id, parent) //
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
+
+	mBackgroundColor = Qt::white;
+	mBackgroundStyle = Qt::SolidPattern;
+	mBackgroundBrush.setColor(mBackgroundColor);
+	mBackgroundBrush.setStyle(mBackgroundStyle);
+
+	mHighlightColor = Qt::yellow;
+	mHightlightStyle = Qt::Dense2Pattern;
+	mHighlightBrush.setColor(mHighlightColor);
+	mHighlightBrush.setStyle(mHightlightStyle);
 }
 
 cIoStep::cIoStep(const int id, const QString& text, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
@@ -739,6 +784,7 @@ void cIoStep::setReadOnly(bool read_only)
 	mAllowEdit = !read_only;
 }
 
+/*
 void cIoStep::setTitle(const QString& title)
 {
 	mTitle = title;
@@ -796,6 +842,7 @@ void cIoStep::setAntialiased(bool antialiased)
 	mAntialiased = antialiased;
 	update();
 }
+*/
 
 void cIoStep::recomputeBoxSize()
 {

@@ -249,7 +249,7 @@ void cExperimentDesignMdiChild::set_X_Position(int x_mm)
         }
     }
 
-    redrawPath(mExperimentFile);
+    reloadPath();
 
     onExperimentChange();
 }
@@ -272,7 +272,7 @@ void cExperimentDesignMdiChild::set_Y_Position(int y_mm)
         }
     }
 
-    redrawPath(mExperimentFile);
+    reloadPath();
 
     onExperimentChange();
 }
@@ -294,8 +294,6 @@ void cExperimentDesignMdiChild::set_Z_Position(int z_mm)
             }
         }
     }
-
-    redrawPath(mExperimentFile);
 
     onExperimentChange();
 }
@@ -338,9 +336,12 @@ void cExperimentDesignMdiChild::shiftPositions(int x_mm, int y_mm, int z_mm)
         }
     }
 
-    redrawPath(mExperimentFile);
-
     onExperimentChange();
+}
+
+void cExperimentDesignMdiChild::reloadPath()
+{
+    loadExperiment(mExperimentFile);
 }
 
 void cExperimentDesignMdiChild::closeEvent(QCloseEvent *event)
@@ -379,7 +380,7 @@ void cExperimentDesignMdiChild::focusInEvent(QFocusEvent* event)
     {
         if (event->gotFocus())
         {
-            redrawPath(mExperimentFile);
+            cExperimentDesignWidget::redrawPath(mExperimentFile);
         }
     }
 
