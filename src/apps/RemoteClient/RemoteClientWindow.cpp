@@ -79,6 +79,7 @@ cRemoteClientWindow::cRemoteClientWindow(QWidget* parent) :
     QMainWindow(parent),
     mpSplashScreen(nullptr),
     mpFileMenu(nullptr),
+    mpSettingMenu(nullptr),
     mpHelpMenu(nullptr),
     mpLoopMeter(nullptr),
     mpUI(new Ui::MainWindow),
@@ -398,10 +399,24 @@ void cRemoteClientWindow::onLocalLogMessage(uint8_t type, QString device, QStrin
 }
 
 //-----------------------------------------------------------------------------
+void cRemoteClientWindow::onSettingDefaultDataPath()
+{
+    QString defaultDirectory = QString::fromStdString(mMainModel.defaultDataPath());
+
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Select Default Data Directory..."), defaultDirectory);
+
+    if (directory.isEmpty())
+        return;
+
+    mMainModel.setDefaultDataPath(directory.toStdString());
+}
+
+//-----------------------------------------------------------------------------
 void cRemoteClientWindow::createMainMenu()
 {
-    mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
-    mpHelpMenu = mpUI->menuBar->addMenu(tr("&Help"));
+    mpFileMenu    = mpUI->menuBar->addMenu(tr("&File"));
+    mpSettingMenu = mpUI->menuBar->addMenu(tr("&Settings"));
+    mpHelpMenu    = mpUI->menuBar->addMenu(tr("&Help"));
 }
 
 //-----------------------------------------------------------------------------
@@ -415,6 +430,12 @@ void cRemoteClientWindow::createSubMenusAndActions()
     pMenuItem->setStatusTip(tr("Exit program"));
     connect(pMenuItem, &QAction::triggered, &QApplication::closeAllWindows);
     mpFileMenu->addAction(pMenuItem);
+
+    // Build the Setting Menu
+    pMenuItem = new QAction(tr("Default Data Path"), this);
+    pMenuItem->setStatusTip(tr("The default path for data file"));
+    connect(pMenuItem, &QAction::triggered, this, &cRemoteClientWindow::onSettingDefaultDataPath);
+    mpSettingMenu->addAction(pMenuItem);
 
     // Build the Help Menu
 //    pMenuItem = new QAction(tr("&About"), this);

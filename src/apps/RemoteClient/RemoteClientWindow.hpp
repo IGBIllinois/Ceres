@@ -55,6 +55,7 @@ public slots:
     void onLocalLogMessage(uint8_t type, QString device, QString msg);
 
 private slots:
+    void onSettingDefaultDataPath();
 
 private:
     void createMainMenu();
@@ -71,6 +72,7 @@ private:
     cRemoteClientCentalWindow* mpCentralWindow;
 
     QMenu* mpFileMenu;
+    QMenu* mpSettingMenu;
     QMenu* mpHelpMenu;
 
     cLoopTimeMeter* mpLoopMeter;
