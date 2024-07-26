@@ -140,11 +140,11 @@ private:
 
 	QBrush  mBackgroundBrush;
 	QColor  mBackgroundColor;
-	Qt::BrushStyle mBackgroundStyle;
+	Qt::BrushStyle mBackgroundStyle = Qt::SolidPattern;
 
 	QBrush  mHighlightBrush;
-	QColor  mHighlightColor;
-	Qt::BrushStyle mHightlightStyle;
+	QColor  mHighlightColor = Qt::yellow;
+	Qt::BrushStyle mHightlightStyle = Qt::Dense2Pattern;
 
 	QPen    mPen;
 	QBrush  mBrush;
@@ -218,11 +218,11 @@ protected:
 
 	QBrush  mBackgroundBrush;
 	QColor  mBackgroundColor;
-	Qt::BrushStyle mBackgroundStyle;
+	Qt::BrushStyle mBackgroundStyle = Qt::SolidPattern;
 
 	QBrush  mHighlightBrush;
 	QColor  mHighlightColor;
-	Qt::BrushStyle mHightlightStyle;
+	Qt::BrushStyle mHightlightStyle = Qt::Dense2Pattern;
 
 	QPen    mPen;
 	QBrush  mBrush;

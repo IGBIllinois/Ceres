@@ -167,6 +167,13 @@ PRIVATE
     ScanPreviewWidget.hpp
     ScanPreviewWidget.cpp
 
+	PlannerDataModel.hpp
+	PlannerDataModel.cpp
+	PlannerDataModelLocal.hpp
+	PlannerDataModelLocal.cpp
+	PlannerDataThread.hpp
+	PlannerDataThread.cpp
+	
     MainWindow.hpp
     MainWindow.cpp
 
@@ -189,6 +196,7 @@ if(APPLE)
         )
 endif()
 
+target_include_directories(CeresExperimentPlanner PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(CeresExperimentPlanner PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(CeresExperimentPlanner PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
 target_include_directories(CeresExperimentPlanner PRIVATE ${SENSORS_INCLUDE_DIR})
@@ -199,6 +207,7 @@ target_link_libraries(CeresExperimentPlanner PRIVATE nlohmann_json::nlohmann_jso
 target_link_libraries(CeresExperimentPlanner PRIVATE Utilities)
 target_link_libraries(CeresExperimentPlanner PRIVATE ExperimentControllers)
 target_link_libraries(CeresExperimentPlanner PRIVATE ${VTK_LIBRARIES} )
+target_link_libraries(CeresExperimentPlanner PRIVATE common)
 
 vtk_module_autoinit(TARGETS CeresExperimentPlanner MODULES ${VTK_LIBRARIES})
 

@@ -61,7 +61,6 @@ private:
 
 	QComboBox* mpPlotUnits = nullptr;
 
-	QGroupBox*	  mpMeasureFrom = nullptr;
 	QRadioButton* mpStart = nullptr;
 	QRadioButton* mpCenter = nullptr;
 	QRadioButton* mpEnd = nullptr;

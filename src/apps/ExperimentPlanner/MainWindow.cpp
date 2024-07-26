@@ -2,6 +2,9 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "PlannerDataModel.hpp"
+#include "PlannerDataModelLocal.hpp"
+
 #include "Constants.hpp"
 
 #include "CreateLidarExperimentFromSpiderCamPointDlg.hpp"
@@ -30,6 +33,9 @@
 #include "ExperimentCtrlInfoDlg.hpp"
 #include "ExperimentSensorInfoDlg.hpp"
 
+#include "ExperimentCtrlFactory.hpp"
+#include "ExperimentCtrlModel.hpp"
+
 #include "ExperimentFieldLayoutDlg.hpp"
 
 #include "RappFieldBoundary.hpp"
@@ -49,6 +55,61 @@
 #include <filesystem>
 
 #include <nlohmann/json.hpp>
+
+
+namespace
+{
+    std::string getCfgFilePath()
+    {
+        QString cfgPath;
+
+        auto args = QApplication::arguments();
+        if (args.size() > 1)
+        {
+            auto n = args.size() - 1;
+            for (std::size_t i = 1; i < n; ++i)
+            {
+                QString arg = args[i];
+                if (arg.compare("-c") || arg.compare("--config") || arg.compare("/c"))
+                {
+                    cfgPath = args[i + 1];
+                    break;
+                }
+            }
+        }
+
+        if (!cfgPath.isEmpty())
+        {
+            if (QFile::exists(cfgPath))
+            {
+                return cfgPath.toStdString();
+            }
+
+            QString msg = "Configuration file \"";
+            msg += cfgPath;
+            msg += "\" does not exist!  Make sure the \"-c\" option specifies the full path to the configuration file and that the file exists.";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            return std::string();
+        }
+
+        cfgPath = QApplication::applicationDirPath();
+        cfgPath += "/ceres.json";
+        if (QFile::exists(cfgPath))
+            return cfgPath.toStdString();
+
+        QString msg = "The default configuration file \"";
+        msg += cfgPath;
+        msg += "\" does not exist!";
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+        mb.exec();
+
+        return std::string();
+    }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -79,6 +140,8 @@ cMainWindow::cMainWindow(QWidget* parent) :
 //-----------------------------------------------------------------------------
 cMainWindow::~cMainWindow()
 {
+//    mpModel->stopDataThread();
+
     delete mpUI;
     mpUI = nullptr;
 }
@@ -86,6 +149,56 @@ cMainWindow::~cMainWindow()
 //-----------------------------------------------------------------------------
 void cMainWindow::initialize()
 {
+    std::string cfgFileName = getCfgFilePath();
+    nlohmann::json configDoc;
+
+    if (!cfgFileName.empty())
+    {
+        std::ifstream in;
+        in.open(cfgFileName);
+
+        if (!in.is_open())
+        {
+            QString msg = "Could not open ";
+            msg += cfgFileName.c_str();
+            msg += " for reading!";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+
+        try
+        {
+            configDoc = nlohmann::json::parse(in, nullptr, true, true);
+        }
+        catch (const nlohmann::json::parse_error& e)
+        {
+            QString msg = "Parsing error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+        catch (const std::exception& e)
+        {
+            QString msg = "Unknown error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+    }
+
     createMainMenu();
     createSubMenusAndActions();
     createActions();
@@ -93,12 +206,17 @@ void cMainWindow::initialize()
     createToolBars();
     createDockWindows();
 
+    createDataModel(configDoc);
+    createExperimentController(configDoc);
+
     createStatusBar();
 
     mpMdiArea = new QMdiArea(this);
     mpMdiArea->setViewMode(QMdiArea::TabbedView);
     mpMdiArea->setTabsClosable(true);
     setCentralWidget(mpMdiArea);
+
+//    QTimer::singleShot(1000, mpModel, &cDataModel::startDataThread);
 }
 
 //-----------------------------------------------------------------------------
@@ -130,6 +248,15 @@ void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
 {
     onStatusUpdate(msg);
 }
+
+void cMainWindow::onExperimentTerminated()
+{
+}
+
+void cMainWindow::onExperimentCompleted()
+{
+}
+
 
 //-----------------------------------------------------------------------------
 void cMainWindow::createMainMenu()
@@ -386,6 +513,63 @@ void cMainWindow::createDockWindows()
     dock->setWidget(mpFieldLayout);
     addDockWidget(Qt::RightDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::createDataModel(const nlohmann::json& configDoc)
+{
+/*
+    mpModel = new cPlannerDataModelLocal(this);
+
+    QObject::connect(mpModel, &cPlannerDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(mpModel, &cPlannerDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(mpModel, &cPlannerDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(mpModel, &cPlannerDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+
+    QObject::connect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
+    QObject::connect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+*/
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
+{
+/*
+    std::string name = configDoc["controller"];
+
+    auto widgets = create_experiment_controller(name, true);
+
+    cExperimentControlModel* pModel = widgets.pModel;
+
+    if ((pModel == nullptr))
+    {
+        return;
+    }
+
+    QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
+*/
+
+//    QObject::connect(this, &cMainWindow::refreshDisplay, mpController, &cExperimentControlView::refresh);
+
+/*
+    QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
+        mpController, &cExperimentControlView::experimentStatusUpdating);
+
+    QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
+        mpController, &cExperimentControlView::experimentStateChanging);
+*/
+
+/*
+    mpModel->addExperimentControlModel(pModel);
+
+    if (configDoc.contains(name))
+    {
+        pModel->configure(configDoc[name]);
+    }
+*/
 }
 
 //-----------------------------------------------------------------------------

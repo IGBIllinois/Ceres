@@ -59,6 +59,15 @@ void cExperimentManager::contextMenuEvent(QContextMenuEvent* event)
     connect(&open, &QAction::triggered, this, &cExperimentManager::openExperiment);
     contextMenu.addAction(&open);
 
+    if (mConnected)
+    {
+        contextMenu.addSeparator();
+
+        QAction test("Test...", this);
+        connect(&test, &QAction::triggered, this, &cExperimentManager::testExperiment);
+        contextMenu.addAction(&test);
+    }
+
     contextMenu.exec(event->globalPos());
 }
 
@@ -73,6 +82,10 @@ void cExperimentManager::openExperiment()
     QString filename = QString::fromStdString(path.string());
 
     emit loadExperiment(filename);
+}
+
+void cExperimentManager::testExperiment()
+{
 }
 
 const cExperimentTreeItem* cExperimentManager::experiments() const

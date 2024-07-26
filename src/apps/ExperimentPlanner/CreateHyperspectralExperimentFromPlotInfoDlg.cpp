@@ -154,10 +154,9 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::createControls_PointSelectio
 	mPlotConversionFactor = nConstants::M_TO_MM;
 	connect(mpPlotUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralExperimentFromPlotInfoDlg::onPlotUnitChange);
 
-	mpMeasureFrom = new QGroupBox(this);
-	mpStart = new QRadioButton("Start", mpMeasureFrom);
-	mpCenter = new QRadioButton("Center", mpMeasureFrom);
-	mpEnd = new QRadioButton("End", mpMeasureFrom);
+	mpStart = new QRadioButton("Start");
+	mpCenter = new QRadioButton("Center");
+	mpEnd = new QRadioButton("End");
 
 	mpCenter->setChecked(true);
 }
@@ -218,6 +217,10 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::createLayout_PointSelection(
 	pGroupBox = new QGroupBox(tr("Plot Information"));
 	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+	mpStart->setParent(pGroupBox);
+	mpCenter->setParent(pGroupBox);
+	mpEnd->setParent(pGroupBox);
+
 	pVSubLayout = new QVBoxLayout();
 
 	QHBoxLayout* pPlotLayout = new QHBoxLayout();
@@ -235,7 +238,7 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::createLayout_PointSelection(
 
 	pPlotLayout = new QHBoxLayout();
 	pPlotLayout->addStretch(1);
-	pText = new QLabel("Measure From:", this);
+	pText = new QLabel("Measured From:", this);
 	pPlotLayout->addWidget(pText);
 	pPlotLayout->addSpacing(10);
 	pPlotLayout->addWidget(mpStart);

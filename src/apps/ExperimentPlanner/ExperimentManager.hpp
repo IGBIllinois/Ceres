@@ -34,6 +34,7 @@ protected:
 
 private slots:
 	void openExperiment();
+	void testExperiment();
 
 private:
 	void loadExperiments();
@@ -42,6 +43,8 @@ private:
 private:
 	cExperimentTreeItem*	mpExperimentItems;
 	std::filesystem::path	mExperimentPath;
+
+	bool mConnected = false;
 };
 
 class cExperimentSelectDlg : public QDialog

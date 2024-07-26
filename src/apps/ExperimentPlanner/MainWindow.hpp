@@ -28,6 +28,7 @@ QT_END_NAMESPACE
 
 
 // Forward Declarations
+class cPlannerDataModel;
 class cExperimentManager;
 class cExperimentTreeItem;
 class cFieldLayoutWidget;
@@ -60,6 +61,9 @@ public slots:
     void onWarningMessage(QString title, QString msg);
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString msg);
+
+    void onExperimentTerminated();
+    void onExperimentCompleted();
 
 
 // Slots associated with "File" menu actions
@@ -124,6 +128,8 @@ private:
     void createToolBars();
     void createStatusBar();
     void createDockWindows();
+    void createDataModel(const nlohmann::json& configDoc);
+    void createExperimentController(const nlohmann::json& configDoc);
     cExperimentDesignMdiChild* createMdiChild();
 
 private:
@@ -154,5 +160,7 @@ private:
 
     Ui::MainWindow* mpUI = nullptr;
     QString mCurrentFile;
+
+//    cPlannerDataModel* mpModel = nullptr;
 };
 

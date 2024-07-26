@@ -178,6 +178,11 @@ void cFlowArrow::onInsertHySpexCommand()
 
 cTerminal::cTerminal(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
 {
+	mBackgroundStyle = Qt::SolidPattern;
+
+	mHighlightColor = Qt::yellow;
+	mHightlightStyle = Qt::Dense2Pattern;
+
 	QFontMetrics fm(mFont);
 
 	auto b = fm.boundingRect(mText);
@@ -194,7 +199,7 @@ cTerminal::cTerminal(const int id, QGraphicsItem* parent) : cConnectedItem(id, p
 	mBottom.setY(mScale * mBoxHeight / 2);
 }
 
-cTerminal::cTerminal(const int id, const QString& text, QGraphicsItem* parent) : cConnectedItem(id, parent)
+cTerminal::cTerminal(const int id, const QString& text, QGraphicsItem* parent) : cTerminal(id, parent)
 {
 	setText(text);
 
