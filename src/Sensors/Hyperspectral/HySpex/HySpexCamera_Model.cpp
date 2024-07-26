@@ -114,6 +114,8 @@ std::uint32_t cHySpexCameraModel::getFramePeriod_us() const { return mFramePerio
 std::uint32_t cHySpexCameraModel::getMinFramePeriod_us() const { return mMinFramePeriod_us; }
 std::uint32_t cHySpexCameraModel::getIntegrationTime_us() const { return mIntegrationTime_us; }
 std::uint32_t cHySpexCameraModel::getMaxIntegrationTime_us() const { return mMaxIntegrationTime_us; }
+
+/* Uncomment
 std::uint16_t cHySpexCameraModel::getNumberFramesToSkip() const { return mNumFramesToSkip; }
 
 void cHySpexCameraModel::setNumberFramesToSkip(std::uint16_t skip)
@@ -123,6 +125,7 @@ void cHySpexCameraModel::setNumberFramesToSkip(std::uint16_t skip)
     if (mSkipNumber > mNumFramesToSkip)
         mSkipNumber = mNumFramesToSkip;
 }
+*/
 
 /*
  * Retrieve the current lens information

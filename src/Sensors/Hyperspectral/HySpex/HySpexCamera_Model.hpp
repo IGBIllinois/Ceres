@@ -84,12 +84,14 @@ public:
     std::uint32_t getIntegrationTime_us() const;
     std::uint32_t getMaxIntegrationTime_us() const;
 
-    std::uint16_t getNumberFramesToSkip() const;
+// Uncomment
+//    std::uint16_t getNumberFramesToSkip() const;
 
     virtual void setAcquisitionParameters(std::uint16_t avg_frames, 
         std::uint32_t frame_period_us, std::uint32_t integration_time_us) = 0;
 
-    void setNumberFramesToSkip(std::uint16_t skip);
+// Uncomment
+//    void setNumberFramesToSkip(std::uint16_t skip);
 
     /*
      * Retrieve the current lens information
@@ -199,8 +201,12 @@ protected:
     std::uint32_t mMinFramePeriod_us = 0;
     std::uint32_t mIntegrationTime_us = 0;
     std::uint32_t mMaxIntegrationTime_us = 0;
+
+/* Uncomment
     std::uint16_t mNumFramesToSkip = 0;
     std::uint16_t mSkipNumber = 0;
+*/
+
     double mAmbientTemp_C = 0.0;
 	double mSensorTemp_C = 0.0;
 
