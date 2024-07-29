@@ -118,6 +118,7 @@ void cSpidercamView::updateRecordingState(bool recording)
 {
 	mpScanArea->setRecording(recording);
 }
+
 void cSpidercamView::refresh()
 {
 	if (mLayoutFilename.empty()) return;
