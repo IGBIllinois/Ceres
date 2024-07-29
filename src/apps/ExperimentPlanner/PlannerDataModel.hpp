@@ -4,6 +4,8 @@
 #include "DataModel.hpp"
 #include "PlannerDataThread.hpp"
 
+#include <spidercam/spidercam_types.hpp>
+
 #include <QObject>
 #include <QThread>
 #include <QMutex>
@@ -42,6 +44,7 @@ public:
     void addSensor(cSensorModel* pSensor) override;
 
     virtual void addExperimentControlModel(cExperimentControlModel* pModel);
+    virtual cExperimentControlModel* removeExperimentControlModel();
 
     void startDataThread() override;
     void stopDataThread() override;
@@ -70,6 +73,15 @@ public:
     void terminateExperiment();
 
 signals:
+    void connectedToController();
+    void disconnectedFromController();
+
+signals:
+    void limitsChanged(spidercam::sWorkingDimensions limits);
+    void positionChanged(spidercam::sPosition_1_t pos);
+    void recordingStateChanged(bool recording);
+
+signals:
     void experimentTerminated();
     void experimentCompleted();
 
@@ -78,6 +90,11 @@ protected slots:
      * Toggles the recording state of the sensor.
      */
     virtual void dataRecordingStateChange(bool record) = 0;
+
+private slots:
+    void updateLimits(spidercam::sWorkingDimensions limits);
+    void updatePosition(spidercam::sPosition_1_t pos);
+    void updateRecordingState(bool recording);
 
 private slots:
     void onExperimentStateChange(experiment::eState state);
@@ -90,6 +107,11 @@ protected:
     std::string mExperimentTitle;
 
     bool mFileOpen = false;
+
+    bool mRecording = false;
+
+    spidercam::sWorkingDimensions mLimits;
+    spidercam::sPosition_1_t mCurrentPosition;
 
     cPlannerDataThread mThread;
 

@@ -24,8 +24,11 @@ public:
 
 signals:
 	void loadExperiment(const QString& file_name);
+	void runExperiment(const QString& file_name);
 
 public slots:
+	void onConnectToSpidercam();
+	void onDisconnectFromSpidercam();
 	void reloadExperiments();
 	void reloadExperiments(QString path);
 

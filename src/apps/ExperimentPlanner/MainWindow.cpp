@@ -35,6 +35,7 @@
 
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentCtrlModel.hpp"
+#include "Spidercam/SpidercamModel.hpp"
 
 #include "ExperimentFieldLayoutDlg.hpp"
 
@@ -140,7 +141,10 @@ cMainWindow::cMainWindow(QWidget* parent) :
 //-----------------------------------------------------------------------------
 cMainWindow::~cMainWindow()
 {
-//    mpModel->stopDataThread();
+    if (mpModel)
+    {
+        mpModel->stopDataThread();
+    }
 
     delete mpUI;
     mpUI = nullptr;
@@ -206,17 +210,12 @@ void cMainWindow::initialize()
     createToolBars();
     createDockWindows();
 
-    createDataModel(configDoc);
-    createExperimentController(configDoc);
-
     createStatusBar();
 
     mpMdiArea = new QMdiArea(this);
     mpMdiArea->setViewMode(QMdiArea::TabbedView);
     mpMdiArea->setTabsClosable(true);
     setCentralWidget(mpMdiArea);
-
-//    QTimer::singleShot(1000, mpModel, &cDataModel::startDataThread);
 }
 
 //-----------------------------------------------------------------------------
@@ -251,10 +250,12 @@ void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
 
 void cMainWindow::onExperimentTerminated()
 {
+    emit experimentCompleted();
 }
 
 void cMainWindow::onExperimentCompleted()
 {
+    emit experimentCompleted();
 }
 
 
@@ -265,6 +266,7 @@ void cMainWindow::createMainMenu()
     mpEditMenu = mpUI->menuBar->addMenu(tr("&Edit"));
     mpGenerateMenu = mpUI->menuBar->addMenu(tr("&Generate"));
     mpPreferencesMenu = mpUI->menuBar->addMenu(tr("&Preferences"));
+    mpSpidercamMenu = mpUI->menuBar->addMenu(tr("&Spidercam"));
     mpViewMenu = mpUI->menuBar->addMenu(tr("&View"));
     mpHelpMenu = mpUI->menuBar->addMenu(tr("&Help"));
 
@@ -454,6 +456,14 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultFieldBoundaries);
     mpPreferencesMenu->addAction(pMenuItem);
 
+    //
+    // Build the Preference Sub Menu
+    //
+    mpSpidercamConnect = new QAction(tr("Connect"), this);
+    mpSpidercamConnect->setStatusTip(tr("Connect to Spidercam"));
+    connect(mpSpidercamConnect, &QAction::triggered, this, &cMainWindow::onConnectToSpidercam);
+    mpSpidercamMenu->addAction(mpSpidercamConnect);
+
     // Build the View Menu
     /* The view menu is built by the dock window system */
 
@@ -488,8 +498,13 @@ void cMainWindow::createDockWindows()
 {
     QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+
     mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
     connect(mpExperiments, &cExperimentManager::loadExperiment, this, &cMainWindow::onOpenExperiment);
+    connect(mpExperiments, &cExperimentManager::runExperiment,  this, &cMainWindow::onExperimentRun);
+
+    connect(this, &cMainWindow::connectedToController,      mpExperiments, &cExperimentManager::onConnectToSpidercam);
+    connect(this, &cMainWindow::disconnectedFromController, mpExperiments, &cExperimentManager::onDisconnectFromSpidercam);
 
     dock->setWidget(mpExperiments);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
@@ -500,6 +515,10 @@ void cMainWindow::createDockWindows()
     mpFieldLayout = new cFieldLayoutWidget(dock);
     mpFieldLayout->initialize();
 
+    connect(this, &cMainWindow::connectedToController, mpFieldLayout, &cFieldLayoutWidget::onConnectToSpidercam);
+    connect(this, &cMainWindow::disconnectedFromController, mpFieldLayout, &cFieldLayoutWidget::onDisconnectFromSpidercam);
+    connect(this, &cMainWindow::experimentRunning, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    
     auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 0).toInt();
     auto maxX_mm = mSettings.value("Defaults/fieldBounds/maxX_mm", 190000).toInt();
     auto minY_mm = mSettings.value("Defaults/fieldBounds/minY_mm", 0).toInt();
@@ -513,63 +532,6 @@ void cMainWindow::createDockWindows()
     dock->setWidget(mpFieldLayout);
     addDockWidget(Qt::RightDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::createDataModel(const nlohmann::json& configDoc)
-{
-/*
-    mpModel = new cPlannerDataModelLocal(this);
-
-    QObject::connect(mpModel, &cPlannerDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::connect(mpModel, &cPlannerDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::connect(mpModel, &cPlannerDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::connect(mpModel, &cPlannerDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
-
-    QObject::connect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
-    QObject::connect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
-*/
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
-{
-/*
-    std::string name = configDoc["controller"];
-
-    auto widgets = create_experiment_controller(name, true);
-
-    cExperimentControlModel* pModel = widgets.pModel;
-
-    if ((pModel == nullptr))
-    {
-        return;
-    }
-
-    QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::connect(pModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
-*/
-
-//    QObject::connect(this, &cMainWindow::refreshDisplay, mpController, &cExperimentControlView::refresh);
-
-/*
-    QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
-        mpController, &cExperimentControlView::experimentStatusUpdating);
-
-    QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
-        mpController, &cExperimentControlView::experimentStateChanging);
-*/
-
-/*
-    mpModel->addExperimentControlModel(pModel);
-
-    if (configDoc.contains(name))
-    {
-        pModel->configure(configDoc[name]);
-    }
-*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1186,6 +1148,166 @@ void cMainWindow::onPreferenceDefaultFieldBoundaries()
     mSettings.setValue("Defaults/fieldBounds/maxY_mm", maxY_mm);
 }
 
+
+/********************************************************************
+ * Slots associated with "Connect" menu actions
+ *******************************************************************/
+void cMainWindow::onConnectToSpidercam()
+{
+    if (mpModel)
+    {
+        onDisconnectFromSpidercam();
+        return;
+    }
+
+    std::string cfgFileName = getCfgFilePath();
+    nlohmann::json configDoc;
+
+    if (!cfgFileName.empty())
+    {
+        std::ifstream in;
+        in.open(cfgFileName);
+
+        if (!in.is_open())
+        {
+            QString msg = "Could not open ";
+            msg += cfgFileName.c_str();
+            msg += " for reading!";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+
+        try
+        {
+            configDoc = nlohmann::json::parse(in, nullptr, true, true);
+        }
+        catch (const nlohmann::json::parse_error& e)
+        {
+            QString msg = "Parsing error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+        catch (const std::exception& e)
+        {
+            QString msg = "Unknown error in ";
+            msg += cfgFileName.c_str();
+            msg += ".\n";
+            msg += e.what();
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+            mb.exec();
+
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    std::string name = configDoc["controller"];
+
+    auto widgets = create_experiment_controller(name, true);
+
+    cExperimentControlModel* pCtrlModel = widgets.pModel;
+
+    if ((pCtrlModel == nullptr))
+    {
+        return;
+    }
+
+    mpModel = new cPlannerDataModelLocal(this);
+
+    QObject::connect(mpModel, &cPlannerDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(mpModel, &cPlannerDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(mpModel, &cPlannerDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(mpModel, &cPlannerDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+
+    QObject::connect(mpModel, &cPlannerDataModel::connectedToController, this, &cMainWindow::connectedToController);
+    QObject::connect(mpModel, &cPlannerDataModel::disconnectedFromController, this, &cMainWindow::disconnectedFromController);
+
+    QObject::connect(mpModel, &cPlannerDataModel::limitsChanged, mpFieldLayout, &cFieldLayoutWidget::updateLimits);
+    QObject::connect(mpModel, &cPlannerDataModel::positionChanged, mpFieldLayout, &cFieldLayoutWidget::updatePosition);
+    QObject::connect(mpModel, &cPlannerDataModel::recordingStateChanged, mpFieldLayout, &cFieldLayoutWidget::updateRecordingState);
+
+    QObject::connect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
+    QObject::connect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+
+    QObject::connect(pCtrlModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::connect(pCtrlModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::connect(pCtrlModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::connect(pCtrlModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
+
+
+    //    QObject::connect(this, &cMainWindow::refreshDisplay, mpController, &cExperimentControlView::refresh);
+
+    /*
+        QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
+            mpController, &cExperimentControlView::experimentStatusUpdating);
+
+        QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
+            mpController, &cExperimentControlView::experimentStateChanging);
+    */
+
+    mpModel->addExperimentControlModel(pCtrlModel);
+
+    if (configDoc.contains(name))
+    {
+        pCtrlModel->configure(configDoc[name]);
+    }
+
+    mpModel->startDataThread();
+
+    mpSpidercamConnect->setText(tr("Disconnect"));
+    mpSpidercamConnect->setStatusTip(tr("Disconnect from Spidercam"));
+}
+
+
+void cMainWindow::onDisconnectFromSpidercam()
+{
+    if (!mpModel)
+    {
+        return;
+    }
+
+    mpModel->stopDataThread();
+
+    cExperimentControlModel* pCtrlModel = mpModel->removeExperimentControlModel();
+
+    QObject::disconnect(pCtrlModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::disconnect(pCtrlModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::disconnect(pCtrlModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::disconnect(pCtrlModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
+
+    QObject::disconnect(mpModel, &cPlannerDataModel::limitsChanged, mpFieldLayout, &cFieldLayoutWidget::updateLimits);
+    QObject::disconnect(mpModel, &cPlannerDataModel::positionChanged, mpFieldLayout, &cFieldLayoutWidget::updatePosition);
+    QObject::disconnect(mpModel, &cPlannerDataModel::recordingStateChanged, mpFieldLayout, &cFieldLayoutWidget::updateRecordingState);
+
+    QObject::disconnect(mpModel, &cPlannerDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+    QObject::disconnect(mpModel, &cPlannerDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
+    QObject::disconnect(mpModel, &cPlannerDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
+    QObject::disconnect(mpModel, &cPlannerDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
+
+    QObject::disconnect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
+    QObject::disconnect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+
+    delete mpModel;
+    mpModel = nullptr;
+
+    delete pCtrlModel;
+
+    mpSpidercamConnect->setText(tr("Connect"));
+    mpSpidercamConnect->setStatusTip(tr("Connect to Spidercam"));
+
+    emit disconnectedFromController();
+}
+
+
 /********************************************************************
  * Slots associated with "Help" menu actions
  *******************************************************************/
@@ -1249,6 +1371,134 @@ void cMainWindow::onExperimentChange(QSharedPointer<cExperimentFile> experiment)
 void cMainWindow::onExperimentListUpdateNeeded()
 {
     mpExperiments->reloadExperiments();
+}
+
+
+//-----------------------------------------------------------------------------
+bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
+{
+    QString msg = "Loading experiment \"";
+    msg += experiment.text(0);
+    msg += "\" from file ";
+    msg += experiment.getFilename();
+    onStatusUpdate(msg);
+
+    std::string name = experiment.text(0).toStdString();
+    auto expDoc = experiment.getExperimentDocument();
+    if (!mpModel->loadExperiment(name, expDoc))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
+{
+    using namespace nlohmann;
+
+    std::ifstream in;
+    in.open(experiment_file);
+
+    if (!in.is_open())
+    {
+        throw std::invalid_argument("Could not open file.");
+    }
+
+    nlohmann::json jsonDoc;
+    std::string name;
+
+    try
+    {
+        in >> jsonDoc;
+
+        if (jsonDoc.contains("experiment name"))
+            name = jsonDoc["experiment name"];
+        else
+            name = jsonDoc["experiment_name"];
+    }
+    catch (const detail::exception& e)
+    {
+        QString msg = "Failed to loading experiment file: ";
+        msg += QString::fromStdString(experiment_file.string());
+        onWarningMessage("File Error", msg);
+
+        return false;
+    }
+
+
+    QString msg = "Loading experiment \"";
+    msg += QString::fromStdString(name);
+    msg += "\" from file ";
+    msg += QString::fromStdString(experiment_file.string());
+    onStatusUpdate(msg);
+
+    if (!mpModel->loadExperiment(name, jsonDoc))
+    {
+        QString msg = "Experiment \"";
+        msg += QString::fromStdString(name);
+        msg += "\" from file ";
+        msg += QString::fromStdString(experiment_file.string());
+        msg += " failed to load!";
+        onStatusUpdate(msg);
+        return false;
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::onExperimentRun(const QString& filename)
+{
+    if (!mpModel)
+        return;
+
+    if (mpModel->isExperimentRunning())
+    {
+        if (mpModel->isExperimentPaused())
+        {
+            mpModel->startExperiment();
+        }
+        return;
+    }
+
+    onOpenExperiment(filename);
+
+    if (!mpModel->systemReady())
+    {
+        return;
+    }
+
+    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+
+    if (pExperiment == nullptr)
+    {
+        return;
+    }
+
+    if (pExperiment->hasExperimentDocument())
+    {
+        loadExperiment(*pExperiment);
+    }
+ 
+    if (!mpModel->isExperimentLoaded())
+    {
+        return;
+    }
+
+    if (mpModel->experimentRequiresDataFile())
+    {
+        std::string fileName = mpModel->experimentTitle();
+        if (!mpModel->openDataFile("", fileName, false))
+        {
+            mpModel->terminateExperiment();
+            return;
+        }
+    }
+
+    mpModel->startExperiment();
+
+    emit experimentRunning();
 }
 
 //-----------------------------------------------------------------------------

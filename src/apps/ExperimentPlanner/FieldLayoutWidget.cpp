@@ -71,6 +71,40 @@ const std::vector<cSpidercamScanArea::experimentLayout_t>& cFieldLayoutWidget::g
     return mpScanArea->getLayouts();
 }
 
+void cFieldLayoutWidget::onConnectToSpidercam()
+{
+    mpScanArea->showDollyPosition();
+    mpScanArea->repaint();
+}
+
+void cFieldLayoutWidget::onDisconnectFromSpidercam()
+{
+    mpScanArea->hideDollyPosition();
+    mpScanArea->repaint();
+}
+
+void cFieldLayoutWidget::updateLimits(spidercam::sWorkingDimensions limits)
+{
+    auto mMinX_mm = limits.minX_mm;
+    auto mMaxX_mm = limits.maxX_mm;
+    auto mMinY_mm = limits.minY_mm;
+    auto mMaxY_mm = limits.maxY_mm;
+//    mMinHeight_mm = limits.minHeight_mm;
+//    mMaxHeight_mm = limits.maxHeight_mm;
+
+    mpScanArea->updateBounds(mMinX_mm, mMaxX_mm, mMinY_mm, mMaxY_mm);
+}
+
+void cFieldLayoutWidget::updatePosition(spidercam::sPosition_1_t pos)
+{
+    mpScanArea->updateDollyPosition(pos.X_mm, pos.Y_mm);
+}
+
+void cFieldLayoutWidget::updateRecordingState(bool recording)
+{
+    mpScanArea->setRecording(recording);
+}
+
 void cFieldLayoutWidget::clearRecordingPath()
 {
     mpScanArea->clearRecordedPath();

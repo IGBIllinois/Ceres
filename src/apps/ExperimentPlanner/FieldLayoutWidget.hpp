@@ -5,6 +5,8 @@
 
 #include "Spidercam/SpidercamScanArea.hpp"
 
+#include <spidercam/spidercam_types.hpp>
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
@@ -39,6 +41,15 @@ public:
 	void save(const QString& layout_filename);
 
 public slots:
+	void onConnectToSpidercam();
+	void onDisconnectFromSpidercam();
+
+public slots:
+	void updateLimits(spidercam::sWorkingDimensions limits);
+	void updatePosition(spidercam::sPosition_1_t pos);
+
+public slots:
+	void updateRecordingState(bool recording);
 	void clearRecordingPath();
 	void drawRecordingPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
 

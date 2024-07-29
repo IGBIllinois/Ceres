@@ -38,6 +38,16 @@ cExperimentManager::cExperimentManager(const QString& path, QWidget* parent)
     loadExperiments();
 }
 
+void cExperimentManager::onConnectToSpidercam()
+{
+    mConnected = true;
+}
+
+void cExperimentManager::onDisconnectFromSpidercam()
+{
+    mConnected = false;
+}
+
 void cExperimentManager::reloadExperiments()
 {
     clear();
@@ -55,17 +65,17 @@ void cExperimentManager::contextMenuEvent(QContextMenuEvent* event)
 {
     QMenu contextMenu(this);
 
-    QAction open("Open...", this);
-    connect(&open, &QAction::triggered, this, &cExperimentManager::openExperiment);
-    contextMenu.addAction(&open);
+    QAction* menuItem = new QAction("Open...", this);
+    connect(menuItem, &QAction::triggered, this, &cExperimentManager::openExperiment);
+    contextMenu.addAction(menuItem);
 
     if (mConnected)
     {
         contextMenu.addSeparator();
 
-        QAction test("Test...", this);
-        connect(&test, &QAction::triggered, this, &cExperimentManager::testExperiment);
-        contextMenu.addAction(&test);
+        QAction* menuItem = new QAction("Test...", this);
+        connect(menuItem, &QAction::triggered, this, &cExperimentManager::testExperiment);
+        contextMenu.addAction(menuItem);
     }
 
     contextMenu.exec(event->globalPos());
@@ -86,6 +96,15 @@ void cExperimentManager::openExperiment()
 
 void cExperimentManager::testExperiment()
 {
+    auto pItem = dynamic_cast<cExperimentTreeItem*>(currentItem());
+    if (!pItem)
+        return;
+
+    auto path = pItem->getExperimentFile();
+
+    QString filename = QString::fromStdString(path.string());
+
+    emit runExperiment(filename);
 }
 
 const cExperimentTreeItem* cExperimentManager::experiments() const

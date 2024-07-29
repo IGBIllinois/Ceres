@@ -14,6 +14,10 @@ public:
     explicit cPlannerDataThread();
     virtual ~cPlannerDataThread();
 
+signals:
+    void connectedToController();
+    void disconnectedFromController();
+
 protected:
     void updateAll() override;
 

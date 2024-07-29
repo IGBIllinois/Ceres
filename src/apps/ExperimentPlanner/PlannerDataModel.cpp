@@ -4,6 +4,8 @@
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
+#include "Spidercam/SpidercamModel.hpp"
+
 #include <QMessageBox>
 
 #include <tuple>
@@ -57,6 +59,9 @@ cPlannerDataModel::cPlannerDataModel(QObject* parent)
     QObject::connect(&mThread, &cDataThread::statusMessage, this, &cPlannerDataModel::onStatusUpdate);
     QObject::connect(&mThread, &cDataThread::errorMessage, this, &cPlannerDataModel::onErrorUpdate);
     QObject::connect(&mThread, &cDataThread::terminate, this, &cPlannerDataModel::onDataThreadTermination);
+
+    QObject::connect(&mThread, &cPlannerDataThread::connectedToController,      this, &cPlannerDataModel::connectedToController);
+    QObject::connect(&mThread, &cPlannerDataThread::disconnectedFromController, this, &cPlannerDataModel::disconnectedFromController);
 }
 
 cPlannerDataModel::~cPlannerDataModel()
@@ -80,7 +85,37 @@ void cPlannerDataModel::addExperimentControlModel(cExperimentControlModel* pCont
         mThread.mpController = pControlModel;
         QObject::connect(mThread.mpController, &cExperimentControlModel::experimentStateChanged, this, &cPlannerDataModel::onExperimentStateChange);
         mThread.mpController->moveToThread(&mThread);
+
+        cSpidercamModel* pScModel = dynamic_cast<cSpidercamModel*>(pControlModel);
+
+        if (pScModel)
+        {
+            QObject::connect(pScModel, &cSpidercamModel::limitsChanged, this, &cPlannerDataModel::updateLimits);
+            QObject::connect(pScModel, &cSpidercamModel::positionChanged, this, &cPlannerDataModel::updatePosition);
+            QObject::connect(pScModel, &cSpidercamModel::requestDataRecordingState, this, &cPlannerDataModel::updateRecordingState);
+        }
     }
+}
+
+cExperimentControlModel* cPlannerDataModel::removeExperimentControlModel()
+{
+    auto* pModel = mThread.mpController;
+
+    if (pModel)
+    {
+        cSpidercamModel* pScModel = dynamic_cast<cSpidercamModel*>(pModel);
+
+        if (pScModel)
+        {
+            QObject::disconnect(pScModel, &cSpidercamModel::limitsChanged, this, &cPlannerDataModel::updateLimits);
+            QObject::disconnect(pScModel, &cSpidercamModel::positionChanged, this, &cPlannerDataModel::updatePosition);
+            QObject::disconnect(pScModel, &cSpidercamModel::requestDataRecordingState, this, &cPlannerDataModel::updateRecordingState);
+        }
+    }
+
+    mThread.mpController = nullptr;
+
+    return pModel;
 }
 
 void cPlannerDataModel::startDataThread()
@@ -235,6 +270,24 @@ void cPlannerDataModel::terminateExperiment()
 {
     if (mThread.mpController)
         mThread.mpController->terminateExperiment();
+}
+
+void cPlannerDataModel::updateLimits(spidercam::sWorkingDimensions limits)
+{
+    mLimits = limits;
+    emit limitsChanged(limits);
+
+}
+
+void cPlannerDataModel::updatePosition(spidercam::sPosition_1_t pos)
+{
+    mCurrentPosition = pos;
+    emit positionChanged(pos);
+}
+
+void cPlannerDataModel::updateRecordingState(bool recording)
+{
+    mRecording = recording;
 }
 
 void cPlannerDataModel::onExperimentStateChange(experiment::eState state)

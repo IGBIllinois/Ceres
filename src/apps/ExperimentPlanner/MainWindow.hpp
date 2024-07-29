@@ -52,8 +52,14 @@ public:
     void initialize();
 
 signals:
+    void experimentRunning();
+    void experimentCompleted();
     void refreshDisplay();
     void defaultExperimentPathChange(const QString& path);
+
+signals:
+    void connectedToController();
+    void disconnectedFromController();
 
 public slots:
     void onStatusUpdate(QString msg);
@@ -108,6 +114,11 @@ private slots:
     void onPreferenceDefaultPlotSplitDirectory();
     void onPreferenceDefaultFieldBoundaries();
 
+    // Slots associated with "Spidercam" menu actions
+private slots:
+    void onConnectToSpidercam();
+    void onDisconnectFromSpidercam();
+
 // Slots associated with "Help" menu actions
 private slots:
     void onHelpAbout();
@@ -117,6 +128,8 @@ private slots:
     void onOpenExperiment(const QString& filename);
     void onExperimentChange(QSharedPointer<cExperimentFile> experiment);
     void onExperimentListUpdateNeeded();
+
+    void onExperimentRun(const QString& filename);
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -128,9 +141,11 @@ private:
     void createToolBars();
     void createStatusBar();
     void createDockWindows();
-    void createDataModel(const nlohmann::json& configDoc);
-    void createExperimentController(const nlohmann::json& configDoc);
     cExperimentDesignMdiChild* createMdiChild();
+
+private:
+    bool loadExperiment(const cExperimentTreeItem& experiment);
+    bool loadExperiment(const std::filesystem::path& experiment);
 
 private:
     void LoadGpsData(QString fileName);
@@ -153,14 +168,17 @@ private:
     QMenu* mpEditMenu = nullptr;
     QMenu* mpGenerateMenu = nullptr;
     QMenu* mpPreferencesMenu = nullptr;
+    QMenu* mpSpidercamMenu = nullptr;
     QMenu* mpViewMenu = nullptr;
     QMenu* mpHelpMenu = nullptr;
+
+    QAction* mpSpidercamConnect = nullptr;
 
     QToolBar* mpFileBar = nullptr;
 
     Ui::MainWindow* mpUI = nullptr;
     QString mCurrentFile;
 
-//    cPlannerDataModel* mpModel = nullptr;
+    cPlannerDataModel* mpModel = nullptr;
 };
 

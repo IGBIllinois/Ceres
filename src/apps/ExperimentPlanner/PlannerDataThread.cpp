@@ -28,11 +28,15 @@ bool cPlannerDataThread::startCommunications()
         QObject::connect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
     }
 
+    emit connectedToController();
+
     return true;
 }
 
 bool cPlannerDataThread::stopCommunications()
 {
+    emit disconnectedFromController();
+
     for (auto& sensor : mActiveSensors)
     {
         QObject::disconnect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
