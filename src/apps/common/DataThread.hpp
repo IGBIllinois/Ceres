@@ -18,6 +18,8 @@ public:
     void start();
     void stop();
 
+    void abort();
+
 signals:
     void statusMessage(QString msg);
     void errorMessage(QString title, QString msg);
@@ -35,6 +37,7 @@ public:
     std::vector<cSensorModel*> mActiveSensors;
 
 private:
+    bool mStop  = false;
     bool mAbort = false;
 };
 

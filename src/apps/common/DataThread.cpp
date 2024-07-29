@@ -11,19 +11,27 @@ cDataThread::cDataThread()
 
 cDataThread::~cDataThread()
 {
-    stop();
+    abort();
 }
 
 void cDataThread::start()
 {
     if (!isRunning()) 
     {
+        mStop = false;
         mAbort = false;
         QThread::start(TimeCriticalPriority);
     }
 }
 
 void cDataThread::stop()
+{
+    mStop = true;
+
+    wait();
+}
+
+void cDataThread::abort()
 {
     mAbort = true;
 
@@ -101,6 +109,11 @@ void cDataThread::run()
             if (pDispatcher->hasPendingEvents())
             {
                 pDispatcher->processEvents(QEventLoop::ExcludeUserInputEvents);
+            }
+
+            if (mStop)
+            {
+                goto cleanup;
             }
 
             if (mAbort)
