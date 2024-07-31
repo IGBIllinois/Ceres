@@ -90,6 +90,9 @@ public:
     void updateBounds(double minX, double maxX, double minY, double maxY);
     void updateDollyPosition(uint32_t x, uint32_t y);
 
+    struct sPosition_t { int32_t x = 0; int32_t y = 0; };
+    sPosition_t getDollyPosition() const;
+
     void loadLayout(const std::string& layout_filename);
     void saveLayout(const std::string& layout_filename);
 

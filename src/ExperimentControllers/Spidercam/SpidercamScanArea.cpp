@@ -225,6 +225,12 @@ void cSpidercamScanArea::updateDollyPosition(uint32_t x, uint32_t y)
 	repaint();
 }
 
+cSpidercamScanArea::sPosition_t cSpidercamScanArea::getDollyPosition() const
+{
+	return { mDollyPosition.x(), mDollyPosition.y() };
+}
+
+
 void cSpidercamScanArea::updateSecondaryDollyPosition(bool valid, uint32_t x, uint32_t y)
 {
 	mHasSecondaryPosition = valid;
