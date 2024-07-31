@@ -83,4 +83,8 @@ private:
 
 	QPushButton* mpSampleXY = nullptr;
 	QPushButton* mpSampleXYZ = nullptr;
+
+	uint32_t mSpidercamX_mm = 0;
+	uint32_t mSpidercamY_mm = 0;
+	uint32_t mSpidercamZ_mm = 0;
 };

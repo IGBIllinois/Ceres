@@ -36,7 +36,7 @@
 
 namespace
 {
-	const QString SCAN_DISTANCE_TEXT = "Distance (";
+	const QString SCAN_DISTANCE_TEXT = "Scan Distance (";
 	const QString SCAN_SEPARATION_TEXT = "Separation (";
 
 	const QString WEST_TO_EAST = "West to East";
@@ -91,6 +91,10 @@ void cCreateLidarExperimentFromSpiderCamDlg::createControls_PointSelection()
 	mpScanUnits->setCurrentIndex(2);
 	mScanConversionFactor = nConstants::FT_TO_MM;
 	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateLidarExperimentFromSpiderCamDlg::onScanUnitChange);
+
+	mpSampleXY = new QPushButton("Record X, Y", this);
+	mpSampleXY->setEnabled(false);
+	connect(mpSampleXY, &QPushButton::pressed, this, &cCreateLidarExperimentFromSpiderCamDlg::recordXY);
 }
 
 void cCreateLidarExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -117,6 +121,9 @@ void cCreateLidarExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLa
 	pGridLayout->addWidget(mpScanOrientation, 2, 3);
 	pGridLayout->addWidget(mpScanUnits, 2, 4);
 	pPosLayout->addLayout(pGridLayout);
+
+	pPosLayout->addSpacing(10);
+	pPosLayout->addWidget(mpSampleXY);
 
 	pPosLayout->addStretch(1);
 
@@ -581,5 +588,21 @@ void cCreateLidarExperimentFromSpiderCamDlg::onShowPath()
 			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 		}
 	}
+}
 
+void cCreateLidarExperimentFromSpiderCamDlg::recordXY()
+{
+	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
+	{
+		mpStartX_mm->setText(QString::number(mSpidercamX_mm));
+		mpStartY_mm->setText(QString::number(mSpidercamY_mm));
+	}
+}
+
+void cCreateLidarExperimentFromSpiderCamDlg::positionUpdated(spidercam::sPosition_1_t pos)
+{
+	mSpidercamX_mm = pos.X_mm;
+	mSpidercamY_mm = pos.Y_mm;
+
+	mpSampleXY->setEnabled(true);
 }

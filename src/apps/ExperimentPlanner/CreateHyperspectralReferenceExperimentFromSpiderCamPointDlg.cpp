@@ -72,6 +72,32 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createControls_Poi
 
 	mpRefPosY_mm = new QLineEdit(this);
 	mpRefPosY_mm->setValidator(new QIntValidator(10000, 190000));
+
+	// default to feet
+	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
+	mpScanDistance = new QLineEdit(this);
+	mpScanDistance->setValidator(new QDoubleValidator(0, 10000.0, 3));
+
+	mpScanOrientation = new QComboBox(this);
+	mpScanOrientation->setEditable(false);
+	mpScanOrientation->addItem(WEST_TO_EAST);
+	mpScanOrientation->addItem(EAST_TO_WEST);
+	mpScanOrientation->addItem(NORTH_TO_SOUTH);
+	mpScanOrientation->addItem(SOUTH_TO_NORTH);
+
+	mpScanUnits = new QComboBox(this);
+	mpScanUnits->setEditable(false);
+	mpScanUnits->addItem("Meters");
+	mpScanUnits->addItem("Millimeters");
+	mpScanUnits->addItem("Feet");
+	mpScanUnits->addItem("Inches");
+	mpScanUnits->setCurrentIndex(2);
+	mScanConversionFactor = nConstants::FT_TO_MM;
+	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onScanUnitChange);
+
+	mpSampleXY = new QPushButton("Record X, Y", this);
+	mpSampleXY->setEnabled(false);
+	connect(mpSampleXY, &QPushButton::pressed, this, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::recordXY);
 }
 
 void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -93,7 +119,14 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_Point
 	pText = new QLabel("Y position (mm)");
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpRefPosY_mm, 0, 4);
+	pGridLayout->addWidget(mpScanDistanceLabel, 2, 0);
+	pGridLayout->addWidget(mpScanDistance, 2, 1);
+	pGridLayout->addWidget(mpScanOrientation, 2, 3);
+	pGridLayout->addWidget(mpScanUnits, 2, 4);
 	pPosLayout->addLayout(pGridLayout);
+
+	pPosLayout->addSpacing(10);
+	pPosLayout->addWidget(mpSampleXY);
 
 	pPosLayout->addStretch(1);
 
@@ -106,6 +139,39 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_Point
 	pMainLayout->addLayout(pPosLayout);
 
 	pMainLayout->addSpacing(10);
+}
+
+void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
+{
+	double distance = mpScanDistance->text().toDouble() * mScanConversionFactor;
+
+	switch (mpScanUnits->currentIndex())
+	{
+	case 0:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "m)");
+
+		mScanConversionFactor = nConstants::M_TO_MM;
+		break;
+	case 1:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "mm)");
+
+		mScanConversionFactor = 1.0;
+		break;
+	case 2:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "ft)");
+
+		mScanConversionFactor = nConstants::FT_TO_MM;
+		break;
+	case 3:
+		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "in)");
+
+		mScanConversionFactor = nConstants::IN_TO_MM;
+		break;
+	}
+
+	distance /= mScanConversionFactor;
+
+	mpScanDistance->setText(QString::number(distance));
 }
 
 bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
@@ -154,6 +220,36 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 			h1_mm = 0;
 	}
 
+	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+
+	int x2_mm = x1_mm;
+	int y2_mm = y1_mm;
+	int h2_mm = h1_mm;
+
+	switch (mpScanOrientation->currentIndex())
+	{
+	case SCAN_WEST_TO_EAST:
+		y2_mm += distance_mm;
+		break;
+	case SCAN_EAST_TO_WEST:
+		y2_mm -= distance_mm;
+		break;
+	case SCAN_NORTH_TO_SOUTH:
+		x2_mm += distance_mm;
+		break;
+	case SCAN_SOUTH_TO_NORTH:
+		x2_mm -= distance_mm;
+		break;
+	}
+
+	if (pGroundModel)
+	{
+		h2_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x2_mm, y2_mm));
+
+		if (h2_mm == rfm::INVALID_HEIGHT)
+			h2_mm = 0;
+	}
+
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int scan_z_mm = static_cast<int>(mpReferenceHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	scan_z_mm += mpLensFocalDistance->currentData().toInt();
@@ -198,8 +294,12 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		scan_z_mm += sensor_offset_mm;
 	}
 
+	int dx_mm = x2_mm - x1_mm;
+	int dy_mm = y2_mm - y1_mm;
+
 	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
+//BAF	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
 	int safe_vertical_speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
 
 	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
@@ -274,15 +374,18 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		}
 	}
 
-	float measurement_time_sec = mpMeasurementTime_sec->text().toFloat();
-
-	if (measurement_time_sec > 0.0)
+	if ((dx_mm == 0) && (dy_mm == 0))
 	{
-		// Do measurement...
-		std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-		delay->setWaitTime_sec(measurement_time_sec);
-		delay->setRecording(true);
-		pInfo->appendStep(std::move(delay));
+		float measurement_time_sec = mpMeasurementTime_sec->text().toFloat();
+
+		if (measurement_time_sec > 0.0)
+		{
+			// Do measurement...
+			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+			delay->setWaitTime_sec(measurement_time_sec);
+			delay->setRecording(true);
+			pInfo->appendStep(std::move(delay));
+		}
 	}
 
 	// Move dolly to a safe height to park it
@@ -338,11 +441,10 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 	return true;
 }
 
-/*
 void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onShowPath()
 {
-	int x1_mm = mpStartX_mm->text().toInt();
-	int y1_mm = mpStartY_mm->text().toInt();
+	int x1_mm = mpRefPosX_mm->text().toInt();
+	int y1_mm = mpRefPosY_mm->text().toInt();
 
 	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
 
@@ -365,7 +467,22 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::onShowPath()
 		break;
 	}
 
-
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 }
-*/
+
+void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::recordXY()
+{
+	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
+	{
+		mpRefPosX_mm->setText(QString::number(mSpidercamX_mm));
+		mpRefPosY_mm->setText(QString::number(mSpidercamY_mm));
+	}
+}
+
+void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::positionUpdated(spidercam::sPosition_1_t pos)
+{
+	mSpidercamX_mm = pos.X_mm;
+	mSpidercamY_mm = pos.Y_mm;
+
+	mpSampleXY->setEnabled(true);
+}

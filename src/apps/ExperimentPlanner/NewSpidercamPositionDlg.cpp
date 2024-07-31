@@ -13,24 +13,26 @@
 
 #include <algorithm>
 
-
-cNewSpidercam_X_PositionDlg::cNewSpidercam_X_PositionDlg(QWidget* parent)
+//
+// Set a new X value for the whole experiment
+//
+cNewSpidercam_X_PositionDlg::cNewSpidercam_X_PositionDlg(int minX_mm, int maxX_mm, QWidget* parent)
 :
 	QDialog(parent)
 {
 	setWindowTitle("Shift Parameters");
 
-	createControls();
+	createControls(minX_mm, maxX_mm);
 	createLayout();
 }
 
 cNewSpidercam_X_PositionDlg::~cNewSpidercam_X_PositionDlg()
 {}
 
-void cNewSpidercam_X_PositionDlg::createControls()
+void cNewSpidercam_X_PositionDlg::createControls(int minX_mm, int maxX_mm)
 {
 	mpX_mm = new QLineEdit(this);
-	mpX_mm->setValidator(new QIntValidator(10000, 190000));
+	mpX_mm->setValidator(new QIntValidator(minX_mm, maxX_mm));
 	mpX_mm->setText("0");
 
 	mpSampleX = new QPushButton("Record X", this);
@@ -76,27 +78,37 @@ int cNewSpidercam_X_PositionDlg::x_mm() const
 
 void cNewSpidercam_X_PositionDlg::recordX()
 {
+	if (mSpidercamX_mm > 0)
+		mpX_mm->setText(QString::number(mSpidercamX_mm));
+}
 
+void cNewSpidercam_X_PositionDlg::positionUpdated(spidercam::sPosition_1_t pos)
+{
+	mSpidercamX_mm = pos.X_mm;
+	mpSampleX->setEnabled(true);
 }
 
 
-cNewSpidercam_Y_PositionDlg::cNewSpidercam_Y_PositionDlg(QWidget* parent)
+//
+// Set a new Y value for the whole experiment
+//
+cNewSpidercam_Y_PositionDlg::cNewSpidercam_Y_PositionDlg(int minY_mm, int maxY_mm, QWidget* parent)
 	:
 	QDialog(parent)
 {
 	setWindowTitle("Shift Parameters");
 
-	createControls();
+	createControls(minY_mm, maxY_mm);
 	createLayout();
 }
 
 cNewSpidercam_Y_PositionDlg::~cNewSpidercam_Y_PositionDlg()
 {}
 
-void cNewSpidercam_Y_PositionDlg::createControls()
+void cNewSpidercam_Y_PositionDlg::createControls(int minY_mm, int maxY_mm)
 {
 	mpY_mm = new QLineEdit(this);
-	mpY_mm->setValidator(new QIntValidator(10000, 190000));
+	mpY_mm->setValidator(new QIntValidator(minY_mm, maxY_mm));
 	mpY_mm->setText("0");
 
 	mpSampleY = new QPushButton("Record Y", this);
@@ -142,27 +154,37 @@ int cNewSpidercam_Y_PositionDlg::y_mm() const
 
 void cNewSpidercam_Y_PositionDlg::recordY()
 {
+	if (mSpidercamY_mm > 0)
+		mpY_mm->setText(QString::number(mSpidercamY_mm));
+}
 
+void cNewSpidercam_Y_PositionDlg::positionUpdated(spidercam::sPosition_1_t pos)
+{
+	mSpidercamY_mm = pos.Y_mm;
+	mpSampleY->setEnabled(true);
 }
 
 
-cNewSpidercam_Z_PositionDlg::cNewSpidercam_Z_PositionDlg(QWidget* parent)
+//
+// Set a new Z value for the whole experiment
+//
+cNewSpidercam_Z_PositionDlg::cNewSpidercam_Z_PositionDlg(int minZ_mm, int maxZ_mm, QWidget* parent)
 	:
 	QDialog(parent)
 {
 	setWindowTitle("Shift Parameters");
 
-	createControls();
+	createControls(minZ_mm, maxZ_mm);
 	createLayout();
 }
 
 cNewSpidercam_Z_PositionDlg::~cNewSpidercam_Z_PositionDlg()
 {}
 
-void cNewSpidercam_Z_PositionDlg::createControls()
+void cNewSpidercam_Z_PositionDlg::createControls(int minZ_mm, int maxZ_mm)
 {
 	mpZ_mm = new QLineEdit(this);
-	mpZ_mm->setValidator(new QIntValidator(10000, 190000));
+	mpZ_mm->setValidator(new QIntValidator(minZ_mm, maxZ_mm));
 	mpZ_mm->setText("0");
 
 	mpSampleZ = new QPushButton("Record Z", this);
@@ -208,6 +230,13 @@ int cNewSpidercam_Z_PositionDlg::z_mm() const
 
 void cNewSpidercam_Z_PositionDlg::recordZ()
 {
+	if (mSpidercamZ_mm > 0)
+		mpZ_mm->setText(QString::number(mSpidercamZ_mm));
+}
 
+void cNewSpidercam_Z_PositionDlg::positionUpdated(spidercam::sPosition_1_t pos)
+{
+	mSpidercamZ_mm = pos.Z_mm;
+	mpSampleZ->setEnabled(true);
 }
 

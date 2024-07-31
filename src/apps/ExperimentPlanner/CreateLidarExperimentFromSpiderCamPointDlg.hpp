@@ -3,6 +3,8 @@
 
 #include "CreateLidarExperimentDlg.hpp"
 
+#include <spidercam/spidercam_types.hpp>
+
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -27,10 +29,14 @@ public:
 	virtual ~cCreateLidarExperimentFromSpiderCamDlg();
 
 
+public slots:
+	void positionUpdated(spidercam::sPosition_1_t pos);
+
 private slots:
 	bool generate() override;
 	void onShowPath() override;
 	void onScanUnitChange(const QString& text);
+	void recordXY();
 
 private:
 	void createControls_PointSelection() override;
@@ -48,4 +54,9 @@ private:
 	QComboBox* mpScanOrientation = nullptr;
 
 	QComboBox* mpScanUnits = nullptr;
+
+	QPushButton* mpSampleXY = nullptr;
+
+	uint32_t mSpidercamX_mm = 0;
+	uint32_t mSpidercamY_mm = 0;
 };

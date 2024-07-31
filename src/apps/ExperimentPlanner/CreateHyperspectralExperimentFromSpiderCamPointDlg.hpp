@@ -3,6 +3,8 @@
 
 #include "CreateHyperspectralExperimentDlg.hpp"
 
+#include <spidercam/spidercam_types.hpp>
+
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -26,26 +28,43 @@ public:
 	cCreateHyperspectralExperimentFromSpiderCamDlg(QWidget* parent = nullptr);
 	virtual ~cCreateHyperspectralExperimentFromSpiderCamDlg();
 
+public slots:
+	void positionUpdated(spidercam::sPosition_1_t pos);
 
 private slots:
 	bool generate() override;
 	void onShowPath() override;
-	void onScanUnitChange(const QString& text);
+	void onPlotUnitChange(const QString& text);
+	void recordXY();
 
 private:
 	void createControls_PointSelection() override;
 	void createLayout_PointSelection(QVBoxLayout* pMainLayout) override;
 
 private:
-	double mScanConversionFactor = 1.0;
+	double mPlotConversionFactor = 1.0;
 
 	QLineEdit* mpStartX_mm = nullptr;
 	QLineEdit* mpStartY_mm = nullptr;
 
-	QLabel* mpScanDistanceLabel = nullptr;
-	QLineEdit* mpScanDistance = nullptr;
+	QLabel* mpPlotLengthLabel = nullptr;
+	QLineEdit* mpPlotLength = nullptr;
 
-	QComboBox* mpScanOrientation = nullptr;
+	QLabel* mpAlleyLengthLabel = nullptr;
+	QLineEdit* mpAlleyLength = nullptr;
 
-	QComboBox* mpScanUnits = nullptr;
+	QComboBox* mpPlotOrientation = nullptr;
+
+	QComboBox* mpPlotUnits = nullptr;
+
+	QLineEdit* mpNumOfPlots = nullptr;
+
+	QRadioButton* mpStart = nullptr;
+	QRadioButton* mpCenter = nullptr;
+	QRadioButton* mpEnd = nullptr;
+
+	QPushButton* mpSampleXY = nullptr;
+
+	uint32_t mSpidercamX_mm = 0;
+	uint32_t mSpidercamY_mm = 0;
 };

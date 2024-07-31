@@ -113,10 +113,25 @@ void cFieldLayoutWidget::clearRecordingPath()
 
 void cFieldLayoutWidget::drawRecordingPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm)
 {
+    int x_mm = -1;
+    int y_mm = -1;
+
+    if (mpScanArea->isDollyPositionVisible())
+    {
+        auto pos = mpScanArea->getDollyPosition();
+        x_mm = pos.x;
+        y_mm = pos.y;
+    }
+
     mpScanArea->setRecording(true);
     mpScanArea->updateDollyPosition(x1_mm, y1_mm);
     mpScanArea->updateDollyPosition(x2_mm, y2_mm);
     mpScanArea->setRecording(false);
+
+    if ((x_mm > 0) && (y_mm > 0))
+    {
+        mpScanArea->updateDollyPosition(x_mm, y_mm);
+    }
 }
 
 void cFieldLayoutWidget::load(const QString& layout_filename)

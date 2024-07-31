@@ -136,6 +136,13 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     if (!fileName.isEmpty())
         LoadGpsData(fileName);
+
+    mLimits.minX_mm = 10'000;
+    mLimits.maxX_mm = 190'000;
+    mLimits.minY_mm = 10'000;
+    mLimits.maxY_mm = 190'000;
+    mLimits.minHeight_mm = 1'000;
+    mLimits.maxHeight_mm = 9'000;
 }
 
 //-----------------------------------------------------------------------------
@@ -201,6 +208,24 @@ void cMainWindow::initialize()
 
             exit(EXIT_FAILURE);
         }
+    }
+
+    try
+    {
+        if (configDoc.contains("spidercam"))
+        {
+            auto jsonCfg = configDoc["spidercam"];
+            mLimits.minX_mm = static_cast<uint32_t>(jsonCfg["min X position (m)"] * nConstants::M_TO_MM);
+            mLimits.maxX_mm = static_cast<uint32_t>(jsonCfg["max X position (m)"] * nConstants::M_TO_MM);
+            mLimits.minY_mm = static_cast<uint32_t>(jsonCfg["min Y position (m)"] * nConstants::M_TO_MM);
+            mLimits.maxY_mm = static_cast<uint32_t>(jsonCfg["max Y position (m)"] * nConstants::M_TO_MM);
+            mLimits.minHeight_mm = static_cast<uint32_t>(jsonCfg["min height (m)"] * nConstants::M_TO_MM);
+            mLimits.maxHeight_mm = static_cast<uint32_t>(jsonCfg["max height (m)"] * nConstants::M_TO_MM);
+            auto maxSpeed_mmps = static_cast<uint32_t>(jsonCfg["max speed (m/s)"] * nConstants::M_TO_MM);
+        }
+    }
+    catch (const std::exception& e)
+    {
     }
 
     createMainMenu();
@@ -464,6 +489,27 @@ void cMainWindow::createSubMenusAndActions()
     connect(mpSpidercamConnect, &QAction::triggered, this, &cMainWindow::onConnectToSpidercam);
     mpSpidercamMenu->addAction(mpSpidercamConnect);
 
+    mpSpidercamMenu->addSeparator();
+
+    mpTestExperiment = new QAction(tr("Test Experiment"), this);
+    mpTestExperiment->setStatusTip(tr("Run the experiment in test mode (no data recording)"));
+    mpTestExperiment->setEnabled(false);
+    connect(mpTestExperiment, &QAction::triggered, this, &cMainWindow::onSpidercamTestExperiment);
+    mpSpidercamMenu->addAction(mpTestExperiment);
+
+    mpStopExperiment = new QAction(tr("Stop Experiment"), this);
+    mpStopExperiment->setStatusTip(tr("Stop the running experiment"));
+    mpStopExperiment->setEnabled(false);
+    connect(mpStopExperiment, &QAction::triggered, this, &cMainWindow::onSpidercamStopExperiment);
+    mpSpidercamMenu->addAction(mpStopExperiment);
+
+    mpPauseRunExperiment = new QAction(tr("Pause Experiment"), this);
+    mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
+    mpPauseRunExperiment->setEnabled(false);
+    connect(mpPauseRunExperiment, &QAction::triggered, this, &cMainWindow::onSpidercamPauseRunExperiment);
+    mpSpidercamMenu->addAction(mpPauseRunExperiment);
+
+
     // Build the View Menu
     /* The view menu is built by the dock window system */
 
@@ -684,7 +730,13 @@ void cMainWindow::onEditAddExperimentToLayout()
 
 void cMainWindow::onEditMoveExperimentX()
 {
-    cNewSpidercam_X_PositionDlg dlg;
+    cNewSpidercam_X_PositionDlg dlg(mLimits.minX_mm, mLimits.maxX_mm);
+
+    if (mpModel && mpModel->isConnected())
+    {
+        dlg.positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cNewSpidercam_X_PositionDlg::positionUpdated);
+    }
 
     auto result = dlg.exec();
 
@@ -706,7 +758,13 @@ void cMainWindow::onEditMoveExperimentX()
 
 void cMainWindow::onEditMoveExperimentY()
 {
-    cNewSpidercam_Y_PositionDlg dlg;
+    cNewSpidercam_Y_PositionDlg dlg(mLimits.minY_mm, mLimits.maxY_mm);
+
+    if (mpModel && mpModel->isConnected())
+    {
+        dlg.positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cNewSpidercam_Y_PositionDlg::positionUpdated);
+    }
 
     auto result = dlg.exec();
 
@@ -721,6 +779,9 @@ void cMainWindow::onEditMoveExperimentY()
 
     int y_mm = dlg.y_mm();
 
+    if (y_mm < mLimits.minY_mm) y_mm = mLimits.minY_mm;
+    if (y_mm > mLimits.maxY_mm) y_mm = mLimits.maxY_mm;
+
     child->set_Y_Position(y_mm);
 
     child->reloadPath();
@@ -728,7 +789,13 @@ void cMainWindow::onEditMoveExperimentY()
 
 void cMainWindow::onEditMoveExperimentZ()
 {
-    cNewSpidercam_Z_PositionDlg dlg;
+    cNewSpidercam_Z_PositionDlg dlg(mLimits.minHeight_mm, mLimits.maxHeight_mm);
+
+    if (mpModel && mpModel->isConnected())
+    {
+        dlg.positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cNewSpidercam_Z_PositionDlg::positionUpdated);
+    }
 
     auto result = dlg.exec();
 
@@ -742,6 +809,9 @@ void cMainWindow::onEditMoveExperimentZ()
     auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
 
     int z_mm = dlg.z_mm();
+
+    if (z_mm < mLimits.minHeight_mm) z_mm = mLimits.minHeight_mm;
+    if (z_mm > mLimits.maxHeight_mm) z_mm = mLimits.maxHeight_mm;
 
     child->set_Z_Position(z_mm);
 
@@ -784,6 +854,12 @@ void cMainWindow::onGenerateLidarScan_SpiderCam_Point()
     connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
     connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+
+    if (mpModel && mpModel->isConnected())
+    {
+        dlg.positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cCreateLidarExperimentFromSpiderCamDlg::positionUpdated);
+    }
 
     auto result = dlg.exec();
 
@@ -917,6 +993,12 @@ void cMainWindow::onGenerateHyperspectralRefScan_SpiderCam_Point()
     connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
     connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
 
+    if (mpModel && mpModel->isConnected())
+    {
+        dlg.positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::positionUpdated);
+    }
+
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
@@ -934,7 +1016,26 @@ void cMainWindow::onGenerateHyperspectralRefScan_GPS()
 
 void cMainWindow::onGenerateHyperspectralScan_SpiderCam_Point()
 {
-//    cCreateHyperspectralExperimentFromSpiderCamPointDlg dlg;
+    cCreateHyperspectralExperimentFromSpiderCamDlg dlg;
+
+    connect(&dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::clearPaths,          mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::drawPath,            mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::experimentChanged,   this,          &cMainWindow::onExperimentChange);
+
+    if (mpModel && mpModel->isConnected())
+    {
+        dlg.positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::positionUpdated);
+    }
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
 }
 
 void cMainWindow::onGenerateHyperspectralScan_GPS()
@@ -1265,6 +1366,10 @@ void cMainWindow::onConnectToSpidercam()
 
     mpSpidercamConnect->setText(tr("Disconnect"));
     mpSpidercamConnect->setStatusTip(tr("Disconnect from Spidercam"));
+
+    mpTestExperiment->setEnabled(true);
+    mpStopExperiment->setEnabled(true);
+    mpPauseRunExperiment->setEnabled(true);
 }
 
 
@@ -1274,6 +1379,12 @@ void cMainWindow::onDisconnectFromSpidercam()
     {
         return;
     }
+
+    onSpidercamStopExperiment();
+
+    mpTestExperiment->setEnabled(false);
+    mpStopExperiment->setEnabled(false);
+    mpPauseRunExperiment->setEnabled(false);
 
     mpModel->stopDataThread();
 
@@ -1307,6 +1418,96 @@ void cMainWindow::onDisconnectFromSpidercam()
     emit disconnectedFromController();
 }
 
+void cMainWindow::onSpidercamTestExperiment()
+{
+    if (!mpModel)
+    {
+        return;
+    }
+
+    if (!mpModel->systemReady())
+    {
+        return;
+    }
+
+    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+
+    if (pExperiment == nullptr)
+    {
+        return;
+    }
+
+    if (pExperiment->hasExperimentDocument())
+    {
+        loadExperiment(*pExperiment);
+    }
+
+    if (!mpModel->isExperimentLoaded())
+    {
+        return;
+    }
+
+    if (mpModel->experimentRequiresDataFile())
+    {
+        std::string fileName = mpModel->experimentTitle();
+        if (!mpModel->openDataFile("", fileName, false))
+        {
+            mpModel->terminateExperiment();
+            return;
+        }
+    }
+
+    mpModel->startExperiment();
+
+    mpPauseRunExperiment->setText(tr("Pause Experiment"));
+    mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
+
+    emit experimentRunning();
+}
+
+void cMainWindow::onSpidercamStopExperiment()
+{
+    if (!mpModel)
+    {
+        return;
+    }
+
+    if (!mpModel->isExperimentRunning())
+    {
+        return;
+    }
+
+    mpModel->terminateExperiment();
+
+    mpPauseRunExperiment->setText(tr("Pause Experiment"));
+    mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
+}
+
+void cMainWindow::onSpidercamPauseRunExperiment()
+{
+    if (!mpModel)
+    {
+        return;
+    }
+
+    if (!mpModel->isExperimentRunning())
+    {
+        return;
+    }
+
+    if (mpModel->isExperimentPaused())
+    {
+        mpModel->startExperiment();
+        mpPauseRunExperiment->setText(tr("Pause Experiment"));
+        mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
+    }
+    else
+    {
+        mpModel->pauseExperiment();
+        mpPauseRunExperiment->setText("Continue Experiment");
+        mpPauseRunExperiment->setStatusTip(tr("Continue the running experiment"));
+    }
+}
 
 /********************************************************************
  * Slots associated with "Help" menu actions

@@ -60,12 +60,17 @@ cPlannerDataModel::cPlannerDataModel(QObject* parent)
     QObject::connect(&mThread, &cDataThread::errorMessage, this, &cPlannerDataModel::onErrorUpdate);
     QObject::connect(&mThread, &cDataThread::terminate, this, &cPlannerDataModel::onDataThreadTermination);
 
-    QObject::connect(&mThread, &cPlannerDataThread::connectedToController,      this, &cPlannerDataModel::connectedToController);
-    QObject::connect(&mThread, &cPlannerDataThread::disconnectedFromController, this, &cPlannerDataModel::disconnectedFromController);
+    QObject::connect(&mThread, &cPlannerDataThread::connectedToController,      this, &cPlannerDataModel::controllerConnected);
+    QObject::connect(&mThread, &cPlannerDataThread::disconnectedFromController, this, &cPlannerDataModel::controllerDisconnected);
 }
 
 cPlannerDataModel::~cPlannerDataModel()
 {
+}
+
+bool cPlannerDataModel::isConnected() const
+{
+    return mConnected;
 }
 
 std::size_t cPlannerDataModel::sensorCount() const
@@ -272,6 +277,11 @@ void cPlannerDataModel::terminateExperiment()
         mThread.mpController->terminateExperiment();
 }
 
+spidercam::sPosition_1_t cPlannerDataModel::getPosition() const
+{
+    return mCurrentPosition;
+}
+
 void cPlannerDataModel::updateLimits(spidercam::sWorkingDimensions limits)
 {
     mLimits = limits;
@@ -341,7 +351,23 @@ void cPlannerDataModel::doExperimentCleanup()
 
 void cPlannerDataModel::onDataThreadTermination()
 {
+    mConnected = false;
+
     if (isExperimentRunning())
         terminateExperiment();
+}
+
+void cPlannerDataModel::controllerConnected()
+{
+    mConnected = true;
+
+    emit connectedToController();
+}
+
+void cPlannerDataModel::controllerDisconnected()
+{
+    mConnected = false;
+
+    emit disconnectedFromController();
 }
 

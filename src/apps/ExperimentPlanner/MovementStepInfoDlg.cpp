@@ -144,6 +144,9 @@ void cMovementStepInfoDlg::positionUpdated(spidercam::sPosition_1_t pos)
 	mpSampleXY->setEnabled(true);
 	mpSampleXYZ->setEnabled(true);
 
+	mSpidercamX_mm = pos.X_mm;
+	mSpidercamY_mm = pos.Y_mm;
+	mSpidercamZ_mm = pos.Z_mm;
 }
 
 bool cMovementStepInfoDlg::hasX() const
@@ -257,7 +260,20 @@ void cMovementStepInfoDlg::setRecording(bool recording)
 }
 
 void cMovementStepInfoDlg::recordXY()
-{}
+{
+	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
+	{
+		mpX_mm->setText(QString::number(mSpidercamX_mm));
+		mpY_mm->setText(QString::number(mSpidercamY_mm));
+	}
+}
 
 void cMovementStepInfoDlg::recordXYZ()
-{}
+{
+	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
+	{
+		mpX_mm->setText(QString::number(mSpidercamX_mm));
+		mpY_mm->setText(QString::number(mSpidercamY_mm));
+		mpZ_mm->setText(QString::number(mSpidercamZ_mm));
+	}
+}

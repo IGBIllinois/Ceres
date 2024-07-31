@@ -238,7 +238,7 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::createLayout_PointSelection(
 
 	pPlotLayout = new QHBoxLayout();
 	pPlotLayout->addStretch(1);
-	pText = new QLabel("Measured From:", this);
+	pText = new QLabel("Measure:", this);
 	pPlotLayout->addWidget(pText);
 	pPlotLayout->addSpacing(10);
 	pPlotLayout->addWidget(mpStart);

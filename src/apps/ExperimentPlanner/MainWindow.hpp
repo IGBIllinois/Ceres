@@ -5,6 +5,8 @@
 
 #include "RappGroundModel.hpp"
 
+#include <spidercam/spidercam_types.hpp>
+
 #include <vector>
 #include <filesystem>
 
@@ -118,6 +120,9 @@ private slots:
 private slots:
     void onConnectToSpidercam();
     void onDisconnectFromSpidercam();
+    void onSpidercamTestExperiment();
+    void onSpidercamStopExperiment();
+    void onSpidercamPauseRunExperiment();
 
 // Slots associated with "Help" menu actions
 private slots:
@@ -152,6 +157,7 @@ private:
 
 private:
     cRappGroundModel mData;
+    spidercam::sWorkingDimensions mLimits;
 
     QSettings mSettings;
 
@@ -173,6 +179,9 @@ private:
     QMenu* mpHelpMenu = nullptr;
 
     QAction* mpSpidercamConnect = nullptr;
+    QAction* mpTestExperiment = nullptr;
+    QAction* mpStopExperiment = nullptr;
+    QAction* mpPauseRunExperiment = nullptr;
 
     QToolBar* mpFileBar = nullptr;
 

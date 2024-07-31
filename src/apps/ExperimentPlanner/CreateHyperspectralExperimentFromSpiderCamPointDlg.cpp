@@ -30,6 +30,7 @@
 #include <QStandardItemModel>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QRadioButton>
 
 
 #include <algorithm>
@@ -37,7 +38,8 @@
 
 namespace
 {
-	const QString SCAN_DISTANCE_TEXT = "Distance (";
+	const QString PLOT_LENGTH_TEXT = "Plot Length (";
+	const QString ALLEY_LENGTH_TEXT = "Alley Length (";
 	const QString SCAN_SEPARATION_TEXT = "Separation (";
 
 	const QString WEST_TO_EAST = "West to East";
@@ -71,27 +73,47 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::createControls_PointSelecti
 	mpStartY_mm = new QLineEdit(this);
 	mpStartY_mm->setValidator(new QIntValidator(10000, 190000));
 
+	mpSampleXY = new QPushButton("Record X, Y", this);
+	mpSampleXY->setEnabled(false);
+	connect(mpSampleXY, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromSpiderCamDlg::recordXY);
+
 	// default to feet
-	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
-	mpScanDistance = new QLineEdit(this);
-	mpScanDistance->setValidator(new QDoubleValidator(0, 10000.0, 3));
+	mpPlotLengthLabel = new QLabel(PLOT_LENGTH_TEXT + "ft)", this);
+	mpPlotLength = new QLineEdit(this);
+	mpPlotLength->setValidator(new QDoubleValidator(0, 10000.0, 3));
+	mpPlotLength->setText("8");
 
-	mpScanOrientation = new QComboBox(this);
-	mpScanOrientation->setEditable(false);
-	mpScanOrientation->addItem(WEST_TO_EAST);
-	mpScanOrientation->addItem(EAST_TO_WEST);
-	mpScanOrientation->addItem(NORTH_TO_SOUTH);
-	mpScanOrientation->addItem(SOUTH_TO_NORTH);
+	mpAlleyLengthLabel = new QLabel(ALLEY_LENGTH_TEXT + "ft)", this);
+	mpAlleyLength = new QLineEdit(this);
+	mpAlleyLength->setValidator(new QDoubleValidator(0, 10000.0, 3));
+	mpAlleyLength->setText("0");
 
-	mpScanUnits = new QComboBox(this);
-	mpScanUnits->setEditable(false);
-	mpScanUnits->addItem("Meters");
-	mpScanUnits->addItem("Millimeters");
-	mpScanUnits->addItem("Feet");
-	mpScanUnits->addItem("Inches");
-	mpScanUnits->setCurrentIndex(2);
-	mScanConversionFactor = nConstants::FT_TO_MM;
-	connect(mpScanUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralExperimentFromSpiderCamDlg::onScanUnitChange);
+	mpPlotOrientation = new QComboBox(this);
+	mpPlotOrientation->setEditable(false);
+	mpPlotOrientation->addItem(WEST_TO_EAST);
+	mpPlotOrientation->addItem(EAST_TO_WEST);
+	mpPlotOrientation->addItem(NORTH_TO_SOUTH);
+	mpPlotOrientation->addItem(SOUTH_TO_NORTH);
+
+	mpPlotUnits = new QComboBox(this);
+	mpPlotUnits->setEditable(false);
+	mpPlotUnits->addItem("Meters");
+	mpPlotUnits->addItem("Millimeters");
+	mpPlotUnits->addItem("Feet");
+	mpPlotUnits->addItem("Inches");
+	mpPlotUnits->setCurrentIndex(2);
+	mPlotConversionFactor = nConstants::FT_TO_MM;
+	connect(mpPlotUnits, &QComboBox::currentTextChanged, this, &cCreateHyperspectralExperimentFromSpiderCamDlg::onPlotUnitChange);
+
+	mpNumOfPlots = new QLineEdit(this);
+	mpNumOfPlots->setValidator(new QIntValidator(1, 100));
+	mpNumOfPlots->setText("1");
+
+	mpStart = new QRadioButton("Start");
+	mpCenter = new QRadioButton("Center");
+	mpEnd = new QRadioButton("End");
+
+	mpCenter->setChecked(true);
 }
 
 void cCreateHyperspectralExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -113,11 +135,10 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::createLayout_PointSelection
 	pText = new QLabel("Y position (mm)");
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpStartY_mm, 0, 4);
-	pGridLayout->addWidget(mpScanDistanceLabel, 2, 0);
-	pGridLayout->addWidget(mpScanDistance, 2, 1);
-	pGridLayout->addWidget(mpScanOrientation, 2, 3);
-	pGridLayout->addWidget(mpScanUnits, 2, 4);
 	pPosLayout->addLayout(pGridLayout);
+
+	pPosLayout->addSpacing(10);
+	pPosLayout->addWidget(mpSampleXY);
 
 	pPosLayout->addStretch(1);
 
@@ -129,40 +150,89 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::createLayout_PointSelection
 
 	pMainLayout->addLayout(pPosLayout);
 
+	pGroupBox = new QGroupBox(tr("Plot Information"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	mpStart->setParent(pGroupBox);
+	mpCenter->setParent(pGroupBox);
+	mpEnd->setParent(pGroupBox);
+
+	pVSubLayout = new QVBoxLayout();
+
+	QHBoxLayout* pPlotLayout = new QHBoxLayout();
+
+	pText = new QLabel("Number Of Plots:", this);
+	pPlotLayout->addWidget(pText);
+	pPlotLayout->addWidget(mpNumOfPlots);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpPlotLengthLabel);
+	pPlotLayout->addWidget(mpPlotLength);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpAlleyLengthLabel);
+	pPlotLayout->addWidget(mpAlleyLength);
+	pPlotLayout->addSpacing(5);
+	pText = new QLabel("Orientation:", this);
+	pPlotLayout->addWidget(pText);
+	pPlotLayout->addWidget(mpPlotOrientation);
+	pPlotLayout->addSpacing(10);
+	pText = new QLabel("Units:", this);
+	pPlotLayout->addWidget(pText);
+	pPlotLayout->addWidget(mpPlotUnits);
+
+	pVSubLayout->addLayout(pPlotLayout);
+
+	pPlotLayout = new QHBoxLayout();
+	pPlotLayout->addStretch(1);
+	pText = new QLabel("Measure:", this);
+	pPlotLayout->addWidget(pText);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpStart);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpCenter);
+	pPlotLayout->addSpacing(10);
+	pPlotLayout->addWidget(mpEnd);
+	pPlotLayout->addStretch(1);
+	pVSubLayout->addLayout(pPlotLayout);
+
+	pGroupBox->setLayout(pVSubLayout);
+
+	pMainLayout->addWidget(pGroupBox);
+
+
 	pMainLayout->addSpacing(10);
 }
 
-void cCreateHyperspectralExperimentFromSpiderCamDlg::onScanUnitChange(const QString& text)
+void cCreateHyperspectralExperimentFromSpiderCamDlg::onPlotUnitChange(const QString& text)
 {
-	double distance = mpScanDistance->text().toDouble() * mScanConversionFactor;
+	double distance = mpPlotLength->text().toDouble() * mPlotConversionFactor;
 
-	switch (mpScanUnits->currentIndex())
+	switch (mpPlotUnits->currentIndex())
 	{
 	case 0:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "m)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "m)");
 
-		mScanConversionFactor = nConstants::M_TO_MM;
+		mPlotConversionFactor = nConstants::M_TO_MM;
 		break;
 	case 1:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "mm)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "mm)");
 
-		mScanConversionFactor = 1.0;
+		mPlotConversionFactor = 1.0;
 		break;
 	case 2:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "ft)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "ft)");
 
-		mScanConversionFactor = nConstants::FT_TO_MM;
+		mPlotConversionFactor = nConstants::FT_TO_MM;
 		break;
 	case 3:
-		mpScanDistanceLabel->setText(SCAN_DISTANCE_TEXT + "in)");
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "in)");
 
-		mScanConversionFactor = nConstants::IN_TO_MM;
+		mPlotConversionFactor = nConstants::IN_TO_MM;
 		break;
 	}
 
-	distance /= mScanConversionFactor;
+	distance /= mPlotConversionFactor;
 
-	mpScanDistance->setText(QString::number(distance));
+	mpPlotLength->setText(QString::number(distance));
 }
 
 bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
@@ -523,15 +593,18 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 
 void cCreateHyperspectralExperimentFromSpiderCamDlg::onShowPath()
 {
+	struct path_t { int x1_mm; int y1_mm; int x2_mm; int y2_mm; };
+	std::vector<path_t> path;
+
 	int x1_mm = mpStartX_mm->text().toInt();
 	int y1_mm = mpStartY_mm->text().toInt();
 
-	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+	int distance_mm = static_cast<int>(mpPlotLength->text().toDouble() * mPlotConversionFactor);
 
 	int x2_mm = x1_mm;
 	int y2_mm = y1_mm;
 
-	switch (mpScanOrientation->currentIndex())
+	switch (mpPlotOrientation->currentIndex())
 	{
 	case SCAN_WEST_TO_EAST:
 		y2_mm += distance_mm;
@@ -546,7 +619,6 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::onShowPath()
 		x2_mm -= distance_mm;
 		break;
 	}
-
 
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 
@@ -584,4 +656,21 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::onShowPath()
 			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 		}
 	}
+}
+
+void cCreateHyperspectralExperimentFromSpiderCamDlg::recordXY()
+{
+	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
+	{
+		mpStartX_mm->setText(QString::number(mSpidercamX_mm));
+		mpStartY_mm->setText(QString::number(mSpidercamY_mm));
+	}
+}
+
+void cCreateHyperspectralExperimentFromSpiderCamDlg::positionUpdated(spidercam::sPosition_1_t pos)
+{
+	mSpidercamX_mm = pos.X_mm;
+	mSpidercamY_mm = pos.Y_mm;
+
+	mpSampleXY->setEnabled(true);
 }

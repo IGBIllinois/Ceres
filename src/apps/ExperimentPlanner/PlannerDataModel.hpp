@@ -40,6 +40,8 @@ public:
     explicit cPlannerDataModel(QObject* parent = nullptr);
     ~cPlannerDataModel();
 
+    bool isConnected() const;
+
     std::size_t sensorCount() const override;
     void addSensor(cSensorModel* pSensor) override;
 
@@ -72,6 +74,8 @@ public:
     void pauseExperiment();
     void terminateExperiment();
 
+    spidercam::sPosition_1_t getPosition() const;
+
 signals:
     void connectedToController();
     void disconnectedFromController();
@@ -100,6 +104,10 @@ private slots:
     void onExperimentStateChange(experiment::eState state);
     void onDataThreadTermination();
 
+private slots:
+    void controllerConnected();
+    void controllerDisconnected();
+
 protected:
     virtual void endDataRecording() = 0;
 
@@ -110,8 +118,10 @@ protected:
 
     bool mRecording = false;
 
-    spidercam::sWorkingDimensions mLimits;
-    spidercam::sPosition_1_t mCurrentPosition;
+    spidercam::sWorkingDimensions mLimits = { 10000, 190000, 10000, 190000, 1000, 9000 };
+    spidercam::sPosition_1_t mCurrentPosition = spidercam::sPosition_1_t();
+
+    bool mConnected = false;
 
     cPlannerDataThread mThread;
 

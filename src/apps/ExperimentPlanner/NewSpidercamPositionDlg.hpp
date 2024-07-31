@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include <spidercam/spidercam_types.hpp>
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QAbstractButton;
@@ -16,13 +18,16 @@ QT_END_NAMESPACE
 class cNewSpidercam_X_PositionDlg : public QDialog
 {
 public:
-	cNewSpidercam_X_PositionDlg(QWidget* parent = nullptr);
+	cNewSpidercam_X_PositionDlg(int minX_mm, int maxX_mm, QWidget* parent = nullptr);
 	virtual ~cNewSpidercam_X_PositionDlg();
 
 	int x_mm() const;
 
+public slots:
+	void positionUpdated(spidercam::sPosition_1_t pos);
+
 private:
-	void createControls();
+	void createControls(int minX_mm, int maxX_mm);
 	void createLayout();
 
 private slots:
@@ -31,18 +36,23 @@ private slots:
 private:
 	QLineEdit*   mpX_mm = nullptr;
 	QPushButton* mpSampleX = nullptr;
+
+	uint32_t mSpidercamX_mm = 0;
 };
 
 class cNewSpidercam_Y_PositionDlg : public QDialog
 {
 public:
-	cNewSpidercam_Y_PositionDlg(QWidget* parent = nullptr);
+	cNewSpidercam_Y_PositionDlg(int minY_mm, int maxY_mm, QWidget* parent = nullptr);
 	virtual ~cNewSpidercam_Y_PositionDlg();
 
 	int y_mm() const;
 
+public slots:
+	void positionUpdated(spidercam::sPosition_1_t pos);
+
 private:
-	void createControls();
+	void createControls(int minY_mm, int maxY_mm);
 	void createLayout();
 
 private slots:
@@ -51,18 +61,23 @@ private slots:
 private:
 	QLineEdit*   mpY_mm = nullptr;
 	QPushButton* mpSampleY = nullptr;
+
+	uint32_t mSpidercamY_mm = 0;
 };
 
 class cNewSpidercam_Z_PositionDlg : public QDialog
 {
 public:
-	cNewSpidercam_Z_PositionDlg(QWidget* parent = nullptr);
+	cNewSpidercam_Z_PositionDlg(int minZ_mm, int maxZ_mm, QWidget* parent = nullptr);
 	virtual ~cNewSpidercam_Z_PositionDlg();
 
 	int z_mm() const;
 
+public slots:
+	void positionUpdated(spidercam::sPosition_1_t pos);
+
 private:
-	void createControls();
+	void createControls(int minZ_mm, int maxZ_mm);
 	void createLayout();
 
 private slots:
@@ -71,5 +86,7 @@ private slots:
 private:
 	QLineEdit*   mpZ_mm = nullptr;
 	QPushButton* mpSampleZ = nullptr;
+
+	uint32_t mSpidercamZ_mm = 0;
 };
 

@@ -74,6 +74,7 @@ public:
 signals:
     void experimentStatus(QString msg);
     void experimentStateChanged(experiment::eState state);
+    void stateNumberChanged(int id);
     void requestDataRecordingState(bool record);
 
  /**

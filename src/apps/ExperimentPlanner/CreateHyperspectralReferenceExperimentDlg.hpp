@@ -39,6 +39,7 @@ signals:
 
 protected slots:
 	virtual bool generate() = 0;
+	virtual void onShowPath() = 0;
 
 private slots:
 	void accept() override;

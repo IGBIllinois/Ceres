@@ -90,6 +90,8 @@ void cExperimentStateMachine::clearExperiment()
     if (mRunning) return;
 
     mActiveStateNumber = 0;
+    emit stateNumberChanged(-1);
+
     mpActiveState = nullptr;
 
     std::lock_guard<std::mutex> lock{mPendingDeleteMutex};
@@ -227,6 +229,7 @@ void cExperimentStateMachine::startExperiment()
     mpActiveState = mExperimentStates[mActiveStateNumber];
     mpActiveState->initialize();
 
+    emit stateNumberChanged(mActiveStateNumber);
     emit experimentStateChanged(eState::RUNNING);
 
     QString msg = "Running experiment: ";
@@ -324,6 +327,7 @@ void cExperimentStateMachine::updateExperimentStateMachine()
                 QString msg;
                 msg.sprintf("Step %d: ", mActiveStateNumber);
                 msg += mpActiveState->getStatusStr();
+                emit stateNumberChanged(mActiveStateNumber);
                 emit experimentStatus(msg);
             }
             else
@@ -332,6 +336,7 @@ void cExperimentStateMachine::updateExperimentStateMachine()
                 mpActiveState->cleanup();
                 mRunning = false;
                 mExperimentName.clear();
+                emit stateNumberChanged(-1);
                 emit experimentStateChanged(eState::EXP_ERROR);
             }
         }
@@ -341,6 +346,7 @@ void cExperimentStateMachine::updateExperimentStateMachine()
             mpActiveState->cleanup();
             mRunning = false;
             mExperimentName.clear();
+            emit stateNumberChanged(-1);
             emit experimentStateChanged(eState::COMPLETED);
         }
     }
