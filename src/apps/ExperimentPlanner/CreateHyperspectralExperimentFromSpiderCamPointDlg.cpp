@@ -1,5 +1,6 @@
 ﻿
 #include "CreateHyperspectralExperimentFromSpiderCamPointDlg.hpp"
+#include "Hyperspectral/HySpex/HySpexFactory.hpp"
 #include "Constants.hpp"
 
 #include "ExperimentSteps.hpp"
@@ -47,10 +48,10 @@ namespace
 	const QString NORTH_TO_SOUTH = "North to South";
 	const QString SOUTH_TO_NORTH = "South to North";
 
-	constexpr int SCAN_WEST_TO_EAST = 0;
-	constexpr int SCAN_EAST_TO_WEST = 1;
-	constexpr int SCAN_NORTH_TO_SOUTH = 2;
-	constexpr int SCAN_SOUTH_TO_NORTH = 3;
+	constexpr int PLOT_WEST_TO_EAST = 0;
+	constexpr int PLOT_EAST_TO_WEST = 1;
+	constexpr int PLOT_NORTH_TO_SOUTH = 2;
+	constexpr int PLOT_SOUTH_TO_NORTH = 3;
 }
 
 cCreateHyperspectralExperimentFromSpiderCamDlg::cCreateHyperspectralExperimentFromSpiderCamDlg(QWidget* parent)
@@ -76,6 +77,12 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::createControls_PointSelecti
 	mpSampleXY = new QPushButton("Record X, Y", this);
 	mpSampleXY->setEnabled(false);
 	connect(mpSampleXY, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromSpiderCamDlg::recordXY);
+
+	mpClearPath = new QPushButton("Clear Path", this);
+	connect(mpClearPath, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromSpiderCamDlg::clearPaths);
+
+	mpShowPath = new QPushButton("Show Path", this);
+	connect(mpShowPath, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromSpiderCamDlg::onShowPath);
 
 	// default to feet
 	mpPlotLengthLabel = new QLabel(PLOT_LENGTH_TEXT + "ft)", this);
@@ -204,40 +211,49 @@ void cCreateHyperspectralExperimentFromSpiderCamDlg::createLayout_PointSelection
 
 void cCreateHyperspectralExperimentFromSpiderCamDlg::onPlotUnitChange(const QString& text)
 {
-	double distance = mpPlotLength->text().toDouble() * mPlotConversionFactor;
+	double plot_length  = mpPlotLength->text().toDouble() * mPlotConversionFactor;
+	double alley_length = mpAlleyLength->text().toDouble() * mPlotConversionFactor;
 
 	switch (mpPlotUnits->currentIndex())
 	{
 	case 0:
 		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "m)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "m)");
 
 		mPlotConversionFactor = nConstants::M_TO_MM;
 		break;
 	case 1:
 		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "mm)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "mm)");
 
 		mPlotConversionFactor = 1.0;
 		break;
 	case 2:
 		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "ft)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "ft)");
 
 		mPlotConversionFactor = nConstants::FT_TO_MM;
 		break;
 	case 3:
 		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "in)");
+		mpAlleyLengthLabel->setText(ALLEY_LENGTH_TEXT + "in)");
 
 		mPlotConversionFactor = nConstants::IN_TO_MM;
 		break;
 	}
 
-	distance /= mPlotConversionFactor;
+	plot_length /= mPlotConversionFactor;
+	alley_length /= mPlotConversionFactor;
 
-	mpPlotLength->setText(QString::number(distance));
+	mpPlotLength->setText(QString::number(plot_length));
+	mpAlleyLength->setText(QString::number(alley_length));
 }
 
 bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 {
-#if 0
+	struct path_t { int x1_mm; int y1_mm; int x2_mm; int y2_mm;};
+	std::vector<path_t> path;
+
 	std::string str;
 	QString text;
 	std::vector<std::string> list;
@@ -252,7 +268,7 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 	}
 
 	if (mpStartX_mm->text().isEmpty() || mpStartY_mm->text().isEmpty()
-		|| mpScanDistance->text().isEmpty())
+		|| !isScanDistanceValid())
 	{
 		QString msg = "The SpiderCam position or scan distance can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
@@ -273,49 +289,138 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 		return false;
 	}
 
-	int h1_mm = 0;
-	
-	if (pGroundModel)
-	{
-		h1_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x1_mm, y1_mm));
+	int numOfPlots = mpNumOfPlots->text().toInt();
+	int plot_length_mm = static_cast<int>(mpPlotLength->text().toDouble() * mPlotConversionFactor);
+	int alley_length_mm = static_cast<int>(mpAlleyLength->text().toDouble() * mPlotConversionFactor);
+	int scan_length_mm = getScanDistance_mm();
 
-		if (h1_mm == rfm::INVALID_HEIGHT)
-			h1_mm = 0;
+	int start_offset_mm = 0;
+	int numOfScans = 1;
+	int separation_mm = 0;
+	bool fastMode = false;
+	auto orientation = eSubScanOrientation::NORTH_TO_SOUTH;
+
+	if (mpHasSubScans->isChecked())
+	{
+		numOfScans = mpNumOfScans->text().toInt();
+		int sub_separation_mm = getSubScanSeparation_mm();
+		orientation = getSubScanOrientation();
+		fastMode = mpFastMode->isChecked();
+
+		if (mpScanEveryRow->isChecked() || (mpScanInsideRows->isChecked() && (numOfScans <= 2)))
+		{
+			if (numOfScans <= 1)
+			{
+				numOfScans = 1;
+			}
+			else
+			{
+				switch (orientation)
+				{
+				case eSubScanOrientation::NORTH_TO_SOUTH:
+					separation_mm = sub_separation_mm;
+					break;
+				case eSubScanOrientation::SOUTH_TO_NORTH:
+					separation_mm = -sub_separation_mm;
+					break;
+				case eSubScanOrientation::EAST_TO_WEST:
+					separation_mm = -sub_separation_mm;
+					break;
+				case eSubScanOrientation::WEST_TO_EAST:
+					separation_mm = sub_separation_mm;
+					break;
+				}
+			}
+		}
+		else if (mpScanCenterOnly->isChecked())
+		{
+			switch (orientation)
+			{
+			case eSubScanOrientation::NORTH_TO_SOUTH:
+				x1_mm += (numOfScans * sub_separation_mm) / 2;
+				break;
+			case eSubScanOrientation::SOUTH_TO_NORTH:
+				x1_mm -= (numOfScans * sub_separation_mm) / 2;
+				break;
+			case eSubScanOrientation::EAST_TO_WEST:
+				y1_mm -= (numOfScans * sub_separation_mm) / 2;
+				separation_mm = -sub_separation_mm;
+				break;
+			case eSubScanOrientation::WEST_TO_EAST:
+				y1_mm += (numOfScans * sub_separation_mm) / 2;
+				break;
+			}
+
+			numOfScans = 1;
+		}
+		else if (mpScanInsideRows->isChecked())
+		{
+			numOfScans -= 2;
+
+			switch (orientation)
+			{
+			case eSubScanOrientation::NORTH_TO_SOUTH:
+				x1_mm += sub_separation_mm;
+				separation_mm = sub_separation_mm;
+				break;
+			case eSubScanOrientation::SOUTH_TO_NORTH:
+				x1_mm -= sub_separation_mm;
+				separation_mm = -sub_separation_mm;
+				break;
+			case eSubScanOrientation::EAST_TO_WEST:
+				y1_mm -= sub_separation_mm;
+				separation_mm = -sub_separation_mm;
+				break;
+			case eSubScanOrientation::WEST_TO_EAST:
+				y1_mm += sub_separation_mm;
+				separation_mm = sub_separation_mm;
+				break;
+			}
+		}
 	}
 
-	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+	if (mpStart->isChecked())
+	{
+		start_offset_mm = 0;
+	}
+	else if (mpCenter->isChecked())
+	{
+		start_offset_mm = (plot_length_mm / 2) - (scan_length_mm / 2);
+	}
+	else if (mpEnd->isChecked())
+	{
+		start_offset_mm = plot_length_mm - scan_length_mm;
+	}
 
 	int x2_mm = x1_mm;
 	int y2_mm = y1_mm;
-	int h2_mm = h1_mm;
 
-	switch (mpScanOrientation->currentIndex())
+	switch (mpPlotOrientation->currentIndex())
 	{
-	case SCAN_WEST_TO_EAST:
-		y2_mm += distance_mm;
+	case PLOT_WEST_TO_EAST:
+		y1_mm += start_offset_mm;
+		y2_mm = y1_mm + scan_length_mm;
 		break;
-	case SCAN_EAST_TO_WEST:
-		y2_mm -= distance_mm;
+	case PLOT_EAST_TO_WEST:
+		y1_mm -= start_offset_mm;
+		y2_mm = y1_mm - scan_length_mm;
 		break;
-	case SCAN_NORTH_TO_SOUTH:
-		x2_mm += distance_mm;
+	case PLOT_NORTH_TO_SOUTH:
+		x1_mm += start_offset_mm;
+		x2_mm = x1_mm + scan_length_mm;
 		break;
-	case SCAN_SOUTH_TO_NORTH:
-		x2_mm -= distance_mm;
+	case PLOT_SOUTH_TO_NORTH:
+		x1_mm -= start_offset_mm;
+		x2_mm = x1_mm - scan_length_mm;
 		break;
 	}
 
-	if (pGroundModel)
-	{
-		h2_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(x2_mm, y2_mm));
-
-		if (h2_mm == rfm::INVALID_HEIGHT)
-			h2_mm = 0;
-	}
 
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
-	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
+
+	int scan_z_offset_mm = static_cast<int>(mpHeightOffset->text().toDouble() * nConstants::M_TO_MM);
+	scan_z_offset_mm += mpLensFocalDistance->currentData().toInt();
 
 	std::optional<double> tilt_deg;
 	std::optional<double> safe_tilt_deg;
@@ -352,41 +457,48 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 	if (!mpSensorOffset_mm->text().isEmpty())
 	{
 		int sensor_offset_mm = mpSensorOffset_mm->text().toInt();
-		scan_z_mm += sensor_offset_mm;
+		scan_z_offset_mm += sensor_offset_mm;
 	}
 
-	int dx_mm = x2_mm - x1_mm;
-	int dy_mm = y2_mm - y1_mm;
+
+	path.push_back({ x1_mm, y1_mm, x2_mm, y2_mm });
+
+	for (int i = 1; i < numOfPlots; ++i)
+	{
+		switch (mpPlotOrientation->currentIndex())
+		{
+		case PLOT_WEST_TO_EAST:
+			y1_mm += (plot_length_mm + alley_length_mm);
+			y2_mm = y1_mm + scan_length_mm;
+			break;
+		case PLOT_EAST_TO_WEST:
+			y1_mm -= (plot_length_mm + alley_length_mm);
+			y2_mm = y1_mm - scan_length_mm;
+			break;
+		case PLOT_NORTH_TO_SOUTH:
+			x1_mm += (plot_length_mm + alley_length_mm);
+			x2_mm = x1_mm + scan_length_mm;
+			break;
+		case PLOT_SOUTH_TO_NORTH:
+			x1_mm -= (plot_length_mm + alley_length_mm);
+			x2_mm = x1_mm - scan_length_mm;
+			break;
+		}
+
+		path.push_back({ x1_mm, y1_mm, x2_mm, y2_mm });
+	}
 
 	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
 	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
 	int safe_vertical_speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
 
-	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
-	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
-
-
 	/* Grab the info for multiple scans if selected */
 	int startNum = 0;
 	bool hasNumber = nStringUtils::endsWithInt(title, &startNum);
 
-	bool mFastMode = false;
 
-	int numOfScans = 1;
-	int orientation = 0;
-	double separation_mm = 0.0;
-
-	if (mpHasSubScans->isChecked())
-	{
-		numOfScans = mpNumOfScans->text().toInt();
-		orientation = mpSubScanOrientation->currentIndex();
-		separation_mm = mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor;
-		mFastMode = mpFastMode->isChecked();
-	}
-
-
-	for (int scan = 0; scan < numOfScans; ++scan)
+	for (int scanNum = 0; scanNum < numOfScans; ++scanNum)
 	{
 		QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
@@ -405,149 +517,159 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 		step->setSpeed_mmps(vertical_speed_mmps);
 		pInfo->appendStep(std::move(step));
 
-		if ((dx_mm == 0) && (dy_mm == 0))
+		auto it = path.begin();
+
+		// Moving dolly to the beginning of the measurement scan...
+		step = std::make_unique<cExperimentStep_Movement>();
+		step->setX_mm(it->x1_mm);
+		step->setY_mm(it->y1_mm);
+		step->setSpeed_mmps(travel_speed_mmps);
+		pInfo->appendStep(std::move(step));
+
+		// Move the dolly to measurement height...
+		step = std::make_unique<cExperimentStep_Movement>();
+
+		int h_mm = 0;
+
+		if (pGroundModel)
 		{
-			// Moving dolly to the beginning of the measurement scan...
-			step = std::make_unique<cExperimentStep_Movement>();
-			step->setX_mm(x1_mm);
-			step->setY_mm(y1_mm);
-			step->setSpeed_mmps(travel_speed_mmps);
-			pInfo->appendStep(std::move(step));
+			h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(it->x1_mm, it->y1_mm));
 
+			if (h_mm == rfm::INVALID_HEIGHT)
+				h_mm = 0;
+		}
 
-			// Move the dolly to measurement height...
-			step = std::make_unique<cExperimentStep_Movement>();
+		h_mm += scan_z_offset_mm;
 
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
+		step->setZ_mm(h_mm);
 
-			step->setSpeed_mmps(vertical_speed_mmps);
+		step->setSpeed_mmps(vertical_speed_mmps);
 
-			step->setTilt_deg(tilt_deg);
-			step->setRoll_deg(roll_deg);
-			step->setPan_deg(pan_deg);
+		step->setTilt_deg(tilt_deg);
+		step->setRoll_deg(roll_deg);
+		step->setPan_deg(pan_deg);
 
-			pInfo->appendStep(std::move(step));
+		pInfo->appendStep(std::move(step));
 
-			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
+		float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
 
-			if (delay_sec > 0.0)
+		if (delay_sec > 0.0)
+		{
+			// Add delay for dolly to stabilize...
+			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+			delay->setWaitTime_sec(delay_sec);
+			pInfo->appendStep(std::move(delay));
+		}
+
+		for (const auto& sensor : mSensorInfo)
+		{
+			if (sensor->getType() == vnir_3000N_id)
 			{
-				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				pInfo->appendStep(std::move(delay));
+				// We need to take a background spectra...
+				std::unique_ptr<cExperimentStep_HySpex_Command> close_shutter = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "close shutter");
+				pInfo->appendStep(std::move(close_shutter));
+
+				std::unique_ptr<cExperimentStep_HySpex_Command> background = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "background");
+				pInfo->appendStep(std::move(background));
+
+				std::unique_ptr<cExperimentStep_HySpex_Command> open_shutter = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "open shutter");
+				pInfo->appendStep(std::move(open_shutter));
 			}
 
-			delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
-
-			if (delay_sec > 0.0)
+			if (sensor->getType() == swir_384_id)
 			{
-				// Do measurement...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				delay->setRecording(true);
-				pInfo->appendStep(std::move(delay));
+				// We need to take a background spectra...
+				std::unique_ptr<cExperimentStep_HySpex_Command> close_shutter = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "close shutter");
+				pInfo->appendStep(std::move(close_shutter));
+
+				std::unique_ptr<cExperimentStep_HySpex_Command> background = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "background");
+				pInfo->appendStep(std::move(background));
+
+				std::unique_ptr<cExperimentStep_HySpex_Command> open_shutter = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "open shutter");
+				pInfo->appendStep(std::move(open_shutter));
 			}
 		}
-		else
+
+		h_mm = 0;
+
+		if (pGroundModel)
 		{
-			int x_mm = 0;
-			int y_mm = 0;
+			h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(it->x2_mm, it->y2_mm));
 
-			if (std::abs(dx_mm) < 500)
-			{
-				x_mm = (x2_mm + x1_mm) / 2;
+			if (h_mm == rfm::INVALID_HEIGHT)
+				h_mm = 0;
+		}
 
-				if (y1_mm > y2_mm)
-					y_mm = y1_mm + start_offset_mm;
-				else
-					y_mm = y1_mm - start_offset_mm;
-			}
-			else if (std::abs(dy_mm) < 500)
-			{
-				if (x1_mm > x2_mm)
-					x_mm = x1_mm + start_offset_mm;
-				else
-					x_mm = x1_mm - start_offset_mm;
+		h_mm += scan_z_offset_mm;
 
-				y_mm = (y2_mm + y1_mm) / 2;
-			}
+		// Do measurement...
+		step = std::make_unique<cExperimentStep_Movement>();
+		step->setX_mm(it->x2_mm);
+		step->setY_mm(it->y2_mm);
 
-			// Moving dolly to the beginning of the measurement scan...
+		step->setZ_mm(h_mm);
+
+		step->setSpeed_mmps(scan_speed_mmps);
+		step->setRecording(true);
+		pInfo->appendStep(std::move(step));
+
+		for (; it != path.end(); ++it)
+		{
+			// Move to next measurement...
 			step = std::make_unique<cExperimentStep_Movement>();
-			step->setX_mm(x_mm);
-			step->setY_mm(y_mm);
-			step->setSpeed_mmps(travel_speed_mmps);
+			step->setX_mm(it->x1_mm);
+			step->setY_mm(it->y1_mm);
+
+			h_mm = 0;
+
+			if (pGroundModel)
+			{
+				h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(it->x1_mm, it->y1_mm));
+
+				if (h_mm == rfm::INVALID_HEIGHT)
+					h_mm = 0;
+			}
+
+			h_mm += scan_z_offset_mm;
+
+			step->setZ_mm(h_mm);
+
+			step->setSpeed_mmps(scan_speed_mmps);
+			step->setRecording(false);
 			pInfo->appendStep(std::move(step));
-
-			// Move the dolly to measurement height...
-			step = std::make_unique<cExperimentStep_Movement>();
-
-			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
-			else
-				step->setZ_mm(scan_z_mm);
-
-			step->setSpeed_mmps(vertical_speed_mmps);
-
-			step->setTilt_deg(tilt_deg);
-			step->setRoll_deg(roll_deg);
-			step->setPan_deg(pan_deg);
-
-			pInfo->appendStep(std::move(step));
-
-			float delay_sec = mpStartMeasurementDelay_sec->text().toFloat();
-
-			if (delay_sec > 0.0)
-			{
-				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				pInfo->appendStep(std::move(delay));
-			}
-
-			if (std::abs(dx_mm) < 500)
-			{
-				if (y1_mm > y2_mm)
-					y_mm = y2_mm - end_offset_mm;
-				else
-					y_mm = y2_mm + end_offset_mm;
-			}
-			else if (std::abs(dy_mm) < 500)
-			{
-				if (x1_mm > x2_mm)
-					x_mm = x2_mm - end_offset_mm;
-				else
-					x_mm = x2_mm + end_offset_mm;
-			}
 
 			// Do measurement...
 			step = std::make_unique<cExperimentStep_Movement>();
-			step->setX_mm(x_mm);
-			step->setY_mm(y_mm);
+			step->setX_mm(it->x2_mm);
+			step->setY_mm(it->y2_mm);
 
-			if ((mpHeightReference->currentIndex() == 1) &&
-				((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
+			h_mm = 0;
+
+			if (pGroundModel)
 			{
-				step->setZ_mm(scan_z_mm + h2_mm);
+				h_mm = static_cast<int>(pGroundModel->getMeshHeight_mm(it->x2_mm, it->y2_mm));
+
+				if (h_mm == rfm::INVALID_HEIGHT)
+					h_mm = 0;
 			}
+
+			h_mm += scan_z_offset_mm;
+
+			step->setZ_mm(h_mm);
 
 			step->setSpeed_mmps(scan_speed_mmps);
 			step->setRecording(true);
 			pInfo->appendStep(std::move(step));
+		}
 
-			delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
+		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 
-			if (delay_sec > 0.0)
-			{
-				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
-				delay->setWaitTime_sec(delay_sec);
-				pInfo->appendStep(std::move(delay));
-			}
+		if (delay_sec > 0.0)
+		{
+			// Add delay for dolly to stabilize...
+			std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+			delay->setWaitTime_sec(delay_sec);
+			pInfo->appendStep(std::move(delay));
 		}
 
 		// Move dolly to a safe height to park it
@@ -560,100 +682,226 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 
 		emit experimentChanged(pInfo);
 
-		switch (orientation)
+		for (auto& p : path)
 		{
-		case 0:
-			x1_mm += separation_mm;
-			x2_mm += separation_mm;
-			break;
-		case 1:
-			x1_mm -= separation_mm;
-			x2_mm -= separation_mm;
-			break;
-		case 2:
-			y1_mm -= separation_mm;
-			y2_mm -= separation_mm;
-			break;
-		case 3:
-			y1_mm += separation_mm;
-			y2_mm += separation_mm;
-			break;
+			switch (orientation)
+			{
+			case eSubScanOrientation::NORTH_TO_SOUTH:
+			case eSubScanOrientation::SOUTH_TO_NORTH:
+				p.x1_mm += separation_mm;
+				p.x2_mm += separation_mm;
+				break;
+			case eSubScanOrientation::EAST_TO_WEST:
+			case eSubScanOrientation::WEST_TO_EAST:
+				p.y1_mm += separation_mm;
+				p.y2_mm += separation_mm;
+				break;
+			}
+
+			if (fastMode)
+			{
+				std::swap(p.x1_mm, p.x2_mm);
+				std::swap(p.y1_mm, p.y2_mm);
+			}
 		}
 
-		if (mFastMode)
-		{
-			std::swap(x1_mm, x2_mm);
-			std::swap(y1_mm, y2_mm);
-		}
+		if (fastMode)
+			std::reverse(path.begin(), path.end());
 	}
-#endif
 
 	return true;
 }
 
 void cCreateHyperspectralExperimentFromSpiderCamDlg::onShowPath()
 {
+	emit clearPaths();
+
 	struct path_t { int x1_mm; int y1_mm; int x2_mm; int y2_mm; };
 	std::vector<path_t> path;
 
+	int numOfPlots = mpNumOfPlots->text().toInt();
 	int x1_mm = mpStartX_mm->text().toInt();
 	int y1_mm = mpStartY_mm->text().toInt();
 
-	int distance_mm = static_cast<int>(mpPlotLength->text().toDouble() * mPlotConversionFactor);
+	int plot_length_mm = static_cast<int>(mpPlotLength->text().toDouble() * mPlotConversionFactor);
+	int alley_length_mm = static_cast<int>(mpAlleyLength->text().toDouble() * mPlotConversionFactor);
+	int scan_length_mm = getScanDistance_mm();
+
+	int start_offset_mm = 0;
+	int numOfScans = 0;
+	int separation_mm = 0;
+
+	if (mpHasSubScans->isChecked())
+	{
+		numOfScans = mpNumOfScans->text().toInt();
+		int sub_separation_mm = getSubScanSeparation_mm();
+		auto orientation = getSubScanOrientation();
+
+		if (mpScanEveryRow->isChecked() || (mpScanInsideRows->isChecked() && (numOfScans <= 2)))
+		{
+			if (numOfScans <= 1)
+			{
+				numOfScans = 0;
+			}
+			else
+			{
+				numOfScans -= 1;
+
+				switch (orientation)
+				{
+				case eSubScanOrientation::NORTH_TO_SOUTH:
+					separation_mm = sub_separation_mm;
+					break;
+				case eSubScanOrientation::SOUTH_TO_NORTH:
+					separation_mm = -sub_separation_mm;
+					break;
+				case eSubScanOrientation::EAST_TO_WEST:
+					separation_mm = -sub_separation_mm;
+					break;
+				case eSubScanOrientation::WEST_TO_EAST:
+					separation_mm = sub_separation_mm;
+					break;
+				}
+			}
+		}
+		else if (mpScanCenterOnly->isChecked())
+		{
+			switch (orientation)
+			{
+			case eSubScanOrientation::NORTH_TO_SOUTH:
+				x1_mm += (numOfScans * sub_separation_mm) / 2;
+				break;
+			case eSubScanOrientation::SOUTH_TO_NORTH:
+				x1_mm -= (numOfScans * sub_separation_mm) / 2;
+				break;
+			case eSubScanOrientation::EAST_TO_WEST:
+				y1_mm -= (numOfScans * sub_separation_mm) / 2;
+				separation_mm = -sub_separation_mm;
+				break;
+			case eSubScanOrientation::WEST_TO_EAST:
+				y1_mm += (numOfScans * sub_separation_mm) / 2;
+				break;
+			}
+
+			numOfScans = 0;
+		}
+		else if (mpScanInsideRows->isChecked())
+		{
+			numOfScans -= 2;
+
+			switch (orientation)
+			{
+			case eSubScanOrientation::NORTH_TO_SOUTH:
+				x1_mm += sub_separation_mm;
+				separation_mm = sub_separation_mm;
+				break;
+			case eSubScanOrientation::SOUTH_TO_NORTH:
+				x1_mm -= sub_separation_mm;
+				separation_mm = -sub_separation_mm;
+				break;
+			case eSubScanOrientation::EAST_TO_WEST:
+				y1_mm -= sub_separation_mm;
+				separation_mm = -sub_separation_mm;
+				break;
+			case eSubScanOrientation::WEST_TO_EAST:
+				y1_mm += sub_separation_mm;
+				separation_mm = sub_separation_mm;
+				break;
+			}
+		}
+	}
+
+	if (mpStart->isChecked())
+	{
+		start_offset_mm = 0;
+	}
+	else if (mpCenter->isChecked())
+	{
+		start_offset_mm = (plot_length_mm / 2) - (scan_length_mm / 2);
+	}
+	else if (mpEnd->isChecked())
+	{
+		start_offset_mm = plot_length_mm - scan_length_mm;
+	}
 
 	int x2_mm = x1_mm;
 	int y2_mm = y1_mm;
 
 	switch (mpPlotOrientation->currentIndex())
 	{
-	case SCAN_WEST_TO_EAST:
-		y2_mm += distance_mm;
+	case PLOT_WEST_TO_EAST:
+		y1_mm += start_offset_mm;
+		y2_mm = y1_mm + scan_length_mm;
 		break;
-	case SCAN_EAST_TO_WEST:
-		y2_mm -= distance_mm;
+	case PLOT_EAST_TO_WEST:
+		y1_mm -= start_offset_mm;
+		y2_mm = y1_mm - scan_length_mm;
 		break;
-	case SCAN_NORTH_TO_SOUTH:
-		x2_mm += distance_mm;
+	case PLOT_NORTH_TO_SOUTH:
+		x1_mm += start_offset_mm;
+		x2_mm = x1_mm + scan_length_mm;
 		break;
-	case SCAN_SOUTH_TO_NORTH:
-		x2_mm -= distance_mm;
+	case PLOT_SOUTH_TO_NORTH:
+		x1_mm -= start_offset_mm;
+		x2_mm = x1_mm - scan_length_mm;
 		break;
 	}
 
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 
+	path.push_back({ x1_mm, y1_mm, x2_mm, y2_mm });
+
+	for (int i = 1; i < numOfPlots; ++i)
+	{
+		switch (mpPlotOrientation->currentIndex())
+		{
+		case PLOT_WEST_TO_EAST:
+			y1_mm += (plot_length_mm + alley_length_mm);
+			y2_mm = y1_mm + scan_length_mm;
+			break;
+		case PLOT_EAST_TO_WEST:
+			y1_mm -= (plot_length_mm + alley_length_mm);
+			y2_mm = y1_mm - scan_length_mm;
+			break;
+		case PLOT_NORTH_TO_SOUTH:
+			x1_mm += (plot_length_mm + alley_length_mm);
+			x2_mm = x1_mm + scan_length_mm;
+			break;
+		case PLOT_SOUTH_TO_NORTH:
+			x1_mm -= (plot_length_mm + alley_length_mm);
+			x2_mm = x1_mm - scan_length_mm;
+			break;
+		}
+
+		emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+
+		path.push_back({ x1_mm, y1_mm, x2_mm, y2_mm });
+	}
 
 	if (mpHasSubScans->isChecked())
 	{
-		int separation_mm = getSubScanSeparation_mm();
-
-		int numOfScans = mpNumOfScans->text().toInt();
-
 		auto orientation = getSubScanOrientation();
 
 		for (int i = 1; i < numOfScans; ++i)
 		{
-			switch (orientation)
+			for (auto& p : path)
 			{
-			case eSubScanOrientation::NORTH_TO_SOUTH:
-				x1_mm += separation_mm;
-				x2_mm += separation_mm;
-				break;
-			case eSubScanOrientation::SOUTH_TO_NORTH:
-				x1_mm -= separation_mm;
-				x2_mm -= separation_mm;
-				break;
-			case eSubScanOrientation::EAST_TO_WEST:
-				y1_mm -= separation_mm;
-				y2_mm -= separation_mm;
-				break;
-			case eSubScanOrientation::WEST_TO_EAST:
-				y1_mm += separation_mm;
-				y2_mm += separation_mm;
-				break;
-			}
+				switch (orientation)
+				{
+				case eSubScanOrientation::NORTH_TO_SOUTH:
+				case eSubScanOrientation::SOUTH_TO_NORTH:
+					p.x1_mm += separation_mm;
+					p.x2_mm += separation_mm;
+					break;
+				case eSubScanOrientation::EAST_TO_WEST:
+				case eSubScanOrientation::WEST_TO_EAST:
+					p.y1_mm += separation_mm;
+					p.y2_mm += separation_mm;
+					break;
+				}
 
-			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
+				emit drawPath(p.x1_mm, p.y1_mm, p.x2_mm, p.y2_mm);
+			}
 		}
 	}
 }

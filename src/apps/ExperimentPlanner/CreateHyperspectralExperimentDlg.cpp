@@ -86,11 +86,21 @@ cCreateHyperspectralExperimentDlg::eSubScanOrientation cCreateHyperspectralExper
 	return eSubScanOrientation::NORTH_TO_SOUTH;
 }
 
+bool cCreateHyperspectralExperimentDlg::isScanDistanceValid() const
+{
+	return !mpScanDistance->text().isEmpty();
+}
+
 int cCreateHyperspectralExperimentDlg::getScanDistance_mm() const
 {
 	if (mpScanDistance->text().isEmpty()) return 0;
 
 	return static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+}
+
+bool cCreateHyperspectralExperimentDlg::isSubScanDistanceValid() const
+{
+	return !mpSubScanSeparation->text().isEmpty();
 }
 
 int cCreateHyperspectralExperimentDlg::getSubScanSeparation_mm() const

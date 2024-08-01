@@ -58,8 +58,10 @@ protected:
 	enum class eSubScanOrientation {NORTH_TO_SOUTH, SOUTH_TO_NORTH, EAST_TO_WEST, WEST_TO_EAST};
 	eSubScanOrientation getSubScanOrientation() const;
 
+	bool isScanDistanceValid() const;
 	int getScanDistance_mm() const;
 
+	bool isSubScanDistanceValid() const;
 	int getSubScanSeparation_mm() const;
 
 protected:
