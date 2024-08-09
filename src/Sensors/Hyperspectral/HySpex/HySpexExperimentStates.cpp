@@ -4,13 +4,19 @@
 #include "HySpexSWIR_384_PropertyPage_Remote.hpp"
 
 #include <QMessageBox>
+#include <QThread>
 
+#include <chrono>
+#include <thread>
+
+const long long NETWORK_DELAY_MS = 500;
 
 /*******************************************************************/
 /**       Base Class for Remote HySpex Experiment States          **/
 /*******************************************************************/
 cHySpexCamera_ExperimentState_Remote::cHySpexCamera_ExperimentState_Remote
-	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6)
+	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6, QObject* parent)
+	: cExperimentStateRemoteInterface(parent)
 {
 	mHostname = hostname;
 	mPort = port;
@@ -45,9 +51,9 @@ bool cHySpexCamera_ExperimentState_Remote::recording()
 /**         HySpex Experiment States to Control Shutter           **/
 /*******************************************************************/
 cHySpexCamera_ShutterCtrl_Remote::cHySpexCamera_ShutterCtrl_Remote(const std::string& hostname, uint16_t port,
-	const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state)
+	const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state, QObject* parent)
 	:
-	cHySpexCamera_ExperimentState_Remote(hostname, port, localIpAddress, use_IpV6), cHySpexCamera_PropertiesNetEncoder(255),
+	cHySpexCamera_ExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent), cHySpexCamera_PropertiesNetEncoder(255),
 	mDesiredState(desired_state)
 {
 	mShutterTimer.interval_sec(5);
@@ -64,6 +70,9 @@ void cHySpexCamera_ShutterCtrl_Remote::run()
 	if (mShutterTimer.elapsed())
 	{
 		sendQueryShutterState();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
 		mShutterTimer.reset();
 	}
 }
@@ -93,12 +102,19 @@ void cHySpexCamera_ShutterCtrl_Remote::onShutterState(eShutterState state)
 	if (mDesiredState == eShutterState::CLOSED)
 	{
 		sendCloseShutter();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
 		sendQueryShutterState();
 	}
 
 	if (mDesiredState == eShutterState::OPEN)
 	{
 		sendOpenShutter();
+
+		// Sleep for 250 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
 		sendQueryShutterState();
 	}
 }
@@ -106,6 +122,10 @@ void cHySpexCamera_ShutterCtrl_Remote::onShutterState(eShutterState state)
 void cHySpexCamera_ShutterCtrl_Remote::onConnect()
 {
 	sendQueryShutterState();
+
+	// Sleep for 250 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
 	mShutterTimer.reset();
 }
 
@@ -121,9 +141,9 @@ int cHySpexCamera_ShutterCtrl_Remote::sendOutgoingData(const char* data, std::si
 
 /*** Experimental State to Close Shutter ***/
 cHySpexCamera_CloseShutter_Remote::cHySpexCamera_CloseShutter_Remote(const std::string& hostname, uint16_t port,
-	const std::string& localIpAddress, bool use_IpV6)
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
 	:
-	cHySpexCamera_ShutterCtrl_Remote(hostname, port, localIpAddress, use_IpV6, eShutterState::CLOSED)
+	cHySpexCamera_ShutterCtrl_Remote(hostname, port, localIpAddress, use_IpV6, eShutterState::CLOSED, parent)
 {}
 
 QString cHySpexCamera_CloseShutter_Remote::getStatusStr()
@@ -133,9 +153,9 @@ QString cHySpexCamera_CloseShutter_Remote::getStatusStr()
 
 /*** Experimental State to Open Shutter ***/
 cHySpexCamera_OpenShutter_Remote::cHySpexCamera_OpenShutter_Remote(const std::string& hostname, uint16_t port,
-	const std::string& localIpAddress, bool use_IpV6)
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
 	:
-	cHySpexCamera_ShutterCtrl_Remote(hostname, port, localIpAddress, use_IpV6, eShutterState::OPEN)
+	cHySpexCamera_ShutterCtrl_Remote(hostname, port, localIpAddress, use_IpV6, eShutterState::OPEN, parent)
 {}
 
 QString cHySpexCamera_OpenShutter_Remote::getStatusStr()
@@ -148,9 +168,9 @@ QString cHySpexCamera_OpenShutter_Remote::getStatusStr()
 /**       HySpex Experiment States to Control Acquisition         **/
 /*******************************************************************/
 cHySpexCamera_Acquisition_Remote::cHySpexCamera_Acquisition_Remote(const std::string& hostname, uint16_t port,
-	const std::string& localIpAddress, bool use_IpV6)
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
 	: 
-	cHySpexCamera_ExperimentState_Remote(hostname, port, localIpAddress, use_IpV6), cHySpexCamera_PropertiesNetEncoder(255)
+	cHySpexCamera_ExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent), cHySpexCamera_PropertiesNetEncoder(255)
 {}
 
 cHySpexCamera_Acquisition_Remote::~cHySpexCamera_Acquisition_Remote()
@@ -223,6 +243,9 @@ void cHySpexCamera_Acquisition_Remote::stop() {}
 void cHySpexCamera_Acquisition_Remote::onConnect()
 {
 	sendQueryState();
+
+	// Sleep for 250 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 }
 
 void cHySpexCamera_Acquisition_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
@@ -238,9 +261,9 @@ int cHySpexCamera_Acquisition_Remote::sendOutgoingData(const char* data, std::si
 
 /*** Experimental State to Adjust Acquisition Parameters ***/
 cHySpexCamera_AcqParameters_Remote::cHySpexCamera_AcqParameters_Remote(const std::string& hostname, uint16_t port,
-	const std::string& localIpAddress, bool use_IpV6)
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
 	:
-	cHySpexCamera_Acquisition_Remote(hostname, port, localIpAddress, use_IpV6) 
+	cHySpexCamera_Acquisition_Remote(hostname, port, localIpAddress, use_IpV6, parent) 
 {}
 
 QString cHySpexCamera_AcqParameters_Remote::getStatusStr()
@@ -290,9 +313,9 @@ void cHySpexCamera_AcqParameters_Remote::onCurrentState(bool valid, std::uint16_
 
 /*** Experimental State to Do Background Measurement ***/
 cHySpexCamera_Background_Remote::cHySpexCamera_Background_Remote(const std::string& hostname, uint16_t port,
-	const std::string& localIpAddress, bool use_IpV6)
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
 	:
-	cHySpexCamera_Acquisition_Remote(hostname, port, localIpAddress, use_IpV6)
+	cHySpexCamera_Acquisition_Remote(hostname, port, localIpAddress, use_IpV6, parent)
 {}
 
 
@@ -383,9 +406,17 @@ void cHySpexCamera_Background_Remote::onCurrentState(bool valid, std::uint16_t a
 		std::uint32_t integrationTime_us = mDesiredIntegrationTime_us.has_value() ? mDesiredIntegrationTime_us.value() : mCurrentIntegrationTime_us;
 
 		sendAcquisitionParameters(averageFrames, framePeriod_us, integrationTime_us);
+
+		// Sleep for 250 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
 		mHasAcquisitionState = false;
 		mState = eSTATE::WAIT_FOR_STATE_UPDATE;
 		sendQueryState();
+
+		// Sleep for 250 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
 		return;
 	}
 
@@ -420,6 +451,9 @@ void cHySpexCamera_Background_Remote::onConnect()
 {
 	mState = eSTATE::WAIT_FOR_STATE;
 	cHySpexCamera_Acquisition_Remote::onConnect();
+
+	// Sleep for 250 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 }
 
 

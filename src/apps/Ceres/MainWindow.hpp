@@ -49,6 +49,8 @@ signals:
     void experimentPaused();
     void experimentStopped();
     void refreshDisplay();
+    void showMessage(const QString& message, int timeout = 0);
+
 
 public slots:
     void addSensorPropertyPage(QAction* pAction);

@@ -531,14 +531,16 @@ void cMainWindow::onExperimentTerminated()
     mBatchFileName.clear();
     mBatchProcess.clear();
 
+/* FIX ME
     mpExpLoad->setEnabled(true);
     mpExpRun->setEnabled(true);
     mpExpPause->setEnabled(false);
     mpExpStop->setEnabled(false);
+*/
 
     emit experimentStopped();
 
-    onStatusUpdate("Experiment stopped!");
+    emit showMessage("Experiment stopped!");
 }
 
 void cMainWindow::onExperimentCompleted()
@@ -663,6 +665,8 @@ void cMainWindow::createToolBars()
 void cMainWindow::createStatusBar()
 {
     statusBar();
+
+    connect(this, &cMainWindow::showMessage, statusBar(), &QStatusBar::showMessage);
 
     mpHobbsMeter = new cHobbsMeter(statusBar());
 }

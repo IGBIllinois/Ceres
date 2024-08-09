@@ -16,7 +16,7 @@ cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWi
 		cHySpexVNIR_3000N_PropertiesNetEncoder(255)
 {}
 
-cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry)
+cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 	if (type == "VNIR-3000N")
 	{
@@ -28,13 +28,34 @@ cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::
 		std::string cmd = entry["command"];
 
 		if (cmd == "background")
-			return new cHySpexCamera_Background_Remote(hostname, port, localIp, use_IpV6);
+		{
+			auto* pState = new cHySpexCamera_Background_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
 
 		if (cmd == "close shutter")
-			return new cHySpexCamera_CloseShutter_Remote(hostname, port, localIp, use_IpV6);
+		{
+			auto* pState = new cHySpexCamera_CloseShutter_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
 
 		if (cmd == "open shutter")
-			return new cHySpexCamera_OpenShutter_Remote(hostname, port, localIp, use_IpV6);
+		{
+			auto* pState = new cHySpexCamera_OpenShutter_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
 	}
 
 	return nullptr;

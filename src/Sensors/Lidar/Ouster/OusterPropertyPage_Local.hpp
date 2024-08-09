@@ -17,7 +17,7 @@ public:
     ~cOusterPropertyPage_Local() = default;
 
 public:
-    cExperimentState* createState(const std::string& type, const nlohmann::json& entry) override;
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
     void doLayout() override;
 

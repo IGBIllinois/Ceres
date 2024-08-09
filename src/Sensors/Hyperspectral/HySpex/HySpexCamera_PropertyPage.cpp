@@ -96,7 +96,7 @@ QGroupBox* cHySpexCamera_PropertyPage::getBackgroundLayout()
 	return bgBox;
 }
 
-cExperimentState* cHySpexCamera_PropertyPage::createState(const std::string& type, const nlohmann::json& entry)
+cExperimentState* cHySpexCamera_PropertyPage::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 	return nullptr;
 }

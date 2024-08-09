@@ -106,7 +106,7 @@ void cDataThread::run()
 
         forever
         {
-            if (pDispatcher->hasPendingEvents())
+            if (pDispatcher && pDispatcher->hasPendingEvents())
             {
                 pDispatcher->processEvents(QEventLoop::ExcludeUserInputEvents);
             }

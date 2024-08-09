@@ -21,7 +21,7 @@ public:
     ~cHySpexSWIR_384_PropertyPage_Remote() = default;
 
 public:
-    cExperimentState* createState(const std::string& type, const nlohmann::json& entry) override;
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 public:
     void onCurrentState(bool valid, std::uint16_t average_frames,

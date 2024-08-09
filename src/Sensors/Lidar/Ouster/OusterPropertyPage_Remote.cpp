@@ -11,7 +11,7 @@ cOusterPropertyPage_Remote::cOusterPropertyPage_Remote(QWidget* parent)
 		cOusterPropertiesNetEncoder(255)
 {}
 
-cExperimentState* cOusterPropertyPage_Remote::createState(const std::string& type, const nlohmann::json& stateDoc)
+cExperimentState* cOusterPropertyPage_Remote::createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent)
 {
 	return nullptr;
 }

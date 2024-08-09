@@ -145,7 +145,12 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
             {
                 for (auto* creator : mStateCreators)
                 {
-                    pState = creator->createState(type, entry);
+                    pState = creator->createState(type, entry, this);
+
+                    if (pState)
+                    {
+                        break;
+                    }
                 }
             }
 

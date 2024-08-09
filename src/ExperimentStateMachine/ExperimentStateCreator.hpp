@@ -6,11 +6,16 @@
 
 class cExperimentState;
 
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QObject;
+QT_END_NAMESPACE
+
 
 class cExperimentStateCreator
 {
 public:
-    virtual cExperimentState* createState(const std::string& type, const nlohmann::json& stateDoc) = 0;
+    virtual cExperimentState* createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent) = 0;
 };
 
 

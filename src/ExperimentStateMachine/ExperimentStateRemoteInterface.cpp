@@ -43,7 +43,7 @@ void cExperimentStateRemoteInterface::destroy()
 bool cExperimentStateRemoteInterface::initialize(const std::string& hostname, uint16_t port,
     bool use_ipv6, const std::string& local_ip)
 {
-    mpSocket = new QTcpSocket();
+    mpSocket = new QTcpSocket(this);
     mpSocket->setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
     mpSocket->setSocketOption(QAbstractSocket::SocketOption::KeepAliveOption, 1);
 

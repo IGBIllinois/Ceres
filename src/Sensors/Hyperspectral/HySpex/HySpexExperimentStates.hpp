@@ -28,7 +28,7 @@ class cHySpexCamera_ExperimentState_Remote : public cExperimentStateRemoteInterf
 
 public:
 	cHySpexCamera_ExperimentState_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6);
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 	virtual ~cHySpexCamera_ExperimentState_Remote();
 
 	void cleanup() override;
@@ -54,7 +54,7 @@ class cHySpexCamera_ShutterCtrl_Remote : public cHySpexCamera_ExperimentState_Re
 
 public:
 	cHySpexCamera_ShutterCtrl_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state);
+		const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state, QObject* parent = nullptr);
 
 	bool configure(const nlohmann::json& stateDoc) override;
 
@@ -94,7 +94,7 @@ class cHySpexCamera_CloseShutter_Remote : public cHySpexCamera_ShutterCtrl_Remot
 {
 public:
 	cHySpexCamera_CloseShutter_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6);
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
 };
@@ -104,7 +104,7 @@ class cHySpexCamera_OpenShutter_Remote : public cHySpexCamera_ShutterCtrl_Remote
 {
 public:
 	cHySpexCamera_OpenShutter_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6);
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
 };
@@ -121,7 +121,7 @@ class cHySpexCamera_Acquisition_Remote : public cHySpexCamera_ExperimentState_Re
 
 public:
 	cHySpexCamera_Acquisition_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6);
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 	~cHySpexCamera_Acquisition_Remote();
 
 	bool configure(const nlohmann::json& stateDoc) override;
@@ -156,7 +156,7 @@ class cHySpexCamera_AcqParameters_Remote : public cHySpexCamera_Acquisition_Remo
 {
 public:
 	cHySpexCamera_AcqParameters_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6);
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
 
@@ -179,7 +179,7 @@ class cHySpexCamera_Background_Remote : public cHySpexCamera_Acquisition_Remote
 {
 public:
 	cHySpexCamera_Background_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6);
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	bool configure(const nlohmann::json& stateDoc) override;
 

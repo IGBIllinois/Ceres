@@ -19,7 +19,7 @@ public:
     ~cOusterPropertyPage_Remote() = default;
 
 public:
-    cExperimentState* createState(const std::string& type, const nlohmann::json& entry) override;
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 public:
     void onAzimuthWindow(double min_deg, double max_deg) override;

@@ -55,7 +55,7 @@ void cAxisCommunicationsPropertyPage::doLayout()
 	setLayout(pMainLayout);
 }
 
-cExperimentState* cAxisCommunicationsPropertyPage::createState(const std::string& type, const nlohmann::json& entry)
+cExperimentState* cAxisCommunicationsPropertyPage::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 	return nullptr;
 }
