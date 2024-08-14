@@ -386,10 +386,8 @@ void cMainWindow::onExperimentRun()
         {
             mpModel->startExperiment();
 
-            mpExpLoad->setEnabled(false);
-            mpExpRun->setEnabled(false);
-            mpExpPause->setEnabled(true);
-            mpExpStop->setEnabled(true);
+            emit setExperimentActions(false, false, true, true);
+
         }
         return;
     }
@@ -433,10 +431,7 @@ void cMainWindow::onExperimentRun()
 
     mpModel->startExperiment();
 
-    mpExpLoad->setEnabled(false);
-    mpExpRun->setEnabled(false);
-    mpExpPause->setEnabled(true);
-    mpExpStop->setEnabled(true);
+    emit setExperimentActions(false, false, true, true);
 
     emit experimentRunning();
 }
@@ -451,10 +446,7 @@ void cMainWindow::onExperimentPause()
 
     mpModel->pauseExperiment();
 
-    mpExpLoad->setEnabled(false);
-    mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(true);
-    mpExpStop->setEnabled(true);
+    emit setExperimentActions(false, true, true, true);
 
     emit experimentPaused();
 }
@@ -470,6 +462,14 @@ void cMainWindow::onExperimentStop()
     mpModel->terminateExperiment();
 
 //    onExperimentTerminated();
+}
+
+void cMainWindow::onSetExperimentActions(bool load, bool run, bool pause, bool stop)
+{
+    mpExpLoad->setEnabled(load);
+    mpExpRun->setEnabled(run);
+    mpExpPause->setEnabled(pause);
+    mpExpStop->setEnabled(stop);
 }
 
 //-----------------------------------------------------------------------------
@@ -531,12 +531,7 @@ void cMainWindow::onExperimentTerminated()
     mBatchFileName.clear();
     mBatchProcess.clear();
 
-/* FIX ME
-    mpExpLoad->setEnabled(true);
-    mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(false);
-    mpExpStop->setEnabled(false);
-*/
+    emit setExperimentActions(true, true, false, false);
 
     emit experimentStopped();
 
@@ -559,17 +554,13 @@ void cMainWindow::onExperimentCompleted()
         }
     }
 
-    mpExpLoad->setEnabled(true);
-    mpExpRun->setEnabled(true);
-    mpExpPause->setEnabled(false);
-    mpExpStop->setEnabled(false);
+    emit setExperimentActions(true, true, false, false);
 
     emit experimentStopped();
 
     QSound::play(":/ripe.illinois.edu/end_experiment.wav");
     onStatusUpdate("Experiment completed!");
 }
-
 
 //-----------------------------------------------------------------------------
 void cMainWindow::createMainMenu()
@@ -624,6 +615,8 @@ void cMainWindow::createSubMenusAndActions()
     connect(mpExpStop, &QAction::triggered, this, &cMainWindow::onExperimentStop);
     mpExperimentMenu->addAction(mpExpStop);
     mpExpStop->setEnabled(false);
+
+    connect(this, &cMainWindow::setExperimentActions, this, &cMainWindow::onSetExperimentActions);
 
     // Build the View Menu
     /* The view menu is built by the dock window system */

@@ -50,6 +50,7 @@ signals:
     void experimentStopped();
     void refreshDisplay();
     void showMessage(const QString& message, int timeout = 0);
+    void setExperimentActions(bool load, bool run, bool pause, bool stop);
 
 
 public slots:
@@ -74,6 +75,7 @@ private slots:
     void onExperimentPause();
     void onExperimentStop();
     void helpAbout();
+    void onSetExperimentActions(bool load, bool run, bool pause, bool stop);
 
 private:
     bool loadExperiment(const cExperimentTreeItem& experiment);
