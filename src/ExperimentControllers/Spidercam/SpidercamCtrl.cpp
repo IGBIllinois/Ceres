@@ -133,7 +133,7 @@ bool cSpidercamController::startCommunications()
 {
     if (mpSocket) return true;
 
-    mpSocket = new QTcpSocket();
+    mpSocket = new QTcpSocket(this);
 
     QObject::connect(mpSocket, &QTcpSocket::connected, this, &cSpidercamController::onConnect);
     QObject::connect(mpSocket, &QTcpSocket::disconnected, this, &cSpidercamController::onDisconnect);

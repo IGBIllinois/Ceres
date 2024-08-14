@@ -49,7 +49,6 @@ cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
     mTemperature_C = 0.0;
     mRH_pct = 0.0;
     mPAR_umole = 0.0;
-
 }
 
 cCtrlDataModelRemote::~cCtrlDataModelRemote()
