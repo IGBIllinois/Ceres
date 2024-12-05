@@ -141,6 +141,7 @@ void cExperimentMetaInfoDlg::createControls()
 	mpPlantingMonth->addItem("June");
 	mpPlantingMonth->addItem("July");
 	mpPlantingMonth->addItem("August");
+	mpPlantingMonth->addItem("Sept");
 	mpPlantingMonth->setEditable(false);
 
 
