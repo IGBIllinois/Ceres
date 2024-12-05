@@ -1,5 +1,8 @@
 
 #include "SsnxModel_file.hpp"
+
+#include "../Sensors/GPS/GpsUtils.hpp"
+
 #include <functional>
 
 
@@ -39,14 +42,20 @@ void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_1_t data)
 	mGroundTrack_deg = data.GroundTrack_deg;
 	mDatum = ::gps::eDatum::WGS84;
 
+	mNumOfSv = data.NrSV;
+
 	double height_m = mHeight_m - mUndulation_m;
 
 	emit updatePVT(mTimestamp_s, mLatitude_rad, mLongitude_rad, height_m,
-		mNorthSpeed_mps, mEastSpeed_mps, mVertSpeed_mps, mGroundTrack_deg, mDatum);
+		mNorthSpeed_mps, mEastSpeed_mps, mVertSpeed_mps, mGroundTrack_deg, ::gps::to_int(mDatum), mNumOfSv, 0);
 }
 
 void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_2_t data)
 {
+	mSolutionType = static_cast<::gps::eSolutionType>(data.Mode);
+
+	emit updateSolutionType(::gps::to_int(mSolutionType));
+
 	mTimestamp_s = data.timestamp_s;
 	mLatitude_rad = data.Lat_rad;
 	mLongitude_rad = data.Lon_rad;
@@ -58,10 +67,13 @@ void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_2_t data)
 	mGroundTrack_deg = data.GroundTrack_deg;
 	mDatum = static_cast<::gps::eDatum>(data.Datum);
 
+	mNumOfSv = data.NrSV;
+	mNumOfBases = data.NrBases.value_or(0);
+
 	double height_m = mHeight_m - mUndulation_m;
 
 	emit updatePVT(mTimestamp_s, mLatitude_rad, mLongitude_rad, height_m,
-		mNorthSpeed_mps, mEastSpeed_mps, mVertSpeed_mps, mGroundTrack_deg, mDatum);
+		mNorthSpeed_mps, mEastSpeed_mps, mVertSpeed_mps, mGroundTrack_deg, ::gps::to_int(mDatum), mNumOfSv, mNumOfBases);
 }
 
 void cSsnxModel_file::onReceiverTime(ssnx::gps::ReceiverTime_1_t data)

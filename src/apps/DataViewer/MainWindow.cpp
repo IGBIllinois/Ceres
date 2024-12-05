@@ -70,6 +70,7 @@ void cMainWindow::initialize()
     mpSsnxView->topLevelChanged(true);
     mpSsnxView->setWindowFlag(Qt::Tool);
 
+    QObject::connect(mpSsnxModel, &cSsnxModel_file::updateSolutionType, mpSsnxView, &cSsnxView::updateSolutionType);
     QObject::connect(mpSsnxModel, &cSsnxModel_file::updatePVT, mpSsnxView, &cSsnxView::updatePVT);
     QObject::connect(mpSsnxModel, &cSsnxModel_file::updateUTC, mpSsnxView, &cSsnxView::updateUTC);
 

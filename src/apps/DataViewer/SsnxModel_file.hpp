@@ -17,10 +17,12 @@ public:
     ~cSsnxModel_file();
 
 signals:
+	void updateSolutionType(int solution_type);
+
     void updatePVT(double timestamp_s,
         double lat_rad, double lng_rad, double height_m,
         double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,
-        double groundTrack_deg, ::gps::eDatum datum);
+        double groundTrack_deg, int datum, int num_sv, int num_bases);
 
     void updateUTC(int hour, int min, int sec, int day, int month, int year);
 
@@ -40,6 +42,8 @@ protected:
 	void onRtcmDatum(ssnx::gps::RtcmDatum_1_t data) override {};
 
 private:
+	::gps::eSolutionType mSolutionType = ::gps::eSolutionType::NONE;
+
 	double mX_m = 0.0;
 	double mY_m = 0.0;
 	double mZ_m = 0.0;
@@ -58,5 +62,8 @@ private:
 	double mGroundTrack_deg = 0.0;
 	double mUndulation_m = 0.0;
 	::gps::eDatum mDatum = ::gps::eDatum::WGS84;
+
+	int mNumOfSv = 0;
+	int mNumOfBases = 0;
 };
 
