@@ -5,35 +5,7 @@
 cGpsModel::cGpsModel(const std::string& name, QObject* parent)
 :
     cSensorModel(name, parent)
-{
-    mDatum = gps::eDatum::WGS84;
-
-    mPvtValid = false;
-    mPvtTimestamp_s = 0.0;
-    mLatitude_rad = 0.0;
-    mLongitude_rad = 0.0;
-    mHeight_m = 0.0;
-    mUndulation_m = 0.0;
-    mVn_mps = 0.0;
-    mVe_mps = 0.0;
-    mVu_mps = 0.0;
-    mGroundTrack_deg = 0.0;
-
-    mTimeValid = false;
-    mRxTimestamp_s = 0.0;
-
-    mUtcHour = 0;
-    mUtcMinute = 0;
-    mUtcSecond = 0;
-
-    mUtcDay = 0;
-    mUtcMonth = 0;
-    mUtcYear = 0;
-
-    mRxTimeLocked = false;
-
-    mRecordTrack = false;
-}
+{}
 
 bool cGpsModel::isPositionValid() const
 {
@@ -43,6 +15,11 @@ bool cGpsModel::isPositionValid() const
 bool cGpsModel::isTimeValid() const
 {
     return mTimeValid;
+}
+
+::gps::eSolutionType cGpsModel::getSolutionType() const
+{
+    return mSolutionType;
 }
 
 gps::eDatum cGpsModel::getDatum() const

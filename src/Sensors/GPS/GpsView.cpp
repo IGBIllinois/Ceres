@@ -78,6 +78,18 @@ void cGpsView::createWidgets()
 	mpTimeLabel->setText("Time:");
 	mpTime = new QLineEdit();
 	mpTime->setReadOnly(true);
+
+	mpNumSvLabel = new QLabel("Number Of SVs:");
+	mpNumSv = new QLineEdit();
+	mpNumSv->setReadOnly(true);
+
+	mpNumBasesLabel = new QLabel("Number Of Bases:");
+	mpNumBases = new QLineEdit();
+	mpNumBases->setReadOnly(true);
+
+	mpSolutionTypeLabel = new QLabel("Solution Type:");
+	mpSolutionType = new QLineEdit();
+	mpSolutionType->setReadOnly(true);
 }
 
 void cGpsView::horizontalLayout()
@@ -108,6 +120,12 @@ void cGpsView::horizontalLayout()
 	mainlayout->addWidget(mpDate, 3, 1);
 	mainlayout->addWidget(mpTimeLabel, 3, 2);
 	mainlayout->addWidget(mpTime, 3, 3);
+	mainlayout->addWidget(mpNumSvLabel, 4, 0);
+	mainlayout->addWidget(mpNumSv, 4, 1);
+	mainlayout->addWidget(mpNumBasesLabel, 4, 2);
+	mainlayout->addWidget(mpNumBases, 4, 3);
+	mainlayout->addWidget(mpSolutionTypeLabel, 4, 4);
+	mainlayout->addWidget(mpSolutionType, 4, 5);
 
 	setLayout(mainlayout);
 }
@@ -129,6 +147,9 @@ void cGpsView::verticalLayout()
 	mainlayout->addRow(mpTimestampLabel, mpTimestamp_s);
 	mainlayout->addRow(mpDateLabel, mpDate);
 	mainlayout->addRow(mpTimeLabel, mpTime);
+	mainlayout->addRow(mpNumSvLabel, mpNumSv);
+	mainlayout->addRow(mpNumBasesLabel, mpNumBases);
+	mainlayout->addRow(mpSolutionTypeLabel, mpSolutionType);
 
 	setLayout(mainlayout);
 }

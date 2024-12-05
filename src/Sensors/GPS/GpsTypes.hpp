@@ -16,6 +16,20 @@ namespace  gps
         SECOND_USER_DATUM
     };
 
+    enum class eSolutionType
+    {
+        NONE,
+        STAND_ALONE,
+        DIFFERENTIAL,
+        FIXED,
+        RTK_FIXED,
+        RTK_FLOAT,
+        SBAS,
+        MOVING_RTK_FIXED,
+        MOVING_RTK_FLOAT,
+        PPP
+    };
+
     struct sGpsPoint
     {
         double  Timestamp_s;

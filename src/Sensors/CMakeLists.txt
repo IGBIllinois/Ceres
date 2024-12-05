@@ -58,7 +58,6 @@ PRIVATE
 #
     SensorFactory.hpp
     SensorFactory.cpp
-
 )
 
 #
@@ -107,5 +106,8 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/RGB)
 
 # Add the IR camera library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/IR)
+
+# Add the Time-Of-Flight camera library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/TimeOfFlight)
 
 

@@ -2,6 +2,8 @@
 #include "SsnxModel_direct.hpp"
 #include "RappFieldBoundary.hpp"
 
+#include "../GpsUtils.hpp"
+
 #include <QtSerialPort/QSerialPortInfo>
 
 #include <functional>
@@ -263,6 +265,10 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
 
+    mSolutionType = static_cast<::gps::eSolutionType>(pvt.Mode);
+
+    emit solutionTypeChanged(::gps::to_int(mSolutionType));
+
     if (!mPvtValid)
     {
         emit positionChanged(-1, -1, -1);
@@ -279,6 +285,10 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     mVe_mps = pvt.Ve_mps;
     mVu_mps = pvt.Vu_mps;
     mGroundTrack_deg = pvt.GroundTrack_deg;
+    
+    mNumBases = pvt.NrBases.value_or(0);
+
+    mNumSV = pvt.NrSV;
 
     double height_m = mHeight_m - mUndulation_m;
 
@@ -301,7 +311,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     emit updateGeodeticPVT(mPvtTimestamp_s,
         mLatitude_rad, mLongitude_rad, height_m,
         mVn_mps, mVe_mps, mVu_mps,
-        mGroundTrack_deg, mDatum);
+        mGroundTrack_deg, ::gps::to_int(mDatum), mNumSV, mNumBases);
 
     auto pos = rfb::fromGPS(mLatitude_rad, mLongitude_rad, height_m);
 
@@ -406,6 +416,14 @@ void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
     {
         mSerializer.write(rtcm);
     }
+}
+
+void cSsnxModel_direct::receiverStatus(const ssnx::gps::ReceiverStatus_2_t& status)
+{
+}
+
+void cSsnxModel_direct::ntripClientStatus(const ssnx::gps::NTRIP_ClientStatus_1_t& status)
+{
 }
 
 

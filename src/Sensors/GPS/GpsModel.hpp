@@ -20,43 +20,46 @@ public:
     bool isPositionValid() const;
     bool isTimeValid() const;
 
-    ::gps::eDatum    getDatum() const;
-    ::gps::sPosition getPosition() const;
-    ::gps::sVelocity getVelocity() const;
-    ::gps::sUtcDate  getDate() const;
-    ::gps::sUtcTime  getTime() const;
+    ::gps::eSolutionType getSolutionType() const;
+    ::gps::eDatum        getDatum() const;
+    ::gps::sPosition     getPosition() const;
+    ::gps::sVelocity     getVelocity() const;
+    ::gps::sUtcDate      getDate() const;
+    ::gps::sUtcTime      getTime() const;
 
 protected:
     cGpsModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cGpsModel() = default;
 
-    ::gps::eDatum mDatum;
+    ::gps::eSolutionType mSolutionType = ::gps::eSolutionType::NONE;
 
-    bool    mPvtValid;
-    double  mPvtTimestamp_s;
-    double  mLatitude_rad;
-    double  mLongitude_rad;
-    double  mHeight_m;
-    double  mUndulation_m;
-    double  mVn_mps;
-    double  mVe_mps;
-    double  mVu_mps;
-    double  mGroundTrack_deg;
+    ::gps::eDatum mDatum = ::gps::eDatum::WGS84;
 
-    bool    mTimeValid;
-    double  mRxTimestamp_s;
+    bool    mPvtValid = false;
+    double  mPvtTimestamp_s = 0.0;
+    double  mLatitude_rad = 0.0;
+    double  mLongitude_rad = 0.0;
+    double  mHeight_m = 0.0;
+    double  mUndulation_m = 0.0;
+    double  mVn_mps = 0.0;
+    double  mVe_mps = 0.0;
+    double  mVu_mps = 0.0;
+    double  mGroundTrack_deg = 0.0;
 
-    int mUtcHour;
-    int mUtcMinute;
-    int mUtcSecond;
+    bool    mTimeValid = false;
+    double  mRxTimestamp_s = 0.0;
 
-    int mUtcDay;
-    int mUtcMonth;
-    int mUtcYear;
+    int mUtcHour = 0;
+    int mUtcMinute = 0;
+    int mUtcSecond = 0;
 
-    bool mRxTimeLocked;
+    int mUtcDay = 0;
+    int mUtcMonth = 0;
+    int mUtcYear = 0;
 
-    bool mRecordTrack;
+    bool mRxTimeLocked = false;
+
+    bool mRecordTrack = false;
     std::deque<::gps::sGpsPoint> mTrack;
 };
 

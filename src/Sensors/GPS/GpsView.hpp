@@ -62,4 +62,13 @@ protected:
 
     QLabel* mpTimeLabel;
     QLineEdit* mpTime;
+
+    QLabel* mpNumSvLabel;
+    QLineEdit* mpNumSv;
+
+    QLabel* mpNumBasesLabel;
+    QLineEdit* mpNumBases;
+
+    QLabel* mpSolutionTypeLabel;
+    QLineEdit* mpSolutionType;
 };

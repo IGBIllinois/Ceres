@@ -45,7 +45,10 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
             QObject::connect(pModel, &cSsnxModel::posProjectedStateChanged, pView, &cSsnxStatusView::onPosProjectedStateChange);
             QObject::connect(pModel, &cSsnxModel::receiverTimeStateChanged, pView, &cSsnxStatusView::onReceiverTimeStateChange);
             QObject::connect(pModel, &cSsnxModel::rtcmDatumStateChanged, pView, &cSsnxStatusView::onRtcmDatumStateChange);
+            QObject::connect(pModel, &cSsnxModel::solutionTypeChanged, pView, &cSsnxStatusView::onSolutionTypeChange);
             QObject::connect(pModel, &cSsnxModel::positionChanged, pView, &cSsnxStatusView::onPositionChange);
+            QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxStatusView::onGeodeticPVT_Change);
+            QObject::connect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxStatusView::onUTC_Change);
 
             widgets.pRemoteStatusView = pView;
         }

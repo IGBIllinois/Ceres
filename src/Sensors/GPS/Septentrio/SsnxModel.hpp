@@ -39,17 +39,21 @@ signals:
     void posProjectedStateChanged(bool valid);
     void receiverTimeStateChanged(bool valid);
     void rtcmDatumStateChanged(bool valid);
+    void solutionTypeChanged(int solution_type);
     void positionChanged(int x_mm, int y_mm, int z_mm);
 
 signals:
     void updateGeodeticPVT(double timestamp_s,
         double lat_rad, double lng_rad, double height_m,
         double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,
-        double groundTrack_deg, ::gps::eDatum datum);
+        double groundTrack_deg, int datum, int num_sv, int num_bases);
 
     void updateUTC(int hour, int min, int sec, int day, int month, int year);
 
 protected:
+    int mNumBases = 0;
+    int mNumSV = 0;
+
     cSsnxSerializer mSerializer;
 };
 

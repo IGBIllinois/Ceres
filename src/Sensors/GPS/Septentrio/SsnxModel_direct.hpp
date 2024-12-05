@@ -45,6 +45,8 @@ protected:
     void posProjected(const ssnx::gps::POS_Projected_1_t& pvt) override;
     void receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt) override;
     void rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm) override;
+    void receiverStatus(const ssnx::gps::ReceiverStatus_2_t& status) override;
+    void ntripClientStatus(const ssnx::gps::NTRIP_ClientStatus_1_t& status) override;
 
 private:
     void closeConnection() override;

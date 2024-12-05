@@ -1,5 +1,8 @@
 
 #include "SsnxModel_net.hpp"
+
+#include "../GpsUtils.hpp"
+
 #include <functional>
 
 using namespace ssnx;
@@ -104,6 +107,10 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
 
+    mSolutionType = static_cast<::gps::eSolutionType>(pvt.Mode);
+
+    emit solutionTypeChanged(::gps::to_int(mSolutionType));
+
     if (!mPvtValid) return;
 
     mDatum = static_cast<::gps::eDatum>(pvt.Datum);
@@ -116,6 +123,9 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
     mVe_mps = pvt.Ve_mps;
     mVu_mps = pvt.Vu_mps;
     mGroundTrack_deg = pvt.GroundTrack_deg;
+
+    mNumBases = pvt.NrBases.value_or(0);
+    mNumSV = pvt.NrSV;
 
     double height_m = mHeight_m - mUndulation_m;
 
@@ -137,7 +147,7 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
     emit updateGeodeticPVT(mPvtTimestamp_s,
         mLatitude_rad, mLongitude_rad, height_m,
         mVn_mps, mVe_mps, mVu_mps,
-        mGroundTrack_deg, mDatum);
+        mGroundTrack_deg, ::gps::to_int(mDatum), mNumSV, mNumBases);
 }
 
 void cSsnxModel_net::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)

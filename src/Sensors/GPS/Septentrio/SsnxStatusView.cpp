@@ -5,6 +5,8 @@
 #include "Constants.hpp"
 #include "QIndicator.hpp"
 
+#include "../GpsUtils.hpp"
+
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QLabel>
@@ -13,29 +15,6 @@
 #include <QFormLayout>
 
 #include <string>
-
-namespace
-{
-/*
-	QString to_qstring(gps::eDatum datum)
-	{
-		switch (datum)
-		{
-		case gps::eDatum::WGS84: return QString("WGS84");
-		case gps::eDatum::DGNSS: return QString("DGNSS");
-		case gps::eDatum::ETRS89: return QString("ETRS89");
-		case gps::eDatum::NAD83: return QString("NAD83");
-		case gps::eDatum::NAD83_PA11: return QString("NAD83 PA11");
-		case gps::eDatum::NAD83_MA11: return QString("NAD83 (MA11)");
-		case gps::eDatum::GDA94: return QString("GDA94");
-		case gps::eDatum::FIRST_USER_DATUM: return QString("First Uset Datum");
-		case gps::eDatum::SECOND_USER_DATUM: return QString("Second Uset Datum");
-		}
-
-		return QString("Unknown");
-	}
-*/
-}
 
 
 cSsnxStatusView::cSsnxStatusView(cSsnxModel* pModel, QWidget* parent)
@@ -64,6 +43,48 @@ void cSsnxStatusView::createWidgets()
 
 	mpRtcmDatumValid = new QLedIndicator("RTCM Datum Valid", this);
 
+	mpLatitude_deg = new QLineEdit();
+	mpLatitude_deg->setReadOnly(true);
+
+	mpLongitude_deg = new QLineEdit();
+	mpLongitude_deg->setReadOnly(true);
+
+	mpHeight_m = new QLineEdit();
+	mpHeight_m->setReadOnly(true);
+
+	mpNorthVelocity_mps = new QLineEdit();
+	mpNorthVelocity_mps->setReadOnly(true);
+
+	mpEastVelocity_mps = new QLineEdit();
+	mpEastVelocity_mps->setReadOnly(true);
+
+	mpUpVelocity_mps = new QLineEdit();
+	mpUpVelocity_mps->setReadOnly(true);
+
+	mpGroundTrack_deg = new QLineEdit();
+	mpGroundTrack_deg->setReadOnly(true);
+
+	mpDatum = new QLineEdit();
+	mpDatum->setReadOnly(true);
+
+	mpNumBases = new QLineEdit();
+	mpNumBases->setReadOnly(true);
+
+	mpNumSV = new QLineEdit();
+	mpNumSV->setReadOnly(true);
+
+	mpSolutionType = new QLineEdit();
+	mpSolutionType->setReadOnly(true);
+
+	mpTimestamp_s = new QLineEdit();
+	mpTimestamp_s->setReadOnly(true);
+
+	mpDate = new QLineEdit();
+	mpDate->setReadOnly(true);
+
+	mpTime = new QLineEdit();
+	mpTime->setReadOnly(true);
+
 	mpX_mm = new QLineEdit(this);
 	mpX_mm->setReadOnly(true);
 
@@ -76,6 +97,8 @@ void cSsnxStatusView::createWidgets()
 
 void cSsnxStatusView::doLayout()
 {
+	QLabel* text = nullptr;
+
 	auto* mainLayout = new QVBoxLayout(this);
 
 	mainLayout->addWidget(getSensorStatusBox());
@@ -97,10 +120,116 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addSpacing(10);
 
-	QGroupBox* posBox = new QGroupBox("Approximate Position");
+	QGroupBox* geodeticBox = new QGroupBox("Geodetic Position");
+
+	auto* pLatLngLayout = new QHBoxLayout();
+
+	text = new QLabel("Latitude (deg)");
+	pLatLngLayout->addWidget(text);
+	pLatLngLayout->addWidget(mpLatitude_deg, 1);
+	pLatLngLayout->addSpacing(10);
+
+	text = new QLabel("Longitude (deg)");
+	pLatLngLayout->addWidget(text);
+	pLatLngLayout->addWidget(mpLongitude_deg, 1);
+	pLatLngLayout->addSpacing(10);
+
+	text = new QLabel("Height (m)");
+	pLatLngLayout->addWidget(text);
+	pLatLngLayout->addWidget(mpHeight_m, 1);
+
+	geodeticBox->setLayout(pLatLngLayout);
+
+	mainLayout->addWidget(geodeticBox);
+
+	mainLayout->addSpacing(10);
+
+	QGroupBox* speedBox = new QGroupBox("GPS Speeds");
+
+	auto* pSpeedLayout = new QHBoxLayout();
+
+	text = new QLabel("North Speed (m/s)");
+	pSpeedLayout->addWidget(text);
+	pSpeedLayout->addWidget(mpNorthVelocity_mps, 1);
+	pSpeedLayout->addSpacing(10);
+
+	text = new QLabel("East Speed (m/s)");
+	pSpeedLayout->addWidget(text);
+	pSpeedLayout->addWidget(mpEastVelocity_mps, 1);
+	pSpeedLayout->addSpacing(10);
+
+	text = new QLabel("Vertical Speed (m/s)");
+	pSpeedLayout->addWidget(text);
+	pSpeedLayout->addWidget(mpUpVelocity_mps, 1);
+
+	speedBox->setLayout(pSpeedLayout);
+
+	mainLayout->addWidget(speedBox);
+
+	mainLayout->addSpacing(10);
+
+	QGroupBox* infoBox = new QGroupBox("GPS Information");
+
+	auto* pInfoLayout = new QHBoxLayout();
+
+	text = new QLabel("Ground Track (deg)");
+	pInfoLayout->addWidget(text);
+	pInfoLayout->addWidget(mpGroundTrack_deg, 1);
+	pInfoLayout->addSpacing(10);
+
+	text = new QLabel("Datum");
+	pInfoLayout->addWidget(text);
+	pInfoLayout->addWidget(mpDatum, 1);
+	pInfoLayout->addSpacing(10);
+
+	text = new QLabel("Num Of Satellites");
+	pInfoLayout->addWidget(text);
+	pInfoLayout->addWidget(mpNumSV, 1);
+	pInfoLayout->addSpacing(10);
+
+	text = new QLabel("Num Of Bases");
+	pInfoLayout->addWidget(text);
+	pInfoLayout->addWidget(mpNumBases, 1);
+	pInfoLayout->addSpacing(10);
+
+	text = new QLabel("Solution Type");
+	pInfoLayout->addWidget(text);
+	pInfoLayout->addWidget(mpSolutionType, 1);
+
+	infoBox->setLayout(pInfoLayout);
+
+	mainLayout->addWidget(infoBox);
+
+	mainLayout->addSpacing(10);
+
+	QGroupBox* timeBox = new QGroupBox("GPS Time");
+
+	auto* pTimeLayout = new QHBoxLayout();
+
+	text = new QLabel("Timestamp (s):");
+	pTimeLayout->addWidget(text);
+	pTimeLayout->addWidget(mpTimestamp_s, 1);
+	pTimeLayout->addSpacing(10);
+
+	text = new QLabel("Date:");
+	pTimeLayout->addWidget(text);
+	pTimeLayout->addWidget(mpDate, 1);
+	pTimeLayout->addSpacing(10);
+
+	text = new QLabel("Time:");
+	pTimeLayout->addWidget(text);
+	pTimeLayout->addWidget(mpTime, 1);
+
+	timeBox->setLayout(pTimeLayout);
+
+	mainLayout->addWidget(timeBox);
+
+	mainLayout->addSpacing(10);
+
+	QGroupBox* posBox = new QGroupBox("Approximate Spidercam Position");
 
 	auto* pPosLayout = new QHBoxLayout();
-	QLabel* text = new QLabel("X (mm)", this);
+	text = new QLabel("X (mm)", this);
 	pPosLayout->addWidget(text);
 	pPosLayout->addWidget(mpX_mm, 1);
 	pPosLayout->addSpacing(10);
@@ -158,8 +287,58 @@ void cSsnxStatusView::onRtcmDatumStateChange(bool valid)
 	mpRtcmDatumValid->setState(valid);
 }
 
+void cSsnxStatusView::onGeodeticPVT_Change(double timestamp_s,
+	double lat_rad, double lng_rad, double height_m,
+	double northSpeed_mps, double eastSpeed_mps, double vertSpeed_mps,
+	double groundTrack_deg, int datum, int num_sv, int num_bases)
+{
+	if (!isActiveWindow())
+		return;
+
+	mpLatitude_deg->setText(QString::number(lat_rad * nConstants::RAD_TO_DEG, 'f', 10));
+	mpLongitude_deg->setText(QString::number(lng_rad * nConstants::RAD_TO_DEG, 'f', 10));
+	mpHeight_m->setText(QString::number(height_m));
+	mpNorthVelocity_mps->setText(QString::number(northSpeed_mps));
+	mpEastVelocity_mps->setText(QString::number(eastSpeed_mps));
+	mpUpVelocity_mps->setText(QString::number(vertSpeed_mps));
+
+	if ((groundTrack_deg > 360.0) || (groundTrack_deg < -360.0))
+		mpGroundTrack_deg->setText("");
+	else
+		mpGroundTrack_deg->setText(QString::number(groundTrack_deg));
+
+	mpTimestamp_s->setText(QString::number(timestamp_s, 'f', 6));
+	mpDatum->setText(::gps::to_qstring(::gps::to_datum(datum)));
+	mpNumSV->setText(QString::number(num_sv));
+	mpNumBases->setText(QString::number(num_bases));
+}
+
+
+void cSsnxStatusView::onUTC_Change(int hour, int min, int sec, int day, int month, int year)
+{
+	if (!isActiveWindow())
+		return;
+
+	mpDate->setText(QString("%1/%2/%3").arg(QString::number(month), 2, '0')
+		.arg(QString::number(day), 2, '0').arg(QString::number(year)));
+
+	mpTime->setText(QString("%1:%2:%3").arg(QString::number(hour), 2, '0')
+		.arg(QString::number(min), 2, '0').arg(QString::number(sec), 2, '0'));
+}
+
+void cSsnxStatusView::onSolutionTypeChange(int solution_type)
+{
+	if (!isActiveWindow())
+		return;
+
+	mpSolutionType->setText(::gps::to_qstring(::gps::to_solution_type(solution_type)));
+}
+
 void cSsnxStatusView::onPositionChange(int x_mm, int y_mm, int z_mm)
 {
+	if (!isActiveWindow())
+		return;
+
 	if (x_mm < 0)
 		mpX_mm->setText("");
 	else

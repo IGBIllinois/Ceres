@@ -10,6 +10,8 @@ set(GPS_SOURCE_FILES
 # General GPS View-Model-Controller files
 #
 	GpsTypes.hpp
+    GpsUtils.hpp
+    GpsUtils.cpp
     GpsView.hpp
     GpsView.cpp
     GpsModel.hpp
