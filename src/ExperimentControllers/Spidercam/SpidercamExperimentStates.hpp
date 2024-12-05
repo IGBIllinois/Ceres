@@ -9,25 +9,22 @@
 class cSpidercamController;
 
 
-class cSpidercamExperimentState_Movement : public cExperimentState
+class cSpidercamExperimentState : public cExperimentState
 {
 public:
-	cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
+	cSpidercamExperimentState(const spidercam::sPosition_1_t& pos,
 		cSpidercamController& controller, uint32_t tolerance_mm);
 
 	QString getStatusStr() override;
 
-	bool configure(const nlohmann::json& stateDoc) override;
-
 	bool recording() override;
 
-	bool initialize() override;
 	void run() override;
 	void pause() override;
 	void stop() override;
 	eRESULT finished() override;
 
-private:
+protected:
 	const spidercam::sPosition_1_t& mDollyPos;
 	cSpidercamController& mController;
 
@@ -43,21 +40,55 @@ private:
 
 	bool mRecordData = false;
 
-	double mX_mm = 0.0;
-	double mY_mm = 0.0;
-	double mZ_mm = 0.0;
-
-	bool mX_NeedsInitialization = false;
-	bool mY_NeedsInitialization = false;
-	bool mZ_NeedsInitialization = false;
-
 	uint32_t mTolerance_mm = 10.0;
 
 	double mSpeed_mmps = 0.0;
 
+	double mX_mm = 0.0;
+	double mY_mm = 0.0;
+	double mZ_mm = 0.0;
+
 	double mPan_deg = 0.0;
 	double mTilt_deg = 0.0;
 	double mRoll_deg = 0.0;
+};
+
+
+class cSpidercamExperimentState_Movement : public cSpidercamExperimentState
+{
+public:
+	cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
+		cSpidercamController& controller, uint32_t tolerance_mm);
+
+	bool configure(const nlohmann::json& stateDoc) override;
+
+	bool initialize() override;
+
+private:
+	bool mX_NeedsInitialization = false;
+	bool mY_NeedsInitialization = false;
+	bool mZ_NeedsInitialization = false;
+
+	bool mPan_NeedsInitialization = false;
+	bool mTilt_NeedsInitialization = false;
+	bool mRoll_NeedsInitialization = false;
+};
+
+
+class cSpidercamExperimentState_DeltaMovement : public cSpidercamExperimentState
+{
+public:
+	cSpidercamExperimentState_DeltaMovement(const spidercam::sPosition_1_t& pos,
+		cSpidercamController& controller, uint32_t tolerance_mm);
+
+	bool configure(const nlohmann::json& stateDoc) override;
+
+	bool initialize() override;
+
+private:
+	double mDeltaX_mm = 0.0;
+	double mDeltaY_mm = 0.0;
+	double mDeltaZ_mm = 0.0;
 
 	bool mPan_NeedsInitialization = false;
 	bool mTilt_NeedsInitialization = false;
