@@ -15,6 +15,7 @@ syntax = "proto3";
 {
     eQUERY_UNSPECIFIED = 0;
     eQUERY_REFERENCE_DATA = 1;
+    eQUERY_REFERENCE_PARAMETERS = 2;
 }
 
 enum gps_eReferenceCommand
@@ -23,7 +24,7 @@ enum gps_eReferenceCommand
     eReferenceCmd_ABORT = 1;
 }
 
-enum hyspex_eReferenceReply
+enum gps_eReferenceReply
 {
     eReferenceReply_GOOD = 0;
     eReferenceReply_FAILED = 1;
@@ -38,18 +39,18 @@ enum hyspex_eReferenceReply
 
 message gps_QueryMessage_1 
 {
-	hyspex_eQuery query = 1;
+	gps_eQuery query = 1;
 }
 
-message gps_SetNumOfPointsForAverage_1 
+message gps_SetReferenceParameters_1 
 {
-    uint32 integration_time_sec = 1;
-    uint32 max_integration_time_sec = 2;
+    uint16 integration_time_sec = 1;
+    uint16 max_integration_time_sec = 2;
 }
 
-message gps_RefCommand_1 
+message gps_ReferenceCommand_1 
 {
-    gps_eReferenceCommand cmd = 1;
+    gps_eReferenceCommand command = 1;
 }
 
 
@@ -57,15 +58,27 @@ message gps_RefCommand_1
  * Sensor Controller -> Property Page
  *****************************************************************************/
 
- message gps_CurrentState_1 
+message gps_ReferenceParameters_1 
 {
 	bool valid = 1;
-    uint32 integration_time_sec = 2;
-    uint32 max_integration_time_sec = 3;
+    uint16 integration_time_sec = 2;
+    uint16 max_integration_time_sec = 3;
 }
 
-message hyspex_RefCommandReply_1 
+message gps_ReferenceData_1 
 {
-	hyspex_eReferenceReply reply = 1;
+	bool valid = 1;
+    double avg_lat_rad = 2;
+    double avg_lng_rad = 3;
+    double avg_height_m = 4;
+    double std_lat_rad = 5;
+    double std_lng_rad = 6;
+    double std_height_m = 7;
+	bool   height_valid = 8;
+}
+
+message gps_RefCommandReply_1 
+{
+	gps_eReferenceReply reply = 1;
 }
 
