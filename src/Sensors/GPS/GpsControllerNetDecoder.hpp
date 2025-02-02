@@ -1,0 +1,47 @@
+/*
+ * The GpsControllerNetDecoder is used to decode TCP packets from 
+ * the GpsPropertiesNetEncoder.
+ * You will need to override various virtual methods!
+ */
+
+#pragma once
+
+#include "net_packet_decoder.hpp"
+
+#include <string>
+
+namespace gps
+{
+    enum class ePacketType : uint16_t;
+}
+
+
+class cGpsControllerNetDecoder : public cNetworkDecoder
+{
+public:
+
+    cGpsControllerNetDecoder() = default;
+    virtual ~cGpsControllerNetDecoder() = default;
+
+protected:
+    /*
+     * Property Page ----> Controller
+     */
+    virtual void onQueryState() = 0;
+    virtual void onQueryLensNames() = 0;
+    virtual void onQueryShutterState() = 0;
+    virtual void onSetAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us) = 0;
+    virtual void onSetLensName(const std::string& lens_name) = 0;
+    virtual void onSetNumOfBackgrounds(int num_backgrounds) = 0;
+    virtual void onCalcBackground() = 0;
+    virtual void onStopBackground() = 0;
+
+    virtual void onOpenShutter() = 0;
+    virtual void onCloseShutter() = 0;
+
+protected:
+    void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override;
+    virtual void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer);
+};
+
+

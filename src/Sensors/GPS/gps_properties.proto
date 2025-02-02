@@ -1,0 +1,71 @@
+
+// We are using Protobuf syntax version three.
+
+syntax = "proto3";
+
+// Google protobuf does not support namespaces.  To avoid linker name conficts 
+// all messages must start with "namespace" name
+
+
+/******************************************************************************
+ * Enums used in various messages
+ *****************************************************************************/
+
+ enum gps_eQuery 
+{
+    eQUERY_UNSPECIFIED = 0;
+    eQUERY_REFERENCE_DATA = 1;
+}
+
+enum gps_eReferenceCommand
+{
+    eReferenceCmd_START = 0;
+    eReferenceCmd_ABORT = 1;
+}
+
+enum hyspex_eReferenceReply
+{
+    eReferenceReply_GOOD = 0;
+    eReferenceReply_FAILED = 1;
+    eReferenceReply_ABORTED = 2;
+    eReferenceReply_PENDING = 3;
+}
+
+
+/******************************************************************************
+ * Property Page -> Sensor Controller
+ *****************************************************************************/
+
+message gps_QueryMessage_1 
+{
+	hyspex_eQuery query = 1;
+}
+
+message gps_SetNumOfPointsForAverage_1 
+{
+    uint32 integration_time_sec = 1;
+    uint32 max_integration_time_sec = 2;
+}
+
+message gps_RefCommand_1 
+{
+    gps_eReferenceCommand cmd = 1;
+}
+
+
+/******************************************************************************
+ * Sensor Controller -> Property Page
+ *****************************************************************************/
+
+ message gps_CurrentState_1 
+{
+	bool valid = 1;
+    uint32 integration_time_sec = 2;
+    uint32 max_integration_time_sec = 3;
+}
+
+message hyspex_RefCommandReply_1 
+{
+	hyspex_eReferenceReply reply = 1;
+}
+
