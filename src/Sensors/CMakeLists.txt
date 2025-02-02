@@ -81,6 +81,7 @@ target_link_libraries(Sensors PRIVATE hyperspectral_static)
 target_link_libraries(Sensors PRIVATE rgb_camera_static)
 target_link_libraries(Sensors PRIVATE ir_camera_static)
 target_link_libraries(Sensors PRIVATE multispectral_static)
+target_link_libraries(Sensors PRIVATE tof_camera_static)
 
 
 set_target_properties(Sensors PROPERTIES FOLDER "Sensors")
