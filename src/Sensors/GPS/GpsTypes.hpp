@@ -73,5 +73,19 @@ namespace  gps
         int  utcMinute;
         int  utcSecond;
     };
+
+    struct sReferencePosition
+    {
+        bool valid = false;
+        double  Timestamp_s = 0;
+        double  avgLatitude_rad = 0;
+        double  avgLongitude_rad = 0;
+        double  avgHeight_m = 0;
+        double  stdLatitude_rad = 0;
+        double  stdLongitude_rad = 0;
+        double  stdHeight_m = 0;
+        bool    heightValid = false;
+    };
+
 };
 

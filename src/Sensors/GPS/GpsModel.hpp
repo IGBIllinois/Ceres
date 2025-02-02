@@ -59,6 +59,8 @@ protected:
 
     bool mRxTimeLocked = false;
 
+    ::gps::sReferencePosition mReferencePosition;
+
     bool mRecordTrack = false;
     std::deque<::gps::sGpsPoint> mTrack;
 };

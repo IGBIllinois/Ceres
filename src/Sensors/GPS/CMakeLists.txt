@@ -1,4 +1,12 @@
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+source_group("Resources" FILES gps_properties.proto)
+
+# Generate the header/source files needed from the protobuf
+protobuf_generate_cpp(GPS_PROTO_SRCS GPS_PROTO_HDRS DESCRIPTORS PROTO_DESCS gps_properties.proto)
+
+
 # Add the public header files to use the library
 set(GPS_PUBLIC_HEADERS
     GpsFactory.hpp
@@ -6,6 +14,12 @@ set(GPS_PUBLIC_HEADERS
 
 # Add the source files used in the library
 set(GPS_SOURCE_FILES
+#
+# GPS packet utilities
+#
+	gps_packet_utils.hpp
+	gps_packet_utils.cpp
+
 #
 # General GPS View-Model-Controller files
 #
@@ -17,7 +31,40 @@ set(GPS_SOURCE_FILES
     GpsModel.hpp
     GpsModel.cpp
     GpsFactory.cpp
+
+# General GPS Controller Code
+
+    GpsController.hpp
+    GpsController.cpp
+    GpsControllerNetDecoder.hpp
+    GpsControllerNetDecoder.cpp
+    GpsControllerNetEncoder.hpp
+    GpsControllerNetEncoder.cpp
+
+
+# General GPS Property Page Code
+	GpsPropertiesNetDecoder.hpp
+	GpsPropertiesNetDecoder.cpp
+	GpsPropertiesNetEncoder.hpp
+	GpsPropertiesNetEncoder.cpp
+    GpsPropertyPage_Remote.hpp
+	GpsPropertyPage_Remote.cpp
+	GpsPropertyPage.hpp
+	GpsPropertyPage.cpp
+
+#
+# Gps Experiment State Files
+#
+    GpsExperimentStates.hpp
+    GpsExperimentStates.cpp
 )
+
+
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+#set_property(SOURCE ExperimentCtrlView.hpp PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
 
 
 # The static library (.lib/.a) for incorporating GPS data in Ceres
@@ -41,11 +88,22 @@ PUBLIC
  
 PRIVATE
     ${GPS_SOURCE_FILES}
+
+	${GPS_PROTO_HDRS}
+    ${GPS_PROTO_SRCS}
+	gps_properties.proto
 )
 
 target_include_directories(gps_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(gps_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 
+target_include_directories(gps_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
+
+target_link_libraries(gps_static PUBLIC ${Qt}::Network)
+target_link_libraries(gps_static PRIVATE ExperimentStateMachine)
 target_link_libraries(gps_static PRIVATE cbdf::gps)
+target_link_libraries(gps_static PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(gps_static PRIVATE ${Protobuf_LIBRARIES})
 target_link_libraries(gps_static PUBLIC septentrio_static)
 
 #
