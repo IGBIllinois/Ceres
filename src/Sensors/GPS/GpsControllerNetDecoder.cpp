@@ -19,79 +19,44 @@ void cGpsControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     {
         break;
     }
-    case ePacketType::HYSPEX_QUERY:
+    case ePacketType::GPS_QUERY:
     {
-        auto query = to_hyspex_query_enum_1(hdr.length, buffer);
+        auto query = to_gps_query_enum_1(hdr.length, buffer);
         switch (query)
         {
-        case eQUERY_STATE:
+        case eQUERY_REFERENCE_DATA:
 #ifdef LOG_MESSAGE
-            qInfo() << "Query status received.";
+            qInfo() << "Query reference data received.";
 #endif
-            onQueryState();
+            onQueryReferenceData();
             break;
-        case eQUERY_LENS_NAMES:
+        case eQUERY_REFERENCE_PARAMETERS:
 #ifdef LOG_MESSAGE
-            qInfo() << "Query lens names received.";
+            qInfo() << "Query reference parameters received.";
 #endif
-            onQueryLensNames();
-            break;
-        case eQUERY_SHUTTER_STATE:
-#ifdef LOG_MESSAGE
-            qInfo() << "Query shutter state received.";
-#endif
-            onQueryShutterState();
+            onQueryReferenceParameters();
             break;
         default:
             qWarning() << "Unknown query state received: " << query;
         }
         break;
     }
-    case ePacketType::SET_ACQUISITION_PARAMETERS:
+    case ePacketType::SET_REFERENCE_PARAMETERS:
     {
-        auto data = to_acquisition_parameters_1(hdr.length, buffer);
-        onSetAcquisitionParameters(data.average_frames, data.frame_period_us, data.integration_time_us);
+        auto data = to_reference_parameters_1(hdr.length, buffer);
+        onSetReferenceParameters(data.integration_time_sec, data.max_integration_time_sec);
         break;
     }
-    case ePacketType::SET_LENS_NAME:
+    case ePacketType::GPS_REFERENCE_COMMAND:
     {
-        auto data = to_lens_name_1(hdr.length, buffer);
-        onSetLensName(data);
-        break;
-    }
-    case ePacketType::SET_NUM_BACKGROUNDS:
-    {
-        auto data = to_num_backgrounds_1(hdr.length, buffer);
-        onSetNumOfBackgrounds(data);
-        break;
-    }
-    case ePacketType::CALC_BACKGROUND:
-    {
-        onCalcBackground();
-        break;
-    }
-    case ePacketType::SET_SHUTTER_STATE:
-    {
-        auto state = to_set_shutter_state_1(hdr.length, buffer);
-
-        if (state == hyspex_eShutterState::eShutterState_OPEN)
-            onOpenShutter();
-
-        if (state == hyspex_eShutterState::eShutterState_CLOSED)
-            onCloseShutter();
-
-        break;
-    }
-    case ePacketType::HYSPEX_COMMAND:
-    {
-        auto command = to_hyspex_command_enum_1(hdr.length, buffer);
+        auto command = to_gps_reference_command_enum_1(hdr.length, buffer);
         switch (command)
         {
-        case eCOMMAND_CALC_BACKGROUND:
-            onCalcBackground();
+        case eReferenceCmd_START:
+            onCalcReference();
             break;
-        case eCOMMAND_STOP_BACKGROUND:
-            onStopBackground();
+        case eReferenceCmd_ABORT:
+            onStopReference();
             break;
         default:
             qWarning() << "Unknown command received: " << command;

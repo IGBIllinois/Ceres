@@ -44,8 +44,8 @@ message gps_QueryMessage_1
 
 message gps_SetReferenceParameters_1 
 {
-    uint16 integration_time_sec = 1;
-    uint16 max_integration_time_sec = 2;
+    uint32 integration_time_sec = 1;
+    uint32 max_integration_time_sec = 2;
 }
 
 message gps_ReferenceCommand_1 
@@ -61,13 +61,13 @@ message gps_ReferenceCommand_1
 message gps_ReferenceParameters_1 
 {
 	bool valid = 1;
-    uint16 integration_time_sec = 2;
-    uint16 max_integration_time_sec = 3;
+    uint32 integration_time_sec = 2;
+    uint32 max_integration_time_sec = 3;
 }
 
 message gps_ReferenceData_1 
 {
-	bool valid = 1;
+	bool   valid = 1;
     double avg_lat_rad = 2;
     double avg_lng_rad = 3;
     double avg_height_m = 4;

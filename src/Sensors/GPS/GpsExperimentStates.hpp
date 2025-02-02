@@ -51,7 +51,8 @@ class cGpsReferenceAcquisition_Remote : public cGpsExperimentState_Remote,
 
 public:
 	cGpsReferenceAcquisition_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state, QObject* parent = nullptr);
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
+	virtual ~cGpsReferenceAcquisition_Remote();
 
 	bool configure(const nlohmann::json& stateDoc) override;
 
@@ -65,69 +66,29 @@ public:
 
 protected:
 
-	void onCurrentState(bool valid, std::uint16_t average_frames,
-		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
-		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
-		std::uint32_t num_backgrounds, const std::string& lens_name) override {};
+	void onReferenceParameters(bool valid, uint16_t integration_time_sec, uint16_t max_integration_time_sec) override {};
 
-	void onLensNames(const std::vector<std::string>& names) override {};
+	void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+		double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) override {};
 
-	void onCommandReply(eCommandReply reply) override {};
-	void onBackgroundReply(eBackgroundReply reply) override {};
-
-	void onShutterState(eShutterState state) override;
+	void onReferenceCommandReply(eReferenceReply reply) override {};
 
 	void onConnect() override;
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
 	int sendOutgoingData(const char* data, std::size_t len) override;
 
 protected:
-	eShutterState mShutterState = eShutterState::UNKNOWN;
-	const eShutterState mDesiredState;
+	std::optional<std::uint16_t> mDesiredIntegrationTime_sec;
+	std::optional<std::uint16_t> mDesiredMaxIntegrationTime_sec;
 
-	cIntervalTimer mShutterTimer;
+	std::uint16_t mCurrentIntegrationTime_sec = 0;
+	std::uint16_t mCurrentMaxIntegrationTime_sec = 0;
+
+	bool mHasReferenceState = false;
+
+	enum class eSTATE { WAIT_FOR_CONNECT, WAIT_FOR_STATE, WAIT_FOR_STATE_UPDATE, WAIT_FOR_REFERENCE, COMPLETE, ERROR };
+	eSTATE mState = eSTATE::WAIT_FOR_CONNECT;
+
+	cIntervalTimer mReferenceTimer;
 };
-
-
-/*******************************************************************/
-/**       HySpex Experiment States to Control Acquisition         **/
-/*******************************************************************/
-
-/*
-class cHySpexCamera_Acquisition_Remote : public cHySpexCamera_ExperimentState_Remote,
-	protected cHySpexCamera_PropertiesNetDecoder, protected cHySpexCamera_PropertiesNetEncoder
-{
-	Q_OBJECT
-
-public:
-	cHySpexCamera_Acquisition_Remote(const std::string& hostname, uint16_t port,
-		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
-	~cHySpexCamera_Acquisition_Remote();
-
-	bool configure(const nlohmann::json& stateDoc) override;
-
-	void run() override;
-	void pause() override;
-	void stop() override;
-
-protected:
-	void onLensNames(const std::vector<std::string>& names) override {};
-	void onShutterState(eShutterState state) override {};
-
-	void onConnect() override;
-	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
-	int sendOutgoingData(const char* data, std::size_t len) override;
-
-protected:
-	std::optional<std::uint16_t> mDesiredAverageFrames;
-	std::optional<std::uint32_t> mDesiredFramePeriod_us;
-	std::optional<std::uint32_t> mDesiredIntegrationTime_us;
-
-	std::uint16_t mCurrentAverageFrames = 0;
-	std::uint32_t mCurrentFramePeriod_us = 0;
-	std::uint32_t mCurrentIntegrationTime_us = 0;
-
-	bool mHasAcquisitionState = false;
-};
-*/
 

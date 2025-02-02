@@ -15,84 +15,41 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     {
         break;
     }
-    case ePacketType::CURRENT_STATE:
+    case ePacketType::REFERENCE_PARAMETERS:
     {
-        sCurrentState_t data = to_current_state_1(hdr.length, buffer);
+        sReferenceParameters_t data = to_reference_parameters_1(hdr.length, buffer);
 
-        onCurrentState(data.valid, data.average_frames, data.frame_period_us,
-            data.min_frame_period_us, data.integration_time_us, data.max_integration_time_us,
-            data.num_backgrounds, data.lens_name);
+        onReferenceParameters(true, data.integration_time_sec, data.max_integration_time_sec);
 
         break;
     }
-    case ePacketType::LENS_NAMES:
+    case ePacketType::REFERENCE_DATA:
     {
-        onLensNames(to_lens_names_1(hdr.length, buffer));
+        sReferenceData_t data = to_reference_data_1(hdr.length, buffer);
+        
+        onReferenceData(data.valid, data.avg_lat_rad, data.avg_lng_rad, data.avg_height_m,
+            data.std_lat_rad, data.std_lng_rad, data.std_height_m, data.height_valid);
 
         break;
     }
-    case ePacketType::COMMAND_REPLY:
+    case ePacketType::REFERENCE_REPLY:
     {
-        auto reply = to_command_reply_1(hdr.length, buffer);
-        //switch (reply)
-        //{
-        //case hyspex_eCommand::eCOMMAND_CALC_BACKGROUND:
-        //    onCommandReply(eCommandReply::CALC_BACKGROUND);
-        //    break;
-        //case hyspex_eCommand::eCOMMAND_STOP_BACKGROUND:
-        //    onCommandReply(eCommandReply::STOP_BACKGROUND);
-        //    break;
-        //case hyspex_eCommand::eCOMMAND_UNSPECIFIED:
-        //default:
-        //    onCommandReply(eCommandReply::UNKNOWN);
-        //    break;
-        //}
-        break;
-    }
-    case ePacketType::BACKGROUND_REPLY:
-    {
-        auto reply = to_background_reply_1(hdr.length, buffer);
-        //switch (reply)
-        //{
-        //case hyspex_eBackgroundReply::eBackgroundReply_GOOD:
-        //    onBackgroundReply(eBackgroundReply::GOOD);
-        //    break;
-        //case hyspex_eBackgroundReply::eBackgroundReply_ABORTED:
-        //    onBackgroundReply(eBackgroundReply::ABORTED);
-        //    break;
-        //case hyspex_eBackgroundReply::eBackgroundReply_FAILED:
-        //    onBackgroundReply(eBackgroundReply::FAILED);
-        //    break;
-        //case hyspex_eBackgroundReply::eBackgroundReply_PENDING:
-        //    onBackgroundReply(eBackgroundReply::PENDING);
-        //    break;
-        //}
-        break;
-    }
-    case ePacketType::SHUTTER_STATE_REPLY:
-    {
-        auto reply = to_shutter_state_reply_1(hdr.length, buffer);
-        //switch (reply)
-        //{
-        //case hyspex_eShutterState::eShutterState_UNKNOWN:
-        //    onShutterState(eShutterState::UNKNOWN);
-        //    break;
-        //case hyspex_eShutterState::eShutterState_OPEN:
-        //    onShutterState(eShutterState::OPEN);
-        //    break;
-        //case hyspex_eShutterState::eShutterState_CLOSED:
-        //    onShutterState(eShutterState::CLOSED);
-        //    break;
-        //case hyspex_eShutterState::eShutterState_PENDING_OPEN:
-        //    onShutterState(eShutterState::PENDING_OPEN);
-        //    break;
-        //case hyspex_eShutterState::eShutterState_PENDING_CLOSE:
-        //    onShutterState(eShutterState::PENDING_CLOSED);
-        //    break;
-        //case hyspex_eShutterState::eShutterState_ERROR:
-        //    onShutterState(eShutterState::ERROR);
-        //    break;
-        //}
+        auto reply = to_reference_reply_1(hdr.length, buffer);
+        switch (reply)
+        {
+        case gps_eReferenceReply::eReferenceReply_GOOD:
+            onReferenceCommandReply(eReferenceReply::GOOD);
+            break;
+        case gps_eReferenceReply::eReferenceReply_ABORTED:
+            onReferenceCommandReply(eReferenceReply::ABORTED);
+            break;
+        case gps_eReferenceReply::eReferenceReply_FAILED:
+            onReferenceCommandReply(eReferenceReply::FAILED);
+            break;
+        case gps_eReferenceReply::eReferenceReply_PENDING:
+            onReferenceCommandReply(eReferenceReply::PENDING);
+            break;
+        }
         break;
     }
     default:

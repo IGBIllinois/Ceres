@@ -26,48 +26,26 @@ public:
 
     void createWidgets() override;
 
-    virtual void doCalcBackground() = 0;
+    virtual void doCalcReference() = 0;
 
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 protected:
-    QGroupBox* getLensLayout();
-    QGroupBox* getAcquisitionLayout();
-    QGroupBox* getBackgroundLayout();
+    QGroupBox* getReferenceLayout();
 
 protected:
-    QLabel*     mpLensLabel = nullptr;
-    QComboBox*  mpLenses = nullptr;
-
-    QLabel* mpAvgFramesLabel = nullptr;
-    QLineEdit* mpAvgFrames = nullptr;
-
-    QLabel* mpFramePeriodLabel = nullptr;
-    QLineEdit* mpFramePeriod_us = nullptr;
-
-    QLabel* mpMinFramePeriodLabel = nullptr;
-    QLineEdit* mpMinFramePeriod_us = nullptr;
-
     QLabel* mpIntegrationTimeLabel = nullptr;
-    QLineEdit* mpIntegrationTime_us = nullptr;
+    QLineEdit* mpIntegrationTime_sec = nullptr;
 
     QLabel* mpMaxIntegrationTimeLabel = nullptr;
-    QLineEdit* mpMaxIntegrationTime_us = nullptr;
+    QLineEdit* mpMaxIntegrationTime_sec = nullptr;
 
-
-    QLabel* mpNumBackgroundsLabel = nullptr;
-    QLineEdit* mpNumBackgrounds = nullptr;
-
-    QPushButton* mpDoBackground = nullptr;
+    QPushButton* mpDoReference = nullptr;
 
 protected:
-    std::uint16_t mDefaultAverageFrames = 0;
-    std::uint32_t mDefaultFramePeriod_us = 0;
-    std::uint32_t mDefaultIntegrationTime_us = 0;
-    std::uint32_t mDefaultNumBackgrounds = 0;
-
-    QString mDefaultLensName;
+    std::uint16_t mDefaultIntegrationTime_sec = 0;
+    std::uint16_t mDefaultMaxIntegrationTime_sec = 0;
 };
 
 

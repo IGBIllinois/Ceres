@@ -52,7 +52,7 @@ bool cGpsExperimentState_Remote::recording()
 cGpsReferenceAcquisition_Remote::cGpsReferenceAcquisition_Remote(const std::string& hostname, uint16_t port,
 	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
 	: 
-	cGpsExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent), cHySpexCamera_PropertiesNetEncoder(255)
+	cGpsExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent), cGpsPropertiesNetEncoder(255)
 {}
 
 cGpsReferenceAcquisition_Remote::~cGpsReferenceAcquisition_Remote()
@@ -62,26 +62,20 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
 
-	mHasAcquisitionState = false;
+	mHasReferenceState = false;
 
 	try
 	{
-		if (stateDoc.contains("average frames"))
+		if (stateDoc.contains("integration time (sec)"))
 		{
-			mDesiredAverageFrames = stateDoc["average frames"];
-			mHasAcquisitionState = true;
+			mDesiredIntegrationTime_sec = stateDoc["integration time (us)"];
+			mHasReferenceState = true;
 		}
 
-		if (stateDoc.contains("frame period (us)"))
+		if (stateDoc.contains("max integration time (sec)"))
 		{
-			mDesiredFramePeriod_us = stateDoc["frame period(us)"];
-			mHasAcquisitionState = true;
-		}
-
-		if (stateDoc.contains("integration time (us)"))
-		{
-			mDesiredIntegrationTime_us = stateDoc["integration time (us)"];
-			mHasAcquisitionState = true;
+			mDesiredMaxIntegrationTime_sec = stateDoc["max integration time (us)"];
+			mHasReferenceState = true;
 		}
 	}
 	catch (const detail::parse_error& e)
@@ -89,7 +83,7 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 		QString msg = "Parse Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "HySpex Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "GPS Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -99,7 +93,7 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 		QString msg = "Type Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "HySpex Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "GPS Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -109,7 +103,7 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 		QString msg = "Unknown Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "HySpex Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "GPS Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -122,9 +116,35 @@ void cGpsReferenceAcquisition_Remote::run() {}
 void cGpsReferenceAcquisition_Remote::pause() {}
 void cGpsReferenceAcquisition_Remote::stop() {}
 
+cExperimentState::eRESULT cGpsReferenceAcquisition_Remote::finished()
+{
+	if (mState == eSTATE::ERROR)
+		return eRESULT::ABORT;
+
+	if (mState == eSTATE::COMPLETE)
+		return eRESULT::DONE;
+
+	return eRESULT::WAITING;
+}
+
+QString cGpsReferenceAcquisition_Remote::getStatusStr()
+{
+	QString msg;
+	if (mHasReferenceState)
+	{
+		msg = "Updating reference parameters and collecting a reference point...";
+	}
+	else
+	{
+		msg = "Waiting for GPS to collect reference point...";
+	}
+	return msg;
+}
+
 void cGpsReferenceAcquisition_Remote::onConnect()
 {
-	sendQueryState();
+	mState = eSTATE::WAIT_FOR_STATE;
+	sendQueryReferenceParameters();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));

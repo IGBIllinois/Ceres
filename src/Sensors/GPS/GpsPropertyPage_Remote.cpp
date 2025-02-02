@@ -27,7 +27,7 @@ cExperimentState* cGpsPropertyPage_Remote::createState(const std::string& type, 
 
 		std::string cmd = entry["command"];
 
-		if (cmd == "background")
+		if (cmd == "reference")
 		{
 			auto* pState = new cGpsReferenceAcquisition_Remote(hostname, port, localIp, use_IpV6, parent);
 
@@ -46,12 +46,6 @@ void cGpsPropertyPage_Remote::onConnect()
 {
 	setEnabled(false);
 
-	if (mpLenses->count() == 0)
-	{
-		queryLensNames();
-	}
-
-	queryState();
 
 	setEnabled(true);
 	update();
@@ -59,82 +53,38 @@ void cGpsPropertyPage_Remote::onConnect()
 
 void cGpsPropertyPage_Remote::onDisconnect()
 {
-	mpLenses->clear();
-	mAcquisitionParametersValid = false;
+	mReferenceParametersValid = false;
 
 	doCancel();
 }
 
-void cGpsPropertyPage_Remote::onCurrentState(bool valid,
-	std::uint16_t average_frames, std::uint32_t frame_period_us,
-	std::uint32_t min_frame_period_us, std::uint32_t integration_time_us,
-	std::uint32_t max_integration_time_us, std::uint32_t num_backgrounds,
-	const std::string& lens_name)
+void cGpsPropertyPage_Remote::onReferenceParameters(bool valid, uint16_t integration_time_sec, uint16_t max_integration_time_sec)
 {
 	if (!valid) return;
 
-	mAcquisitionParametersValid = true;
+	mReferenceParametersValid = true;
 
-	mpAvgFrames->setText(QString::number(average_frames));
-	mpFramePeriod_us->setText(QString::number(frame_period_us));
-	mpMinFramePeriod_us->setText(QString::number(min_frame_period_us));
-	mpIntegrationTime_us->setText(QString::number(integration_time_us));
-	mpMaxIntegrationTime_us->setText(QString::number(max_integration_time_us));
-	mpNumBackgrounds->setText(QString::number(num_backgrounds));
+	mpIntegrationTime_sec->setText(QString::number(integration_time_sec));
+	mpMaxIntegrationTime_sec->setText(QString::number(max_integration_time_sec));
 
-	mDefaultAverageFrames = average_frames;
-	mDefaultFramePeriod_us = frame_period_us;
-	mDefaultIntegrationTime_us = integration_time_us;
-	mDefaultNumBackgrounds = num_backgrounds;
-
-	mDefaultLensName = QString::fromStdString(lens_name);
-
-	for (int i = 0; i < mpLenses->count(); ++i)
-	{
-		if (mDefaultLensName == mpLenses->itemText(i))
-		{
-			mpLenses->setCurrentIndex(i);
-			break;
-		}
-	}
+	mDefaultIntegrationTime_sec = integration_time_sec;
+	mDefaultMaxIntegrationTime_sec = max_integration_time_sec;
 }
 
-void cGpsPropertyPage_Remote::onLensNames(const std::vector<std::string>& names)
+void cGpsPropertyPage_Remote::onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+	double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
 {
-	mpLenses->clear();
-	for (std::size_t i = 0; i < names.size(); ++i)
-	{
-		mpLenses->addItem(QString::fromStdString(names[i]));
-	}
+
 }
 
-void cGpsPropertyPage_Remote::onCommandReply(eCommandReply reply)
-{}
-
-void cGpsPropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
+void cGpsPropertyPage_Remote::onReferenceCommandReply(eReferenceReply reply)
 {
-	mBackgroundValid = true;
+	mReferenceValid = true;
 	setEnabled(true);
 	update();
 }
 
-void cGpsPropertyPage_Remote::onShutterState(eShutterState state)
-{}
-
-void cGpsPropertyPage_Remote::showPage()
-{
-	if (!openConnection())
-	{
-		QMessageBox::warning(this, "Ceres",
-			"Could not connect to the GPS controller.",
-			QMessageBox::Ok);
-
-	}
-
-	cGpsPropertyPage::showPage();
-}
-
-void cGpsPropertyPage_Remote::doCalcBackground()
+void cGpsPropertyPage_Remote::doCalcReference()
 {
 	if (!mConnected)
 		return;
@@ -144,7 +94,7 @@ void cGpsPropertyPage_Remote::doCalcBackground()
 
 	sendChangedData();
 
-	calcBackground();
+	calcReference();
 
 	setEnabled(true);
 	update();
@@ -187,149 +137,98 @@ void cGpsPropertyPage_Remote::sendChangedData()
 	if (!mConnected)
 		return;
 
-	auto frames = mpAvgFrames->text().toInt();
-	auto frame_period_us = mpFramePeriod_us->text().toInt();
-	auto integration_time_us = mpIntegrationTime_us->text().toInt();
-	auto num_backgrounds = mpNumBackgrounds->text().toInt();
+	auto integration_time_sec = mpIntegrationTime_sec->text().toInt();
+	auto max_integration_time_sec = mpMaxIntegrationTime_sec->text().toInt();
 
-	if ((mDefaultAverageFrames != frames)
-		|| (mDefaultFramePeriod_us != frame_period_us)
-		|| (mDefaultIntegrationTime_us != integration_time_us)
-		|| (mDefaultNumBackgrounds != num_backgrounds))
+	if ((mDefaultIntegrationTime_sec != integration_time_sec)
+		|| (mDefaultMaxIntegrationTime_sec != max_integration_time_sec))
 	{
 		setEnabled(false);
 	}
 
-	if ((mDefaultAverageFrames != frames)
-		|| (mDefaultFramePeriod_us != frame_period_us)
-		|| (mDefaultIntegrationTime_us != integration_time_us))
+	if ((mDefaultIntegrationTime_sec != integration_time_sec)
+		|| (mDefaultMaxIntegrationTime_sec != max_integration_time_sec))
 	{
-		setAcquisitionParameters(frames, frame_period_us, integration_time_us);
-	}
-
-	if (mDefaultNumBackgrounds != num_backgrounds)
-	{
-		setNumOfBackgrounds(num_backgrounds);
+		setReferenceParameters(integration_time_sec, max_integration_time_sec);
 	}
 }
 
-void cGpsPropertyPage_Remote::queryState()
+void cGpsPropertyPage_Remote::queryReferenceParameters()
 {
-	mAcquisitionParametersValid = false;
+	mReferenceParametersValid = false;
 
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendQueryState();
+		cGpsPropertiesNetEncoder::sendQueryReferenceParameters();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
 		{
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-			if (mAcquisitionParametersValid)
+			if (mReferenceParametersValid)
 				return;
 		}
 	}
 }
 
-void cGpsPropertyPage_Remote::queryLensNames()
+void cGpsPropertyPage_Remote::queryReferenceData()
 {
 	// We are going to try to get the lens names three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendQueryLensNames();
+		cGpsPropertiesNetEncoder::sendQueryReferenceData();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
 		{
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-			if (mpLenses->count() > 0)
 				return;
 		}
 	}
 }
 
-void cGpsPropertyPage_Remote::setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
+void cGpsPropertyPage_Remote::setReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec)
 {
-	mAcquisitionParametersValid = false;
+	mReferenceParametersValid = false;
 
-	// We are going to try to get the acquisition parameters three times.
+	// We are going to try to get the reference parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendAcquisitionParameters(average_frame, frame_period_us, integration_time_us);
-		cGpsPropertiesNetEncoder::sendQueryState();
+		cGpsPropertiesNetEncoder::sendReferenceParameters(integration_time_sec, max_integration_time_sec);
+		cGpsPropertiesNetEncoder::sendQueryReferenceParameters();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
 		{
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-			if (mAcquisitionParametersValid)
+			if (mReferenceParametersValid)
 				return;
 		}
 	}
 }
 
-void cGpsPropertyPage_Remote::setLensName(const std::string& lens_name)
+void cGpsPropertyPage_Remote::calcReference()
 {
-	mAcquisitionParametersValid = false;
+	mReferenceValid = false;
+
+	int secs = 1000; // static_cast<int>(3 * mDefaultNumBackgrounds * mDefaultAverageFrames * (mDefaultFramePeriod_us / 1'000'000.0));
 
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendLensName(lens_name);
-		cGpsPropertiesNetEncoder::sendQueryState();
-
-		QTime delayTime = QTime::currentTime().addSecs(3);
-		while (QTime::currentTime() < delayTime)
-		{
-			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-			if (mAcquisitionParametersValid)
-				return;
-		}
-	}
-}
-
-void cGpsPropertyPage_Remote::setNumOfBackgrounds(int num_backgrounds)
-{
-	mAcquisitionParametersValid = false;
-
-	// We are going to try to get the acquisition parameters three times.
-	for (int i = 0; i < 3; ++i)
-	{
-		cGpsPropertiesNetEncoder::sendNumOfBackgrounds(num_backgrounds);
-		cGpsPropertiesNetEncoder::sendQueryState();
-
-		QTime delayTime = QTime::currentTime().addSecs(3);
-		while (QTime::currentTime() < delayTime)
-		{
-			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-			if (mAcquisitionParametersValid)
-				return;
-		}
-	}
-}
-
-void cGpsPropertyPage_Remote::calcBackground()
-{
-	mBackgroundValid = false;
-
-	int secs = static_cast<int>(3 * mDefaultNumBackgrounds * mDefaultAverageFrames * (mDefaultFramePeriod_us / 1'000'000.0));
-
-	// We are going to try to get the acquisition parameters three times.
-	for (int i = 0; i < 3; ++i)
-	{
-		cGpsPropertiesNetEncoder::sendCalcBackground();
+		cGpsPropertiesNetEncoder::sendCalcReference();
 
 		QTime delayTime = QTime::currentTime().addSecs(secs);
 		while (QTime::currentTime() < delayTime)
 		{
 			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-			if (mBackgroundValid)
+			if (mReferenceValid)
 				return;
 		}
 	}
 
-	cGpsPropertiesNetEncoder::sendStopBackground();
+	cGpsPropertiesNetEncoder::sendStopReference();
 }
 
 void cGpsPropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

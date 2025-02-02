@@ -21,18 +21,13 @@ public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 public:
-    void onCurrentState(bool valid, std::uint16_t average_frames,
-        std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
-        std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
-        std::uint32_t num_backgrounds, const std::string& lens_name) override;
+    void onReferenceParameters(bool valid, uint16_t integration_time_sec, uint16_t max_integration_time_sec) override;
 
-    void onLensNames(const std::vector<std::string>& names) override;
+    void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+        double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) override;
 
-    void onCommandReply(eCommandReply reply) override;
+    void onReferenceCommandReply(eReferenceReply reply) override;
 
-    void onBackgroundReply(eBackgroundReply reply) override;
-
-    void onShutterState(eShutterState state) override;
 
 protected:
     void onConnect() override;
@@ -41,7 +36,7 @@ protected:
 protected:
     void showPage() override;
 
-    void doCalcBackground() override;
+    void doCalcReference() override;
 
     void doOK() override;
     void doCancel() override;
@@ -51,20 +46,18 @@ protected:
 
 private:
     void sendChangedData();
-    void queryState();
-    void queryLensNames();
-    void setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
-    void setLensName(const std::string& lens_name);
-    void setNumOfBackgrounds(int num_backgrounds);
-    void calcBackground();
+    void queryReferenceData();
+    void queryReferenceParameters();
+    void setReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec);
+    void calcReference();
 
 private:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
 
 private:
-    bool mAcquisitionParametersValid = false;
-    bool mBackgroundValid = false;
+    bool mReferenceParametersValid = false;
+    bool mReferenceValid = false;
 };
 
 

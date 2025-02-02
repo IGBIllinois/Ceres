@@ -27,33 +27,21 @@ public:
       *
       * You need to call sendData to make sure the data is sent out!
       */
-    void encodeQueryState();
-    void encodeQueryLensNames();
-    void encodeQueryShutterState();
-    void encodeAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
-    void encodeLensName(const std::string& lens_name);
-    void encodeNumOfBackgrounds(int num_backgrounds);
-    void encodeCalcBackground();
-    void encodeStopBackground();
-
-    void encodeOpenShutter();
-    void encodeCloseShutter();
+    void encodeQueryReferenceData();
+    void encodeQueryReferenceParameters();
+    void encodeReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec);
+    void encodeCalcReference();
+    void encodeStopReference();
 
     /*
      * The send methods will encode the packet into the data buffer and will automatically
      * send the data.
      */
-    void sendQueryState();
-    void sendQueryLensNames();
-    void sendQueryShutterState();
-    void sendAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
-    void sendLensName(const std::string& lens_name);
-    void sendNumOfBackgrounds(int num_backgrounds);
-    void sendCalcBackground();
-    void sendStopBackground();
-
-    void sendOpenShutter();
-    void sendCloseShutter();
+    void sendQueryReferenceData();
+    void sendQueryReferenceParameters();
+    void sendReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec);
+    void sendCalcReference();
+    void sendStopReference();
 };
 
 

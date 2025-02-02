@@ -147,7 +147,7 @@ namespace
 		return false;
 	}
 
-}
+}	// End of namespace
 
 
 

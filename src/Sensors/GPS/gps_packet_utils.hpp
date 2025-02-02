@@ -74,7 +74,7 @@ namespace gps
 	};
 	sReferenceData_t to_reference_data_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_reference_data(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
-			double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid, net_buffer& buffer);
+		double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid, net_buffer& buffer);
 
 	/*** send/receive the reference command reply message ***/
 	gps_eReferenceReply to_reference_reply_1(std::uint16_t length, const net_buffer_view& buffer);
