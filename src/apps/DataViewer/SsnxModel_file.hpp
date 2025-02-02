@@ -41,6 +41,10 @@ protected:
 	void onReceiverTime(ssnx::gps::ReceiverTime_1_t data) override;
 	void onRtcmDatum(ssnx::gps::RtcmDatum_1_t data) override {};
 
+	void onReferencePoint(double avgLat_rad, double avgLng_rad, double avgHeight_m,
+		double stdLat_rad, double stdLng_rad, double stdHeight_m, bool heightComputed) override
+	{};
+
 private:
 	::gps::eSolutionType mSolutionType = ::gps::eSolutionType::NONE;
 
