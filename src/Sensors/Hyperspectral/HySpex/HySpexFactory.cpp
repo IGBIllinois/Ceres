@@ -213,7 +213,6 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
         QObject::connect(pModel, &cHySpexSWIR_384_Model::newSpatialDistributionData, pView, &cHySpexSWIR_384_StatusView::onSpatialDistributionUpdated);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::newSpectralDistributionData, pView, &cHySpexSWIR_384_StatusView::onSpectralDistributionUpdated);
 
-
         auto* pController = new cHySpexSWIR_384_Controller(pModel);
 
         QObject::connect(pModel, &cHySpexSWIR_384_Model::backgroundComplete, pController, &cHySpexSWIR_384_Controller::onBackgroundComplete);
