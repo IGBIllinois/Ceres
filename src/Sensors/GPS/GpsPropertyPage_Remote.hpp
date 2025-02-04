@@ -13,6 +13,8 @@ class cGpsPropertyPage_Remote : public cGpsPropertyPage,
     public cSensorPropertyPageRemoteInterface, 
     private cGpsPropertiesNetDecoder, private cGpsPropertiesNetEncoder
 {
+    Q_OBJECT
+
 public:
     cGpsPropertyPage_Remote(QWidget* parent = nullptr);
     ~cGpsPropertyPage_Remote() = default;

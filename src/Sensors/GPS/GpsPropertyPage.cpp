@@ -15,8 +15,8 @@ cGpsPropertyPage::cGpsPropertyPage(QWidget* parent)
 void cGpsPropertyPage::createWidgets()
 {
 	/** Acquisition Info */
-	mpIntegrationTimeLabel = new QLabel("Integration Time (sec) :", this);
-	mpIntegrationTime_sec = new QLineEdit(this);
+	mpMinIntegrationTimeLabel = new QLabel("Min Integration Time (sec) :", this);
+	mpMinIntegrationTime_sec = new QLineEdit(this);
 
 	mpMaxIntegrationTimeLabel = new QLabel("Max Integration Time (sec) :", this);
 	mpMaxIntegrationTime_sec = new QLineEdit(this);
@@ -33,7 +33,7 @@ QGroupBox* cGpsPropertyPage::getReferenceLayout()
 
 	auto* acqLayout = new QFormLayout();
 
-	acqLayout->addRow(mpIntegrationTimeLabel, mpIntegrationTime_sec);
+	acqLayout->addRow(mpMinIntegrationTimeLabel, mpMinIntegrationTime_sec);
 	acqLayout->addRow(mpMaxIntegrationTimeLabel, mpMaxIntegrationTime_sec);
 
 	acqLayout->addWidget(mpDoReference);

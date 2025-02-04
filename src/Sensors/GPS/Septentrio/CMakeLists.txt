@@ -1,4 +1,7 @@
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+
 # Add the public header files to use the library
 set(SEPTENTRIO_PUBLIC_HEADERS
     SsnxFactory.hpp
@@ -10,15 +13,24 @@ set(SEPTENTRIO_SOURCE_FILES
 # Different Septertino GPS Models based on data source
 #
 
-#	Network stream from relay program on dolly
+# Network stream from relay program on dolly
     SsnxGpsStream.hpp
     SsnxGpsStream.cpp
     SsnxModel_net.hpp
     SsnxModel_net.cpp
 
-#	Directly connected to GPS receiver's com port
+# Directly connected to GPS receiver's com port
     SsnxModel_direct.hpp
     SsnxModel_direct.cpp
+
+# Septertino GPS Controller Code
+
+    SsnxController.hpp
+    SsnxController.cpp
+
+# Septertino GPS Property Page Code
+	SsnxPropertyPage_Remote.hpp
+	SsnxPropertyPage_Remote.cpp
 
 #
 # Septertino GPS receiver files
@@ -32,6 +44,8 @@ set(SEPTENTRIO_SOURCE_FILES
 
     SsnxFactory.hpp
     SsnxFactory.cpp
+
+	${GPS_PROTO_HDRS}
 )
 
 
@@ -60,6 +74,8 @@ PRIVATE
 
 target_include_directories(septentrio_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(septentrio_static PRIVATE ${UTILITIES_INCLUDE_DIR})
+
+target_include_directories(septentrio_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
 #target_link_libraries(septentrio_static PRIVATE cbdf::gps)
 

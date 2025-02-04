@@ -23,12 +23,12 @@ public:
     const std::string& name() const override;
 
 public slots:
-    virtual void onBackgroundComplete() = 0;
+    virtual void onReferenceComplete() = 0;
 
 protected:
-    void txCurrentState(cGpsControllerNetEncoder* encoder);
-    void txLensNames(cGpsControllerNetEncoder* encoder);
-    void txShutterState(cGpsControllerNetEncoder* encoder);
+    void txReferenceData(cGpsControllerNetEncoder* encoder);
+    void txReferenceParameters(cGpsControllerNetEncoder* encoder);
+    void txReferenceReply(cGpsControllerNetEncoder* encoder);
 
 private:
     cGpsModel* mpModel = nullptr;

@@ -65,7 +65,7 @@ gps::sReferenceParameters_t gps::to_reference_parameters_1(std::uint16_t length,
     pckt.ParseFromArray(buffer.data(), length);
 
     gps::sReferenceParameters_t data;
-    data.integration_time_sec     = pckt.integration_time_sec();
+    data.min_integration_time_sec     = pckt.min_integration_time_sec();
     data.max_integration_time_sec = pckt.max_integration_time_sec();
     return data;
 }
@@ -74,7 +74,7 @@ int gps::encode_set_reference_parameters(std::uint16_t integration_time_sec,
     std::uint16_t max_integration_time_sec, net_buffer& buffer)
 {
     gps_SetReferenceParameters_1 pckt;
-    pckt.set_integration_time_sec(integration_time_sec);
+    pckt.set_min_integration_time_sec(integration_time_sec);
     pckt.set_max_integration_time_sec(max_integration_time_sec);
 
     std::string str;
@@ -92,11 +92,11 @@ int gps::encode_set_reference_parameters(std::uint16_t integration_time_sec,
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int gps::encode_reference_parameters_reply(std::uint16_t integration_time_sec,
+int gps::encode_reference_parameters_reply(std::uint16_t min_integration_time_sec,
     std::uint16_t max_integration_time_sec, net_buffer& buffer)
 {
     gps_SetReferenceParameters_1 pckt;
-    pckt.set_integration_time_sec(integration_time_sec);
+    pckt.set_min_integration_time_sec(min_integration_time_sec);
     pckt.set_max_integration_time_sec(max_integration_time_sec);
 
     std::string str;

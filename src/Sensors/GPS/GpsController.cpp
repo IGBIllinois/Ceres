@@ -38,45 +38,36 @@ const std::string& cGpsController::name() const
     return mpModel->name();
 }
 
-void cGpsController::txCurrentState(cGpsControllerNetEncoder* encoder)
+void cGpsController::txReferenceData(cGpsControllerNetEncoder* encoder)
 {
-    //std::uint16_t average_frames = mpModel->getAverageFrames();
-    //std::uint32_t frame_period_us = mpModel->getFramePeriod_us();
-    //std::uint32_t min_frame_period_us = mpModel->getMinFramePeriod_us();
-    //std::uint32_t integration_time_us = mpModel->getIntegrationTime_us();
-    //std::uint32_t max_integration_time_us = mpModel->getMaxIntegrationTime_us();
-    //std::uint32_t num_backgrounds = mpModel->getNumOfBackgrounds();
-    //std::string lens_name = mpModel->getLensName();
+    auto pos = mpModel->getReferencePosition();
 
-    //encoder->sendCurrentState(true, average_frames, frame_period_us, min_frame_period_us,
-    //    integration_time_us, max_integration_time_us, num_backgrounds, lens_name);
+    bool valid = pos.valid;
+    double avg_lat_rad = pos.avgLatitude_rad;
+    double avg_lng_rad = pos.avgLongitude_rad;
+    double avg_height_m = pos.avgHeight_m;
+    double std_lat_rad = pos.stdLatitude_rad;
+    double std_lng_rad = pos.stdLongitude_rad;
+    double std_height_m = pos.stdHeight_m;
+    bool height_valid = pos.heightValid;
+
+    encoder->sendReferenceData(valid, avg_lat_rad, avg_lng_rad, avg_height_m,
+        std_lat_rad, std_lng_rad, std_height_m, height_valid);
 }
 
-void cGpsController::txLensNames(cGpsControllerNetEncoder* encoder)
+void cGpsController::txReferenceParameters(cGpsControllerNetEncoder* encoder)
 {
-    //encoder->sendLensNames(mpModel->getLensNames());
+    int integration_time_sec = mpModel->getRefIntegrationTime_sec();
+    int max_integration_time_sec = mpModel->getRefMaxIntegrationTime_sec();
+
+    encoder->sendReferenceParameters(integration_time_sec, max_integration_time_sec);
 }
 
-void cGpsController::txShutterState(cGpsControllerNetEncoder* encoder)
+void cGpsController::txReferenceReply(cGpsControllerNetEncoder* encoder)
 {
-    //switch (mpModel->getShutterStatus())
-    //{
-    //case hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN:
-    //    encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_OPEN);
-    //    break;
-    //case hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED:
-    //    encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_CLOSED);
-    //    break;
-    //case hyspex::ShutterStatus::HYSPEX_SHUTTER_FAIL_CLOSE:
-    //case hyspex::ShutterStatus::HYSPEX_SHUTTER_FAIL_OPEN:
-    //    encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_ERROR);
-    //    break;
-    //case hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN:
-    //case hyspex::ShutterStatus::HYSPEX_SHUTTER_PENDING_OPEN:
-    //case hyspex::ShutterStatus::HYSPEX_SHUTTER_PENDING_CLOSE:
-    //    encoder->sendShutterStateReply(hyspex_eShutterState::eShutterState_UNKNOWN);
-    //    break;
-    //}
+    auto state = mpModel->getReferenceState();
+
+    encoder->sendReferenceState(state);
 }
 
 

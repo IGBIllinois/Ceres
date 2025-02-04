@@ -9,6 +9,8 @@
 
 class cGpsModel : public cSensorModel
 {
+    Q_OBJECT
+
 public:
 
     /*
@@ -26,6 +28,18 @@ public:
     ::gps::sVelocity     getVelocity() const;
     ::gps::sUtcDate      getDate() const;
     ::gps::sUtcTime      getTime() const;
+
+    ::gps::eReferenceState getReferenceState() const;
+
+    int getRefIntegrationTime_sec() const;
+    int getRefMaxIntegrationTime_sec() const;
+
+    void setReferenceIntegrationTimes(int integration_time_sec, int max_integration_time_sec);
+
+    ::gps::sReferencePosition getReferencePosition() const;
+
+signals:
+    void referenceComplete();
 
 protected:
     cGpsModel(const std::string& name, QObject* parent = nullptr);
@@ -59,6 +73,9 @@ protected:
 
     bool mRxTimeLocked = false;
 
+    int mRefIntegrationTime_sec = 0;
+    int mRefMaxIntegrationTime_sec = 0;
+    ::gps::eReferenceState    mReferenceState;
     ::gps::sReferencePosition mReferencePosition;
 
     bool mRecordTrack = false;

@@ -6,14 +6,13 @@
 #pragma once
 
 #include "net_packet_encoder.hpp"
-#include "gps_properties.pb.h"
+#include "GpsTypes.hpp"
 
 #include <vector>
 #include <string>
 
 class cGpsControllerNetEncoder : public cNetworkEncoder
 {
-
 public:
     cGpsControllerNetEncoder(std::size_t capacity);
     ~cGpsControllerNetEncoder() = default;
@@ -34,7 +33,7 @@ public:
 
     void encodeReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec);
 
-    void encodeReferenceReply(gps_eReferenceReply reply);
+    void encodeReferenceState(gps::eReferenceState state);
 
 
     /*
@@ -46,7 +45,7 @@ public:
 
     void sendReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec);
 
-    void sendReferenceReply(gps_eReferenceReply reply);
+    void sendReferenceState(gps::eReferenceState state);
 };
 
 

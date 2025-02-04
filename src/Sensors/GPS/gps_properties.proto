@@ -16,6 +16,7 @@ syntax = "proto3";
     eQUERY_UNSPECIFIED = 0;
     eQUERY_REFERENCE_DATA = 1;
     eQUERY_REFERENCE_PARAMETERS = 2;
+    eQUERY_REFERENCE_STATE = 3;
 }
 
 enum gps_eReferenceCommand
@@ -30,6 +31,7 @@ enum gps_eReferenceReply
     eReferenceReply_FAILED = 1;
     eReferenceReply_ABORTED = 2;
     eReferenceReply_PENDING = 3;
+    eReferenceReply_IDLE = 4;
 }
 
 
@@ -44,7 +46,7 @@ message gps_QueryMessage_1
 
 message gps_SetReferenceParameters_1 
 {
-    uint32 integration_time_sec = 1;
+    uint32 min_integration_time_sec = 1;
     uint32 max_integration_time_sec = 2;
 }
 

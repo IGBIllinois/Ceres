@@ -5,6 +5,8 @@
 #include "SsnxModel_direct.hpp"
 #include "SsnxView.hpp"
 #include "SsnxStatusView.hpp"
+#include "SsnxController.hpp"
+#include "SsnxPropertyPage_Remote.hpp"
 
 #include <stdexcept>
 
@@ -52,6 +54,13 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
 
             widgets.pRemoteStatusView = pView;
         }
+
+        auto* pController = new cSsnxController(pModel);
+
+        QObject::connect(pModel, &cSsnxModel::referenceComplete, pController, &cGpsController::onReferenceComplete);
+
+        widgets.pController = pController;
+
         return widgets;
     }
 
@@ -85,4 +94,18 @@ void ssnx::remove_sensor(sSensorWidgets widgets)
 
     delete pModel;
     delete dockWidget;
+}
+
+
+cSensorPropertyPage* ssnx::create_sensor_property_page(const std::string& model, uint32_t version,
+    const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
+{
+    if (model == ssnx_id)
+    {
+        auto page = new cSsnxPropertyPage_Remote();
+        page->initialize(remote_ip_address, port, false, local_ip_address);
+        return page;
+    }
+
+    return nullptr;
 }

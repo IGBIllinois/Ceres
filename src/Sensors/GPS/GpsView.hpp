@@ -12,6 +12,8 @@ QT_END_NAMESPACE
 
 class cGpsView : public QAbstractScrollArea
 {
+    Q_OBJECT
+
 public:
 	cGpsView(QWidget* parent = nullptr);
 	virtual ~cGpsView();

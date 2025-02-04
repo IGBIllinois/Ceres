@@ -87,5 +87,11 @@ namespace  gps
         bool    heightValid = false;
     };
 
+    // States using in computing the reference point
+    enum class eReferenceState
+    {
+        WAITING, PENDING, COMPLETE_GOOD, COMPLETE_FAILED, ABORTED
+    };
+
 };
 

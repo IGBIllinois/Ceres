@@ -29,13 +29,13 @@ protected:
      */
     virtual void onQueryReferenceData() = 0;
     virtual void onQueryReferenceParameters() = 0;
-    virtual void onSetReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec) = 0;
+    virtual void onSetReferenceParameters(std::uint16_t min_integration_time_sec, std::uint16_t max_integration_time_sec) = 0;
     virtual void onCalcReference() = 0;
     virtual void onStopReference() = 0;
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override;
-    virtual void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer);
+    virtual void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) {};
 };
 
 

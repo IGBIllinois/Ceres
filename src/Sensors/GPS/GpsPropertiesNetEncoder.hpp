@@ -12,7 +12,6 @@
 
 class cGpsPropertiesNetEncoder : public cNetworkEncoder
 {
-
 public:
     cGpsPropertiesNetEncoder(std::size_t capacity);
     ~cGpsPropertiesNetEncoder() = default;

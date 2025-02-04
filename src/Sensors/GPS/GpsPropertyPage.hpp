@@ -20,6 +20,8 @@ QT_END_NAMESPACE
 
 class cGpsPropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
 {
+    Q_OBJECT
+
 public:
     cGpsPropertyPage(QWidget* parent = nullptr);
     ~cGpsPropertyPage() = default;
@@ -35,8 +37,8 @@ protected:
     QGroupBox* getReferenceLayout();
 
 protected:
-    QLabel* mpIntegrationTimeLabel = nullptr;
-    QLineEdit* mpIntegrationTime_sec = nullptr;
+    QLabel* mpMinIntegrationTimeLabel = nullptr;
+    QLineEdit* mpMinIntegrationTime_sec = nullptr;
 
     QLabel* mpMaxIntegrationTimeLabel = nullptr;
     QLineEdit* mpMaxIntegrationTime_sec = nullptr;
@@ -44,7 +46,7 @@ protected:
     QPushButton* mpDoReference = nullptr;
 
 protected:
-    std::uint16_t mDefaultIntegrationTime_sec = 0;
+    std::uint16_t mDefaultMinIntegrationTime_sec = 0;
     std::uint16_t mDefaultMaxIntegrationTime_sec = 0;
 };
 

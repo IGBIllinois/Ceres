@@ -58,16 +58,21 @@ void cGpsPropertyPage_Remote::onDisconnect()
 	doCancel();
 }
 
-void cGpsPropertyPage_Remote::onReferenceParameters(bool valid, uint16_t integration_time_sec, uint16_t max_integration_time_sec)
+void cGpsPropertyPage_Remote::showPage()
+{
+
+}
+
+void cGpsPropertyPage_Remote::onReferenceParameters(bool valid, uint16_t min_integration_time_sec, uint16_t max_integration_time_sec)
 {
 	if (!valid) return;
 
 	mReferenceParametersValid = true;
 
-	mpIntegrationTime_sec->setText(QString::number(integration_time_sec));
+	mpMinIntegrationTime_sec->setText(QString::number(min_integration_time_sec));
 	mpMaxIntegrationTime_sec->setText(QString::number(max_integration_time_sec));
 
-	mDefaultIntegrationTime_sec = integration_time_sec;
+	mDefaultMinIntegrationTime_sec = min_integration_time_sec;
 	mDefaultMaxIntegrationTime_sec = max_integration_time_sec;
 }
 
@@ -137,19 +142,22 @@ void cGpsPropertyPage_Remote::sendChangedData()
 	if (!mConnected)
 		return;
 
-	auto integration_time_sec = mpIntegrationTime_sec->text().toInt();
+	auto min_integration_time_sec = mpMinIntegrationTime_sec->text().toInt();
 	auto max_integration_time_sec = mpMaxIntegrationTime_sec->text().toInt();
 
-	if ((mDefaultIntegrationTime_sec != integration_time_sec)
+	if (max_integration_time_sec < min_integration_time_sec)
+		std::swap(min_integration_time_sec, max_integration_time_sec);
+
+	if ((mDefaultMinIntegrationTime_sec != min_integration_time_sec)
 		|| (mDefaultMaxIntegrationTime_sec != max_integration_time_sec))
 	{
 		setEnabled(false);
 	}
 
-	if ((mDefaultIntegrationTime_sec != integration_time_sec)
+	if ((mDefaultMinIntegrationTime_sec != min_integration_time_sec)
 		|| (mDefaultMaxIntegrationTime_sec != max_integration_time_sec))
 	{
-		setReferenceParameters(integration_time_sec, max_integration_time_sec);
+		setReferenceParameters(min_integration_time_sec, max_integration_time_sec);
 	}
 }
 

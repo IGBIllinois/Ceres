@@ -46,3 +46,32 @@ gps::sUtcTime cGpsModel::getTime() const
 {
     return { mRxTimestamp_s, mUtcHour, mUtcMinute , mUtcSecond };
 }
+
+gps::eReferenceState cGpsModel::getReferenceState() const
+{
+    return mReferenceState;
+}
+
+
+int cGpsModel::getRefIntegrationTime_sec() const
+{
+    return mRefIntegrationTime_sec;
+}
+
+int cGpsModel::getRefMaxIntegrationTime_sec() const
+{
+    return mRefMaxIntegrationTime_sec;
+}
+
+void cGpsModel::setReferenceIntegrationTimes(int integration_time_sec, int max_integration_time_sec)
+{
+    mRefIntegrationTime_sec = integration_time_sec;
+    mRefMaxIntegrationTime_sec = max_integration_time_sec;
+}
+
+gps::sReferencePosition cGpsModel::getReferencePosition() const
+{
+    return mReferencePosition;
+}
+
+

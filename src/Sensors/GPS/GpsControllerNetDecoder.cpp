@@ -44,7 +44,7 @@ void cGpsControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     case ePacketType::SET_REFERENCE_PARAMETERS:
     {
         auto data = to_reference_parameters_1(hdr.length, buffer);
-        onSetReferenceParameters(data.integration_time_sec, data.max_integration_time_sec);
+        onSetReferenceParameters(data.min_integration_time_sec, data.max_integration_time_sec);
         break;
     }
     case ePacketType::GPS_REFERENCE_COMMAND:

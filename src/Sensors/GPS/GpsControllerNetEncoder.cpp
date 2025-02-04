@@ -2,6 +2,7 @@
 
 #include "GpsControllerNetEncoder.hpp"
 #include "gps_packet_utils.hpp"
+#include "gps_properties.pb.h"
 
 
 using namespace gps;
@@ -33,8 +34,29 @@ void cGpsControllerNetEncoder::encodeReferenceParameters(uint16_t integration_ti
     }
 }
 
-void cGpsControllerNetEncoder::encodeReferenceReply(gps_eReferenceReply reply)
+void cGpsControllerNetEncoder::encodeReferenceState(gps::eReferenceState state)
 {
+    gps_eReferenceReply reply;
+
+    switch (state)
+    {
+    case gps::eReferenceState::ABORTED:
+        reply = gps_eReferenceReply::eReferenceReply_ABORTED;
+        break;
+    case gps::eReferenceState::COMPLETE_FAILED:
+        reply = gps_eReferenceReply::eReferenceReply_FAILED;
+        break;
+    case gps::eReferenceState::COMPLETE_GOOD:
+        reply = gps_eReferenceReply::eReferenceReply_GOOD;
+        break;
+    case gps::eReferenceState::PENDING:
+        reply = gps_eReferenceReply::eReferenceReply_PENDING;
+        break;
+    case gps::eReferenceState::WAITING:
+        reply = gps_eReferenceReply::eReferenceReply_IDLE;
+        break;
+    }
+
     if (encode_reference_reply(reply, mBuffer) < 0)
     {
         sendData();
@@ -58,8 +80,29 @@ void cGpsControllerNetEncoder::sendReferenceParameters(uint16_t integration_time
     sendData();
 }
 
-void cGpsControllerNetEncoder::sendReferenceReply(gps_eReferenceReply reply)
+void cGpsControllerNetEncoder::sendReferenceState(gps::eReferenceState state)
 {
+    gps_eReferenceReply reply;
+
+    switch (state)
+    {
+    case gps::eReferenceState::ABORTED:
+        reply = gps_eReferenceReply::eReferenceReply_ABORTED;
+        break;
+    case gps::eReferenceState::COMPLETE_FAILED:
+        reply = gps_eReferenceReply::eReferenceReply_FAILED;
+        break;
+    case gps::eReferenceState::COMPLETE_GOOD:
+        reply = gps_eReferenceReply::eReferenceReply_GOOD;
+        break;
+    case gps::eReferenceState::PENDING:
+        reply = gps_eReferenceReply::eReferenceReply_PENDING;
+        break;
+    case gps::eReferenceState::WAITING:
+        reply = gps_eReferenceReply::eReferenceReply_IDLE;
+        break;
+    }
+
     encode_reference_reply(reply, mBuffer);
     sendData();
 }

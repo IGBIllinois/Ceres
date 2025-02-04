@@ -29,7 +29,7 @@ protected:
     /*
      * Controller ----> Property Page
      */
-    virtual void onReferenceParameters(bool valid, uint16_t integration_time_sec, uint16_t max_integration_time_sec) = 0;
+    virtual void onReferenceParameters(bool valid, uint16_t min_integration_time_sec, uint16_t max_integration_time_sec) = 0;
 
     virtual void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
                                     double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) = 0;

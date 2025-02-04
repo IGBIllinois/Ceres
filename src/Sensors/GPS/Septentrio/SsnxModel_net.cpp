@@ -90,6 +90,18 @@ void cSsnxModel_net::update()
 
 void cSsnxModel_net::writeDataHeader()
 {
+    if (((mReferenceState == ::gps::eReferenceState::COMPLETE_GOOD)
+        || (mReferenceState == ::gps::eReferenceState::COMPLETE_FAILED))
+        && mReferencePosition.valid)
+    {
+        mSerializer.writeReferencePoint(mReferencePosition.avgLatitude_rad, 
+            mReferencePosition.avgLongitude_rad, mReferencePosition.avgHeight_m,
+            mReferencePosition.stdLatitude_rad, mReferencePosition.stdLongitude_rad, mReferencePosition.stdHeight_m,
+            mReferencePosition.heightValid);
+
+        mReferencePosition.valid = false;
+        mReferenceState = ::gps::eReferenceState::WAITING;
+    }
 }
 
 void cSsnxModel_net::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t pvt)
