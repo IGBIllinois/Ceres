@@ -2,8 +2,8 @@
 #include "ExperimentSensorInfo.hpp"
 
 #include "DummySensorFactory.hpp"
-#include "GPS/Septentrio/SsnxFactory.hpp"
-#include "Lidar/Ouster/OusterFactory.hpp"
+#include "GPS/Septentrio/SsnxIDs.hpp"
+#include "Lidar/Ouster/OusterIDs.hpp"
 #include "RGB/AxisCommunications/AxisCommunicationsFactory.hpp"
 #include "Hyperspectral/HySpex/HySpexFactory.hpp"
 
