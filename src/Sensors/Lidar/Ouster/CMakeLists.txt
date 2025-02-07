@@ -14,6 +14,9 @@ set(OUSTER_PUBLIC_HEADERS
 
 # Add the source files used in the library
 set(OUSTER_SOURCE_FILES
+
+    OusterIDs.hpp
+
 #
 # OUSTER packet utilities
 #

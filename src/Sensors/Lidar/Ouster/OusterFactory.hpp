@@ -4,8 +4,6 @@
 #include "../../SensorFactory.hpp"
 
 
-static const char* ouster_id = "ouster";
-
 namespace ouster
 {
 	sSensorWidgets create_sensor(const nlohmann::json& sensorInfo, bool no_visualization);
