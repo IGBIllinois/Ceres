@@ -15,6 +15,7 @@ Q_DECLARE_METATYPE(experiment::eState)
 cExperimentStateMachine::cExperimentStateMachine(QObject* parent)
 :
     QObject(parent),
+    mStateCreatorsMutex(),
     mRunning(false),
     mPaused(false),
     mActiveStateNumber(0),
@@ -92,8 +93,6 @@ void cExperimentStateMachine::clearExperiment()
     mActiveStateNumber = 0;
     emit stateNumberChanged(-1);
 
-    mpActiveState = nullptr;
-
     std::lock_guard<std::mutex> lock{mPendingDeleteMutex};
 
     for (std::size_t i = 0; i < mExperimentStates.size(); ++i)
@@ -129,6 +128,8 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
         return false;
 
     clearExperiment();
+
+    mpActiveState = nullptr;
 
     mVariableTable = std::make_shared<cExperimentVariableTable>();
     mExperimentStates.push_back(new cExperimentState_Dummy());
@@ -258,6 +259,7 @@ void cExperimentStateMachine::terminateExperiment()
     if (mpActiveState)
     {
         mpActiveState->stop();
+        mpActiveState = nullptr;
     }
 
     mRunning = false;
@@ -298,7 +300,11 @@ void cExperimentStateMachine::updateExperimentStateMachine()
         mPendingDelete.clear();
     }
 
-    if (!mRunning || (mpActiveState == nullptr)) return;
+    if (!mRunning || (!mpActiveState))
+    {
+        mRunning = false;
+        return;
+    }
 
     mRecording = mpActiveState->recording();
 
