@@ -14,6 +14,11 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
         onUnknownID(hdr.id);
         break;
     }
+    case ePacketType::EXPERIMENT_TYPE_REPLY:
+    {
+        onExperimentTypeReply();
+        break;
+    }
     case ePacketType::EXPERIMENT_INFO_REPLY:
     {
         onExperimentInfoReply();

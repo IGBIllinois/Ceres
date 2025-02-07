@@ -8,6 +8,15 @@ cCeresNetEncoder::cCeresNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
 {}
 
+void cCeresNetEncoder::encodeExperimentType(const std::string& type)
+{
+    if (encode_experiment_type(type, mBuffer) < 0)
+    {
+        sendData();
+        encode_experiment_type(type, mBuffer);
+    }
+}
+
 void cCeresNetEncoder::encodeExperimentInfo(const std::string& title, const std::string& researcher,
     const std::string& cultivar, const std::string& doc)
 {
@@ -277,6 +286,11 @@ void cCeresNetEncoder::encodeEndOfExperimentInfo()
     }
 }
 
+void cCeresNetEncoder::sendExperimentType(const std::string& type)
+{
+    encode_experiment_type(type, mBuffer);
+    sendData();
+}
 
 void cCeresNetEncoder::sendExperimentInfo(const std::string& title, const std::string& researcher,
     const std::string& cultivar, const std::string& doc)

@@ -20,6 +20,8 @@ protected:
     /*
      * The Ceres Remote Client sends these packets and should never receive them!
      */
+    virtual void onExperimentTypeReply() = 0;
+
     virtual void onExperimentInfoReply() = 0;
     virtual void onDataFileState(bool is_open) = 0;
 

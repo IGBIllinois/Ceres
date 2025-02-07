@@ -64,6 +64,8 @@ enum class ePacketType : uint16_t
 	EXPERIMENT_DOCUMENT,
 	SPECIES,
 	CULTIVAR,
+	EXPERIMENT_TYPE,
+	EXPERIMENT_TYPE_REPLY,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -78,6 +80,10 @@ enum class ePacketType : uint16_t
 /**********************************************************
  * Ceres/Ceres Remote Client packets utilities
  **********************************************************/
+
+std::string to_experiment_type_1(const ExperimentType_1& pckt);
+int encode_experiment_type(const std::string& type, net_buffer& buffer);
+
 struct sExperimentInfo_t
 {
 	std::string title;

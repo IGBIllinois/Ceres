@@ -16,6 +16,11 @@ syntax = "proto3";
  * General Control Packets   Ceres -> Remote Client
  *****************************************************************************/
 
+message ExperimentType_1 
+{
+	string type = 1;
+}
+
 message OpenDataFile_1 
 {
 	string filename = 1;

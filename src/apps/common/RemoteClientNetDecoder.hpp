@@ -22,6 +22,8 @@ public:
     virtual ~cCeresRemoteClientNetDecoder() = default;
 
 protected:
+    virtual void onExperimentType(const std::string& type) = 0;
+
     virtual void onExperimentInfo(const std::string& title,
         const std::string& researcher, const std::string& cultivar, 
         const std::string& doc) = 0;

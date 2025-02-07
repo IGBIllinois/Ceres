@@ -213,7 +213,14 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
 
     qualifiedFileName += ".ceres";
 
-    mFullyQualifiedFileName = mDefaultDataPath / qualifiedFileName;
+    if (mExperimentType.empty())
+    {
+        mFullyQualifiedFileName = mDefaultDataPath / qualifiedFileName;
+    }
+    else
+    {
+        mFullyQualifiedFileName = mDefaultDataPath / mExperimentType / qualifiedFileName;
+    }
 
     path testPath = mFullyQualifiedFileName;
     testPath.remove_filename();
@@ -463,6 +470,15 @@ void cRemoteDataModel::onStopExperiment()
     mIsExperimentRunning = false;
 
     emit statusMessage("Experiment Stopped!");
+}
+
+void cRemoteDataModel::onExperimentType(const std::string& type)
+{
+    mExperimentType = type;
+
+    QString msg = "Experiment Type: ";
+    msg += QString::fromStdString(mExperimentType);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
 }
 
 void cRemoteDataModel::onExperimentInfo(const std::string& title, 

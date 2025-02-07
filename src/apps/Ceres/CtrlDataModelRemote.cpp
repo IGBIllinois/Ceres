@@ -369,6 +369,7 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
     bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
     if (!result) return false;
 
+    mExperimentTypeConfirmed = false;
     mExperimentInfoConfirmed = false;
 
     // We are going to try send the experiment info on the remote computer
@@ -594,6 +595,11 @@ int cCtrlDataModelRemote::sendOutgoingData(const char* data, std::size_t len)
 /**********************************************************
  * Packet Handlers
  *********************************************************/
+void cCtrlDataModelRemote::onExperimentTypeReply()
+{
+    mExperimentTypeConfirmed = true;
+}
+
 void cCtrlDataModelRemote::onExperimentInfoReply()
 {
     mExperimentInfoConfirmed = true;

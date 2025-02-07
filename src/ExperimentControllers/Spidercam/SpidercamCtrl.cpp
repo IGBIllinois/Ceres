@@ -185,6 +185,8 @@ bool cSpidercamController::checkForReply()
 
 int cSpidercamController::send_cmd(const std::string_view msg)
 {
+    if (!mpSocket) return -1;
+
     auto len = mpSocket->write(msg.data(), msg.size());
     mpSocket->flush();
     mpSocket->waitForBytesWritten();

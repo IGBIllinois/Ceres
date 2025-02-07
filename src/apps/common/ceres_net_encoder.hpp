@@ -30,6 +30,8 @@ public:
      * 
      * You need to call sendData to make sure the data is sent out!
      */
+    void encodeExperimentType(const std::string& type);
+
     void encodeExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc);
 
@@ -65,6 +67,8 @@ public:
      * The send methods will encode the packet into the data buffer and will automatically
      * send the data.
      */
+    void sendExperimentType(const std::string& type);
+
     void sendExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc);
 

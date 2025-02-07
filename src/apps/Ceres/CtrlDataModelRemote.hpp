@@ -94,6 +94,8 @@ private:
  * Packet Handlers
  */
 private:
+    void onExperimentTypeReply() override;
+
     void onExperimentInfoReply() override;
     void onDataFileState(bool is_open) override;
     void onStatusMessage(const std::string& msg) override;
@@ -119,6 +121,7 @@ private:
 private:
     bool mConnected = false;
     bool mDataFileIsOpen = false;
+    bool mExperimentTypeConfirmed = false;
     bool mExperimentInfoConfirmed = false;
 
     cRemoteClientView* mpView;

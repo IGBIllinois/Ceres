@@ -93,6 +93,8 @@ private slots:
 /*
  * Packet Handlers
  */
+    void onExperimentType(const std::string& type) override;
+
     void onExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& cultivar, const std::string& doc) override;
 
@@ -155,6 +157,8 @@ protected:
     std::filesystem::path mDefaultDataPath;
     bool mIsRecording = false;
     bool mIsExperimentRunning = false;
+
+    std::string  mExperimentType;
 
     std::filesystem::path   mFullyQualifiedFileName;
     cBlockDataFileWriter    mFile;

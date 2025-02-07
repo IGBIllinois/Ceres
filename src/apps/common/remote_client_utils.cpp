@@ -9,6 +9,38 @@
 /*
  * Ceres <---> Ceres Remote Client Packets
  */
+
+std::string to_experiment_type_1(const ExperimentType_1& pckt)
+{
+    return pckt.type();
+}
+
+int encode_experiment_type(const std::string& type, net_buffer& buffer)
+{
+    ExperimentType_1 pckt;
+
+    pckt.set_type(type);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_TYPE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
 sExperimentInfo_t to_experiment_info_1(const ExperimentInfo_1& pckt)
 {
     sExperimentInfo_t data;
