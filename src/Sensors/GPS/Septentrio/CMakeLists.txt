@@ -12,6 +12,7 @@ set(SEPTENTRIO_SOURCE_FILES
 #
 # Different Septertino GPS Models based on data source
 #
+    SsnxIDs.hpp
 
 # Network stream from relay program on dolly
     SsnxGpsStream.hpp

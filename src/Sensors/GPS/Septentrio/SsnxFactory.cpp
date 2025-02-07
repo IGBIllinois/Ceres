@@ -51,6 +51,7 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
             QObject::connect(pModel, &cSsnxModel::positionChanged, pView, &cSsnxStatusView::onPositionChange);
             QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxStatusView::onGeodeticPVT_Change);
             QObject::connect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxStatusView::onUTC_Change);
+            QObject::connect(pModel, &cSsnxModel::referenceChanged, pView, &cSsnxStatusView::onReferenceChange);
 
             widgets.pRemoteStatusView = pView;
         }
@@ -100,12 +101,7 @@ void ssnx::remove_sensor(sSensorWidgets widgets)
 cSensorPropertyPage* ssnx::create_sensor_property_page(const std::string& model, uint32_t version,
     const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
-    if (model == ssnx_id)
-    {
-        auto page = new cSsnxPropertyPage_Remote();
-        page->initialize(remote_ip_address, port, false, local_ip_address);
-        return page;
-    }
-
-    return nullptr;
+    auto page = new cSsnxPropertyPage_Remote();
+    page->initialize(remote_ip_address, port, false, local_ip_address);
+    return page;
 }
