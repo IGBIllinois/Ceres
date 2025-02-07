@@ -25,12 +25,12 @@ void cGpsControllerNetEncoder::encodeReferenceData(bool valid, double avg_lat_ra
     }
 }
 
-void cGpsControllerNetEncoder::encodeReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec)
+void cGpsControllerNetEncoder::encodeReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
-    if (encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, mBuffer) < 0)
+    if (encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer) < 0)
     {
         sendData();
-        encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, mBuffer);
+        encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer);
     }
 }
 
@@ -40,7 +40,7 @@ void cGpsControllerNetEncoder::encodeReferenceState(gps::eReferenceState state)
 
     switch (state)
     {
-    case gps::eReferenceState::ABORTED:
+    case gps::eReferenceState::ABORT:
         reply = gps_eReferenceReply::eReferenceReply_ABORTED;
         break;
     case gps::eReferenceState::COMPLETE_FAILED:
@@ -49,6 +49,7 @@ void cGpsControllerNetEncoder::encodeReferenceState(gps::eReferenceState state)
     case gps::eReferenceState::COMPLETE_GOOD:
         reply = gps_eReferenceReply::eReferenceReply_GOOD;
         break;
+    case gps::eReferenceState::START:
     case gps::eReferenceState::PENDING:
         reply = gps_eReferenceReply::eReferenceReply_PENDING;
         break;
@@ -74,9 +75,9 @@ void cGpsControllerNetEncoder::sendReferenceData(bool valid, double avg_lat_rad,
     sendData();
 }
 
-void cGpsControllerNetEncoder::sendReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec)
+void cGpsControllerNetEncoder::sendReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
-    encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, mBuffer);
+    encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer);
     sendData();
 }
 
@@ -86,7 +87,7 @@ void cGpsControllerNetEncoder::sendReferenceState(gps::eReferenceState state)
 
     switch (state)
     {
-    case gps::eReferenceState::ABORTED:
+    case gps::eReferenceState::ABORT:
         reply = gps_eReferenceReply::eReferenceReply_ABORTED;
         break;
     case gps::eReferenceState::COMPLETE_FAILED:
@@ -95,6 +96,7 @@ void cGpsControllerNetEncoder::sendReferenceState(gps::eReferenceState state)
     case gps::eReferenceState::COMPLETE_GOOD:
         reply = gps_eReferenceReply::eReferenceReply_GOOD;
         break;
+    case gps::eReferenceState::START:
     case gps::eReferenceState::PENDING:
         reply = gps_eReferenceReply::eReferenceReply_PENDING;
         break;

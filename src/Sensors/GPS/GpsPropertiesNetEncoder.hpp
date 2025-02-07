@@ -28,7 +28,7 @@ public:
       */
     void encodeQueryReferenceData();
     void encodeQueryReferenceParameters();
-    void encodeReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec);
+    void encodeReferenceParameters(std::uint16_t min_integration_time_sec, std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm);
     void encodeCalcReference();
     void encodeStopReference();
 
@@ -38,7 +38,7 @@ public:
      */
     void sendQueryReferenceData();
     void sendQueryReferenceParameters();
-    void sendReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec);
+    void sendReferenceParameters(std::uint16_t min_integration_time_sec, std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm);
     void sendCalcReference();
     void sendStopReference();
 };

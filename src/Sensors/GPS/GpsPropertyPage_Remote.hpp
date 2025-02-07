@@ -20,10 +20,8 @@ public:
     ~cGpsPropertyPage_Remote() = default;
 
 public:
-    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
-
-public:
-    void onReferenceParameters(bool valid, uint16_t integration_time_sec, uint16_t max_integration_time_sec) override;
+    void onReferenceParameters(bool valid, uint16_t integration_time_sec, 
+        uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm) override;
 
     void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
         double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) override;
@@ -46,11 +44,14 @@ protected:
 
     void reject() override;
 
+protected:
+    void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) override {};
+
 private:
     void sendChangedData();
     void queryReferenceData();
     void queryReferenceParameters();
-    void setReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec);
+    void setReferenceParameters(std::uint16_t min_integration_time_sec, std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm);
     void calcReference();
 
 private:

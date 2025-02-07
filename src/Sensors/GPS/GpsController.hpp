@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../SensorController.hpp"
+#include "GpsTypes.hpp"
 
 class cGpsModel;
 class cGpsControllerNetEncoder;
@@ -28,9 +29,10 @@ public slots:
 protected:
     void txReferenceData(cGpsControllerNetEncoder* encoder);
     void txReferenceParameters(cGpsControllerNetEncoder* encoder);
-    void txReferenceReply(cGpsControllerNetEncoder* encoder);
+    void txReferenceState(cGpsControllerNetEncoder* encoder);
+    void txReferenceState(cGpsControllerNetEncoder* encoder, gps::eReferenceState state);
 
-private:
+protected:
     cGpsModel* mpModel = nullptr;
 };
 

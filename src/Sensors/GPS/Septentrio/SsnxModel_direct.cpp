@@ -110,8 +110,7 @@ void cSsnxModel_direct::update()
 }
 
 void cSsnxModel_direct::writeDataHeader()
-{
-}
+{}
 
 void cSsnxModel_direct::closeConnection()
 {
@@ -285,6 +284,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     mVe_mps = pvt.Ve_mps;
     mVu_mps = pvt.Vu_mps;
     mGroundTrack_deg = pvt.GroundTrack_deg;
+    mHeightComputed = pvt.HeightComputed;
     
     mNumBases = pvt.NrBases.value_or(0);
 
@@ -297,6 +297,8 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     {
         mSerializer.write(pvt);
     }
+    else
+        calcReferencePosition();
 
     if (mRecordTrack)
     {

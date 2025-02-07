@@ -45,6 +45,7 @@ public slots:
 		double groundTrack_deg, int datum, int num_sv, int num_bases);
 
 	void onUTC_Change(int hour, int min, int sec, int day, int month, int year);
+	void onReferenceChange(int x_mm, int y_mm, int z_mm, double error_mm, int count);
 
 private:
 	QLedIndicator* mpPvtCartesianValid = nullptr;
@@ -80,4 +81,10 @@ private:
 	QLineEdit* mpX_mm = nullptr;
 	QLineEdit* mpY_mm = nullptr;
 	QLineEdit* mpZ_mm = nullptr;
+
+	QLineEdit* mpRef_X_mm = nullptr;
+	QLineEdit* mpRef_Y_mm = nullptr;
+	QLineEdit* mpRef_Z_mm = nullptr;
+	QLineEdit* mpRef_Error_mm = nullptr;
+	QLineEdit* mpRef_Count = nullptr;
 };

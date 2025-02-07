@@ -31,7 +31,7 @@ public:
     void encodeReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
         double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid);
 
-    void encodeReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec);
+    void encodeReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm);
 
     void encodeReferenceState(gps::eReferenceState state);
 
@@ -43,7 +43,7 @@ public:
     void sendReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
         double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid);
 
-    void sendReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec);
+    void sendReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm);
 
     void sendReferenceState(gps::eReferenceState state);
 };

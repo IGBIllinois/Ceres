@@ -29,7 +29,11 @@ protected:
      */
     virtual void onQueryReferenceData() = 0;
     virtual void onQueryReferenceParameters() = 0;
-    virtual void onSetReferenceParameters(std::uint16_t min_integration_time_sec, std::uint16_t max_integration_time_sec) = 0;
+    virtual void onQueryReferenceState() = 0;
+
+    virtual void onSetReferenceParameters(std::uint16_t min_integration_time_sec, 
+        std::uint16_t max_integration_time_sec, std::uint16_t error_threshold_mm) = 0;
+
     virtual void onCalcReference() = 0;
     virtual void onStopReference() = 0;
 

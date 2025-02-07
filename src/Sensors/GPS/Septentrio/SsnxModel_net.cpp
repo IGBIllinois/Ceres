@@ -90,6 +90,7 @@ void cSsnxModel_net::update()
 
 void cSsnxModel_net::writeDataHeader()
 {
+/*
     if (((mReferenceState == ::gps::eReferenceState::COMPLETE_GOOD)
         || (mReferenceState == ::gps::eReferenceState::COMPLETE_FAILED))
         && mReferencePosition.valid)
@@ -102,6 +103,7 @@ void cSsnxModel_net::writeDataHeader()
         mReferencePosition.valid = false;
         mReferenceState = ::gps::eReferenceState::WAITING;
     }
+*/
 }
 
 void cSsnxModel_net::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t pvt)
@@ -135,6 +137,7 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
     mVe_mps = pvt.Ve_mps;
     mVu_mps = pvt.Vu_mps;
     mGroundTrack_deg = pvt.GroundTrack_deg;
+    mHeightComputed = pvt.HeightComputed;
 
     mNumBases = pvt.NrBases.value_or(0);
     mNumSV = pvt.NrSV;
@@ -145,6 +148,8 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
     {
         mSerializer.write(pvt);
     }
+    else
+        calcReferencePosition();
 
     if (mRecordTrack)
     {

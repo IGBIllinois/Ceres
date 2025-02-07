@@ -22,7 +22,11 @@ public:
 protected:
     void onQueryReferenceData() override;
     void onQueryReferenceParameters() override;
-    void onSetReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec) override;
+    void onQueryReferenceState() override;
+
+    void onSetReferenceParameters(std::uint16_t min_integration_time_sec, 
+        std::uint16_t max_integration_time_sec, std::uint16_t error_threshold_mm) override;
+
     void onCalcReference() override;
     void onStopReference() override;
 

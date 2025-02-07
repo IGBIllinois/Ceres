@@ -21,7 +21,6 @@ namespace gps
 class cGpsPropertiesNetDecoder : public cNetworkDecoder
 {
 public:
-
     cGpsPropertiesNetDecoder() = default;
     virtual ~cGpsPropertiesNetDecoder() = default;
 
@@ -29,7 +28,8 @@ protected:
     /*
      * Controller ----> Property Page
      */
-    virtual void onReferenceParameters(bool valid, uint16_t min_integration_time_sec, uint16_t max_integration_time_sec) = 0;
+    virtual void onReferenceParameters(bool valid, uint16_t min_integration_time_sec, 
+                                         uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm) = 0;
 
     virtual void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
                                     double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) = 0;
@@ -39,6 +39,6 @@ protected:
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
-    virtual void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) {};
+    virtual void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) = 0;
 };
 

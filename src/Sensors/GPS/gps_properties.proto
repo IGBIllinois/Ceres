@@ -48,6 +48,7 @@ message gps_SetReferenceParameters_1
 {
     uint32 min_integration_time_sec = 1;
     uint32 max_integration_time_sec = 2;
+    uint32 ref_error_threshold_mm = 3;
 }
 
 message gps_ReferenceCommand_1 

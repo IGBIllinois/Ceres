@@ -1,5 +1,5 @@
 /*
- * The GpsPropertyPage to control a GPS unit
+ * The SsnxPropertyPage to control a GPS unit
  * connected to a remote computer.
  */
 
@@ -15,7 +15,8 @@ public:
     cSsnxPropertyPage_Remote(QWidget* parent = nullptr);
     ~cSsnxPropertyPage_Remote() = default;
 
-    void doLayout() override;
+public:
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 };
 
 

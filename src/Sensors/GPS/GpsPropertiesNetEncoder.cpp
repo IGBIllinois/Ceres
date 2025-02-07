@@ -30,12 +30,12 @@ void cGpsPropertiesNetEncoder::encodeQueryReferenceParameters()
     }
 }
 
-void cGpsPropertiesNetEncoder::encodeReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec)
+void cGpsPropertiesNetEncoder::encodeReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
-    if (encode_set_reference_parameters(integration_time_sec, max_integration_time_sec, mBuffer) < 0)
+    if (encode_reference_parameters_set(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer) < 0)
     {
         sendData();
-        encode_set_reference_parameters(integration_time_sec, max_integration_time_sec, mBuffer);
+        encode_reference_parameters_set(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer);
     }
 }
 
@@ -71,9 +71,9 @@ void cGpsPropertiesNetEncoder::sendQueryReferenceParameters()
     sendData();
 }
 
-void cGpsPropertiesNetEncoder::sendReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec)
+void cGpsPropertiesNetEncoder::sendReferenceParameters(std::uint16_t integration_time_sec, std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm)
 {
-    encode_set_reference_parameters(integration_time_sec, max_integration_time_sec, mBuffer);
+    encode_reference_parameters_set(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer);
     sendData();
 }
 

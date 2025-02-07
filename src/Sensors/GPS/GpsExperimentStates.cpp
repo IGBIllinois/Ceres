@@ -62,20 +62,26 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
 
-	mHasReferenceState = false;
+	mHasReferenceParameters = false;
 
 	try
 	{
-		if (stateDoc.contains("integration time (sec)"))
+		if (stateDoc.contains("min integration time (sec)"))
 		{
-			mDesiredIntegrationTime_sec = stateDoc["integration time (us)"];
-			mHasReferenceState = true;
+			mDesiredMinIntegrationTime_sec = stateDoc["min integration time (us)"];
+			mHasReferenceParameters = true;
 		}
 
 		if (stateDoc.contains("max integration time (sec)"))
 		{
 			mDesiredMaxIntegrationTime_sec = stateDoc["max integration time (us)"];
-			mHasReferenceState = true;
+			mHasReferenceParameters = true;
+		}
+
+		if (stateDoc.contains("error threshold (mm)"))
+		{
+			mDesiredRefErrorThreshold_mm = stateDoc["error threshold (mm)"];
+			mHasReferenceParameters = true;
 		}
 	}
 	catch (const detail::parse_error& e)
@@ -130,7 +136,7 @@ cExperimentState::eRESULT cGpsReferenceAcquisition_Remote::finished()
 QString cGpsReferenceAcquisition_Remote::getStatusStr()
 {
 	QString msg;
-	if (mHasReferenceState)
+	if (mHasReferenceParameters)
 	{
 		msg = "Updating reference parameters and collecting a reference point...";
 	}
@@ -140,6 +146,58 @@ QString cGpsReferenceAcquisition_Remote::getStatusStr()
 	}
 	return msg;
 }
+
+void cGpsReferenceAcquisition_Remote::onReferenceParameters(bool valid, uint16_t min_integration_time_sec,
+	uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
+{
+	mCurrentMinIntegrationTime_sec = min_integration_time_sec;
+	mCurrentMaxIntegrationTime_sec = max_integration_time_sec;
+	mCurrentRefErrorThreshold_mm = ref_error_threshold_mm;
+
+	if (mHasReferenceParameters)
+	{
+		std::uint16_t min_time_sec = mDesiredMinIntegrationTime_sec.has_value() ? mDesiredMinIntegrationTime_sec.value() : mCurrentMinIntegrationTime_sec;
+		std::uint32_t max_time_sec = mDesiredMaxIntegrationTime_sec.has_value() ? mDesiredMaxIntegrationTime_sec.value() : mCurrentMaxIntegrationTime_sec;
+		std::uint32_t threshold_mm = mDesiredRefErrorThreshold_mm.has_value() ? mDesiredRefErrorThreshold_mm.value() : mCurrentRefErrorThreshold_mm;
+
+		sendReferenceParameters(min_time_sec, max_time_sec, threshold_mm);
+
+		// Sleep for 250 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
+		mHasReferenceParameters = false;
+		mState = eSTATE::WAIT_FOR_STATE_UPDATE;
+		sendQueryReferenceParameters();
+
+		// Sleep for 250 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
+		return;
+	}
+
+	mState = eSTATE::WAIT_FOR_REFERENCE;
+	sendCalcReference();;
+}
+
+void cGpsReferenceAcquisition_Remote::onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+	double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
+{
+}
+
+void cGpsReferenceAcquisition_Remote::onReferenceCommandReply(eReferenceReply reply)
+{
+	switch (reply)
+	{
+	case eReferenceReply::GOOD:
+		mState = eSTATE::COMPLETE;
+		break;
+	case eReferenceReply::ABORTED:
+	case eReferenceReply::FAILED:
+		mState = eSTATE::ERROR;
+		break;
+	}
+}
+
 
 void cGpsReferenceAcquisition_Remote::onConnect()
 {

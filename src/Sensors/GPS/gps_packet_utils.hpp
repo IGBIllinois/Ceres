@@ -53,12 +53,13 @@ namespace gps
 	{
 		std::uint16_t min_integration_time_sec = 0;
 		std::uint16_t max_integration_time_sec = 0;
+		std::uint16_t ref_error_threshold_mm = 0;
 	};
 	sReferenceParameters_t to_reference_parameters_1(std::uint16_t length, const net_buffer_view& buffer);
-	int encode_set_reference_parameters(std::uint16_t min_integration_time_sec, 
-		std::uint16_t max_integration_time_sec, net_buffer& buffer);
+	int encode_reference_parameters_set(std::uint16_t min_integration_time_sec, 
+		std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm, net_buffer& buffer);
 	int encode_reference_parameters_reply(std::uint16_t min_integration_time_sec,
-		std::uint16_t max_integration_time_sec, net_buffer& buffer);
+		std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm, net_buffer& buffer);
 
 	/*** send/receive  the reference position message ***/
 	struct sReferenceData_t

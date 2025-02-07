@@ -4,7 +4,10 @@
 #include "../SensorModel.hpp"
 #include "GpsTypes.hpp"
 
+#include "Timers.hpp"
+
 #include <deque>
+#include <vector>
 
 
 class cGpsModel : public cSensorModel
@@ -31,20 +34,30 @@ public:
 
     ::gps::eReferenceState getReferenceState() const;
 
-    int getRefIntegrationTime_sec() const;
+    int getRefMinIntegrationTime_sec() const;
     int getRefMaxIntegrationTime_sec() const;
+    int getRefErrorThreshold_mm() const;
 
-    void setReferenceIntegrationTimes(int integration_time_sec, int max_integration_time_sec);
+    void setReferenceIntegrationTimes(int integration_time_sec,
+        int max_integration_time_sec, int ref_error_threshold_mm);
 
     ::gps::sReferencePosition getReferencePosition() const;
 
+    void startReferenceComputation();
+    void abortReferenceCompute();
+
 signals:
     void referenceComplete();
+    void referenceChanged(int x_mm, int y_mm, int z_mm, double error_mm, int count);
 
 protected:
     cGpsModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cGpsModel() = default;
 
+protected:
+    void calcReferencePosition();
+
+protected:
     ::gps::eSolutionType mSolutionType = ::gps::eSolutionType::NONE;
 
     ::gps::eDatum mDatum = ::gps::eDatum::WGS84;
@@ -55,6 +68,7 @@ protected:
     double  mLongitude_rad = 0.0;
     double  mHeight_m = 0.0;
     double  mUndulation_m = 0.0;
+    bool    mHeightComputed = false;
     double  mVn_mps = 0.0;
     double  mVe_mps = 0.0;
     double  mVu_mps = 0.0;
@@ -73,9 +87,18 @@ protected:
 
     bool mRxTimeLocked = false;
 
-    int mRefIntegrationTime_sec = 0;
-    int mRefMaxIntegrationTime_sec = 0;
-    ::gps::eReferenceState    mReferenceState;
+    int mRefMinIntegrationTime_sec = 3;
+    int mRefMaxIntegrationTime_sec = 10;
+    int mRefErrorThreshold_mm = 100;
+
+    cOneShotTimer mRefMinIntegrationTimer;
+    cOneShotTimer mRefMaxIntegrationTimer;
+
+    std::vector<double>   mRefLatitudes;
+    std::vector<double>   mRefLongitudes;
+    std::vector<double>   mRefHeights;
+
+    ::gps::eReferenceState    mReferenceState = ::gps::eReferenceState::WAITING;
     ::gps::sReferencePosition mReferencePosition;
 
     bool mRecordTrack = false;

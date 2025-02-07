@@ -90,7 +90,7 @@ namespace  gps
     // States using in computing the reference point
     enum class eReferenceState
     {
-        WAITING, PENDING, COMPLETE_GOOD, COMPLETE_FAILED, ABORTED
+        WAITING, START, PENDING, COMPLETE_GOOD, COMPLETE_FAILED, ABORT
     };
 
 };

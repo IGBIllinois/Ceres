@@ -57,18 +57,23 @@ void cGpsController::txReferenceData(cGpsControllerNetEncoder* encoder)
 
 void cGpsController::txReferenceParameters(cGpsControllerNetEncoder* encoder)
 {
-    int integration_time_sec = mpModel->getRefIntegrationTime_sec();
+    int min_integration_time_sec = mpModel->getRefMinIntegrationTime_sec();
     int max_integration_time_sec = mpModel->getRefMaxIntegrationTime_sec();
+    int ref_error_threshold_mm = mpModel->getRefErrorThreshold_mm();
 
-    encoder->sendReferenceParameters(integration_time_sec, max_integration_time_sec);
+    encoder->sendReferenceParameters(min_integration_time_sec, max_integration_time_sec, ref_error_threshold_mm);
 }
 
-void cGpsController::txReferenceReply(cGpsControllerNetEncoder* encoder)
+void cGpsController::txReferenceState(cGpsControllerNetEncoder* encoder)
 {
     auto state = mpModel->getReferenceState();
 
     encoder->sendReferenceState(state);
 }
 
+void cGpsController::txReferenceState(cGpsControllerNetEncoder* encoder, gps::eReferenceState state)
+{
+    encoder->sendReferenceState(state);
+}
 
 

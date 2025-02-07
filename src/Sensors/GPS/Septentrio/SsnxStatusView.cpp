@@ -93,6 +93,21 @@ void cSsnxStatusView::createWidgets()
 
 	mpZ_mm = new QLineEdit(this);
 	mpZ_mm->setReadOnly(true);
+
+	mpRef_X_mm = new QLineEdit(this);
+	mpRef_X_mm->setReadOnly(true);
+
+	mpRef_Y_mm = new QLineEdit(this);
+	mpRef_Y_mm->setReadOnly(true);
+
+	mpRef_Z_mm = new QLineEdit(this);
+	mpRef_Z_mm->setReadOnly(true);
+
+	mpRef_Error_mm = new QLineEdit(this);
+	mpRef_Error_mm->setReadOnly(true);
+
+	mpRef_Count = new QLineEdit(this);
+	mpRef_Count->setReadOnly(true);
 }
 
 void cSsnxStatusView::doLayout()
@@ -247,6 +262,38 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addWidget(posBox);
 
+	mainLayout->addSpacing(10);
+
+	QGroupBox* refBox = new QGroupBox("Reference Position");
+
+	auto* pRefLayout = new QHBoxLayout();
+	text = new QLabel("X (mm)", this);
+	pRefLayout->addWidget(text);
+	pRefLayout->addWidget(mpRef_X_mm, 1);
+	pRefLayout->addSpacing(10);
+
+	text = new QLabel("Y (mm)", this);
+	pRefLayout->addWidget(text);
+	pRefLayout->addWidget(mpRef_Y_mm, 1);
+	pRefLayout->addSpacing(10);
+
+	text = new QLabel("Z (mm)", this);
+	pRefLayout->addWidget(text);
+	pRefLayout->addWidget(mpRef_Z_mm, 1);
+	pRefLayout->addSpacing(10);
+
+	text = new QLabel("Error (mm)", this);
+	pRefLayout->addWidget(text);
+	pRefLayout->addWidget(mpRef_Error_mm, 1);
+
+	text = new QLabel("Count", this);
+	pRefLayout->addWidget(text);
+	pRefLayout->addWidget(mpRef_Count, 1);
+
+	refBox->setLayout(pRefLayout);
+
+	mainLayout->addWidget(refBox);
+
 	mainLayout->addStretch();
 
 	setLayout(mainLayout);
@@ -344,14 +391,45 @@ void cSsnxStatusView::onPositionChange(int x_mm, int y_mm, int z_mm)
 	else
 		mpX_mm->setText(QString::number(x_mm));
 
-	if (y_mm < 0)
-		mpY_mm->setText("");
-	else
+//	if (y_mm < 0)
+//		mpY_mm->setText("");
+//	else
 		mpY_mm->setText(QString::number(y_mm));
 
-	if (z_mm < 0)
-		mpZ_mm->setText("");
-	else
+//	if (z_mm < 0)
+//		mpZ_mm->setText("");
+//	else
 		mpZ_mm->setText(QString::number(z_mm));
-
 }
+
+void cSsnxStatusView::onReferenceChange(int x_mm, int y_mm, int z_mm, double error_mm, int count)
+{
+	if (!isActiveWindow())
+		return;
+
+	if (x_mm < 0)
+		mpRef_X_mm->setText("");
+	else
+		mpRef_X_mm->setText(QString::number(x_mm));
+
+//	if (y_mm < 0)
+//		mpRef_Y_mm->setText("");
+//	else
+		mpRef_Y_mm->setText(QString::number(y_mm));
+
+//	if (z_mm < 0)
+//		mpRef_Z_mm->setText("");
+//	else
+		mpRef_Z_mm->setText(QString::number(z_mm));
+
+	if (error_mm < 0)
+		mpRef_Error_mm->setText("");
+	else
+		mpRef_Error_mm->setText(QString::number(error_mm));
+
+	if (count < 0)
+		mpRef_Count->setText("");
+	else
+		mpRef_Count->setText(QString::number(count));
+}
+

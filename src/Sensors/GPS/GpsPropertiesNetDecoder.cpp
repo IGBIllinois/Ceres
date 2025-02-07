@@ -19,7 +19,7 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     {
         sReferenceParameters_t data = to_reference_parameters_1(hdr.length, buffer);
 
-        onReferenceParameters(true, data.min_integration_time_sec, data.max_integration_time_sec);
+        onReferenceParameters(true, data.min_integration_time_sec, data.max_integration_time_sec, data.ref_error_threshold_mm);
 
         break;
     }
