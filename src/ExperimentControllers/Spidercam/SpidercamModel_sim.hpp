@@ -36,10 +36,24 @@ public:
 protected:
 	void update() override;
 
+private:
+	void reset_x_to_pos(long pos);
+	void reset_y_to_pos(long pos);
+	void reset_z_to_pos(long pos);
+	void update_flags();
 
-protected:
+private:
+	double mX_mm = 0.0;
+	double mY_mm = 0.0;
+	double mZ_mm = 0.0;
 
-	cIntervalTimer	mTimer;
+	long mTargetX_mm = -1;
+	long mTargetY_mm = -1;
+	long mTargetZ_mm = -1;
+
+	double mVx_mmps = 0.0;
+	double mVy_mmps = 0.0;
+	double mVz_mmps = 0.0;
 };
 
 
