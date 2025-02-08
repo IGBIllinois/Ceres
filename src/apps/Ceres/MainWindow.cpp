@@ -764,9 +764,25 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 //-----------------------------------------------------------------------------
 void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
 {
-    std::string name = configDoc["controller"];
+    std::string name;
+    sExperimentControllerWidgets widgets;
 
-    auto widgets = create_experiment_controller(name);
+    if (configDoc["controller"].is_object())
+    {
+        auto ctrlDoc = configDoc["controller"];
+
+        name = ctrlDoc["type"];
+
+        widgets = create_experiment_controller(name, ctrlDoc);
+    }
+    else
+    {
+        name = configDoc["controller"];
+        nlohmann::json emptyDoc;
+
+        widgets = create_experiment_controller(name, emptyDoc);
+
+    }
 
     cExperimentControlModel* pModel = widgets.pModel;
     mpController = widgets.pView;

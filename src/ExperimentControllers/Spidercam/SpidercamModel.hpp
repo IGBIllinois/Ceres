@@ -18,7 +18,7 @@ class cSpidercamModel : public cExperimentControlModel
 
 public:
 	cSpidercamModel(QObject* parent = nullptr);
-	~cSpidercamModel();
+	virtual ~cSpidercamModel();
 
 	/*
 	 * Returns a string used as a descriptor of the experiment
@@ -33,16 +33,6 @@ public:
      * model.
      */
     void configure(const nlohmann::json& jsonCfg) override;
-
-	/*
-	 * Is the system ready to run an experiment?
-	*/
-	bool systemReady() const override;
-
-	/*
-	 * Create a experiment state for the state machine
-	 */
-	cExperimentState* createState(const std::string& type, const nlohmann::json& expState) override;
 
 	/**
 	 * Started the loaded experiment.
@@ -65,9 +55,6 @@ public:
     void writeDataHeader() override;
 	void stopDataRecording() override;
 
-	bool startCommunications() override;
-	void stopCommunications() override;
-
 signals:
     void limitsChanged(spidercam::sWorkingDimensions limits);
     void positionChanged(spidercam::sPosition_1_t pos);
@@ -78,30 +65,10 @@ signals:
 	void inPositionStateChanged(bool in_position);
 	void inScriptMode(bool in_script_mode);
 
-/*
-	bool mIpCameraConnected;
-	bool mSafetyCircuitRestarted;
-	bool mPlaceKnown;
-	bool mBordersKnown;
-	bool mFieldKnown;
-	bool mSetPointEnabled;
-	bool mCalibrated;
-	bool mCableLengthAdjustmentRequired;
-	bool mNearBorder;
-	bool mAtCalibrationPosition;
-	bool mAtCorrectionPosition;
-*/
-
-protected slots:
-	void onConnectionStateChange(bool connected);
 
 protected:
-	void update() override;
-
-	void updateState();
-	void updateObstacleDistance();
-
-protected:
+	spidercam::sWorkingDimensions mLimits;
+	double mMaxSpeed_mmps = 0;
 
 	spidercam::sPosition_1_t mCurrentPosition;
 
@@ -131,8 +98,6 @@ protected:
 
 	double mPositionTolerance_mm;
 
-private:
-    cSpidercamController mController;
 	cSpidercamSerializer mSerializer;
 };
 
