@@ -1,6 +1,6 @@
 ﻿
 #include "CreateHyperspectralReferenceExperimentFromSpiderCamPointDlg.hpp"
-#include "Hyperspectral/HySpex/HySpexFactory.hpp"
+#include "Hyperspectral/HySpex/HySpexIDs.hpp"
 
 #include "Constants.hpp"
 

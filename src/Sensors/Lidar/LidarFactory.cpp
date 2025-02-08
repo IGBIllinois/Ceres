@@ -4,6 +4,7 @@
 #include "LidarFactory.hpp"
 #include "Ouster/OusterIDs.hpp"
 #include "Ouster/OusterFactory.hpp"
+#include "Hokuyo/HokuyoIDs.hpp"
 #include "Hokuyo/HokuyoFactory.hpp"
 
 

@@ -1,11 +1,11 @@
 
 #include "ExperimentSensorInfo.hpp"
 
-#include "DummySensorFactory.hpp"
+#include "DummySensorIDs.hpp"
 #include "GPS/Septentrio/SsnxIDs.hpp"
 #include "Lidar/Ouster/OusterIDs.hpp"
-#include "RGB/AxisCommunications/AxisCommunicationsFactory.hpp"
-#include "Hyperspectral/HySpex/HySpexFactory.hpp"
+#include "RGB/AxisCommunications/AxisCommunicationsIDs.hpp"
+#include "Hyperspectral/HySpex/HySpexIDs.hpp"
 
 #include <QLabel>
 #include <QLayout>

@@ -29,6 +29,7 @@ PRIVATE
     DummySensorView.cpp
     DummySensorModel.hpp
     DummySensorModel.cpp
+    DummySensorIDs.hpp
     DummySensorFactory.hpp
     DummySensorFactory.cpp
 

@@ -1,5 +1,6 @@
 
 #include "WeatherDataFactory.hpp"
+#include "WeatherDataIDs.hpp"
 
 #include "WeatherDataModel_Http_Wind.hpp"
 #include "WeatherDataModel_Http_Wind_T_RH_PAR.hpp"
@@ -57,7 +58,7 @@ sSensorWidgets create_http_based_sensor(const std::string& data_type, bool no_vi
     return widgets;
 }
 
-sSensorWidgets create_weather_data_sensor(const nlohmann::json& sensorInfo,
+sSensorWidgets weather_data::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
     std::string protocol = sensorInfo["protocol"];
@@ -69,6 +70,6 @@ sSensorWidgets create_weather_data_sensor(const nlohmann::json& sensorInfo,
     return sSensorWidgets();
 }
 
-void remove_weather_data_sensor(sSensorWidgets widgets)
+void weather_data::remove_sensor(sSensorWidgets widgets)
 {
 }

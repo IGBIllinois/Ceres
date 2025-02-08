@@ -13,6 +13,9 @@ set(HYSPEX_PUBLIC_HEADERS
 
 # Add the public header files to use the library
 set(HYSPEX_SOURCE_FILES
+
+	HySpexIDs.hpp
+
 #
 # HySpex packet utilities
 #

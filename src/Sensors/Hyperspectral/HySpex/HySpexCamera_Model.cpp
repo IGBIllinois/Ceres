@@ -1,6 +1,6 @@
 
 #include "HySpexCamera_Model.hpp"
-#include "HySpexFactory.hpp"
+#include "HySpexIDs.hpp"
 #include "Constants.hpp"
 
 #include <optional>

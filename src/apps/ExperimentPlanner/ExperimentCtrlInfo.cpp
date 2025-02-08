@@ -1,8 +1,8 @@
 
 #include "ExperimentCtrlInfo.hpp"
 
-#include "Spidercam/SpidercamCtrlFactory.hpp"
-#include "DummyCtrlFactory.hpp"
+#include "Spidercam/SpidercamCtrlIDs.hpp"
+#include "DummyCtrlIDs.hpp"
 
 
 std::unique_ptr<cExperimentCtrlInfo> copy(const std::unique_ptr<cExperimentCtrlInfo>& rhs)

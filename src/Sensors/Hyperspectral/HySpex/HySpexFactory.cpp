@@ -2,6 +2,7 @@
  */
 
 #include "HySpexFactory.hpp"
+#include "HySpexIDs.hpp"
 #include "HySpexVNIR_3000N_Model_direct.hpp"
 #include "HySpexVNIR_3000N_Model_net.hpp"
 #include "HySpexVNIR_3000N_Model_simulation.hpp"

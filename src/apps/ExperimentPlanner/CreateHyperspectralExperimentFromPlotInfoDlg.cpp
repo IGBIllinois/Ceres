@@ -1,6 +1,6 @@
 ﻿
 #include "CreateHyperspectralExperimentFromPlotInfoDlg.hpp"
-#include "Hyperspectral/HySpex/HySpexFactory.hpp"
+#include "Hyperspectral/HySpex/HySpexIDs.hpp"
 #include "GpsFileReader.hpp"
 #include "Constants.hpp"
 

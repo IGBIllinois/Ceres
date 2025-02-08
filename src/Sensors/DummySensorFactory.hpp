@@ -4,9 +4,10 @@
 #include "SensorFactory.hpp"
 
 
-static const char* dummy_id = "dummy";
+namespace dummy
+{
+	sSensorWidgets create_sensor(bool no_visualization);
 
-sSensorWidgets create_dummy_sensor(bool no_visualization);
-
-void remove_dummy_sensor(sSensorWidgets widgets);
+	void remove_sensor(sSensorWidgets widgets);
+}
 

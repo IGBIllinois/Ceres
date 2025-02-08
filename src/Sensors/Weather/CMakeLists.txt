@@ -6,6 +6,9 @@ set(WEATHER_PUBLIC_HEADERS
 
 # Add the public header files to use the library
 set(WEATHER_SOURCE_FILES
+
+    WeatherDataIDs.hpp
+
 #
 # Weather Station at the Energy Farm
 #

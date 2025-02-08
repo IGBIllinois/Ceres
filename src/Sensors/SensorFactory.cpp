@@ -1,9 +1,11 @@
 
 #include "SensorFactory.hpp"
 
+#include "DummySensorIDs.hpp"
 #include "DummySensorFactory.hpp"
 #include "Lidar/LidarFactory.hpp"
 #include "GPS/GpsFactory.hpp"
+#include "Weather/WeatherDataIDs.hpp"
 #include "Weather/WeatherDataFactory.hpp"
 #include "Hyperspectral/HyperspectralFactory.hpp"
 #include "RGB/RgbCameraFactory.hpp"
@@ -14,12 +16,12 @@ sSensorWidgets create_sensor(const std::string& sensor_id,
 {
     if (sensor_id.compare(dummy_id) == 0)
     {
-        return create_dummy_sensor(no_visualization);
+        return dummy::create_sensor(no_visualization);
     }
 
     if (sensor_id.compare(weather_data_id) == 0)
     {
-        return create_weather_data_sensor(sensorInfo, no_visualization);
+        return weather_data::create_sensor(sensorInfo, no_visualization);
     }
 
     sSensorWidgets result;
@@ -51,13 +53,13 @@ void remove_sensor(const std::string& sensor_id, sSensorWidgets widgets)
 {
     if (sensor_id.compare(dummy_id) == 0)
     {
-        remove_dummy_sensor(widgets);
+        dummy::remove_sensor(widgets);
         return;
     }
 
     if (sensor_id.compare(weather_data_id) == 0)
     {
-        remove_weather_data_sensor(widgets);
+        weather_data::remove_sensor(widgets);
         return;
     }
 

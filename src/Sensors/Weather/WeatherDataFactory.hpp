@@ -4,10 +4,10 @@
 #include "../SensorFactory.hpp"
 
 
-static const char* weather_data_id = "weather_data";
+namespace weather_data
+{
+	sSensorWidgets create_sensor(const nlohmann::json& sensorInfo,
+		bool no_visualization);
 
-sSensorWidgets create_weather_data_sensor(const nlohmann::json& sensorInfo,
-	bool no_visualization);
-
-void remove_weather_data_sensor(sSensorWidgets widgets);
-
+	void remove_sensor(sSensorWidgets widgets);
+}

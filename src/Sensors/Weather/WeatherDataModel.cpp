@@ -1,6 +1,6 @@
 
 #include "WeatherDataModel.hpp"
-#include "WeatherDataFactory.hpp"
+#include "WeatherDataIDs.hpp"
 
 
 cWeatherDataModel::cWeatherDataModel(QObject* parent)

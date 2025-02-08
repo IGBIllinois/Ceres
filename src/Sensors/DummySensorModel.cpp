@@ -1,6 +1,6 @@
 
 #include "DummySensorModel.hpp"
-#include "DummySensorFactory.hpp"
+#include "DummySensorIDs.hpp"
 
 
 cDummyModel::cDummyModel(QObject* parent)

@@ -4,8 +4,6 @@
 #include "../../SensorFactory.hpp"
 
 
-static const char* hokuyo_id = "hokuyo";
-
 namespace hokuyo
 {
 	sSensorWidgets create_sensor(const nlohmann::json& sensorInfo, bool no_visualization);

@@ -1,6 +1,6 @@
 
 #include "HokuyoModel.hpp"
-#include "HokuyoFactory.hpp"
+#include "HokuyoIDs.hpp"
 #include "Constants.hpp"
 
 #include <optional>

@@ -14,6 +14,8 @@ set(AXIS_COMM_PUBLIC_HEADERS
 # Add the public header files to use the library
 set(AXIS_COMM_SOURCE_FILES
 
+	AxisCommunicationsIDs.hpp
+
 #
 # Axis Communications packet utilities
 #

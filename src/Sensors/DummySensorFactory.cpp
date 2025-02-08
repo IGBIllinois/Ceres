@@ -2,6 +2,7 @@
  */
 
 #include "DummySensorFactory.hpp"
+#include "DummySensorIDs.hpp"
 
 #include "DummySensorModel.hpp"
 #include "DummySensorView.hpp"
@@ -12,7 +13,7 @@
 #include <QMetaType>
 
 
-sSensorWidgets create_dummy_sensor(bool no_visualization)
+sSensorWidgets dummy::create_sensor(bool no_visualization)
 {
     // Create the dummy model and view...
     auto* pModel = new cDummyModel();
@@ -33,7 +34,7 @@ sSensorWidgets create_dummy_sensor(bool no_visualization)
     return sSensorWidgets(pModel, dockWidget);
 }
 
-void remove_dummy_sensor(sSensorWidgets widgets)
+void dummy::remove_sensor(sSensorWidgets widgets)
 {
     // Dummy model and view...
     auto* pModel = static_cast<cDummyModel*>(widgets.pModel);

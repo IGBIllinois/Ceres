@@ -14,6 +14,9 @@ set(HOKUYO_PUBLIC_HEADERS
 
 # Add the source files used in the library
 set(HOKUYO_SOURCE_FILES
+
+    HokuyoIDs.hpp
+
 #
 # Hokuyo packet utilities
 #
