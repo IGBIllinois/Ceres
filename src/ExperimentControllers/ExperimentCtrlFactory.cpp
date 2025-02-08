@@ -1,22 +1,24 @@
 
 #include "ExperimentCtrlFactory.hpp"
 
+#include "DummyCtrlIDs.hpp"
 #include "DummyCtrlFactory.hpp"
+#include "Spidercam/SpidercamCtrlIDs.hpp"
 #include "Spidercam/SpidercamCtrlFactory.hpp"
 
 #include <QObject>
 
 
-sExperimentControllerWidgets create_experiment_controller(const std::string& name, bool no_visualization)
+sExperimentControllerWidgets create_experiment_controller(const std::string& name, const nlohmann::json& ctrlInfo, bool no_visualization)
 {
     if (name.compare(dummy_id) == 0)
     {
-        return create_dummy_controller(no_visualization);
+        return dummy::create_controller(ctrlInfo, no_visualization);
     }
 
     if (name.compare(spidercam_id) == 0)
     {
-        return create_spidercam_controller(no_visualization);
+        return spidercam::create_controller(ctrlInfo, no_visualization);
     }
 
     return sExperimentControllerWidgets();

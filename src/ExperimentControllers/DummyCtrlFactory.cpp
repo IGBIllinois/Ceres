@@ -4,7 +4,7 @@
 #include "DummyCtrlView.hpp"
 #include "DummyCtrlModel.hpp"
 
-sExperimentControllerWidgets create_dummy_controller(bool no_visualization)
+sExperimentControllerWidgets dummy::create_controller(const nlohmann::json& ctrlInfo, bool no_visualization)
 {
     // Create the Dummy Controller...
     auto* pModel = new cDummyControlModel();

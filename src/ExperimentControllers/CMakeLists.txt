@@ -24,6 +24,7 @@ PRIVATE
     DummyCtrlView.cpp
     DummyCtrlModel.hpp
     DummyCtrlModel.cpp
+    DummyCtrlIDs.hpp
     DummyCtrlFactory.hpp
     DummyCtrlFactory.cpp
 

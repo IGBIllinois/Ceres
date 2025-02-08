@@ -3,6 +3,8 @@
 
 #include "SpidercamView.hpp"
 #include "SpidercamModel.hpp"
+#include "SpidercamModel_net.hpp"
+#include "SpidercamModel_sim.hpp"
 #include "SpidercamDollyStatus.hpp"
 #include "SpidercamToolbar.hpp"
 
@@ -13,14 +15,14 @@
 Q_DECLARE_METATYPE(spidercam::sWorkingDimensions);
 Q_DECLARE_METATYPE(spidercam::sPosition_1_t);
 
-sExperimentControllerWidgets create_spidercam_controller(bool no_visualization)
+sExperimentControllerWidgets spidercam::create_controller(const nlohmann::json& ctrlInfo, bool no_visualization)
 {
     // Register our custom spidercam types with Qt's meta type system.  Needed for using signals/slots
     qRegisterMetaType<spidercam::sWorkingDimensions>();
     qRegisterMetaType<spidercam::sPosition_1_t>();
 
     // Create the Spidercam Controller...
-    cSpidercamModel* pModel = new cSpidercamModel();
+    cSpidercamModel* pModel = new cSpidercamModel_net();
 
     if (no_visualization)
         return sExperimentControllerWidgets(pModel, nullptr);

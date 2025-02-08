@@ -2,6 +2,7 @@
 #pragma once
 
 #include <string>
+#include <nlohmann/json.hpp>
 
 // Forward Declaration
 class cExperimentControlView;
@@ -34,4 +35,4 @@ struct sExperimentControllerWidgets
 	{}
 };
 
-sExperimentControllerWidgets create_experiment_controller(const std::string& name, bool no_visualization = false);
+sExperimentControllerWidgets create_experiment_controller(const std::string& name, const nlohmann::json& ctrlInfo, bool no_visualization = false);

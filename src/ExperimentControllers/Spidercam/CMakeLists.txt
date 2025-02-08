@@ -7,6 +7,21 @@ set(SPIDERCAM_CTRL_PUBLIC_HEADERS
 
 # Add the source files used in the library
 set(SPIDERCAM_CTRL_SOURCE_FILES
+
+    SpidercamCtrlIDs.hpp
+
+#
+# Spidercam Network files
+#
+    SpidercamModel_net.hpp
+    SpidercamModel_net.cpp
+
+#
+# Spidercam Simulation files
+#
+    SpidercamModel_sim.hpp
+    SpidercamModel_sim.cpp
+
 #
 # Spidercam files
 #
