@@ -21,8 +21,29 @@ sExperimentControllerWidgets spidercam::create_controller(const nlohmann::json& 
     qRegisterMetaType<spidercam::sWorkingDimensions>();
     qRegisterMetaType<spidercam::sPosition_1_t>();
 
+    bool use_sim = false;
+
+    if (!ctrlInfo.empty())
+    {
+        if (ctrlInfo.contains("use_sim"))
+        {
+            use_sim = ctrlInfo["use_sim"];
+        }
+
+        if (use_sim)
+        {
+            // Message box asking if you really want to use simulation mode 
+        }
+    }
+
+
     // Create the Spidercam Controller...
-    cSpidercamModel* pModel = new cSpidercamModel_net();
+    cSpidercamModel* pModel = nullptr;
+    
+    if (use_sim)
+        pModel = new cSpidercamModel_sim();
+    else
+        pModel = new cSpidercamModel_net();
 
     if (no_visualization)
         return sExperimentControllerWidgets(pModel, nullptr);
