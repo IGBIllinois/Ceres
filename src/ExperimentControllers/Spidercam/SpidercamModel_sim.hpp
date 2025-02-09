@@ -3,6 +3,11 @@
 
 
 #include "SpidercamModel.hpp"
+#include "SpidercamExperimentStates.hpp"
+#include "SpidercamCtrlProxies.hpp"
+
+#include <chrono>
+#include <memory>
 
 
 class cSpidercamModel_sim : public cSpidercamModel
@@ -33,6 +38,21 @@ public:
 	bool startCommunications() override;
 	void stopCommunications() override;
 
+public:
+	bool isBusy() const;
+	bool isConsoleConnected() const;
+	bool isMoving() const;
+	bool isSetPointEnabled() const;
+	bool isInScriptMode() const;
+	bool isInError() const;
+
+	const spidercam::sPosition_1_t& getLastKnownPosition() const;
+
+	bool requestStop();
+
+	bool sendRequestNewPosition(double x_mm, double y_mm, double z_mm, double height_mm,
+		uint32_t speed_mmps, float pan_deg, float tilt_deg, float roll_deg);
+
 protected:
 	void update() override;
 
@@ -54,6 +74,12 @@ private:
 	double mVx_mmps = 0.0;
 	double mVy_mmps = 0.0;
 	double mVz_mmps = 0.0;
+
+	bool mSetPointEnabled = true;
+
+	std::chrono::high_resolution_clock::time_point mLastUpdateTime;
+
+	std::unique_ptr<cSpidercamCtrlProxy<cSpidercamModel_sim>> mpProxy;
 };
 
 

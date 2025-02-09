@@ -1,17 +1,14 @@
 
 #pragma once
 
-//#include "../ExperimentCtrlModel.hpp"
 
 #include "SpidercamModel.hpp"
+#include "SpidercamCtrl.hpp"
+#include "SpidercamCtrlProxies.hpp"
 
-//#include "SpidercamUtils.hpp"
-//#include "SpidercamExperimentStates.hpp"
-//#include "../../Utilities/Timers.hpp"
-//#include "../../Utilities/Utilities.hpp"
+#include "SpidercamExperimentStates.hpp"
 
-//#include <cbdf/SpidercamSerializer.hpp>
-
+#include <memory>
 
 class cSpidercamModel_net : public cSpidercamModel
 {
@@ -55,6 +52,7 @@ protected:
 
 private:
     cSpidercamController mController;
+	std::unique_ptr<cSpidercamCtrlProxy<cSpidercamController>> mpProxy;
 };
 
 

@@ -10,6 +10,8 @@ cSpidercamModel_net::cSpidercamModel_net(QObject* parent)
     mController(this)
 
 {
+    mpProxy = std::make_unique<cSpidercamCtrlProxy<cSpidercamController>>(&mController);
+
     QObject::connect(&mController, &cSpidercamController::connectionStateChange,
                 this, &cSpidercamModel_net::onConnectionStateChange);
 }
@@ -81,7 +83,7 @@ void cSpidercamModel_net::stopCommunications()
 cExperimentState* cSpidercamModel_net::createState(const std::string& type, const nlohmann::json& expDoc)
 {
     if (type == "movement")
-        return new cSpidercamExperimentState_Movement(mCurrentPosition, mController, mPositionTolerance_mm);
+        return new cSpidercamExperimentState_Movement(mCurrentPosition, *(mpProxy.get()), mPositionTolerance_mm);
 
     return cExperimentControlModel::createState(type, expDoc);
 }

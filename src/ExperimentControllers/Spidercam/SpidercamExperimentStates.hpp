@@ -6,14 +6,14 @@
 #include <spidercam/spidercam_types.hpp>
 
 // Forward Declarations
-class cSpidercamController;
+class iSpidercamController;
 
 
 class cSpidercamExperimentState : public cExperimentState
 {
 public:
 	cSpidercamExperimentState(const spidercam::sPosition_1_t& pos,
-		cSpidercamController& controller, uint32_t tolerance_mm);
+		iSpidercamController& controller, uint32_t tolerance_mm);
 
 	QString getStatusStr() override;
 
@@ -26,7 +26,7 @@ public:
 
 protected:
 	const spidercam::sPosition_1_t& mDollyPos;
-	cSpidercamController& mController;
+	iSpidercamController& mController;
 
 	bool mMotionDetected = false;
 	bool mMoveCommandSent = false;
@@ -58,7 +58,7 @@ class cSpidercamExperimentState_Movement : public cSpidercamExperimentState
 {
 public:
 	cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
-		cSpidercamController& controller, uint32_t tolerance_mm);
+		iSpidercamController& controller, uint32_t tolerance_mm);
 
 	bool configure(const nlohmann::json& stateDoc) override;
 
@@ -79,7 +79,7 @@ class cSpidercamExperimentState_DeltaMovement : public cSpidercamExperimentState
 {
 public:
 	cSpidercamExperimentState_DeltaMovement(const spidercam::sPosition_1_t& pos,
-		cSpidercamController& controller, uint32_t tolerance_mm);
+		iSpidercamController& controller, uint32_t tolerance_mm);
 
 	bool configure(const nlohmann::json& stateDoc) override;
 

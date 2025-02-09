@@ -1,6 +1,6 @@
 
 #include "SpidercamExperimentStates.hpp"
-#include "SpidercamCtrl.hpp"
+#include "SpidercamCtrlProxies.hpp"
 #include "../../Utilities/Constants.hpp"
 
 #include <QMessageBox>
@@ -22,7 +22,7 @@ namespace
  ******************************************************************************/
 
 cSpidercamExperimentState::cSpidercamExperimentState(const spidercam::sPosition_1_t& pos,
-	cSpidercamController& controller, uint32_t tolerance_mm)
+	iSpidercamController& controller, uint32_t tolerance_mm)
 	:
 	mDollyPos(pos), mController(controller), mTolerance_mm(tolerance_mm)
 {
@@ -128,7 +128,7 @@ cExperimentState::eRESULT cSpidercamExperimentState::finished()
  ******************************************************************************/
 
 cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
-	cSpidercamController& controller, uint32_t tolerance_mm)
+	iSpidercamController& controller, uint32_t tolerance_mm)
 :
 	cSpidercamExperimentState(pos, controller, tolerance_mm)
 {
@@ -317,7 +317,7 @@ bool cSpidercamExperimentState_Movement::initialize()
  ******************************************************************************/
 
 cSpidercamExperimentState_DeltaMovement::cSpidercamExperimentState_DeltaMovement(const spidercam::sPosition_1_t& pos,
-	cSpidercamController& controller, uint32_t tolerance_mm)
+	iSpidercamController& controller, uint32_t tolerance_mm)
 	:
 	cSpidercamExperimentState(pos, controller, tolerance_mm)
 {
