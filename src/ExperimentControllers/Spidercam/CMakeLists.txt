@@ -37,6 +37,7 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
     SpidercamView.cpp
     SpidercamModel.hpp
     SpidercamModel.cpp
+    SpidercamCtrlProxies.hpp
     SpidercamCtrl.hpp
     SpidercamCtrl.cpp
     SpidercamUtils.hpp
