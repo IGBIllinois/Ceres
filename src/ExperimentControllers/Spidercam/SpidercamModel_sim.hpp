@@ -75,7 +75,7 @@ private:
 	double mVy_mmps = 0.0;
 	double mVz_mmps = 0.0;
 
-	bool mSetPointEnabled = true;
+	uint64_t mFlags = 0;
 
 	std::chrono::high_resolution_clock::time_point mLastUpdateTime;
 

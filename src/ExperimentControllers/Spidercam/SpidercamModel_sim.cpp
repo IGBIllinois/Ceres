@@ -35,11 +35,12 @@ namespace
     const uint64_t	IN_ERROR = 0x00'00'00'00'80'00'00'00;
 
     const uint64_t	DOLLY_BATTERY_MASK = 0x00'00'7F'80'00'00'00'00;
+    const uint64_t	BATTERY = 0x00'00'7F'80'00'00'00'00;
 
-    const uint64_t BASE_FLAGS = DOLLY_CONNECTED || CONSOLE_CONNECTED 
-        || SAFETY_CIRCUIT_RESTARTED || ACTIVATED || DOLLY_POS_KNOWN || PLACE_KNOWN
-        || BORDER_KNOWN || FIELD_KNOWN || SETPOINT_GEN_ENABLED || CONSOLE_ENABLED
-        || CALIBRATED;
+    const uint64_t BASE_FLAGS = DOLLY_CONNECTED | SAFETY_CIRCUIT_RESTARTED 
+        | ACTIVATED | DOLLY_POS_KNOWN | PLACE_KNOWN
+        | BORDER_KNOWN | FIELD_KNOWN | SETPOINT_GEN_ENABLED | CONSOLE_ENABLED
+        | CALIBRATED;
 
 }
 
@@ -47,10 +48,6 @@ cSpidercamModel_sim::cSpidercamModel_sim(QObject* parent)
 :
     cSpidercamModel(parent)
 {
-    mTargetX_mm = -1;
-    mTargetY_mm = -1;
-    mTargetZ_mm = -1;
-
     mObstacleLessThan2000mm = false;
     mObstacleLessThan1500mm = false;
     mObstacleLessThan1000mm = false;
@@ -65,9 +62,7 @@ cSpidercamModel_sim::cSpidercamModel_sim(QObject* parent)
 
     mBatteryLevel_pct = 100;
 
-//    mFlags = BASE_FLAGS | DONE | IN_POSITION | IN_SCRIPT_MODE;
-
-//    mTime_ms = 0;
+    mFlags = BASE_FLAGS | DONE | IN_POSITION | IN_SCRIPT_MODE;
 
     mpProxy = std::make_unique<cSpidercamCtrlProxy<cSpidercamModel_sim>>(this);
 }
@@ -134,33 +129,32 @@ bool cSpidercamModel_sim::systemReady() const
 
 bool cSpidercamModel_sim::isBusy() const
 {
-    return mBusy;
+    return (mFlags & BUSY) != 0;
 }
 
 bool cSpidercamModel_sim::isConsoleConnected() const
 {
-    return mConsoleConnected;
+    return (mFlags & CONSOLE_CONNECTED) != 0;
 }
 
 bool cSpidercamModel_sim::isMoving() const
 {
-    return mMoving;
-
+    return (mFlags & MOVING) != 0;
 }
 
 bool cSpidercamModel_sim::isSetPointEnabled() const
 {
-    return mSetPointEnabled;
+    return (mFlags & SETPOINT_GEN_ENABLED) != 0;
 }
 
 bool cSpidercamModel_sim::isInScriptMode() const
 {
-    return mInScriptMode;
+    return (mFlags & IN_SCRIPT_MODE) != 0;
 }
 
 bool cSpidercamModel_sim::isInError() const
 {
-    return mInError;
+    return (mFlags & IN_ERROR) != 0;
 }
 
 const spidercam::sPosition_1_t& cSpidercamModel_sim::getLastKnownPosition() const
@@ -249,7 +243,6 @@ void cSpidercamModel_sim::update()
             mDone = true;
             mInPosition = true;
             mMoving = false;
-            update_flags();
         }
 
         if (mX_mm >= mLimits.maxX_mm)
@@ -258,7 +251,6 @@ void cSpidercamModel_sim::update()
             mDone = true;
             mInPosition = true;
             mMoving = false;
-            update_flags();
         }
 
         if (mY_mm <= mLimits.minY_mm)
@@ -267,7 +259,6 @@ void cSpidercamModel_sim::update()
             mDone = true;
             mInPosition = true;
             mMoving = false;
-            update_flags();
         }
 
         if (mY_mm >= mLimits.maxY_mm)
@@ -276,7 +267,6 @@ void cSpidercamModel_sim::update()
             mDone = true;
             mInPosition = true;
             mMoving = false;
-            update_flags();
         }
 
         if (mZ_mm <= mLimits.minHeight_mm)
@@ -285,7 +275,6 @@ void cSpidercamModel_sim::update()
             mDone = true;
             mInPosition = true;
             mMoving = false;
-            update_flags();
         }
 
         if (mZ_mm >= mLimits.maxHeight_mm)
@@ -294,7 +283,6 @@ void cSpidercamModel_sim::update()
             mDone = true;
             mInPosition = true;
             mMoving = false;
-            update_flags();
         }
     }
     else
@@ -451,19 +439,43 @@ void cSpidercamModel_sim::update()
             mInPosition = true;
             mMoving = false;
         }
-
-        update_flags();
     }
 
     if (mTimer.elapsed())
     {
+        if (mBusy.HasChanged())
+            emit busyChanged(mBusy);
+
+        if (mMoving.HasChanged())
+            emit movingChanged(mMoving);
+
+        if (mObstacleLessThan2000mm.HasChanged())
+            emit obstacleDistanceChanged(2000.0f);
+        else if (mObstacleLessThan1500mm.HasChanged())
+            emit obstacleDistanceChanged(1500.0f);
+        else if (mObstacleLessThan1000mm.HasChanged())
+            emit obstacleDistanceChanged(1000.0f);
+        else if (mObstacleLessThan500mm.HasChanged())
+            emit obstacleDistanceChanged(500.0f);
+
+        if (mInPosition.HasChanged())
+            emit inPositionStateChanged(mInPosition);
+
+        if (mInScriptMode.HasChanged())
+            emit inScriptMode(mInScriptMode);
+
         mCurrentPosition.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+
+        auto speed_mmps = sqrt(mVx_mmps * mVx_mmps + mVy_mmps * mVy_mmps + mVz_mmps * mVz_mmps);
+
+        bool posChanged = (mCurrentPosition.X_mm != mX_mm) || (mCurrentPosition.Y_mm != mY_mm) 
+            || (mCurrentPosition.Z_mm != mZ_mm) || (mCurrentPosition.speed_mmps != speed_mmps);
 
         mCurrentPosition.X_mm = mX_mm;
         mCurrentPosition.Y_mm = mY_mm;
         mCurrentPosition.Z_mm = mZ_mm;
         mCurrentPosition.height_mm = mZ_mm;
-        mCurrentPosition.speed_mmps = sqrt(mVx_mmps*mVx_mmps + mVy_mmps*mVy_mmps + mVz_mmps*mVz_mmps);
+        mCurrentPosition.speed_mmps = speed_mmps;
         mCurrentPosition.pan_deg = 0;
         mCurrentPosition.pan_speed_dps = 0;
         mCurrentPosition.pitch_deg = 0;
@@ -474,6 +486,9 @@ void cSpidercamModel_sim::update()
         mCurrentPosition.focus = 0;
         mCurrentPosition.iris = 0;
         mCurrentPosition.zoom = 0;
+
+        if (posChanged)
+            emit positionChanged(mCurrentPosition);
 
         update_flags();
     }
@@ -504,20 +519,25 @@ void cSpidercamModel_sim::reset_z_to_pos(long pos)
 
 void cSpidercamModel_sim::update_flags()
 {
-/*
     mFlags = BASE_FLAGS;
 
-    if (mUSL_2000_mm)
-        mFlags |= USL_2000;
+    if (mBusy)
+        mFlags |= BUSY;
 
-    if (mUSL_1500_mm)
-        mFlags |= USL_1500;
+    if (mConsoleConnected)
+        mFlags |= CONSOLE_CONNECTED;
 
-    if (mUSL_1000_mm)
-        mFlags |= USL_1000;
+    if (mObstacleLessThan2000mm)
+        mFlags |= OBSTACLE_LESS_THAN_2000mm;
 
-    if (mUSL_500_mm)
-        mFlags |= USL_500;
+    if (mObstacleLessThan1500mm)
+        mFlags |= OBSTACLE_LESS_THAN_1500mm;
+
+    if (mObstacleLessThan1000mm)
+        mFlags |= OBSTACLE_LESS_THAN_1000mm;
+
+    if (mObstacleLessThan500mm)
+        mFlags |= OBSTACLE_LESS_THAN_500mm;
 
     if (mDone)
         mFlags |= DONE;
@@ -528,10 +548,9 @@ void cSpidercamModel_sim::update_flags()
     if (mInPosition)
         mFlags |= IN_POSITION;
 
-    if (mInScriptM)
+    if (mInScriptMode)
         mFlags |= IN_SCRIPT_MODE;
 
     mFlags |= BATTERY;
-*/
 }
 
