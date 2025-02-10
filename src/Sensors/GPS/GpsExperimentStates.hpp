@@ -6,8 +6,6 @@
 #include "GpsPropertiesNetDecoder.hpp"
 #include "GpsPropertiesNetEncoder.hpp"
 
-#include "Timers.hpp"
-
 
 // Forward Declarations
 class cGpsPropertyPage_Remote;
@@ -91,8 +89,6 @@ protected:
 
 	enum class eSTATE { WAIT_FOR_CONNECT, WAIT_FOR_STATE, WAIT_FOR_STATE_UPDATE, WAIT_FOR_REFERENCE, COMPLETE, ERROR };
 	eSTATE mState = eSTATE::WAIT_FOR_CONNECT;
-
-	cIntervalTimer mReferenceTimer;
 
 private:
 	void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) override {};
