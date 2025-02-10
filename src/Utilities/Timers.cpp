@@ -76,6 +76,7 @@ bool cIntervalTimer::elapsed()
 
 
 cOneShotTimer::cOneShotTimer()
+	: mInterval(0)
 {
 	mRunning = false;
 }

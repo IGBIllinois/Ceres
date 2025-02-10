@@ -7,7 +7,7 @@ class cIntervalTimer
 {
 public:
 	cIntervalTimer();
-	cIntervalTimer(uint32_t interval_ms);
+	explicit cIntervalTimer(uint32_t interval_ms);
 	~cIntervalTimer() = default;
 
 	bool is_running() const;
