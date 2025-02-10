@@ -58,11 +58,15 @@ bool cWeatherDataModel_Http::startCommunications()
 	mpHttpManager  = new QNetworkAccessManager(this);
 	connect(mpHttpManager, &QNetworkAccessManager::finished, this, &cWeatherDataModel_Http::requestReceived);
 
-	return true;
+    mTimer.reset();
+
+    return true;
 }
 
 void cWeatherDataModel_Http::stopCommunications()
 {
+    mTimer.stop();
+
     if (!mpHttpManager) return;
 
     disconnect(mpHttpManager, &QNetworkAccessManager::finished, this, &cWeatherDataModel_Http::requestReceived);

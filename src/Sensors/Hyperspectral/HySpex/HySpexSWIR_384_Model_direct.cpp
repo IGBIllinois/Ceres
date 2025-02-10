@@ -285,6 +285,7 @@ bool cHySpexSWIR_384_Model_direct::startCommunications()
 
 void cHySpexSWIR_384_Model_direct::stopCommunications()
 {
+    mTemperatureUpdateTimer.stop();
     mCamera->stopAcquisition();
 
     mAcquisitionStatus = mCamera->getAcquisitionStatus();

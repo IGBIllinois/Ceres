@@ -137,6 +137,7 @@ bool cHySpexVNIR_3000N_Model_simulation::initialize()
 bool cHySpexVNIR_3000N_Model_simulation::startCommunications()
 {
     mTemperatureUpdateTimer.reset();
+    mSimDataUpdateTimer.reset();
 
     mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_RUNNING;
     emit acqStatusChanged();
@@ -161,6 +162,9 @@ bool cHySpexVNIR_3000N_Model_simulation::startCommunications()
 
 void cHySpexVNIR_3000N_Model_simulation::stopCommunications()
 {
+    mTemperatureUpdateTimer.stop();
+    mSimDataUpdateTimer.stop();
+
     mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_STOPPED;
     emit acqStatusChanged();
 
@@ -198,7 +202,7 @@ void cHySpexVNIR_3000N_Model_simulation::update()
         {
             if (mBackgroundTimer.elapsed())
             {
-                mShutterTimer.reset();
+                mShutterTimer.stop();
                 mBackgroundState = eBgStates::SH_OPEN;
                 break;
             }

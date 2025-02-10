@@ -251,6 +251,7 @@ bool cHySpexVNIR_3000N_Model_direct::startCommunications()
 
 void cHySpexVNIR_3000N_Model_direct::stopCommunications()
 {
+    mTemperatureUpdateTimer.stop();
     mCamera->stopAcquisition();
 
     mAcquisitionStatus = mCamera->getAcquisitionStatus();
