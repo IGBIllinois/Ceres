@@ -69,6 +69,8 @@ bool cSpidercamModel_net::startCommunications()
         emit statusMessage("Ready");
 
         emit updateControllerConnection(true);
+
+        mTimer.reset();
     }
 
     return result;
@@ -78,6 +80,7 @@ void cSpidercamModel_net::stopCommunications()
 {
     emit updateControllerConnection(false);
     mController.stopCommunications();
+    mTimer.stop();
 }
 
 cExperimentState* cSpidercamModel_net::createState(const std::string& type, const nlohmann::json& expDoc)

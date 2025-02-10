@@ -74,6 +74,13 @@ bool cSpidercamModel_sim::startCommunications()
 {
     mLastUpdateTime = std::chrono::high_resolution_clock::now();
 
+    mDollyConnected = true;
+    mConsoleConnected = true;
+    mActivated = true;
+    mDollyPositionKnown = true;
+    mConsoleEnabled = true;
+    mInInteractiveMode = false;
+
     mBusy = false;
     mInError = false;
     mDone = true;
@@ -95,11 +102,15 @@ bool cSpidercamModel_sim::startCommunications()
 
     emit updateControllerConnection(true);
 
+    mTimer.reset();
+
     return true;
 }
 
 void cSpidercamModel_sim::stopCommunications()
-{}
+{
+    mTimer.stop();
+}
 
 cExperimentState* cSpidercamModel_sim::createState(const std::string& type, const nlohmann::json& expDoc)
 {
@@ -228,7 +239,7 @@ void cSpidercamModel_sim::update()
     auto now = std::chrono::high_resolution_clock::now();
     auto diff = now - mLastUpdateTime;
 
-    double dt_sec = duration_cast<std::chrono::milliseconds>(diff).count() / 1000.0;
+    double dt_sec = duration_cast<std::chrono::microseconds>(diff).count() / 1'000'000.0;
 
     mLastUpdateTime = now;
 

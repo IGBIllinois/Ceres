@@ -46,10 +46,6 @@ protected:
 	void updateState();
 	void updateObstacleDistance();
 
-protected:
-
-	cIntervalTimer	mTimer;
-
 private:
     cSpidercamController mController;
 	std::unique_ptr<cSpidercamCtrlProxy<cSpidercamController>> mpProxy;
