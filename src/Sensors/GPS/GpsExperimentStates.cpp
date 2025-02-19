@@ -68,13 +68,13 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 	{
 		if (stateDoc.contains("min integration time (sec)"))
 		{
-			mDesiredMinIntegrationTime_sec = stateDoc["min integration time (us)"];
+			mDesiredMinIntegrationTime_sec = stateDoc["min integration time (sec)"];
 			mHasReferenceParameters = true;
 		}
 
 		if (stateDoc.contains("max integration time (sec)"))
 		{
-			mDesiredMaxIntegrationTime_sec = stateDoc["max integration time (us)"];
+			mDesiredMaxIntegrationTime_sec = stateDoc["max integration time (sec)"];
 			mHasReferenceParameters = true;
 		}
 
@@ -113,6 +113,24 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 		mb.exec();
 
 		return false;
+	}
+
+	if (mDesiredMinIntegrationTime_sec.has_value() && mDesiredMaxIntegrationTime_sec.has_value())
+	{
+		auto minTime = mDesiredMinIntegrationTime_sec.value();
+		auto maxTime = mDesiredMaxIntegrationTime_sec.value();
+
+		if (maxTime < minTime)
+		{
+			mDesiredMinIntegrationTime_sec = maxTime;
+			mDesiredMaxIntegrationTime_sec = minTime;
+		}
+	}
+
+	if (mDesiredRefErrorThreshold_mm.has_value())
+	{
+		if (mDesiredRefErrorThreshold_mm.value() < 0)
+			mDesiredRefErrorThreshold_mm.reset();
 	}
 
 	return true;
