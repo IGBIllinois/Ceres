@@ -101,6 +101,8 @@ PRIVATE
     ExperimentSteps.cpp
     ExperimentSteps_HySpex.hpp
     ExperimentSteps_HySpex.cpp
+    ExperimentSteps_Ssnx.hpp
+    ExperimentSteps_Ssnx.cpp
 
     GpsFileReader.hpp
     GpsFileReader.cpp
