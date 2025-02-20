@@ -44,7 +44,7 @@ void cDelayStepInfoDlg::createControls()
 void cDelayStepInfoDlg::createLayout()
 {
 	QLabel* pText = nullptr;
-	QHBoxLayout* pTopLayout = nullptr;
+//	QHBoxLayout* pTopLayout = nullptr;
 
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
 

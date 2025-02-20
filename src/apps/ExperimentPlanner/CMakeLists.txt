@@ -86,6 +86,9 @@ PRIVATE
     HySpexCommandDlg.hpp
     HySpexCommandDlg.cpp
 
+    ReferencePointDlg.hpp
+    ReferencePointDlg.cpp
+
     ExperimentDesignItems.hpp
     ExperimentDesignItems.cpp
 

@@ -17,7 +17,7 @@
 class cExperimentStep;
 
 
-enum eExperimentStep {delay, pause, movement, hyspex_command};
+enum eExperimentStep {delay, pause, movement, hyspex_command, reference_point};
 
 
 class cExperimentFile

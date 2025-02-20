@@ -28,19 +28,31 @@ namespace ssnx
 }
 
 /// <summary>
-/// Experiment Step: Command sent to Ssnx GPS Unit
-/// 
-/// For example: command could be "reference"
+/// Experiment Step: Command sent to GPS to compute a reference point
 /// </summary>
-class cExperimentStep_Ssnx_Command : public cExperimentStep
+class cExperimentStep_ReferencePoint : public cExperimentStep
 {
 	Q_OBJECT
 
 public:
-	cExperimentStep_Ssnx_Command() = delete;
-	cExperimentStep_Ssnx_Command(std::string_view command);
+	cExperimentStep_ReferencePoint() = default;
+
+	double getMinIntegrationTime_sec() const;
+	double getMaxIntegrationTime_sec() const;
+	int	   getErrorThreshold_mm() const;
+
+	void setMinIntegrationTime_sec(double sec);
+	void setMaxIntegrationTime_sec(double sec);
+	void setErrorThreshold_mm(int threshold_mm);
 
 	cBaseStep* graphicsItem(const int id) const override;
+
+signals:
+	void onDescriptionChange(const QString& desc);
+	void onCommentChange(const QString& comment);
+
+public slots:
+	bool onEdit();
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
@@ -48,8 +60,12 @@ protected:
 
 private:
 	QString generateDescription() const;
+	QString generateComment() const;
 
 private:
-	std::string mCommand;
+	double mMinIntegrationTime_sec = 5.0;
+	double mMaxIntegrationTime_sec = 10.0;
+
+	int mErrorThreshold_mm = 100;
 };
 
