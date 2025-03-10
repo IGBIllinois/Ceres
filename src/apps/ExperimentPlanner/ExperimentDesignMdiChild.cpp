@@ -3,6 +3,7 @@
 
 #include "ExperimentSteps.hpp"
 #include "ExperimentSteps_HySpex.hpp"
+#include "ExperimentSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -470,6 +471,16 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
 
         std::unique_ptr<cExperimentStep_HySpex_Command> step = std::make_unique<cExperimentStep_HySpex_Command>(camera_type, command);
 
+        mExperimentFile.insertBefore(id, std::move(step));
+        break;
+    }
+    case eExperimentStep::reference_point:
+    {
+        std::unique_ptr<cExperimentStep_ReferencePoint> step = std::make_unique<cExperimentStep_ReferencePoint>();
+        if (!step->onEdit())
+        {
+            return;
+        }
         mExperimentFile.insertBefore(id, std::move(step));
         break;
     }

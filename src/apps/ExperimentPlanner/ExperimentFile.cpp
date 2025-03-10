@@ -66,6 +66,17 @@ void cExperimentFile::setExperimentName(const std::string& name)
 	mExperimentName = name;
 }
 
+const cExperimentFile::eExperimentType cExperimentFile::getExperimentType() const
+{
+	return mExperimentType;
+}
+
+void cExperimentFile::setExperimentType(eExperimentType type)
+{
+	mDirty = mExperimentType != type;
+	mExperimentType = type;
+}
+
 const std::string& cExperimentFile::getLayoutName() const
 {
 	return mLayoutName;
@@ -105,6 +116,8 @@ void cExperimentFile::clear()
 	mFileName.clear();
 	mLayoutName.clear();
 	mExperimentName.clear();
+
+	mExperimentType = eExperimentType::UNKNOWN;
 
 	mMetaInfo.clear();
 	mpController.reset();
@@ -155,8 +168,26 @@ void cExperimentFile::open(const std::string& file_name)
 	else
 		mExperimentName = configDoc["experiment_name"];
 
+
+	if (configDoc.contains("experiment_type"))
+	{
+		std::string type = configDoc["experiment_type"];
+		if (type == "lidar")
+			mExperimentType = eExperimentType::LIDAR;
+		else if (type == "hyperspectral")
+			mExperimentType = eExperimentType::HYPERSPECTRAL;
+		else if (type == "time-of-flight")
+			mExperimentType = eExperimentType::TOF;
+		else
+			mExperimentType = eExperimentType::UNKNOWN;
+	}
+	else
+		mExperimentType = eExperimentType::UNKNOWN;
+	
 	if (configDoc.contains("layout name"))
 		mLayoutName = configDoc["layout name"];
+	else
+		mLayoutName = configDoc["layout_name"];
 
 	mMetaInfo.load(configDoc);
 
@@ -250,8 +281,24 @@ void cExperimentFile::buildDocument(nlohmann::json& configDoc)
 {
 	configDoc["experiment_name"] = mExperimentName;
 
+	if (mExperimentType != eExperimentType::UNKNOWN)
+	{
+		switch (mExperimentType)
+		{
+		case eExperimentType::LIDAR:
+			configDoc["experiment_type"] = "lidar";
+			break;
+		case eExperimentType::HYPERSPECTRAL:
+			configDoc["experiment_type"] = "hyperspectral";
+			break;
+		case eExperimentType::TOF:
+			configDoc["experiment_type"] = "time-of-flight";
+			break;
+		}
+	}
+
 	if (!mLayoutName.empty())
-		configDoc["layout name"] = mLayoutName;
+		configDoc["layout_name"] = mLayoutName;
 
 	mMetaInfo.save(configDoc);
 

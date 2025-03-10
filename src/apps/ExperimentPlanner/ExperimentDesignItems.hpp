@@ -78,6 +78,7 @@ private slots:
 	void onInsertPause();
 	void onInsertMovement();
 	void onInsertHySpexCommand();
+	void onInsertReferencePoint();
 
 private:
 	float mScale = 1.0;
@@ -259,11 +260,13 @@ private slots:
 	void onInsertBefore_Pause();
 	void onInsertBefore_Movement();
 	void onInsertBefore_HySpexCommand();
+	void onInsertBefore_ReferencePoint();
 
 	void onInsertAfter_Delay();
 	void onInsertAfter_Pause();
 	void onInsertAfter_Movement();
 	void onInsertAfter_HySpexCommand();
+	void onInsertAfter_ReferencePoint();
 
 	void onDeleteStep();
 

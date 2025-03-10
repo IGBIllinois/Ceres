@@ -64,7 +64,14 @@ void cReferencePointDlg::createLayout()
 
 	pMainLayout->addSpacing(10);
 
-	pMainLayout->addWidget(mpErrorThreshold_mm);
+	QHBoxLayout* pSubLayout = new QHBoxLayout();
+
+	pText = new QLabel("Error Threshold (mm)");
+	pSubLayout->addWidget(pText);
+	pSubLayout->addSpacing(10);
+	pSubLayout->addWidget(mpErrorThreshold_mm);
+
+	pMainLayout->addLayout(pSubLayout);
 
 	pMainLayout->addSpacing(10);
 

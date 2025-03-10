@@ -23,6 +23,7 @@ enum eExperimentStep {delay, pause, movement, hyspex_command, reference_point};
 class cExperimentFile
 {
 public:
+	enum class eExperimentType { UNKNOWN, LIDAR, HYPERSPECTRAL, TOF, };
 	typedef std::list<std::shared_ptr<cExperimentStep>> Experiment_t;
 
 	typedef Experiment_t::iterator			iterator;
@@ -39,6 +40,9 @@ public:
 
 	const std::string& getExperimentName() const;
 	void setExperimentName(const std::string& name);
+
+	const eExperimentType getExperimentType() const;
+	void setExperimentType(eExperimentType type);
 
 	const std::string& getLayoutName() const;
 	void setLayoutName(const std::string& name);
@@ -99,6 +103,8 @@ private:
 
 	std::string	mExperimentName;
 	std::string	mLayoutName;
+
+	eExperimentType mExperimentType = eExperimentType::UNKNOWN;
 
 	cExperimentMetaInfo mMetaInfo;
 

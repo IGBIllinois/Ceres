@@ -71,7 +71,7 @@ cBaseStep* cExperimentStep_ReferencePoint::graphicsItem(const int id) const
 	connect(this, &cExperimentStep_ReferencePoint::onDescriptionChange, step, &cProcessStep::setSubHeading1);
 	connect(this, &cExperimentStep_ReferencePoint::onCommentChange, step, &cProcessStep::setSubHeading2);
 
-	step->setTitle("ssnx");
+	step->setTitle("SSNX: Reference Point");
 
 	auto description = generateDescription();
 	step->setSubHeading1(description);
@@ -85,6 +85,21 @@ cBaseStep* cExperimentStep_ReferencePoint::graphicsItem(const int id) const
 void cExperimentStep_ReferencePoint::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
+
+	if (jdoc.contains("min integration time (sec)"))
+	{
+		mMinIntegrationTime_sec = jdoc["min integration time (sec)"].get<double>();
+	}
+
+	if (jdoc.contains("max integration time (sec)"))
+	{
+		mMaxIntegrationTime_sec = jdoc["max integration time (sec)"].get<double>();
+	}
+
+	if (jdoc.contains("error threshold (mm)"))
+	{
+		mErrorThreshold_mm = jdoc["error threshold (mm)"].get<int>();
+	}
 }
 
 nlohmann::json cExperimentStep_ReferencePoint::save()
@@ -94,6 +109,10 @@ nlohmann::json cExperimentStep_ReferencePoint::save()
 	entry["type"] = "ssnx";
 
 	entry["command"] = "reference";
+
+	entry["min integration time (sec)"] = mMinIntegrationTime_sec;
+	entry["max integration time (sec)"] = mMaxIntegrationTime_sec;
+	entry["error threshold (mm)"] = mErrorThreshold_mm;
 
 	mDirty = false;
 
@@ -135,14 +154,26 @@ bool cExperimentStep_ReferencePoint::onEdit()
 
 QString cExperimentStep_ReferencePoint::generateDescription() const
 {
-	return "Collect a GPS reference point for later processing.";
+	QString description;
+
+	description = "Integration time: minimum ";
+	description += QString::number(mMinIntegrationTime_sec);
+	description += " sec, maximum ";
+	description += QString::number(mMaxIntegrationTime_sec);
+	description += " sec";
+
+	return description;
 }
 
 QString cExperimentStep_ReferencePoint::generateComment() const
 {
-		return QString("Recording: On");
+	QString comment;
 
-	return QString();
+	comment = "Error Threshold: ";
+	comment += QString::number(mErrorThreshold_mm);
+	comment += " mm";
+
+	return comment;
 }
 
 

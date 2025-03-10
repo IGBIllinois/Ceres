@@ -142,6 +142,14 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	connect(&movementStep, &QAction::triggered, this, &cFlowArrow::onInsertMovement);
 	contextMenu.addAction(&movementStep);
 
+	contextMenu.addSeparator();
+
+	QAction referenceStep("Insert Reference Point Step...");
+	connect(&referenceStep, &QAction::triggered, this, &cFlowArrow::onInsertReferencePoint);
+	contextMenu.addAction(&referenceStep);
+
+	contextMenu.addSeparator();
+
 	QAction commandStep("Insert HySpex Command Step...");
 	connect(&commandStep, &QAction::triggered, this, &cFlowArrow::onInsertHySpexCommand);
 	contextMenu.addAction(&commandStep);
@@ -167,6 +175,11 @@ void cFlowArrow::onInsertMovement()
 void cFlowArrow::onInsertHySpexCommand()
 {
 	emit insertBefore(getID(), eExperimentStep::hyspex_command);
+}
+
+void cFlowArrow::onInsertReferencePoint()
+{
+	emit insertBefore(getID(), eExperimentStep::reference_point);
 }
 
 
@@ -699,6 +712,11 @@ void cProcessStep::onInsertBefore_HySpexCommand()
 	emit insertBefore(getID(), eExperimentStep::hyspex_command);
 }
 
+void cProcessStep::onInsertBefore_ReferencePoint()
+{
+	emit insertBefore(getID(), eExperimentStep::reference_point);
+}
+
 void cProcessStep::onInsertAfter_Delay()
 {
 	emit insertAfter(getID(), eExperimentStep::delay);
@@ -717,6 +735,11 @@ void cProcessStep::onInsertAfter_Movement()
 void cProcessStep::onInsertAfter_HySpexCommand()
 {
 	emit insertAfter(getID(), eExperimentStep::hyspex_command);
+}
+
+void cProcessStep::onInsertAfter_ReferencePoint()
+{
+	emit insertAfter(getID(), eExperimentStep::reference_point);
 }
 
 void cProcessStep::onDeleteStep()
