@@ -6,6 +6,7 @@
 
 #include "ExperimentSteps.hpp"
 #include "ExperimentSteps_HySpex.hpp"
+#include "ExperimentSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -398,6 +399,14 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 		scan_z_offset_mm += sensor_offset_mm;
 	}
 
+	double minIntegrationTime_sec = mpMinIntegrationTime_sec->text().toDouble();
+	double maxIntegrationTime_sec = mpMaxIntegrationTime_sec->text().toDouble();
+
+	if (maxIntegrationTime_sec < minIntegrationTime_sec)
+		std::swap(minIntegrationTime_sec, maxIntegrationTime_sec);
+
+	int errorThreshold_mm = mpErrorThreshold_mm->text().toInt();
+
 	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
 	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
@@ -566,6 +575,14 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 				pInfo->appendStep(std::move(delay));
 			}
 
+			// Collect a reference point measurement
+			std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+			reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+			reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+			reference->setErrorThreshold_mm(errorThreshold_mm);
+			pInfo->appendStep(std::move(reference));
+
 			for (const auto& sensor : mSensorInfo)
 			{
 				if (sensor->getType() == vnir_3000N_id)
@@ -669,6 +686,14 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 				delay->setWaitTime_sec(delay_sec);
 				pInfo->appendStep(std::move(delay));
 			}
+
+			// Collect a reference point measurement
+			std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+			reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+			reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+			reference->setErrorThreshold_mm(errorThreshold_mm);
+			pInfo->appendStep(std::move(reference));
 
 			for (const auto& sensor : mSensorInfo)
 			{

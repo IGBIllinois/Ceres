@@ -4,6 +4,7 @@
 
 #include "ExperimentSteps.hpp"
 #include "ExperimentSteps_HySpex.hpp"
+#include "ExperimentSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -219,6 +220,14 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 	int start_offset_mm = 0;
 	int end_offset_mm = 0;
 
+	double minIntegrationTime_sec = mpMinIntegrationTime_sec->text().toDouble();
+	double maxIntegrationTime_sec = mpMaxIntegrationTime_sec->text().toDouble();
+
+	if (maxIntegrationTime_sec < minIntegrationTime_sec)
+		std::swap(minIntegrationTime_sec, maxIntegrationTime_sec);
+
+	int errorThreshold_mm = mpErrorThreshold_mm->text().toInt();
+
 
 	/* Grab the info for multiple scans if selected */
 	int startNum = 0;
@@ -282,6 +291,14 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 				delay->setWaitTime_sec(delay_sec);
 				pInfo->appendStep(std::move(delay));
 			}
+
+			// Collect a reference point measurement
+			std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+			reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+			reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+			reference->setErrorThreshold_mm(errorThreshold_mm);
+			pInfo->appendStep(std::move(reference));
 
 			delay_sec = mpMeasurementTime_sec->text().toFloat();
 
@@ -347,6 +364,14 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 				delay->setWaitTime_sec(delay_sec);
 				pInfo->appendStep(std::move(delay));
 			}
+
+			// Collect a reference point measurement
+			std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+			reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+			reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+			reference->setErrorThreshold_mm(errorThreshold_mm);
+			pInfo->appendStep(std::move(reference));
 
 			if (std::abs(dx_mm) < 500)
 			{

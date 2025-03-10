@@ -161,6 +161,18 @@ void cCreateHyperspectralExperimentDlg::createControls_Measurement()
 	mpStartMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
 	mpStartMeasurementDelay_sec->setText("4.0");
 
+	mpMinIntegrationTime_sec = new QLineEdit(this);
+	mpMinIntegrationTime_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
+	mpMinIntegrationTime_sec->setText("5.0");
+
+	mpMaxIntegrationTime_sec = new QLineEdit(this);
+	mpMaxIntegrationTime_sec->setValidator(new QDoubleValidator(5.0, 300.0, 3));
+	mpMaxIntegrationTime_sec->setText("10.0");
+
+	mpErrorThreshold_mm = new QLineEdit(this);
+	mpErrorThreshold_mm->setValidator(new QIntValidator(50, 1000));
+	mpErrorThreshold_mm->setText("100");
+
 	// default to feet
 	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
 	mpScanDistance = new QLineEdit(this);
@@ -379,22 +391,44 @@ void cCreateHyperspectralExperimentDlg::createLayout_Measurement(QVBoxLayout* pM
 	pGridLayout->addWidget(pText, 0, 6);
 	pGridLayout->addWidget(mpLensFocalDistance, 0, 7);
 
-	pText = new QLabel("Height Offset AGL (m)");
+	pText = new QLabel("Integration Time (sec)");
 	pGridLayout->addWidget(pText, 2, 0);
+
+	QHBoxLayout* pIntegrationLayout = new QHBoxLayout();
+	pText = new QLabel("Min: ");
+	pIntegrationLayout->addWidget(pText);
+	pIntegrationLayout->addWidget(mpMinIntegrationTime_sec, 1);
+	pGridLayout->addLayout(pIntegrationLayout, 2, 1);
+
+//	pIntegrationLayout = new QHBoxLayout();
+	pText = new QLabel("Max: ");
+//	pIntegrationLayout->addWidget(pText);
+//	pIntegrationLayout->addWidget(mpMaxIntegrationTime_sec, 1);
+//	pGridLayout->addLayout(pIntegrationLayout, 2, 4);
+
+	pGridLayout->addWidget(pText, 2, 3);
+	pGridLayout->addWidget(mpMaxIntegrationTime_sec, 2, 4);
+
+	pText = new QLabel("Error Threshold (mm)");
+	pGridLayout->addWidget(pText, 2, 6);
+	pGridLayout->addWidget(mpErrorThreshold_mm, 2, 7);
+
+	pText = new QLabel("Height Offset AGL (m)");
+	pGridLayout->addWidget(pText, 4, 0);
 	QHBoxLayout* pOffsetLayout = new QHBoxLayout();
 	pOffsetLayout->addWidget(mpHeightOffset, 1);
 	pOffsetLayout->addWidget(mpAskForOffset);
-	pGridLayout->addLayout(pOffsetLayout, 2, 1);
+	pGridLayout->addLayout(pOffsetLayout, 4, 1);
 
-	pGridLayout->addWidget(mpScanDistanceLabel, 2, 3);
+	pGridLayout->addWidget(mpScanDistanceLabel, 4, 3);
 	QHBoxLayout* pScanLayout = new QHBoxLayout();
 	pScanLayout->addWidget(mpScanDistance, 1);
 	pScanLayout->addWidget(mpScanUnits);
-	pGridLayout->addLayout(pScanLayout, 2, 4);
+	pGridLayout->addLayout(pScanLayout, 4, 4);
 
 	pText = new QLabel("Measurement Speed (mm/s)");
-	pGridLayout->addWidget(pText, 2, 6);
-	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 2, 7);
+	pGridLayout->addWidget(pText, 4, 6);
+	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 4, 7);
 
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);

@@ -114,13 +114,21 @@ void cCreateLidarExperimentDlg::createControls_Measurement()
 	mpBeginningOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
 	mpBeginningOffset_m->setText("2.0");
 
-	mpEndingOffset_m = new QLineEdit(this);
-	mpEndingOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
-	mpEndingOffset_m->setText("2.0");
-
 	mpStartMeasurementDelay_sec = new QLineEdit(this);
 	mpStartMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
 	mpStartMeasurementDelay_sec->setText("4.0");
+
+	mpMinIntegrationTime_sec = new QLineEdit(this);
+	mpMinIntegrationTime_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
+	mpMinIntegrationTime_sec->setText("5.0");
+
+	mpMaxIntegrationTime_sec = new QLineEdit(this);
+	mpMaxIntegrationTime_sec->setValidator(new QDoubleValidator(5.0, 300.0, 3));
+	mpMaxIntegrationTime_sec->setText("10.0");
+
+	mpErrorThreshold_mm = new QLineEdit(this);
+	mpErrorThreshold_mm->setValidator(new QIntValidator(50, 1000));
+	mpErrorThreshold_mm->setText("100");
 
 	mpMeasurementHeight_m = new QLineEdit(this);
 	mpMeasurementHeight_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
@@ -134,6 +142,10 @@ void cCreateLidarExperimentDlg::createControls_Measurement()
 	mpMeasurementSpeed_mmps = new QLineEdit(this);
 	mpMeasurementSpeed_mmps->setValidator(new QIntValidator(0, 1000));
 	mpMeasurementSpeed_mmps->setText("450");
+
+	mpEndingOffset_m = new QLineEdit(this);
+	mpEndingOffset_m->setValidator(new QDoubleValidator(0.0, 10.0, 3));
+	mpEndingOffset_m->setText("2.0");
 
 	mpEndMeasurementDelay_sec = new QLineEdit(this);
 	mpEndMeasurementDelay_sec->setValidator(new QDoubleValidator(0.0, 300.0, 3));
@@ -316,26 +328,42 @@ void cCreateLidarExperimentDlg::createLayout_Measurement(QVBoxLayout* pMainLayou
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 4);
 
-	pText = new QLabel("Measurement Height (m)");
+	pText = new QLabel("Integration Time (sec)");
 	pGridLayout->addWidget(pText, 2, 0);
+
+	QHBoxLayout* pIntegrationLayout = new QHBoxLayout();
+	pText = new QLabel("Min: ");
+	pIntegrationLayout->addWidget(pText);
+	pIntegrationLayout->addWidget(mpMinIntegrationTime_sec, 1);
+	pText = new QLabel("Max: ");
+	pIntegrationLayout->addWidget(pText);
+	pIntegrationLayout->addWidget(mpMaxIntegrationTime_sec, 1);
+	pGridLayout->addLayout(pIntegrationLayout, 2, 1);
+
+	pText = new QLabel("Error Threshold (mm)");
+	pGridLayout->addWidget(pText, 2, 3);
+	pGridLayout->addWidget(mpErrorThreshold_mm, 2, 4);
+
+	pText = new QLabel("Measurement Height (m)");
+	pGridLayout->addWidget(pText, 4, 0);
 
 	//	pGridLayout->addWidget(mpMeasurementHeight_m, 2, 1);
 	QHBoxLayout* pMeasurementLayout = new QHBoxLayout();
 	pMeasurementLayout->addWidget(mpMeasurementHeight_m, 1);
 	pMeasurementLayout->addWidget(mpHeightReference);
-	pGridLayout->addLayout(pMeasurementLayout, 2, 1);
+	pGridLayout->addLayout(pMeasurementLayout, 4, 1);
 
 	pText = new QLabel("Measurement Speed (mm/s)");
-	pGridLayout->addWidget(pText, 2, 3);
-	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 2, 4);
+	pGridLayout->addWidget(pText, 4, 3);
+	pGridLayout->addWidget(mpMeasurementSpeed_mmps, 4, 4);
 
 	pText = new QLabel("End Delay (sec)");
-	pGridLayout->addWidget(pText, 4, 0);
-	pGridLayout->addWidget(mpEndMeasurementDelay_sec, 4, 1);
+	pGridLayout->addWidget(pText, 6, 0);
+	pGridLayout->addWidget(mpEndMeasurementDelay_sec, 6, 1);
 
 	pText = new QLabel("End Offset (m)");
-	pGridLayout->addWidget(pText, 4, 3);
-	pGridLayout->addWidget(mpEndingOffset_m, 4, 4);
+	pGridLayout->addWidget(pText, 6, 3);
+	pGridLayout->addWidget(mpEndingOffset_m, 6, 4);
 
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);

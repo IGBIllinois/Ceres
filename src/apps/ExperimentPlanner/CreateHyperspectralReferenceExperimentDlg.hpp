@@ -80,6 +80,11 @@ protected:
 
 	/* Measurement */
 	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
+
+	QLineEdit* mpMinIntegrationTime_sec = nullptr;
+	QLineEdit* mpMaxIntegrationTime_sec = nullptr;
+	QLineEdit* mpErrorThreshold_mm = nullptr;
+
 	QLineEdit* mpReferenceHeight_m = nullptr;
 	QComboBox* mpLensFocalDistance = nullptr;
 	QLineEdit* mpMeasurementTime_sec = nullptr;

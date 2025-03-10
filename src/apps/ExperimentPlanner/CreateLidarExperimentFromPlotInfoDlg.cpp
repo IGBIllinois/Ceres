@@ -4,6 +4,7 @@
 #include "Constants.hpp"
 
 #include "ExperimentSteps.hpp"
+#include "ExperimentSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -403,6 +404,14 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
 	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
 
+	double minIntegrationTime_sec = mpMinIntegrationTime_sec->text().toDouble();
+	double maxIntegrationTime_sec = mpMaxIntegrationTime_sec->text().toDouble();
+
+	if (maxIntegrationTime_sec < minIntegrationTime_sec)
+		std::swap(minIntegrationTime_sec, maxIntegrationTime_sec);
+
+	int errorThreshold_mm = mpErrorThreshold_mm->text().toInt();
+
 	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
 	pInfo->setExperimentName(title);
@@ -453,6 +462,14 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 			delay->setWaitTime_sec(delay_sec);
 			pInfo->appendStep(std::move(delay));
 		}
+
+		// Collect a reference point measurement
+		std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+		reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+		reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+		reference->setErrorThreshold_mm(errorThreshold_mm);
+		pInfo->appendStep(std::move(reference));
 
 		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 
@@ -521,6 +538,14 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 			delay->setWaitTime_sec(delay_sec);
 			pInfo->appendStep(std::move(delay));
 		}
+
+		// Collect a reference point measurement
+		std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+		reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+		reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+		reference->setErrorThreshold_mm(errorThreshold_mm);
+		pInfo->appendStep(std::move(reference));
 
 		if (std::abs(dx_mm) < 500)
 		{

@@ -5,6 +5,7 @@
 
 #include "ExperimentSteps.hpp"
 #include "ExperimentSteps_HySpex.hpp"
+#include "ExperimentSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -415,12 +416,19 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 		break;
 	}
 
-
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int safe_z_mm = static_cast<int>(mpSafeHeight_m->text().toDouble() * nConstants::M_TO_MM);
 
 	int scan_z_offset_mm = static_cast<int>(mpHeightOffset->text().toDouble() * nConstants::M_TO_MM);
 	scan_z_offset_mm += mpLensFocalDistance->currentData().toInt();
+
+	double minIntegrationTime_sec = mpMinIntegrationTime_sec->text().toDouble();
+	double maxIntegrationTime_sec = mpMaxIntegrationTime_sec->text().toDouble();
+
+	if (maxIntegrationTime_sec < minIntegrationTime_sec)
+		std::swap(minIntegrationTime_sec, maxIntegrationTime_sec);
+
+	int errorThreshold_mm = mpErrorThreshold_mm->text().toInt();
 
 	std::optional<double> tilt_deg;
 	std::optional<double> safe_tilt_deg;
@@ -561,6 +569,14 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 			delay->setWaitTime_sec(delay_sec);
 			pInfo->appendStep(std::move(delay));
 		}
+
+		// Collect a reference point measurement
+		std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+		reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+		reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+		reference->setErrorThreshold_mm(errorThreshold_mm);
+		pInfo->appendStep(std::move(reference));
 
 		for (const auto& sensor : mSensorInfo)
 		{

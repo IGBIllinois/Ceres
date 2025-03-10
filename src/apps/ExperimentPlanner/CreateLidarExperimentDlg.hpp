@@ -94,12 +94,17 @@ protected:
 
 	/* Measurement */
 	QLineEdit* mpBeginningOffset_m = nullptr;
-	QLineEdit* mpEndingOffset_m = nullptr;
-
 	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
+
+	QLineEdit* mpMinIntegrationTime_sec = nullptr;
+	QLineEdit* mpMaxIntegrationTime_sec = nullptr;
+	QLineEdit* mpErrorThreshold_mm = nullptr;
+
 	QLineEdit* mpMeasurementHeight_m = nullptr;
 	QComboBox* mpHeightReference = nullptr;
 	QLineEdit* mpMeasurementSpeed_mmps = nullptr;
+
+	QLineEdit* mpEndingOffset_m = nullptr;
 	QLineEdit* mpEndMeasurementDelay_sec = nullptr;
 
 	/* Gimble Orientation */

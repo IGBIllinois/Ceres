@@ -6,6 +6,7 @@
 
 #include "ExperimentSteps.hpp"
 #include "ExperimentSteps_HySpex.hpp"
+#include "ExperimentSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
