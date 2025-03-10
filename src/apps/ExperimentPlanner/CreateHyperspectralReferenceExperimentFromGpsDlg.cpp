@@ -239,6 +239,7 @@ bool cCreateHyperspectralReferenceExperimentFromGpsDlg::generate()
 			nStringUtils::replaceIntAtEnd(title, startNum++);
 
 		pInfo->setExperimentName(title);
+		pInfo->setExperimentType(cExperimentFile::eExperimentType::HYPERSPECTRAL);
 		pInfo->setController(copy(mCtrlInfo));
 		pInfo->setSensors(mSensorInfo);
 
