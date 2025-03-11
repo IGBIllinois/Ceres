@@ -1,6 +1,6 @@
 
 #include "AxisCommunicationsModel_F44.hpp"
-#include "AxisCommunicationsFactory.hpp"
+#include "AxisCommunicationsIDs.hpp"
 
 #include <QNetworkAccessManager>
 #include <QMessageBox>

@@ -2,6 +2,7 @@
  */
 
 #include "RgbCameraFactory.hpp"
+#include "AxisCommunications/AxisCommunicationsIDs.hpp"
 #include "AxisCommunications/AxisCommunicationsFactory.hpp"
 
 sSensorWidgets rgb::create_sensor(const std::string& sensor_id,

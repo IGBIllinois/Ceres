@@ -4,7 +4,7 @@
 #include "../../SensorFactory.hpp"
 
 
-namespace axis_communications
+namespace lucid_vision_labs
 {
 	sSensorWidgets create_sensor(const nlohmann::json& sensorInfo,
 		bool no_visualization);

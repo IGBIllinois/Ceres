@@ -1,6 +1,7 @@
 
 # Add the public header files to use the library
 set(IR_CAMERA_PUBLIC_HEADERS
+    IrCameraFactory.hpp
 )
 
 # Add the public header files to use the library
@@ -13,6 +14,7 @@ set(IR_CAMERA_SOURCE_FILES
     IrCameraView.cpp
     IrCameraModel.hpp
     IrCameraModel.cpp
+    IrCameraFactory.cpp
 )
 
 

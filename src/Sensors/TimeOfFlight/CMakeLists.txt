@@ -1,18 +1,25 @@
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(RGB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+
 # Add the public header files to use the library
 set(TOF_CAMERA_PUBLIC_HEADERS
+    TofCameraFactory.hpp
 )
 
 # Add the public header files to use the library
 set(TOF_CAMERA_SOURCE_FILES
 
 #
-# General IR Camera View-Model-Controller files
+# General Time-Of-Flight Camera View-Model-Controller files
 #
     TofCameraView.hpp
     TofCameraView.cpp
     TofCameraModel.hpp
     TofCameraModel.cpp
+    TofCameraFactory.cpp
 )
 
 
@@ -40,11 +47,12 @@ PRIVATE
 
 target_include_directories(tof_camera_static PRIVATE ${COMMON_INCLUDE_DIR})
 
-#target_include_directories(tof_camera_static PRIVATE cbdf::ir)
+#target_include_directories(tof_camera_static PRIVATE cbdf::tof)
 
 target_link_libraries(tof_camera_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(tof_camera_static PUBLIC ${Qt}::Network)
 target_link_libraries(tof_camera_static PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(tof_camera_static PUBLIC lucid_vision_labs_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
@@ -52,3 +60,8 @@ target_link_libraries(tof_camera_static PRIVATE nlohmann_json::nlohmann_json)
 set_property(TARGET tof_camera_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 set_target_properties(tof_camera_static PROPERTIES FOLDER "Sensors/TOF_Camera")
+
+
+# Add the Lucid Vision Labs time-of-flight library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/LucidVisionLabs)
+
