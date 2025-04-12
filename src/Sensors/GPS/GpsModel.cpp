@@ -5,8 +5,9 @@
 
 #include <numeric>
 
+
 cGpsModel::cGpsModel(const std::string& name, QObject* parent)
-:
+    :
     cSensorModel(name, parent)
 {
     mRefMinIntegrationTimer.time_sec(mRefMinIntegrationTime_sec);

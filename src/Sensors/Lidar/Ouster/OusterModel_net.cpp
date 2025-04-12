@@ -311,7 +311,7 @@ void cOusterModel_net::setLidarDataFormat(const ouster::lidar_data_format_2_t& f
 
     if (mSerializer)
     {
-        mSerializer.write(mDataFormat);
+        mSerializer.write(mDeviceID, mDataFormat);
     }
 }
 
@@ -484,19 +484,19 @@ void cOusterModel_net::disableDataRecording()
 
 void cOusterModel_net::writeDataHeader()
 {
-    mSerializer.write(mConfigParameters);
-    mSerializer.write(mSensorInfo);
-    mSerializer.write(mBeamIntrinsics);
-    mSerializer.write(mImuIntrinsics);
-    mSerializer.write(mLidarIntrinsics);
-    mSerializer.write(mDataFormat);
+    mSerializer.write(mDeviceID, mConfigParameters);
+    mSerializer.write(mDeviceID, mSensorInfo);
+    mSerializer.write(mDeviceID, mBeamIntrinsics);
+    mSerializer.write(mDeviceID, mImuIntrinsics);
+    mSerializer.write(mDeviceID, mLidarIntrinsics);
+    mSerializer.write(mDeviceID, mDataFormat);
 }
 
 void cOusterModel_net::onNewData(const ouster::imu_data_t& data)
 {
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(data);
+        mSerializer.write(mDeviceID, data);
     }
 
     mLastImuData = data;
@@ -512,7 +512,7 @@ void cOusterModel_net::onNewData(uint16_t frameID, const cOusterLidarData& data)
 {
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(frameID, data);
+        mSerializer.write(mDeviceID, frameID, data);
     }
 
     mLastFrameID = frameID;
@@ -568,8 +568,8 @@ void cOusterModel_net::retrieveSensorInfo()
 
     updateName(mSensorInfo.product_line);
 
-    mSerializer.setVersion(mSensorInfo.build_revision.major,
-        mSensorInfo.build_revision.minor);
+//    mSerializer.setVersion(mSensorInfo.build_revision.major,
+//        mSensorInfo.build_revision.minor);
 }
 
 bool cOusterModel_net::retrieveBeamIntrinsics()

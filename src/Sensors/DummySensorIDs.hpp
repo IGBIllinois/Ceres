@@ -2,6 +2,6 @@
 #pragma once
 
 
-static const char* dummy_id = "dummy";
+static const char* dummy_class_id = "dummy";
 
 

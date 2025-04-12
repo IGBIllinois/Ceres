@@ -17,6 +17,12 @@ public:
     ~cSsnxModel();
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: Septertino GPS
+     */
+    uint8_t device_id() const override;
+
+    /*
      * Returns a string used as a descriptor of the sensor.
      */
     const char* descriptor() const override;
@@ -57,5 +63,22 @@ protected:
     int mNumSV = 0;
 
     cSsnxSerializer mSerializer;
+
+private:
+    const uint8_t mDeviceID;
 };
+
+/**
+ * Implementation Details
+ **/
+
+inline uint8_t cSsnxModel::device_id() const
+{
+    return mDeviceID;
+}
+
+inline uint16_t cSsnxModel::data_class_id() const
+{
+    return mSerializer.classID();
+}
 

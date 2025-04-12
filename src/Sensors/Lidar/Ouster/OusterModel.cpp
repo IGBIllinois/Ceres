@@ -5,11 +5,19 @@
 
 #include <optional>
 
+
+namespace
+{
+    static uint8_t ouster_device_id = 0;
+}
+
+
 cOusterModel::cOusterModel(QObject* parent)
 :
     cLidarModel("OUSTER", parent),
     mLastFrameID(0),
-    mLidarOriginToBeamOrigin_mm(0)
+    mLidarOriginToBeamOrigin_mm(0), 
+    mDeviceID(++ouster_device_id)
 {
     mManufacturer = "OUSTER";
     mImuDataCounter = 0;

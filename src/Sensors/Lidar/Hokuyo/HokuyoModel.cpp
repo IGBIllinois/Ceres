@@ -5,12 +5,24 @@
 
 #include <optional>
 
+
+namespace
+{
+    static uint8_t hokuyo_device_id = 0;
+}
+
+
 cHokuyoModel::cHokuyoModel(QObject* parent)
 :
-    cLidarModel("Hokuyo", parent)
+    cLidarModel("Hokuyo", parent), mDeviceID(++hokuyo_device_id)
 {
     mManufacturer = "Hokuyo";
     mFrameCounter = 0;
+}
+
+uint8_t cHokuyoModel::device_id() const
+{
+    return mDeviceID;
 }
 
 const char* cHokuyoModel::descriptor() const

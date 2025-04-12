@@ -11,6 +11,13 @@ const std::size_t MAX_CAMERAS = 4;
 
 #define USE_LOG_MESSAGE
 
+
+namespace
+{
+    static uint8_t axis_comm_F44_device_id = 0;
+}
+
+
 namespace
 {
     bool operator>(const rgb::sImageSize_t& lhs, const rgb::sImageSize_t& rhs)
@@ -24,7 +31,8 @@ cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
     cAxisCommunicationsModel("Axis F44 Webcam", parent),
     mImageData(),
     mImageBuffer(&mImageData),
-    mpActiveCamera(nullptr)
+    mpActiveCamera(nullptr), 
+    mDeviceID(++axis_comm_F44_device_id)
 {
     mModel = "AXIS F44 DUAL AUDO INPUT";
 
@@ -42,6 +50,11 @@ cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
         delete camera;
         camera = nullptr;
     }
+}
+
+uint8_t cAxisCommunicationsModel_F44::device_id() const
+{
+    return mDeviceID;
 }
 
 void cAxisCommunicationsModel_F44::updateViews()
@@ -153,10 +166,10 @@ void cAxisCommunicationsModel_F44::writeDataHeader()
 {
     if (!mpActiveCamera) return;
 
-    mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
+    mSerializer.writeActiveCameraId(mDeviceID, mpActiveCamera->cameraID());
     auto size = mpActiveCamera->getImageSize();
-    mSerializer.writeImageSize(size.width, size.height);
-    mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
+    mSerializer.writeImageSize(mDeviceID, size.width, size.height);
+    mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
 
 }
 
@@ -253,11 +266,11 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.writeActiveCameraId(mpActiveCamera->cameraID());
-        mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
+        mSerializer.writeActiveCameraId(mDeviceID, mpActiveCamera->cameraID());
+        mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
 
         auto size = mpActiveCamera->getImageSize();
-        mSerializer.writeImageSize(size.width, size.height);
+        mSerializer.writeImageSize(mDeviceID, size.width, size.height);
     }
 
     emit cameraIdChanged(id);
@@ -301,7 +314,7 @@ void cAxisCommunicationsModel_F44::setActiveImageSize(rgb::sImageSize_t image_si
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         auto size = mpActiveCamera->getImageSize();
-        mSerializer.writeImageSize(size.width, size.height);
+        mSerializer.writeImageSize(mDeviceID, size.width, size.height);
     }
 
     emit imageSizeChanged(image_size.width, image_size.height);
@@ -338,7 +351,7 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.writeFramesPerSecond(mpActiveCamera->getFramesPerSeconds());
+        mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
     }
 
     emit frameRateChanged(fps);
@@ -354,7 +367,7 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
         try
         {
             axis::to_buffer(mCurrentImage, mMpegFrameBuffer);
-            mSerializer.write(mMpegFrameBuffer);
+            mSerializer.write(mDeviceID, mMpegFrameBuffer);
         }
         catch (const std::exception& e)
         {
@@ -376,7 +389,7 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
         try
         {
             axis::to_buffer(mCurrentImage, mJpegBuffer);
-            mSerializer.write(mJpegBuffer);
+            mSerializer.write(mDeviceID, mJpegBuffer);
         }
         catch (const std::exception& e)
         {

@@ -27,6 +27,12 @@ public:
     virtual ~cAxisCommunicationsModel_F44();
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: Axis Communications F44 RGB Camera
+     */
+    uint8_t device_id() const override;
+
+    /*
      * Emit all status messages to update all views
      */
     void updateViews() override;
@@ -83,5 +89,8 @@ private:
     cAxisCamera* mpActiveCamera;
 
     std::vector<cAxisCamera*> mCameras;
+
+private:
+    const uint8_t mDeviceID;
 };
 

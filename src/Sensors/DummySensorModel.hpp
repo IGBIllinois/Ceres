@@ -9,6 +9,12 @@ class cDummyModel : public cSensorModel
 public:
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: Dummy
+     */
+    uint8_t device_id() const override;
+
+    /*
      * Returns a string used as a class descriptor of the
      * type sensor.
      */
@@ -49,5 +55,8 @@ public:
 
 protected:
     void update() override;
+
+private:
+    const uint8_t mDeviceID;
 };
 

@@ -6,15 +6,26 @@
 #include <iostream>
 
 
+namespace
+{
+    static uint8_t vnir_3000N_device_id = 0;
+}
+
+
 cHySpexVNIR_3000N_Model::cHySpexVNIR_3000N_Model(QObject* parent)
 :
-    cHySpexCameraModel("VNIR-3000N", parent)
+    cHySpexCameraModel("VNIR-3000N", parent), mDeviceID(++vnir_3000N_device_id)
 {
     mModel = "VNIR-3000N";
 }
 
 cHySpexVNIR_3000N_Model::~cHySpexVNIR_3000N_Model()
 {}
+
+uint8_t cHySpexVNIR_3000N_Model::device_id() const
+{
+    return mDeviceID;
+}
 
 uint16_t cHySpexVNIR_3000N_Model::data_class_id() const
 {
@@ -50,45 +61,45 @@ void cHySpexVNIR_3000N_Model::disableDataRecording()
 
 void cHySpexVNIR_3000N_Model::writeDataHeader()
 {
-    mSerializer.writeID(mID);
-    mSerializer.writeSerialNumber(mSerialNumber);
+    mSerializer.writeID(mDeviceID, mID);
+    mSerializer.writeSerialNumber(mDeviceID, mSerialNumber);
     switch (mWavelengthRangeId)
     {
     case hyspex::WavelengthRangeId::HYSPEX_WRID_SWIR:
-        mSerializer.writeWavelengthRange_nm(1000, 2500);
+        mSerializer.writeWavelengthRange_nm(mDeviceID, 1000, 2500);
         break;
     case hyspex::WavelengthRangeId::HYSPEX_WRID_SWIRi:
-        mSerializer.writeWavelengthRange_nm(1000, 1700);
+        mSerializer.writeWavelengthRange_nm(mDeviceID, 1000, 1700);
         break;
     case hyspex::WavelengthRangeId::HYSPEX_WRID_VNIR:
-        mSerializer.writeWavelengthRange_nm(400, 1000);
+        mSerializer.writeWavelengthRange_nm(mDeviceID, 400, 1000);
         break;
     }
 
-    mSerializer.writeSpatialSize(mSpatialSize);
-    mSerializer.writeSpectralSize(mSpectralSize);
+    mSerializer.writeSpatialSize(mDeviceID, mSpatialSize);
+    mSerializer.writeSpectralSize(mDeviceID, mSpectralSize);
 
-    mSerializer.writeMaxSpatialSize(mMaxSpatialSize);
-    mSerializer.writeMaxSpectralSize(mMaxSpectralSize);
+    mSerializer.writeMaxSpatialSize(mDeviceID, mMaxSpatialSize);
+    mSerializer.writeMaxSpectralSize(mDeviceID, mMaxSpectralSize);
 
-    mSerializer.writeMaxPixelValue(mMaxPixelValue);
+    mSerializer.writeMaxPixelValue(mDeviceID, mMaxPixelValue);
 
-    mSerializer.writeAverageFrames(mAverageFrames);
-    mSerializer.writeFramePeriod_us(mFramePeriod_us);
-    mSerializer.writeIntegrationTime_us(mIntegrationTime_us);
-    mSerializer.writeAmbientTemperature_C(mAmbientTemp_C);
-    mSerializer.writeSensorTemperature_C(mSensorTemp_C);
+    mSerializer.writeAverageFrames(mDeviceID, mAverageFrames);
+    mSerializer.writeFramePeriod_us(mDeviceID, mFramePeriod_us);
+    mSerializer.writeIntegrationTime_us(mDeviceID, mIntegrationTime_us);
+    mSerializer.writeAmbientTemperature_C(mDeviceID, mAmbientTemp_C);
+    mSerializer.writeSensorTemperature_C(mDeviceID, mSensorTemp_C);
 
-    mSerializer.writeLensName(mLens);
-    mSerializer.writeLensWorkingDistance_cm(mWorkingDistance_cm);
-    mSerializer.writeLensFieldOfView_deg(mFieldOfView_deg);
+    mSerializer.writeLensName(mDeviceID, mLens);
+    mSerializer.writeLensWorkingDistance_cm(mDeviceID, mWorkingDistance_cm);
+    mSerializer.writeLensFieldOfView_deg(mDeviceID, mFieldOfView_deg);
 
-    mSerializer.writeNumOfBackgrounds(mNumBackgrounds);
+    mSerializer.writeNumOfBackgrounds(mDeviceID, mNumBackgrounds);
 
-    mSerializer.writeResponsivityMatrix(mResponsivityMatrix);
-    mSerializer.writeQuantumEfficiencyData(mQuantumEfficiencyData);
-    mSerializer.writeSpectralCalibration(mSpectralCalibrationPerBand);
-    mSerializer.writeBadPixelCorrection(mBadPixelCorrectionData);
+    mSerializer.writeResponsivityMatrix(mDeviceID, mResponsivityMatrix);
+    mSerializer.writeQuantumEfficiencyData(mDeviceID, mQuantumEfficiencyData);
+    mSerializer.writeSpectralCalibration(mDeviceID, mSpectralCalibrationPerBand);
+    mSerializer.writeBadPixelCorrection(mDeviceID, mBadPixelCorrectionData);
 }
 
 

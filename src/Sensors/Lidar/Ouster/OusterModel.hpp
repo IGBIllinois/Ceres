@@ -19,6 +19,12 @@ public:
     virtual ~cOusterModel() = default;
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: OUSTER
+     */
+    uint8_t device_id() const override;
+
+    /*
      * Returns a string used as a descriptor of the sensor.
      */
     const char* descriptor() const override;
@@ -102,5 +108,17 @@ protected:
     double mLidarOriginToBeamOrigin_mm;
     std::vector<double> mBeamAzimuthAngles_rad;
     std::vector<double> mBeamAltitudeAngles_rad;
+
+protected:
+    const uint8_t mDeviceID;
 };
+
+/**
+ * Implementation Details
+ **/
+
+inline uint8_t cOusterModel::device_id() const
+{
+    return mDeviceID;
+}
 

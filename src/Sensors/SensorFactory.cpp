@@ -15,7 +15,7 @@
 sSensorWidgets create_sensor(const std::string& sensor_id, 
     const nlohmann::json& sensorInfo, bool no_visualization)
 {
-    if (sensor_id.compare(dummy_id) == 0)
+    if (sensor_id.compare(dummy_class_id) == 0)
     {
         return dummy::create_sensor(no_visualization);
     }
@@ -57,7 +57,7 @@ sSensorWidgets create_sensor(const std::string& sensor_id,
 
 void remove_sensor(const std::string& sensor_id, sSensorWidgets widgets)
 {
-    if (sensor_id.compare(dummy_id) == 0)
+    if (sensor_id.compare(dummy_class_id) == 0)
     {
         dummy::remove_sensor(widgets);
         return;

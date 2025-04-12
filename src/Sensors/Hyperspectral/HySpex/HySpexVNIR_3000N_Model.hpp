@@ -17,6 +17,12 @@ public:
     virtual ~cHySpexVNIR_3000N_Model();
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: HySpex VNIR 3000N Hyperspectral Camera
+     */
+    uint8_t device_id() const override;
+
+    /*
      * Returns the class identifier used by the sensor's serializer
      */
     uint16_t data_class_id() const override;
@@ -36,5 +42,8 @@ signals:
 
 protected:
     cHySpexVNIR_3000N_Serializer mSerializer;
+
+private:
+    const uint8_t mDeviceID;
 };
 

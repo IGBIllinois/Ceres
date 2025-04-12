@@ -112,7 +112,7 @@ void cSsnxModel_net::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t pvt)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(pvt);
+        mSerializer.write(device_id(), pvt);
     }
 }
 
@@ -146,7 +146,7 @@ void cSsnxModel_net::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t pvt)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(pvt);
+        mSerializer.write(device_id(), pvt);
     }
     else
         calcReferencePosition();
@@ -173,7 +173,7 @@ void cSsnxModel_net::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(cov);
+        mSerializer.write(device_id(), cov);
     }
 }
 
@@ -183,7 +183,7 @@ void cSsnxModel_net::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(cov);
+        mSerializer.write(device_id(), cov);
     }
 }
 
@@ -193,7 +193,7 @@ void cSsnxModel_net::posLocal(const ssnx::gps::POS_Local_1_t pos)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(pos);
+        mSerializer.write(device_id(), pos);
     }
 }
 
@@ -203,7 +203,7 @@ void cSsnxModel_net::posProjected(const ssnx::gps::POS_Projected_1_t pos)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(pos);
+        mSerializer.write(device_id(), pos);
     }
 }
 
@@ -224,7 +224,7 @@ void cSsnxModel_net::receiverTime(const ssnx::gps::ReceiverTime_1_t pvt)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(pvt);
+        mSerializer.write(device_id(), pvt);
     }
 
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
@@ -236,7 +236,7 @@ void cSsnxModel_net::rtcmDatum(const ssnx::gps::RtcmDatum_1_t rtcm)
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
-        mSerializer.write(rtcm);
+        mSerializer.write(device_id(), rtcm);
     }
 }
 

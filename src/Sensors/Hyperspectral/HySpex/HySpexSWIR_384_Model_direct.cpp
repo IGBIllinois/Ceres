@@ -340,8 +340,8 @@ void cHySpexSWIR_384_Model_direct::update()
 
                 if (mIsRecording && mSerializer)
                 {
-                    mSerializer.writeNumOfBackgrounds(mNumBackgrounds);
-                    mSerializer.writeBackgroundMatrix(mBackgroundMatrix);
+                    mSerializer.writeNumOfBackgrounds(device_id(), mNumBackgrounds);
+                    mSerializer.writeBackgroundMatrix(device_id(), mBackgroundMatrix);
                 }
 
                 break;
@@ -409,8 +409,8 @@ void cHySpexSWIR_384_Model_direct::writeDataHeader()
     if (!mBackgroundMatrix.empty())
     {
         auto age_ms = mCamera->getBackgroundMatrixAge_ms();
-        mSerializer.writeBackgroundMatrixAge_ms(age_ms);
-        mSerializer.writeBackgroundMatrix(mBackgroundMatrix);
+        mSerializer.writeBackgroundMatrixAge_ms(device_id(), age_ms);
+        mSerializer.writeBackgroundMatrix(device_id(), mBackgroundMatrix);
     }
 }
 
@@ -750,7 +750,7 @@ void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_option
     {
         mImageData = HySpexConnect::image_data_view<unsigned short>(a_image);
 
-        mSerializer.writeImage(mImageData);
+        mSerializer.writeImage(device_id(), mImageData);
     }
 
 //    auto n = a_image.saturated.size;

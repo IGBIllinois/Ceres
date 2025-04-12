@@ -19,6 +19,12 @@ public:
     virtual ~cHokuyoModel() = default;
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: Hokuyo
+     */
+    uint8_t device_id() const override;
+
+    /*
      * Returns a string used as a descriptor of the sensor.
      */
     const char* descriptor() const override;
@@ -38,5 +44,8 @@ protected:
 
 protected:
     int mFrameCounter;
+
+protected:
+    const uint8_t mDeviceID;
 };
 

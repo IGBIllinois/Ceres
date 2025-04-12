@@ -16,6 +16,12 @@ public:
     virtual ~cHySpexSWIR_384_Model() = default;
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: HySpex SWIR 384 Hyperspectral Camera
+     */
+    uint8_t device_id() const override;
+
+    /*
      * Returns the class identifier used by the sensor's serializer
      */
     uint16_t data_class_id() const override;
@@ -35,5 +41,8 @@ signals:
 
 protected:
     cHySpexSWIR_384_Serializer mSerializer;
+
+private:
+    const uint8_t mDeviceID;
 };
 

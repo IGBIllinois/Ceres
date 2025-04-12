@@ -42,6 +42,12 @@ public:
     virtual ~cSensorModel() = default;
 
     /*
+     * Returns a device identifier used by the sensor.  The ids are
+     * only unique within a device type: GPS, LiDAR, etc.
+     */
+    virtual uint8_t device_id() const = 0;
+
+    /*
      * Returns a string used as a class descriptor of the 
      * type sensor.
      */

@@ -3,15 +3,26 @@
 #include "DummySensorIDs.hpp"
 
 
+namespace
+{
+    static uint8_t dummy_id = 0;
+}
+
+
 cDummyModel::cDummyModel(QObject* parent)
 :
-	cSensorModel("Dummy", parent)
+	cSensorModel("Dummy", parent), mDeviceID(++dummy_id)
 {
+}
+
+uint8_t cDummyModel::device_id() const
+{
+    return mDeviceID;
 }
 
 const char* cDummyModel::descriptor() const
 {
-    return dummy_id;
+    return dummy_class_id;
 }
 
 uint16_t cDummyModel::data_class_id() const
