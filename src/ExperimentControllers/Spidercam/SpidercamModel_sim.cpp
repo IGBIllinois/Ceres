@@ -1,6 +1,8 @@
 
 #include "SpidercamModel_sim.hpp"
 
+#include <thread>
+
 namespace
 {
     const uint64_t	DOLLY_CONNECTED = 0x00'00'00'00'00'00'00'01;
@@ -202,7 +204,7 @@ bool cSpidercamModel_sim::sendRequestNewPosition(double x_mm, double y_mm, doubl
 
     double d2 = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
 
-    if (d2 < (mPositionTolerance_mm* mPositionTolerance_mm))
+    if (d2 < (mPositionTolerance_mm * mPositionTolerance_mm))
     {
         return true;
     }
@@ -236,6 +238,13 @@ bool cSpidercamModel_sim::sendRequestNewPosition(double x_mm, double y_mm, doubl
 
 void cSpidercamModel_sim::update()
 {
+    if (!mTimer.elapsed())
+    {
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(10ms);
+        return;
+    }
+
     auto now = std::chrono::high_resolution_clock::now();
     auto diff = now - mLastUpdateTime;
 
@@ -452,57 +461,54 @@ void cSpidercamModel_sim::update()
         }
     }
 
-    if (mTimer.elapsed())
-    {
-        if (mBusy.HasChanged())
-            emit busyChanged(mBusy);
+    if (mBusy.HasChanged())
+        emit busyChanged(mBusy);
 
-        if (mMoving.HasChanged())
-            emit movingChanged(mMoving);
+    if (mMoving.HasChanged())
+        emit movingChanged(mMoving);
 
-        if (mObstacleLessThan2000mm.HasChanged())
-            emit obstacleDistanceChanged(2000.0f);
-        else if (mObstacleLessThan1500mm.HasChanged())
-            emit obstacleDistanceChanged(1500.0f);
-        else if (mObstacleLessThan1000mm.HasChanged())
-            emit obstacleDistanceChanged(1000.0f);
-        else if (mObstacleLessThan500mm.HasChanged())
-            emit obstacleDistanceChanged(500.0f);
+    if (mObstacleLessThan2000mm.HasChanged())
+        emit obstacleDistanceChanged(2000.0f);
+    else if (mObstacleLessThan1500mm.HasChanged())
+        emit obstacleDistanceChanged(1500.0f);
+    else if (mObstacleLessThan1000mm.HasChanged())
+        emit obstacleDistanceChanged(1000.0f);
+    else if (mObstacleLessThan500mm.HasChanged())
+        emit obstacleDistanceChanged(500.0f);
 
-        if (mInPosition.HasChanged())
-            emit inPositionStateChanged(mInPosition);
+    if (mInPosition.HasChanged())
+        emit inPositionStateChanged(mInPosition);
 
-        if (mInScriptMode.HasChanged())
-            emit inScriptMode(mInScriptMode);
+    if (mInScriptMode.HasChanged())
+        emit inScriptMode(mInScriptMode);
 
-        mCurrentPosition.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    mCurrentPosition.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
 
-        auto speed_mmps = sqrt(mVx_mmps * mVx_mmps + mVy_mmps * mVy_mmps + mVz_mmps * mVz_mmps);
+    auto speed_mmps = sqrt(mVx_mmps * mVx_mmps + mVy_mmps * mVy_mmps + mVz_mmps * mVz_mmps);
 
-        bool posChanged = (mCurrentPosition.X_mm != mX_mm) || (mCurrentPosition.Y_mm != mY_mm) 
-            || (mCurrentPosition.Z_mm != mZ_mm) || (mCurrentPosition.speed_mmps != speed_mmps);
+    bool posChanged = (mCurrentPosition.X_mm != mX_mm) || (mCurrentPosition.Y_mm != mY_mm) 
+        || (mCurrentPosition.Z_mm != mZ_mm) || (mCurrentPosition.speed_mmps != speed_mmps);
 
-        mCurrentPosition.X_mm = mX_mm;
-        mCurrentPosition.Y_mm = mY_mm;
-        mCurrentPosition.Z_mm = mZ_mm;
-        mCurrentPosition.height_mm = mZ_mm;
-        mCurrentPosition.speed_mmps = speed_mmps;
-        mCurrentPosition.pan_deg = 0;
-        mCurrentPosition.pan_speed_dps = 0;
-        mCurrentPosition.pitch_deg = 0;
-        mCurrentPosition.roll_deg = 0;
-        mCurrentPosition.roll_gimbal_deg = 0;
-        mCurrentPosition.tilt_deg = 0;
-        mCurrentPosition.tilt_speed_dps = 0;
-        mCurrentPosition.focus = 0;
-        mCurrentPosition.iris = 0;
-        mCurrentPosition.zoom = 0;
+    mCurrentPosition.X_mm = mX_mm;
+    mCurrentPosition.Y_mm = mY_mm;
+    mCurrentPosition.Z_mm = mZ_mm;
+    mCurrentPosition.height_mm = mZ_mm;
+    mCurrentPosition.speed_mmps = speed_mmps;
+    mCurrentPosition.pan_deg = 0;
+    mCurrentPosition.pan_speed_dps = 0;
+    mCurrentPosition.pitch_deg = 0;
+    mCurrentPosition.roll_deg = 0;
+    mCurrentPosition.roll_gimbal_deg = 0;
+    mCurrentPosition.tilt_deg = 0;
+    mCurrentPosition.tilt_speed_dps = 0;
+    mCurrentPosition.focus = 0;
+    mCurrentPosition.iris = 0;
+    mCurrentPosition.zoom = 0;
 
-        if (posChanged)
-            emit positionChanged(mCurrentPosition);
+    if (posChanged)
+        emit positionChanged(mCurrentPosition);
 
-        update_flags();
-    }
+    update_flags();
 
     updateExperimentStateMachine();
 }
