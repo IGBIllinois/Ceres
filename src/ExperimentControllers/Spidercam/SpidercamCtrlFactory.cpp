@@ -11,6 +11,8 @@
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
+#include <QMessageBox>
+
 
 Q_DECLARE_METATYPE(spidercam::sWorkingDimensions);
 Q_DECLARE_METATYPE(spidercam::sPosition_1_t);
@@ -33,6 +35,21 @@ sExperimentControllerWidgets spidercam::create_controller(const nlohmann::json& 
         if (use_sim)
         {
             // Message box asking if you really want to use simulation mode 
+            QMessageBox msgBox;
+            msgBox.setText("You are using the Spidercam Simulator.");
+            msgBox.setInformativeText("Are you sure you want the system in simulation mode?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Save);
+            int ret = msgBox.exec();
+
+            if (ret == QMessageBox::No)
+            {
+                use_sim = false;
+            }
+            else if (ret == QMessageBox::Cancel)
+            {
+                return sExperimentControllerWidgets();
+            }
         }
     }
 
