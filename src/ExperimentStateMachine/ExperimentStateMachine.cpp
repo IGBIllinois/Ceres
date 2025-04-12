@@ -230,7 +230,6 @@ void cExperimentStateMachine::startExperiment()
     if (mRunning)
         return;
 
-    mRunning = true;
     mActiveStateNumber = 0;
     mpActiveState = mExperimentStates[mActiveStateNumber];
     mpActiveState->initialize();
@@ -241,6 +240,11 @@ void cExperimentStateMachine::startExperiment()
     QString msg = "Running experiment: ";
     msg += QString::fromStdString(mExperimentName);
     emitStatusMessage(msg);
+
+    // Everything is setup so it is ok to update the state maching.
+    // We need to be careful as updating the state machine is in 
+    // another thread!
+    mRunning = true;
 }
 
 void cExperimentStateMachine::terminateExperiment()
@@ -256,13 +260,17 @@ void cExperimentStateMachine::terminateExperiment()
 
     recordingStateChanged(false);
 
+    // We should stop the updating of the state machine before
+    // removing the active state as the state maching is in 
+    // another thread!
+    mRunning = false;
+
     if (mpActiveState)
     {
         mpActiveState->stop();
         mpActiveState = nullptr;
     }
 
-    mRunning = false;
     mPaused = false;
     mExperimentName.clear();
 
@@ -300,7 +308,12 @@ void cExperimentStateMachine::updateExperimentStateMachine()
         mPendingDelete.clear();
     }
 
-    if (!mRunning || (!mpActiveState))
+    if (!mRunning)
+    {
+        return;
+    }
+
+    if (mpActiveState == nullptr)
     {
         mRunning = false;
         return;
