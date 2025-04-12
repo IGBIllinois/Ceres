@@ -88,7 +88,10 @@ void cPlannerDataModel::addExperimentControlModel(cExperimentControlModel* pCont
     if (pControlModel)
     {
         mThread.mpController = pControlModel;
+
+        QObject::connect(mThread.mpController, &cExperimentControlModel::experimentStatus, this, &cPlannerDataModel::experimentStatus);
         QObject::connect(mThread.mpController, &cExperimentControlModel::experimentStateChanged, this, &cPlannerDataModel::onExperimentStateChange);
+
         mThread.mpController->moveToThread(&mThread);
 
         cSpidercamModel* pScModel = dynamic_cast<cSpidercamModel*>(pControlModel);
@@ -116,6 +119,9 @@ cExperimentControlModel* cPlannerDataModel::removeExperimentControlModel()
             QObject::disconnect(pScModel, &cSpidercamModel::positionChanged, this, &cPlannerDataModel::updatePosition);
             QObject::disconnect(pScModel, &cSpidercamModel::requestDataRecordingState, this, &cPlannerDataModel::updateRecordingState);
         }
+
+        QObject::disconnect(pModel, &cExperimentControlModel::experimentStatus, this, &cPlannerDataModel::experimentStatus);
+        QObject::disconnect(pModel, &cExperimentControlModel::experimentStateChanged, this, &cPlannerDataModel::onExperimentStateChange);
     }
 
     mThread.mpController = nullptr;
@@ -333,6 +339,8 @@ void cPlannerDataModel::onExperimentStateChange(experiment::eState state)
             break;
         }
     }
+
+    emit experimentStateChanged(state);
 }
 
 void cPlannerDataModel::doExperimentCleanup()

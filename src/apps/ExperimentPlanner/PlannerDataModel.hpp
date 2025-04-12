@@ -17,7 +17,7 @@
 #include <nlohmann/json.hpp>
 
 // Forward Declarations
-class cExperimentControlModel;
+//class cExperimentControlModel;
 //class cSensorModel;
 //class cSensorPropertyPage;
 
@@ -84,6 +84,10 @@ signals:
     void limitsChanged(spidercam::sWorkingDimensions limits);
     void positionChanged(spidercam::sPosition_1_t pos);
     void recordingStateChanged(bool recording);
+
+signals:
+    void experimentStatus(QString msg);
+    void experimentStateChanged(experiment::eState state);
 
 signals:
     void experimentTerminated();
