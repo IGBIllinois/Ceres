@@ -4,6 +4,7 @@
 
 #include <QLayout>
 #include <QContextMenuEvent>
+#include <QStatusBar>
 
 
 cFieldLayoutWidget::cFieldLayoutWidget(QWidget* parent)
@@ -18,10 +19,17 @@ void cFieldLayoutWidget::initialize()
     mpScanArea = new cSpidercamScanArea(this);
     mpScanArea->hideDollyPosition();
 
+    mpExperimentStatus = new QStatusBar();
+    mpExperimentStatus->setHidden(true);
+    mpExperimentStatus->setSizeGripEnabled(false);
+    mpExperimentStatus->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    mpExperimentStatus->setStyleSheet("background-color: rgb(8, 255, 8);");
+
     auto* mainlayout = new QVBoxLayout();
     mainlayout->addSpacing(10);
     mainlayout->addWidget(mpScanArea);
     mainlayout->addSpacing(10);
+    mainlayout->addWidget(mpExperimentStatus);
 
     setLayout(mainlayout);
 }
@@ -132,6 +140,44 @@ void cFieldLayoutWidget::drawRecordingPath(int x1_mm, int y1_mm, int x2_mm, int 
     {
         mpScanArea->updateDollyPosition(x_mm, y_mm);
     }
+}
+
+void cFieldLayoutWidget::refresh()
+{
+//    if (mLayoutFilename.empty()) return;
+
+//    mpScanArea->loadLayout(mLayoutFilename);
+}
+
+void cFieldLayoutWidget::experimentStateChanging(experiment::eState state)
+{
+    using namespace experiment;
+
+    switch (state)
+    {
+    case eState::LOADED:
+        mpExperimentStatus->setHidden(false);
+        break;
+    case eState::RUNNING:
+        mpExperimentStatus->setStyleSheet("background-color: rgb(8, 255, 8);");
+        break;
+    case eState::PAUSED:
+        mpExperimentStatus->setStyleSheet("background-color: rgb(255, 191, 0);");
+        break;
+    case eState::COMPLETED:
+    case eState::TERMINATED:
+        mpExperimentStatus->clearMessage();
+        mpExperimentStatus->setHidden(true);
+        break;
+    case eState::EXP_ERROR:
+        mpExperimentStatus->setStyleSheet("background-color: rgb(235, 33, 46);");
+        break;
+    }
+}
+
+void cFieldLayoutWidget::experimentStatusUpdating(QString msg)
+{
+    mpExperimentStatus->showMessage(msg);
 }
 
 void cFieldLayoutWidget::load(const QString& layout_filename)

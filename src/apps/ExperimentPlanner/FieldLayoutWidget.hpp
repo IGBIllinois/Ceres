@@ -4,16 +4,18 @@
 #include <QWidget>
 
 #include "Spidercam/SpidercamScanArea.hpp"
+#include "ExperimentTypes.hpp"
 
 #include <spidercam/spidercam_types.hpp>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
-class QAbstractButton;
-class QPushButton;
-class QLineEdit;
-class QCheckBox;
-class QLabel;
+//class QAbstractButton;
+//class QPushButton;
+//class QLineEdit;
+//class QCheckBox;
+//class QLabel;
+class QStatusBar;
 QT_END_NAMESPACE
 
 
@@ -53,6 +55,11 @@ public slots:
 	void clearRecordingPath();
 	void drawRecordingPath(int x1_mm, int y1_mm, int x2_mm, int y2_mm);
 
+public slots:
+	void refresh();
+	void experimentStateChanging(experiment::eState state);
+	void experimentStatusUpdating(QString msg);
+
 protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;
 
@@ -61,4 +68,5 @@ private:
 
 	cSpidercamScanArea* mpScanArea = nullptr;
 
+	QStatusBar* mpExperimentStatus = nullptr;
 };
