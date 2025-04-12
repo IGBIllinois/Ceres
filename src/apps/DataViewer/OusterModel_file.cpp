@@ -15,12 +15,12 @@ void cOusterModel_file::updateViews()
 
 }
 
-void cOusterModel_file::onConfigParam(ouster::config_param_2_t data)
+void cOusterModel_file::onConfigParam(uint8_t device_id, ouster::config_param_2_t data)
 {
     mConfigParameters = data;
 }
 
-void cOusterModel_file::onSensorInfo(ouster::sensor_info_2_t data)
+void cOusterModel_file::onSensorInfo(uint8_t device_id, ouster::sensor_info_2_t data)
 {
     mSensorInfo = data;
 
@@ -43,28 +43,28 @@ void cOusterModel_file::onSensorInfo(ouster::sensor_info_2_t data)
     emit updateSensorInfo();
 }
 
-void cOusterModel_file::onTimestamp(ouster::timestamp_2_t data)
+void cOusterModel_file::onTimestamp(uint8_t device_id, ouster::timestamp_2_t data)
 {}
 
-void cOusterModel_file::onSyncPulseIn(ouster::sync_pulse_in_2_t data)
+void cOusterModel_file::onSyncPulseIn(uint8_t device_id, ouster::sync_pulse_in_2_t data)
 {}
 
-void cOusterModel_file::onSyncPulseOut(ouster::sync_pulse_out_2_t data)
+void cOusterModel_file::onSyncPulseOut(uint8_t device_id, ouster::sync_pulse_out_2_t data)
 {}
 
-void cOusterModel_file::onMultipurposeIo(ouster::multipurpose_io_2_t data)
+void cOusterModel_file::onMultipurposeIo(uint8_t device_id, ouster::multipurpose_io_2_t data)
 {}
 
-void cOusterModel_file::onNmea(ouster::nmea_2_t data)
+void cOusterModel_file::onNmea(uint8_t device_id, ouster::nmea_2_t data)
 {}
 
-void cOusterModel_file::onTimeInfo(ouster::time_info_2_t data)
+void cOusterModel_file::onTimeInfo(uint8_t device_id, ouster::time_info_2_t data)
 {
     mTimeInfo = data;
     emit updateTimeInfo();
 }
 
-void cOusterModel_file::onBeamIntrinsics(ouster::beam_intrinsics_2_t data)
+void cOusterModel_file::onBeamIntrinsics(uint8_t device_id, ouster::beam_intrinsics_2_t data)
 {
     mBeamIntrinsics = data;
 
@@ -111,7 +111,7 @@ void cOusterModel_file::onBeamIntrinsics(ouster::beam_intrinsics_2_t data)
     emit updateBeamIntrinsics();
 }
 
-void cOusterModel_file::onImuIntrinsics(ouster::imu_intrinsics_2_t data)
+void cOusterModel_file::onImuIntrinsics(uint8_t device_id, ouster::imu_intrinsics_2_t data)
 {
     mImuIntrinsics = data;
 
@@ -128,7 +128,7 @@ void cOusterModel_file::onImuIntrinsics(ouster::imu_intrinsics_2_t data)
 
 }
 
-void cOusterModel_file::onLidarIntrinsics(ouster::lidar_intrinsics_2_t data)
+void cOusterModel_file::onLidarIntrinsics(uint8_t device_id, ouster::lidar_intrinsics_2_t data)
 {
     mLidarIntrinsics = data;
 
@@ -144,7 +144,7 @@ void cOusterModel_file::onLidarIntrinsics(ouster::lidar_intrinsics_2_t data)
     emit updateLidarIntrinsics();
 }
 
-void cOusterModel_file::onLidarDataFormat(ouster::lidar_data_format_2_t data)
+void cOusterModel_file::onLidarDataFormat(uint8_t device_id, ouster::lidar_data_format_2_t data)
 {
     mDataFormat = data;
 
@@ -171,12 +171,12 @@ void cOusterModel_file::onLidarDataFormat(ouster::lidar_data_format_2_t data)
     emit updateDataFormat();
 }
 
-void cOusterModel_file::onImuData(ouster::imu_data_t data)
+void cOusterModel_file::onImuData(uint8_t device_id, ouster::imu_data_t data)
 {
     onNewData(data);
 }
 
-void cOusterModel_file::onLidarData(cOusterLidarData data)
+void cOusterModel_file::onLidarData(uint8_t device_id, cOusterLidarData data)
 {
     onNewData(data.frame_id(), data);
 }

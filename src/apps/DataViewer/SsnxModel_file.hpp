@@ -27,21 +27,21 @@ signals:
     void updateUTC(int hour, int min, int sec, int day, int month, int year);
 
 protected:
-	void onPVT_Cartesian(ssnx::gps::PVT_Cartesian_1_t data) override {};
-	void onPVT_Cartesian(ssnx::gps::PVT_Cartesian_2_t data) override;
-	void onPVT_Geodetic(ssnx::gps::PVT_Geodetic_1_t data) override;
-	void onPVT_Geodetic(ssnx::gps::PVT_Geodetic_2_t data) override;
-	void onPosCovGeodetic(ssnx::gps::PosCovGeodetic_1_t data) override {};
-	void onVelCovGeodetic(ssnx::gps::VelCovGeodetic_1_t data) override {};
-	void onDOP(ssnx::gps::DOP_1_t data) override {};
-	void onPVT_Residuals(ssnx::gps::PVT_Residuals_1_t data) override {};
-	void onRAIMStatistics(ssnx::gps::RAIMStatistics_1_t data) override {};
-	void onPOS_Local(ssnx::gps::POS_Local_1_t pos) override {};
-	void onPOS_Projected(ssnx::gps::POS_Projected_1_t data) override {};
-	void onReceiverTime(ssnx::gps::ReceiverTime_1_t data) override;
-	void onRtcmDatum(ssnx::gps::RtcmDatum_1_t data) override {};
+	void onPVT_Cartesian(uint8_t device_id, ssnx::gps::PVT_Cartesian_1_t data) override {};
+	void onPVT_Cartesian(uint8_t device_id, ssnx::gps::PVT_Cartesian_2_t data) override;
+	void onPVT_Geodetic(uint8_t device_id, ssnx::gps::PVT_Geodetic_1_t data) override;
+	void onPVT_Geodetic(uint8_t device_id, ssnx::gps::PVT_Geodetic_2_t data) override;
+	void onPosCovGeodetic(uint8_t device_id, ssnx::gps::PosCovGeodetic_1_t data) override {};
+	void onVelCovGeodetic(uint8_t device_id, ssnx::gps::VelCovGeodetic_1_t data) override {};
+	void onDOP(uint8_t device_id, ssnx::gps::DOP_1_t data) override {};
+	void onPVT_Residuals(uint8_t device_id, ssnx::gps::PVT_Residuals_1_t data) override {};
+	void onRAIMStatistics(uint8_t device_id, ssnx::gps::RAIMStatistics_1_t data) override {};
+	void onPOS_Local(uint8_t device_id, ssnx::gps::POS_Local_1_t pos) override {};
+	void onPOS_Projected(uint8_t device_id, ssnx::gps::POS_Projected_1_t data) override {};
+	void onReceiverTime(uint8_t device_id, ssnx::gps::ReceiverTime_1_t data) override;
+	void onRtcmDatum(uint8_t device_id, ssnx::gps::RtcmDatum_1_t data) override {};
 
-	void onReferencePoint(double avgLat_rad, double avgLng_rad, double avgHeight_m,
+	void onReferencePoint(uint8_t device_id, double avgLat_rad, double avgLng_rad, double avgHeight_m,
 		double stdLat_rad, double stdLng_rad, double stdHeight_m, bool heightComputed) override
 	{};
 

@@ -18,7 +18,7 @@ cSsnxModel_file::~cSsnxModel_file()
 {
 }
 
-void cSsnxModel_file::onPVT_Cartesian(ssnx::gps::PVT_Cartesian_2_t data)
+void cSsnxModel_file::onPVT_Cartesian(uint8_t device_id, ssnx::gps::PVT_Cartesian_2_t data)
 {
 	mX_m = data.X_m;
 	mY_m = data.Y_m;
@@ -29,7 +29,7 @@ void cSsnxModel_file::onPVT_Cartesian(ssnx::gps::PVT_Cartesian_2_t data)
 	mDollyGroundTrack_deg = data.GroundTrack_deg;
 }
 
-void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_1_t data)
+void cSsnxModel_file::onPVT_Geodetic(uint8_t device_id, ssnx::gps::PVT_Geodetic_1_t data)
 {
 	mTimestamp_s = data.timestamp_s;
 	mLatitude_rad = data.Lat_rad;
@@ -50,7 +50,7 @@ void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_1_t data)
 		mNorthSpeed_mps, mEastSpeed_mps, mVertSpeed_mps, mGroundTrack_deg, ::gps::to_int(mDatum), mNumOfSv, 0);
 }
 
-void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_2_t data)
+void cSsnxModel_file::onPVT_Geodetic(uint8_t device_id, ssnx::gps::PVT_Geodetic_2_t data)
 {
 	mSolutionType = static_cast<::gps::eSolutionType>(data.Mode);
 
@@ -76,7 +76,7 @@ void cSsnxModel_file::onPVT_Geodetic(ssnx::gps::PVT_Geodetic_2_t data)
 		mNorthSpeed_mps, mEastSpeed_mps, mVertSpeed_mps, mGroundTrack_deg, ::gps::to_int(mDatum), mNumOfSv, mNumOfBases);
 }
 
-void cSsnxModel_file::onReceiverTime(ssnx::gps::ReceiverTime_1_t data)
+void cSsnxModel_file::onReceiverTime(uint8_t device_id, ssnx::gps::ReceiverTime_1_t data)
 {
 	emit updateUTC(data.utcHour, data.utcMinute, data.utcSecond,
                     data.utcDay, data.utcMonth, data.utcYear);

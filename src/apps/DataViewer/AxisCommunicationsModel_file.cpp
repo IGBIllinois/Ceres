@@ -13,26 +13,26 @@ cAxisCommunicationsModel_file::cAxisCommunicationsModel_file(QObject* parent)
 cAxisCommunicationsModel_file::~cAxisCommunicationsModel_file()
 {}
 
-void cAxisCommunicationsModel_file::onActiveCameraId(int id)
+void cAxisCommunicationsModel_file::onActiveCameraId(uint8_t device_id, int id)
 {
     mCameraId = id;
     emit updateActiveCameraId(mCameraId);
 
 }
 
-void cAxisCommunicationsModel_file::onFramesPerSecond(int frames_per_sec)
+void cAxisCommunicationsModel_file::onFramesPerSecond(uint8_t device_id, int frames_per_sec)
 {
     mFramesPerSec = frames_per_sec;
     emit updateFramesRate(mFramesPerSec);
 }
 
-void cAxisCommunicationsModel_file::onBitmap(const cBitmapBuffer& buffer)
+void cAxisCommunicationsModel_file::onBitmap(uint8_t device_id, const cBitmapBuffer& buffer)
 {}
 
-void cAxisCommunicationsModel_file::onJPEG(const cJpegBuffer& buffer)
+void cAxisCommunicationsModel_file::onJPEG(uint8_t device_id, const cJpegBuffer& buffer)
 {}
 
-void cAxisCommunicationsModel_file::onMpegFrame(const cMpegFrameBuffer& buffer)
+void cAxisCommunicationsModel_file::onMpegFrame(uint8_t device_id, const cMpegFrameBuffer& buffer)
 {
     try
     {
@@ -51,7 +51,7 @@ void cAxisCommunicationsModel_file::onMpegFrame(const cMpegFrameBuffer& buffer)
     ++numImages;
 }
 
-void cAxisCommunicationsModel_file::onImageSize(int width, int height)
+void cAxisCommunicationsModel_file::onImageSize(uint8_t device_id, int width, int height)
 {
     mImageWidth = width;
     mImageHeight = height;
