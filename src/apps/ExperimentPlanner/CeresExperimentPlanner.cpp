@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QCoreApplication::setOrganizationName("University of Illinois");
     QCoreApplication::setOrganizationDomain("rapp.ripe.illinois.edu");
-    QCoreApplication::setApplicationName("Ceres");
+    QCoreApplication::setApplicationName("Ceres Experiment Planner");
 
     QApplication app(argc, argv);
 
