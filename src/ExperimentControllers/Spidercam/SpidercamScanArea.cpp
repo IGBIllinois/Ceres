@@ -219,7 +219,8 @@ void cSpidercamScanArea::updateDollyPosition(uint32_t x, uint32_t y)
 			mIsRecording.reset();
 		}
 
-		mpActivePath->push_back({x,y});
+		if (mpActivePath)
+			mpActivePath->push_back({x,y});
 	}
 
 	repaint();
@@ -536,8 +537,6 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-//	painter.setPen(QPen(mBorderColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-
 	QFont font = painter.font();
 	QFontMetrics metrics(font);
 	auto w1Bounds = metrics.tightBoundingRect("W1X");
@@ -780,9 +779,6 @@ void cSpidercamScanArea::drawLayout(QPainter& painter, double height, experiment
 		}
 	}
 
-//	textLowerLeftCorner.setX(textCenter.x() - (textBounds.width() / 2) * abs(sin_orientation));
-//	textLowerLeftCorner.setY(textCenter.y() - (textBounds.height() / 2) * abs(cos_orientation));
-
 	textPoint = textLeftCenter + textOffset;
 
 	if (layout.caption.orientation_deg != 0.0f)
@@ -814,7 +810,6 @@ void cSpidercamScanArea::drawDollyMarker(QPainter& painter, double height,
 
 	painter.setBrush(brush);
 	painter.drawEllipse(center, mDollyMarkerRadius, mDollyMarkerRadius);
-
 }
 
 void cSpidercamScanArea::drawPath(QPainter& painter, double height)

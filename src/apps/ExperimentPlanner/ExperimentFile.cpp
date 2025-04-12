@@ -185,9 +185,13 @@ void cExperimentFile::open(const std::string& file_name)
 		mExperimentType = eExperimentType::UNKNOWN;
 	
 	if (configDoc.contains("layout name"))
+	{
 		mLayoutName = configDoc["layout name"];
-	else
+	}
+	else if (configDoc.contains("layout_name"))
+	{
 		mLayoutName = configDoc["layout_name"];
+	}
 
 	mMetaInfo.load(configDoc);
 

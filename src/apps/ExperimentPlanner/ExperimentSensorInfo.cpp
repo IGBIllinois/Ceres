@@ -52,7 +52,7 @@ cExperimentSensorInfo_Dummy::cExperimentSensorInfo_Dummy()
 cExperimentSensorInfo_Dummy::~cExperimentSensorInfo_Dummy()
 {}
 
-const char* cExperimentSensorInfo_Dummy::type() { return dummy_id; }
+const char* cExperimentSensorInfo_Dummy::type() { return dummy_class_id; }
 std::string cExperimentSensorInfo_Dummy::getType() const { return type(); }
 QString		cExperimentSensorInfo_Dummy::getName() const { return "Dummy"; }
 

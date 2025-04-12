@@ -1311,9 +1311,21 @@ void cMainWindow::onConnectToSpidercam()
         }
     }
 
-    std::string name = configDoc["controller"];
+    std::string name;
+    nlohmann::json ctrlDoc;
 
-    auto widgets = create_experiment_controller(name, true);
+    if (configDoc["controller"].is_object())
+    {
+        ctrlDoc = configDoc["controller"];
+
+        name = ctrlDoc["type"];
+    }
+    else
+    {
+        name = configDoc["controller"];
+    }
+
+    auto widgets = create_experiment_controller(name, ctrlDoc, true);
 
     cExperimentControlModel* pCtrlModel = widgets.pModel;
 
@@ -1335,6 +1347,8 @@ void cMainWindow::onConnectToSpidercam()
     QObject::connect(mpModel, &cPlannerDataModel::limitsChanged, mpFieldLayout, &cFieldLayoutWidget::updateLimits);
     QObject::connect(mpModel, &cPlannerDataModel::positionChanged, mpFieldLayout, &cFieldLayoutWidget::updatePosition);
     QObject::connect(mpModel, &cPlannerDataModel::recordingStateChanged, mpFieldLayout, &cFieldLayoutWidget::updateRecordingState);
+    QObject::connect(mpModel, &cPlannerDataModel::experimentStatus, mpFieldLayout, &cFieldLayoutWidget::experimentStatusUpdating);
+    QObject::connect(mpModel, &cPlannerDataModel::experimentStateChanged, mpFieldLayout, &cFieldLayoutWidget::experimentStateChanging);
 
     QObject::connect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
     QObject::connect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
@@ -1398,6 +1412,8 @@ void cMainWindow::onDisconnectFromSpidercam()
     QObject::disconnect(mpModel, &cPlannerDataModel::limitsChanged, mpFieldLayout, &cFieldLayoutWidget::updateLimits);
     QObject::disconnect(mpModel, &cPlannerDataModel::positionChanged, mpFieldLayout, &cFieldLayoutWidget::updatePosition);
     QObject::disconnect(mpModel, &cPlannerDataModel::recordingStateChanged, mpFieldLayout, &cFieldLayoutWidget::updateRecordingState);
+    QObject::disconnect(mpModel, &cPlannerDataModel::experimentStatus, mpFieldLayout, &cFieldLayoutWidget::experimentStatusUpdating);
+    QObject::disconnect(mpModel, &cPlannerDataModel::experimentStateChanged, mpFieldLayout, &cFieldLayoutWidget::experimentStateChanging);
 
     QObject::disconnect(mpModel, &cPlannerDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
     QObject::disconnect(mpModel, &cPlannerDataModel::infoMessage, this, &cMainWindow::onInfoMessage);

@@ -1,0 +1,64 @@
+{
+	"head": 
+	{
+		"transaction": 0,
+		"signature": 16630,
+		"environment":  
+		{
+			"station_name":  "4597",
+			"table_name":  "Spidercam",
+			"model":  "CR1000X",
+			"serial_no":  "4597",
+			"os_version":  "CR1000X.Std.02.00",
+			"prog_name":  "CPU:SpidercamWeather_Soil_NOSLO_Quantum_HMP60.CR1X"
+		},
+		"fields":  [
+			{
+				"name":  "WS_ms",
+				"type":  "xsd:float",
+				"units":  "m/s",
+				"process":  "Smp",
+				"settable":  false
+			},
+			{
+				"name":  "WindDir",
+				"type":  "xsd:float",
+				"units":  "degrees",
+				"process":  "Smp",
+				"settable":  false
+			},
+			{
+				"name":  "Invalid_Wind",
+				"type":  "xsd:float",
+				"process":  "Smp",
+				"settable":  false
+			},
+			{
+				"name":  "Temp_2M",
+				"type":  "xsd:float",
+				"process":  "Smp",
+				"settable":  false
+			},
+			{
+				"name":  "RH_2M",
+				"type":  "xsd:float",
+				"process":  "Smp",
+				"settable":  false
+			},
+			{
+				"name":  "PAR",
+				"type":  "xsd:float",
+				"units":  "umol/s/m^2",
+				"process":  "Smp",
+				"settable":  false
+			}
+		]
+	},
+	"data": [
+		{
+			"time":  "2023-08-02T15:10:30",
+			"no":  14,
+			"vals": [2.17,172.5,0,25.06,69.25,691.7]
+		}
+	]
+}
