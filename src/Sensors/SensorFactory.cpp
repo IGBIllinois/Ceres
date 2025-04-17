@@ -7,6 +7,7 @@
 #include "GPS/GpsFactory.hpp"
 #include "Weather/WeatherDataIDs.hpp"
 #include "Weather/WeatherDataFactory.hpp"
+#include "IR/IrCameraFactory.hpp"
 #include "Hyperspectral/HyperspectralFactory.hpp"
 #include "RGB/RgbCameraFactory.hpp"
 #include "TimeOfFlight/TofCameraFactory.hpp"
@@ -47,6 +48,11 @@ sSensorWidgets create_sensor(const std::string& sensor_id,
     if (result)
         return result;
 
+    result = ir::create_sensor(sensor_id, sensorInfo, no_visualization);
+
+    if (result)
+        return result;
+
     result = tof::create_sensor(sensor_id, sensorInfo, no_visualization);
 
     if (result)
@@ -81,6 +87,9 @@ void remove_sensor(const std::string& sensor_id, sSensorWidgets widgets)
     if (rgb::remove_sensor(sensor_id, widgets))
         return;
 
+    if (ir::remove_sensor(sensor_id, widgets))
+        return;
+
     if (tof::remove_sensor(sensor_id, widgets))
         return;
 }
@@ -102,6 +111,9 @@ cSensorPropertyPage* create_sensor_property_page(
     if (result) return result;
 
     result = hyperspectral::create_sensor_property_page(sensor_id, model, version, remote_ip_address, port, local_ip_address);
+    if (result) return result;
+
+    result = ir::create_sensor_property_page(sensor_id, model, version, remote_ip_address, port, local_ip_address);
     if (result) return result;
 
     result = tof::create_sensor_property_page(sensor_id, model, version, remote_ip_address, port, local_ip_address);

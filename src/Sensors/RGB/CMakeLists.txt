@@ -22,7 +22,7 @@ set(RGB_CAMERA_SOURCE_FILES
     RgbCameraView.cpp
     RgbCameraModel.hpp
     RgbCameraModel.cpp
-	RgbCameraFactory.cpp
+    RgbCameraFactory.cpp
 )
 
 

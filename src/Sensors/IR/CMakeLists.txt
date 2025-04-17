@@ -47,6 +47,7 @@ target_include_directories(ir_camera_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_link_libraries(ir_camera_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(ir_camera_static PUBLIC ${Qt}::Network)
 target_link_libraries(ir_camera_static PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(ir_camera_static PUBLIC teledyne_flir_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
@@ -54,3 +55,7 @@ target_link_libraries(ir_camera_static PRIVATE nlohmann_json::nlohmann_json)
 set_property(TARGET ir_camera_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 set_target_properties(ir_camera_static PROPERTIES FOLDER "Sensors/IR_Camera")
+
+
+# Add the Teledyne FLIR thermal camera library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/TeledyneFLIR)
