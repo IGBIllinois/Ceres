@@ -1,0 +1,14 @@
+
+// We are using Protobuf syntax version three.
+
+syntax = "proto3";
+
+// Google protobuf does not support namespaces.  To avoid linker name conficts 
+// all messages must start with "namespace" name
+
+
+/******************************************************************************
+ * Property Page <-> Sensor Controller
+ *****************************************************************************/
+
+
