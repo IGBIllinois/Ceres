@@ -1,10 +1,10 @@
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#source_group("Resources" FILES teledyne_flir_properties.proto)
+source_group("Resources" FILES teledyne_flir_properties.proto)
 
 # Generate the header/source files needed from the protobuf
-#protobuf_generate_cpp(TELEDYNE_FLIR_PROTO_SRCS TELEDYNE_FLIR_PROTO_HDRS DESCRIPTORS PROTO_DESCS teledyne_flir_properties.proto)
+protobuf_generate_cpp(TELEDYNE_FLIR_PROTO_SRCS TELEDYNE_FLIR_PROTO_HDRS DESCRIPTORS PROTO_DESCS teledyne_flir_properties.proto)
 
 # Add the public header files to use the library
 set(TELEDYNE_FLIR_PUBLIC_HEADERS
@@ -29,6 +29,12 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 #
 # Teledyne FLIR Video Cameras
 #
+	TeledyneFlirCameraView.hpp
+	TeledyneFlirCameraView.cpp
+#	TeledyneFlirStatusView.hpp
+#	TeledyneFlirStatusView.cpp
+	TeledyneFlirCameraModel.hpp
+	TeledyneFlirCameraModel.cpp
 	TeledyneFlirFactory.cpp
 )
 
@@ -66,11 +72,11 @@ PRIVATE
 )
 
 target_include_directories(teledyne_flir_static PRIVATE ${COMMON_INCLUDE_DIR})
-target_include_directories(teledyne_flir_static PRIVATE ${RGB_INCLUDE_DIR})
+target_include_directories(teledyne_flir_static PRIVATE ${IR_INCLUDE_DIR})
 target_include_directories(teledyne_flir_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(teledyne_flir_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
-#target_link_libraries(teledyne_flir_static PRIVATE cbdf::rgb)
+target_link_libraries(teledyne_flir_static PRIVATE cbdf::ir)
 
 target_link_libraries(teledyne_flir_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(teledyne_flir_static PUBLIC ${Qt}::Network)

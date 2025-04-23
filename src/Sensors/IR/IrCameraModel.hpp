@@ -4,7 +4,7 @@
 #include "../SensorModel.hpp"
 
 
-class cIrCameralModel : public cSensorModel
+class cIrCameraModel : public cSensorModel
 {
 public:
 
@@ -21,8 +21,8 @@ public:
     const char* sensorClass() const override { return "ir"; };
 
 protected:
-    cIrCameralModel(const std::string& name, QObject* parent = nullptr);
-    virtual ~cIrCameralModel() = default;
+    cIrCameraModel(const std::string& name, QObject* parent = nullptr);
+    virtual ~cIrCameraModel() = default;
 
 private:
     const uint8_t mDeviceID;

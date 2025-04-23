@@ -1,4 +1,8 @@
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(IR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Add the public header files to use the library
 set(IR_CAMERA_PUBLIC_HEADERS
     IrCameraFactory.hpp

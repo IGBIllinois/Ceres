@@ -8,13 +8,13 @@ namespace
 }
 
 
-cIrCameralModel::cIrCameralModel(const std::string& name, QObject* parent)
+cIrCameraModel::cIrCameraModel(const std::string& name, QObject* parent)
 :
 	cSensorModel(name, parent), mDeviceID(++ir_camera_id)
 {
 }
 
-uint8_t cIrCameralModel::device_id() const
+uint8_t cIrCameraModel::device_id() const
 {
 	return mDeviceID;
 }
