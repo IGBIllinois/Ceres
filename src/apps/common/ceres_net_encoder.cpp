@@ -37,12 +37,21 @@ void cCeresNetEncoder::encodeExperimentInfo(const std::string& title, const std:
     }
 }
 
-void cCeresNetEncoder::encodeTitle(const std::string& title)
+void cCeresNetEncoder::encodeExperimentTitle(const std::string& title)
 {
     if (encode_experiment_title(title, mBuffer) < 0)
     {
         sendData();
         encode_experiment_title(title, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeMeasurementTitle(const std::string& title)
+{
+    if (encode_measurement_title(title, mBuffer) < 0)
+    {
+        sendData();
+        encode_measurement_title(title, mBuffer);
     }
 }
 

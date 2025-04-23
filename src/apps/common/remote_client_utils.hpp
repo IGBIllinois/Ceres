@@ -66,6 +66,7 @@ enum class ePacketType : uint16_t
 	CULTIVAR,
 	EXPERIMENT_TYPE,
 	EXPERIMENT_TYPE_REPLY,
+	MEASUREMENT_TITLE,
 
 	SPIDER_CAM_DATA = 1000,
 
@@ -103,6 +104,9 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
 
 std::string to_experiment_title_1(const ExperimentTitle_1& pckt);
 int encode_experiment_title(const std::string& title, net_buffer& buffer);
+
+std::string to_measurement_title_1(const MeasurementTitle_1& pckt);
+int encode_measurement_title(const std::string& title, net_buffer& buffer);
 
 std::string to_experiment_document_1(const ExperimentDocument_1& pckt);
 int encode_experiment_document(const std::string& doc, net_buffer& buffer);

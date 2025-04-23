@@ -172,6 +172,37 @@ int encode_experiment_title(const std::string& title, net_buffer& buffer)
     return pckt_size;
 }
 
+std::string to_measurement_title_1(const MeasurementTitle_1& pckt)
+{
+    return pckt.title();
+}
+
+int encode_measurement_title(const std::string& title, net_buffer& buffer)
+{
+    ExperimentTitle_1 pckt;
+
+    pckt.set_title(title);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::MEASUREMENT_TITLE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
 std::string to_experiment_document_1(const ExperimentDocument_1& pckt)
 {
     return pckt.document();

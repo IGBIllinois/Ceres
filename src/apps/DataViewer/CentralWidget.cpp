@@ -341,9 +341,14 @@ void cCentralWidget::onEndOfFooter()
     mFooterComplete = true;
 }
 
-void cCentralWidget::onTitle(const std::string& title)
+void cCentralWidget::onExperimentTitle(const std::string& title)
 {
     mpTitle->setText(QString::fromStdString(title));
+}
+
+void cCentralWidget::onMeasurementTitle(const std::string& title)
+{
+//    mpTitle->setText(QString::fromStdString(title));
 }
 
 void cCentralWidget::onSpecies(const std::string& species)

@@ -60,7 +60,8 @@ private:
     void onBeginFooter() override;
     void onEndOfFooter() override;
 
-    void onTitle(const std::string& title) override;
+    void onExperimentTitle(const std::string& title) override;
+    void onMeasurementTitle(const std::string& title) override;
     void onSpecies(const std::string& species) override;
     void onCultivar(const std::string& cultivar) override;
     void onPrincipalInvestigator(const std::string& investigator) override;

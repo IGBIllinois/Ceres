@@ -210,6 +210,7 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
 
         if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
         {
+            mMeasurementTitle.clear();
             mPrincipalInvestigator.clear();
             mResearchers.clear();
             mSpecies.clear();
@@ -227,6 +228,11 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
                 mExperimentTitle = static_cast<std::string>(expDoc["experiment name"]);
             else
                 mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
+
+            if (expDoc.contains("measurement name"))
+                mMeasurementTitle = static_cast<std::string>(expDoc["measurement name"]);
+            else if (expDoc.contains("measurement_name"))
+                mMeasurementTitle = static_cast<std::string>(expDoc["measurement_name"]);
 
             if (expDoc.contains("principal investigator"))
             {
@@ -476,6 +482,7 @@ void cCtrlDataModel::doExperimentCleanup()
     closeDataFile();
 
     mExperimentTitle.clear();
+    mMeasurementTitle.clear();
     mExperimentDoc.clear();
 	
     if (mThread.mpController)

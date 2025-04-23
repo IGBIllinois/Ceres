@@ -233,7 +233,10 @@ void cCtrlDataModelLocal::startExperiment()
     if (isDataFileOpen())
     {
         mSerializer.writeBeginHeader();
-        mSerializer.writeTitle(mExperimentTitle);
+        mSerializer.writeExperimentTitle(mExperimentTitle);
+
+        if (!mMeasurementTitle.empty())
+            mSerializer.writeMeasurementTitle(mMeasurementTitle);
 
         if (!mPrincipalInvestigator.empty())
             mSerializer.writePrincipalInvestigator(mPrincipalInvestigator);

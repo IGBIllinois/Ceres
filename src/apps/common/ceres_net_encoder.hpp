@@ -38,7 +38,8 @@ public:
     void encodeExperimentInfo(const std::string& title, const std::string& researcher,
         const std::string& species, const std::string& cultivar, const std::string& doc);
 
-    void encodeTitle(const std::string& title);
+    void encodeExperimentTitle(const std::string& title);
+    void encodeMeasurementTitle(const std::string& title);
     void encodeDocument(const std::string& doc);
     void encodeSpecies(const std::string& species);
     void encodeCultivar(const std::string& cultivar);

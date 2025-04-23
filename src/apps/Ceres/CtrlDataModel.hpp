@@ -91,6 +91,7 @@ protected:
 
 protected:
     std::string  mExperimentTitle;
+    std::string  mMeasurementTitle;
     std::string  mPrincipalInvestigator;
     std::vector<std::string> mResearchers;
     std::string  mSpecies;

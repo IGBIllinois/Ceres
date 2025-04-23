@@ -228,6 +228,14 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onParData(data);
         break;
     }
+    case ePacketType::MEASUREMENT_TITLE:
+    {
+        MeasurementTitle_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        onMeasurementTitle(to_measurement_title_1(packet));
+        break;
+    }
+
     case ePacketType::EXPERIMENT_INFO_REPLY:
     case ePacketType::DATA_RECORDING_STATE:
     {

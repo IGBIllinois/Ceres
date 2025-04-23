@@ -33,6 +33,7 @@ protected:
         const std::string& cultivar, const std::string& doc) = 0;
 
     virtual void onExperimentTitle(const std::string& title) = 0;
+    virtual void onMeasurementTitle(const std::string& title) = 0;
     virtual void onExperimentDocument(const std::string& doc) = 0;
 
     virtual void onPrincipalInvestigator(const std::string& pi) = 0;

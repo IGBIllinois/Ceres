@@ -102,6 +102,7 @@ private slots:
         const std::string& species, const std::string& cultivar, const std::string& doc) override;
 
     void onExperimentTitle(const std::string& title) override;
+    void onMeasurementTitle(const std::string& title) override;
     void onExperimentDocument(const std::string& doc) override;
 
     void onPrincipalInvestigator(const std::string& pi) override;
@@ -179,6 +180,7 @@ protected:
 private:
     // Experiment Info
     std::string  mExperimentTitle;
+    std::string  mMeasurementTitle;
     std::string  mPrincipalInvestigator;
     std::vector<std::string> mResearchers;
     std::string  mSpecies;

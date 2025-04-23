@@ -395,7 +395,10 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
         }
 */
 
-        encodeTitle(mExperimentTitle);
+        encodeExperimentTitle(mExperimentTitle);
+
+        if (!mMeasurementTitle.empty())
+            encodeMeasurementTitle(mMeasurementTitle);
 
         if (!mPrincipalInvestigator.empty())
             encodePrincipalInvestigator(mPrincipalInvestigator);

@@ -32,6 +32,7 @@ cExperimentFile& cExperimentFile::operator=(const cExperimentFile& rhs)
 	mDirty = rhs.mDirty;
 
 	mExperimentName = rhs.mExperimentName;
+	mMeasurementName = rhs.mMeasurementName;
 	mLayoutName = mLayoutName;
 
 	mMetaInfo = rhs.mMetaInfo;
@@ -64,6 +65,17 @@ void cExperimentFile::setExperimentName(const std::string& name)
 {
 	mDirty = mExperimentName != name;
 	mExperimentName = name;
+}
+
+const std::string& cExperimentFile::getMeasurementName() const
+{
+	return mMeasurementName;
+}
+
+void cExperimentFile::setMeasurementName(const std::string& name)
+{
+	mDirty = mMeasurementName != name;
+	mMeasurementName = name;
 }
 
 const cExperimentFile::eExperimentType cExperimentFile::getExperimentType() const
@@ -116,6 +128,7 @@ void cExperimentFile::clear()
 	mFileName.clear();
 	mLayoutName.clear();
 	mExperimentName.clear();
+	mMeasurementName.clear();
 
 	mExperimentType = eExperimentType::UNKNOWN;
 
@@ -183,7 +196,16 @@ void cExperimentFile::open(const std::string& file_name)
 	}
 	else
 		mExperimentType = eExperimentType::UNKNOWN;
-	
+
+	if (configDoc.contains("measurement name"))
+	{
+		mMeasurementName = configDoc["measurement name"];
+	}
+	else if (configDoc.contains("measurement_name"))
+	{
+		mMeasurementName = configDoc["measurement_name"];
+	}
+
 	if (configDoc.contains("layout name"))
 	{
 		mLayoutName = configDoc["layout name"];
@@ -300,6 +322,9 @@ void cExperimentFile::buildDocument(nlohmann::json& configDoc)
 			break;
 		}
 	}
+
+	if (!mMeasurementName.empty())
+		configDoc["measurement_name"] = mMeasurementName;
 
 	if (!mLayoutName.empty())
 		configDoc["layout_name"] = mLayoutName;

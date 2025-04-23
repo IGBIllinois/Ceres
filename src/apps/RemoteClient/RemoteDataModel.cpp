@@ -344,7 +344,7 @@ void cRemoteDataModel::onStartExperiment()
     emit localLogMessage(logSTATUS, "Remote Client", msg);
 
     mSerializer.writeBeginHeader();
-    mSerializer.writeTitle(mExperimentTitle);
+    mSerializer.writeExperimentTitle(mExperimentTitle);
 
     if (!mResearchers.empty())
     {
@@ -529,6 +529,11 @@ void cRemoteDataModel::onExperimentTitle(const std::string& title)
     QString msg = "Experiment Info: ";
     msg += QString::fromStdString(mExperimentTitle);
     emit localLogMessage(logSTATUS, "Remote Client", msg);
+}
+
+void cRemoteDataModel::onMeasurementTitle(const std::string& title)
+{
+    mMeasurementTitle = title;
 }
 
 void cRemoteDataModel::onExperimentDocument(const std::string& doc)

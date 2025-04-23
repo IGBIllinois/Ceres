@@ -53,6 +53,11 @@ message ExperimentTitle_1
 	string title = 1;
 }
 
+message MeasurementTitle_1 
+{
+	string title = 1;
+}
+
 message ExperimentDocument_1 
 {
 	string document = 1;

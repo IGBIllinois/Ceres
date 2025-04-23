@@ -186,7 +186,7 @@ find_package(Spinnaker REQUIRED)
 
 find_package(nlohmann_json REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb weather)
+find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb ir weather)
 
 # Find package VTK
 find_package(VTK 9.0 REQUIRED COMPONENTS GUISupportQt IOLegacy)
