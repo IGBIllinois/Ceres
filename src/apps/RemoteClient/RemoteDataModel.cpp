@@ -186,7 +186,7 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
         return;
     }
 
-    if (fileName.empty() && mExperimentTitle.empty())
+    if (fileName.empty() && mMeasurementTitle.empty() && mExperimentTitle.empty())
     {
         sendDataFileState(false);
         return;
@@ -195,7 +195,12 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
     std::string qualifiedFileName = fileName;
     if (qualifiedFileName.empty())
     {
-        qualifiedFileName = mExperimentTitle;
+        qualifiedFileName = mMeasurementTitle;
+
+        if (qualifiedFileName.empty())
+        {
+            qualifiedFileName = mExperimentTitle;
+        }
     }
 
     auto ext = qualifiedFileName.find_last_of('.');
@@ -346,6 +351,9 @@ void cRemoteDataModel::onStartExperiment()
     mSerializer.writeBeginHeader();
     mSerializer.writeExperimentTitle(mExperimentTitle);
 
+    if (!mMeasurementTitle.empty())
+        mSerializer.writeMeasurementTitle(mMeasurementTitle);
+
     if (!mResearchers.empty())
     {
         if (mResearchers.size() == 1)
@@ -486,6 +494,9 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
 {
     mExperimentTitle = title;
 
+    if (mMeasurementTitle.empty())
+        mMeasurementTitle = title;
+
     if (!researcher.empty())
         mResearchers.push_back(researcher);
 
@@ -506,6 +517,9 @@ void cRemoteDataModel::onExperimentInfo(const std::string& title,
     const std::string& cultivar, const std::string& doc)
 {
     mExperimentTitle = title;
+
+    if (mMeasurementTitle.empty())
+        mMeasurementTitle = title;
 
     if (!researcher.empty())
         mResearchers.push_back(researcher);

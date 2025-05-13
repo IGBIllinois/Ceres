@@ -280,9 +280,12 @@ bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::s
     tm* ltm = localtime(&t);
 
     std::string filename;
-    std::string experiment_title = mExperimentTitle;
+    std::string measurement_title = mMeasurementTitle;
 
-    std::replace_if(experiment_title.begin(), experiment_title.end(),
+    if (measurement_title.empty())
+        measurement_title = mExperimentTitle;
+
+    std::replace_if(measurement_title.begin(), measurement_title.end(),
         [](std::string::value_type c)
         {
             if (c == '/') return true;
@@ -313,7 +316,7 @@ bool cCtrlDataModelRemote::openDataFile(const QString& defaultPath, const std::s
     }
     filename += std::to_string(ltm->tm_mday);
     filename += "/";
-    filename += experiment_title;
+    filename += measurement_title;
 
     // We are going to try an open a data file on the remote computer
     // three times.
