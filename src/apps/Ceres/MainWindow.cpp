@@ -888,7 +888,14 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         bool validSensor = false;
         try
         {
-            validSensor = widgets.pModel->configure(configDoc[type]);
+            std::string entry = type;
+            if (sensor.contains("instance"))
+            {
+                entry += ":";
+                entry += sensor["instance"];
+            }
+
+            validSensor = widgets.pModel->configure(configDoc[entry]);
         }
         catch (const std::exception& e)
         {

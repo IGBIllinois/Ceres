@@ -514,12 +514,19 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
             widgets.pModel->updateViews();
         }
 
-        if (configDoc.contains(type))
+        std::string entry = type;
+        if (sensor.contains("instance"))
+        {
+            entry += ":";
+            entry += sensor["instance"];
+        }
+
+        if (configDoc.contains(entry))
         {
             bool validSensor = false;
             try
             {
-                validSensor = widgets.pModel->configure(configDoc[type]);
+                validSensor = widgets.pModel->configure(configDoc[entry]);
             }
             catch (const std::exception& e)
             {
