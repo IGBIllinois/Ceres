@@ -64,6 +64,8 @@ protected:
 	virtual void createLayout_Postamble(QVBoxLayout* pMainLayout);
 
 protected:
+	std::string mExperimentTitle;
+
 	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;
 

@@ -26,6 +26,9 @@ public:
 	std::string getExperimentTitle() const;
 	void setExperimentTitle(const std::string& title);
 
+	std::string getMeasurementTitle() const;
+	void setMeasurementTitle(const std::string& title);
+
 private slots:
 	void accept() override;
 	void apply();
@@ -37,7 +40,8 @@ private:
 private:
 	cExperimentMetaInfo& mInfo;
 
-	QLineEdit* mpTitle = nullptr;
+	QLineEdit* mpExperimentTitle = nullptr;
+	QLineEdit* mpMeasurementTitle = nullptr;
 
 	QLineEdit* mpPrincipalInvestigator = nullptr;
 	QPlainTextEdit* mpResearchers = nullptr;

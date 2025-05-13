@@ -73,6 +73,8 @@ protected:
 protected:
 	double mSubScanConversionFactor = 1.0;
 
+	std::string mExperimentTitle;
+
 	cExperimentMetaInfo mMetaInfo;
 	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;

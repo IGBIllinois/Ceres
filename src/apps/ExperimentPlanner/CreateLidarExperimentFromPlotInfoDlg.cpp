@@ -235,10 +235,20 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 	std::string title = mpTitle->text().toStdString();
 	if (title.empty())
 	{
-		QString msg = "The \"Experiment Title\" can not be blank.";
+		QString msg = "The \"Measurement Title\" can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
+	}
+
+	if (mExperimentTitle.empty())
+	{
+		auto pos = title.find("_Pass");
+
+		if (pos == std::string::npos)
+			mExperimentTitle = title;
+		else
+			mExperimentTitle = title.substr(0, pos);
 	}
 
 	QModelIndex startIndex = mpStartPosition->currentIndex();
@@ -414,7 +424,8 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 
 	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
-	pInfo->setExperimentName(title);
+	pInfo->setMeasurementName(title);
+	pInfo->setExperimentName(mExperimentTitle);
 	pInfo->setExperimentType(cExperimentFile::eExperimentType::LIDAR);
 	pInfo->setMetaData(mMetaInfo);
 	pInfo->setController(copy(mCtrlInfo));

@@ -54,7 +54,7 @@ cCreateLidarExperimentDlg::cCreateLidarExperimentDlg(QWidget* parent)
 :
 	QDialog(parent)
 {
-	setWindowTitle("Create LiDAR Experiment");
+	setWindowTitle("Create LiDAR Measurement");
 
 	mCtrlInfo = std::make_unique<cExperimentCtrlInfo_SpiderCam>();
 	mSensorInfo.push_back(std::make_shared<cExperimentSensorInfo_Ouster>());
@@ -270,7 +270,7 @@ void cCreateLidarExperimentDlg::createLayout_TitleInfo(QVBoxLayout* pMainLayout)
 	QLabel* pText = nullptr;
 
 	QHBoxLayout* pTitleLayout = new QHBoxLayout();
-	pText = new QLabel("Experiment Title");
+	pText = new QLabel("Measurement Title");
 	pTitleLayout->addWidget(pText);
 	pTitleLayout->addWidget(mpTitle, 1);
 	pTitleLayout->addWidget(mpMetaInfo);
@@ -472,14 +472,30 @@ void cCreateLidarExperimentDlg::onMetaInfoUpdate()
 {
 	cExperimentMetaInfoDlg dlg(mMetaInfo, this);
 
-	dlg.setExperimentTitle(mpTitle->text().toStdString());
+	std::string title = mpTitle->text().toStdString();
+
+	dlg.setMeasurementTitle(title);
+
+	if (!title.empty() && mExperimentTitle.empty())
+	{
+		auto pos = title.find("_Pass");
+
+		if (pos == std::string::npos)
+			mExperimentTitle = title;
+		else
+			mExperimentTitle = title.substr(0, pos);
+	}
+
+	dlg.setExperimentTitle(mExperimentTitle);
 
 	auto result = dlg.exec();
 
 	if (result == QDialog::Rejected)
 		return;
 
-	mpTitle->setText(QString::fromStdString(dlg.getExperimentTitle()));
+	mExperimentTitle = dlg.getExperimentTitle();
+
+	mpTitle->setText(QString::fromStdString(dlg.getMeasurementTitle()));
 }
 
 void cCreateLidarExperimentDlg::onControllerUpdate()

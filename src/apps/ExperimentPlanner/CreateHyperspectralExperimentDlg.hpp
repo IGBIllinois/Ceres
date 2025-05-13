@@ -84,6 +84,8 @@ protected:
 	virtual void createLayout_SubScanInfo(QVBoxLayout* pMainLayout);
 
 protected:
+	std::string mExperimentTitle;
+
 	cExperimentMetaInfo mMetaInfo;
 	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;

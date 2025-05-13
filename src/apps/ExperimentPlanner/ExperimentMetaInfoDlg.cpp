@@ -37,7 +37,8 @@ void cExperimentMetaInfoDlg::createControls()
 	QFontMetrics fm(font);
 	int pixelsHigh = fm.height();
 
-	mpTitle = new QLineEdit(this);
+	mpExperimentTitle = new QLineEdit(this);
+	mpMeasurementTitle = new QLineEdit(this);
 
 	mpPrincipalInvestigator = new QLineEdit(this);
 	if (!mInfo.getPrincipalInvestigator().empty())
@@ -193,9 +194,9 @@ void cExperimentMetaInfoDlg::createLayout()
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
 
 	QHBoxLayout* pTitleLayout = new QHBoxLayout();
-	pText = new QLabel("Experiment Title");
+	pText = new QLabel("Measurement Title");
 	pTitleLayout->addWidget(pText);
-	pTitleLayout->addWidget(mpTitle, 1);
+	pTitleLayout->addWidget(mpMeasurementTitle, 1);
 
 	pMainLayout->addLayout(pTitleLayout);
 
@@ -205,17 +206,21 @@ void cExperimentMetaInfoDlg::createLayout()
 	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	pGridLayout = new QGridLayout();
-	pText = new QLabel("Principal Investigator");
+	pText = new QLabel("Experiment Title");
 	pGridLayout->addWidget(pText, 0, 0);
-	pGridLayout->addWidget(mpPrincipalInvestigator, 0, 1);
+	pGridLayout->addWidget(mpExperimentTitle, 0, 1);
+
+	pText = new QLabel("Principal Investigator");
+	pGridLayout->addWidget(pText, 1, 0);
+	pGridLayout->addWidget(mpPrincipalInvestigator, 1, 1);
 
 	pText = new QLabel("Researcher(s)");
-	pGridLayout->addWidget(pText, 1, 0);
-	pGridLayout->addWidget(mpResearchers, 1, 1);
+	pGridLayout->addWidget(pText, 2, 0);
+	pGridLayout->addWidget(mpResearchers, 2, 1);
 
 	pText = new QLabel("Comment(s)");
-	pGridLayout->addWidget(pText, 2, 0);
-	pGridLayout->addWidget(mpComments, 2, 1);
+	pGridLayout->addWidget(pText, 3, 0);
+	pGridLayout->addWidget(mpComments, 3, 1);
 
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);
@@ -310,12 +315,22 @@ void cExperimentMetaInfoDlg::createLayout()
 
 std::string cExperimentMetaInfoDlg::getExperimentTitle() const
 {
-	return mpTitle->text().toStdString();
+	return mpExperimentTitle->text().toStdString();
 }
 
 void cExperimentMetaInfoDlg::setExperimentTitle(const std::string& title)
 {
-	mpTitle->setText(QString::fromStdString(title));
+	mpExperimentTitle->setText(QString::fromStdString(title));
+}
+
+std::string cExperimentMetaInfoDlg::getMeasurementTitle() const
+{
+	return mpMeasurementTitle->text().toStdString();
+}
+
+void cExperimentMetaInfoDlg::setMeasurementTitle(const std::string& title)
+{
+	mpMeasurementTitle->setText(QString::fromStdString(title));
 }
 
 void cExperimentMetaInfoDlg::accept()

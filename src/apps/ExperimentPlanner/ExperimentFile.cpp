@@ -176,11 +176,34 @@ void cExperimentFile::open(const std::string& file_name)
 
 	mFileName = file_name;
 
+	if (configDoc.contains("measurement name"))
+	{
+		mMeasurementName = configDoc["measurement name"];
+	}
+	else if (configDoc.contains("measurement_name"))
+	{
+		mMeasurementName = configDoc["measurement_name"];
+	}
+
 	if (configDoc.contains("experiment name"))
 		mExperimentName = configDoc["experiment name"];
 	else
 		mExperimentName = configDoc["experiment_name"];
 
+	if (mMeasurementName.empty() && !mExperimentName.empty())
+	{
+		mMeasurementName = mExperimentName;
+	}
+
+	if (!mMeasurementName.empty() && mExperimentName.empty())
+	{
+		auto pos = mMeasurementName.find("_Pass");
+
+		if (pos == std::string::npos)
+			mExperimentName = mMeasurementName;
+		else
+			mExperimentName = mMeasurementName.substr(0, pos);
+	}
 
 	if (configDoc.contains("experiment_type"))
 	{
@@ -196,15 +219,6 @@ void cExperimentFile::open(const std::string& file_name)
 	}
 	else
 		mExperimentType = eExperimentType::UNKNOWN;
-
-	if (configDoc.contains("measurement name"))
-	{
-		mMeasurementName = configDoc["measurement name"];
-	}
-	else if (configDoc.contains("measurement_name"))
-	{
-		mMeasurementName = configDoc["measurement_name"];
-	}
 
 	if (configDoc.contains("layout name"))
 	{
