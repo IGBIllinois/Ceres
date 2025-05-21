@@ -116,6 +116,9 @@ private:
     //-----------------------------------------------------
     // Weather Data
     //-----------------------------------------------------
+    void onBeginWeatherInfoBlock() override;
+    void onEndWeatherInfoBlock() override;
+    void onTimeStamp_ns(uint64_t timestamp_ns) override;
     void onConfigInfo(const std::string& info) override;
     void onWindData_mps(bool valid, double speed_mps, double dir_deg) override;
     void onWindData_knots(bool valid, double speed_knots, double dir_deg) override;

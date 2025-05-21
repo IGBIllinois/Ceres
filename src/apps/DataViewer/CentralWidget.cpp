@@ -507,6 +507,10 @@ void cCentralWidget::onPosition(spidercam::sPosition_1_t pos)
 // Weather Parser Data
 //-----------------------------------------------------------------------------
 
+void cCentralWidget::onBeginWeatherInfoBlock() {}
+void cCentralWidget::onEndWeatherInfoBlock() {}
+void cCentralWidget::onTimeStamp_ns(uint64_t timestamp_ns) {}
+
 void cCentralWidget::onConfigInfo(const std::string& info) {}
 
 void cCentralWidget::onWindData_mps(bool valid, double speed_mps, double dir_deg)
