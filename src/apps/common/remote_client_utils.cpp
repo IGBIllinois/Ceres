@@ -1341,4 +1341,52 @@ int encode_par_data(double par_umole, net_buffer& buffer)
     return pckt_size;
 }
 
+sWeatherData_t to_weather_data_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    WeatherData_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+
+    sWeatherData_t data;
+
+    data.wind_data_valid = pckt.wind_data_valid();
+    data.wind_speed_mps = pckt.wind_speed_mps();
+    data.wind_direction_deg = pckt.wind_direction_deg();
+    data.temp_C = pckt.temperature_c();
+    data.rh_pct = pckt.rh_pct();
+    data.par_umole = pckt.par_umole();
+
+    return data;
+}
+
+int encode_weather_data(bool wind_data_valid, double wind_speed_mps, double wind_direction_deg,
+    double temp_C, double rh_pct, double par_umole, net_buffer& buffer)
+{
+    WeatherData_1 pckt;
+
+    pckt.set_wind_data_valid(wind_data_valid);
+    pckt.set_wind_speed_mps(wind_speed_mps);
+    pckt.set_wind_direction_deg(wind_direction_deg);
+    pckt.set_temperature_c(temp_C);
+    pckt.set_rh_pct(rh_pct);
+    pckt.set_par_umole(par_umole);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::WEATHER_DATA);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
 

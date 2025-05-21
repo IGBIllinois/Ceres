@@ -228,6 +228,13 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onParData(data);
         break;
     }
+    case ePacketType::WEATHER_DATA:
+    {
+        auto data = to_weather_data_1(hdr.length, buffer);
+        onWeatherData(data.wind_data_valid, data.wind_speed_mps, data.wind_direction_deg,
+            data.temp_C, data.rh_pct, data.par_umole);
+        break;
+    }
     case ePacketType::MEASUREMENT_TITLE:
     {
         MeasurementTitle_1 packet;

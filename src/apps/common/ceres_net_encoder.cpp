@@ -286,6 +286,16 @@ void cCeresNetEncoder::encodeParData(double par_umole)
     }
 }
 
+void cCeresNetEncoder::encodeWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
+    double temp_C, double rh_pct, double par_umole)
+{
+    if (encode_weather_data(valid, wind_speed_mps, wind_direction_deg, temp_C, rh_pct, par_umole, mBuffer) < 0)
+    {
+        sendData();
+        encode_weather_data(valid, wind_speed_mps, wind_direction_deg, temp_C, rh_pct, par_umole, mBuffer);
+    }
+}
+
 void cCeresNetEncoder::encodeEndOfExperimentInfo()
 {
     if (encode_end_of_experiment_info(mBuffer) < 0)
@@ -448,4 +458,10 @@ void cCeresNetEncoder::sendParData(double par_umole)
     sendData();
 }
 
+void cCeresNetEncoder::sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
+    double temp_C, double rh_pct, double par_umole)
+{
+    encode_par_data(par_umole, mBuffer);
+    sendData();
+}
 

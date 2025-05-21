@@ -74,6 +74,7 @@ enum class ePacketType : uint16_t
 	TEMPERATURE_DATA,
 	RELATIVE_HUMIDITY_DATA,
 	PAR_DATA,
+	WEATHER_DATA,
 };
 
 
@@ -244,4 +245,17 @@ int encode_relative_humidity_data(double rh_pct, net_buffer& buffer);
 float to_par_data_1(std::uint16_t length, const net_buffer_view& buffer);
 int encode_par_data(double par_umole, net_buffer& buffer);
 
+struct sWeatherData_t
+{
+	bool  wind_data_valid;
+	float wind_speed_mps;
+	float wind_direction_deg;
+	float temp_C;
+	float rh_pct;
+	float par_umole;
+};
+
+sWeatherData_t to_weather_data_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_weather_data(bool wind_valid, double wind_speed_mps, double wind_direction_deg, 
+	double temp_C, double rh_pct, double par_umole, net_buffer& buffer);
 

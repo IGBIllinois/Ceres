@@ -58,10 +58,14 @@ public:
     void encodeEndOfExperimentInfo();
 
     void encodeSpidercamPosition(const spidercam::sPosition_1_t& pos);
+
     void encodeWindData(bool valid, double wind_speed_mps, double wind_direction_deg);
     void encodeTemperatureData(double temp_C);
     void encodeRelativeHumidityData(double rh_pct);
     void encodeParData(double par_umole);
+
+    void encodeWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
+        double temp_C, double rh_pct, double par_umole);
 
 
     /*
@@ -99,9 +103,13 @@ public:
     void sendStopDataRecording();
 
     void sendSpidercamPosition(const spidercam::sPosition_1_t& pos);
+
     void sendWindData(bool valid, double wind_speed_mps, double wind_direction_deg);
     void sendTemperatureData(double temp_C);
     void sendRelativeHumidityData(double rh_pct);
     void sendParData(double par_umole);
+
+    void sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
+        double temp_C, double rh_pct, double par_umole);
 };
 

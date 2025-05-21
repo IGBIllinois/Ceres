@@ -33,3 +33,14 @@ message ParData_1
 {
 	float par_umole = 1;
 }
+
+message WeatherData_1 
+{
+	bool  wind_data_valid = 1;
+	float wind_speed_mps = 2;
+	float wind_direction_deg = 3;
+	float temperature_C = 4;
+	float rh_pct = 5;
+	float par_umole = 6;
+}
+
