@@ -219,6 +219,9 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
         onStatusUpdate("Initializing sensors...");
         createSensorModelsAndViews(configDoc);
+
+        onStatusUpdate("Starting data model...");
+        startDataModel(configDoc);
     }
     catch (const std::exception& e)
     {
@@ -718,12 +721,12 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
     }
     else if (data_model.is_object())
     {
-        std::string c4_ip = data_model["c4_ip"];
-        uint16_t port = data_model["port"];
+//        std::string c4_ip = data_model["c4_ip"];
+//        uint16_t port = data_model["port"];
 
-        std::string c3_ip;
-        if (data_model.contains("c3_ip"))
-            c3_ip = data_model["c3_ip"];
+//        std::string c3_ip;
+//        if (data_model.contains("c3_ip"))
+//            c3_ip = data_model["c3_ip"];
 
         cCtrlDataModelRemote* pModel = new cCtrlDataModelRemote(this);
 
@@ -748,17 +751,46 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
             mpViewMenu->addAction(dockWidget->toggleViewAction());
         }
 
-        bool result = pModel->try_to_connect(QString(c4_ip.c_str()), port,
-            false, QString(c3_ip.c_str()));
+//        bool result = pModel->try_to_connect(QString(c4_ip.c_str()), port,
+//            false, QString(c3_ip.c_str()));
 
-        if (!result)
-        { }
+//        if (!result)
+//        { }
 
         mpModel = pModel;
     }
 
     QObject::connect(mpModel, &cCtrlDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
     QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+}
+
+
+//-----------------------------------------------------------------------------
+void cMainWindow::startDataModel(const nlohmann::json& configDoc)
+{
+    auto data_model = configDoc["data model"];
+
+    if (data_model.is_object())
+    {
+        std::string c4_ip = data_model["c4_ip"];
+        uint16_t port = data_model["port"];
+
+        std::string c3_ip;
+        if (data_model.contains("c3_ip"))
+            c3_ip = data_model["c3_ip"];
+
+        cCtrlDataModelRemote* pModel = dynamic_cast<cCtrlDataModelRemote*>(mpModel);
+
+        if (!pModel)
+            return;
+
+        bool result = pModel->try_to_connect(QString(c4_ip.c_str()), port,
+            false, QString(c3_ip.c_str()));
+
+        if (!result)
+        {
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

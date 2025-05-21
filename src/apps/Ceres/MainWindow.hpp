@@ -92,6 +92,8 @@ private:
     void createExperimentController(const nlohmann::json& configDoc);
     void createSensorModelsAndViews(const nlohmann::json& configDoc);
 
+    void startDataModel(const nlohmann::json& configDoc);
+
     cCeresSplashScreen* mpSplashScreen;
 
     cExperimentManager* mpExperiments;

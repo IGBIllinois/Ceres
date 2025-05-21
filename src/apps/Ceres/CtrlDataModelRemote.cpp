@@ -122,6 +122,7 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
 
     if (pWind_T_RH_PAR)
     {
+/*
         if (pWind_T_RH_PAR->windDataValid())
         {
             mWindSpeedValid = true;
@@ -130,15 +131,23 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
 
             sendWindData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg);
         }
+*/
+
+        mWindSpeedValid = pWind_T_RH_PAR->windDataValid();
+        mWindSpeed_mps = pWind_T_RH_PAR->windSpeed_mps();
+        mWind_dir_deg = pWind_T_RH_PAR->windDirection_deg();
 
         mTemperature_C = pWind_T_RH_PAR->temperature_C();
         mRH_pct = pWind_T_RH_PAR->relativeHumidity_pct();
         mPAR_umole = pWind_T_RH_PAR->par_umole();
 
+/*
         encodeTemperatureData(mTemperature_C);
         encodeRelativeHumidityData(mRH_pct);
         encodeParData(mPAR_umole);
         sendData();
+*/
+        sendWeatherData(mWindSpeedValid, mWindSpeed_mps, mWind_dir_deg, mTemperature_C, mRH_pct, mPAR_umole);
 
         QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::windDataChanged, this, &cCtrlDataModelRemote::updateWindData);
         QObject::connect(pWind_T_RH_PAR, &cWeatherDataModel_Http_Wind_T_RH_PAR::temperatureChanged, this, &cCtrlDataModelRemote::updateTemperatureData);
@@ -206,6 +215,15 @@ void cCtrlDataModelRemote::updateParData(double par_umole)
     if (!mConnected) return;
 
     sendParData(mPAR_umole);
+}
+
+void cCtrlDataModelRemote::setCommunicationParamters(const QString& hostname, uint16_t port,
+    bool use_ipv6, const QString& local_ip)
+{
+    mHostName = hostname;
+    mPort = port;
+    mUseIpv6 = use_ipv6;
+    mLocalIp = local_ip;
 }
 
 bool cCtrlDataModelRemote::try_to_connect(const QString& hostname, uint16_t port, 

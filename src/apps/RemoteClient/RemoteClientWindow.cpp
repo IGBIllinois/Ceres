@@ -519,6 +519,7 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         {
             entry += ":";
             entry += sensor["instance"];
+            widgets.pModel->setInstanceName(sensor["instance"]);
         }
 
         if (configDoc.contains(entry))

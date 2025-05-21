@@ -38,6 +38,9 @@ public:
 
     bool systemReady() const override;
 
+    void setCommunicationParamters(const QString& hostname, uint16_t port,
+        bool use_ipv6, const QString& local_ip);
+
     bool try_to_connect(const QString& hostname, uint16_t port, 
                         bool use_ipv6, const QString& local_ip);
 
@@ -126,9 +129,13 @@ private:
 
     cRemoteClientView* mpView;
 
+    QString  mHostName;
+    uint16_t mPort;
+    bool     mUseIpv6;
+    QString  mLocalIp;
+
     std::string  mLocalIpAddress;
     QHostAddress mRemoteEndpoint;
-    uint16_t     mPort;
 
     QTcpSocket mSocket;
     QByteArray mReplyBuffer;
