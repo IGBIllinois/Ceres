@@ -69,6 +69,11 @@ public:
     const std::string& name() const { return mSensorName; };
 
     /*
+     * Returns a string used as the sensor instance.
+     */
+    const std::string& instance() const { return mSensorInstance; };
+
+    /*
      * Returns the manufacturer of the sensor as a string.
      */
     virtual const std::string& manufacturer() const { return mManufacturer; };
@@ -137,6 +142,8 @@ public:
     virtual bool startCommunications() = 0;
     virtual void stopCommunications() = 0;
 
+    void setInstanceName(const std::string& instance);
+
 public slots:
     /*
      * Toggles the recording state of the sensor.
@@ -163,6 +170,7 @@ public:
 
 protected:
     cSensorModel(const std::string& name, QObject* parent = nullptr);
+    cSensorModel(const std::string& name, const std::string& instance, QObject* parent = nullptr);
 
     void setStatus(const sensor::eStatus status);
     void updateName(const std::string& name);
@@ -186,6 +194,7 @@ protected:
 
 private:
     std::string mSensorName;
+    std::string mSensorInstance;
     sensor::eStatus mStatus = sensor::eStatus::UNKNOWN;
 };
 

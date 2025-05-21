@@ -82,6 +82,12 @@ cSensorModel::cSensorModel(const std::string& name, QObject* parent)
     mIsRecording = false;
 }
 
+cSensorModel::cSensorModel(const std::string& name, const std::string& instance, QObject* parent)
+    : cSensorModel(name, parent)
+{
+    mSensorInstance = instance;
+}
+
 bool cSensorModel::configure(const nlohmann::json& jsonCfg)
 {
     if (mManufacturer.empty())
@@ -120,6 +126,11 @@ bool cSensorModel::initialize()
     setStatus(sensor::eStatus::INITIALIZED);
     return true;
 };
+
+void cSensorModel::setInstanceName(const std::string& instance)
+{
+    mSensorInstance = instance;
+}
 
 void cSensorModel::enableDataRecording(cBlockDataFileWriter& file)
 {
