@@ -149,7 +149,10 @@ void cAxisCommunicationsController_F44::onQueryState()
 
     bool valid = (id >= 0) && (fps > 0);
 
-    sendCurrentState(valid, id, image_size.width, image_size.height, fps);
+    int minID = mpModel->getMinCameraID();
+    int maxID = mpModel->getMaxCameraID();
+
+    sendCurrentState(valid, id, image_size.width, image_size.height, fps, minID, maxID);
 }
 
 void cAxisCommunicationsController_F44::onQueryCameraId()
@@ -166,6 +169,11 @@ void cAxisCommunicationsController_F44::onQueryImageSize()
 void cAxisCommunicationsController_F44::onQueryFrameRate()
 {
     sendFrameRate(mpModel->getActiveFramesRate_fps());
+}
+
+void cAxisCommunicationsController_F44::onGrabImage()
+{
+    mpModel->requestImage();
 }
 
 void cAxisCommunicationsController_F44::setCameraId(uint8_t id)

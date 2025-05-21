@@ -49,6 +49,9 @@ public:
 
     bool isConnected() const { return mConnected; }
 
+    bool autoEmitImages() const;
+    void autoEmitImages(bool auto_emit_images);
+
     const QImage& getCurrentImage() const;
 
     QUrl url() const { return mUrl; }
@@ -82,6 +85,9 @@ signals:
     void frameRateChanged(int rate_fps);
     void imageSizeChanged(int width, int height);
 
+public slots:
+    void requestImage();
+
 protected slots:
     void requestReceived(QNetworkReply* pReply);
 
@@ -103,14 +109,15 @@ protected:
     virtual void processReply(const std::string& reply) {};
 
 protected:
-    bool mConnected;
+    bool mConnected = false;
     QNetworkAccessManager* mpHttpManager;
     QUrl mUrl;
 
-    int mVapixVersion;
+    int mVapixVersion = 0;
     std::vector<rgb::sImageSize_t>  mSupportedImageSizes;
     std::vector<rgb::eIMAGE_FORMAT> mSupportedImageFormats;
 
+    bool mAutoEmitImages = true;
     QImage mCurrentImage;
 
     cBitmapBuffer    mBitmapBuffer;

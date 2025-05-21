@@ -42,10 +42,15 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
             pView->createWidgets();
             pView->doLayout();
 
+            pModel->autoEmitImages(false);
+
             QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
             QObject::connect(pModel, &cAxisCommunicationsModel::cameraIdChanged, pView, &cAxisCommunicationsStatusView::onCameraIdChange);
             QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged, pView, &cAxisCommunicationsStatusView::onFrameRateChange);
             QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged, pView, &cAxisCommunicationsStatusView::onImageSizeChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage, pView, &cAxisCommunicationsStatusView::imageUpdated);
+
+            QObject::connect(pView, &cAxisCommunicationsStatusView::requestImage, pModel, &cAxisCommunicationsModel::requestImage);
 
             auto* pController = new cAxisCommunicationsController_F44(pModel);
             return sSensorWidgets(pModel, pController, pView);

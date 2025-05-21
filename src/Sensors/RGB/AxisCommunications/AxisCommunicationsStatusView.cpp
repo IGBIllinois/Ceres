@@ -7,6 +7,8 @@
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QFormLayout>
+#include <QPushButton>
+#include <QResizeEvent>
 
 #include <string>
 
@@ -18,8 +20,7 @@ cAxisCommunicationsStatusView::cAxisCommunicationsStatusView(cAxisCommunications
 }
 
 cAxisCommunicationsStatusView::~cAxisCommunicationsStatusView()
-{
-}
+{}
 
 void cAxisCommunicationsStatusView::createWidgets()
 {
@@ -36,6 +37,11 @@ void cAxisCommunicationsStatusView::createWidgets()
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
 	mpFrameRate_fps->setReadOnly(true);
+
+	mpGrabImage = new QPushButton("Grab Image", this);
+	connect(mpGrabImage, &QPushButton::pressed, this, &cAxisCommunicationsStatusView::requestImage);
+
+	mpImage = new cRgbImageWidget(this);
 }
 
 void cAxisCommunicationsStatusView::doLayout()
@@ -57,11 +63,16 @@ void cAxisCommunicationsStatusView::doLayout()
 	cameraInfoLayout->addWidget(mpFrameRateLabel);
 	cameraInfoLayout->addWidget(mpFrameRate_fps);
 
+	cameraInfoLayout->addStretch(1);
+
+	cameraInfoLayout->addWidget(mpGrabImage);
+
 	infoBox->setLayout(cameraInfoLayout);
 
 	mainLayout->addWidget(infoBox);
 
-	mainLayout->addStretch();
+	mainLayout->addWidget(mpImage, 1);
+//	mainLayout->addStretch();
 
 	setLayout(mainLayout);
 }
@@ -85,4 +96,16 @@ void cAxisCommunicationsStatusView::onImageSizeChange(int width, int height)
 	mpImageSizes->setText(str);
 }
 
+void cAxisCommunicationsStatusView::imageUpdated(const QImage& image)
+{
+	mpImage->setImage(image);
 
+	if (!isHidden())
+		mpImage->repaint();
+}
+
+void cAxisCommunicationsStatusView::resizeEvent(QResizeEvent* e)
+{
+	cSensorStatusView::resizeEvent(e);
+	mpImage->resizeImage(e->size().width(), e->size().height());
+}

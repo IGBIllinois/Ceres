@@ -38,7 +38,7 @@ cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
 
     mImageBuffer.open(QIODevice::ReadWrite);
 
-    mCameras = {nullptr, nullptr, nullptr, nullptr};
+//    mCameras = {nullptr, nullptr, nullptr, nullptr};
 }
 
 cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
@@ -76,7 +76,6 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     {
         auto section = jsonCfg["F44"];
 
-
         if (!cAxisCommunicationsModel::configure(section))
         {
             setStatus(sensor::eStatus::FAILED);
@@ -97,11 +96,19 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 
         for (int i = 0; i < cameras.size(); ++i)
         {
-            auto camera = cameras[i];
-            int id = camera["id"];
-            mCameras[i] = new cAxisCamera(id, this);
+            auto camera_info = cameras[i];
+            int id = camera_info["id"];
+            
+            if (mMinCameraID == -1)
+                mMinCameraID = id;
+            else
+                mMinCameraID = std::min(mMinCameraID, id);
 
-            rgb::sImageSize_t image_size = axis::to_image_size(camera["resolution"]);
+            mMaxCameraID = std::max(mMaxCameraID, id);
+
+            std::unique_ptr<cAxisCamera> pCamera = std::make_unique<cAxisCamera>(id, this);
+
+            rgb::sImageSize_t image_size = axis::to_image_size(camera_info["resolution"]);
             if (image_size > max_image_size)
                 max_image_size = image_size;
 
@@ -115,17 +122,19 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
                 setStatus(sensor::eStatus::FAILED);
                 return false;
             }
-            mCameras[i]->setImageSize(image_size);
+            pCamera->setImageSize(image_size);
 
-            int fps = camera["frames per second"];
-            mCameras[i]->setFramesPerSeconds(fps);
+            int fps = camera_info["frames per second"];
+            pCamera->setFramesPerSeconds(fps);
 
-            mCameras[i]->setSource(mUrl);
+            pCamera->setSource(mUrl);
 
-            connect(mCameras[i], &cAxisCamera::frameGrabbed, this, &cAxisCommunicationsModel_F44::frameGrabbed);
-            connect(mCameras[i], &cAxisCamera::imageGrabbed, this, &cAxisCommunicationsModel_F44::imageGrabbed);
-            connect(mCameras[i], &cAxisCamera::errorHappend, this, &cAxisCommunicationsModel_F44::errorHappend);
-            connect(mCameras[i], &cAxisCamera::stateChanged, this, &cAxisCommunicationsModel_F44::stateChanged);
+            connect(pCamera.get(), &cAxisCamera::frameGrabbed, this, &cAxisCommunicationsModel_F44::frameGrabbed);
+            connect(pCamera.get(), &cAxisCamera::imageGrabbed, this, &cAxisCommunicationsModel_F44::imageGrabbed);
+            connect(pCamera.get(), &cAxisCamera::errorHappend, this, &cAxisCommunicationsModel_F44::errorHappend);
+            connect(pCamera.get(), &cAxisCamera::stateChanged, this, &cAxisCommunicationsModel_F44::stateChanged);
+
+            mCameras.push_back(pCamera.release());
 
             emit enableCamera(id);
         }
@@ -360,7 +369,10 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
 void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
 {
     mCurrentImage = *img;
-    emit onNewImage(mCurrentImage);
+    if (mAutoEmitImages)
+    {
+        emit onNewImage(mCurrentImage);
+    }
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
@@ -382,7 +394,11 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
 void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
 {
     mCurrentImage = *img;
-    emit onNewImage(mCurrentImage);
+
+    if (mAutoEmitImages)
+    {
+        emit onNewImage(mCurrentImage);
+    }
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {

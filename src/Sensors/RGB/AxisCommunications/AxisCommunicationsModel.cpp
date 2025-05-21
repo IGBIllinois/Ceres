@@ -43,6 +43,9 @@ uint16_t cAxisCommunicationsModel::data_class_id() const
     return mSerializer.classID();
 }
 
+bool cAxisCommunicationsModel::autoEmitImages() const { return mAutoEmitImages; }
+void cAxisCommunicationsModel::autoEmitImages(bool auto_emit_images) { mAutoEmitImages = auto_emit_images; }
+
 const QImage& cAxisCommunicationsModel::getCurrentImage() const
 {
     return mCurrentImage;
@@ -133,6 +136,11 @@ void cAxisCommunicationsModel::stopCommunications()
     if (!mpHttpManager) return;
 
     delete mpHttpManager; mpHttpManager = nullptr;
+}
+
+void cAxisCommunicationsModel::requestImage()
+{
+    emit onNewImage(mCurrentImage);
 }
 
 void cAxisCommunicationsModel::requestReceived(QNetworkReply* pReply)

@@ -64,6 +64,9 @@ public:
     int getActiveFramesRate_fps() const override;
     rgb::sImageSize_t getActiveImageSize() const override;
 
+    int getMinCameraID() const { return mMinCameraID; }
+    int getMaxCameraID() const { return mMaxCameraID; }
+
 signals:
     void enableCamera(int id);
 
@@ -87,6 +90,9 @@ private:
     QBuffer mImageBuffer;
 
     cAxisCamera* mpActiveCamera;
+
+    int mMinCameraID = -1;
+    int mMaxCameraID = -1;
 
     std::vector<cAxisCamera*> mCameras;
 

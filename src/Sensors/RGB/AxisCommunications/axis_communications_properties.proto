@@ -41,12 +41,23 @@ message axis_FrameRateMessage_1
 	uint32 frames_per_second = 1;
 }
 
- message axis_StateMessage_1 
+message axis_StateMessage_1 
 {
 	bool   valid = 1;
 	uint32 camera_id = 2;
 	uint32 width = 3;
 	uint32 height = 4;
     uint32 frames_per_second = 5;
+}
+
+message axis_StateMessage_2
+{
+	bool   valid = 1;
+	uint32 active_camera_id = 2;
+	uint32 width = 3;
+	uint32 height = 4;
+    uint32 frames_per_second = 5;
+	uint32 min_camera_id = 6;
+	uint32 max_camera_id = 7;
 }
 

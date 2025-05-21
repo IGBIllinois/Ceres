@@ -18,6 +18,11 @@ void cAxisCommunicationsPropertyPage_Remote::onConnect()
 	cAxisPropertiesNetEncoder::sendQueryState();
 }
 
+void cAxisCommunicationsPropertyPage_Remote::requestImage()
+{
+	cAxisPropertiesNetEncoder::sendGrabImage();
+}
+
 void cAxisCommunicationsPropertyPage_Remote::onCameraId(uint8_t id)
 {
 	if ((id == 0) || (id > 4))
@@ -63,6 +68,18 @@ void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t 
 	onCameraId(id);
 	onImageSize(width, height);
 	onFrameRate(fps);
+}
+
+void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t active_id,
+	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
+{
+	if (!valid) return;
+
+	onCameraId(active_id);
+	onImageSize(width, height);
+	onFrameRate(fps);
+
+	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
 }
 
 void cAxisCommunicationsPropertyPage_Remote::showPage()

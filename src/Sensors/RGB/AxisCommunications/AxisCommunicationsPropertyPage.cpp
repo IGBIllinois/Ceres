@@ -6,6 +6,7 @@
 #include <QLayout>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QPushButton>
 
 
 cAxisCommunicationsPropertyPage::cAxisCommunicationsPropertyPage(QWidget* parent)
@@ -29,6 +30,9 @@ void cAxisCommunicationsPropertyPage::createWidgets()
 
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
+
+	mpGrabImage = new QPushButton("Grab Image", this);
+	connect(mpGrabImage, &QPushButton::pressed, this, &cAxisCommunicationsPropertyPage::requestImage);
 }
 
 void cAxisCommunicationsPropertyPage::doLayout()
@@ -50,6 +54,9 @@ void cAxisCommunicationsPropertyPage::doLayout()
 	frLayout->addWidget(mpFrameRate_fps);
 	pMainLayout->addLayout(frLayout);
 
+	pMainLayout->addWidget(mpGrabImage);
+	pMainLayout->addSpacing(10);
+
 	pMainLayout->addWidget(mpButtons);
 
 	setLayout(pMainLayout);
@@ -59,3 +66,6 @@ cExperimentState* cAxisCommunicationsPropertyPage::createState(const std::string
 {
 	return nullptr;
 }
+
+void cAxisCommunicationsPropertyPage::requestImage()
+{ }

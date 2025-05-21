@@ -77,6 +77,7 @@ protected:
     void onQueryCameraId() override;
     void onQueryImageSize() override;
     void onQueryFrameRate() override;
+    void onGrabImage() override;
 
     void setCameraId(uint8_t id) override;
     void setImageSize(uint16_t width, uint16_t height) override;

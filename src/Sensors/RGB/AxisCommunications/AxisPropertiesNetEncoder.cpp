@@ -32,3 +32,9 @@ void cAxisPropertiesNetEncoder::sendSetFrameRate_fps(uint8_t fps)
     sendData();
 }
 
+void cAxisPropertiesNetEncoder::sendGrabImage()
+{
+    encode_grab_image(mBuffer);
+    sendData();
+}
+

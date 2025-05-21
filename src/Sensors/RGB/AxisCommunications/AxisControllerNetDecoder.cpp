@@ -56,6 +56,9 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         setFrameRate(fps);
         break;
     }
+    case ePacketType::GRAB_IMAGE:
+        onGrabImage();
+        break;
     }
 }
 

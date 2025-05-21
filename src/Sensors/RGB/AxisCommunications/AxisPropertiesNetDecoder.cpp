@@ -40,11 +40,28 @@ void cAxisPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     }
     case ePacketType::CURRENT_STATE:
     {
-        axis_StateMessage_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto state = to_current_state_t(packet);
-        onCurrentState(state.valid, state.camera_id, state.width,
-            state.height, state.frames_per_second);
+        switch (hdr.revision)
+        {
+        case 1:
+        {
+            axis_StateMessage_1 packet;
+            packet.ParseFromArray(buffer.data(), hdr.length);
+            auto state = to_current_state_t(packet);
+            onCurrentState(state.valid, state.active_camera_id, state.width,
+                state.height, state.frames_per_second);
+            break;
+        }
+        case 2:
+        {
+            axis_StateMessage_2 packet;
+            packet.ParseFromArray(buffer.data(), hdr.length);
+            auto state = to_current_state_t(packet);
+            onCurrentState(state.valid, state.active_camera_id, state.width,
+                state.height, state.frames_per_second, state.min_camera_id, state.max_camera_id);
+            break;
+        }
+        }
+
         break;
     }
     }

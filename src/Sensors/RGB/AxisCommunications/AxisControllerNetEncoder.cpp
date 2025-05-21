@@ -15,6 +15,14 @@ void cAxisControllerNetEncoder::sendCurrentState(bool valid, uint8_t camera_id,
     sendData();
 }
 
+void cAxisControllerNetEncoder::sendCurrentState(bool valid, uint8_t active_camera_id,
+    uint16_t width, uint16_t height, uint8_t fps,
+    uint8_t min_camera_id, uint8_t max_camera_id)
+{
+    encode_current_state(valid, active_camera_id, width, height, fps, min_camera_id, max_camera_id, mBuffer);
+    sendData();
+}
+
 void cAxisControllerNetEncoder::sendActiveCameraId(uint8_t camera_id)
 {
     encode_active_camera_id(camera_id, mBuffer);

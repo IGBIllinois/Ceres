@@ -26,7 +26,8 @@ enum class ePacketType : uint16_t
 	IMAGE_SIZE,
 	FRAMES_PER_SECOND,
 
-	CURRENT_STATE
+	CURRENT_STATE,
+	GRAB_IMAGE,
 };
 
 
@@ -38,6 +39,7 @@ int encode_query_current_state(net_buffer& buffer);
 int encode_query_active_camera_id(net_buffer& buffer);
 int encode_query_image_size(net_buffer& buffer);
 int encode_query_frame_rate(net_buffer& buffer);
+int encode_grab_image(net_buffer& buffer);
 
 uint8_t to_active_camera_id_t(const axis_ActiveCameraIdMessage_1& pckt);
 int encode_active_camera_id(uint8_t id, net_buffer& buffer);
@@ -59,13 +61,18 @@ int encode_frame_rate(uint8_t fps, net_buffer& buffer);
 struct sCurrentState
 {
 	bool     valid;
-	uint8_t  camera_id;
+	uint8_t  active_camera_id;
 	uint16_t width;
 	uint16_t height;
 	uint8_t  frames_per_second;
+	uint8_t  min_camera_id;
+	uint8_t  max_camera_id;
 };
 sCurrentState to_current_state_t(const axis_StateMessage_1& pckt);
 int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
 	uint16_t height, uint8_t fps, net_buffer& buffer);
 
+sCurrentState to_current_state_t(const axis_StateMessage_2& pckt);
+int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
+	uint16_t height, uint8_t fps, uint8_t min_camera_id, uint8_t max_camera_id, net_buffer& buffer);
 

@@ -16,11 +16,14 @@ class QTextEdit;
 class QLineEdit;
 class QComboBox;
 class QGroupBox;
+class QPushButton;
 QT_END_NAMESPACE
 
 
 class cAxisCommunicationsPropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
 {
+    Q_OBJECT
+
 public:
     cAxisCommunicationsPropertyPage(QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage() = default;
@@ -30,6 +33,9 @@ public:
 
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
+
+protected slots:
+    virtual void requestImage();
 
 protected:
     QLabel* mpCameraIdLabel = nullptr;
@@ -44,6 +50,8 @@ protected:
     int mDefaultCameraId = -1;
     QString mDefaultImageSize;
     int  mDefaultFrameRate_fps = -1;
+
+    QPushButton* mpGrabImage = nullptr;
 };
 
 

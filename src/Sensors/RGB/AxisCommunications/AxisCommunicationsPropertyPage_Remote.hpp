@@ -24,9 +24,12 @@ public:
     void onFrameRate(uint8_t fps) override;
     void onCurrentState(bool valid, uint8_t id,
         uint16_t width, uint16_t height, uint8_t fps) override;
+    void onCurrentState(bool valid, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
 
 protected:
     void onConnect() override;
+    void requestImage() override;
 
 protected:
     void showPage() override;

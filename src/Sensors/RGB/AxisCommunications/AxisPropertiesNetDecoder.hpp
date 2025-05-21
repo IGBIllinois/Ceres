@@ -27,6 +27,8 @@ protected:
     virtual void onFrameRate(uint8_t fps) = 0;
     virtual void onCurrentState(bool valid, uint8_t id,
         uint16_t width, uint16_t height, uint8_t fps) = 0;
+    virtual void onCurrentState(bool valid, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) = 0;
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
