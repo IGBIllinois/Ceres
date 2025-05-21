@@ -149,6 +149,9 @@ private slots:
     void onRelativeHumidityData(double rh_pct) override;
     void onParData(double par_umole) override;
 
+    void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
+        double temp_C, double rh_pct, double par_umole) override;
+
 private:
     void clearExperimentInfo();
 

@@ -445,8 +445,13 @@ void cRemoteDataModel::onStartExperiment()
 
     mSpidercamSerializer.write(mDollyPosition);
 
-    mWeatherSerializer.writeWindData_mps(mWindDataValid,
-        mWindSpeed_mps, mWindDirection_deg);
+    mWeatherSerializer.writeBeginWeatherInfoBlock(timestamp_ns());
+    mWeatherSerializer.writeWindData_mps(mWindDataValid, mWindSpeed_mps, mWindDirection_deg);
+    mWeatherSerializer.writeTemperature_C(mTemperature_C);
+    mWeatherSerializer.writeRelativeHumidity_pct(mRelativeHumidity_pct);
+    mWeatherSerializer.writePAR_umole(mPAR_umole);
+    mWeatherSerializer.writeEndWeatherInfoBlock();
+
 
     for (auto& sensor : mThread.mActiveSensors)
     {
@@ -744,7 +749,7 @@ void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
     emit localStatusMessage("Dolly data updated");
 #endif
 
-    if (mIsRecording)
+    if (mIsRecording && static_cast<bool>(mSpidercamSerializer))
     {
         mSpidercamSerializer.write(mDollyPosition);
     }
@@ -760,7 +765,7 @@ void cRemoteDataModel::onWindData(bool valid, double wind_speed_mps, double wind
     emit localStatusMessage("Wind data updated");
 #endif
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    if (mIsRecording && static_cast<bool>(mWeatherSerializer))
     {
         mWeatherSerializer.writeWindData_mps(mWindDataValid, 
             mWindSpeed_mps, mWindDirection_deg);
@@ -775,7 +780,7 @@ void cRemoteDataModel::onTemperatureData(double temp_C)
     emit localStatusMessage("Temperature data updated");
 #endif
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    if (mIsRecording && static_cast<bool>(mWeatherSerializer))
     {
         mWeatherSerializer.writeTemperature_C(mTemperature_C);
     }
@@ -789,7 +794,7 @@ void cRemoteDataModel::onRelativeHumidityData(double rh_pct)
     emit localStatusMessage("Relative Humidity data updated");
 #endif
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    if (mIsRecording && static_cast<bool>(mWeatherSerializer))
     {
         mWeatherSerializer.writeRelativeHumidity_pct(mRelativeHumidity_pct);
     }
@@ -803,9 +808,34 @@ void cRemoteDataModel::onParData(double par_umole)
     emit localStatusMessage("PAR data updated");
 #endif
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    if (mIsRecording && static_cast<bool>(mWeatherSerializer))
     {
         mWeatherSerializer.writePAR_umole(mPAR_umole);
+    }
+}
+
+void cRemoteDataModel::onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
+    double temp_C, double rh_pct, double par_umole)
+{
+    mWindDataValid = valid;
+    mWindSpeed_mps = wind_speed_mps;
+    mWindDirection_deg = wind_direction_deg;
+    mTemperature_C = temp_C;
+    mRelativeHumidity_pct = rh_pct;
+    mPAR_umole = par_umole;
+
+#ifdef LOG_EXPERIMENT_INFO
+    emit localStatusMessage("weather data updated");
+#endif
+
+    if (mIsRecording && static_cast<bool>(mWeatherSerializer))
+    {
+        mWeatherSerializer.writeBeginWeatherInfoBlock(timestamp_ns());
+        mWeatherSerializer.writeWindData_mps(mWindDataValid, mWindSpeed_mps, mWindDirection_deg);
+        mWeatherSerializer.writeTemperature_C(mTemperature_C);
+        mWeatherSerializer.writeRelativeHumidity_pct(mRelativeHumidity_pct);
+        mWeatherSerializer.writePAR_umole(mPAR_umole);
+        mWeatherSerializer.writeEndWeatherInfoBlock();
     }
 }
 
