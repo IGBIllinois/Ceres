@@ -16,6 +16,7 @@ class cSsnxModel_direct : public cSsnxModel, public cSsnCom
 
 public:
     explicit cSsnxModel_direct(QObject* parent = nullptr);
+    explicit cSsnxModel_direct(const std::string& instance, QObject* parent = nullptr);
     ~cSsnxModel_direct();
 
     /*

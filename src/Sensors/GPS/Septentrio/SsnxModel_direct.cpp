@@ -21,6 +21,15 @@ cSsnxModel_direct::cSsnxModel_direct(QObject* parent)
 {
 }
 
+cSsnxModel_direct::cSsnxModel_direct(const std::string& instance, QObject* parent)
+    :
+    cSsnxModel(instance, parent),
+    mSerialPort(this),
+    mSerialBuffer(1024, '\0')
+{
+}
+
+
 cSsnxModel_direct::~cSsnxModel_direct()
 {
 }

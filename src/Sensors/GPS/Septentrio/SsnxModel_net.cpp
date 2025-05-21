@@ -14,6 +14,13 @@ cSsnxModel_net::cSsnxModel_net(QObject* parent)
     mConnected = false;
 }
 
+cSsnxModel_net::cSsnxModel_net(const std::string& instance, QObject* parent)
+:
+    cSsnxModel(instance, parent)
+{
+    mConnected = false;
+}
+
 cSsnxModel_net::~cSsnxModel_net()
 {
 }

@@ -14,6 +14,7 @@ class cSsnxModel : public cGpsModel
 
 public:
     explicit cSsnxModel(QObject* parent = nullptr);
+    explicit cSsnxModel(const std::string& instance, QObject* parent = nullptr);
     ~cSsnxModel();
 
     /*

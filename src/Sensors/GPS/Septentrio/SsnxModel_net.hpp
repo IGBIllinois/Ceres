@@ -15,6 +15,7 @@ class cSsnxModel_net : public cSsnxModel, public cSsnNetDecoder, private cSsnxGp
 
 public:
     explicit cSsnxModel_net(QObject* parent = nullptr);
+    explicit cSsnxModel_net(const std::string& instance, QObject* parent = nullptr);
     ~cSsnxModel_net();
 
     /*

@@ -14,6 +14,14 @@ cGpsModel::cGpsModel(const std::string& name, QObject* parent)
     mRefMaxIntegrationTimer.time_sec(mRefMaxIntegrationTime_sec);
 }
 
+cGpsModel::cGpsModel(const std::string& name, const std::string& instance, QObject* parent)
+    :
+    cSensorModel(name, instance, parent)
+{
+    mRefMinIntegrationTimer.time_sec(mRefMinIntegrationTime_sec);
+    mRefMaxIntegrationTimer.time_sec(mRefMaxIntegrationTime_sec);
+}
+
 bool cGpsModel::isPositionValid() const
 {
     return mPvtValid;

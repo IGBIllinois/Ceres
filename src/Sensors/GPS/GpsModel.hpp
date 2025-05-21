@@ -52,6 +52,7 @@ signals:
 
 protected:
     cGpsModel(const std::string& name, QObject* parent = nullptr);
+    cGpsModel(const std::string& name, const std::string& instance, QObject* parent = nullptr);
     virtual ~cGpsModel() = default;
 
 protected:

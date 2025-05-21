@@ -19,6 +19,14 @@ cSsnxModel::cSsnxModel(QObject* parent)
 {
 }
 
+cSsnxModel::cSsnxModel(const std::string& instance, QObject* parent)
+    :
+    cGpsModel("SSNX GPS", instance, parent),
+    mSerializer(4096),
+    mDeviceID(++ssnx_device_id)
+{}
+
+
 cSsnxModel::~cSsnxModel()
 {
 }
