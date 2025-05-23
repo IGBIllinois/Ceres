@@ -49,7 +49,7 @@ public slots:
     void onInfoMessage(QString title, QString msg);
     void onWarningMessage(QString title, QString msg) const;
     void onErrorMessage(QString title, QString msg);
-    void onLogMessage(uint8_t type, QString device, QString msg);
+    void onLogMessage(uint8_t type, QString device, QString instance, QString msg);
 
     void onLocalStatusUpdate(QString msg);
     void onLocalLogMessage(uint8_t type, QString device, QString msg);

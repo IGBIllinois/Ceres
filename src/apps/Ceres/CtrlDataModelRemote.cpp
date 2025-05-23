@@ -644,10 +644,20 @@ void cCtrlDataModelRemote::onLogMessage(uint8_t msg_type, const std::string& dev
     mpView->updateLogMsg(msg_type, QString::fromStdString(device), QString::fromStdString(msg));
 }
 
+void cCtrlDataModelRemote::onLogMessage(uint8_t msg_type, const std::string& device, const std::string& instance, const std::string& msg)
+{
+    std::string name = device + ":" + instance;
+    mpView->updateLogMsg(msg_type, QString::fromStdString(name), QString::fromStdString(msg));
+}
+
 void cCtrlDataModelRemote::onSensorStatus(const std::string& sensor, const std::string& status)
 {
-    mpView->updateSensorStatus(QString::fromStdString(sensor),
-        QString::fromStdString(status));
+    mpView->updateSensorStatus(QString::fromStdString(sensor), QString::fromStdString(status));
+}
+
+void cCtrlDataModelRemote::onSensorStatus(const std::string& sensor, const std::string& instance, const std::string& status)
+{
+    mpView->updateSensorStatus(QString::fromStdString(sensor), QString::fromStdString(instance), QString::fromStdString(status));
 }
 
 void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const std::string& new_name)
@@ -663,7 +673,28 @@ void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const
             break;
         }
     }
+}
 
+void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const std::string& new_name, const std::string& instance)
+{
+    auto oname = QString::fromStdString(old_name);
+    oname += ":";
+    oname += QString::fromStdString(instance);
+
+    auto nname = QString::fromStdString(new_name);
+    nname += ":";
+    nname += QString::fromStdString(instance);
+
+    mpView->sensorNameChange(QString::fromStdString(old_name), QString::fromStdString(new_name), QString::fromStdString(instance));
+
+    for (auto* page : mPropertyPages)
+    {
+        if (page->windowTitle() == oname)
+        {
+            page->setTitle(nname);
+            break;
+        }
+    }
 }
 
 void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, 
@@ -676,6 +707,37 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     if (!page) return;
 
     page->setTitle(QString::fromStdString(name));
+    page->createWidgets();
+    page->doLayout();
+
+    connect(page, &cSensorPropertyPage::statusMessage, this, &cDataModel::statusMessage);
+    mPropertyPages.push_back(page);
+
+    emit addSensorPropertyPage(page->showAction());
+
+    cExperimentStateCreator* creator = dynamic_cast<cExperimentStateCreator*>(page);
+
+    if (creator)
+    {
+        mStateCreators.push_back(creator);
+        mThread.mpController->addStateCreator(creator);
+    }
+}
+
+void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor,
+    const std::string& model, uint32_t version, const std::string& name, const std::string& instance,
+    const std::string& ip_address, uint16_t port)
+{
+    cSensorPropertyPage* page = create_sensor_property_page(sensor,
+        model, version, ip_address, port, mLocalIpAddress);
+
+    if (!page) return;
+
+    QString title = QString::fromStdString(name);
+    title += ":";
+    title += QString::fromStdString(instance);
+
+    page->setTitle(title);
     page->createWidgets();
     page->doLayout();
 

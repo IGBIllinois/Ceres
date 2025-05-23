@@ -37,7 +37,7 @@ bool cHySpexSWIR_384_Model::configure(const nlohmann::json& jsonCfg)
     {
         QString msg = "Error in the \"hyspex\" configuration: ";
         msg.append(e.what());
-        emit logMessage(logERROR, q_name(), msg);
+        logMessage(logERROR, msg);
         return false;
     }
 

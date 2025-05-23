@@ -104,7 +104,7 @@ gps::sReferencePosition cGpsModel::getReferencePosition() const
 
 void cGpsModel::startReferenceComputation()
 {
-    emit logMessage(logSTATUS, q_name(), "Reference computation start requested.");
+    logMessage(logSTATUS, "Reference computation start requested.");
 
     if ((mReferenceState == gps::eReferenceState::START)
         || (mReferenceState == gps::eReferenceState::PENDING))
@@ -115,7 +115,7 @@ void cGpsModel::startReferenceComputation()
 
 void cGpsModel::abortReferenceCompute()
 {
-    emit logMessage(logSTATUS, q_name(), "Reference computation abort requested.");
+    logMessage(logSTATUS, "Reference computation abort requested.");
     
     mReferenceState = gps::eReferenceState::ABORT;
 }
@@ -128,7 +128,7 @@ void cGpsModel::calcReferencePosition()
         mRefMinIntegrationTimer.start();
         mRefMaxIntegrationTimer.start();
 
-        emit logMessage(logSTATUS, q_name(), "Reference computation started...");
+        logMessage(logSTATUS, "Reference computation started...");
     }
 
     if (mReferenceState == gps::eReferenceState::ABORT)
@@ -143,7 +143,7 @@ void cGpsModel::calcReferencePosition()
 
         emit referenceChanged(-1, -1, -1, -1.0, -1);
 
-        emit logMessage(logSTATUS, q_name(), "Reference computation aborted!");
+        logMessage(logSTATUS, "Reference computation aborted!");
         return;
     }
 
@@ -162,7 +162,7 @@ void cGpsModel::calcReferencePosition()
 
             emit referenceComplete();
             emit referenceChanged(-1, -1, -1, -1.0, count);
-            emit logMessage(logSTATUS, q_name(), "Reference computation failed!");
+            logMessage(logSTATUS, "Reference computation failed!");
 
             return;
         }
@@ -228,7 +228,7 @@ void cGpsModel::calcReferencePosition()
 
         emit referenceChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
 
-        emit logMessage(logSTATUS, q_name(), "Reference computation hit max integration time!");
+        logMessage(logSTATUS, "Reference computation hit max integration time!");
 
         mReferenceState = gps::eReferenceState::COMPLETE_GOOD;
 
@@ -317,7 +317,7 @@ void cGpsModel::calcReferencePosition()
         auto p = rfb::fromGPS(avgLat_rad, avgLng_rad, avgHeight_m);
 
         emit referenceChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
-        emit logMessage(logSTATUS, q_name(), "Reference computation complete");
+        logMessage(logSTATUS, "Reference computation complete");
     }
 }
 

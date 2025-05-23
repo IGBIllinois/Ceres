@@ -59,7 +59,7 @@ uint8_t cAxisCommunicationsModel_F44::device_id() const
 
 void cAxisCommunicationsModel_F44::updateViews()
 {
-    emit sensorStatusChanging(q_name(), getStatus());
+    emit sensorStatusChanging(q_name(), q_instance(), getStatus());
 
     emit cameraIdChanged(getActiveCameraID());
     emit frameRateChanged(getActiveFramesRate_fps());
@@ -88,7 +88,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
         {
             QString str = "Error in the \"axis_communications\" configuration:\n";
             str.append("The F44 controller only supports a maximum of four cameras.");
-            emit logMessage(logERROR, q_name(), str);
+            logMessage(logERROR, str);
 
             setStatus(sensor::eStatus::FAILED);
             return false;
@@ -117,7 +117,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
             {
                 QString str = "Error in the \"axis_communications\" configuration:\n";
                 str.append("The F44 controller only supports a maximum of four cameras.");
-                emit logMessage(logERROR, q_name(), str);
+                logMessage(logERROR, str);
 
                 setStatus(sensor::eStatus::FAILED);
                 return false;
@@ -147,7 +147,7 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
     {
         setStatus(sensor::eStatus::FAILED);
         qCritical() << "Axis Communications F44 failed configuration";
-        emit logMessage(logERROR, q_name(), "Axis Communications F44 failed configuration");
+        logMessage(logERROR, "Axis Communications F44 failed configuration");
         return false;
     }
 
@@ -315,7 +315,7 @@ void cAxisCommunicationsModel_F44::setActiveImageSize(rgb::sImageSize_t image_si
     msg += QString::number(image_size.height);
 
 #ifdef USE_LOG_MESSAGE
-    emit logMessage(logSTATUS, q_name(), msg);
+    logMessage(logSTATUS, msg);
 #else
     emit statusMessage(msg);
 #endif
@@ -353,7 +353,7 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
     msg += QString::number(fps);
 
 #ifdef USE_LOG_MESSAGE
-    emit logMessage(logSTATUS, q_name(), msg);
+    logMessage(logSTATUS, msg);
 #else
     emit statusMessage(msg);
 #endif
@@ -385,7 +385,7 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
         {
             QString msg = "Error in writing MPEG frame: ";
             msg += e.what();
-            emit logMessage(logERROR, q_name(), msg);
+            logMessage(logERROR, msg);
             qCritical() << msg;
         }
     }
@@ -411,7 +411,7 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
         {
             QString msg = "Error in writing JPEG: ";
             msg += e.what();
-            emit logMessage(logERROR, q_name(), msg);
+            logMessage(logERROR, msg);
             qCritical() << msg;
         }
     }
@@ -419,9 +419,10 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
 
 void cAxisCommunicationsModel_F44::errorHappend(int id, QString msg)
 {
-    QString title = "Camera ";
-    title += QString::number(id);
-    emit logMessage(logERROR, title, msg);
+    QString full_msg = "Camera ";
+    full_msg += QString::number(id);
+    full_msg += ": " + msg;
+    logMessage(logERROR, full_msg);
 
     setStatus(sensor::eStatus::FAILED);
 }
@@ -452,7 +453,7 @@ void cAxisCommunicationsModel_F44::stateChanged(int id, cAxisCamera::GrabbingSta
     }
 
 #ifdef USE_LOG_MESSAGE
-    emit logMessage(logSTATUS, q_name(), msg);
+    logMessage(logSTATUS, msg);
 #else
     emit statusMessage(msg);
 #endif

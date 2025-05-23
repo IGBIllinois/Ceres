@@ -39,6 +39,16 @@ const std::string& cOusterController::name() const
     return mpModel->name();
 }
 
+const std::string& cOusterController::instance() const
+{
+    return mpModel->instance();
+}
+
+bool cOusterController::has_instance() const
+{
+    return mpModel->has_instance();
+}
+
 void cOusterController::processStream(const void* pBuffer, std::size_t buf_length)
 {
     if (!pBuffer)

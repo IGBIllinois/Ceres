@@ -38,6 +38,16 @@ const std::string& cGpsController::name() const
     return mpModel->name();
 }
 
+const std::string& cGpsController::instance() const
+{
+    return mpModel->instance();
+}
+
+bool cGpsController::has_instance() const
+{
+    return mpModel->has_instance();
+}
+
 void cGpsController::txReferenceData(cGpsControllerNetEncoder* encoder)
 {
     auto pos = mpModel->getReferencePosition();

@@ -148,6 +148,6 @@ void cOusterModel::setAzimuthWindow(ouster::azimuth_range_t range)
     msg += QString::number(range.max_deg);
     msg += ")";
 
-    emit logMessage(logINFO, q_name(), msg);
+    logMessage(logINFO, msg);
 }
 

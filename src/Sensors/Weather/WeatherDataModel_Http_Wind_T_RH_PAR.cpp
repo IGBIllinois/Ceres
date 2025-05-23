@@ -77,7 +77,7 @@ bool cWeatherDataModel_Http_Wind_T_RH_PAR::configure(const nlohmann::json& jsonC
 		// Error
 		QString msg = "Wind Data Communication Error: ";
 		msg += reply->errorString();
-		emit logMessage(logERROR, q_name(), msg);
+		logMessage(logERROR, msg);
 
 		return false;
 	}
@@ -192,7 +192,7 @@ bool cWeatherDataModel_Http_Wind_T_RH_PAR::configure(const nlohmann::json& jsonC
 	{
 		QString msg = "Wind Data Communication Error: ";
 		msg += e.what();
-		emit logMessage(logERROR, q_name(), msg);
+		logMessage(logERROR, msg);
 
 		return false;
 	}

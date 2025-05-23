@@ -69,7 +69,48 @@ void cRemoteClientView::updateSensorStatus(const QString& sensor, const QString&
 	update();
 }
 
+void cRemoteClientView::updateSensorStatus(const QString& sensor, const QString& instance, const QString& status)
+{
+	QString device_name = sensor + ":" + instance;
+	for (auto sensor_status : mSensorStatus)
+	{
+		if (sensor_status.mpSensorLabel->text() == device_name)
+		{
+			sensor_status.mpSensorStatus->setText(status);
+			update();
+			return;
+		}
+	}
+
+	sSensorStatus_t new_sensor;
+
+	new_sensor.mpSensorLabel = new QLabel();
+	new_sensor.mpSensorLabel->setText(device_name);
+	new_sensor.mpSensorStatus = new QLineEdit();
+	new_sensor.mpSensorStatus->setReadOnly(true);
+	new_sensor.mpSensorStatus->setText(status);
+
+	mSensorStatus.emplace_back(new_sensor);
+
+	verticalLayout();
+
+	update();
+}
+
 void cRemoteClientView::sensorNameChange(const QString& old_name, const QString& new_name)
+{
+	for (auto sensor : mSensorStatus)
+	{
+		if (sensor.mpSensorLabel->text() == old_name)
+		{
+			sensor.mpSensorLabel->setText(new_name);
+			update();
+			return;
+		}
+	}
+}
+
+void cRemoteClientView::sensorNameChange(const QString& old_name, const QString& new_name, const QString& instance)
 {
 	for (auto sensor : mSensorStatus)
 	{

@@ -50,13 +50,15 @@ public:
     void sendStatusMessage(const std::string& msg);
 
     void sendLogMessage(uint8_t type, const QString& device, const QString& msg);
+    void sendLogMessage(uint8_t type, const QString& device, const QString& instaqnce, const QString& msg);
     void sendLogMessage(uint8_t type, const std::string& device, const std::string& msg);
+    void sendLogMessage(uint8_t type, const std::string& device, const std::string& instance, const std::string& msg);
 
     const cRemoteDataThread& getThread() const { return mThread; }
 
 signals:
     void requestDataRecordingState(bool record);
-    void logMessage(quint8 type, QString device, QString msg);
+    void logMessage(quint8 type, QString device, QString instance, QString msg);
 
     void localStatusMessage(QString msg) const;
     void localLogMessage(quint8 type, QString device, QString msg);
@@ -71,8 +73,8 @@ private slots:
  * Signals handlers from the sensors
  */
 private slots:
-    void updateSensorStatus(QString name, sensor::eStatus status);
-    void updateSensorName(QString old_name, QString new_name);
+    void updateSensorStatus(QString name, QString instance, sensor::eStatus status);
+    void updateSensorName(QString old_name, QString new_name, QString instance);
 
 /*
  * Signals handlers from the TCP server

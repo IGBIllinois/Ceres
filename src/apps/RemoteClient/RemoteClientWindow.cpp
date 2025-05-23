@@ -378,12 +378,17 @@ void cRemoteClientWindow::onErrorMessage(QString title, QString msg)
     msg_box.exec();
 }
 
-void cRemoteClientWindow::onLogMessage(uint8_t type, QString device, QString msg)
+void cRemoteClientWindow::onLogMessage(uint8_t type, QString device, QString instance, QString msg)
 {
-    mMainModel.sendLogMessage(type, device, msg);
+    if (instance.isEmpty())
+        mMainModel.sendLogMessage(type, device, msg);
+    else
+        mMainModel.sendLogMessage(type, device, instance, msg);
 
     if (mpCentralWindow)
+    {
         mpCentralWindow->logMessage(type, device, msg);
+    }
 }
 
 void cRemoteClientWindow::onLocalStatusUpdate(QString msg)
@@ -482,6 +487,7 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
 
             if (sensor.contains("sensor"))
             {
+
                 msg += ", sensor name: ";
                 msg += sensor["sensor"];
             }
@@ -493,8 +499,12 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
             continue;
         }
 
+        if (sensor.contains("instance"))
+            widgets.pModel->setInstanceName(sensor["instance"]);
+
+
         QObject::connect(widgets.pModel, &cSensorModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
-        QObject::connect(widgets.pModel, &cSensorModel::logMessage,     this, &cRemoteClientWindow::onLogMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::elogMessage,     this, &cRemoteClientWindow::onLogMessage);
 
         if (widgets.pStatusBar)
         {
@@ -519,7 +529,6 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         {
             entry += ":";
             entry += sensor["instance"];
-            widgets.pModel->setInstanceName(sensor["instance"]);
         }
 
         if (configDoc.contains(entry))

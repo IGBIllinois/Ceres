@@ -38,6 +38,16 @@ const std::string& cAxisCommunicationsController::name() const
     return mpModel->name();
 }
 
+const std::string& cAxisCommunicationsController::instance() const
+{
+    return mpModel->instance();
+}
+
+bool cAxisCommunicationsController::has_instance() const
+{
+    return mpModel->has_instance();
+}
+
 void cAxisCommunicationsController::processStream(const void* pBuffer, std::size_t buf_length)
 {
     if (!pBuffer)
@@ -117,6 +127,16 @@ const std::string& cAxisCommunicationsController_F44::serial_number() const
 const std::string& cAxisCommunicationsController_F44::name() const
 {
     return mpModel->name();
+}
+
+const std::string& cAxisCommunicationsController_F44::instance() const
+{
+    return mpModel->instance();
+}
+
+bool cAxisCommunicationsController_F44::has_instance() const
+{
+    return mpModel->has_instance();
 }
 
 void cAxisCommunicationsController_F44::processStream(const void* pBuffer, std::size_t buf_length)

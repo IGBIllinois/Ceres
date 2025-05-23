@@ -27,7 +27,11 @@ public:
     void enableReconnectButton(bool enable);
 
     void updateSensorStatus(const QString& sensor, const QString& status);
+    void updateSensorStatus(const QString& sensor, const QString& instance, const QString& status);
+
     void sensorNameChange(const QString& old_name, const QString& new_name);
+    void sensorNameChange(const QString& old_name, const QString& new_name, const QString& instance);
+
     void removeAllSensors();
 
     void updateStatusMsg(const QString& msg);

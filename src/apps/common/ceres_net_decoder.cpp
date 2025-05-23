@@ -47,7 +47,14 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
         LogMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto data = to_log_message_1(packet);
-        onLogMessage(data.msg_type, data.device, data.message);
+        if (data.instance.empty())
+        {
+            onLogMessage(data.msg_type, data.device, data.message);
+        }
+        else
+        {
+            onLogMessage(data.msg_type, data.device, data.instance, data.message);
+        }
         break;
     }
     case ePacketType::SENSOR_STATUS:
@@ -55,7 +62,14 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
         SensorStatus_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         sSensorStatus_t data = to_sensor_status_1(packet);
-        onSensorStatus(data.name, data.status);
+        if (data.instance.empty())
+        {
+            onSensorStatus(data.name, data.status);
+        }
+        else
+        {
+            onSensorStatus(data.name, data.instance, data.status);
+        }
         break;
     }
     case ePacketType::SENSOR_NAME_CHANGE:
@@ -63,7 +77,14 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
         SensorNameChange_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         sSensorNameChange_t data = to_sensor_name_change_1(packet);
-        onSensorNameChange(data.old_name, data.new_name);
+        if (data.instance.empty())
+        {
+            onSensorNameChange(data.old_name, data.new_name);
+        }
+        else
+        {
+            onSensorNameChange(data.old_name, data.new_name, data.instance);
+        }
         break;
     }
     case ePacketType::SENSOR_PROPERTY_CONNECT_INFO:
@@ -71,8 +92,16 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
         SensorPropertyConnectInfo_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         sSensorPropertyConnectInfo_t data = to_sensor_property_connect_info_1(packet);
-        onSensorPropertyConnectInfo(data.sensor, data.model, data.version, 
-            data.name, data.ip_address, data.port);
+        if (data.instance.empty())
+        {
+            onSensorPropertyConnectInfo(data.sensor, data.model, data.version,
+                data.name, data.ip_address, data.port);
+        }
+        else
+        {
+            onSensorPropertyConnectInfo(data.sensor, data.model, data.version,
+                data.name, data.instance, data.ip_address, data.port);
+        }
         break;
     }
     }

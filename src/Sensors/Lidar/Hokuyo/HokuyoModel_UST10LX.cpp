@@ -358,6 +358,6 @@ void cHokuyoModel_UST10LX::emitStatusMessage(QString& msg)
 
 void cHokuyoModel_UST10LX::emitLogMessage(quint8 type, QString msg)
 {
-    emit logMessage(type, q_name(), msg);
+    logMessage(type, msg);
 }
 

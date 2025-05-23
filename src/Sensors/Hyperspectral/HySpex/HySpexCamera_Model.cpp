@@ -207,7 +207,7 @@ HySpexConnect::cSpectralData<float> cHySpexCameraModel::getSpectralDistributionD
 
 void cHySpexCameraModel::postLogMessage(quint8 type, QString device, QString msg)
 {
-    emit logMessage(logSTATUS, device, msg);
+    emit elogMessage(logSTATUS, device, "", msg);
 }
 
 void cHySpexCameraModel::computeFocusNumber(const HySpexConnect::spatial_major_data_view<uint16_t>& image)

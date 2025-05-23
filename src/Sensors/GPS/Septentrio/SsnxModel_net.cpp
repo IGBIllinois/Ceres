@@ -46,7 +46,7 @@ bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
     {
         QString str = "Error in the \"ssnx\" configuration: ";
         str.append(e.what());
-        emit logMessage(logERROR, q_name(), str);
+        logMessage(logERROR, str);
         return false;
     }
 
@@ -58,7 +58,7 @@ bool cSsnxModel_net::configure(const nlohmann::json& jsonCfg)
 
     if (!try_to_connect(ip, port, false))
     {
-        emit logMessage(logERROR, q_name(), "Could not establish connection to GPS receiver!");
+        logMessage(logERROR, "Could not establish connection to GPS receiver!");
         return false;
     }
 
@@ -69,7 +69,7 @@ bool cSsnxModel_net::startCommunications()
 {
     if (!cSsnxGpsStream::startCommunications())
     {
-        emit logMessage(logERROR, q_name(), "Could not establish connection to GPS receiver!");
+        logMessage(logERROR, "Could not establish connection to GPS receiver!");
         return false;
     }
 
@@ -77,7 +77,7 @@ bool cSsnxModel_net::startCommunications()
 
     if (!mConnected)
     {
-        emit logMessage(logERROR, q_name(), "Could not establish connection to GPS receiver!");
+        logMessage(logERROR, "Could not establish connection to GPS receiver!");
         return false;
     }
 

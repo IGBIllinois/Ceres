@@ -14,7 +14,15 @@ cSensorStatusView::cSensorStatusView(cSensorModel* pModel, QWidget* parent)
 :
 	QWidget(parent)
 {
-	setWindowTitle(pModel->name().c_str());
+	auto title = pModel->name();
+
+	if (pModel->has_instance())
+	{
+		title += ":";
+		title += pModel->instance();
+	}
+
+	setWindowTitle(title.c_str());
 }
 
 cSensorStatusView::~cSensorStatusView()
@@ -38,7 +46,7 @@ void cSensorStatusView::createWidgets()
 	mpSensorStatusBox->setLayout(sensorInfoLayout);
 }
 
-void cSensorStatusView::onSensorStatusChange(QString name, sensor::eStatus status)
+void cSensorStatusView::onSensorStatusChange(QString name, QString instance, sensor::eStatus status)
 {
 	QString str = QString::fromStdString(sensor::to_string(status));
 	mpSensorStatus->setText(str);

@@ -71,6 +71,7 @@ public:
     /*
      * Returns a string used as the sensor instance.
      */
+    bool has_instance() const { return !mSensorInstance.empty(); };
     const std::string& instance() const { return mSensorInstance; };
 
     /*
@@ -153,14 +154,10 @@ public slots:
 signals:
     void statusMessage(QString msg);
 
-//    void infoMessage(QString title, QString msg);
-//    void warningMessage(QString title, QString msg);
-//    void errorMessage(QString title, QString msg);
+    void elogMessage(quint8 type, QString device, QString instance, QString msg);
 
-    void logMessage(quint8 type, QString device, QString msg);
-
-    void sensorStatusChanging(QString name, sensor::eStatus status);
-    void sensorNameChanging(QString old_name, QString new_name);
+    void sensorStatusChanging(QString name, QString instance, sensor::eStatus status);
+    void sensorNameChanging(QString old_name, QString new_name, QString instance);
 
 public:
     /*
@@ -174,8 +171,10 @@ protected:
 
     void setStatus(const sensor::eStatus status);
     void updateName(const std::string& name);
+    void logMessage(quint8 type, QString msg);
 
-    QString q_name() const { return QString::fromStdString(mSensorName); }
+    QString q_name() const      { return QString::fromStdString(mSensorName); }
+    QString q_instance() const  { return QString::fromStdString(mSensorInstance); }
 
 protected:
     bool mIsInitialized = false;

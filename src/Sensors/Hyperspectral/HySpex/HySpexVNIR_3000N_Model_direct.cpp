@@ -69,7 +69,7 @@ bool cHySpexVNIR_3000N_Model_direct::configure(const nlohmann::json& jsonCfg)
         msg.append(e.what());
         qCritical() << msg;
 
-        emit logMessage(logERROR, q_name(), msg);
+        logMessage(logERROR, msg);
 
         setStatus(sensor::eStatus::FAILED);
 
@@ -134,7 +134,7 @@ bool cHySpexVNIR_3000N_Model_direct::initialize()
         {
             QString msg = "VNIR-3000N: ";
             msg += to_string(mInitStatus).c_str();
-            emit logMessage(logERROR, q_name(), msg);
+            logMessage(logERROR, msg);
 
             qCritical() << msg;
 

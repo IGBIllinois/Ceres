@@ -24,6 +24,8 @@ public:
     virtual const std::string& serial_number() const = 0;
 
     virtual const std::string& name() const = 0;
+    virtual const std::string& instance() const = 0;
+    virtual bool has_instance() const = 0;
 
 public:
     bool startTcpServer(const std::string& ip);

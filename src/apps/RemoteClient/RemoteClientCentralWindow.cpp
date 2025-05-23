@@ -20,12 +20,28 @@ cRemoteClientCentalWindow::~cRemoteClientCentalWindow()
 }
 
 //-----------------------------------------------------------------------------
-void cRemoteClientCentalWindow::updateSensorName(QString old_name, QString new_name)
+void cRemoteClientCentalWindow::updateSensorName(QString old_name, QString new_name, QString instance)
 {
+    QString oname = old_name;
+
+    if (!instance.isEmpty())
+    {
+        oname += ":";
+        oname += instance;
+    }
+
+    QString nname = new_name;
+
+    if (!instance.isEmpty())
+    {
+        nname += ":";
+        nname += instance;
+    }
+
     qInfo() << "Changing sensor name from ";
-    qInfo() << old_name;
+    qInfo() << oname;
     qInfo() << " to ";
-    qInfo() << new_name;
+    qInfo() << nname;
     qInfo() << "\n";
 
     auto n = count();
@@ -33,7 +49,13 @@ void cRemoteClientCentalWindow::updateSensorName(QString old_name, QString new_n
     {
         if (tabText(i) == old_name)
         {
-            setTabText(i, new_name);
+            setTabText(i, nname);
+            break;
+        }
+
+        if (tabText(i) == oname)
+        {
+            setTabText(i, nname);
             break;
         }
     }

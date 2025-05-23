@@ -180,26 +180,32 @@ struct sLogMessage_t
 {
 	uint8_t  msg_type;
 	std::string device;
+	std::string instance;
 	std::string message;
 };
 sLogMessage_t to_log_message_1(const LogMessage_1& pckt);
 int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& message, net_buffer& buffer);
+int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& instance, const std::string& message, net_buffer& buffer);
 
 struct sSensorStatus_t
 {
 	std::string name;
+	std::string instance;
 	std::string status;
 };
 sSensorStatus_t to_sensor_status_1(const SensorStatus_1& pckt);
 int encode_sensor_status(const std::string& device, const std::string& message, net_buffer& buffer);
+int encode_sensor_status(const std::string& device, const std::string& instance, const std::string& message, net_buffer& buffer);
 
 struct sSensorNameChange_t
 {
 	std::string old_name;
 	std::string new_name;
+	std::string instance;
 };
 sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt);
 int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, net_buffer& buffer);
+int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, const std::string& instance, net_buffer& buffer);
 
 struct sSensorPropertyConnectInfo_t
 {
@@ -207,13 +213,20 @@ struct sSensorPropertyConnectInfo_t
 	std::string model;
 	uint32_t    version;
 	std::string name;
+	std::string instance;
 	std::string ip_address;
 	uint16_t	port;
 };
 sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPropertyConnectInfo_1& pckt);
+
 int encode_sensor_property_connect_info(const std::string& sensor, 
 	const std::string& model, uint32_t version,
 	const std::string& name, const std::string& ip_address, uint16_t port, net_buffer& buffer);
+
+int encode_sensor_property_connect_info(const std::string& sensor,
+	const std::string& model, uint32_t version,
+	const std::string& name, const std::string& instance, 
+	const std::string& ip_address, uint16_t port, net_buffer& buffer);
 
 
 /**********************************************************

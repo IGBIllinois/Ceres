@@ -36,7 +36,7 @@ cSsnxModel_direct::~cSsnxModel_direct()
 
 void cSsnxModel_direct::updateViews()
 {
-    emit sensorStatusChanging(q_name(), getStatus());
+    emit sensorStatusChanging(q_name(), q_instance(), getStatus());
 
     emit pvtCartesianStateChanged(mPvtCartesianValid);
     emit pvtGeodeticStateChanged(mPvtGeodeticValid);
@@ -82,7 +82,7 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
     {
         QString msg = "Error in the \"ssnx\" configuration: ";
         msg.append(e.what());
-        emit logMessage(logERROR, q_name(), msg);
+        logMessage(logERROR, msg);
         return false;
     }
 
@@ -95,7 +95,7 @@ bool cSsnxModel_direct::startCommunications()
 
     if (!mSerialPort.open(QIODevice::ReadWrite))
     {
-        emit logMessage(logERROR, q_name(), "Could not establish connection to GPS receiver!");
+        logMessage(logERROR, "Could not establish connection to GPS receiver!");
         return false;
     }
 
@@ -131,7 +131,7 @@ bool cSsnxModel_direct::isConnected()
     if (!mSerialPort.isOpen())
     {
 #ifdef USE_LOG_MESSAGE
-        emit logMessage(logSTATUS, q_name(), "Serial port is not open.");
+        logMessage(logSTATUS, "Serial port is not open.");
 #else
         emit statusMessage("Serial port is not open.");
 #endif
@@ -143,7 +143,7 @@ bool cSsnxModel_direct::isConnected()
 void cSsnxModel_direct::communicationError(const std::string& errorString)
 {
     QString msg = QString::fromStdString(errorString);
-    emit logMessage(logERROR, q_name(), msg);
+    logMessage(logERROR, msg);
 }
 
 void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDescriptor)
@@ -152,7 +152,7 @@ void cSsnxModel_direct::newConnectionDescriptor(const std::string& connectionDes
     msg += QString::fromStdString(connectionDescriptor);
 
 #ifdef USE_LOG_MESSAGE
-    emit logMessage(logSTATUS, q_name(), msg);
+    logMessage(logSTATUS, msg);
 #else
     emit statusMessage(msg);
 #endif
@@ -174,7 +174,7 @@ void cSsnxModel_direct::newAsciiDisplay(const std::string& asciiDisplay)
     msg += QString::fromStdString(asciiDisplay);
 
 #ifdef USE_LOG_MESSAGE
-    emit logMessage(logSTATUS, q_name(), msg);
+    logMessage(logSTATUS, msg);
 #else
     emit statusMessage(msg);
 #endif
@@ -198,7 +198,7 @@ void cSsnxModel_direct::stopReceived()
 
 
 #ifdef USE_LOG_MESSAGE
-    emit logMessage(logSTATUS, q_name(), "STOP received from the GPS receiver!");
+    logMessage(logSTATUS, "STOP received from the GPS receiver!");
 #else
     emit statusMessage("STOP received from the GPS receiver!");
 #endif

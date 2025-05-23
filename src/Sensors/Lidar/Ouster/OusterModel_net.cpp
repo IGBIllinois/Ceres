@@ -82,7 +82,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
                 QString str = "Error in the \"ouster\" configuration:\n";
                 str.append("    The \"azimuth window\" min/max values must be in the range 0.0 to 360.0 degrees.\n");
                 str.append("\nThe \"azimuth window\" parameters will be ignored.");
-                emit logMessage(logWARNING, q_name(), str);
+                logMessage(logWARNING, str);
                 azimuth_min_deg.reset();
                 azimuth_max_deg.reset();
             }
@@ -91,7 +91,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
                 QString str = "Error in the \"ouster\" configuration:\n";
                 str.append("    The minimum angle for the \"azimuth window\" must be less than the maximum angle.\n");
                 str.append("\nThe \"azimuth window\" parameters will be ignored.");
-                emit logMessage(logWARNING, q_name(), str);
+                logMessage(logWARNING, str);
                 azimuth_min_deg.reset();
                 azimuth_max_deg.reset();
             }
@@ -131,7 +131,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
                 str.append("        512x10, 1024x10, 2048x10\n");
                 str.append("        512x20, 1024x20\n");
                 str.append("\nThe \"mode\" parameter will be ignored.");
-                emit logMessage(logWARNING, q_name(), str);
+                logMessage(logWARNING, str);
             }
         }
     }
@@ -139,19 +139,19 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
     {
         QString str = "Error in the \"ouster\" configuration: ";
         str.append(e.what());
-        emit logMessage(logERROR, q_name(), str);
+        logMessage(logERROR, str);
         return false;
     }
 
     qInfo() << "Searching for OUSTER LiDARs...";
-    emit logMessage(logSTATUS, q_name(), "Searching for OUSTER LiDARs...");
+    logMessage(logSTATUS, "Searching for OUSTER LiDARs...");
 
     auto sensors = ouster::find_sensors(false, true, false);
 
     if (sensors.empty())
     {
         qCritical() << "No Ouster sensors were detected on the network!";
-        emit logMessage(logERROR, q_name(), "No Ouster sensors were detected on the network!");
+        logMessage(logERROR, "No Ouster sensors were detected on the network!");
         return false;
     }
     
@@ -167,7 +167,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
         std::cout << std::endl;
         std::cout << "Please use the \"lidar_hostname\" command line option to select sensor." << std::endl;
 */
-        emit logMessage(logERROR, q_name(), "Multiple Ouster sensors were detected on the network!");
+        logMessage(logERROR, "Multiple Ouster sensors were detected on the network!");
         return false;
     }
 
@@ -187,7 +187,7 @@ bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)
 
     if (!mCmdStream.connect_to_sensor(sensor_ip, use_ipv6, local_ip))
     {
-        emit logMessage(logERROR, q_name(), "Could not establish command connection to OUSTER lidar!");
+        logMessage(logERROR, "Could not establish command connection to OUSTER lidar!");
         return false;
     }
 
@@ -282,14 +282,14 @@ bool cOusterModel_net::initialize()
 
     if (!cOusterImuStream_Qt::determineLocalEndpoint(mDstIpAddress, mImuPort, mUseIpv6))
     {
-        emit logMessage(logERROR, q_name(), "Could not establish IMU data connection to OUSTER lidar!");
+        logMessage(logERROR, "Could not establish IMU data connection to OUSTER lidar!");
         setStatus(sensor::eStatus::FAILED);
         return false;
     }
 
     if (!cOusterLidarStream_Qt::determineLocalEndpoint(mDstIpAddress, mImuPort, mUseIpv6))
     {
-        emit logMessage(logERROR, q_name(), "Could not establish data connection to OUSTER lidar!");
+        logMessage(logERROR, "Could not establish data connection to OUSTER lidar!");
         setStatus(sensor::eStatus::FAILED);
         return false;
     }
@@ -347,7 +347,7 @@ void cOusterModel_net::setLidarMode(ouster::eLIDAR_MODE mode)
     QString msg = "Lidar mode set to ";
     msg += QString::fromStdString(to_string(mode));
 
-    emit logMessage(logINFO, q_name(), msg);
+    logMessage(logINFO, msg);
 }
 
 
@@ -398,7 +398,7 @@ bool cOusterModel_net::startCommunications()
 
     if (!cOusterImuStream_Qt::startCommunications(mDstIpAddress, mImuPort, mUseIpv6))
     {
-        emit logMessage(logERROR, q_name(), "Could not establish IMU data connection to OUSTER lidar!");
+        logMessage(logERROR, "Could not establish IMU data connection to OUSTER lidar!");
         setStatus(sensor::eStatus::FAILED);
         return false;
     }
@@ -407,7 +407,7 @@ bool cOusterModel_net::startCommunications()
 
     if (!cOusterLidarStream_Qt::startCommunications(mDstIpAddress, mLidarPort, mUseIpv6))
     {
-        emit logMessage(logERROR, q_name(), "Could not establish data connection to OUSTER lidar!");
+        logMessage(logERROR, "Could not establish data connection to OUSTER lidar!");
         setStatus(sensor::eStatus::FAILED);
         return false;
     }
@@ -420,7 +420,7 @@ bool cOusterModel_net::startCommunications()
     setStatus(sensor::eStatus::CONNECTED);
 
 #ifdef USE_LOG_MESSAGE
-    emit logMessage(logSTATUS, q_name(), "LiDAR data connected");
+    logMessage(logSTATUS, "LiDAR data connected");
 #else
     emit statusMessage("LiDAR data connected");
 #endif
@@ -771,7 +771,7 @@ void cOusterModel_net::emitStatusMessage(QString& msg)
 
 void cOusterModel_net::emitLogMessage(quint8 type, QString msg)
 {
-    emit logMessage(type, q_name(), msg);
+    logMessage(type, msg);
 }
 
 void cOusterModel_net::startCmdQueue()

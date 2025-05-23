@@ -22,6 +22,8 @@ public:
     const std::string& model() const override;
     const std::string& serial_number() const override;
     const std::string& name() const override;
+    const std::string& instance() const override;
+    bool has_instance() const override;
 
 public slots:
     virtual void onReferenceComplete() = 0;

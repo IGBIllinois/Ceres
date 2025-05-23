@@ -511,7 +511,7 @@ void cMainWindow::onErrorMessage(QString title, QString msg)
     msg_box.exec();
 }
 
-void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
+void cMainWindow::onLogMessage(uint8_t type, QString device, QString instance, QString msg)
 {
     switch (type)
     {
@@ -907,7 +907,7 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
 //        QObject::connect(widgets.pModel, &cSensorModel::infoMessage, this, &cMainWindow::onInfoMessage);
 //        QObject::connect(widgets.pModel, &cSensorModel::warningMessage, this, &cMainWindow::onWarningMessage);
 //        QObject::connect(widgets.pModel, &cSensorModel::errorMessage, this, &cMainWindow::onErrorMessage);
-        QObject::connect(widgets.pModel, &cSensorModel::logMessage, this, &cMainWindow::onLogMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::elogMessage, this, &cMainWindow::onLogMessage);
 
         if (!configDoc.contains(type))
         {

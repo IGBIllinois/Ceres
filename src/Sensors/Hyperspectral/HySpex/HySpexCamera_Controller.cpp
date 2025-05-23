@@ -38,6 +38,16 @@ const std::string& cHySpexCamera_Controller::name() const
     return mpModel->name();
 }
 
+const std::string& cHySpexCamera_Controller::instance() const
+{
+    return mpModel->instance();
+}
+
+bool cHySpexCamera_Controller::has_instance() const
+{
+    return mpModel->has_instance();
+}
+
 void cHySpexCamera_Controller::txCurrentState(cHySpexCamera_ControllerNetEncoder* encoder)
 {
     std::uint16_t average_frames = mpModel->getAverageFrames();

@@ -112,7 +112,7 @@ void cRemoteDataModel::addSensor(cSensorModel* pSensor)
     {
         connect(pSensor, &cSensorModel::sensorStatusChanging, this, &cRemoteDataModel::updateSensorStatus);
         connect(pSensor, &cSensorModel::sensorNameChanging, this, &cRemoteDataModel::updateSensorName);
-
+    
         if (!pSensor->initialize())
         {
             emit statusMessage("Sensor failed initialization!");
@@ -163,9 +163,19 @@ void cRemoteDataModel::sendLogMessage(uint8_t type, const QString& device, const
     cCeresRemoteClientNetEncoder::sendLogMessage(type, device.toStdString(), msg.toStdString());
 }
 
+void cRemoteDataModel::sendLogMessage(uint8_t type, const QString& device, const QString& instance, const QString& msg)
+{
+    cCeresRemoteClientNetEncoder::sendLogMessage(type, device.toStdString(), instance.toStdString(), msg.toStdString());
+}
+
 void cRemoteDataModel::sendLogMessage(uint8_t type, const std::string& device, const std::string& msg)
 {
     cCeresRemoteClientNetEncoder::sendLogMessage(type, device, msg);
+}
+
+void cRemoteDataModel::sendLogMessage(uint8_t type, const std::string& device, const std::string& instance, const std::string& msg)
+{
+    cCeresRemoteClientNetEncoder::sendLogMessage(type, device, instance, msg);
 }
 
 /********************************************************************
@@ -245,7 +255,7 @@ void cRemoteDataModel::onOpenDataFile(const std::string& fileName)
         sendDataFileState(false);
         QString msg = "Failed to open file ";
         msg.append(mFullyQualifiedFileName.c_str());
-        emit logMessage(logERROR, "Remote Client", msg);
+        emit logMessage(logERROR, "Remote Client", "", msg);
         emit statusMessage(msg);
         sendDataFileState(false);
         return;
@@ -291,7 +301,7 @@ void cRemoteDataModel::onCloseDataFile()
     QString msg = QString::fromStdString(mFullyQualifiedFileName.filename().string());
     msg += ", size = ";
     msg += QString::fromStdString(to_human_readable_size(fs));
-    emit logMessage(logINFO, "Remote Client", msg);
+    emit logMessage(logINFO, "Remote Client", "", msg);
 }
 
 void cRemoteDataModel::onStartDataRecording()
@@ -848,23 +858,49 @@ void cRemoteDataModel::onHeartbeat()
 }
 
 /***   Signals handlers from the sensors   ****/
-void cRemoteDataModel::updateSensorStatus(QString name, sensor::eStatus status)
+void cRemoteDataModel::updateSensorStatus(QString name, QString instance, sensor::eStatus status)
 {
     if (mpClient)
     {
-        sendSensorStatus(name.toStdString(),
-            to_string(status));
+        if (instance.isEmpty())
+        {
+            QString msg = "name = ";
+            msg += name;
+            msg += ", status = ";
+            msg += to_string(status).c_str();
+            emit localLogMessage(logSTATUS, "Update Sensor Status", msg);
+
+            sendSensorStatus(name.toStdString(), to_string(status));
+        }
+        else
+        {
+            QString msg = "name = ";
+            msg += name;
+            msg += ", instance = ";
+            msg += instance;
+            msg += ", status = ";
+            msg += to_string(status).c_str();
+            emit localLogMessage(logSTATUS, "Update Sensor Status", msg);
+
+            sendSensorStatus(name.toStdString(), instance.toStdString(), to_string(status));
+        }
 
         emit statusMessage("Sent Sensor Status.");
     }
 }
 
-void cRemoteDataModel::updateSensorName(QString old_name, QString new_name)
+void cRemoteDataModel::updateSensorName(QString old_name, QString new_name, QString instance)
 {
     if (mpClient)
     {
-        sendSensorNameChange(old_name.toStdString(),
-            new_name.toStdString());
+        if (instance.isEmpty())
+        {
+            sendSensorNameChange(old_name.toStdString(), new_name.toStdString());
+        }
+        else
+        {
+            sendSensorNameChange(old_name.toStdString(), new_name.toStdString(), instance.toStdString());
+        }
 
         emit statusMessage("Sent Sensor Name Change.");
     }
@@ -900,7 +936,28 @@ void cRemoteDataModel::newConnection()
 
         for (auto& sensor : mThread.mSensors)
         {
-            encodeSensorStatus(sensor->name(), to_string(sensor->getStatus()));
+            if (sensor->has_instance())
+            {
+                QString msg = "name = ";
+                msg += QString::fromStdString(sensor->name());
+                msg += ", instance = ";
+                msg += QString::fromStdString(sensor->instance());
+                msg += ", status = ";
+                msg += to_string(sensor->getStatus()).c_str();
+                emit localLogMessage(logSTATUS, "Update Sensor Status", msg);
+
+                encodeSensorStatus(sensor->name(), sensor->instance(), to_string(sensor->getStatus()));
+            }
+            else
+            {
+                QString msg = "name = ";
+                msg += QString::fromStdString(sensor->name());
+                msg += ", status = ";
+                msg += to_string(sensor->getStatus()).c_str();
+                emit localLogMessage(logSTATUS, "Update Sensor Status", msg);
+
+                encodeSensorStatus(sensor->name(), to_string(sensor->getStatus()));
+            }
         }
         cNetworkEncoder::sendData();
 
@@ -912,7 +969,11 @@ void cRemoteDataModel::newConnection()
             std::string name = controller->name();
             auto ip_address = controller->serverIpAddress();
             auto port = controller->serverPort();
-            encodeSensorPropertyConnectInfo(sensor, model, version, name, ip_address, port);
+
+            if (controller->has_instance())
+                encodeSensorPropertyConnectInfo(sensor, model, version, name, controller->instance(), ip_address, port);
+            else
+                encodeSensorPropertyConnectInfo(sensor, model, version, name, ip_address, port);
         }
         cNetworkEncoder::sendData();
 

@@ -102,11 +102,21 @@ private:
     void onExperimentInfoReply() override;
     void onDataFileState(bool is_open) override;
     void onStatusMessage(const std::string& msg) override;
+
     void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg) override;
+    void onLogMessage(uint8_t msg_type, const std::string& device, const std::string& instance, const std::string& msg) override;
+
     void onSensorStatus(const std::string& sensor, const std::string& status) override;
+    void onSensorStatus(const std::string& sensor, const std::string& instance, const std::string& status) override;
+
     void onSensorNameChange(const std::string& old_name, const std::string& new_name) override;
+    void onSensorNameChange(const std::string& old_name, const std::string& new_name, const std::string& instance) override;
+
     void onSensorPropertyConnectInfo(const std::string& sensor, const std::string& model, uint32_t version,
         const std::string& name, const std::string& ip_address, uint16_t port) override;
+
+    void onSensorPropertyConnectInfo(const std::string& sensor, const std::string& model, uint32_t version,
+        const std::string& name, const std::string& instance, const std::string& ip_address, uint16_t port) override;
 
     void onUnknownID(uint16_t id) override;
 

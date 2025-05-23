@@ -58,7 +58,7 @@ bool cHySpexSWIR_384_Model_direct::configure(const nlohmann::json& jsonCfg)
         msg.append(e.what());
         qCritical() << msg;
 
-        emit logMessage(logERROR, q_name(), msg);
+        logMessage(logERROR, msg);
 
         setStatus(sensor::eStatus::FAILED);
 
@@ -133,7 +133,7 @@ bool cHySpexSWIR_384_Model_direct::initialize()
         {
             QString msg = "SWIR-384: ";
             msg += to_string(mInitStatus).c_str();
-            emit logMessage(logERROR, q_name(), msg);
+            logMessage(logERROR, msg);
 
             qCritical() << msg;
 
@@ -161,7 +161,7 @@ bool cHySpexSWIR_384_Model_direct::initialize()
                     msg.append(e.what());
                     qCritical() << msg;
 
-                    emit logMessage(logERROR, q_name(), msg);
+                    logMessage(logERROR, msg);
 
                     setStatus(sensor::eStatus::FAILED);
 

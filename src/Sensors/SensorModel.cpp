@@ -156,17 +156,24 @@ bool cSensorModel::isRecording()
 void cSensorModel::setStatus(sensor::eStatus status)
 {
     mStatus = status;
-    emit sensorStatusChanging(q_name(), mStatus);
+    emit sensorStatusChanging(q_name(), q_instance(), mStatus);
 }
 
 void cSensorModel::updateName(const std::string& name)
 {
     QString old_name = QString::fromStdString(mSensorName);
     QString new_name = QString::fromStdString(name);
+    QString instance = QString::fromStdString(mSensorInstance);
 
     mSensorName = name;
 
-    emit sensorNameChanging(old_name, new_name);
+    emit sensorNameChanging(old_name, new_name, instance);
 }
+
+void cSensorModel::logMessage(quint8 type, QString msg)
+{
+    emit elogMessage(type, q_name(), q_instance(), msg);
+}
+
 
 

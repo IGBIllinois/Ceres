@@ -53,7 +53,7 @@ bool cHySpexVNIR_3000N_Model_simulation::configure(const nlohmann::json& jsonCfg
         msg.append(e.what());
         qCritical() << msg;
 
-        emit logMessage(logERROR, q_name(), msg);
+        logMessage(logERROR, msg);
 
         setStatus(sensor::eStatus::FAILED);
 

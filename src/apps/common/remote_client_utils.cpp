@@ -980,6 +980,9 @@ sLogMessage_t to_log_message_1(const LogMessage_1& pckt)
     data.device = pckt.device();
     data.message = pckt.message();
 
+    if (pckt.has_instance())
+        data.instance = pckt.instance();
+
     return data;
 }
 
@@ -1011,12 +1014,44 @@ int encode_log_message(uint8_t msg_type, const std::string& device, const std::s
     return pckt_size;
 }
 
+int encode_log_message(uint8_t msg_type, const std::string& device, const std::string& instance, const std::string& message, net_buffer& buffer)
+{
+    LogMessage_1 pckt;
+
+    pckt.set_msg_type(msg_type);
+    pckt.set_device(device);
+    pckt.set_instance(instance);
+    pckt.set_message(message);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::LOG_MESSAGE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
 sSensorStatus_t to_sensor_status_1(const SensorStatus_1& pckt)
 {
     sSensorStatus_t data;
 
     data.name = pckt.device();
     data.status = pckt.message();
+
+    if (pckt.has_instance())
+        data.instance = pckt.instance();
 
     return data;
 }
@@ -1048,12 +1083,43 @@ int encode_sensor_status(const std::string& device, const std::string& message, 
     return pckt_size;
 }
 
+int encode_sensor_status(const std::string& device, const std::string& instance, const std::string& message, net_buffer& buffer)
+{
+    SensorStatus_1 pckt;
+
+    pckt.set_device(device);
+    pckt.set_message(message);
+    pckt.set_instance(instance);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_STATUS);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
 sSensorNameChange_t to_sensor_name_change_1(const SensorNameChange_1& pckt)
 {
     sSensorNameChange_t data;
 
     data.old_name = pckt.old_name();
     data.new_name = pckt.new_name();
+
+    if (pckt.has_instance())
+        data.instance = pckt.instance();
 
     return data;
 }
@@ -1064,6 +1130,34 @@ int encode_sensor_name_change(const std::string& old_name, const std::string& ne
 
     pckt.set_old_name(old_name);
     pckt.set_new_name(new_name);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_NAME_CHANGE);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
+int encode_sensor_name_change(const std::string& old_name, const std::string& new_name, const std::string& instance, net_buffer& buffer)
+{
+    SensorNameChange_1 pckt;
+
+    pckt.set_old_name(old_name);
+    pckt.set_new_name(new_name);
+    pckt.set_instance(instance);
 
     std::string str;
     pckt.SerializeToString(&str);
@@ -1096,6 +1190,11 @@ sSensorPropertyConnectInfo_t to_sensor_property_connect_info_1(const SensorPrope
     data.ip_address = pckt.ip_address();
     data.port       = pckt.port();
 
+    if (pckt.has_instance())
+    {
+        data.instance = pckt.instance();
+    }
+
     return data;
 }
 
@@ -1110,6 +1209,39 @@ int encode_sensor_property_connect_info(const std::string& sensor, const std::st
     pckt.set_name(name);
     pckt.set_ip_address(ip_address);
     pckt.set_port(port);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_PROPERTY_CONNECT_INFO);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
+int encode_sensor_property_connect_info(const std::string& sensor, const std::string& model, uint32_t version,
+    const std::string& name, const std::string& instance, const std::string& ip_address, uint16_t port, net_buffer& buffer)
+{
+    SensorPropertyConnectInfo_1 pckt;
+
+    pckt.set_device(sensor);
+    pckt.set_model(model);
+    pckt.set_version(version);
+    pckt.set_name(name);
+    pckt.set_ip_address(ip_address);
+    pckt.set_port(port);
+    pckt.set_instance(instance);
 
     std::string str;
     pckt.SerializeToString(&str);
