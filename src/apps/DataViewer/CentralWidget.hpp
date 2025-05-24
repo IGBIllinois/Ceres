@@ -99,6 +99,8 @@ private:
     void onBeginSensorList() override;
     void onEndOfSensorList() override;
     void onSensorBlockInfo(uint16_t class_id, const std::string& name) override;
+    void onSensorBlockInfo(uint16_t class_id, const std::string& name, const std::string& instance,
+        const std::string& manufacturer, const std::string& model, const std::string& serial_number, uint8_t device_id) override;
 
     void onStartTime(sExperimentTime_t start_time) override;
     void onEndTime(sExperimentTime_t end_time) override;

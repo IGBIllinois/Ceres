@@ -447,7 +447,11 @@ void cRemoteDataModel::onStartExperiment()
     mSerializer.writeBeginSensorList();
     for (auto& sensor : mThread.mActiveSensors)
     {
-        mSerializer.writeSensorBlockInfo(sensor->data_class_id(), sensor->name());
+        if (sensor->manufacturer().empty() && sensor->model().empty())
+            mSerializer.writeSensorBlockInfo(sensor->data_class_id(), sensor->name());
+        else
+            mSerializer.writeSensorBlockInfo(sensor->data_class_id(), sensor->name(), sensor->instance(),
+                sensor->manufacturer(), sensor->model(), sensor->serial_number(), sensor->device_id());
     }
     mSerializer.writeEndOfSensorList();
 

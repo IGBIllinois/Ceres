@@ -490,6 +490,10 @@ void cCentralWidget::onEndOfSensorList()
 void cCentralWidget::onSensorBlockInfo(uint16_t class_id, const std::string& name)
 {}
 
+void cCentralWidget::onSensorBlockInfo(uint16_t class_id, const std::string& name, const std::string& instance,
+    const std::string& manufacturer, const std::string& model, const std::string& serial_number, uint8_t device_id)
+{}
+
 
 //-----------------------------------------------------------------------------
 // Spidercam Parser Data
