@@ -112,11 +112,21 @@ void cRemoteClientView::sensorNameChange(const QString& old_name, const QString&
 
 void cRemoteClientView::sensorNameChange(const QString& old_name, const QString& new_name, const QString& instance)
 {
+	QString oname = old_name + ":" + instance;
+	QString nname = new_name + ":" + instance;
+
 	for (auto sensor : mSensorStatus)
 	{
 		if (sensor.mpSensorLabel->text() == old_name)
 		{
-			sensor.mpSensorLabel->setText(new_name);
+			sensor.mpSensorLabel->setText(nname);
+			update();
+			return;
+		}
+
+		if (sensor.mpSensorLabel->text() == oname)
+		{
+			sensor.mpSensorLabel->setText(nname);
 			update();
 			return;
 		}
