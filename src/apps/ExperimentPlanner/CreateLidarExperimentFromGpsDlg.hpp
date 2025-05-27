@@ -29,6 +29,8 @@ public:
 
 
 private slots:
+	void onStartItem(const QModelIndex& index);
+	void onEndItem(const QModelIndex& index);
 	bool generate() override;
 	void onShowPath() override;
 
@@ -37,6 +39,12 @@ private:
 	void createLayout_PointSelection(QVBoxLayout* pMainLayout) override;
 
 private:
+	QLineEdit* mpStartX_mm = nullptr;
+	QLineEdit* mpStartY_mm = nullptr;
+
+	QLineEdit* mpEndX_mm = nullptr;
+	QLineEdit* mpEndY_mm = nullptr;
+
 	uint32_t mStartIndex = 0;
 	uint32_t mEndIndex = 0;
 

@@ -88,8 +88,23 @@ cCreateLidarExperimentFromGpsDlg::~cCreateLidarExperimentFromGpsDlg()
 
 void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 {
+	mpStartX_mm = new QLineEdit(this);
+	mpStartX_mm->setValidator(new QIntValidator(10000, 190000));
+
+	mpStartY_mm = new QLineEdit(this);
+	mpStartY_mm->setValidator(new QIntValidator(10000, 190000));
+
+	mpEndX_mm = new QLineEdit(this);
+	mpEndX_mm->setValidator(new QIntValidator(10000, 190000));
+
+	mpEndY_mm = new QLineEdit(this);
+	mpEndY_mm->setValidator(new QIntValidator(10000, 190000));
+
 	mpStartPosition = new QTableView(this);
 	mpStartPosition->setModel(mpModel);
+
+	connect(mpStartPosition, &QTableView::activated, this, &cCreateLidarExperimentFromGpsDlg::onStartItem);
+	connect(mpStartPosition, &QTableView::pressed, this, &cCreateLidarExperimentFromGpsDlg::onStartItem);
 
 	mpStartPosition->verticalHeader()->hide();
 
@@ -105,6 +120,9 @@ void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 
 	mpEndPosition = new QTableView(this);
 	mpEndPosition->setModel(mpModel);
+
+	connect(mpEndPosition, &QTableView::activated, this, &cCreateLidarExperimentFromGpsDlg::onEndItem);
+	connect(mpEndPosition, &QTableView::pressed, this, &cCreateLidarExperimentFromGpsDlg::onEndItem);
 
 	mpEndPosition->verticalHeader()->hide();
 
@@ -134,11 +152,47 @@ void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* 
 	QGroupBox* pGroupBox = nullptr;
 	QGridLayout* pGridLayout = nullptr;
 
+	QHBoxLayout* pStartLayout = new QHBoxLayout();
+
+	pText = new QLabel("X (mm)");
+	pStartLayout->addWidget(pText);
+	pStartLayout->addSpacing(5);
+	pStartLayout->addWidget(mpStartX_mm);
+	pStartLayout->addSpacing(10);
+	pText = new QLabel("Y (mm)");
+	pStartLayout->addWidget(pText);
+	pStartLayout->addSpacing(5);
+	pStartLayout->addWidget(mpStartY_mm);
+
+	QVBoxLayout* pVStartLayout = new QVBoxLayout();
+	pVStartLayout->addLayout(pStartLayout);
+	pVStartLayout->addSpacing(10);
+	pVStartLayout->addWidget(mpStartPosition);
+
+	QHBoxLayout* pEndLayout = new QHBoxLayout();
+
+	pText = new QLabel("X (mm)");
+	pEndLayout->addWidget(pText);
+	pEndLayout->addSpacing(5);
+	pEndLayout->addWidget(mpEndX_mm);
+	pEndLayout->addSpacing(10);
+	pText = new QLabel("Y (mm)");
+	pEndLayout->addWidget(pText);
+	pEndLayout->addSpacing(5);
+	pEndLayout->addWidget(mpEndY_mm);
+
+	QVBoxLayout* pVEndLayout = new QVBoxLayout();
+	pVEndLayout->addLayout(pEndLayout);
+	pVEndLayout->addSpacing(10);
+	pVEndLayout->addWidget(mpEndPosition);
+
 	QHBoxLayout* pPosLayout = new QHBoxLayout();
 	pPosLayout->addStretch(1);
-	pPosLayout->addWidget(mpStartPosition);
+	pPosLayout->addLayout(pVStartLayout);
+//	pPosLayout->addWidget(mpStartPosition);
 	pPosLayout->addSpacing(10);
-	pPosLayout->addWidget(mpEndPosition);
+	pPosLayout->addLayout(pVEndLayout);
+	//	pPosLayout->addWidget(mpEndPosition);
 	pPosLayout->addSpacing(10);
 
 	QVBoxLayout* pVSubLayout = new QVBoxLayout();
@@ -157,6 +211,24 @@ void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* 
 	pMainLayout->addLayout(pOptionsLayout);
 
 	pMainLayout->addSpacing(10);
+}
+
+void cCreateLidarExperimentFromGpsDlg::onStartItem(const QModelIndex& index)
+{
+	auto x1 = mpModel->data(index.siblingAtColumn(1)).toFloat();
+	auto y1 = mpModel->data(index.siblingAtColumn(2)).toFloat();
+
+	mpStartX_mm->setText(QString::number(x1 * 1000));
+	mpStartY_mm->setText(QString::number(y1 * 1000));
+}
+
+void cCreateLidarExperimentFromGpsDlg::onEndItem(const QModelIndex& index)
+{
+	auto x1 = mpModel->data(index.siblingAtColumn(1)).toFloat();
+	auto y1 = mpModel->data(index.siblingAtColumn(2)).toFloat();
+
+	mpEndX_mm->setText(QString::number(x1 * 1000));
+	mpEndY_mm->setText(QString::number(y1 * 1000));
 }
 
 bool cCreateLidarExperimentFromGpsDlg::generate()
@@ -195,6 +267,13 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 		return false;
 	}
 
+	int x1_mm = mpStartX_mm->text().toInt();
+	int y1_mm = mpStartY_mm->text().toInt();
+
+	int x2_mm = mpEndX_mm->text().toInt();
+	int y2_mm = mpEndY_mm->text().toInt();
+
+
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
@@ -210,11 +289,11 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 		std::swap(h1, h2);
 	}
 
-	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
-	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
+//	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
+//	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
 	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
-	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
-	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
+//	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
+//	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
 	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
 
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
