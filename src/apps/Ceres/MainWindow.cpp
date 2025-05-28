@@ -9,9 +9,9 @@
 #include "CtrlDataModelLocal.hpp"
 #include "CtrlDataModelRemote.hpp"
 
-#include "ExperimentManager.hpp"
-#include "ExperimentTreeItem.hpp"
-#include "ExperimentToolbar.hpp"
+#include "MeasurementManager.hpp"
+#include "MeasurementTreeItem.hpp"
+#include "MeasurementToolbar.hpp"
 #include "BatchExpConfirmDlg.hpp"
 
 #include "ExperimentCtrlFactory.hpp"
@@ -92,7 +92,7 @@ namespace
 cMainWindow::cMainWindow(QWidget* parent) :
     QMainWindow(parent),
     mpSplashScreen(nullptr),
-    mpExperiments(nullptr),
+    mpMeasurements(nullptr),
     mpExpLoad(nullptr),
     mpExpRun(nullptr),
     mpExpPause(nullptr),
@@ -246,7 +246,7 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 //-----------------------------------------------------------------------------
 void cMainWindow::fileRefresh()
 {
-    mpExperiments->refresh();
+    mpMeasurements->refresh();
 
     emit refreshDisplay();
 }
@@ -268,54 +268,54 @@ void cMainWindow::onExperimentLoad()
         //TODO: Something here!
     }
 
-    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+    auto* pMeasurement = static_cast<cMeasurementTreeItem*>(mpMeasurements->currentItem());
 
-    if (pExperiment == nullptr)
+    if (pMeasurement == nullptr)
     {
         return;
     }
 
-    if (pExperiment->hasExperimentDocument())
+    if (pMeasurement->hasMeasurementDocument())
     {
-        bool result = loadExperiment(*pExperiment);
+        bool result = loadMeasurement(*pMeasurement);
         return;
     }
 
-    if (0 == pExperiment->childCount())
+    if (0 == pMeasurement->childCount())
     {
         return;
     }
 
     cBatchExpConfirmDlg* pDlg = new cBatchExpConfirmDlg(this);
 
-    pDlg->initialize(pExperiment);
+    pDlg->initialize(pMeasurement);
 
     auto result = pDlg->exec();
     if (result == QDialog::Rejected)
         return;
 
-    mBatchProcess = pDlg->getSelectedExperiments();
+    mBatchProcess = pDlg->getSelectedMeasurements();
 
     if (mBatchProcess.empty())
         return;
 
-    auto expFile = mBatchProcess.front();
+    auto measurementFile = mBatchProcess.front();
     mBatchProcess.erase(mBatchProcess.begin());
 
-    loadExperiment(expFile);
+    loadMeasurement(measurementFile);
 }
 
 //-----------------------------------------------------------------------------
-bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
+bool cMainWindow::loadMeasurement(const cMeasurementTreeItem& measurement)
 {
-    QString msg = "Loading experiment \"";
-    msg += experiment.text(0);
+    QString msg = "Loading measurement \"";
+    msg += measurement.text(0);
     msg += "\" from file ";
-    msg += experiment.getFilename();
+    msg += measurement.getFilename();
     onStatusUpdate(msg);
 
-    std::string name = experiment.text(0).toStdString();
-    auto expDoc = experiment.getExperimentDocument();
+    std::string name = measurement.text(0).toStdString();
+    auto expDoc = measurement.getMeasurementDocument();
     if (!mpModel->loadExperiment(name, expDoc))
     {
         return false;
@@ -324,12 +324,12 @@ bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
     return true;
 }
 
-bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
+bool cMainWindow::loadMeasurement(const std::filesystem::path& measurement_file)
 {
     using namespace nlohmann;
 
     std::ifstream in;
-    in.open(experiment_file);
+    in.open(measurement_file);
 
     if (!in.is_open())
     {
@@ -343,33 +343,37 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
     {
         in >> jsonDoc;
 
-        if (jsonDoc.contains("experiment name"))
+        if (jsonDoc.contains("measurement name"))
+            name = jsonDoc["measurement name"];
+        else if (jsonDoc.contains("measurement_name"))
+            name = jsonDoc["measurement_name"];
+        else if (jsonDoc.contains("experiment name"))
             name = jsonDoc["experiment name"];
         else
             name = jsonDoc["experiment_name"];
     }
     catch (const detail::exception& e)
     {
-        QString msg = "Failed to loading experiment file: ";
-        msg += QString::fromStdString(experiment_file.string());
+        QString msg = "Failed to loading measurement file: ";
+        msg += QString::fromStdString(measurement_file.string());
         onWarningMessage("File Error", msg);
 
         return false;
     }
 
 
-    QString msg = "Loading experiment \"";
+    QString msg = "Loading measurement \"";
     msg += QString::fromStdString(name);
     msg += "\" from file ";
-    msg += QString::fromStdString(experiment_file.string());
+    msg += QString::fromStdString(measurement_file.string());
     onStatusUpdate(msg);
 
     if (!mpModel->loadExperiment(name, jsonDoc))
     {
-        QString msg = "Experiment \"";
+        QString msg = "Measurement \"";
         msg += QString::fromStdString(name);
         msg += "\" from file ";
-        msg += QString::fromStdString(experiment_file.string());
+        msg += QString::fromStdString(measurement_file.string());
         msg += " failed to load!";
         onStatusUpdate(msg);
         return false;
@@ -415,7 +419,7 @@ void cMainWindow::onExperimentRun()
     {
         if (mBatchFileName.empty())
         {
-            std::string fileName = mpModel->experimentTitle();
+            std::string fileName = mpModel->measurementTitle();
             if (!mpModel->openDataFile(mDefaultDataPath, fileName, false))
             {
                 mpModel->terminateExperiment();
@@ -538,7 +542,7 @@ void cMainWindow::onExperimentTerminated()
 
     emit experimentStopped();
 
-    emit showMessage("Experiment stopped!");
+    emit showMessage("Measurement stopped!");
 }
 
 void cMainWindow::onExperimentCompleted()
@@ -547,10 +551,10 @@ void cMainWindow::onExperimentCompleted()
 
     while (!mBatchProcess.empty())
     {
-        auto expFile = mBatchProcess.front();
+        auto measurementFile = mBatchProcess.front();
         mBatchProcess.erase(mBatchProcess.begin());
 
-        if (loadExperiment(expFile))
+        if (loadMeasurement(measurementFile))
         {
             onExperimentRun();
             return;
@@ -562,7 +566,7 @@ void cMainWindow::onExperimentCompleted()
     emit experimentStopped();
 
     QSound::play(":/ripe.illinois.edu/end_experiment.wav");
-    onStatusUpdate("Experiment completed!");
+    onStatusUpdate("Measurement completed!");
 }
 
 //-----------------------------------------------------------------------------
@@ -644,15 +648,15 @@ void cMainWindow::createToolBars()
 {
 //    mpFileBar = addToolBar("File");
 
-    auto* toolbar = new cExperimentToolbar(this);
-    connect(this, &cMainWindow::experimentRunning, toolbar, &cExperimentToolbar::experimentRunning);
-    connect(this, &cMainWindow::experimentPaused, toolbar, &cExperimentToolbar::experimentPaused);
-    connect(this, &cMainWindow::experimentStopped, toolbar, &cExperimentToolbar::experimentStopped);
+    auto* toolbar = new cMeasurementToolbar(this);
+    connect(this, &cMainWindow::experimentRunning, toolbar, &cMeasurementToolbar::measurementRunning);
+    connect(this, &cMainWindow::experimentPaused, toolbar, &cMeasurementToolbar::measurementPaused);
+    connect(this, &cMainWindow::experimentStopped, toolbar, &cMeasurementToolbar::measurementStopped);
 
-    connect(toolbar, &cExperimentToolbar::loadSelected, this, &cMainWindow::onExperimentLoad);
-    connect(toolbar, &cExperimentToolbar::runSelected, this, &cMainWindow::onExperimentRun);
-    connect(toolbar, &cExperimentToolbar::pauseSelected, this, &cMainWindow::onExperimentPause);
-    connect(toolbar, &cExperimentToolbar::stopSelected, this, &cMainWindow::onExperimentStop);
+    connect(toolbar, &cMeasurementToolbar::loadSelected, this, &cMainWindow::onExperimentLoad);
+    connect(toolbar, &cMeasurementToolbar::runSelected, this, &cMainWindow::onExperimentRun);
+    connect(toolbar, &cMeasurementToolbar::pauseSelected, this, &cMainWindow::onExperimentPause);
+    connect(toolbar, &cMeasurementToolbar::stopSelected, this, &cMainWindow::onExperimentStop);
 
     addToolBar(toolbar);
 }
@@ -681,13 +685,13 @@ void cMainWindow::createDockWindows(const nlohmann::json& configDoc)
 #endif
     }
 
-    QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
+    QDockWidget* dock = new QDockWidget(tr("Measurements"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
-    connect(mpExperiments, &cExperimentManager::runExperiment, this, &cMainWindow::onExperimentRun);
+    mpMeasurements = new cMeasurementManager(mExperimentFilesPath, dock);
+    connect(mpMeasurements, &cMeasurementManager::runExperiment, this, &cMainWindow::onExperimentRun);
 
 
-    dock->setWidget(mpExperiments);
+    dock->setWidget(mpMeasurements);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
 }

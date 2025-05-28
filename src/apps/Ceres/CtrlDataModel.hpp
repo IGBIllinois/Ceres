@@ -61,7 +61,7 @@ public:
     bool isExperimentRunning();
     bool isExperimentPaused();
 
-    std::string experimentTitle() const;
+    std::string measurementTitle() const;
 
     bool isExperimentLoaded() const;
     bool experimentRequiresDataFile() const;
@@ -114,6 +114,6 @@ protected:
     std::vector<cSensorPropertyPage*> mPropertyPages;
 
 private:
-    void doExperimentCleanup();
+    void doMeasurementCleanup();
 };
 

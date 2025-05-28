@@ -63,7 +63,7 @@ public:
     bool isExperimentRunning();
     bool isExperimentPaused();
 
-    std::string experimentTitle() const;
+    std::string measurementTitle() const;
 
     bool isExperimentLoaded() const;
     bool experimentRequiresDataFile() const;
@@ -116,7 +116,7 @@ protected:
     virtual void endDataRecording() = 0;
 
 protected:
-    std::string mExperimentTitle;
+    std::string mMeasurementTitle;
 
     bool mFileOpen = false;
 

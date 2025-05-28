@@ -10,12 +10,12 @@ class QToolButton;
 QT_END_NAMESPACE
 
 
-class cExperimentToolbar : public QToolBar
+class cMeasurementToolbar : public QToolBar
 {
 	Q_OBJECT
 
 public:
-	cExperimentToolbar(QWidget* parent = nullptr);
+	cMeasurementToolbar(QWidget* parent = nullptr);
 
 signals:
 	void loadSelected();
@@ -24,9 +24,9 @@ signals:
 	void stopSelected();
 
 public slots:
-	void experimentRunning();
-	void experimentPaused();
-	void experimentStopped();
+	void measurementRunning();
+	void measurementPaused();
+	void measurementStopped();
 
 private slots:
 	void loadButtonPressed();

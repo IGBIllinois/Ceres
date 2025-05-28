@@ -7,26 +7,26 @@
 #include <nlohmann/json.hpp>
 #include <filesystem>
 
-class cExperimentTreeItem : public QTreeWidgetItem
+class cMeasurementTreeItem : public QTreeWidgetItem
 {
 public:
-	cExperimentTreeItem(QTreeWidget* parent, const QString& text);
-	cExperimentTreeItem(QTreeWidget* parent, const std::filesystem::path& file);
-	cExperimentTreeItem(QTreeWidget* parent, const QString& name, const std::filesystem::path& file);
+	cMeasurementTreeItem(QTreeWidget* parent, const QString& text);
+	cMeasurementTreeItem(QTreeWidget* parent, const std::filesystem::path& file);
+	cMeasurementTreeItem(QTreeWidget* parent, const QString& name, const std::filesystem::path& file);
 
-	cExperimentTreeItem(QTreeWidgetItem* parent, const QString& text);
-	cExperimentTreeItem(QTreeWidgetItem* parent, const std::filesystem::path& file);
-	cExperimentTreeItem(QTreeWidgetItem* parent, const QString& name, const std::filesystem::path& file);
+	cMeasurementTreeItem(QTreeWidgetItem* parent, const QString& text);
+	cMeasurementTreeItem(QTreeWidgetItem* parent, const std::filesystem::path& file);
+	cMeasurementTreeItem(QTreeWidgetItem* parent, const QString& name, const std::filesystem::path& file);
 
-	cExperimentTreeItem(const cExperimentTreeItem& other);
+	cMeasurementTreeItem(const cMeasurementTreeItem& other);
 
 	QString getFilename() const;
-	const std::filesystem::path& getExperimentFile() const;
+	const std::filesystem::path& getMeasurementFile() const;
 
-	bool hasExperimentDocument() const;
-	nlohmann::json getExperimentDocument() const;
+	bool hasMeasurementDocument() const;
+	nlohmann::json getMeasurementDocument() const;
 
 private:
-	std::filesystem::path mExperimentFile;
+	std::filesystem::path mMeasurementFile;
 };
 

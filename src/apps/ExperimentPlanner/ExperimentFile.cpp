@@ -69,6 +69,11 @@ void cExperimentFile::setExperimentName(const std::string& name)
 
 const std::string& cExperimentFile::getMeasurementName() const
 {
+	// For backward compatibility, we will return the experiment name if there
+	// is no measurement name
+	if (mMeasurementName.empty())
+		return mExperimentName;
+
 	return mMeasurementName;
 }
 

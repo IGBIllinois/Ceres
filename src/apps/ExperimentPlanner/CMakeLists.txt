@@ -138,10 +138,10 @@ PRIVATE
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp
 
-    ExperimentManager.hpp
-    ExperimentManager.cpp
-    ExperimentTreeItem.hpp
-    ExperimentTreeItem.cpp
+    MeasurementManager.hpp
+    MeasurementManager.cpp
+    MeasurementTreeItem.hpp
+    MeasurementTreeItem.cpp
 
 	FieldUtils.hpp
 	FieldUtils.cpp

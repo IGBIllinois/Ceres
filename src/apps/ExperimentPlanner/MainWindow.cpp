@@ -18,8 +18,8 @@
 #include "CreateHyperspectralExperimentFromGpsDlg.hpp"
 #include "CreateHyperspectralExperimentFromPlotInfoDlg.hpp"
 
-#include "ExperimentManager.hpp"
-#include "ExperimentTreeItem.hpp"
+#include "MeasurementManager.hpp"
+#include "MeasurementTreeItem.hpp"
 #include "FieldLayoutWidget.hpp"
 #include "ExperimentDesignWidget.hpp"
 #include "ExperimentDesignMdiChild.hpp"
@@ -116,19 +116,19 @@ namespace
 //-----------------------------------------------------------------------------
 cMainWindow::cMainWindow(QWidget* parent) :
     QMainWindow(parent),
-    mpExperiments(nullptr),
+    mpMeasurements(nullptr),
     mpUI(new Ui::MainWindow),
-    mSettings("UIUC", "Ceres Experiment Planner")
+    mSettings("UIUC", "Ceres Measurement Planner")
 {
     mpUI->setupUi(this);
 
-    setWindowTitle(tr("Ceres Experiment Planner"));
+    setWindowTitle(tr("Ceres Measurement Planner"));
 
     setUnifiedTitleAndToolBarOnMac(true);
 
     auto cwd = std::filesystem::current_path();
 
-    mExperimentFilesPath = mSettings.value("Defaults/experimentDirectory", cwd.c_str()).toString();
+    mMeasurementFilesPath = mSettings.value("Defaults/measurementDirectory", cwd.c_str()).toString();
     mFieldLayoutFile = mSettings.value("Defaults/fieldLayoutFile").toString();
     mPlotSplitsPath = mSettings.value("Defaults/plotSplitDirectory").toString();
 
@@ -273,14 +273,14 @@ void cMainWindow::onLogMessage(uint8_t type, QString device, QString msg)
     onStatusUpdate(msg);
 }
 
-void cMainWindow::onExperimentTerminated()
+void cMainWindow::onMeasurementTerminated()
 {
-    emit experimentCompleted();
+    emit measurementCompleted();
 }
 
-void cMainWindow::onExperimentCompleted()
+void cMainWindow::onMeasurementCompleted()
 {
-    emit experimentCompleted();
+    emit measurementCompleted();
 }
 
 
@@ -307,43 +307,43 @@ void cMainWindow::createSubMenusAndActions()
     // Build the File Sub Menu
     //
 
-    pMenuItem = new QAction(tr("New Experiment File"), this);
-    pMenuItem->setStatusTip(tr("Creates a blank experiment file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewExperiment);
+    pMenuItem = new QAction(tr("New Measurement File"), this);
+    pMenuItem->setStatusTip(tr("Creates a blank measurement file"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewMeasurement);
     mpFileMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("Open Experiment File..."), this);
-    pMenuItem->setStatusTip(tr("Loads experiment file into memory"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileOpenExperiment);
-    mpFileMenu->addAction(pMenuItem);
-
-    mpFileMenu->addSeparator();
-
-    pMenuItem = new QAction(tr("Save Experiment File"), this);
-    pMenuItem->setStatusTip(tr("Save the experiment file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveExperimentFile);
-    mpFileMenu->addAction(pMenuItem);
-
-    pMenuItem = new QAction(tr("Save Experiment File As..."), this);
-    pMenuItem->setStatusTip(tr("Save the experiment file with a different file name"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveAsExperimentFile);
-    mpFileMenu->addAction(pMenuItem);
-
-    pMenuItem = new QAction(tr("Save All Experiment Files"), this);
-    pMenuItem->setStatusTip(tr("Save all experiment files"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveAllExperimentFiles);
+    pMenuItem = new QAction(tr("Open Measurement File..."), this);
+    pMenuItem->setStatusTip(tr("Loads measurement file into memory"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileOpenMeasurement);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
 
-    pMenuItem = new QAction(tr("Close Experiment File"), this);
-    pMenuItem->setStatusTip(tr("Close the experiment file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileCloseExperimentFile);
+    pMenuItem = new QAction(tr("Save Measurement File"), this);
+    pMenuItem->setStatusTip(tr("Save the measurement file"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveMeasurementFile);
     mpFileMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("Close All Experiment Files"), this);
-    pMenuItem->setStatusTip(tr("Close all the experiment files"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileCloseAllExperimentFiles);
+    pMenuItem = new QAction(tr("Save Measurement File As..."), this);
+    pMenuItem->setStatusTip(tr("Save the measurement file with a different file name"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveAsMeasurementFile);
+    mpFileMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Save All Measurement Files"), this);
+    pMenuItem->setStatusTip(tr("Save all measurement files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileSaveAllMeasurementFiles);
+    mpFileMenu->addAction(pMenuItem);
+
+    mpFileMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Close Measurement File"), this);
+    pMenuItem->setStatusTip(tr("Close the measurement file"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileCloseMeasurementFile);
+    mpFileMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Close All Measurement Files"), this);
+    pMenuItem->setStatusTip(tr("Close all the measurement files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileCloseAllMeasurementFiles);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
@@ -357,50 +357,50 @@ void cMainWindow::createSubMenusAndActions()
     //
     // Build the Edit Sub Menu
     //
-    pMenuItem = new QAction(tr("Edit Experiment Meta Data..."), this);
-    pMenuItem->setStatusTip(tr("Edit the experiment meta information..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditExperimentMetaInfo);
+    pMenuItem = new QAction(tr("Edit Measurement Meta Data..."), this);
+    pMenuItem->setStatusTip(tr("Edit the measurement meta information..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMeasurementMetaInfo);
     mpEditMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("Edit Experiment Controller Information..."), this);
-    pMenuItem->setStatusTip(tr("Edit the experiment controller information..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditExperimentCtrlInfo);
+    pMenuItem = new QAction(tr("Edit Measurement Controller Information..."), this);
+    pMenuItem->setStatusTip(tr("Edit the measurement controller information..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMeasurementCtrlInfo);
     mpEditMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("Edit Experiment Sensor Information..."), this);
-    pMenuItem->setStatusTip(tr("Edit the experiment sensor information..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditExperimentSernsorInfo);
-    mpEditMenu->addAction(pMenuItem);
-
-    mpEditMenu->addSeparator();
-
-    pMenuItem = new QAction(tr("Add Experiment To Layout..."), this);
-    pMenuItem->setStatusTip(tr("Adds the experiment to the field layout..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditAddExperimentToLayout);
+    pMenuItem = new QAction(tr("Edit Measurement Sensor Information..."), this);
+    pMenuItem->setStatusTip(tr("Edit the measurement sensor information..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMeasurementSernsorInfo);
     mpEditMenu->addAction(pMenuItem);
 
     mpEditMenu->addSeparator();
 
-    pMenuItem = new QAction(tr("Move the Experiment to a X-Position (north/south)..."), this);
-    pMenuItem->setStatusTip(tr("Move (over write) the x-position (north/south) within an experiment..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveExperimentX);
-    mpEditMenu->addAction(pMenuItem);
-
-    pMenuItem = new QAction(tr("Move the Experiment to a Y-Position (east/west)..."), this);
-    pMenuItem->setStatusTip(tr("Move (over write) the y-position (east/west) within an experiment..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveExperimentY);
-    mpEditMenu->addAction(pMenuItem);
-
-    pMenuItem = new QAction(tr("Move the Experiment to a Z-Position (vertical)..."), this);
-    pMenuItem->setStatusTip(tr("Move (over write) the z-position (vertical) within an experiment..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveExperimentZ);
+    pMenuItem = new QAction(tr("Add Measurement To Layout..."), this);
+    pMenuItem->setStatusTip(tr("Adds the measurement to the field layout..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditAddMeasurementToLayout);
     mpEditMenu->addAction(pMenuItem);
 
     mpEditMenu->addSeparator();
 
-    pMenuItem = new QAction(tr("Shift Experiment Positions..."), this);
-    pMenuItem->setStatusTip(tr("Shift the positions used in the experiment..."));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditShiftExperiment);
+    pMenuItem = new QAction(tr("Move the Measurement to a X-Position (north/south)..."), this);
+    pMenuItem->setStatusTip(tr("Move (over write) the x-position (north/south) within an measurement..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveMeasurementX);
+    mpEditMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Move the Measurement to a Y-Position (east/west)..."), this);
+    pMenuItem->setStatusTip(tr("Move (over write) the y-position (east/west) within an measurement..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveMeasurementY);
+    mpEditMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Move the Measurement to a Z-Position (vertical)..."), this);
+    pMenuItem->setStatusTip(tr("Move (over write) the z-position (vertical) within an measurement..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMoveMeasurementZ);
+    mpEditMenu->addAction(pMenuItem);
+
+    mpEditMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Shift Measurement Positions..."), this);
+    pMenuItem->setStatusTip(tr("Shift the positions used in the measurement..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditShiftMeasurement);
     mpEditMenu->addAction(pMenuItem);
 
 
@@ -408,55 +408,55 @@ void cMainWindow::createSubMenusAndActions()
     // Build the Generate Sub Menu
     //
     pMenuItem = new QAction(tr("LiDAR Scans From SpiderCam Point"), this);
-    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from single SpiderCam point"));
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan measurement file(s) from single SpiderCam point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_SpiderCam_Point);
     mpGenerateMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("LiDAR Scans From GPS data (Machine Planted)"), this);
-    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS (begin/end) data"));
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan measurement file(s) from GPS (begin/end) data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_GPS);
     mpGenerateMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("LiDAR Scans From GPS plot data (Hand Planted)"), this);
-    pMenuItem->setStatusTip(tr("Creates LiDAR scan experiment file(s) from GPS plot data"));
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan measurement file(s) from GPS plot data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
 
     mpGenerateMenu->addSeparator();
 
     pMenuItem = new QAction(tr("Hyperspectral Reference Scan From SpiderCam Point"), this);
-    pMenuItem->setStatusTip(tr("Creates hyperspectral reference experiment file(s) from single SpiderCam point"));
+    pMenuItem->setStatusTip(tr("Creates hyperspectral reference measurement file(s) from single SpiderCam point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralRefScan_SpiderCam_Point);
     mpGenerateMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Hyperspectral Reference Scan From GPS Point"), this);
-    pMenuItem->setStatusTip(tr("Creates hyperspectral reference experiment file(s) from single GPS point"));
+    pMenuItem->setStatusTip(tr("Creates hyperspectral reference measurement file(s) from single GPS point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralRefScan_GPS);
     mpGenerateMenu->addAction(pMenuItem);
 
     mpGenerateMenu->addSeparator();
 
     pMenuItem = new QAction(tr("Hyperspectral Scan From SpiderCam Point"), this);
-    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from single SpiderCam point"));
+    pMenuItem->setStatusTip(tr("Creates hyperspectral measurement file(s) from single SpiderCam point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_SpiderCam_Point);
     mpGenerateMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Hyperspectral Scan From GPS Points (Machine Planted)"), this);
-    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from GPS (begin/end) point"));
+    pMenuItem->setStatusTip(tr("Creates hyperspectral measurement file(s) from GPS (begin/end) point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_GPS);
     mpGenerateMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Hyperspectral Scan From GPS plot data (Hand Planted)"), this);
-    pMenuItem->setStatusTip(tr("Creates hyperspectral experiment file(s) from GPS plot point"));
+    pMenuItem->setStatusTip(tr("Creates hyperspectral measurement file(s) from GPS plot point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
 
     //
     // Build the Preference Sub Menu
     //
-    pMenuItem = new QAction(tr("Default Experiment Directory"), this);
-    pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading experiment files"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultExperimentDirectory);
+    pMenuItem = new QAction(tr("Default Measurement Directory"), this);
+    pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading measurement files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultMeasurementDirectory);
     mpPreferencesMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Load Ground Data"), this);
@@ -491,23 +491,23 @@ void cMainWindow::createSubMenusAndActions()
 
     mpSpidercamMenu->addSeparator();
 
-    mpTestExperiment = new QAction(tr("Test Experiment"), this);
-    mpTestExperiment->setStatusTip(tr("Run the experiment in test mode (no data recording)"));
-    mpTestExperiment->setEnabled(false);
-    connect(mpTestExperiment, &QAction::triggered, this, &cMainWindow::onSpidercamTestExperiment);
-    mpSpidercamMenu->addAction(mpTestExperiment);
+    mpTestMeasurement = new QAction(tr("Test Measurement"), this);
+    mpTestMeasurement->setStatusTip(tr("Run the measurement in test mode (no data recording)"));
+    mpTestMeasurement->setEnabled(false);
+    connect(mpTestMeasurement, &QAction::triggered, this, &cMainWindow::onSpidercamTestMeasurement);
+    mpSpidercamMenu->addAction(mpTestMeasurement);
 
-    mpStopExperiment = new QAction(tr("Stop Experiment"), this);
-    mpStopExperiment->setStatusTip(tr("Stop the running experiment"));
-    mpStopExperiment->setEnabled(false);
-    connect(mpStopExperiment, &QAction::triggered, this, &cMainWindow::onSpidercamStopExperiment);
-    mpSpidercamMenu->addAction(mpStopExperiment);
+    mpStopMeasurement = new QAction(tr("Stop Measurement"), this);
+    mpStopMeasurement->setStatusTip(tr("Stop the running measurement"));
+    mpStopMeasurement->setEnabled(false);
+    connect(mpStopMeasurement, &QAction::triggered, this, &cMainWindow::onSpidercamStopMeasurement);
+    mpSpidercamMenu->addAction(mpStopMeasurement);
 
-    mpPauseRunExperiment = new QAction(tr("Pause Experiment"), this);
-    mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
-    mpPauseRunExperiment->setEnabled(false);
-    connect(mpPauseRunExperiment, &QAction::triggered, this, &cMainWindow::onSpidercamPauseRunExperiment);
-    mpSpidercamMenu->addAction(mpPauseRunExperiment);
+    mpPauseRunMeasurement = new QAction(tr("Pause Measurement"), this);
+    mpPauseRunMeasurement->setStatusTip(tr("Pause the running measurement"));
+    mpPauseRunMeasurement->setEnabled(false);
+    connect(mpPauseRunMeasurement, &QAction::triggered, this, &cMainWindow::onSpidercamPauseRunMeasurement);
+    mpSpidercamMenu->addAction(mpPauseRunMeasurement);
 
 
     // Build the View Menu
@@ -542,17 +542,17 @@ void cMainWindow::createStatusBar()
 //-----------------------------------------------------------------------------
 void cMainWindow::createDockWindows()
 {
-    QDockWidget* dock = new QDockWidget(tr("Experiments"), this);
+    QDockWidget* dock = new QDockWidget(tr("Measurements"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
 
-    mpExperiments = new cExperimentManager(mExperimentFilesPath, dock);
-    connect(mpExperiments, &cExperimentManager::loadExperiment, this, &cMainWindow::onOpenExperiment);
-    connect(mpExperiments, &cExperimentManager::runExperiment,  this, &cMainWindow::onExperimentRun);
+    mpMeasurements = new cMeasurementManager(mMeasurementFilesPath, dock);
+    connect(mpMeasurements, &cMeasurementManager::loadMeasurement, this, &cMainWindow::onOpenMeasurement);
+    connect(mpMeasurements, &cMeasurementManager::runMeasurement,  this, &cMainWindow::onMeasurementRun);
 
-    connect(this, &cMainWindow::connectedToController,      mpExperiments, &cExperimentManager::onConnectToSpidercam);
-    connect(this, &cMainWindow::disconnectedFromController, mpExperiments, &cExperimentManager::onDisconnectFromSpidercam);
+    connect(this, &cMainWindow::connectedToController,      mpMeasurements, &cMeasurementManager::onConnectToSpidercam);
+    connect(this, &cMainWindow::disconnectedFromController, mpMeasurements, &cMeasurementManager::onDisconnectFromSpidercam);
 
-    dock->setWidget(mpExperiments);
+    dock->setWidget(mpMeasurements);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     mpViewMenu->addAction(dock->toggleViewAction());
 
@@ -563,7 +563,7 @@ void cMainWindow::createDockWindows()
 
     connect(this, &cMainWindow::connectedToController, mpFieldLayout, &cFieldLayoutWidget::onConnectToSpidercam);
     connect(this, &cMainWindow::disconnectedFromController, mpFieldLayout, &cFieldLayoutWidget::onDisconnectFromSpidercam);
-    connect(this, &cMainWindow::experimentRunning, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(this, &cMainWindow::measurementRunning, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     
     auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 0).toInt();
     auto maxX_mm = mSettings.value("Defaults/fieldBounds/maxX_mm", 190000).toInt();
@@ -584,16 +584,16 @@ void cMainWindow::createDockWindows()
 cExperimentDesignMdiChild* cMainWindow::createMdiChild()
 {
     cExperimentDesignMdiChild* child = new cExperimentDesignMdiChild(this);
-    child->onDefaultExperimentPathChange(mExperimentFilesPath);
+    child->onDefaultExperimentPathChange(mMeasurementFilesPath);
 
     mpMdiArea->addSubWindow(child);
 
     connect(child, &cExperimentDesignWidget::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(child, &cExperimentDesignWidget::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
 
-    connect(child, &cExperimentDesignMdiChild::experimentListNeedsUpdate, this, &cMainWindow::onExperimentListUpdateNeeded);
+    connect(child, &cExperimentDesignMdiChild::experimentListNeedsUpdate, this, &cMainWindow::onMeasurementListUpdateNeeded);
 
-    connect(this, &cMainWindow::defaultExperimentPathChange, child, &cExperimentDesignMdiChild::onDefaultExperimentPathChange);
+    connect(this, &cMainWindow::defaultMeasurementPathChange, child, &cExperimentDesignMdiChild::onDefaultExperimentPathChange);
 
     return child;
 }
@@ -604,7 +604,7 @@ cExperimentDesignMdiChild* cMainWindow::createMdiChild()
 /********************************************************************
  * Slots associated with "File" menu actions
  *******************************************************************/
-void cMainWindow::onFileNewExperiment()
+void cMainWindow::onFileNewMeasurement()
 {
     auto* child = createMdiChild();
     child->newFile();
@@ -613,18 +613,18 @@ void cMainWindow::onFileNewExperiment()
     mpEditMenu->setDisabled(false);
 }
 
-void cMainWindow::onFileOpenExperiment()
+void cMainWindow::onFileOpenMeasurement()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Experiment File"), mExperimentFilesPath,
-        "Experiment Files (*.json)");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Measurement File"), mMeasurementFilesPath,
+        "Measurement Files (*.json)");
 
     if (fileName.isEmpty())
         return;
 
-    onOpenExperiment(fileName);
+    onOpenMeasurement(fileName);
 }
 
-void cMainWindow::onFileSaveExperimentFile()
+void cMainWindow::onFileSaveMeasurementFile()
 {
     auto* childSubWindow = mpMdiArea->currentSubWindow();
     if (!childSubWindow)
@@ -634,7 +634,7 @@ void cMainWindow::onFileSaveExperimentFile()
     child->save();
 }
 
-void cMainWindow::onFileSaveAsExperimentFile()
+void cMainWindow::onFileSaveAsMeasurementFile()
 {
     auto* childSubWindow = mpMdiArea->currentSubWindow();
     if (!childSubWindow)
@@ -645,7 +645,7 @@ void cMainWindow::onFileSaveAsExperimentFile()
     child->saveAs();
 }
 
-void cMainWindow::onFileSaveAllExperimentFiles()
+void cMainWindow::onFileSaveAllMeasurementFiles()
 {
     auto list = mpMdiArea->subWindowList();
     for (auto* subWindow : list)
@@ -655,7 +655,7 @@ void cMainWindow::onFileSaveAllExperimentFiles()
     }
 }
 
-void cMainWindow::onFileCloseExperimentFile()
+void cMainWindow::onFileCloseMeasurementFile()
 {
     auto* childSubWindow = mpMdiArea->currentSubWindow();
     if (!childSubWindow)
@@ -664,7 +664,7 @@ void cMainWindow::onFileCloseExperimentFile()
     childSubWindow->close();
 }
 
-void cMainWindow::onFileCloseAllExperimentFiles()
+void cMainWindow::onFileCloseAllMeasurementFiles()
 {
     mpMdiArea->closeAllSubWindows();
 }
@@ -673,7 +673,7 @@ void cMainWindow::onFileCloseAllExperimentFiles()
 /********************************************************************
  * Slots associated with "Edit" menu actions
  *******************************************************************/
-void cMainWindow::onEditExperimentMetaInfo()
+void cMainWindow::onEditMeasurementMetaInfo()
 {
     auto* childSubWindow = mpMdiArea->currentSubWindow();
     if (!childSubWindow)
@@ -683,7 +683,7 @@ void cMainWindow::onEditExperimentMetaInfo()
     child->editMetaInfo();
 }
 
-void cMainWindow::onEditExperimentCtrlInfo()
+void cMainWindow::onEditMeasurementCtrlInfo()
 {
     auto* childSubWindow = mpMdiArea->currentSubWindow();
     if (!childSubWindow)
@@ -693,7 +693,7 @@ void cMainWindow::onEditExperimentCtrlInfo()
     child->editCtrlInfo();
 }
 
-void cMainWindow::onEditExperimentSernsorInfo()
+void cMainWindow::onEditMeasurementSernsorInfo()
 {
     auto* childSubWindow = mpMdiArea->currentSubWindow();
     if (!childSubWindow)
@@ -703,7 +703,7 @@ void cMainWindow::onEditExperimentSernsorInfo()
     child->editSensorInfo();
 }
 
-void cMainWindow::onEditAddExperimentToLayout()
+void cMainWindow::onEditAddMeasurementToLayout()
 {
     auto* childSubWindow = mpMdiArea->currentSubWindow();
     if (!childSubWindow)
@@ -713,7 +713,7 @@ void cMainWindow::onEditAddExperimentToLayout()
     
     cExperimentFieldLayoutDlg dlg(*mpFieldLayout, this);
 
-    dlg.setExperiment(child->getExperimentFile());
+    dlg.setExperiment(child->getMeasurementFile());
 
     auto result = dlg.exec();
 
@@ -728,7 +728,7 @@ void cMainWindow::onEditAddExperimentToLayout()
     child->setLayoutName(new_layout.caption.label.toStdString());
 }
 
-void cMainWindow::onEditMoveExperimentX()
+void cMainWindow::onEditMoveMeasurementX()
 {
     cNewSpidercam_X_PositionDlg dlg(mLimits.minX_mm, mLimits.maxX_mm);
 
@@ -756,7 +756,7 @@ void cMainWindow::onEditMoveExperimentX()
     child->reloadPath();
 }
 
-void cMainWindow::onEditMoveExperimentY()
+void cMainWindow::onEditMoveMeasurementY()
 {
     cNewSpidercam_Y_PositionDlg dlg(mLimits.minY_mm, mLimits.maxY_mm);
 
@@ -787,7 +787,7 @@ void cMainWindow::onEditMoveExperimentY()
     child->reloadPath();
 }
 
-void cMainWindow::onEditMoveExperimentZ()
+void cMainWindow::onEditMoveMeasurementZ()
 {
     cNewSpidercam_Z_PositionDlg dlg(mLimits.minHeight_mm, mLimits.maxHeight_mm);
 
@@ -818,7 +818,7 @@ void cMainWindow::onEditMoveExperimentZ()
     child->reloadPath();
 }
 
-void cMainWindow::onEditShiftExperiment()
+void cMainWindow::onEditShiftMeasurement()
 {
     cExperimentShiftDlg dlg;
 
@@ -853,7 +853,7 @@ void cMainWindow::onGenerateLidarScan_SpiderCam_Point()
 
     connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateLidarExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     if (mpModel && mpModel->isConnected())
     {
@@ -916,7 +916,7 @@ void cMainWindow::onGenerateLidarScan_GPS()
 
     connect(&dlg, &cCreateLidarExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateLidarExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateLidarExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateLidarExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     auto result = dlg.exec();
 
@@ -973,7 +973,7 @@ void cMainWindow::onGenerateLidarScan_PlotInfo()
 
     connect(&dlg, &cCreateLidarExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateLidarExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateLidarExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateLidarExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     auto result = dlg.exec();
 
@@ -991,7 +991,7 @@ void cMainWindow::onGenerateHyperspectralRefScan_SpiderCam_Point()
 
     connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     if (mpModel && mpModel->isConnected())
     {
@@ -1020,7 +1020,7 @@ void cMainWindow::onGenerateHyperspectralScan_SpiderCam_Point()
 
     connect(&dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::clearPaths,          mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::drawPath,            mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::experimentChanged,   this,          &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateHyperspectralExperimentFromSpiderCamDlg::experimentChanged,   this,          &cMainWindow::onMeasurementChange);
 
     if (mpModel && mpModel->isConnected())
     {
@@ -1083,7 +1083,7 @@ void cMainWindow::onGenerateHyperspectralScan_GPS()
 
     connect(&dlg, &cCreateHyperspectralExperimentFromGpsDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateHyperspectralExperimentFromGpsDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateHyperspectralExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateHyperspectralExperimentFromGpsDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     auto result = dlg.exec();
 
@@ -1140,7 +1140,7 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
 
     connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onExperimentChange);
+    connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     auto result = dlg.exec();
 
@@ -1156,19 +1156,19 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
  * Slots associated with "Preference" menu actions
  *******************************************************************/
 
-void cMainWindow::onPreferenceDefaultExperimentDirectory()
+void cMainWindow::onPreferenceDefaultMeasurementDirectory()
 {
-    QString defaultDirectory = mSettings.value("Defaults/experimentDirectory").toString();
+    QString defaultDirectory = mSettings.value("Defaults/measurementDirectory").toString();
 
-    QString directory = QFileDialog::getExistingDirectory(this, tr("Select Default Directory for Saving/Loading Experiment Files..."), defaultDirectory);
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Select Default Directory for Saving/Loading Measurement Files..."), defaultDirectory);
 
     if (directory.isEmpty())
         return;
 
-    mSettings.setValue("Defaults/experimentDirectory", directory);
-    mExperimentFilesPath = directory;
+    mSettings.setValue("Defaults/measurementDirectory", directory);
+    mMeasurementFilesPath = directory;
 
-    emit defaultExperimentPathChange(mExperimentFilesPath);
+    emit defaultMeasurementPathChange(mMeasurementFilesPath);
 }
 
 //-----------------------------------------------------------------------------
@@ -1350,8 +1350,8 @@ void cMainWindow::onConnectToSpidercam()
     QObject::connect(mpModel, &cPlannerDataModel::experimentStatus, mpFieldLayout, &cFieldLayoutWidget::experimentStatusUpdating);
     QObject::connect(mpModel, &cPlannerDataModel::experimentStateChanged, mpFieldLayout, &cFieldLayoutWidget::experimentStateChanging);
 
-    QObject::connect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
-    QObject::connect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+    QObject::connect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onMeasurementTerminated);
+    QObject::connect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onMeasurementCompleted);
 
     QObject::connect(pCtrlModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
     QObject::connect(pCtrlModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
@@ -1381,9 +1381,9 @@ void cMainWindow::onConnectToSpidercam()
     mpSpidercamConnect->setText(tr("Disconnect"));
     mpSpidercamConnect->setStatusTip(tr("Disconnect from Spidercam"));
 
-    mpTestExperiment->setEnabled(true);
-    mpStopExperiment->setEnabled(true);
-    mpPauseRunExperiment->setEnabled(true);
+    mpTestMeasurement->setEnabled(true);
+    mpStopMeasurement->setEnabled(true);
+    mpPauseRunMeasurement->setEnabled(true);
 }
 
 
@@ -1394,11 +1394,11 @@ void cMainWindow::onDisconnectFromSpidercam()
         return;
     }
 
-    onSpidercamStopExperiment();
+    onSpidercamStopMeasurement();
 
-    mpTestExperiment->setEnabled(false);
-    mpStopExperiment->setEnabled(false);
-    mpPauseRunExperiment->setEnabled(false);
+    mpTestMeasurement->setEnabled(false);
+    mpStopMeasurement->setEnabled(false);
+    mpPauseRunMeasurement->setEnabled(false);
 
     mpModel->stopDataThread();
 
@@ -1420,8 +1420,8 @@ void cMainWindow::onDisconnectFromSpidercam()
     QObject::disconnect(mpModel, &cPlannerDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::disconnect(mpModel, &cPlannerDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-    QObject::disconnect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
-    QObject::disconnect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
+    QObject::disconnect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onMeasurementTerminated);
+    QObject::disconnect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onMeasurementCompleted);
 
     delete mpModel;
     mpModel = nullptr;
@@ -1434,7 +1434,7 @@ void cMainWindow::onDisconnectFromSpidercam()
     emit disconnectedFromController();
 }
 
-void cMainWindow::onSpidercamTestExperiment()
+void cMainWindow::onSpidercamTestMeasurement()
 {
     if (!mpModel)
     {
@@ -1446,16 +1446,16 @@ void cMainWindow::onSpidercamTestExperiment()
         return;
     }
 
-    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+    auto* pMeasurement = static_cast<cMeasurementTreeItem*>(mpMeasurements->currentItem());
 
-    if (pExperiment == nullptr)
+    if (pMeasurement == nullptr)
     {
         return;
     }
 
-    if (pExperiment->hasExperimentDocument())
+    if (pMeasurement->hasMeasurementDocument())
     {
-        loadExperiment(*pExperiment);
+        loadMeasurement(*pMeasurement);
     }
 
     if (!mpModel->isExperimentLoaded())
@@ -1465,7 +1465,7 @@ void cMainWindow::onSpidercamTestExperiment()
 
     if (mpModel->experimentRequiresDataFile())
     {
-        std::string fileName = mpModel->experimentTitle();
+        std::string fileName = mpModel->measurementTitle();
         if (!mpModel->openDataFile("", fileName, false))
         {
             mpModel->terminateExperiment();
@@ -1475,13 +1475,13 @@ void cMainWindow::onSpidercamTestExperiment()
 
     mpModel->startExperiment();
 
-    mpPauseRunExperiment->setText(tr("Pause Experiment"));
-    mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
+    mpPauseRunMeasurement->setText(tr("Pause Measurement"));
+    mpPauseRunMeasurement->setStatusTip(tr("Pause the running measurement"));
 
-    emit experimentRunning();
+    emit measurementRunning();
 }
 
-void cMainWindow::onSpidercamStopExperiment()
+void cMainWindow::onSpidercamStopMeasurement()
 {
     if (!mpModel)
     {
@@ -1495,11 +1495,11 @@ void cMainWindow::onSpidercamStopExperiment()
 
     mpModel->terminateExperiment();
 
-    mpPauseRunExperiment->setText(tr("Pause Experiment"));
-    mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
+    mpPauseRunMeasurement->setText(tr("Pause Measurement"));
+    mpPauseRunMeasurement->setStatusTip(tr("Pause the running measurement"));
 }
 
-void cMainWindow::onSpidercamPauseRunExperiment()
+void cMainWindow::onSpidercamPauseRunMeasurement()
 {
     if (!mpModel)
     {
@@ -1514,14 +1514,14 @@ void cMainWindow::onSpidercamPauseRunExperiment()
     if (mpModel->isExperimentPaused())
     {
         mpModel->startExperiment();
-        mpPauseRunExperiment->setText(tr("Pause Experiment"));
-        mpPauseRunExperiment->setStatusTip(tr("Pause the running experiment"));
+        mpPauseRunMeasurement->setText(tr("Pause Measurement"));
+        mpPauseRunMeasurement->setStatusTip(tr("Pause the running measurement"));
     }
     else
     {
         mpModel->pauseExperiment();
-        mpPauseRunExperiment->setText("Continue Experiment");
-        mpPauseRunExperiment->setStatusTip(tr("Continue the running experiment"));
+        mpPauseRunMeasurement->setText("Continue Measurement");
+        mpPauseRunMeasurement->setStatusTip(tr("Continue the running measurement"));
     }
 }
 
@@ -1535,7 +1535,7 @@ void cMainWindow::onHelpAbout()
 /********************************************************************
  * General Purpose Slots
  *******************************************************************/
-void cMainWindow::onOpenExperiment(const QString& filename)
+void cMainWindow::onOpenMeasurement(const QString& filename)
 {
     if (filename.isEmpty())
         return;
@@ -1558,51 +1558,54 @@ void cMainWindow::onOpenExperiment(const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::onExperimentChange(QSharedPointer<cExperimentFile> experiment)
+void cMainWindow::onMeasurementChange(QSharedPointer<cExperimentFile> measurement)
 {
-    if (experiment.isNull()) return;
+    if (measurement.isNull()) return;
 
-    auto filename = experiment->getFileName();
-    auto title = experiment->getExperimentName();
+    auto filename = measurement->getFileName();
+    auto title = measurement->getMeasurementName();
+
+    if (title.empty())
+        title = measurement->getExperimentName();
 
     auto list = mpMdiArea->subWindowList();
     for (auto* subWindow : list)
     {
         auto* child = static_cast<cExperimentDesignMdiChild*>(subWindow->widget());
-        if ((!title.empty() && (child->getExperimentTitle() == title))
+        if ((!title.empty() && (child->getMeasurementTitle() == title))
             || (!filename.empty() && (child->getFileName() == filename)))
         {
-            child->setExperimentFile(*experiment);
+            child->setMeasurementFile(*measurement);
             mpMdiArea->setActiveSubWindow(subWindow);
             return;
         }
     }
     auto* child = createMdiChild();
-    child->newFile(*experiment);
+    child->newFile(*measurement);
     child->show();
 
     mpEditMenu->setDisabled(false);
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::onExperimentListUpdateNeeded()
+void cMainWindow::onMeasurementListUpdateNeeded()
 {
-    mpExperiments->reloadExperiments();
+    mpMeasurements->reloadMeasurements();
 }
 
 
 //-----------------------------------------------------------------------------
-bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
+bool cMainWindow::loadMeasurement(const cMeasurementTreeItem& measurement)
 {
-    QString msg = "Loading experiment \"";
-    msg += experiment.text(0);
+    QString msg = "Loading measurement \"";
+    msg += measurement.text(0);
     msg += "\" from file ";
-    msg += experiment.getFilename();
+    msg += measurement.getFilename();
     onStatusUpdate(msg);
 
-    std::string name = experiment.text(0).toStdString();
-    auto expDoc = experiment.getExperimentDocument();
-    if (!mpModel->loadExperiment(name, expDoc))
+    std::string name = measurement.text(0).toStdString();
+    auto measureDoc = measurement.getMeasurementDocument();
+    if (!mpModel->loadExperiment(name, measureDoc))
     {
         return false;
     }
@@ -1610,12 +1613,12 @@ bool cMainWindow::loadExperiment(const cExperimentTreeItem& experiment)
     return true;
 }
 
-bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
+bool cMainWindow::loadMeasurement(const std::filesystem::path& measurement_file)
 {
     using namespace nlohmann;
 
     std::ifstream in;
-    in.open(experiment_file);
+    in.open(measurement_file);
 
     if (!in.is_open())
     {
@@ -1629,33 +1632,36 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
     {
         in >> jsonDoc;
 
-        if (jsonDoc.contains("experiment name"))
+        if (jsonDoc.contains("measurement name"))
+            name = jsonDoc["measurement name"];
+        else if (jsonDoc.contains("measurement_name"))
+            name = jsonDoc["measurement_name"];
+        else if (jsonDoc.contains("experiment name"))
             name = jsonDoc["experiment name"];
         else
             name = jsonDoc["experiment_name"];
     }
     catch (const detail::exception& e)
     {
-        QString msg = "Failed to loading experiment file: ";
-        msg += QString::fromStdString(experiment_file.string());
+        QString msg = "Failed to loading measurement file: ";
+        msg += QString::fromStdString(measurement_file.string());
         onWarningMessage("File Error", msg);
 
         return false;
     }
 
-
-    QString msg = "Loading experiment \"";
+    QString msg = "Loading measurement \"";
     msg += QString::fromStdString(name);
     msg += "\" from file ";
-    msg += QString::fromStdString(experiment_file.string());
+    msg += QString::fromStdString(measurement_file.string());
     onStatusUpdate(msg);
 
     if (!mpModel->loadExperiment(name, jsonDoc))
     {
-        QString msg = "Experiment \"";
+        QString msg = "Measurement \"";
         msg += QString::fromStdString(name);
         msg += "\" from file ";
-        msg += QString::fromStdString(experiment_file.string());
+        msg += QString::fromStdString(measurement_file.string());
         msg += " failed to load!";
         onStatusUpdate(msg);
         return false;
@@ -1665,7 +1671,7 @@ bool cMainWindow::loadExperiment(const std::filesystem::path& experiment_file)
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::onExperimentRun(const QString& filename)
+void cMainWindow::onMeasurementRun(const QString& filename)
 {
     if (!mpModel)
         return;
@@ -1679,23 +1685,23 @@ void cMainWindow::onExperimentRun(const QString& filename)
         return;
     }
 
-    onOpenExperiment(filename);
+    onOpenMeasurement(filename);
 
     if (!mpModel->systemReady())
     {
         return;
     }
 
-    auto* pExperiment = static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+    auto* pMeasurement = static_cast<cMeasurementTreeItem*>(mpMeasurements->currentItem());
 
-    if (pExperiment == nullptr)
+    if (pMeasurement == nullptr)
     {
         return;
     }
 
-    if (pExperiment->hasExperimentDocument())
+    if (pMeasurement->hasMeasurementDocument())
     {
-        loadExperiment(*pExperiment);
+        loadMeasurement(*pMeasurement);
     }
  
     if (!mpModel->isExperimentLoaded())
@@ -1705,7 +1711,7 @@ void cMainWindow::onExperimentRun(const QString& filename)
 
     if (mpModel->experimentRequiresDataFile())
     {
-        std::string fileName = mpModel->experimentTitle();
+        std::string fileName = mpModel->measurementTitle();
         if (!mpModel->openDataFile("", fileName, false))
         {
             mpModel->terminateExperiment();
@@ -1715,7 +1721,7 @@ void cMainWindow::onExperimentRun(const QString& filename)
 
     mpModel->startExperiment();
 
-    emit experimentRunning();
+    emit measurementRunning();
 }
 
 //-----------------------------------------------------------------------------

@@ -26,10 +26,10 @@ public:
 
     const std::string& getFileName() const;
 
-    const std::string& getExperimentTitle() const;
+    const std::string& getMeasurementTitle() const;
 
-    const cExperimentFile& getExperimentFile() const;
-    void setExperimentFile(const cExperimentFile& file);
+    const cExperimentFile& getMeasurementFile() const;
+    void setMeasurementFile(const cExperimentFile& file);
 
     const std::string& getLayoutName() const;
     void setLayoutName(const std::string& name);
@@ -69,6 +69,6 @@ private:
     QString strippedName(const QString &fullFileName);
 
     QString mDefaultPath;
-    cExperimentFile mExperimentFile;
+    cExperimentFile mMeasurementFile;
 };
 

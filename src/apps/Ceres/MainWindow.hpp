@@ -25,8 +25,8 @@ QT_END_NAMESPACE
 class cCeresSplashScreen;
 class cCtrlDataModel;
 class cExperimentControlView;
-class cExperimentManager;
-class cExperimentTreeItem;
+class cMeasurementManager;
+class cMeasurementTreeItem;
 class cHobbsMeter;
 
 namespace Ui 
@@ -78,8 +78,8 @@ private slots:
     void onSetExperimentActions(bool load, bool run, bool pause, bool stop);
 
 private:
-    bool loadExperiment(const cExperimentTreeItem& experiment);
-    bool loadExperiment(const std::filesystem::path& experiment);
+    bool loadMeasurement(const cMeasurementTreeItem& measurement);
+    bool loadMeasurement(const std::filesystem::path& measurement);
 
 private:
     void createMainMenu();
@@ -96,7 +96,7 @@ private:
 
     cCeresSplashScreen* mpSplashScreen;
 
-    cExperimentManager* mpExperiments;
+    cMeasurementManager* mpMeasurements;
 
     QString mDefaultDataPath;
     QString mExperimentFilesPath;

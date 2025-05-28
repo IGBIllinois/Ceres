@@ -145,9 +145,9 @@ void cPlannerDataModel::stopDataThread()
     mThread.stop();
 }
 
-std::string cPlannerDataModel::experimentTitle() const
+std::string cPlannerDataModel::measurementTitle() const
 {
-    return mExperimentTitle;
+    return mMeasurementTitle;
 }
 
 bool cPlannerDataModel::systemReady() const
@@ -214,10 +214,14 @@ bool cPlannerDataModel::loadExperiment(const std::string& expName, const nlohman
 
         if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
         {
-            if (expDoc.contains("experiment name"))
-                mExperimentTitle = static_cast<std::string>(expDoc["experiment name"]);
+            if (expDoc.contains("measurement name"))
+                mMeasurementTitle = static_cast<std::string>(expDoc["measurement name"]);
+            else if(expDoc.contains("measurement_name"))
+                mMeasurementTitle = static_cast<std::string>(expDoc["measurement_name"]);
+            else if (expDoc.contains("experiment name"))
+                mMeasurementTitle = static_cast<std::string>(expDoc["experiment name"]);
             else
-                mExperimentTitle = static_cast<std::string>(expDoc["experiment_name"]);
+                mMeasurementTitle = static_cast<std::string>(expDoc["experiment_name"]);
         }
     }
     catch (const detail::parse_error& e)
@@ -349,7 +353,7 @@ void cPlannerDataModel::doExperimentCleanup()
 
     closeDataFile();
 
-    mExperimentTitle.clear();
+    mMeasurementTitle.clear();
 	
     if (mThread.mpController)
     {

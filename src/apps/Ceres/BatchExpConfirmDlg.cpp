@@ -1,6 +1,6 @@
 
 #include "BatchExpConfirmDlg.hpp"
-#include "ExperimentTreeItem.hpp"
+#include "MeasurementTreeItem.hpp"
 
 #include <QLayout>
 #include <QPushButton>
@@ -20,42 +20,42 @@ cBatchExpConfirmDlg::cBatchExpConfirmDlg(QWidget* parent)
 :
     QDialog(parent)
 {
-    setWindowTitle(tr("Select Experiment"));
+    setWindowTitle(tr("Select Measurement"));
 }
 
 cBatchExpConfirmDlg::~cBatchExpConfirmDlg()
 {}
 
-void cBatchExpConfirmDlg::initialize(const cExperimentTreeItem* pRoot)
+void cBatchExpConfirmDlg::initialize(const cMeasurementTreeItem* pRoot)
 {
-    mpExperiments = new QTreeWidget(this);
-    mpExperiments->setColumnCount(0);
-    mpExperiments->setHeaderLabel("Experiments to run...");
-    mpExperiments->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-    mpExperiments->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    mpMeasurements = new QTreeWidget(this);
+    mpMeasurements->setColumnCount(0);
+    mpMeasurements->setHeaderLabel("Measurements to run...");
+    mpMeasurements->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+    mpMeasurements->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     auto n = pRoot->childCount();
     for (int i = 0; i < n; ++i)
     {
-        auto* pExp = static_cast<cExperimentTreeItem*>(pRoot->child(i));
-        if (pExp->hasExperimentDocument())
+        auto* pExp = static_cast<cMeasurementTreeItem*>(pRoot->child(i));
+        if (pExp->hasMeasurementDocument())
         {
-            auto* item = new cExperimentTreeItem(mpExperiments, pExp->text(0), pExp->getExperimentFile());
+            auto* item = new cMeasurementTreeItem(mpMeasurements, pExp->text(0), pExp->getMeasurementFile());
             item->setCheckState(0, Qt::Checked);
         }
         else
         {
-            auto* item = new cExperimentTreeItem(mpExperiments, pExp->text(0));
+            auto* item = new cMeasurementTreeItem(mpMeasurements, pExp->text(0));
             loadExperiments(item, pExp);
             item->setCheckState(0, Qt::Checked);
         }
     }
 
-    connect(mpExperiments, &QTreeWidget::itemChanged, this, &cBatchExpConfirmDlg::itemChanged);
+    connect(mpMeasurements, &QTreeWidget::itemChanged, this, &cBatchExpConfirmDlg::itemChanged);
 
     QVBoxLayout* pMainLayout = new QVBoxLayout();
 
-    pMainLayout->addWidget(mpExperiments);
+    pMainLayout->addWidget(mpMeasurements);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
         | QDialogButtonBox::Cancel);
@@ -68,21 +68,21 @@ void cBatchExpConfirmDlg::initialize(const cExperimentTreeItem* pRoot)
     setLayout(pMainLayout);
 }
 
-void cBatchExpConfirmDlg::loadExperiments(cExperimentTreeItem* pRoot,
-                                            const cExperimentTreeItem* pBranch)
+void cBatchExpConfirmDlg::loadExperiments(cMeasurementTreeItem* pRoot,
+                                            const cMeasurementTreeItem* pBranch)
 {
     auto n = pBranch->childCount();
     for (int i = 0; i < n; ++i)
     {
-        auto* pExp = static_cast<cExperimentTreeItem*>(pBranch->child(i));
-        if (pExp->hasExperimentDocument())
+        auto* pExp = static_cast<cMeasurementTreeItem*>(pBranch->child(i));
+        if (pExp->hasMeasurementDocument())
         {
-            auto* item = new cExperimentTreeItem(pRoot, pExp->text(0), pExp->getExperimentFile());
+            auto* item = new cMeasurementTreeItem(pRoot, pExp->text(0), pExp->getMeasurementFile());
             item->setCheckState(0, Qt::Checked);
         }
         else
         {
-            auto* item = new cExperimentTreeItem(mpExperiments, pExp->text(0));
+            auto* item = new cMeasurementTreeItem(mpMeasurements, pExp->text(0));
             loadExperiments(item, pExp);
             item->setCheckState(0, Qt::Checked);
         }
@@ -91,26 +91,26 @@ void cBatchExpConfirmDlg::loadExperiments(cExperimentTreeItem* pRoot,
 }
 
 
-std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedExperiments()
+std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedMeasurements()
 {
     std::vector<std::filesystem::path> selected;
 
-    auto n = mpExperiments->topLevelItemCount();
+    auto n = mpMeasurements->topLevelItemCount();
     for (int i = 0; i < n; ++i)
     {
         //    auto* item = static_cast<cExperimentTreeItem>(mpExperiments->topLevelItem(0));
-        auto* item = mpExperiments->topLevelItem(i);
-        cExperimentTreeItem* pExp = static_cast<cExperimentTreeItem*>(item);
-        if (pExp->hasExperimentDocument())
+        auto* item = mpMeasurements->topLevelItem(i);
+        cMeasurementTreeItem* pExp = static_cast<cMeasurementTreeItem*>(item);
+        if (pExp->hasMeasurementDocument())
         {
             if (item->checkState(0) == Qt::Checked)
             {
-                selected.push_back(pExp->getExperimentFile());
+                selected.push_back(pExp->getMeasurementFile());
             }
         }
         else
         {
-            auto tmp = getSelectedExperiments(pExp);
+            auto tmp = getSelectedMeasurements(pExp);
             selected.insert(selected.end(), tmp.begin(), tmp.end());
         }
     }
@@ -118,7 +118,7 @@ std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedExperiments()
     return selected;
 }
 
-std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedExperiments(cExperimentTreeItem* pRoot)
+std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedMeasurements(cMeasurementTreeItem* pRoot)
 {
     std::vector<std::filesystem::path> selected;
 
@@ -127,17 +127,17 @@ std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedExperiments(c
     {
         //    auto* item = static_cast<cExperimentTreeItem>(mpExperiments->topLevelItem(0));
         auto* item = pRoot->child(i);
-        cExperimentTreeItem* pExp = static_cast<cExperimentTreeItem*>(item);
-        if (pExp->hasExperimentDocument())
+        cMeasurementTreeItem* pExp = static_cast<cMeasurementTreeItem*>(item);
+        if (pExp->hasMeasurementDocument())
         {
             if (item->checkState(0) == Qt::Checked)
             {
-                selected.push_back(pExp->getExperimentFile());
+                selected.push_back(pExp->getMeasurementFile());
             }
         }
         else
         {
-            auto tmp = getSelectedExperiments(pExp);
+            auto tmp = getSelectedMeasurements(pExp);
             selected.insert(selected.end(), tmp.begin(), tmp.end());
         }
     }
@@ -158,9 +158,9 @@ void cBatchExpConfirmDlg::reject()
 
 void cBatchExpConfirmDlg::itemChanged(QTreeWidgetItem* item, int column)
 {
-    auto* pExp = static_cast<cExperimentTreeItem*>(item);
+    auto* pExp = static_cast<cMeasurementTreeItem*>(item);
 
-    if (pExp->hasExperimentDocument())
+    if (pExp->hasMeasurementDocument())
     {
         return;
     }

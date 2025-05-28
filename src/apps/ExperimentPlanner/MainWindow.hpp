@@ -31,8 +31,8 @@ QT_END_NAMESPACE
 
 // Forward Declarations
 class cPlannerDataModel;
-class cExperimentManager;
-class cExperimentTreeItem;
+class cMeasurementManager;
+class cMeasurementTreeItem;
 class cFieldLayoutWidget;
 class cExperimentDesignWidget;
 class cExperimentDesignMdiChild;
@@ -54,10 +54,10 @@ public:
     void initialize();
 
 signals:
-    void experimentRunning();
-    void experimentCompleted();
+    void measurementRunning();
+    void measurementCompleted();
     void refreshDisplay();
-    void defaultExperimentPathChange(const QString& path);
+    void defaultMeasurementPathChange(const QString& path);
 
 signals:
     void connectedToController();
@@ -70,30 +70,30 @@ public slots:
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString msg);
 
-    void onExperimentTerminated();
-    void onExperimentCompleted();
+    void onMeasurementTerminated();
+    void onMeasurementCompleted();
 
 
 // Slots associated with "File" menu actions
 private slots:
-    void onFileNewExperiment();
-    void onFileOpenExperiment();
-    void onFileSaveExperimentFile();
-    void onFileSaveAsExperimentFile();
-    void onFileSaveAllExperimentFiles();
-    void onFileCloseExperimentFile();
-    void onFileCloseAllExperimentFiles();
+    void onFileNewMeasurement();
+    void onFileOpenMeasurement();
+    void onFileSaveMeasurementFile();
+    void onFileSaveAsMeasurementFile();
+    void onFileSaveAllMeasurementFiles();
+    void onFileCloseMeasurementFile();
+    void onFileCloseAllMeasurementFiles();
 
 // Slots associated with "Edit" menu actions
 private slots:
-    void onEditExperimentMetaInfo();
-    void onEditExperimentCtrlInfo();
-    void onEditExperimentSernsorInfo();
-    void onEditAddExperimentToLayout();
-    void onEditMoveExperimentX();
-    void onEditMoveExperimentY();
-    void onEditMoveExperimentZ();
-    void onEditShiftExperiment();
+    void onEditMeasurementMetaInfo();
+    void onEditMeasurementCtrlInfo();
+    void onEditMeasurementSernsorInfo();
+    void onEditAddMeasurementToLayout();
+    void onEditMoveMeasurementX();
+    void onEditMoveMeasurementY();
+    void onEditMoveMeasurementZ();
+    void onEditShiftMeasurement();
 
     // Slots associated with "Generate" menu actions
 private slots:
@@ -110,7 +110,7 @@ private slots:
 
 // Slots associated with "Preference" menu actions
 private slots:
-    void onPreferenceDefaultExperimentDirectory();
+    void onPreferenceDefaultMeasurementDirectory();
     void onPreferenceLoadGroundMesh();
     void onPreferenceDefaultFieldLayoutFile();
     void onPreferenceDefaultPlotSplitDirectory();
@@ -120,9 +120,9 @@ private slots:
 private slots:
     void onConnectToSpidercam();
     void onDisconnectFromSpidercam();
-    void onSpidercamTestExperiment();
-    void onSpidercamStopExperiment();
-    void onSpidercamPauseRunExperiment();
+    void onSpidercamTestMeasurement();
+    void onSpidercamStopMeasurement();
+    void onSpidercamPauseRunMeasurement();
 
 // Slots associated with "Help" menu actions
 private slots:
@@ -130,11 +130,11 @@ private slots:
 
 // Helper slots
 private slots:
-    void onOpenExperiment(const QString& filename);
-    void onExperimentChange(QSharedPointer<cExperimentFile> experiment);
-    void onExperimentListUpdateNeeded();
+    void onOpenMeasurement(const QString& filename);
+    void onMeasurementChange(QSharedPointer<cExperimentFile> experiment);
+    void onMeasurementListUpdateNeeded();
 
-    void onExperimentRun(const QString& filename);
+    void onMeasurementRun(const QString& filename);
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -149,8 +149,8 @@ private:
     cExperimentDesignMdiChild* createMdiChild();
 
 private:
-    bool loadExperiment(const cExperimentTreeItem& experiment);
-    bool loadExperiment(const std::filesystem::path& experiment);
+    bool loadMeasurement(const cMeasurementTreeItem& measurement);
+    bool loadMeasurement(const std::filesystem::path& measurement);
 
 private:
     void LoadGpsData(QString fileName);
@@ -163,10 +163,10 @@ private:
 
     QMdiArea* mpMdiArea = nullptr;
 
-    cExperimentManager* mpExperiments = nullptr;
+    cMeasurementManager* mpMeasurements = nullptr;
     cFieldLayoutWidget* mpFieldLayout = nullptr;
 
-    QString mExperimentFilesPath;
+    QString mMeasurementFilesPath;
     QString mFieldLayoutFile;
     QString mPlotSplitsPath;
 
@@ -179,9 +179,9 @@ private:
     QMenu* mpHelpMenu = nullptr;
 
     QAction* mpSpidercamConnect = nullptr;
-    QAction* mpTestExperiment = nullptr;
-    QAction* mpStopExperiment = nullptr;
-    QAction* mpPauseRunExperiment = nullptr;
+    QAction* mpTestMeasurement = nullptr;
+    QAction* mpStopMeasurement = nullptr;
+    QAction* mpPauseRunMeasurement = nullptr;
 
     QToolBar* mpFileBar = nullptr;
 

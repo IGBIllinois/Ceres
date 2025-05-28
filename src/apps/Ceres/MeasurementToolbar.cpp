@@ -1,10 +1,10 @@
 
-#include "ExperimentToolbar.hpp"
+#include "MeasurementToolbar.hpp"
 
 #include <QToolButton>
 
-cExperimentToolbar::cExperimentToolbar(QWidget* parent)
-	: QToolBar(tr("Experiment"), parent),
+cMeasurementToolbar::cMeasurementToolbar(QWidget* parent)
+	: QToolBar(tr("Measurement"), parent),
 		mpLoadAction(nullptr), mpStartAction(nullptr),
 		mpPauseAction(nullptr), mpStopAction(nullptr)
 {
@@ -13,33 +13,33 @@ cExperimentToolbar::cExperimentToolbar(QWidget* parent)
 
 	mpLoadAction = new QAction();
 	mpLoadAction->setIcon(QIcon(":/ripe.illinois.edu/load_exp.png"));
-	mpLoadAction->setStatusTip(tr("Load experiment..."));
-	connect(mpLoadAction, &QAction::triggered, this, &cExperimentToolbar::loadButtonPressed);
+	mpLoadAction->setStatusTip(tr("Load measurement..."));
+	connect(mpLoadAction, &QAction::triggered, this, &cMeasurementToolbar::loadButtonPressed);
 	this->addAction(mpLoadAction);
 
 	mpStartAction = new QAction;
 	mpStartAction->setIcon(QIcon(":/ripe.illinois.edu/start_exp.png"));
-	mpStartAction->setStatusTip(tr("Run experiment..."));
-	connect(mpStartAction, &QAction::triggered, this, &cExperimentToolbar::startButtonPressed);
+	mpStartAction->setStatusTip(tr("Run measurement..."));
+	connect(mpStartAction, &QAction::triggered, this, &cMeasurementToolbar::startButtonPressed);
 	this->addAction(mpStartAction);
 
 	mpPauseAction = new QAction;
 	mpPauseAction->setIcon(QIcon(":/ripe.illinois.edu/pause_exp.png"));
-	mpPauseAction->setStatusTip(tr("Pause the currently running experiment"));
-	connect(mpPauseAction, &QAction::triggered, this, &cExperimentToolbar::pauseButtonPressed);
+	mpPauseAction->setStatusTip(tr("Pause the currently running measurement"));
+	connect(mpPauseAction, &QAction::triggered, this, &cMeasurementToolbar::pauseButtonPressed);
 	this->addAction(mpPauseAction);
 
 	mpStopAction = new QAction;
 	mpStopAction->setIcon(QIcon(":/ripe.illinois.edu/stop_exp.png"));
-	mpStopAction->setStatusTip(tr("Stop the currently running experiment"));
-	connect(mpStopAction, &QAction::triggered, this, &cExperimentToolbar::stopButtonPressed);
+	mpStopAction->setStatusTip(tr("Stop the currently running measurement"));
+	connect(mpStopAction, &QAction::triggered, this, &cMeasurementToolbar::stopButtonPressed);
 	this->addAction(mpStopAction);
 
 	mpPauseAction->setEnabled(false);
 	mpStopAction->setEnabled(false);
 }
 
-void cExperimentToolbar::experimentRunning()
+void cMeasurementToolbar::measurementRunning()
 {
 	mpLoadAction->setEnabled(false);
 	mpStartAction->setEnabled(false);
@@ -47,7 +47,7 @@ void cExperimentToolbar::experimentRunning()
 	mpStopAction->setEnabled(true);
 }
 
-void cExperimentToolbar::experimentPaused()
+void cMeasurementToolbar::measurementPaused()
 {
 	mpLoadAction->setEnabled(false);
 	mpStartAction->setEnabled(true);
@@ -55,7 +55,7 @@ void cExperimentToolbar::experimentPaused()
 	mpStopAction->setEnabled(true);
 }
 
-void cExperimentToolbar::experimentStopped()
+void cMeasurementToolbar::measurementStopped()
 {
 	mpLoadAction->setEnabled(true);
 	mpStartAction->setEnabled(true);
@@ -63,22 +63,22 @@ void cExperimentToolbar::experimentStopped()
 	mpStopAction->setEnabled(false);
 }
 
-void cExperimentToolbar::loadButtonPressed()
+void cMeasurementToolbar::loadButtonPressed()
 {
 	emit loadSelected();
 }
 
-void cExperimentToolbar::startButtonPressed()
+void cMeasurementToolbar::startButtonPressed()
 {
 	emit runSelected();
 }
 
-void cExperimentToolbar::pauseButtonPressed()
+void cMeasurementToolbar::pauseButtonPressed()
 {
 	emit pauseSelected();
 }
 
-void cExperimentToolbar::stopButtonPressed()
+void cMeasurementToolbar::stopButtonPressed()
 {
 	emit stopSelected();
 }

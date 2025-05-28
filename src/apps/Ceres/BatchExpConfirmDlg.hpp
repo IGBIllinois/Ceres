@@ -12,7 +12,7 @@ class QLabel;
 QT_END_NAMESPACE
 
 // Forward Declaration
-class cExperimentTreeItem;
+class cMeasurementTreeItem;
 
 
 class cBatchExpConfirmDlg : public QDialog
@@ -23,9 +23,9 @@ public:
 	cBatchExpConfirmDlg(QWidget* parent = nullptr);
 	~cBatchExpConfirmDlg();
 
-	void initialize(const cExperimentTreeItem* pRoot);
+	void initialize(const cMeasurementTreeItem* pRoot);
 
-	std::vector<std::filesystem::path> getSelectedExperiments();
+	std::vector<std::filesystem::path> getSelectedMeasurements();
 
 private slots:
 	void accept() override;
@@ -34,11 +34,11 @@ private slots:
 	void itemChanged(QTreeWidgetItem* item, int column);
 
 private:
-	void loadExperiments(cExperimentTreeItem* pRoot, 
-						 const cExperimentTreeItem* pBranch);
+	void loadExperiments(cMeasurementTreeItem* pRoot,
+						 const cMeasurementTreeItem* pBranch);
 
-	std::vector<std::filesystem::path> getSelectedExperiments(cExperimentTreeItem* pRoot);
+	std::vector<std::filesystem::path> getSelectedMeasurements(cMeasurementTreeItem* pRoot);
 
 private:
-	QTreeWidget* mpExperiments;
+	QTreeWidget* mpMeasurements;
 };

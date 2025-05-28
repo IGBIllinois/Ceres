@@ -1,20 +1,20 @@
 
-#include "ExperimentTreeItem.hpp"
+#include "MeasurementTreeItem.hpp"
 
 #include <fstream>
 
 
-cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const QString& text)
+cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidget* parent, const QString& text)
 	: QTreeWidgetItem(parent)
 {
 	setText(0, text);
 }
 
-cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const std::filesystem::path& experiment_file)
+cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidget* parent, const std::filesystem::path& measurement_file)
     : QTreeWidgetItem(parent)
 {
     std::ifstream in;
-    in.open(experiment_file);
+    in.open(measurement_file);
 
     if (!in.is_open())
     {
@@ -23,43 +23,50 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const std::filesys
 
     nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
 
-    std::string exp_name;
-    if (jsonDoc.contains("experiment name"))
-        exp_name = jsonDoc["experiment name"];
+    std::string measurement_name;
 
-    if (jsonDoc.contains("experiment_name"))
-        exp_name = jsonDoc["experiment_name"];
+    if (jsonDoc.contains("measurement name"))
+        measurement_name = jsonDoc["measurement name"];
 
-    if (exp_name.empty())
+    else if (jsonDoc.contains("measurement_name"))
+        measurement_name = jsonDoc["measurement_name"];
+
+    else if (jsonDoc.contains("experiment name"))
+        measurement_name = jsonDoc["experiment name"];
+
+    else if (jsonDoc.contains("experiment_name"))
+        measurement_name = jsonDoc["experiment_name"];
+
+    if (measurement_name.empty())
     {
         in.close();
-        throw std::invalid_argument("File is not an experiment file.");
+        throw std::invalid_argument("File is not an measurement file.");
     }
 
-    QString name = QString::fromStdString(exp_name);
+    QString name = QString::fromStdString(measurement_name);
     setText(0, name);
 
-    mExperimentFile = experiment_file;
+    mMeasurementFile = measurement_file;
 }
 
-cExperimentTreeItem::cExperimentTreeItem(QTreeWidget* parent, const QString& text, const std::filesystem::path& experiment_file)
+cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidget* parent, const QString& text, const std::filesystem::path& measurement_file)
     : QTreeWidgetItem(parent)
 {
     setText(0, text);
-    mExperimentFile = experiment_file;
+    mMeasurementFile = measurement_file;
 }
 
-cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const QString& text)
+cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidgetItem* parent, const QString& text)
     : QTreeWidgetItem(parent)
 {
     setText(0, text);
 }
 
-cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const std::filesystem::path& experiment_file)
+cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidgetItem* parent, const std::filesystem::path& measurement_file)
 	: QTreeWidgetItem(parent)
 {
     std::ifstream in;
-    in.open(experiment_file);
+    in.open(measurement_file);
 
     if (!in.is_open())
     {
@@ -68,52 +75,57 @@ cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const std::fil
 
     nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
 
-    std::string exp_name;
-    if (jsonDoc.contains("experiment name"))
-        exp_name = jsonDoc["experiment name"];
-    else
-        exp_name = jsonDoc["experiment_name"];
+    std::string measurement_name;
 
-    QString name = QString::fromStdString(exp_name);
+    if (jsonDoc.contains("measurement name"))
+        measurement_name = jsonDoc["measurement name"];
+    else if (jsonDoc.contains("measurement_name"))
+        measurement_name = jsonDoc["measurement_name"];
+    else if (jsonDoc.contains("experiment name"))
+        measurement_name = jsonDoc["experiment name"];
+    else
+        measurement_name = jsonDoc["experiment_name"];
+
+    QString name = QString::fromStdString(measurement_name);
     setText(0, name);
 
-    mExperimentFile = experiment_file;
+    mMeasurementFile = measurement_file;
 }
 
-cExperimentTreeItem::cExperimentTreeItem(QTreeWidgetItem* parent, const QString& name, const std::filesystem::path& experiment_file)
+cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidgetItem* parent, const QString& name, const std::filesystem::path& measurement_file)
     : QTreeWidgetItem(parent)
 {
     setText(0, name);
-    mExperimentFile = experiment_file;
+    mMeasurementFile = measurement_file;
 }
 
-cExperimentTreeItem::cExperimentTreeItem(const cExperimentTreeItem& other)
+cMeasurementTreeItem::cMeasurementTreeItem(const cMeasurementTreeItem& other)
     : QTreeWidgetItem(other)
 {
-    mExperimentFile = other.mExperimentFile;
+    mMeasurementFile = other.mMeasurementFile;
 }
 
 
-QString cExperimentTreeItem::getFilename() const
+QString cMeasurementTreeItem::getFilename() const
 {
-    QString filename = mExperimentFile.string().c_str();
+    QString filename = mMeasurementFile.string().c_str();
     return filename;
 }
 
-const std::filesystem::path& cExperimentTreeItem::getExperimentFile() const
+const std::filesystem::path& cMeasurementTreeItem::getMeasurementFile() const
 {
-    return mExperimentFile;
+    return mMeasurementFile;
 }
 
-bool cExperimentTreeItem::hasExperimentDocument() const
+bool cMeasurementTreeItem::hasMeasurementDocument() const
 {
-    return !mExperimentFile.empty();
+    return !mMeasurementFile.empty();
 }
 
-nlohmann::json cExperimentTreeItem::getExperimentDocument() const
+nlohmann::json cMeasurementTreeItem::getMeasurementDocument() const
 {
     std::ifstream in;
-    in.open(mExperimentFile);
+    in.open(mMeasurementFile);
 
     if (!in.is_open())
     {

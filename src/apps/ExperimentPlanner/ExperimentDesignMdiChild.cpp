@@ -37,9 +37,9 @@ void cExperimentDesignMdiChild::newFile()
 {
     newWindowTitle();
 
-    mExperimentFile.clearSteps();
+    mMeasurementFile.clearSteps();
 
-    loadExperiment(mExperimentFile);
+    loadExperiment(mMeasurementFile);
 }
 
 
@@ -48,7 +48,7 @@ void cExperimentDesignMdiChild::newFile(const cExperimentFile& file)
     auto filename = file.getFileName();
     if (filename.empty())
     {
-        auto title = file.getExperimentName();
+        auto title = file.getMeasurementName();
         if (title.empty())
         {
             newWindowTitle();
@@ -66,11 +66,11 @@ void cExperimentDesignMdiChild::newFile(const cExperimentFile& file)
         setWindowTitle(curFile + "[*]");
     }
 
-    mExperimentFile.clearSteps();
+    mMeasurementFile.clearSteps();
 
-    mExperimentFile = file;
+    mMeasurementFile = file;
 
-    loadExperiment(mExperimentFile);
+    loadExperiment(mMeasurementFile);
 
     onExperimentChange();
 }
@@ -81,44 +81,53 @@ void cExperimentDesignMdiChild::loadFile(const QString &fileName)
     if (fileName.isEmpty())
         return;
 
-    mExperimentFile.clear();
+    mMeasurementFile.clear();
 
-    mExperimentFile.open(fileName.toStdString());
+    mMeasurementFile.open(fileName.toStdString());
 
-    loadExperiment(mExperimentFile);
+    loadExperiment(mMeasurementFile);
 
     setCurrentFile(QFileInfo(fileName).canonicalFilePath());
 }
 
 void cExperimentDesignMdiChild::save()
 {
-    if (!mExperimentFile.isDirty())
+    if (!mMeasurementFile.isDirty())
         return;
 
-    if (mExperimentFile.getFileName().empty())
+    if (mMeasurementFile.getFileName().empty())
     {
         saveAs();
     }
     else
     {
-        mExperimentFile.save();
+        mMeasurementFile.save();
         setWindowModified(false);
     }
 }
 
 void cExperimentDesignMdiChild::saveAs()
 {
-    if (mExperimentFile.empty())
+    if (mMeasurementFile.empty())
         return;
 
     QString defaultDirectory = mDefaultPath;
 
     if (getFileName().empty())
     {
-        if (!mExperimentFile.getExperimentName().empty())
+        if (!mMeasurementFile.getMeasurementName().empty())
         {
             QFileInfo path;
-            QString filename = QString::fromStdString(nStringUtils::safeFilename(mExperimentFile.getExperimentName()));
+            QString filename = QString::fromStdString(nStringUtils::safeFilename(mMeasurementFile.getMeasurementName()));
+
+            path.setFile(defaultDirectory, filename);
+
+            defaultDirectory = path.absoluteFilePath();
+        }
+        else if (!mMeasurementFile.getExperimentName().empty())
+        {
+            QFileInfo path;
+            QString filename = QString::fromStdString(nStringUtils::safeFilename(mMeasurementFile.getExperimentName()));
 
             path.setFile(defaultDirectory, filename);
 
@@ -134,7 +143,7 @@ void cExperimentDesignMdiChild::saveAs()
     if (fileName.isEmpty())
         return;
 
-    mExperimentFile.save_as(fileName.toStdString());
+    mMeasurementFile.save_as(fileName.toStdString());
 
     setCurrentFile(QFileInfo(fileName).canonicalFilePath());
 
@@ -150,83 +159,86 @@ QString cExperimentDesignMdiChild::userFriendlyCurrentFile()
 
 QString cExperimentDesignMdiChild::currentFile()
 {
-    return QString::fromStdString(mExperimentFile.getFileName());
+    return QString::fromStdString(mMeasurementFile.getFileName());
 }
 
 const std::string& cExperimentDesignMdiChild::getFileName() const
 {
-    return mExperimentFile.getFileName();
+    return mMeasurementFile.getFileName();
 }
 
-const std::string& cExperimentDesignMdiChild::getExperimentTitle() const
+const std::string& cExperimentDesignMdiChild::getMeasurementTitle() const
 {
-    return mExperimentFile.getExperimentName();
+    if (mMeasurementFile.getMeasurementName().empty())
+        return mMeasurementFile.getExperimentName();
+
+    return mMeasurementFile.getExperimentName();
 }
 
-const cExperimentFile& cExperimentDesignMdiChild::getExperimentFile() const
+const cExperimentFile& cExperimentDesignMdiChild::getMeasurementFile() const
 {
-    return mExperimentFile;
+    return mMeasurementFile;
 }
 
-void cExperimentDesignMdiChild::setExperimentFile(const cExperimentFile& file)
+void cExperimentDesignMdiChild::setMeasurementFile(const cExperimentFile& file)
 {
-    mExperimentFile = file;
+    mMeasurementFile = file;
 
-    loadExperiment(mExperimentFile);
+    loadExperiment(mMeasurementFile);
 
-    if (mExperimentFile.isDirty())
+    if (mMeasurementFile.isDirty())
         onExperimentChange();
 }
 
 const std::string& cExperimentDesignMdiChild::getLayoutName() const
 {
-    return mExperimentFile.getLayoutName();
+    return mMeasurementFile.getLayoutName();
 }
 
 void cExperimentDesignMdiChild::setLayoutName(const std::string& name)
 {
-    mExperimentFile.setLayoutName(name);
+    mMeasurementFile.setLayoutName(name);
 }
 
 void cExperimentDesignMdiChild::editMetaInfo()
 {
-    cExperimentMetaInfoDlg dlg(mExperimentFile.getMetaData(), this);
+    cExperimentMetaInfoDlg dlg(mMeasurementFile.getMetaData(), this);
 
-    dlg.setExperimentTitle(mExperimentFile.getExperimentName());
+    dlg.setExperimentTitle(mMeasurementFile.getExperimentName());
 
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
         return;
 
-    mExperimentFile.setExperimentName(dlg.getExperimentTitle());
+    mMeasurementFile.setExperimentName(dlg.getExperimentTitle());
 
     onExperimentChange();
 }
 
 void cExperimentDesignMdiChild::editCtrlInfo()
 {
-    cExperimentCtrlInfoDlg dlg(mExperimentFile.getController(), this);
+    cExperimentCtrlInfoDlg dlg(mMeasurementFile.getController(), this);
 
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
         return;
 
-    mExperimentFile.setController(std::move(dlg.getControllerInfo()));
+    mMeasurementFile.setController(std::move(dlg.getControllerInfo()));
     onExperimentChange();
 }
 
 void cExperimentDesignMdiChild::editSensorInfo()
 {
-    auto sensors = mExperimentFile.getSensors();
+    auto sensors = mMeasurementFile.getSensors();
     cExperimentSensorInfoDlg dlg(sensors, this);
     auto result = dlg.exec();
 
     if (result == QDialog::Accepted)
     {
-        mExperimentFile.clearSensors();
-        mExperimentFile.setSensors(dlg.getSensorInfo());
+        mMeasurementFile.clearSensors();
+        mMeasurementFile.setSensors(dlg.getSensorInfo());
         onExperimentChange();
     }
 }
@@ -237,7 +249,7 @@ void cExperimentDesignMdiChild::set_X_Position(int x_mm)
     if ((x_mm < 10000) || (x_mm > 190000))
         return;
 
-    for (auto& step : mExperimentFile)
+    for (auto& step : mMeasurementFile)
     {
         auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
 
@@ -260,7 +272,7 @@ void cExperimentDesignMdiChild::set_Y_Position(int y_mm)
     if ((y_mm < 10000) || (y_mm > 190000))
         return;
 
-    for (auto& step : mExperimentFile)
+    for (auto& step : mMeasurementFile)
     {
         auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
 
@@ -283,7 +295,7 @@ void cExperimentDesignMdiChild::set_Z_Position(int z_mm)
     if ((z_mm < 1000) || (z_mm > 10000))
         return;
 
-    for (auto& step : mExperimentFile)
+    for (auto& step : mMeasurementFile)
     {
         auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
 
@@ -304,7 +316,7 @@ void cExperimentDesignMdiChild::shiftPositions(int x_mm, int y_mm, int z_mm)
     if ((x_mm == 0) && (y_mm == 0) && (z_mm == 0))
         return;
 
-    for (auto& step : mExperimentFile)
+    for (auto& step : mMeasurementFile)
     {
         auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
 
@@ -342,15 +354,15 @@ void cExperimentDesignMdiChild::shiftPositions(int x_mm, int y_mm, int z_mm)
 
 void cExperimentDesignMdiChild::reloadPath()
 {
-    loadExperiment(mExperimentFile);
+    loadExperiment(mMeasurementFile);
 }
 
 void cExperimentDesignMdiChild::closeEvent(QCloseEvent *event)
 {
-    if (mExperimentFile.isDirty())
+    if (mMeasurementFile.isDirty())
     {
         QMessageBox msgBox;
-        msgBox.setText("The experiment file has been modified.");
+        msgBox.setText("The measurement file has been modified.");
         msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Save);
@@ -381,7 +393,7 @@ void cExperimentDesignMdiChild::focusInEvent(QFocusEvent* event)
     {
         if (event->gotFocus())
         {
-            cExperimentDesignWidget::redrawPath(mExperimentFile);
+            cExperimentDesignWidget::redrawPath(mMeasurementFile);
         }
     }
 
@@ -395,7 +407,7 @@ void cExperimentDesignMdiChild::onDefaultExperimentPathChange(const QString& pat
 
 void cExperimentDesignMdiChild::onExperimentChange()
 {
-    setWindowModified(mExperimentFile.isDirty());
+    setWindowModified(mMeasurementFile.isDirty());
 }
 
 void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
@@ -409,13 +421,13 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
         {
             return;
         }
-        mExperimentFile.insertBefore(id, std::move(step));
+        mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
     case eExperimentStep::pause:
     {
         std::unique_ptr<cExperimentStep_Pause> step = std::make_unique<cExperimentStep_Pause>();
-        mExperimentFile.insertBefore(id, std::move(step));
+        mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
     case eExperimentStep::movement:
@@ -425,7 +437,7 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
         {
             return;
         }
-        mExperimentFile.insertBefore(id, std::move(step));
+        mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
     case eExperimentStep::hyspex_command:
@@ -471,7 +483,7 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
 
         std::unique_ptr<cExperimentStep_HySpex_Command> step = std::make_unique<cExperimentStep_HySpex_Command>(camera_type, command);
 
-        mExperimentFile.insertBefore(id, std::move(step));
+        mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
     case eExperimentStep::reference_point:
@@ -481,14 +493,14 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
         {
             return;
         }
-        mExperimentFile.insertBefore(id, std::move(step));
+        mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
     default:
         return;
     }
 
-    loadExperiment(mExperimentFile);
+    loadExperiment(mMeasurementFile);
     onExperimentChange();
 }
 
@@ -503,13 +515,13 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
         {
             return;
         }
-        mExperimentFile.insertAfter(id, std::move(step));
+        mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
     case eExperimentStep::pause:
     {
         auto step = std::make_unique<cExperimentStep_Pause>();
-        mExperimentFile.insertAfter(id, std::move(step));
+        mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
     case eExperimentStep::movement:
@@ -519,7 +531,7 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
         {
             return;
         }
-        mExperimentFile.insertAfter(id, std::move(step));
+        mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
     case eExperimentStep::hyspex_command:
@@ -565,14 +577,14 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
 
         std::unique_ptr<cExperimentStep_HySpex_Command> step = std::make_unique<cExperimentStep_HySpex_Command>(camera_type, command);
 
-        mExperimentFile.insertAfter(id, std::move(step));
+        mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
     default:
         return;
     }
 
-    loadExperiment(mExperimentFile);
+    loadExperiment(mMeasurementFile);
     onExperimentChange();
 }
 
@@ -586,8 +598,8 @@ void cExperimentDesignMdiChild::onDeleteStep(int id)
 
     if (ret == QMessageBox::Yes)
     {
-        if (mExperimentFile.removeStep(id))
-            loadExperiment(mExperimentFile);
+        if (mMeasurementFile.removeStep(id))
+            loadExperiment(mMeasurementFile);
     }
     onExperimentChange();
 }

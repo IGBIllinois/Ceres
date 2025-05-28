@@ -11,16 +11,16 @@ class QButton;
 QT_END_NAMESPACE
 
 // Forward Declarations
-class cExperimentTreeItem;
+class cMeasurementTreeItem;
 
-class cExperimentManager : public QTreeWidget
+class cMeasurementManager : public QTreeWidget
 {
 	Q_OBJECT
 
 public:
-	cExperimentManager(const QString& path, QWidget* parent = nullptr);
+	cMeasurementManager(const QString& path, QWidget* parent = nullptr);
 
-	const cExperimentTreeItem* experiments() const;
+	const cMeasurementTreeItem* measurements() const;
 
 signals:
 	void runExperiment();
@@ -32,30 +32,30 @@ protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
-	void loadExperiments();
-	void loadExperiments(cExperimentTreeItem& parent, const std::filesystem::path& path);
+	void loadMeasurements();
+	void loadMeasurements(cMeasurementTreeItem& parent, const std::filesystem::path& path);
 
 private:
-	cExperimentTreeItem*	mpExperimentItems;
-	std::filesystem::path	mExperimentPath;
+	cMeasurementTreeItem*	mpMeasurementItems;
+	std::filesystem::path	mMeasurementPath;
 };
 
-class cExperimentSelectDlg : public QDialog
+class cMeasurementSelectDlg : public QDialog
 {
 	Q_OBJECT
 
 public:
-	cExperimentSelectDlg(QWidget* parent = nullptr);
-	~cExperimentSelectDlg();
+	cMeasurementSelectDlg(QWidget* parent = nullptr);
+	~cMeasurementSelectDlg();
 
-	void initialize(const cExperimentManager& mgr);
+	void initialize(const cMeasurementManager& mgr);
 
-	cExperimentTreeItem* currentItem() const;
+	cMeasurementTreeItem* currentItem() const;
 
 private slots:
 	void accept() override;
 	void reject() override;
 
 private:
-	QTreeWidget* mpExperiments;
+	QTreeWidget* mpMeasurements;
 };

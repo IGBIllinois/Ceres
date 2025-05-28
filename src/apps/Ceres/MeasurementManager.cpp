@@ -1,6 +1,6 @@
 
-#include "ExperimentManager.hpp"
-#include "ExperimentTreeItem.hpp"
+#include "MeasurementManager.hpp"
+#include "MeasurementTreeItem.hpp"
 
 #include <QLayout>
 #include <QPushButton>
@@ -15,68 +15,68 @@
 
 namespace fs = std::filesystem;
 
-cExperimentManager::cExperimentManager(const QString& path, QWidget* parent)
+cMeasurementManager::cMeasurementManager(const QString& path, QWidget* parent)
 	: QTreeWidget(parent),
-    mpExperimentItems(nullptr),
-    mExperimentPath(path.toStdString())
+    mpMeasurementItems(nullptr),
+    mMeasurementPath(path.toStdString())
 {
     clear();
     setColumnCount(1);
-    setHeaderLabel("Loaded Experiments");
+    setHeaderLabel("Loaded Measurements");
     setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     setSelectionBehavior(QAbstractItemView::SelectItems);
     setSelectionMode(QAbstractItemView::SingleSelection);
 
-    if (!fs::exists(mExperimentPath))
+    if (!fs::exists(mMeasurementPath))
     {
-        fs::create_directory(mExperimentPath);
+        fs::create_directory(mMeasurementPath);
     }
 
-    loadExperiments();
+    loadMeasurements();
 }
 
-void cExperimentManager::refresh()
+void cMeasurementManager::refresh()
 {
     clear();
-    loadExperiments();
+    loadMeasurements();
 }
 
-void cExperimentManager::contextMenuEvent(QContextMenuEvent* event)
+void cMeasurementManager::contextMenuEvent(QContextMenuEvent* event)
 {
     QMenu contextMenu(this);
 
     QAction run("Run...", this);
-    connect(&run, &QAction::triggered, this, &cExperimentManager::runExperiment);
+    connect(&run, &QAction::triggered, this, &cMeasurementManager::runExperiment);
     contextMenu.addAction(&run);
 
     contextMenu.exec(event->globalPos());
 }
 
 
-const cExperimentTreeItem* cExperimentManager::experiments() const
+const cMeasurementTreeItem* cMeasurementManager::measurements() const
 {
     return nullptr;
 }
 
-void cExperimentManager::loadExperiments()
+void cMeasurementManager::loadMeasurements()
 {
 //    mpExperimentItems = new cExperimentTreeItem(this, "Experiments");
 
 //    loadExperiments(*mpExperimentItems, mExperimentPath);
-    for (auto entry : fs::directory_iterator(mExperimentPath))
+    for (auto entry : fs::directory_iterator(mMeasurementPath))
     {
         if (entry.is_directory())
         {
             QString name = entry.path().filename().string().c_str();
-            cExperimentTreeItem* level = new cExperimentTreeItem(this, name);
-            loadExperiments(*level, entry.path());
+            cMeasurementTreeItem* level = new cMeasurementTreeItem(this, name);
+            loadMeasurements(*level, entry.path());
         }
 
         if (entry.is_regular_file())
         {
             try
             {
-                auto* pItem = new cExperimentTreeItem(this, entry.path());
+                auto* pItem = new cMeasurementTreeItem(this, entry.path());
             }
             catch (const std::exception& e)
             {
@@ -87,22 +87,22 @@ void cExperimentManager::loadExperiments()
 //    addTopLevelItem(mpExperimentItems);
 }
 
-void cExperimentManager::loadExperiments(cExperimentTreeItem& root, const std::filesystem::path& path)
+void cMeasurementManager::loadMeasurements(cMeasurementTreeItem& root, const std::filesystem::path& path)
 {
     for (auto entry : fs::directory_iterator(path))
     {
         if (entry.is_directory())
         {
             QString name = entry.path().filename().string().c_str();
-            cExperimentTreeItem* level = new cExperimentTreeItem(&root, name);
-            loadExperiments(*level, entry.path());
+            cMeasurementTreeItem* level = new cMeasurementTreeItem(&root, name);
+            loadMeasurements(*level, entry.path());
         }
 
         if (entry.is_regular_file())
         {
             try
             {
-                auto* pItem = new cExperimentTreeItem(&root, entry.path());
+                auto* pItem = new cMeasurementTreeItem(&root, entry.path());
             }
             catch (const std::invalid_argument&)
             {
@@ -114,7 +114,7 @@ void cExperimentManager::loadExperiments(cExperimentTreeItem& root, const std::f
                 msg += ".\n";
                 msg += e.what();
 
-                QMessageBox mb(QMessageBox::Critical, "Experiment File Error", msg);
+                QMessageBox mb(QMessageBox::Critical, "Measurement File Error", msg);
                 mb.exec();
             }
             catch (const std::exception& e)
@@ -124,7 +124,7 @@ void cExperimentManager::loadExperiments(cExperimentTreeItem& root, const std::f
                 msg += ".\n";
                 msg += e.what();
 
-                QMessageBox mb(QMessageBox::Critical, "Experiment File Error", msg);
+                QMessageBox mb(QMessageBox::Critical, "Measurement File Error", msg);
                 mb.exec();
             }
         }
@@ -134,41 +134,41 @@ void cExperimentManager::loadExperiments(cExperimentTreeItem& root, const std::f
 /*
  *  Selections Dialog
  */
-cExperimentSelectDlg::cExperimentSelectDlg(QWidget* parent)
+cMeasurementSelectDlg::cMeasurementSelectDlg(QWidget* parent)
 :
     QDialog(parent),
-    mpExperiments(nullptr)
+    mpMeasurements(nullptr)
 {
-    setWindowTitle(tr("Select Experiment"));
+    setWindowTitle(tr("Select Measurement"));
 }
 
-cExperimentSelectDlg::~cExperimentSelectDlg()
+cMeasurementSelectDlg::~cMeasurementSelectDlg()
 {}
 
-void cExperimentSelectDlg::initialize(const cExperimentManager& mgr)
+void cMeasurementSelectDlg::initialize(const cMeasurementManager& mgr)
 {
-    mpExperiments = new QTreeWidget(this);
-    mpExperiments->setColumnCount(1);
-    mpExperiments->setHeaderLabel("Loaded Experiments");
-    mpExperiments->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-    mpExperiments->setSelectionBehavior(QAbstractItemView::SelectItems);
-    mpExperiments->setSelectionMode(QAbstractItemView::SingleSelection);
-    auto* active = mgr.experiments();
+    mpMeasurements = new QTreeWidget(this);
+    mpMeasurements->setColumnCount(1);
+    mpMeasurements->setHeaderLabel("Loaded Measurements");
+    mpMeasurements->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+    mpMeasurements->setSelectionBehavior(QAbstractItemView::SelectItems);
+    mpMeasurements->setSelectionMode(QAbstractItemView::SingleSelection);
+    auto* active = mgr.measurements();
     auto n = active->childCount();
 
     QList<QTreeWidgetItem*> items;
     for (int i = 0; i < n; ++i)
     {
-        auto* pChild = static_cast<cExperimentTreeItem*>(active->child(i));
-        auto* item = new cExperimentTreeItem(mpExperiments, pChild->text(0), pChild->getExperimentFile());
+        auto* pChild = static_cast<cMeasurementTreeItem*>(active->child(i));
+        auto* item = new cMeasurementTreeItem(mpMeasurements, pChild->text(0), pChild->getMeasurementFile());
         items.append(item);
     }
 
-    mpExperiments->insertTopLevelItems(0, items);
+    mpMeasurements->insertTopLevelItems(0, items);
 
     QVBoxLayout* pMainLayout = new QVBoxLayout();
 
-    pMainLayout->addWidget(mpExperiments);
+    pMainLayout->addWidget(mpMeasurements);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
         | QDialogButtonBox::Cancel);
@@ -181,20 +181,20 @@ void cExperimentSelectDlg::initialize(const cExperimentManager& mgr)
     setLayout(pMainLayout);
 }
 
-cExperimentTreeItem* cExperimentSelectDlg::currentItem() const
+cMeasurementTreeItem* cMeasurementSelectDlg::currentItem() const
 {
-    if (mpExperiments)
-        return static_cast<cExperimentTreeItem*>(mpExperiments->currentItem());
+    if (mpMeasurements)
+        return static_cast<cMeasurementTreeItem*>(mpMeasurements->currentItem());
 
     return nullptr;
 }
 
-void cExperimentSelectDlg::accept()
+void cMeasurementSelectDlg::accept()
 {
     QDialog::accept();
 }
 
-void cExperimentSelectDlg::reject()
+void cMeasurementSelectDlg::reject()
 {
     QDialog::reject();
 }

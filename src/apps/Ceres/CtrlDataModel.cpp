@@ -123,9 +123,12 @@ void cCtrlDataModel::stopDataThread()
     mThread.stop();
 }
 
-std::string cCtrlDataModel::experimentTitle() const
+std::string cCtrlDataModel::measurementTitle() const
 {
-    return mExperimentTitle;
+    if (mMeasurementTitle.empty())
+        return mExperimentTitle;
+
+    return mMeasurementTitle;
 }
 
 bool cCtrlDataModel::systemReady() const
@@ -450,7 +453,7 @@ void cCtrlDataModel::onExperimentStateChange(experiment::eState state)
             break;
         case eState::EXP_ERROR:
         {
-            doExperimentCleanup();
+            doMeasurementCleanup();
 
             emit experimentTerminated();
 
@@ -458,7 +461,7 @@ void cCtrlDataModel::onExperimentStateChange(experiment::eState state)
         }
         case eState::COMPLETED:
         {
-            doExperimentCleanup();
+            doMeasurementCleanup();
 
             emit experimentCompleted();
 
@@ -466,7 +469,7 @@ void cCtrlDataModel::onExperimentStateChange(experiment::eState state)
         }
         case eState::TERMINATED:
         {
-            doExperimentCleanup();
+            doMeasurementCleanup();
 
             emit experimentTerminated();
 
@@ -475,7 +478,7 @@ void cCtrlDataModel::onExperimentStateChange(experiment::eState state)
     }
 }
 
-void cCtrlDataModel::doExperimentCleanup()
+void cCtrlDataModel::doMeasurementCleanup()
 {
     endDataRecording();
 

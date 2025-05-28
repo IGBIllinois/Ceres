@@ -59,12 +59,12 @@ PRIVATE
 #
 # General Application files
 #
-    ExperimentManager.hpp
-    ExperimentManager.cpp
-    ExperimentTreeItem.hpp
-    ExperimentTreeItem.cpp
-    ExperimentToolbar.hpp
-    ExperimentToolbar.cpp
+    MeasurementManager.hpp
+    MeasurementManager.cpp
+    MeasurementTreeItem.hpp
+    MeasurementTreeItem.cpp
+    MeasurementToolbar.hpp
+    MeasurementToolbar.cpp
     BatchExpConfirmDlg.hpp
     BatchExpConfirmDlg.cpp
 	
