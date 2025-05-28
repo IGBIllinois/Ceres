@@ -218,8 +218,8 @@ void cCreateLidarExperimentFromGpsDlg::onStartItem(const QModelIndex& index)
 	auto x1 = mpModel->data(index.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(index.siblingAtColumn(2)).toFloat();
 
-	mpStartX_mm->setText(QString::number(x1 * 1000));
-	mpStartY_mm->setText(QString::number(y1 * 1000));
+	mpStartX_mm->setText(QString::number(static_cast<int>(x1 * nConstants::M_TO_MM)));
+	mpStartY_mm->setText(QString::number(static_cast<int>(y1 * nConstants::M_TO_MM)));
 }
 
 void cCreateLidarExperimentFromGpsDlg::onEndItem(const QModelIndex& index)
@@ -227,8 +227,8 @@ void cCreateLidarExperimentFromGpsDlg::onEndItem(const QModelIndex& index)
 	auto x1 = mpModel->data(index.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(index.siblingAtColumn(2)).toFloat();
 
-	mpEndX_mm->setText(QString::number(x1 * 1000));
-	mpEndY_mm->setText(QString::number(y1 * 1000));
+	mpEndX_mm->setText(QString::number(static_cast<int>(x1 * nConstants::M_TO_MM)));
+	mpEndY_mm->setText(QString::number(static_cast<int>(y1 * nConstants::M_TO_MM)));
 }
 
 bool cCreateLidarExperimentFromGpsDlg::generate()
@@ -274,27 +274,19 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 	int y2_mm = mpEndY_mm->text().toInt();
 
 
-	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
-	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
-
-	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
-	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
 	auto h2 = mpModel->data(endIndex.siblingAtColumn(3)).toFloat();
+
+	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
+	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
+
 
 	if (mpInverseDirection->isChecked())
 	{
-		std::swap(x1, x2);
-		std::swap(y1, y2);
-		std::swap(h1, h2);
+		std::swap(x1_mm, x2_mm);
+		std::swap(y1_mm, y2_mm);
+		std::swap(h1_mm, h2_mm);
 	}
-
-//	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
-//	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
-	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
-//	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
-//	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
-	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
 
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
