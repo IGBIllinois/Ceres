@@ -8,6 +8,8 @@
 
 namespace
 {
+	uint32_t measurementOffset_mm = 10000;
+
 	constexpr double Re_lat_m = 6361721.0810512137;
 	constexpr double Re_lat_ft = Re_lat_m * nConstants::M_TO_FT;
 
@@ -72,6 +74,16 @@ namespace
 
 }
 
+uint32_t rfb::getMeasureOffset_mm()
+{
+	return measurementOffset_mm;
+}
+
+void rfb::setMeasureOffset_mm(uint32_t measure_offset_mm)
+{
+	measurementOffset_mm = measure_offset_mm;
+}
+
 uint32_t rfb::minX_mm()
 {
 	return mRappTowerLocations[0].x_mm;
@@ -92,6 +104,28 @@ uint32_t rfb::maxY_mm()
 	return mRappTowerLocations[2].y_mm;
 }
 
+
+uint32_t rfb::minMeasurementX_mm()
+{
+	return mRappTowerLocations[0].x_mm + measurementOffset_mm;
+}
+
+uint32_t rfb::maxMeasurementX_mm()
+{
+	return mRappTowerLocations[2].x_mm - measurementOffset_mm;
+}
+
+uint32_t rfb::minMeasurementY_mm()
+{
+	return mRappTowerLocations[0].y_mm + measurementOffset_mm;
+}
+
+uint32_t rfb::maxMeasurementY_mm()
+{
+	return mRappTowerLocations[2].y_mm - measurementOffset_mm;
+}
+
+
 bool rfb::withinBoundary(const rfm::planePoint_t& point)
 {
 	rfm::rappPoint_t p = toRappCoordinates(point);
@@ -109,6 +143,28 @@ bool rfb::withinBoundary(const std::int32_t x_mm, const std::int32_t y_mm)
 		return false;
 
 	if ((y_mm < minY_mm()) || (y_mm > maxY_mm()))
+		return false;
+
+	return true;
+}
+
+bool rfb::withinMeasurementBoundary(const rfm::planePoint_t& point)
+{
+	rfm::rappPoint_t p = toRappCoordinates(point);
+	return withinMeasurementBoundary(p);
+}
+
+bool rfb::withinMeasurementBoundary(const rfm::rappPoint_t& point)
+{
+	return withinMeasurementBoundary(point.x_mm, point.y_mm);
+}
+
+bool rfb::withinMeasurementBoundary(const std::int32_t x_mm, const std::int32_t y_mm)
+{
+	if ((x_mm < minMeasurementX_mm()) || (x_mm > maxMeasurementX_mm()))
+		return false;
+
+	if ((y_mm < minMeasurementY_mm()) || (y_mm > maxMeasurementY_mm()))
 		return false;
 
 	return true;
