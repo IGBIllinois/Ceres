@@ -184,6 +184,9 @@ find_package(HySpexConnect REQUIRED)
 find_package(HySpex REQUIRED)
 find_package(Spinnaker REQUIRED)
 
+find_package(LucidVisionLabsConnect REQUIRED)
+find_package(ArenaSDK REQUIRED)
+
 find_package(nlohmann_json REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb ir weather)

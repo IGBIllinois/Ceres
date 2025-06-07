@@ -17,13 +17,14 @@
 class cExperimentStep;
 
 
-enum eExperimentStep {delay, pause, movement, hyspex_command, reference_point};
+enum eMeasurementStep {delay, pause, movement, hyspex_command, reference_point};
 
 
 class cExperimentFile
 {
 public:
 	enum class eExperimentType { UNKNOWN, LIDAR, HYPERSPECTRAL, TOF, };
+
 	typedef std::list<std::shared_ptr<cExperimentStep>> Experiment_t;
 
 	typedef Experiment_t::iterator			iterator;

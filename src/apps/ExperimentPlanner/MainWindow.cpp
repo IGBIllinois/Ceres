@@ -1219,9 +1219,9 @@ void cMainWindow::onPreferenceDefaultPlotSplitDirectory()
 
 void cMainWindow::onPreferenceDefaultFieldBoundaries()
 {
-    auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 0).toInt();
+    auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 10000).toInt();
     auto maxX_mm = mSettings.value("Defaults/fieldBounds/maxX_mm", 190000).toInt();
-    auto minY_mm = mSettings.value("Defaults/fieldBounds/minY_mm", 0).toInt();
+    auto minY_mm = mSettings.value("Defaults/fieldBounds/minY_mm", 10000).toInt();
     auto maxY_mm = mSettings.value("Defaults/fieldBounds/maxY_mm", 190000).toInt();
 
     cFieldBoundaryDlg dlg(this);

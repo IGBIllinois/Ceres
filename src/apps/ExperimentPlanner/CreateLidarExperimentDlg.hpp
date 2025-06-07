@@ -73,6 +73,7 @@ protected:
 protected:
 	double mSubScanConversionFactor = 1.0;
 
+	std::string mMeasurementTitle;
 	std::string mExperimentTitle;
 
 	cExperimentMetaInfo mMetaInfo;

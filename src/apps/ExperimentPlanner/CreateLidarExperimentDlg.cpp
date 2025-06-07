@@ -462,8 +462,11 @@ void cCreateLidarExperimentDlg::createLayout_SubScanInfo(QVBoxLayout* pMainLayou
 
 void cCreateLidarExperimentDlg::accept()
 {
-	if (!generate())
-		return;
+	if (mMeasurementTitle.empty())
+	{
+		if (!generate())
+			return;
+	}
 
 	QDialog::accept();
 }

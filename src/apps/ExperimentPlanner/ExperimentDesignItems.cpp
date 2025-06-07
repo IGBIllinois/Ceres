@@ -159,27 +159,27 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
 void cFlowArrow::onInsertDelay()
 {
-	emit insertBefore(getID(), eExperimentStep::delay);
+	emit insertBefore(getID(), eMeasurementStep::delay);
 }
 
 void cFlowArrow::onInsertPause()
 {
-	emit insertBefore(getID(), eExperimentStep::pause);
+	emit insertBefore(getID(), eMeasurementStep::pause);
 }
 
 void cFlowArrow::onInsertMovement()
 {
-	emit insertBefore(getID(), eExperimentStep::movement);
+	emit insertBefore(getID(), eMeasurementStep::movement);
 }
 
 void cFlowArrow::onInsertHySpexCommand()
 {
-	emit insertBefore(getID(), eExperimentStep::hyspex_command);
+	emit insertBefore(getID(), eMeasurementStep::hyspex_command);
 }
 
 void cFlowArrow::onInsertReferencePoint()
 {
-	emit insertBefore(getID(), eExperimentStep::reference_point);
+	emit insertBefore(getID(), eMeasurementStep::reference_point);
 }
 
 
@@ -694,52 +694,52 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
 void cProcessStep::onInsertBefore_Delay()
 {
-	emit insertBefore(getID(), eExperimentStep::delay);
+	emit insertBefore(getID(), eMeasurementStep::delay);
 }
 
 void cProcessStep::onInsertBefore_Pause()
 {
-	emit insertBefore(getID(), eExperimentStep::pause);
+	emit insertBefore(getID(), eMeasurementStep::pause);
 }
 
 void cProcessStep::onInsertBefore_Movement()
 {
-	emit insertBefore(getID(), eExperimentStep::movement);
+	emit insertBefore(getID(), eMeasurementStep::movement);
 }
 
 void cProcessStep::onInsertBefore_HySpexCommand()
 {
-	emit insertBefore(getID(), eExperimentStep::hyspex_command);
+	emit insertBefore(getID(), eMeasurementStep::hyspex_command);
 }
 
 void cProcessStep::onInsertBefore_ReferencePoint()
 {
-	emit insertBefore(getID(), eExperimentStep::reference_point);
+	emit insertBefore(getID(), eMeasurementStep::reference_point);
 }
 
 void cProcessStep::onInsertAfter_Delay()
 {
-	emit insertAfter(getID(), eExperimentStep::delay);
+	emit insertAfter(getID(), eMeasurementStep::delay);
 }
 
 void cProcessStep::onInsertAfter_Pause()
 {
-	emit insertAfter(getID(), eExperimentStep::pause);
+	emit insertAfter(getID(), eMeasurementStep::pause);
 }
 
 void cProcessStep::onInsertAfter_Movement()
 {
-	emit insertAfter(getID(), eExperimentStep::movement);
+	emit insertAfter(getID(), eMeasurementStep::movement);
 }
 
 void cProcessStep::onInsertAfter_HySpexCommand()
 {
-	emit insertAfter(getID(), eExperimentStep::hyspex_command);
+	emit insertAfter(getID(), eMeasurementStep::hyspex_command);
 }
 
 void cProcessStep::onInsertAfter_ReferencePoint()
 {
-	emit insertAfter(getID(), eExperimentStep::reference_point);
+	emit insertAfter(getID(), eMeasurementStep::reference_point);
 }
 
 void cProcessStep::onDeleteStep()
@@ -1070,22 +1070,22 @@ void cIoStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
 void cIoStep::onInsertBefore_Delay()
 {
-	emit insertBefore(getID(), eExperimentStep::delay);
+	emit insertBefore(getID(), eMeasurementStep::delay);
 }
 
 void cIoStep::onInsertBefore_Movement()
 {
-	emit insertBefore(getID(), eExperimentStep::movement);
+	emit insertBefore(getID(), eMeasurementStep::movement);
 }
 
 void cIoStep::onInsertAfter_Delay()
 {
-	emit insertAfter(getID(), eExperimentStep::delay);
+	emit insertAfter(getID(), eMeasurementStep::delay);
 }
 
 void cIoStep::onInsertAfter_Movement()
 {
-	emit insertAfter(getID(), eExperimentStep::movement);
+	emit insertAfter(getID(), eMeasurementStep::movement);
 }
 
 void cIoStep::onDeleteStep()

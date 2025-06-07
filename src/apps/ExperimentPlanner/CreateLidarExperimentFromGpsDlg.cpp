@@ -246,6 +246,15 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 		return false;
 	}
 
+	if (mMeasurementTitle.empty())
+	{
+		mMeasurementTitle = title;
+	}
+	else if (mMeasurementTitle == title)
+	{
+
+	}
+
 	if (mExperimentTitle.empty())
 	{
 		auto pos = title.find("_Pass");
@@ -266,6 +275,12 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 		msg_box.exec();
 		return false;
 	}
+
+	if (mpStartX_mm->text().isEmpty() || mpStartY_mm->text().isEmpty())
+		return false;
+
+	if (mpEndX_mm->text().isEmpty() || mpEndY_mm->text().isEmpty())
+		return false;
 
 	int x1_mm = mpStartX_mm->text().toInt();
 	int y1_mm = mpStartY_mm->text().toInt();
@@ -524,6 +539,32 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 				y_mm = (y2_mm + y1_mm) / 2;
 				y_mm += lateral_offset_mm;
 			}
+			else
+			{
+//				double m = dy_mm / dx_mm;
+//				double b = y1_mm - m * x1_mm;
+				if (std::abs(dx_mm) < std::abs(dy_mm))
+				{
+					x_mm = (x2_mm + x1_mm) / 2;
+					x_mm += lateral_offset_mm;
+
+					if (y1_mm > y2_mm)
+						y_mm = y1_mm + start_offset_mm;
+					else
+						y_mm = y1_mm - start_offset_mm;
+				}
+				else
+				{
+					if (x1_mm > x2_mm)
+						x_mm = x1_mm + start_offset_mm;
+					else
+						x_mm = x1_mm - start_offset_mm;
+
+					y_mm = (y2_mm + y1_mm) / 2;
+					y_mm += lateral_offset_mm;
+				}
+
+			}
 
 			// Moving dolly to the beginning of the measurement scan...
 			step = std::make_unique<cExperimentStep_Movement>();
@@ -558,6 +599,14 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 				pInfo->appendStep(std::move(delay));
 			}
 
+			// Collect a reference point measurement
+			std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+
+			reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
+			reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
+			reference->setErrorThreshold_mm(errorThreshold_mm);
+			pInfo->appendStep(std::move(reference));
+
 			if (std::abs(dx_mm) < 500)
 			{
 				if (y1_mm > y2_mm)
@@ -571,6 +620,24 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 					x_mm = x2_mm - end_offset_mm;
 				else
 					x_mm = x2_mm + end_offset_mm;
+			}
+			else
+			{
+				if (std::abs(dx_mm) < std::abs(dy_mm))
+				{
+					if (y1_mm > y2_mm)
+						y_mm = y2_mm - end_offset_mm;
+					else
+						y_mm = y2_mm + end_offset_mm;
+				}
+				else
+				{
+					if (x1_mm > x2_mm)
+						x_mm = x2_mm - end_offset_mm;
+					else
+						x_mm = x2_mm + end_offset_mm;
+				}
+
 			}
 
 			// Do measurement...

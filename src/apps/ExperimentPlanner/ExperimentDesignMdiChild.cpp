@@ -204,6 +204,7 @@ void cExperimentDesignMdiChild::editMetaInfo()
 {
     cExperimentMetaInfoDlg dlg(mMeasurementFile.getMetaData(), this);
 
+    dlg.setMeasurementTitle(mMeasurementFile.getMeasurementName());
     dlg.setExperimentTitle(mMeasurementFile.getExperimentName());
 
     auto result = dlg.exec();
@@ -414,7 +415,7 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
 {
     switch (type)
     {
-    case eExperimentStep::delay:
+    case eMeasurementStep::delay:
     {
         std::unique_ptr<cExperimentStep_Delay> step = std::make_unique<cExperimentStep_Delay>();
         if (!step->onEdit())
@@ -424,13 +425,13 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
         mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
-    case eExperimentStep::pause:
+    case eMeasurementStep::pause:
     {
         std::unique_ptr<cExperimentStep_Pause> step = std::make_unique<cExperimentStep_Pause>();
         mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
-    case eExperimentStep::movement:
+    case eMeasurementStep::movement:
     {
         std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
         if (!step->onEdit())
@@ -440,7 +441,7 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
         mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
-    case eExperimentStep::hyspex_command:
+    case eMeasurementStep::hyspex_command:
     {
         cHySpexCommandDlg dlg(this);
 
@@ -486,7 +487,7 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
         mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
-    case eExperimentStep::reference_point:
+    case eMeasurementStep::reference_point:
     {
         std::unique_ptr<cExperimentStep_ReferencePoint> step = std::make_unique<cExperimentStep_ReferencePoint>();
         if (!step->onEdit())
@@ -508,7 +509,7 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
 {
     switch (type)
     {
-    case eExperimentStep::delay:
+    case eMeasurementStep::delay:
     {
         auto step = std::make_unique<cExperimentStep_Delay>();
         if (!step->onEdit())
@@ -518,13 +519,13 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
         mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
-    case eExperimentStep::pause:
+    case eMeasurementStep::pause:
     {
         auto step = std::make_unique<cExperimentStep_Pause>();
         mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
-    case eExperimentStep::movement:
+    case eMeasurementStep::movement:
     {
         auto step = std::make_unique<cExperimentStep_Movement>();
         if (!step->onEdit())
@@ -534,7 +535,7 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
         mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
-    case eExperimentStep::hyspex_command:
+    case eMeasurementStep::hyspex_command:
     {
         cHySpexCommandDlg dlg(this);
 
