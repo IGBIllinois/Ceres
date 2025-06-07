@@ -4,7 +4,7 @@
 #include "../SensorModel.hpp"
 
 
-class cTofCameralModel : public cSensorModel
+class cTofCameraModel : public cSensorModel
 {
 public:
 
@@ -12,19 +12,16 @@ public:
      * Returns a device identifier used by the sensor.  The ids are
      * only unique within a device type: Time-Of-Flight Camera
      */
-    uint8_t device_id() const override;
+//    uint8_t device_id() const override;
 
     /*
      * Returns a string used as a class descriptor of the
      * type sensor.
      */
-    const char* sensorClass() const override { return "tof"; };
+    const char* sensorClass() const override { return "time-of-flight"; };
 
 protected:
-    cTofCameralModel(const std::string& name, QObject* parent = nullptr);
-    virtual ~cTofCameralModel() = default;
-
-private:
-    const uint8_t mDeviceID;
+    cTofCameraModel(const std::string& name, QObject* parent = nullptr);
+    virtual ~cTofCameraModel() = default;
 };
 

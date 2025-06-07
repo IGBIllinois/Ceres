@@ -1,7 +1,10 @@
 /**
  */
 
-#include "LucidVisionLabsFactory.hpp"
+#include "LucidVisionLabsTofCameraFactory.hpp"
+
+#include <LucidVisionLabsConnect/LucidCameraFactory.hpp>
+#include <LucidVisionLabsConnect/LucidHeliosCamera.hpp>
 
 //#include "AxisCommunicationsModel_F44.hpp"
 //#include "AxisCommunicationsView_F44.hpp"
@@ -73,9 +76,15 @@ sSensorWidgets create_lucid_vision_labs_sensor(const nlohmann::json& sensorInfo,
 }
 #endif
 
-sSensorWidgets lucid_vision_labs::create_sensor(const nlohmann::json& sensorInfo,
+sSensorWidgets lucid_vision_labs_tof::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
+    std::string instance = sensorInfo["instance"];
+
+    cLucidCameraFactory factory;
+
+    auto camera = factory.getHeliosCamera(instance);
+
     std::string sensor = sensorInfo["sensor"];
 
 //    if (sensor == "HTR0035")
@@ -84,7 +93,7 @@ sSensorWidgets lucid_vision_labs::create_sensor(const nlohmann::json& sensorInfo
     return sSensorWidgets();
 }
 
-void lucid_vision_labs::remove_sensor(sSensorWidgets widgets)
+void lucid_vision_labs_tof::remove_sensor(sSensorWidgets widgets)
 {
 /*
     // Ouster model and view...
@@ -107,7 +116,7 @@ void lucid_vision_labs::remove_sensor(sSensorWidgets widgets)
 }
 
 
-cSensorPropertyPage* lucid_vision_labs::create_sensor_property_page(
+cSensorPropertyPage* lucid_vision_labs_tof::create_sensor_property_page(
     const std::string& model, uint32_t version,
     const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {

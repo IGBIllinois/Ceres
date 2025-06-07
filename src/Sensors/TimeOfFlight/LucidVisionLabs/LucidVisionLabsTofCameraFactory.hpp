@@ -4,7 +4,7 @@
 #include "../../SensorFactory.hpp"
 
 
-namespace lucid_vision_labs
+namespace lucid_vision_labs_tof
 {
 	sSensorWidgets create_sensor(const nlohmann::json& sensorInfo,
 		bool no_visualization);

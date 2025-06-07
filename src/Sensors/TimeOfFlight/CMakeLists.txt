@@ -52,7 +52,7 @@ target_include_directories(tof_camera_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_link_libraries(tof_camera_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(tof_camera_static PUBLIC ${Qt}::Network)
 target_link_libraries(tof_camera_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(tof_camera_static PUBLIC lucid_vision_labs_static)
+target_link_libraries(tof_camera_static PUBLIC lucid_vision_labs_tof_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
