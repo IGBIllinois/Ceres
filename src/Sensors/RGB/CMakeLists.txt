@@ -52,6 +52,7 @@ target_link_libraries(rgb_camera_static PRIVATE cbdf::rgb)
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Multimedia)
 target_link_libraries(rgb_camera_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(rgb_camera_static PUBLIC axis_communications_static)
+target_link_libraries(rgb_camera_static PUBLIC lucid_vision_labs_rgb_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
@@ -63,3 +64,6 @@ set_target_properties(rgb_camera_static PROPERTIES FOLDER "Sensors/RGB_Camera")
 
 # Add the Axis Communications WebCam library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/AxisCommunications)
+
+# Add the Lucid Vision Labs RGB Camera library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/LucidVisionLabs)
