@@ -1,5 +1,5 @@
 
-#include "AxisCommunicationsModel_F44.hpp"
+#include "AxisCommunicationsModel.hpp"
 #include "AxisCommunicationsIDs.hpp"
 
 #include <QNetworkAccessManager>
