@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ExperimentSteps.hpp"
+#include "MeasurementSteps.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -24,18 +24,18 @@ class cBaseStep;
 
 namespace ssnx
 {
-	std::shared_ptr<cExperimentStep> create_step(const std::string& type, const nlohmann::json& info);
+	std::shared_ptr<cMeasurementStep> create_step(const std::string& type, const nlohmann::json& info);
 }
 
 /// <summary>
-/// Experiment Step: Command sent to GPS to compute a reference point
+/// Measurement Step: Command sent to GPS to compute a reference point
 /// </summary>
-class cExperimentStep_ReferencePoint : public cExperimentStep
+class cMeasurementStep_ReferencePoint : public cMeasurementStep
 {
 	Q_OBJECT
 
 public:
-	cExperimentStep_ReferencePoint() = default;
+	cMeasurementStep_ReferencePoint() = default;
 
 	double getMinIntegrationTime_sec() const;
 	double getMaxIntegrationTime_sec() const;

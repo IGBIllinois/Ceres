@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ExperimentSteps.hpp"
+#include "MeasurementSteps.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -24,21 +24,21 @@ class cBaseStep;
 
 namespace hyspex
 {
-	std::shared_ptr<cExperimentStep> create_step(const std::string& type, const nlohmann::json& info);
+	std::shared_ptr<cMeasurementStep> create_step(const std::string& type, const nlohmann::json& info);
 }
 
 /// <summary>
-/// Experiment Step: Command sent to HySpex Camera
+/// Measurement Step: Command sent to HySpex Camera
 /// 
 /// For example: command could be "open shutter", "close shutter", or "background"
 /// </summary>
-class cExperimentStep_HySpex_Command : public cExperimentStep
+class cMeasurementStep_HySpex_Command : public cMeasurementStep
 {
 	Q_OBJECT
 
 public:
-	cExperimentStep_HySpex_Command() = delete;
-	cExperimentStep_HySpex_Command(std::string_view camera_model, std::string_view command);
+	cMeasurementStep_HySpex_Command() = delete;
+	cMeasurementStep_HySpex_Command(std::string_view camera_model, std::string_view command);
 
 	cBaseStep* graphicsItem(const int id) const override;
 

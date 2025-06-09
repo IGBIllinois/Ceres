@@ -36,6 +36,8 @@ cMeasurementManager::cMeasurementManager(const QString& path, QWidget* parent)
     }
 
     loadMeasurements();
+
+    connect(this, &QTreeWidget::itemDoubleClicked, this, &cMeasurementManager::onItemDoubleClick);
 }
 
 void cMeasurementManager::onConnectToSpidercam()
@@ -105,6 +107,29 @@ void cMeasurementManager::testMeasurement()
     QString filename = QString::fromStdString(path.string());
 
     emit runMeasurement(filename);
+}
+
+void cMeasurementManager::onItemDoubleClick(QTreeWidgetItem* item, int column)
+{
+    if (item)
+    {
+        auto pItem = dynamic_cast<cMeasurementTreeItem*>(item);
+        if (!pItem)
+            return;
+
+        auto path = pItem->getMeasurementFile();
+
+        if (path.empty())
+        {
+            expandItem(item);
+        }
+        else
+        {
+            QString filename = QString::fromStdString(path.string());
+
+            emit loadMeasurement(filename);
+        }
+    }
 }
 
 const cMeasurementTreeItem* cMeasurementManager::measurements() const

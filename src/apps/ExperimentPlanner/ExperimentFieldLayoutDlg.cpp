@@ -1,7 +1,7 @@
 
 #include "ExperimentFieldLayoutDlg.hpp"
 #include "FieldLayoutDlg.hpp"
-#include "ExperimentSteps.hpp"
+#include "MeasurementSteps.hpp"
 #include "Constants.hpp"
 
 #include <QLabel>
@@ -52,7 +52,7 @@ void cExperimentFieldLayoutDlg::setExperiment(const cExperimentFile& experiment)
 
 	for (auto step : experiment)
 	{
-		auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+		auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
 
 		if (movement)
 		{

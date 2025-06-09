@@ -4,9 +4,9 @@
 #include "GpsFileReader.hpp"
 #include "Constants.hpp"
 
-#include "ExperimentSteps.hpp"
-#include "ExperimentSteps_HySpex.hpp"
-#include "ExperimentSteps_Ssnx.hpp"
+#include "MeasurementSteps.hpp"
+#include "MeasurementSteps_HySpex.hpp"
+#include "MeasurementSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -580,7 +580,7 @@ bool cCreateHyperspectralExperimentFromPlotInfoDlg::generate()
 	pInfo->setSensors(mSensorInfo);
 
 	// Add preamble: moving dolly up to a safe travel height...
-	std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
+	std::unique_ptr<cMeasurementStep_Movement> step = std::make_unique<cMeasurementStep_Movement>();
 
 	step->setZ_mm(travel_z_mm);
 	step->setSpeed_mmps(vertical_speed_mmps);
@@ -611,14 +611,14 @@ bool cCreateHyperspectralExperimentFromPlotInfoDlg::generate()
 	}
 
 	// Moving dolly to the beginning of the measurement scan...
-	step = std::make_unique<cExperimentStep_Movement>();
+	step = std::make_unique<cMeasurementStep_Movement>();
 	step->setX_mm(x_mm);
 	step->setY_mm(y_mm);
 	step->setSpeed_mmps(travel_speed_mmps);
 	pInfo->appendStep(std::move(step));
 
 	// Move the dolly to measurement height...
-	step = std::make_unique<cExperimentStep_Movement>();
+	step = std::make_unique<cMeasurementStep_Movement>();
 
 	if (pGroundModel)
 	{
@@ -643,13 +643,13 @@ bool cCreateHyperspectralExperimentFromPlotInfoDlg::generate()
 	if (delay_sec > 0.0)
 	{
 		// Add delay for dolly to stabilize...
-		std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+		std::unique_ptr<cMeasurementStep_Delay> delay = std::make_unique<cMeasurementStep_Delay>();
 		delay->setWaitTime_sec(delay_sec);
 		pInfo->appendStep(std::move(delay));
 	}
 
 	// Collect a reference point measurement
-	std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+	std::unique_ptr<cMeasurementStep_ReferencePoint> reference = std::make_unique<cMeasurementStep_ReferencePoint>();
 
 	reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
 	reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
@@ -661,26 +661,26 @@ bool cCreateHyperspectralExperimentFromPlotInfoDlg::generate()
 		if (sensor->getType() == vnir_3000N_id)
 		{
 			// We need to take a background spectra...
-			std::unique_ptr<cExperimentStep_HySpex_Command> close_shutter = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "close shutter");
+			std::unique_ptr<cMeasurementStep_HySpex_Command> close_shutter = std::make_unique<cMeasurementStep_HySpex_Command>("VNIR-3000N", "close shutter");
 			pInfo->appendStep(std::move(close_shutter));
 
-			std::unique_ptr<cExperimentStep_HySpex_Command> background = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "background");
+			std::unique_ptr<cMeasurementStep_HySpex_Command> background = std::make_unique<cMeasurementStep_HySpex_Command>("VNIR-3000N", "background");
 			pInfo->appendStep(std::move(background));
 
-			std::unique_ptr<cExperimentStep_HySpex_Command> open_shutter = std::make_unique<cExperimentStep_HySpex_Command>("VNIR-3000N", "open shutter");
+			std::unique_ptr<cMeasurementStep_HySpex_Command> open_shutter = std::make_unique<cMeasurementStep_HySpex_Command>("VNIR-3000N", "open shutter");
 			pInfo->appendStep(std::move(open_shutter));
 		}
 
 		if (sensor->getType() == swir_384_id)
 		{
 			// We need to take a background spectra...
-			std::unique_ptr<cExperimentStep_HySpex_Command> close_shutter = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "close shutter");
+			std::unique_ptr<cMeasurementStep_HySpex_Command> close_shutter = std::make_unique<cMeasurementStep_HySpex_Command>("SWIR-384", "close shutter");
 			pInfo->appendStep(std::move(close_shutter));
 
-			std::unique_ptr<cExperimentStep_HySpex_Command> background = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "background");
+			std::unique_ptr<cMeasurementStep_HySpex_Command> background = std::make_unique<cMeasurementStep_HySpex_Command>("SWIR-384", "background");
 			pInfo->appendStep(std::move(background));
 
-			std::unique_ptr<cExperimentStep_HySpex_Command> open_shutter = std::make_unique<cExperimentStep_HySpex_Command>("SWIR-384", "open shutter");
+			std::unique_ptr<cMeasurementStep_HySpex_Command> open_shutter = std::make_unique<cMeasurementStep_HySpex_Command>("SWIR-384", "open shutter");
 			pInfo->appendStep(std::move(open_shutter));
 		}
 	}
@@ -704,7 +704,7 @@ bool cCreateHyperspectralExperimentFromPlotInfoDlg::generate()
 		}
 
 		// Do measurement...
-		step = std::make_unique<cExperimentStep_Movement>();
+		step = std::make_unique<cMeasurementStep_Movement>();
 		step->setX_mm(x_mm);
 		step->setY_mm(y_mm);
 
@@ -748,7 +748,7 @@ bool cCreateHyperspectralExperimentFromPlotInfoDlg::generate()
 		}
 
 		// Move to next measurement...
-		step = std::make_unique<cExperimentStep_Movement>();
+		step = std::make_unique<cMeasurementStep_Movement>();
 		step->setX_mm(x_mm);
 		step->setY_mm(y_mm);
 
@@ -772,13 +772,13 @@ bool cCreateHyperspectralExperimentFromPlotInfoDlg::generate()
 	if (delay_sec > 0.0)
 	{
 		// Add delay for dolly to stabilize...
-		std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+		std::unique_ptr<cMeasurementStep_Delay> delay = std::make_unique<cMeasurementStep_Delay>();
 		delay->setWaitTime_sec(delay_sec);
 		pInfo->appendStep(std::move(delay));
 	}
 
 	// Move dolly to a safe height to park it
-	step = std::make_unique<cExperimentStep_Movement>();
+	step = std::make_unique<cMeasurementStep_Movement>();
 	step->setZ_mm(safe_z_mm);
 	step->setSpeed_mmps(safe_vertical_speed_mmps);
 	step->setTilt_deg(safe_tilt_deg);

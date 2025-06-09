@@ -2,7 +2,7 @@
 #include "ExperimentDesignWidget.hpp"
 #include "ExperimentDesignItems.hpp"
 #include "ExperimentFile.hpp"
-#include "ExperimentSteps.hpp"
+#include "MeasurementSteps.hpp"
 
 #include <QLabel>
 #include <QLayout>
@@ -53,7 +53,7 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
 
     for (auto step : experiment)
     {
-        connect(step.get(), &cExperimentStep::redraw, this, &cExperimentDesignWidget::stepUpdated);
+        connect(step.get(), &cMeasurementStep::redraw, this, &cExperimentDesignWidget::stepUpdated);
 
         auto item = step->graphicsItem(id);
         connect(item, &cBaseStep::insertBefore, this, &cExperimentDesignWidget::insertBefore);
@@ -62,7 +62,7 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
         item->setTopPoint(arrow->getBottomPoint());
         mScene.addItem(item);
 
-        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
 
         if (movement)
         {
@@ -111,7 +111,7 @@ void cExperimentDesignWidget::redrawPath(const cExperimentFile& experiment)
 
     for (auto step : experiment)
     {
-        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
 
         if (movement)
         {

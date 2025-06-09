@@ -14,7 +14,7 @@
 #include <memory>
 
 // Forward Declarations
-class cExperimentStep;
+class cMeasurementStep;
 
 
 enum eMeasurementStep {delay, pause, movement, hyspex_command, reference_point};
@@ -25,10 +25,10 @@ class cExperimentFile
 public:
 	enum class eExperimentType { UNKNOWN, LIDAR, HYPERSPECTRAL, TOF, };
 
-	typedef std::list<std::shared_ptr<cExperimentStep>> Experiment_t;
+	typedef std::list<std::shared_ptr<cMeasurementStep>> Measurement_t;
 
-	typedef Experiment_t::iterator			iterator;
-	typedef Experiment_t::const_iterator	const_iterator;
+	typedef Measurement_t::iterator			iterator;
+	typedef Measurement_t::const_iterator	const_iterator;
 
 public:
 	cExperimentFile() = default;
@@ -77,8 +77,8 @@ public:
 	void setSensors(const std::vector<std::shared_ptr<cExperimentSensorInfo>>& sensors);
 	void addSensor(std::shared_ptr<cExperimentSensorInfo> sensor);
 
-	const cExperimentStep& front() const;
-	cExperimentStep& front();
+	const cMeasurementStep& front() const;
+	cMeasurementStep& front();
 
 	iterator  begin();
 	iterator  end();
@@ -86,15 +86,15 @@ public:
 	const_iterator	begin() const;
 	const_iterator	end() const;
 
-	void insertBefore(int index, std::unique_ptr<cExperimentStep> step);
-	void insertAfter(int index, std::unique_ptr<cExperimentStep> step);
+	void insertBefore(int index, std::unique_ptr<cMeasurementStep> step);
+	void insertAfter(int index, std::unique_ptr<cMeasurementStep> step);
 
 	bool removeStep(int index);
 
-	void appendStep(std::unique_ptr<cExperimentStep> step);
+	void appendStep(std::unique_ptr<cMeasurementStep> step);
 
-	const cExperimentStep& operator[](int index) const;
-	cExperimentStep& operator[](int index);
+	const cMeasurementStep& operator[](int index) const;
+	cMeasurementStep& operator[](int index);
 
 private:
 	void buildDocument(nlohmann::json& jdoc);
@@ -117,7 +117,7 @@ private:
 
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensors;
 
-	Experiment_t mSteps;
+	Measurement_t mSteps;
 };
 
 

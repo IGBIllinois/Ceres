@@ -1,9 +1,9 @@
 
 #include "ExperimentDesignMdiChild.hpp"
 
-#include "ExperimentSteps.hpp"
-#include "ExperimentSteps_HySpex.hpp"
-#include "ExperimentSteps_Ssnx.hpp"
+#include "MeasurementSteps.hpp"
+#include "MeasurementSteps_HySpex.hpp"
+#include "MeasurementSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -252,7 +252,7 @@ void cExperimentDesignMdiChild::set_X_Position(int x_mm)
 
     for (auto& step : mMeasurementFile)
     {
-        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
 
         if (movement)
         {
@@ -275,7 +275,7 @@ void cExperimentDesignMdiChild::set_Y_Position(int y_mm)
 
     for (auto& step : mMeasurementFile)
     {
-        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
 
         if (movement)
         {
@@ -298,7 +298,7 @@ void cExperimentDesignMdiChild::set_Z_Position(int z_mm)
 
     for (auto& step : mMeasurementFile)
     {
-        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
 
         if (movement)
         {
@@ -319,7 +319,7 @@ void cExperimentDesignMdiChild::shiftPositions(int x_mm, int y_mm, int z_mm)
 
     for (auto& step : mMeasurementFile)
     {
-        auto movement = dynamic_cast<cExperimentStep_Movement*>(step.get());
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
 
         if (movement)
         {
@@ -417,7 +417,7 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
     {
     case eMeasurementStep::delay:
     {
-        std::unique_ptr<cExperimentStep_Delay> step = std::make_unique<cExperimentStep_Delay>();
+        std::unique_ptr<cMeasurementStep_Delay> step = std::make_unique<cMeasurementStep_Delay>();
         if (!step->onEdit())
         {
             return;
@@ -427,13 +427,13 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
     }
     case eMeasurementStep::pause:
     {
-        std::unique_ptr<cExperimentStep_Pause> step = std::make_unique<cExperimentStep_Pause>();
+        std::unique_ptr<cMeasurementStep_Pause> step = std::make_unique<cMeasurementStep_Pause>();
         mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
     case eMeasurementStep::movement:
     {
-        std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
+        std::unique_ptr<cMeasurementStep_Movement> step = std::make_unique<cMeasurementStep_Movement>();
         if (!step->onEdit())
         {
             return;
@@ -482,14 +482,14 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
             return;
         }
 
-        std::unique_ptr<cExperimentStep_HySpex_Command> step = std::make_unique<cExperimentStep_HySpex_Command>(camera_type, command);
+        std::unique_ptr<cMeasurementStep_HySpex_Command> step = std::make_unique<cMeasurementStep_HySpex_Command>(camera_type, command);
 
         mMeasurementFile.insertBefore(id, std::move(step));
         break;
     }
     case eMeasurementStep::reference_point:
     {
-        std::unique_ptr<cExperimentStep_ReferencePoint> step = std::make_unique<cExperimentStep_ReferencePoint>();
+        std::unique_ptr<cMeasurementStep_ReferencePoint> step = std::make_unique<cMeasurementStep_ReferencePoint>();
         if (!step->onEdit())
         {
             return;
@@ -511,7 +511,7 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
     {
     case eMeasurementStep::delay:
     {
-        auto step = std::make_unique<cExperimentStep_Delay>();
+        auto step = std::make_unique<cMeasurementStep_Delay>();
         if (!step->onEdit())
         {
             return;
@@ -521,13 +521,13 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
     }
     case eMeasurementStep::pause:
     {
-        auto step = std::make_unique<cExperimentStep_Pause>();
+        auto step = std::make_unique<cMeasurementStep_Pause>();
         mMeasurementFile.insertAfter(id, std::move(step));
         break;
     }
     case eMeasurementStep::movement:
     {
-        auto step = std::make_unique<cExperimentStep_Movement>();
+        auto step = std::make_unique<cMeasurementStep_Movement>();
         if (!step->onEdit())
         {
             return;
@@ -576,7 +576,7 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
             return;
         }
 
-        std::unique_ptr<cExperimentStep_HySpex_Command> step = std::make_unique<cExperimentStep_HySpex_Command>(camera_type, command);
+        std::unique_ptr<cMeasurementStep_HySpex_Command> step = std::make_unique<cMeasurementStep_HySpex_Command>(camera_type, command);
 
         mMeasurementFile.insertAfter(id, std::move(step));
         break;
@@ -592,7 +592,7 @@ void cExperimentDesignMdiChild::onInsertStepAfter(int id, int type)
 void cExperimentDesignMdiChild::onDeleteStep(int id)
 {
     QMessageBox msgBox;
-    msgBox.setText("Are you sure you want to delete the experiment step?");
+    msgBox.setText("Are you sure you want to delete the measurement step?");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
     int ret = msgBox.exec();

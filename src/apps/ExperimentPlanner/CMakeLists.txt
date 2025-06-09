@@ -100,12 +100,12 @@ PRIVATE
     ExperimentCtrlInfo.cpp
     ExperimentSensorInfo.hpp
     ExperimentSensorInfo.cpp
-    ExperimentSteps.hpp
-    ExperimentSteps.cpp
-    ExperimentSteps_HySpex.hpp
-    ExperimentSteps_HySpex.cpp
-    ExperimentSteps_Ssnx.hpp
-    ExperimentSteps_Ssnx.cpp
+    MeasurementSteps.hpp
+    MeasurementSteps.cpp
+    MeasurementSteps_HySpex.hpp
+    MeasurementSteps_HySpex.cpp
+    MeasurementSteps_Ssnx.hpp
+    MeasurementSteps_Ssnx.cpp
 
     GpsFileReader.hpp
     GpsFileReader.cpp

@@ -1,5 +1,5 @@
 
-#include "ExperimentSteps_HySpex.hpp"
+#include "MeasurementSteps_HySpex.hpp"
 #include "ExperimentDesignItems.hpp"
 
 #include "DelayStepInfoDlg.hpp"
@@ -20,7 +20,7 @@
 
 namespace fs = std::filesystem;
 
-std::shared_ptr<cExperimentStep> hyspex::create_step(const std::string& type, const nlohmann::json& info)
+std::shared_ptr<cMeasurementStep> hyspex::create_step(const std::string& type, const nlohmann::json& info)
 {
 	if (type == "VNIR-3000N")
 	{
@@ -29,13 +29,13 @@ std::shared_ptr<cExperimentStep> hyspex::create_step(const std::string& type, co
 			std::string command = info["command"];
 
 			if (command == "open shutter")
-				return std::make_shared<cExperimentStep_HySpex_Command>("VNIR-3000N", "open shutter");
+				return std::make_shared<cMeasurementStep_HySpex_Command>("VNIR-3000N", "open shutter");
 
 			if (command == "close shutter")
-				return std::make_shared<cExperimentStep_HySpex_Command>("VNIR-3000N", "close shutter");
+				return std::make_shared<cMeasurementStep_HySpex_Command>("VNIR-3000N", "close shutter");
 
 			if (command == "background")
-				return std::make_shared<cExperimentStep_HySpex_Command>("VNIR-3000N", "background");
+				return std::make_shared<cMeasurementStep_HySpex_Command>("VNIR-3000N", "background");
 		}
 	}
 
@@ -46,33 +46,33 @@ std::shared_ptr<cExperimentStep> hyspex::create_step(const std::string& type, co
 			std::string command = info["command"];
 
 			if (command == "open shutter")
-				return std::make_shared<cExperimentStep_HySpex_Command>("SWIR-384", "open shutter");
+				return std::make_shared<cMeasurementStep_HySpex_Command>("SWIR-384", "open shutter");
 
 			if (command == "close shutter")
-				return std::make_shared<cExperimentStep_HySpex_Command>("SWIR-384", "close shutter");
+				return std::make_shared<cMeasurementStep_HySpex_Command>("SWIR-384", "close shutter");
 
 			if (command == "background")
-				return std::make_shared<cExperimentStep_HySpex_Command>("SWIR-384", "background");
+				return std::make_shared<cMeasurementStep_HySpex_Command>("SWIR-384", "background");
 		}
 	}
 
-	return std::shared_ptr<cExperimentStep>();
+	return std::shared_ptr<cMeasurementStep>();
 }
 
 
 /********************************************************************
  *
- * Experiment Step: HySpex Camera Command
+ * Measurement Step: HySpex Camera Command
  *
  ********************************************************************/
 
-cExperimentStep_HySpex_Command::cExperimentStep_HySpex_Command(std::string_view camera_model, std::string_view command)
+cMeasurementStep_HySpex_Command::cMeasurementStep_HySpex_Command(std::string_view camera_model, std::string_view command)
 {
 	mModel = camera_model;
 	mCommand = command;
 }
 
-cBaseStep* cExperimentStep_HySpex_Command::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_HySpex_Command::graphicsItem(const int id) const
 {
 	auto step = new cProcessStep(id);
 
@@ -94,12 +94,12 @@ cBaseStep* cExperimentStep_HySpex_Command::graphicsItem(const int id) const
 	return step;
 }
 
-void cExperimentStep_HySpex_Command::load(const nlohmann::json& jdoc)
+void cMeasurementStep_HySpex_Command::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
 }
 
-nlohmann::json cExperimentStep_HySpex_Command::save()
+nlohmann::json cMeasurementStep_HySpex_Command::save()
 {
 	nlohmann::json entry;
 
@@ -113,7 +113,7 @@ nlohmann::json cExperimentStep_HySpex_Command::save()
 }
 
 
-QString cExperimentStep_HySpex_Command::generateDescription() const
+QString cMeasurementStep_HySpex_Command::generateDescription() const
 {
 	if (mCommand == "open shutter")
 		return "Wait for the shutter to open.";

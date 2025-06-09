@@ -27,7 +27,7 @@
 #include "ExperimentShiftDlg.hpp"
 #include "NewSpidercamPositionDlg.hpp"
 
-#include "ExperimentSteps.hpp"
+#include "MeasurementSteps.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"

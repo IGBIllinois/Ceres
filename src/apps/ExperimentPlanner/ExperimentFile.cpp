@@ -1,7 +1,8 @@
 
 #include "ExperimentFile.hpp"
-#include "ExperimentSteps.hpp"
-#include "ExperimentSteps_HySpex.hpp"
+#include "MeasurementSteps.hpp"
+#include "MeasurementSteps_HySpex.hpp"
+#include "MeasurementSteps_Ssnx.hpp"
 
 #include <QLayout>
 #include <QPushButton>
@@ -268,7 +269,7 @@ void cExperimentFile::open(const std::string& file_name)
 
 		for (const auto& entry : steps)
 		{
-			std::shared_ptr<cExperimentStep> step;
+			std::shared_ptr<cMeasurementStep> step;
 
 			std::string type = entry["type"];
 
@@ -276,6 +277,9 @@ void cExperimentFile::open(const std::string& file_name)
 
 			if (!step)
 				step = hyspex::create_step(type, entry);
+
+			if (!step)
+				step = ssnx::create_step(type, entry);
 
 			if (step)
 			{
@@ -454,8 +458,8 @@ void cExperimentFile::addSensor(std::shared_ptr<cExperimentSensorInfo> sensor)
 	mDirty = true;
 }
 
-const cExperimentStep& cExperimentFile::front() const { return *(mSteps.front()); }
-cExperimentStep& cExperimentFile::front() { return *(mSteps.front()); }
+const cMeasurementStep& cExperimentFile::front() const { return *(mSteps.front()); }
+cMeasurementStep& cExperimentFile::front() { return *(mSteps.front()); }
 
 
 cExperimentFile::iterator cExperimentFile::begin() { return mSteps.begin(); }
@@ -464,7 +468,7 @@ cExperimentFile::iterator cExperimentFile::end() { return mSteps.end(); }
 cExperimentFile::const_iterator	cExperimentFile::begin() const { return mSteps.cbegin(); }
 cExperimentFile::const_iterator	cExperimentFile::end() const { return mSteps.cend(); }
 
-void cExperimentFile::insertBefore(int index, std::unique_ptr<cExperimentStep> step)
+void cExperimentFile::insertBefore(int index, std::unique_ptr<cMeasurementStep> step)
 {
 	if (index <= 0)
 	{
@@ -484,7 +488,7 @@ void cExperimentFile::insertBefore(int index, std::unique_ptr<cExperimentStep> s
 	mSteps.insert(it, std::move(step));
 }
 
-void cExperimentFile::insertAfter(int index, std::unique_ptr<cExperimentStep> step)
+void cExperimentFile::insertAfter(int index, std::unique_ptr<cMeasurementStep> step)
 {
 	++index;
 
@@ -521,18 +525,18 @@ bool cExperimentFile::removeStep(int index)
 	return true;
 }
 
-void cExperimentFile::appendStep(std::unique_ptr<cExperimentStep> step)
+void cExperimentFile::appendStep(std::unique_ptr<cMeasurementStep> step)
 {
 	if (step)
 	{
-		std::shared_ptr<cExperimentStep> shared = std::move(step);
+		std::shared_ptr<cMeasurementStep> shared = std::move(step);
 		mSteps.push_back(shared);
 //		step.release();
 		mDirty = true;
 	}
 }
 
-const cExperimentStep& cExperimentFile::operator[](int index) const
+const cMeasurementStep& cExperimentFile::operator[](int index) const
 {
 	if (index < 0)
 		return *(mSteps.front());
@@ -545,7 +549,7 @@ const cExperimentStep& cExperimentFile::operator[](int index) const
 	return *(*it);
 }
 
-cExperimentStep& cExperimentFile::operator[](int index)
+cMeasurementStep& cExperimentFile::operator[](int index)
 {
 	if (index < 0)
 		return *(mSteps.front());

@@ -18,20 +18,20 @@ QT_END_NAMESPACE
 class cExperimentFile;
 class cConnectedItem;
 class cBaseStep;
-class cExperimentStep;
+class cMeasurementStep;
 
 namespace basic
 {
-	std::shared_ptr<cExperimentStep> create_step(const std::string& type);
+	std::shared_ptr<cMeasurementStep> create_step(const std::string& type);
 }
 
-class cExperimentStep : public QObject
+class cMeasurementStep : public QObject
 {
 	Q_OBJECT
 
 public:
-	cExperimentStep() = default;
-	virtual ~cExperimentStep();
+	cMeasurementStep() = default;
+	virtual ~cMeasurementStep();
 
 	bool isDirty() const;
 
@@ -52,14 +52,14 @@ protected:
 };
 
 /// <summary>
-/// Experiment Step: Simple Time Delay
+/// Measurement Step: Simple Time Delay
 /// </summary>
-class cExperimentStep_Delay : public cExperimentStep
+class cMeasurementStep_Delay : public cMeasurementStep
 {
 	Q_OBJECT
 
 public:
-	cExperimentStep_Delay() = default;
+	cMeasurementStep_Delay() = default;
 
 	double getWaitTime_sec() const;
 	const std::optional<int>& getWaitTime_min() const;
@@ -98,14 +98,14 @@ private:
 };
 
 /// <summary>
-/// Experiment Step: Pause for User Input
+/// Measurement Step: Pause for User Input
 /// </summary>
-class cExperimentStep_Pause : public cExperimentStep
+class cMeasurementStep_Pause : public cMeasurementStep
 {
 	Q_OBJECT
 
 public:
-	cExperimentStep_Pause() = default;
+	cMeasurementStep_Pause() = default;
 
 	cBaseStep* graphicsItem(const int id) const override;
 
@@ -115,14 +115,14 @@ protected:
 };
 
 /// <summary>
-/// Experiment Step: Controls SpiderCam Movement
+/// Measurement Step: Controls SpiderCam Movement
 /// </summary>
-class cExperimentStep_Movement : public cExperimentStep
+class cMeasurementStep_Movement : public cMeasurementStep
 {
 	Q_OBJECT
 
 public:
-	cExperimentStep_Movement() = default;
+	cMeasurementStep_Movement() = default;
 
 	const std::optional<int>& getX_mm() const;
 	const std::optional<int>& getY_mm() const;

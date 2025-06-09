@@ -1,5 +1,5 @@
 
-#include "ExperimentSteps.hpp"
+#include "MeasurementSteps.hpp"
 #include "ExperimentDesignItems.hpp"
 
 #include "DelayStepInfoDlg.hpp"
@@ -20,31 +20,31 @@
 
 namespace fs = std::filesystem;
 
-std::shared_ptr<cExperimentStep> basic::create_step(const std::string& type)
+std::shared_ptr<cMeasurementStep> basic::create_step(const std::string& type)
 {
 	if (type == "delay")
-		return std::make_shared<cExperimentStep_Delay>();
+		return std::make_shared<cMeasurementStep_Delay>();
 	
 	if (type == "pause")
-		return std::make_shared<cExperimentStep_Pause>();
+		return std::make_shared<cMeasurementStep_Pause>();
 
 	if (type == "movement")
-		return std::make_shared<cExperimentStep_Movement>();
+		return std::make_shared<cMeasurementStep_Movement>();
 
-	return std::shared_ptr<cExperimentStep>();
+	return std::shared_ptr<cMeasurementStep>();
 }
 
 
 /********************************************************************
  *
- * Experiment Step: Base Class
+ * Measurement Step: Base Class
  *
  ********************************************************************/
 
-cExperimentStep::~cExperimentStep()
+cMeasurementStep::~cMeasurementStep()
 {}
 
-bool cExperimentStep::isDirty() const
+bool cMeasurementStep::isDirty() const
 {
 	return mDirty;
 }
@@ -53,48 +53,48 @@ bool cExperimentStep::isDirty() const
 
 /********************************************************************
  *
- * Experiment Step: Simple Delay
+ * Measurement Step: Simple Delay
  *
  ********************************************************************/
 
-double cExperimentStep_Delay::getWaitTime_sec() const { return mWaitTime_sec; }
-const std::optional<int>& cExperimentStep_Delay::getWaitTime_min() const { return mWaitTime_min; }
-const std::optional<int>& cExperimentStep_Delay::getWaitTime_hr() const { return mWaitTime_hr; }
+double cMeasurementStep_Delay::getWaitTime_sec() const { return mWaitTime_sec; }
+const std::optional<int>& cMeasurementStep_Delay::getWaitTime_min() const { return mWaitTime_min; }
+const std::optional<int>& cMeasurementStep_Delay::getWaitTime_hr() const { return mWaitTime_hr; }
 
-bool cExperimentStep_Delay::isRecording() const { return mRecording; }
+bool cMeasurementStep_Delay::isRecording() const { return mRecording; }
 
-void cExperimentStep_Delay::setWaitTime_sec(double sec)
+void cMeasurementStep_Delay::setWaitTime_sec(double sec)
 {
 	mDirty |= mWaitTime_sec != sec;
 	mWaitTime_sec = sec;
 }
 
-void cExperimentStep_Delay::setWaitTime_min(const std::optional<int>& min)
+void cMeasurementStep_Delay::setWaitTime_min(const std::optional<int>& min)
 {
 	mDirty |= mWaitTime_min != min;
 	mWaitTime_min = min;
 }
 
-void cExperimentStep_Delay::setWaitTime_hr(const std::optional<int>& hr)
+void cMeasurementStep_Delay::setWaitTime_hr(const std::optional<int>& hr)
 {
 
 	mDirty |= mWaitTime_hr != hr;
 	mWaitTime_hr = hr;
 }
 
-void cExperimentStep_Delay::setRecording(bool recording)
+void cMeasurementStep_Delay::setRecording(bool recording)
 {
 	mDirty |= mRecording != recording;
 	mRecording = recording;
 }
 
 //cConnectedItem* cExperimentStep_Delay::graphicsItem(const int id) const
-cBaseStep* cExperimentStep_Delay::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_Delay::graphicsItem(const int id) const
 {
 	auto step = new cProcessStep(id);
-	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Delay::onEdit);
-	connect(this, &cExperimentStep_Delay::onDescriptionChange, step, &cProcessStep::setSubHeading1);
-	connect(this, &cExperimentStep_Delay::onCommentChange, step, &cProcessStep::setSubHeading2);
+	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_Delay::onEdit);
+	connect(this, &cMeasurementStep_Delay::onDescriptionChange, step, &cProcessStep::setSubHeading1);
+	connect(this, &cMeasurementStep_Delay::onCommentChange, step, &cProcessStep::setSubHeading2);
 
 	step->setTitle("Delay");
 
@@ -107,7 +107,7 @@ cBaseStep* cExperimentStep_Delay::graphicsItem(const int id) const
 	return step;
 }
 
-void cExperimentStep_Delay::load(const nlohmann::json& jdoc)
+void cMeasurementStep_Delay::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
 
@@ -126,7 +126,7 @@ void cExperimentStep_Delay::load(const nlohmann::json& jdoc)
 		mRecording = jdoc["record"];
 }
 
-nlohmann::json cExperimentStep_Delay::save()
+nlohmann::json cMeasurementStep_Delay::save()
 {
 	nlohmann::json entry;
 
@@ -153,7 +153,7 @@ nlohmann::json cExperimentStep_Delay::save()
 	return entry;
 }
 
-bool cExperimentStep_Delay::onEdit()
+bool cMeasurementStep_Delay::onEdit()
 {
 	cDelayStepInfoDlg dlg;
 
@@ -204,7 +204,7 @@ bool cExperimentStep_Delay::onEdit()
 	return true;
 }
 
-QString cExperimentStep_Delay::generateDescription() const
+QString cMeasurementStep_Delay::generateDescription() const
 {
 	QString description = "Delay for ";
 
@@ -256,7 +256,7 @@ QString cExperimentStep_Delay::generateDescription() const
 	return description;
 }
 
-QString cExperimentStep_Delay::generateComment() const
+QString cMeasurementStep_Delay::generateComment() const
 {
 	if (mRecording)
 		return QString("Recording: On");
@@ -267,12 +267,12 @@ QString cExperimentStep_Delay::generateComment() const
 
 /********************************************************************
  *
- * Experiment Step: Pause
+ * Measurement Step: Pause
  *
  ********************************************************************/
 
-//cConnectedItem* cExperimentStep_Pause::graphicsItem(const int id) const
-cBaseStep* cExperimentStep_Pause::graphicsItem(const int id) const
+//cConnectedItem* cMeasurementStep_Pause::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_Pause::graphicsItem(const int id) const
 {
 	auto step = new cIoStep(id);
 	step->setReadOnly(true);
@@ -281,12 +281,12 @@ cBaseStep* cExperimentStep_Pause::graphicsItem(const int id) const
 	return step;
 }
 
-void cExperimentStep_Pause::load(const nlohmann::json& jdoc)
+void cMeasurementStep_Pause::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
 }
 
-nlohmann::json cExperimentStep_Pause::save()
+nlohmann::json cMeasurementStep_Pause::save()
 {
 	nlohmann::json entry;
 
@@ -300,78 +300,78 @@ nlohmann::json cExperimentStep_Pause::save()
 
 /********************************************************************
  *
- * Experiment Step: SpiderCam Movement
+ * Measurement Step: SpiderCam Movement
  *
  ********************************************************************/
 
-const std::optional<int>& cExperimentStep_Movement::getX_mm() const { return mX_mm; }
-const std::optional<int>& cExperimentStep_Movement::getY_mm() const { return mY_mm; }
-const std::optional<int>& cExperimentStep_Movement::getZ_mm() const { return mZ_mm; }
+const std::optional<int>& cMeasurementStep_Movement::getX_mm() const { return mX_mm; }
+const std::optional<int>& cMeasurementStep_Movement::getY_mm() const { return mY_mm; }
+const std::optional<int>& cMeasurementStep_Movement::getZ_mm() const { return mZ_mm; }
 
-int cExperimentStep_Movement::getSpeed_mmps() const { return mSpeed_mmps; }
+int cMeasurementStep_Movement::getSpeed_mmps() const { return mSpeed_mmps; }
 
-const std::optional<double>& cExperimentStep_Movement::getPan_deg() const { return mPan_deg; }
-const std::optional<double>& cExperimentStep_Movement::getTilt_deg() const { return mTilt_deg; }
-const std::optional<double>& cExperimentStep_Movement::getRoll_deg() const { return mRoll_deg; }
+const std::optional<double>& cMeasurementStep_Movement::getPan_deg() const { return mPan_deg; }
+const std::optional<double>& cMeasurementStep_Movement::getTilt_deg() const { return mTilt_deg; }
+const std::optional<double>& cMeasurementStep_Movement::getRoll_deg() const { return mRoll_deg; }
 
-bool cExperimentStep_Movement::isRecording() const { return mRecording; }
+bool cMeasurementStep_Movement::isRecording() const { return mRecording; }
 
-void cExperimentStep_Movement::setX_mm(const std::optional<int>& x_mm)
+void cMeasurementStep_Movement::setX_mm(const std::optional<int>& x_mm)
 {
 	mDirty |= mX_mm != x_mm;
 	mX_mm = x_mm;
 }
 
-void cExperimentStep_Movement::setY_mm(const std::optional<int>& y_mm)
+void cMeasurementStep_Movement::setY_mm(const std::optional<int>& y_mm)
 {
 	mDirty |= mY_mm != y_mm;
 	mY_mm = y_mm;
 }
 
-void cExperimentStep_Movement::setZ_mm(const std::optional<int>& z_mm)
+void cMeasurementStep_Movement::setZ_mm(const std::optional<int>& z_mm)
 {
 	mDirty |= mZ_mm != z_mm;
 	mZ_mm = z_mm;
 }
 
-void cExperimentStep_Movement::setSpeed_mmps(int speed_mmps)
+void cMeasurementStep_Movement::setSpeed_mmps(int speed_mmps)
 {
 	mDirty |= mSpeed_mmps != speed_mmps;
 	mSpeed_mmps = speed_mmps;
 }
 
-void cExperimentStep_Movement::setPan_deg(const std::optional<double>& pan_deg)
+void cMeasurementStep_Movement::setPan_deg(const std::optional<double>& pan_deg)
 {
 	mDirty |= mPan_deg != pan_deg;
 	mPan_deg = pan_deg;
 }
 
-void cExperimentStep_Movement::setTilt_deg(const std::optional<double>& tilt_deg)
+void cMeasurementStep_Movement::setTilt_deg(const std::optional<double>& tilt_deg)
 {
 	mDirty |= mTilt_deg != tilt_deg;
 	mTilt_deg = tilt_deg;
 }
 
-void cExperimentStep_Movement::setRoll_deg(const std::optional<double>& roll_deg)
+void cMeasurementStep_Movement::setRoll_deg(const std::optional<double>& roll_deg)
 {
 	mDirty |= mRoll_deg != roll_deg;
 	mRoll_deg = roll_deg;
 }
 
-void cExperimentStep_Movement::setRecording(bool recording)
+void cMeasurementStep_Movement::setRecording(bool recording)
 {
 	mDirty |= mRecording != recording;
 	mRecording = recording;
 }
 
 //cConnectedItem* cExperimentStep_Movement::graphicsItem(const int id) const
-cBaseStep* cExperimentStep_Movement::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_Movement::graphicsItem(const int id) const
 {
 	auto step = new cProcessStep(id);
-	connect(step, &cProcessStep::editStep, this, &cExperimentStep_Movement::onEdit);
-	connect(this, &cExperimentStep_Movement::onMovementTextChange, step, &cProcessStep::setSubHeading1);
-	connect(this, &cExperimentStep_Movement::onOrientationTextChange, step, &cProcessStep::setSubHeading2);
-	connect(this, &cExperimentStep_Movement::onCommentChange, step, &cProcessStep::setSubHeading3);
+	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_Movement::onEdit);
+	connect(this, &cMeasurementStep_Movement::onMovementTextChange, step, &cProcessStep::setSubHeading1);
+	connect(this, &cMeasurementStep_Movement::onOrientationTextChange, step, &cProcessStep::setSubHeading2);
+	connect(this, &cMeasurementStep_Movement::onCommentChange, step, &cProcessStep::setSubHeading3);
 
 	step->setTitle("Movement");
 
@@ -387,7 +387,7 @@ cBaseStep* cExperimentStep_Movement::graphicsItem(const int id) const
 	return step;
 }
 
-void cExperimentStep_Movement::load(const nlohmann::json& jdoc)
+void cMeasurementStep_Movement::load(const nlohmann::json& jdoc)
 {
 	auto pos = jdoc["position"];
 
@@ -461,7 +461,7 @@ void cExperimentStep_Movement::load(const nlohmann::json& jdoc)
 	mRecording = jdoc["record"];
 }
 
-nlohmann::json cExperimentStep_Movement::save()
+nlohmann::json cMeasurementStep_Movement::save()
 {
 	nlohmann::json entry;
 
@@ -517,7 +517,7 @@ nlohmann::json cExperimentStep_Movement::save()
 }
 
 
-bool cExperimentStep_Movement::onEdit()
+bool cMeasurementStep_Movement::onEdit()
 {
 	cMovementStepInfoDlg dlg;
 
@@ -618,7 +618,7 @@ bool cExperimentStep_Movement::onEdit()
 	return true;
 }
 
-QString cExperimentStep_Movement::generateMovementDescription() const
+QString cMeasurementStep_Movement::generateMovementDescription() const
 {
 	QString description;
 
@@ -656,7 +656,7 @@ QString cExperimentStep_Movement::generateMovementDescription() const
 	return description;
 }
 
-QString cExperimentStep_Movement::generateOrientationDescription() const
+QString cMeasurementStep_Movement::generateOrientationDescription() const
 {
 	QString description;
 
@@ -701,7 +701,7 @@ QString cExperimentStep_Movement::generateOrientationDescription() const
 	return description;
 }
 
-QString cExperimentStep_Movement::generateComment() const
+QString cMeasurementStep_Movement::generateComment() const
 {
 	if (mRecording)
 		return QString("Recording: On");

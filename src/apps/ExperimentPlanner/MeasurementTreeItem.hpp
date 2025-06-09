@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <QtWidgets>
+#include <QTreeWidgetItem>
 #include <QString>
 
 #include <nlohmann/json.hpp>

@@ -39,6 +39,8 @@ private slots:
 	void openMeasurement();
 	void testMeasurement();
 
+	void onItemDoubleClick(QTreeWidgetItem* item, int column);
+
 private:
 	void loadMeasurements();
 	void loadMeasurements(cMeasurementTreeItem& parent, const std::filesystem::path& path);

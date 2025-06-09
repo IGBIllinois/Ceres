@@ -2,8 +2,8 @@
 #include "CreateLidarExperimentFromSpiderCamPointDlg.hpp"
 #include "Constants.hpp"
 
-#include "ExperimentSteps.hpp"
-#include "ExperimentSteps_Ssnx.hpp"
+#include "MeasurementSteps.hpp"
+#include "MeasurementSteps_Ssnx.hpp"
 
 #include "ExperimentMetaInfoDlg.hpp"
 #include "ExperimentCtrlInfoDlg.hpp"
@@ -355,7 +355,7 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 		pInfo->setSensors(mSensorInfo);
 
 		// Add preamble: moving dolly up to a safe travel height...
-		std::unique_ptr<cExperimentStep_Movement> step = std::make_unique<cExperimentStep_Movement>();
+		std::unique_ptr<cMeasurementStep_Movement> step = std::make_unique<cMeasurementStep_Movement>();
 
 		step->setZ_mm(travel_z_mm);
 		step->setSpeed_mmps(vertical_speed_mmps);
@@ -364,7 +364,7 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 		if ((dx_mm == 0) && (dy_mm == 0))
 		{
 			// Moving dolly to the beginning of the measurement scan...
-			step = std::make_unique<cExperimentStep_Movement>();
+			step = std::make_unique<cMeasurementStep_Movement>();
 			step->setX_mm(x1_mm);
 			step->setY_mm(y1_mm);
 			step->setSpeed_mmps(travel_speed_mmps);
@@ -372,7 +372,7 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 
 
 			// Move the dolly to measurement height...
-			step = std::make_unique<cExperimentStep_Movement>();
+			step = std::make_unique<cMeasurementStep_Movement>();
 
 			if (mpHeightReference->currentIndex() == 1)
 				step->setZ_mm(scan_z_mm + h1_mm);
@@ -392,13 +392,13 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 			if (delay_sec > 0.0)
 			{
 				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				std::unique_ptr<cMeasurementStep_Delay> delay = std::make_unique<cMeasurementStep_Delay>();
 				delay->setWaitTime_sec(delay_sec);
 				pInfo->appendStep(std::move(delay));
 			}
 
 			// Collect a reference point measurement
-			std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+			std::unique_ptr<cMeasurementStep_ReferencePoint> reference = std::make_unique<cMeasurementStep_ReferencePoint>();
 
 			reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
 			reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
@@ -410,7 +410,7 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 			if (delay_sec > 0.0)
 			{
 				// Do measurement...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				std::unique_ptr<cMeasurementStep_Delay> delay = std::make_unique<cMeasurementStep_Delay>();
 				delay->setWaitTime_sec(delay_sec);
 				delay->setRecording(true);
 				pInfo->appendStep(std::move(delay));
@@ -441,14 +441,14 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 			}
 
 			// Moving dolly to the beginning of the measurement scan...
-			step = std::make_unique<cExperimentStep_Movement>();
+			step = std::make_unique<cMeasurementStep_Movement>();
 			step->setX_mm(x_mm);
 			step->setY_mm(y_mm);
 			step->setSpeed_mmps(travel_speed_mmps);
 			pInfo->appendStep(std::move(step));
 
 			// Move the dolly to measurement height...
-			step = std::make_unique<cExperimentStep_Movement>();
+			step = std::make_unique<cMeasurementStep_Movement>();
 
 			if (mpHeightReference->currentIndex() == 1)
 				step->setZ_mm(scan_z_mm + h1_mm);
@@ -468,13 +468,13 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 			if (delay_sec > 0.0)
 			{
 				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				std::unique_ptr<cMeasurementStep_Delay> delay = std::make_unique<cMeasurementStep_Delay>();
 				delay->setWaitTime_sec(delay_sec);
 				pInfo->appendStep(std::move(delay));
 			}
 
 			// Collect a reference point measurement
-			std::unique_ptr<cExperimentStep_ReferencePoint> reference = std::make_unique<cExperimentStep_ReferencePoint>();
+			std::unique_ptr<cMeasurementStep_ReferencePoint> reference = std::make_unique<cMeasurementStep_ReferencePoint>();
 
 			reference->setMinIntegrationTime_sec(minIntegrationTime_sec);
 			reference->setMaxIntegrationTime_sec(maxIntegrationTime_sec);
@@ -497,7 +497,7 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 			}
 
 			// Do measurement...
-			step = std::make_unique<cExperimentStep_Movement>();
+			step = std::make_unique<cMeasurementStep_Movement>();
 			step->setX_mm(x_mm);
 			step->setY_mm(y_mm);
 
@@ -516,14 +516,14 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 			if (delay_sec > 0.0)
 			{
 				// Add delay for dolly to stabilize...
-				std::unique_ptr<cExperimentStep_Delay> delay = std::make_unique<cExperimentStep_Delay>();
+				std::unique_ptr<cMeasurementStep_Delay> delay = std::make_unique<cMeasurementStep_Delay>();
 				delay->setWaitTime_sec(delay_sec);
 				pInfo->appendStep(std::move(delay));
 			}
 		}
 
 		// Move dolly to a safe height to park it
-		step = std::make_unique<cExperimentStep_Movement>();
+		step = std::make_unique<cMeasurementStep_Movement>();
 		step->setZ_mm(safe_z_mm);
 		step->setSpeed_mmps(safe_vertical_speed_mmps);
 		step->setTilt_deg(safe_tilt_deg);

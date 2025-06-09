@@ -1,5 +1,5 @@
 
-#include "ExperimentSteps_Ssnx.hpp"
+#include "MeasurementSteps_Ssnx.hpp"
 #include "ExperimentDesignItems.hpp"
 
 #include "ReferencePointDlg.hpp"
@@ -19,7 +19,7 @@
 
 namespace fs = std::filesystem;
 
-std::shared_ptr<cExperimentStep> ssnx::create_step(const std::string& type, const nlohmann::json& info)
+std::shared_ptr<cMeasurementStep> ssnx::create_step(const std::string& type, const nlohmann::json& info)
 {
 	if (type == "ssnx")
 	{
@@ -28,48 +28,48 @@ std::shared_ptr<cExperimentStep> ssnx::create_step(const std::string& type, cons
 			std::string command = info["command"];
 
 			if (command == "reference")
-				return std::make_shared<cExperimentStep_ReferencePoint>();
+				return std::make_shared<cMeasurementStep_ReferencePoint>();
 		}
 	}
 
-	return std::shared_ptr<cExperimentStep>();
+	return std::shared_ptr<cMeasurementStep>();
 }
 
 
 /********************************************************************
  *
- * Experiment Step: Ssnx GPS Reference Point
+ * Measurement Step: Ssnx GPS Reference Point
  *
  ********************************************************************/
 
-double cExperimentStep_ReferencePoint::getMinIntegrationTime_sec() const { return mMinIntegrationTime_sec; }
-double cExperimentStep_ReferencePoint::getMaxIntegrationTime_sec() const { return mMaxIntegrationTime_sec; }
-int cExperimentStep_ReferencePoint::getErrorThreshold_mm() const { return mErrorThreshold_mm; }
+double cMeasurementStep_ReferencePoint::getMinIntegrationTime_sec() const { return mMinIntegrationTime_sec; }
+double cMeasurementStep_ReferencePoint::getMaxIntegrationTime_sec() const { return mMaxIntegrationTime_sec; }
+int cMeasurementStep_ReferencePoint::getErrorThreshold_mm() const { return mErrorThreshold_mm; }
 
-void cExperimentStep_ReferencePoint::setMinIntegrationTime_sec(double sec)
+void cMeasurementStep_ReferencePoint::setMinIntegrationTime_sec(double sec)
 {
 	mDirty |= mMinIntegrationTime_sec != sec;
 	mMinIntegrationTime_sec = sec;
 }
 
-void cExperimentStep_ReferencePoint::setMaxIntegrationTime_sec(double sec)
+void cMeasurementStep_ReferencePoint::setMaxIntegrationTime_sec(double sec)
 {
 	mDirty |= mMaxIntegrationTime_sec != sec;
 	mMaxIntegrationTime_sec = sec;
 }
 
-void cExperimentStep_ReferencePoint::setErrorThreshold_mm(int threshold_mm)
+void cMeasurementStep_ReferencePoint::setErrorThreshold_mm(int threshold_mm)
 {
 	mDirty |= mErrorThreshold_mm != threshold_mm;
 	mErrorThreshold_mm = threshold_mm;
 }
 
-cBaseStep* cExperimentStep_ReferencePoint::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_ReferencePoint::graphicsItem(const int id) const
 {
 	auto step = new cProcessStep(id);
-	connect(step, &cProcessStep::editStep, this, &cExperimentStep_ReferencePoint::onEdit);
-	connect(this, &cExperimentStep_ReferencePoint::onDescriptionChange, step, &cProcessStep::setSubHeading1);
-	connect(this, &cExperimentStep_ReferencePoint::onCommentChange, step, &cProcessStep::setSubHeading2);
+	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_ReferencePoint::onEdit);
+	connect(this, &cMeasurementStep_ReferencePoint::onDescriptionChange, step, &cProcessStep::setSubHeading1);
+	connect(this, &cMeasurementStep_ReferencePoint::onCommentChange, step, &cProcessStep::setSubHeading2);
 
 	step->setTitle("SSNX: Reference Point");
 
@@ -82,7 +82,7 @@ cBaseStep* cExperimentStep_ReferencePoint::graphicsItem(const int id) const
 	return step;
 }
 
-void cExperimentStep_ReferencePoint::load(const nlohmann::json& jdoc)
+void cMeasurementStep_ReferencePoint::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
 
@@ -102,7 +102,7 @@ void cExperimentStep_ReferencePoint::load(const nlohmann::json& jdoc)
 	}
 }
 
-nlohmann::json cExperimentStep_ReferencePoint::save()
+nlohmann::json cMeasurementStep_ReferencePoint::save()
 {
 	nlohmann::json entry;
 
@@ -119,7 +119,7 @@ nlohmann::json cExperimentStep_ReferencePoint::save()
 	return entry;
 }
 
-bool cExperimentStep_ReferencePoint::onEdit()
+bool cMeasurementStep_ReferencePoint::onEdit()
 {
 	cReferencePointDlg dlg;
 
@@ -152,7 +152,7 @@ bool cExperimentStep_ReferencePoint::onEdit()
 	return true;
 }
 
-QString cExperimentStep_ReferencePoint::generateDescription() const
+QString cMeasurementStep_ReferencePoint::generateDescription() const
 {
 	QString description;
 
@@ -165,7 +165,7 @@ QString cExperimentStep_ReferencePoint::generateDescription() const
 	return description;
 }
 
-QString cExperimentStep_ReferencePoint::generateComment() const
+QString cMeasurementStep_ReferencePoint::generateComment() const
 {
 	QString comment;
 
