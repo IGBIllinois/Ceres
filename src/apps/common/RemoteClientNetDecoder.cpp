@@ -156,9 +156,24 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     }
     case ePacketType::PERMIT_INFO:
     {
-        ExperimentPermitInfo_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onPermitInfo(to_permit_info_1(packet));
+        switch (hdr.revision)
+        {
+        case 1:
+        {
+            ExperimentPermitInfo_1 packet;
+            packet.ParseFromArray(buffer.data(), hdr.length);
+            onPermitInfo(to_permit_info_1(packet));
+            break;
+        }
+        case 2:
+        {
+            ExperimentPermitInfo_2 packet;
+            packet.ParseFromArray(buffer.data(), hdr.length);
+            auto permit_info = to_permit_info_2(packet);
+            onPermitInfo(permit_info.authorization, permit_info.permit);
+            break;
+        }
+        }
         break;
     }
     case ePacketType::END_OF_EXPERIMENT_INFO:

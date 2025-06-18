@@ -374,6 +374,8 @@ void cCentralWidget::onResearcher(const std::string& researcher)
 void cCentralWidget::onExperimentDoc(const std::string& doc) {}
 
 void cCentralWidget::onPermitInfo(const std::string& permit) {}
+void cCentralWidget::onPermitInfo(const std::string& authorization, const std::string& permit) {}
+
 
 void cCentralWidget::onBeginTreatmentList() {}
 void cCentralWidget::onEndOfTreatmentList() {}

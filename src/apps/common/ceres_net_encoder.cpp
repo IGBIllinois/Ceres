@@ -241,6 +241,15 @@ void cCeresNetEncoder::encodePermitInfo(const std::string& permit)
     }
 }
 
+void cCeresNetEncoder::encodePermitInfo(const std::string& authorization, const std::string& permit)
+{
+    if (encode_permit_info(authorization, permit, mBuffer) < 0)
+    {
+        sendData();
+        encode_permit_info(authorization, permit, mBuffer);
+    }
+}
+
 void cCeresNetEncoder::encodeSpidercamPosition(const spidercam::sPosition_1_t& pos)
 {
     if (encode_spidercam_pos(pos, mBuffer) < 0)
@@ -382,6 +391,12 @@ void cCeresNetEncoder::sendComment(const std::string& comment)
 void cCeresNetEncoder::sendPermitInfo(const std::string& permit)
 {
     encode_permit_info(permit, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendPermitInfo(const std::string& authorization, const std::string& permit)
+{
+    encode_permit_info(authorization, permit, mBuffer);
     sendData();
 }
 

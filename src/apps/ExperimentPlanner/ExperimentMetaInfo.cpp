@@ -50,7 +50,8 @@ void cExperimentMetaInfo::clear()
     mTargetHarvestMonth.clear();
     mTargetHarvestYear.clear();
 
-	mPermitInfo.clear();
+	mAuthorization.clear();
+    mPermit.clear();
 }
 
 bool cExperimentMetaInfo::isDirty() const
@@ -151,9 +152,14 @@ const std::string& cExperimentMetaInfo::getTargetHarvestYear() const
     return mTargetHarvestYear;
 }
 
+const std::string& cExperimentMetaInfo::getAuthorization() const
+{
+    return mAuthorization;
+}
+
 const std::string& cExperimentMetaInfo::getPermitInfo() const
 {
-	return mPermitInfo;
+	return mPermit;
 }
 
 
@@ -247,10 +253,18 @@ void cExperimentMetaInfo::setTargetHarvestYear(const std::string& year)
     mTargetHarvestYear = year;
 }
 
-void cExperimentMetaInfo::setPermitInfo(const std::string& info)
+void cExperimentMetaInfo::setPermitInfo(const std::string& permit)
 {
-    mDirty |= mPermitInfo != info;
-    mPermitInfo = info;
+    mDirty |= mPermit != permit;
+    mPermit = permit;
+}
+
+void cExperimentMetaInfo::setPermitInfo(const std::string& authorization, const std::string& permit)
+{
+    mDirty |= mAuthorization != authorization;
+    mDirty |= mPermit != permit;
+    mAuthorization = authorization;
+    mPermit = permit;
 }
 
 bool cExperimentMetaInfo::operator!=(const cExperimentMetaInfo& rhs) const
@@ -271,7 +285,8 @@ bool cExperimentMetaInfo::operator!=(const cExperimentMetaInfo& rhs) const
         (mTargetHarvestDay != rhs.mTargetHarvestDay) ||
         (mTargetHarvestMonth != rhs.mTargetHarvestMonth) ||
         (mTargetHarvestYear != rhs.mTargetHarvestYear) ||
-        (mPermitInfo != rhs.mPermitInfo);
+        (mAuthorization != rhs.mAuthorization) ||
+        (mPermit != rhs.mPermit);
 }
 
 
@@ -306,7 +321,16 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
 
     if (jdoc.contains("permit info"))
     {
-        mPermitInfo = jdoc["permit info"];
+        auto permit_info = jdoc["permit info"];
+        if (permit_info.is_string())
+        {
+            mPermit = permit_info;
+        }
+        else if (permit_info.is_object())
+        {
+            mAuthorization = permit_info["authorization"];
+            mPermit = permit_info["permit"];
+        }
     }
 
     if (jdoc.contains("construct"))
@@ -435,9 +459,16 @@ void cExperimentMetaInfo::save(nlohmann::json& jdoc)
         jdoc["cultivar"] = mCultivar;
     }
 
-    if (!mPermitInfo.empty())
+    if (!mAuthorization.empty() && !mPermit.empty())
     {
-        jdoc["permit info"] = mPermitInfo;
+        nlohmann::json permit_info;
+        permit_info["authorization"] = mAuthorization;
+        permit_info["permit"] = mPermit;
+        jdoc["permit info"] = permit_info;
+    }
+    else if (!mPermit.empty())
+    {
+        jdoc["permit info"] = mPermit;
     }
 
     if (!mConstructName.empty())

@@ -751,6 +751,43 @@ int encode_permit_info(const std::string& permit, net_buffer& buffer)
     return pckt_size;
 }
 
+sPermitInfo_t to_permit_info_2(const ExperimentPermitInfo_2& pckt)
+{
+    sPermitInfo_t result;
+
+    result.authorization = pckt.authorization();
+    result.permit = pckt.permit();
+
+    return result;
+}
+
+int encode_permit_info(const std::string& authorization, const std::string& permit, net_buffer& buffer)
+{
+    ExperimentPermitInfo_2 pckt;
+
+    pckt.set_authorization(authorization);
+    pckt.set_permit(permit);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::PERMIT_INFO);
+    hdr.revision = 2;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
 int encode_experiment_info_reply(net_buffer& buffer)
 {
     sPacketHeader_t hdr;

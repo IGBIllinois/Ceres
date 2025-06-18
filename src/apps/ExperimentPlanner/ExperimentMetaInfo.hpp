@@ -39,6 +39,7 @@ public:
 	const std::string& getTargetHarvestMonth() const;
 	const std::string& getTargetHarvestYear() const;
 
+	const std::string& getAuthorization() const;
 	const std::string& getPermitInfo() const;
 
 
@@ -62,7 +63,8 @@ public:
 	void setTargetHarvestMonth(const std::string& month);
 	void setTargetHarvestYear(const std::string& year);
 
-	void setPermitInfo(const std::string& info);
+	void setPermitInfo(const std::string& permit);
+	void setPermitInfo(const std::string& authorization, const std::string& permit);
 
 	bool operator!=(const cExperimentMetaInfo& rhs) const;
 
@@ -93,7 +95,8 @@ private:
 	std::string mTargetHarvestMonth;
 	std::string mTargetHarvestYear;
 
-	std::string mPermitInfo;
+	std::string mAuthorization;
+	std::string mPermit;
 
 	friend class cExperimentFile;
 };

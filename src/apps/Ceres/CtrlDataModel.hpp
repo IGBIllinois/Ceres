@@ -96,7 +96,8 @@ protected:
     std::vector<std::string> mResearchers;
     std::string  mSpecies;
     std::string  mCultivar;
-    std::string  mPermitInfo;
+    std::string  mAuthorization;
+    std::string  mPermit;
     std::string  mExperimentDoc;
     std::vector<std::string> mTreatments;
 

@@ -153,8 +153,18 @@ int encode_start_of_comment_list(net_buffer& buffer);
 int encode_end_of_comment_list(net_buffer& buffer);
 int encode_comment(const std::string& comment, net_buffer& buffer);
 
-std::string to_permit_info_1(const ExperimentPermitInfo_1& pckt);
+std::string  to_permit_info_1(const ExperimentPermitInfo_1& pckt);
 int encode_permit_info(const std::string& permit, net_buffer& buffer);
+
+
+struct sPermitInfo_t
+{
+	std::string authorization;
+	std::string permit;
+};
+
+sPermitInfo_t to_permit_info_2(const ExperimentPermitInfo_2& pckt);
+int encode_permit_info(const std::string& authorization, const std::string& permit, net_buffer& buffer);
 
 int encode_experiment_info_reply(net_buffer& buffer);
 int encode_end_of_experiment_info(net_buffer& buffer);

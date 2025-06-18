@@ -23,6 +23,8 @@ public:
 
 	int x_mm() const;
 
+	void setX_mm(int x_mm);
+
 public slots:
 	void positionUpdated(spidercam::sPosition_1_t pos);
 
@@ -48,6 +50,8 @@ public:
 
 	int y_mm() const;
 
+	void setY_mm(int y_mm);
+
 public slots:
 	void positionUpdated(spidercam::sPosition_1_t pos);
 
@@ -72,6 +76,8 @@ public:
 	virtual ~cNewSpidercam_Z_PositionDlg();
 
 	int z_mm() const;
+
+	void setZ_mm(int z_mm);
 
 public slots:
 	void positionUpdated(spidercam::sPosition_1_t pos);

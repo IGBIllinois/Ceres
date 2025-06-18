@@ -63,5 +63,6 @@ private:
 	QLineEdit* mpTargetHarvestDay = nullptr;
 	QComboBox* mpTargetHarvestYear = nullptr;
 
-	QLineEdit* mpPermitInfo = nullptr;
+	QLineEdit* mpAuthorization = nullptr;
+	QLineEdit* mpPermit = nullptr;
 };

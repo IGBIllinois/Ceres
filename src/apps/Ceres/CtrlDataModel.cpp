@@ -218,7 +218,8 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
             mResearchers.clear();
             mSpecies.clear();
             mCultivar.clear();
-            mPermitInfo.clear();
+            mAuthorization.clear();
+            mPermit.clear();
             mTreatments.clear();
             mConstructName.clear();
             mEventNumbers.clear();
@@ -266,7 +267,16 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
 
             if (expDoc.contains("permit info"))
             {
-                mPermitInfo = expDoc["permit info"];
+                auto permit_info = expDoc["permit info"];
+                if (permit_info.is_string())
+                {
+                    mPermit = permit_info;
+                }
+                else if (permit_info.is_object())
+                {
+                    mAuthorization = permit_info["authorization"];
+                    mPermit = permit_info["permit"];
+                }
             }
 
             if (expDoc.contains("construct"))

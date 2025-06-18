@@ -20,7 +20,7 @@ cNewSpidercam_X_PositionDlg::cNewSpidercam_X_PositionDlg(int minX_mm, int maxX_m
 :
 	QDialog(parent)
 {
-	setWindowTitle("Shift Parameters");
+	setWindowTitle("New Position");
 
 	createControls(minX_mm, maxX_mm);
 	createLayout();
@@ -76,6 +76,11 @@ int cNewSpidercam_X_PositionDlg::x_mm() const
 	return mpX_mm->text().toInt();
 }
 
+void cNewSpidercam_X_PositionDlg::setX_mm(int x_mm)
+{
+	mpX_mm->setText(QString::number(x_mm));
+}
+
 void cNewSpidercam_X_PositionDlg::recordX()
 {
 	if (mSpidercamX_mm > 0)
@@ -96,7 +101,7 @@ cNewSpidercam_Y_PositionDlg::cNewSpidercam_Y_PositionDlg(int minY_mm, int maxY_m
 	:
 	QDialog(parent)
 {
-	setWindowTitle("Shift Parameters");
+	setWindowTitle("New Position");
 
 	createControls(minY_mm, maxY_mm);
 	createLayout();
@@ -152,6 +157,11 @@ int cNewSpidercam_Y_PositionDlg::y_mm() const
 	return mpY_mm->text().toInt();
 }
 
+void cNewSpidercam_Y_PositionDlg::setY_mm(int y_mm)
+{
+	mpY_mm->setText(QString::number(y_mm));
+}
+
 void cNewSpidercam_Y_PositionDlg::recordY()
 {
 	if (mSpidercamY_mm > 0)
@@ -172,7 +182,7 @@ cNewSpidercam_Z_PositionDlg::cNewSpidercam_Z_PositionDlg(int minZ_mm, int maxZ_m
 	:
 	QDialog(parent)
 {
-	setWindowTitle("Shift Parameters");
+	setWindowTitle("New Position");
 
 	createControls(minZ_mm, maxZ_mm);
 	createLayout();
@@ -226,6 +236,11 @@ void cNewSpidercam_Z_PositionDlg::createLayout()
 int cNewSpidercam_Z_PositionDlg::z_mm() const
 {
 	return mpZ_mm->text().toInt();
+}
+
+void cNewSpidercam_Z_PositionDlg::setZ_mm(int z_mm)
+{
+	mpZ_mm->setText(QString::number(z_mm));
 }
 
 void cNewSpidercam_Z_PositionDlg::recordZ()

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <filesystem>
 
 #include <QMainWindow>
@@ -64,6 +65,7 @@ public slots:
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString instance, QString msg);
 
+//    void onRunControllerAction(QString msg);
     void onExperimentTerminated();
     void onExperimentCompleted();
 
@@ -126,5 +128,7 @@ private:
 
     std::string mBatchFileName;
     std::vector<std::filesystem::path> mBatchProcess;
+
+    std::map<std::string, nlohmann::json> mControllerActions;
 };
 

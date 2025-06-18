@@ -123,6 +123,12 @@ message ExperimentPermitInfo_1
 	string permit = 1;
 }
 
+message ExperimentPermitInfo_2
+{
+	string authorization = 1;
+	string permit = 2;
+}
+
 
 /******************************************************************************
  * General Reply Packets   Remote Client -> Ceres

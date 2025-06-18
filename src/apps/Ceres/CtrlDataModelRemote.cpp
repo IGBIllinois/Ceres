@@ -450,8 +450,10 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nloh
         if (!mFieldDesign.empty())
             encodeFieldDesign(mFieldDesign);
 
-        if (!mPermitInfo.empty())
-            encodePermitInfo(mPermitInfo);
+        if (!mAuthorization.empty() && !mPermit.empty())
+            encodePermitInfo(mAuthorization, mPermit);
+        else if (!mPermit.empty())
+            encodePermitInfo(mPermit);
 
         if (mPlantingDate > 0)
             encodePlantingDate(mPlantingDate);

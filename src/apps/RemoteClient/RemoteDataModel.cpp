@@ -378,8 +378,10 @@ void cRemoteDataModel::onStartExperiment()
     if (!mCultivar.empty())
         mSerializer.writeCultivar(mCultivar);
 
-    if (!mPermitInfo.empty())
-        mSerializer.writePermitInfo(mPermitInfo);
+    if (!mAuthorization.empty() && !mPermit.empty())
+        mSerializer.writePermitInfo(mAuthorization, mPermit);
+    else if (!mPermit.empty())
+        mSerializer.writePermitInfo(mPermit);
 
     if (!mPrincipalInvestigator.empty())
         mSerializer.writePrincipalInvestigator(mPrincipalInvestigator);
@@ -734,11 +736,25 @@ void cRemoteDataModel::onComment(const std::string& comment)
 
 void cRemoteDataModel::onPermitInfo(const std::string& permit)
 {
-    mPermitInfo = permit;
+    mPermit = permit;
 
 #ifdef LOG_EXPERIMENT_INFO
     QString msg = "Permit Info: ";
-    msg += QString::fromStdString(mPermitInfo);
+    msg += QString::fromStdString(mPermit);
+    emit localLogMessage(logSTATUS, "Remote Client", msg);
+#endif
+}
+
+void cRemoteDataModel::onPermitInfo(const std::string& authorization, const std::string& permit)
+{
+    mAuthorization = authorization;
+    mPermit = permit;
+
+#ifdef LOG_EXPERIMENT_INFO
+    QString msg = "Permit Info: ";
+    msg += QString::fromStdString(mAuthorization);
+    msg += ", ";
+    msg += QString::fromStdString(mPermit);
     emit localLogMessage(logSTATUS, "Remote Client", msg);
 #endif
 }
@@ -1057,7 +1073,8 @@ void cRemoteDataModel::clearExperimentInfo()
     mResearchers.clear();
     mSpecies.clear();
     mCultivar.clear();
-    mPermitInfo.clear();
+    mAuthorization.clear();
+    mPermit.clear();
     mConstructName.clear();
     mEventNumbers.clear();
     mFieldDesign.clear();

@@ -730,6 +730,16 @@ void cMainWindow::onEditAddMeasurementToLayout()
 
 void cMainWindow::onEditMoveMeasurementX()
 {
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+    {
+        return;
+    }
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    auto current_x = child->x_mm();
+
     cNewSpidercam_X_PositionDlg dlg(mLimits.minX_mm, mLimits.maxX_mm);
 
     if (mpModel && mpModel->isConnected())
@@ -738,18 +748,17 @@ void cMainWindow::onEditMoveMeasurementX()
         connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cNewSpidercam_X_PositionDlg::positionUpdated);
     }
 
+    dlg.setX_mm((current_x.first + current_x.second)/2);
+
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
         return;
 
-    auto* childSubWindow = mpMdiArea->currentSubWindow();
-    if (!childSubWindow)
-        return;
-
-    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
-
     int x_mm = dlg.x_mm();
+
+    if (x_mm < mLimits.minX_mm) x_mm = mLimits.minX_mm;
+    if (x_mm > mLimits.maxX_mm) x_mm = mLimits.maxX_mm;
 
     child->set_X_Position(x_mm);
 
@@ -758,6 +767,16 @@ void cMainWindow::onEditMoveMeasurementX()
 
 void cMainWindow::onEditMoveMeasurementY()
 {
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+    {
+        return;
+    }
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    auto current_y = child->y_mm();
+
     cNewSpidercam_Y_PositionDlg dlg(mLimits.minY_mm, mLimits.maxY_mm);
 
     if (mpModel && mpModel->isConnected())
@@ -766,16 +785,12 @@ void cMainWindow::onEditMoveMeasurementY()
         connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cNewSpidercam_Y_PositionDlg::positionUpdated);
     }
 
+    dlg.setY_mm((current_y.first + current_y.second) / 2);
+
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
         return;
-
-    auto* childSubWindow = mpMdiArea->currentSubWindow();
-    if (!childSubWindow)
-        return;
-
-    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
 
     int y_mm = dlg.y_mm();
 

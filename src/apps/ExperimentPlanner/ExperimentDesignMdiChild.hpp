@@ -38,6 +38,10 @@ public:
     void editCtrlInfo();
     void editSensorInfo();
 
+    std::pair<int, int> x_mm() const;
+    std::pair<int, int> y_mm() const;
+    std::pair<int, int> z_mm() const;
+
     void set_X_Position(int x_mm);
     void set_Y_Position(int y_mm);
     void set_Z_Position(int z_mm);

@@ -63,6 +63,7 @@ protected:
     virtual void onComment(const std::string& comment) = 0;
 
     virtual void onPermitInfo(const std::string& permit) = 0;
+    virtual void onPermitInfo(const std::string& authorization, const std::string& permit) = 0;
 
     virtual void onEndOfExperimentInfo() = 0;
 

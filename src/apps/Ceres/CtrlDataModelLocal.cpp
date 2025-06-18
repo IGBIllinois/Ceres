@@ -178,7 +178,8 @@ void cCtrlDataModelLocal::closeDataFile()
     mResearchers.clear();
     mSpecies.clear();
     mCultivar.clear();
-    mPermitInfo.clear();
+    mAuthorization.clear();
+    mPermit.clear();
     mExperimentDoc.clear();
     mTreatments.clear();
     mConstructName.clear();
@@ -255,8 +256,10 @@ void cCtrlDataModelLocal::startExperiment()
         if (!mCultivar.empty())
             mSerializer.writeCultivar(mCultivar);
 
-        if (!mPermitInfo.empty())
-            mSerializer.writePermitInfo(mPermitInfo);
+        if (!mAuthorization.empty() && !mPermit.empty())
+            mSerializer.writePermitInfo(mAuthorization, mPermit);
+        else if (!mPermit.empty())
+            mSerializer.writePermitInfo(mPermit);
 
         if (!mConstructName.empty())
             mSerializer.writeConstructName(mConstructName);

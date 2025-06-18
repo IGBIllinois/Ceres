@@ -245,6 +245,79 @@ void cExperimentDesignMdiChild::editSensorInfo()
 }
 
 
+std::pair<int, int> cExperimentDesignMdiChild::x_mm() const
+{
+    int start_x = -1;
+    int end_x = -1;
+
+    for (auto& step : mMeasurementFile)
+    {
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getX_mm().has_value())
+            {
+                if (start_x == -1)
+                    start_x = movement->getX_mm().value();
+                else
+                    end_x = movement->getX_mm().value();
+            }
+        }
+    }
+
+    return { start_x, end_x };
+}
+
+std::pair<int, int> cExperimentDesignMdiChild::y_mm() const
+{
+    int start_y = -1;
+    int end_y = -1;
+
+    for (auto& step : mMeasurementFile)
+    {
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getY_mm().has_value())
+            {
+                if (start_y == -1)
+                    start_y = movement->getY_mm().value();
+                else
+                    end_y = movement->getY_mm().value();
+            }
+        }
+    }
+
+    return { start_y, end_y };
+}
+
+std::pair<int, int> cExperimentDesignMdiChild::z_mm() const
+{
+    int start_z = -1;
+    int end_z = -1;
+
+    for (auto& step : mMeasurementFile)
+    {
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getZ_mm().has_value())
+            {
+                if (start_z == -1)
+                    start_z = movement->getZ_mm().value();
+                else
+                    end_z = movement->getZ_mm().value();
+            }
+        }
+    }
+
+    return { start_z, end_z };
+}
+
+
 void cExperimentDesignMdiChild::set_X_Position(int x_mm)
 {
     if ((x_mm < 10000) || (x_mm > 190000))

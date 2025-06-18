@@ -54,6 +54,7 @@ public:
     void encodeTreatments(const std::vector<std::string>& treatments);
     void encodeComments(const std::vector<std::string>& comments);
     void encodePermitInfo(const std::string& permit);
+    void encodePermitInfo(const std::string& authorization, const std::string& permit);
 
     void encodeEndOfExperimentInfo();
 
@@ -90,6 +91,7 @@ public:
     void sendTreatment(const std::string& treatment);
     void sendComment(const std::string& comment);
     void sendPermitInfo(const std::string& permit);
+    void sendPermitInfo(const std::string& authorization, const std::string& permit);
 
     void sendEndOfExperimentInfo();
 

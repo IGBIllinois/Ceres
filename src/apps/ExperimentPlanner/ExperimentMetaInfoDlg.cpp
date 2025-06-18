@@ -153,8 +153,8 @@ void cExperimentMetaInfoDlg::createControls()
 	}
 
 	mpPlantingYear = new QComboBox(this);
-	mpPlantingYear->addItem("2024");
 	mpPlantingYear->addItem("2025");
+	mpPlantingYear->addItem("2026");
 
 
 	mpTargetHarvestDay = new QLineEdit(this);
@@ -177,12 +177,16 @@ void cExperimentMetaInfoDlg::createControls()
 	}
 
 	mpTargetHarvestYear = new QComboBox(this);
-	mpTargetHarvestYear->addItem("2024");
 	mpTargetHarvestYear->addItem("2025");
+	mpTargetHarvestYear->addItem("2026");
 
-	mpPermitInfo = new QLineEdit(this);
+	mpAuthorization = new QLineEdit(this);
+	if (!mInfo.getAuthorization().empty())
+		mpAuthorization->setText(QString::fromStdString(mInfo.getAuthorization()));
+
+	mpPermit = new QLineEdit(this);
 	if (!mInfo.getPermitInfo().empty())
-		mpPermitInfo->setText(QString::fromStdString(mInfo.getPermitInfo()));
+		mpPermit->setText(QString::fromStdString(mInfo.getPermitInfo()));
 }
 
 void cExperimentMetaInfoDlg::createLayout()
@@ -293,9 +297,13 @@ void cExperimentMetaInfoDlg::createLayout()
 
 	pGridLayout->addLayout(pDateLayout, 7, 1);
 
-	pText = new QLabel("Permit Info");
+	pText = new QLabel("Authorization");
 	pGridLayout->addWidget(pText, 8, 0);
-	pGridLayout->addWidget(mpPermitInfo, 8, 1);
+	pGridLayout->addWidget(mpAuthorization, 8, 1);
+
+	pText = new QLabel("Permit");
+	pGridLayout->addWidget(pText, 9, 0);
+	pGridLayout->addWidget(mpPermit, 9, 1);
 
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);
@@ -418,8 +426,14 @@ void cExperimentMetaInfoDlg::apply()
 	str = mpTargetHarvestYear->currentText().toStdString();
 	mInfo.setTargetHarvestYear(str);
 
-	str = mpPermitInfo->text().toStdString();
-	mInfo.setPermitInfo(str);
+	auto auth = mpAuthorization->text().toStdString();
+
+	str = mpPermit->text().toStdString();
+
+	if (auth.empty())
+		mInfo.setPermitInfo(str);
+	else
+		mInfo.setPermitInfo(auth, str);
 }
 
 

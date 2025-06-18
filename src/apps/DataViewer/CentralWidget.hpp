@@ -72,6 +72,7 @@ private:
     
     void onExperimentDoc(const std::string& doc) override;
     void onPermitInfo(const std::string& permit) override;
+    void onPermitInfo(const std::string& authorization, const std::string& permit) override;
 
     void onBeginTreatmentList() override;
     void onEndOfTreatmentList() override;

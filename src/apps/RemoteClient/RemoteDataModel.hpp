@@ -134,6 +134,7 @@ private slots:
     void onComment(const std::string& comment) override;
 
     void onPermitInfo(const std::string& permit) override;
+    void onPermitInfo(const std::string& authorization, const std::string& permit) override;
 
     void onEndOfExperimentInfo() override;
 
@@ -190,7 +191,8 @@ private:
     std::vector<std::string> mResearchers;
     std::string  mSpecies;
     std::string  mCultivar;
-    std::string  mPermitInfo;
+    std::string  mAuthorization;
+    std::string  mPermit;
     std::string  mConstructName;
     std::vector<std::string> mEventNumbers;
     std::string  mFieldDesign;
