@@ -100,11 +100,13 @@ const std::string& cExperimentFile::getLayoutName() const
 	return mLayoutName;
 }
 
+/*
 void cExperimentFile::setLayoutName(const std::string& name)
 {
 	mDirty = mLayoutName != name;
 	mLayoutName = name;
 }
+*/
 
 bool cExperimentFile::isDirty() const
 {

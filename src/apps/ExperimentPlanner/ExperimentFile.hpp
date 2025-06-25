@@ -49,7 +49,7 @@ public:
 	void setExperimentType(eExperimentType type);
 
 	const std::string& getLayoutName() const;
-	void setLayoutName(const std::string& name);
+//	void setLayoutName(const std::string& name);
 
 	bool isDirty() const;
 

@@ -44,17 +44,28 @@ bool cExperimentSensorInfo::isDirty() const
 	return mDirty;
 }
 
+QString cExperimentSensorInfo::getName() const
+{
+	return QString::fromStdString(mName);
+}
+
+void cExperimentSensorInfo::setName(const std::string& name)
+{
+	mDirty |= mName != name;
+	mName = name;
+}
 
 
 cExperimentSensorInfo_Dummy::cExperimentSensorInfo_Dummy()
-{}
+{
+	mName = "Dummy";
+}
 
 cExperimentSensorInfo_Dummy::~cExperimentSensorInfo_Dummy()
 {}
 
 const char* cExperimentSensorInfo_Dummy::type() { return dummy_class_id; }
 std::string cExperimentSensorInfo_Dummy::getType() const { return type(); }
-QString		cExperimentSensorInfo_Dummy::getName() const { return "Dummy"; }
 
 class cSensorWidget_Dummy : public cSensorWidget
 {
@@ -88,6 +99,7 @@ void cExperimentSensorInfo_Dummy::save(nlohmann::json& jdoc)
 
 cExperimentSensorInfo_Ouster::cExperimentSensorInfo_Ouster()
 {
+	mName = "OS-0-128";
 	mManufacturer = "OUSTER";
 	mModel = "OS0-128";
 	mSerialNumber = "992037000167";
@@ -110,8 +122,6 @@ void cExperimentSensorInfo_Ouster::setMode(const std::string& mode)
 	mMode = mode;
 }
 
-QString		cExperimentSensorInfo_Ouster::getName() const { return QString::fromStdString(mModel); }
-
 class cSensorWidget_Ouster : public cSensorWidget
 {
 public:
@@ -132,25 +142,30 @@ public:
 
 		QGridLayout* pGridLayout = new QGridLayout();
 
-		pText = new QLabel("Manufacturer");
+		pText = new QLabel("Name");
 		pGridLayout->addWidget(pText, 0, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
-		pGridLayout->addWidget(pText, 0, 1);
+		mpName = new QLineEdit(mpParent->getName());
+		pGridLayout->addWidget(mpName, 0, 1);
 
-		pText = new QLabel("Model");
+		pText = new QLabel("Manufacturer");
 		pGridLayout->addWidget(pText, 1, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
+		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
 		pGridLayout->addWidget(pText, 1, 1);
 
-		pText = new QLabel("Serial Number");
+		pText = new QLabel("Model");
 		pGridLayout->addWidget(pText, 2, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
 		pGridLayout->addWidget(pText, 2, 1);
 
-		pText = new QLabel("Lidar Mode:");
-		pGridLayout->addWidget(pText, 4, 0);
+		pText = new QLabel("Serial Number");
+		pGridLayout->addWidget(pText, 3, 0);
 		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
-		pGridLayout->addWidget(mpLidarModes, 4, 1);
+		pGridLayout->addWidget(pText, 3, 1);
+
+		pText = new QLabel("Lidar Mode:");
+		pGridLayout->addWidget(pText, 5, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pGridLayout->addWidget(mpLidarModes, 5, 1);
 
 		pMainLayout->addLayout(pGridLayout, 0);
 
@@ -159,18 +174,23 @@ public:
 
 	void accept() override
 	{
+		std::string name = mpName->text().toStdString();
+		mpParent->setName(name);
+			
 		std::string mode = mpLidarModes->currentText().toStdString();
 		mpParent->setMode(mode);
 	}
 
 	void reset() override
 	{
+		mpName->setText(mpParent->getName());
 		mpLidarModes->setCurrentText(QString::fromStdString(mpParent->getMode()));
 	}
 
 private:
 	cExperimentSensorInfo_Ouster* const mpParent;
 
+	QLineEdit* mpName = nullptr;
 	QComboBox* mpLidarModes = nullptr;
 
 };
@@ -183,11 +203,15 @@ cSensorWidget* cExperimentSensorInfo_Ouster::widget()
 void cExperimentSensorInfo_Ouster::load(const nlohmann::json& jdoc)
 {
 	mMode = jdoc["mode"];
+
+	if (jdoc.contains("Name"))
+		mName = jdoc["Name"];
 }
 
 void cExperimentSensorInfo_Ouster::save(nlohmann::json& jdoc)
 {
 	nlohmann::json ouster;
+	ouster["Name"] = mName;
 	ouster["Manufacturer"] = mManufacturer;
 	ouster["Model"] = mModel;
 	ouster["Serial Number"] = mSerialNumber;
@@ -208,6 +232,7 @@ void cExperimentSensorInfo_Ouster::save(nlohmann::json& jdoc)
 
 cExperimentSensorInfo_Septentrio::cExperimentSensorInfo_Septentrio()
 {
+	mName = "Altus-NR3";
 	mManufacturer = "Septentrio";
 	mModel = "Altus-NR3";
 	mSerialNumber = "6106326";
@@ -222,8 +247,6 @@ const std::string& cExperimentSensorInfo_Septentrio::getManufacturer() const { r
 const std::string& cExperimentSensorInfo_Septentrio::getModel() const { return mModel; }
 const std::string& cExperimentSensorInfo_Septentrio::getSerialNumber() const { return mSerialNumber; }
 
-QString		cExperimentSensorInfo_Septentrio::getName() const { return QString::fromStdString(mModel); }
-
 class cSensorWidget_Septentrio : public cSensorWidget
 {
 public:
@@ -235,30 +258,45 @@ public:
 
 		QGridLayout* pGridLayout = new QGridLayout();
 
-		pText = new QLabel("Manufacturer");
+		pText = new QLabel("Name");
 		pGridLayout->addWidget(pText, 0, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
-		pGridLayout->addWidget(pText, 0, 1);
+		mpName = new QLineEdit(mpParent->getName());
+		pGridLayout->addWidget(mpName, 0, 1);
 
-		pText = new QLabel("Model");
+		pText = new QLabel("Manufacturer");
 		pGridLayout->addWidget(pText, 1, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
+		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
 		pGridLayout->addWidget(pText, 1, 1);
 
-		pText = new QLabel("Serial Number");
+		pText = new QLabel("Model");
 		pGridLayout->addWidget(pText, 2, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
 		pGridLayout->addWidget(pText, 2, 1);
+
+		pText = new QLabel("Serial Number");
+		pGridLayout->addWidget(pText, 3, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pGridLayout->addWidget(pText, 3, 1);
 
 		pMainLayout->addLayout(pGridLayout, 0);
 
 		setLayout(pMainLayout);
 	}
 
-	void accept() override {}
-	void reset() override {}
+	void accept() override
+	{
+		std::string name = mpName->text().toStdString();
+		mpParent->setName(name);
+	}
+
+	void reset() override 
+	{
+		mpName->setText(mpParent->getName());
+	}
 
 private:
+	QLineEdit* mpName = nullptr;
+
 	cExperimentSensorInfo_Septentrio* const mpParent;
 };
 
@@ -268,11 +306,15 @@ cSensorWidget* cExperimentSensorInfo_Septentrio::widget()
 }
 
 void cExperimentSensorInfo_Septentrio::load(const nlohmann::json& jdoc)
-{}
+{
+	if (jdoc.contains("Name"))
+		mName = jdoc["Name"];
+}
 
 void cExperimentSensorInfo_Septentrio::save(nlohmann::json& jdoc)
 {
 	nlohmann::json ssnx;
+	ssnx["Name"] = mName;
 	ssnx["Manufacturer"] = mManufacturer;
 	ssnx["Model"] = mModel;
 	ssnx["Serial Number"] = mSerialNumber;
@@ -286,6 +328,7 @@ void cExperimentSensorInfo_Septentrio::save(nlohmann::json& jdoc)
 
 cExperimentSensorInfo_AxisCommunications::cExperimentSensorInfo_AxisCommunications()
 {
+	mName = "Axis F44 Webcam";
 	mManufacturer = "Axis Communications";
 	mModel = "AXIS F44 DUAL AUDO INPUT";
 	mSerialNumber = "B8A44F1E88FB";
@@ -324,7 +367,6 @@ void cExperimentSensorInfo_AxisCommunications::setFrameRate_fps(int fps)
 	mFrameRate_fps = fps;
 }
 
-QString		cExperimentSensorInfo_AxisCommunications::getName() const { return "Axis F44 Webcam"; }
 
 class cSensorWidget_AxisCommunications : public cSensorWidget
 {
@@ -353,40 +395,46 @@ public:
 		mpFrameRate_fps->setText(QString::number(mpParent->getFrameRate_fps()));
 
 		QLabel* pText = nullptr;
+		QLineEdit* pEdit = nullptr;
 
 		QVBoxLayout* pMainLayout = new QVBoxLayout();
 
 		QGridLayout* pGridLayout = new QGridLayout();
 
-		pText = new QLabel("Manufacturer");
+		pText = new QLabel("Name");
 		pGridLayout->addWidget(pText, 0, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
-		pGridLayout->addWidget(pText, 0, 1);
+		mpName = new QLineEdit(mpParent->getName());
+		pGridLayout->addWidget(mpName, 0, 1);
 
-		pText = new QLabel("Model");
+		pText = new QLabel("Manufacturer");
 		pGridLayout->addWidget(pText, 1, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
+		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
 		pGridLayout->addWidget(pText, 1, 1);
 
-		pText = new QLabel("Serial Number");
+		pText = new QLabel("Model");
 		pGridLayout->addWidget(pText, 2, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
 		pGridLayout->addWidget(pText, 2, 1);
 
-		pText = new QLabel("Camera ID:");
-		pGridLayout->addWidget(pText, 4, 0);
+		pText = new QLabel("Serial Number");
+		pGridLayout->addWidget(pText, 3, 0);
 		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
-		pGridLayout->addWidget(mpCameraId, 4, 1);
+		pGridLayout->addWidget(pText, 3, 1);
 
-		pText = new QLabel("Image Size (w x h):");
+		pText = new QLabel("Camera ID:");
 		pGridLayout->addWidget(pText, 5, 0);
 		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
-		pGridLayout->addWidget(mpImageSizes, 5, 1);
+		pGridLayout->addWidget(mpCameraId, 5, 1);
 
-		pText = new QLabel("Frames per Second:");
+		pText = new QLabel("Image Size (w x h):");
 		pGridLayout->addWidget(pText, 6, 0);
 		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
-		pGridLayout->addWidget(mpFrameRate_fps, 6, 1);
+		pGridLayout->addWidget(mpImageSizes, 6, 1);
+
+		pText = new QLabel("Frames per Second:");
+		pGridLayout->addWidget(pText, 7, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pGridLayout->addWidget(mpFrameRate_fps, 7, 1);
 
 		pMainLayout->addLayout(pGridLayout, 0);
 
@@ -395,6 +443,9 @@ public:
 
 	void accept() override
 	{
+		std::string name = mpName->text().toStdString();
+		mpParent->setName(name);
+
 		mpParent->setCameraId(mpCameraId->text().toInt());
 
 		auto resolution = mpImageSizes->currentText().split('x');
@@ -411,6 +462,8 @@ public:
 
 	void reset() override 
 	{
+		mpName->setText(mpParent->getName());
+
 		mpCameraId->setText(QString::number(mpParent->getCameraId()));
 
 		QString resolution = QString::number(mpParent->getImageWidth());
@@ -424,6 +477,7 @@ public:
 private:
 	cExperimentSensorInfo_AxisCommunications* const mpParent;
 
+	QLineEdit* mpName = nullptr;
 	QLineEdit* mpCameraId = nullptr;
 	QComboBox* mpImageSizes = nullptr;
 	QLineEdit* mpFrameRate_fps = nullptr;
@@ -436,6 +490,9 @@ cSensorWidget* cExperimentSensorInfo_AxisCommunications::widget()
 
 void cExperimentSensorInfo_AxisCommunications::load(const nlohmann::json& jdoc)
 {
+	if (jdoc.contains("Name"))
+		mName = jdoc["Name"];
+
 	if (jdoc.contains("camera id"))
 		mCameraId = jdoc["camera id"];
 
@@ -460,6 +517,7 @@ void cExperimentSensorInfo_AxisCommunications::save(nlohmann::json& jdoc)
 {
 	nlohmann::json axis;
 
+	axis["Name"] = mName;
 	axis["Manufacturer"] = mManufacturer;
 	axis["Model"] = mModel;
 	axis["Serial Number"] = mSerialNumber;
@@ -482,6 +540,7 @@ void cExperimentSensorInfo_AxisCommunications::save(nlohmann::json& jdoc)
 
 cExperimentSensorInfo_VNIR3000N::cExperimentSensorInfo_VNIR3000N()
 {
+	mName = "VNIR-3000N";
 	mManufacturer = "HySpex";
 	mModel = "VNIR-3000N";
 	mSerialNumber = "202184";
@@ -496,8 +555,6 @@ const std::string& cExperimentSensorInfo_VNIR3000N::getManufacturer() const { re
 const std::string& cExperimentSensorInfo_VNIR3000N::getModel() const { return mModel; }
 const std::string& cExperimentSensorInfo_VNIR3000N::getSerialNumber() const { return mSerialNumber; }
 
-QString		cExperimentSensorInfo_VNIR3000N::getName() const { return QString::fromStdString(mModel); }
-
 class cSensorWidget_VNIR3000N : public cSensorWidget
 {
 public:
@@ -509,30 +566,45 @@ public:
 
 		QGridLayout* pGridLayout = new QGridLayout();
 
-		pText = new QLabel("Manufacturer");
+		pText = new QLabel("Name");
 		pGridLayout->addWidget(pText, 0, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
-		pGridLayout->addWidget(pText, 0, 1);
+		mpName = new QLineEdit(mpParent->getName());
+		pGridLayout->addWidget(mpName, 0, 1);
 
-		pText = new QLabel("Model");
+		pText = new QLabel("Manufacturer");
 		pGridLayout->addWidget(pText, 1, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
+		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
 		pGridLayout->addWidget(pText, 1, 1);
 
-		pText = new QLabel("Serial Number");
+		pText = new QLabel("Model");
 		pGridLayout->addWidget(pText, 2, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
 		pGridLayout->addWidget(pText, 2, 1);
+
+		pText = new QLabel("Serial Number");
+		pGridLayout->addWidget(pText, 3, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pGridLayout->addWidget(pText, 3, 1);
 
 		pMainLayout->addLayout(pGridLayout, 0);
 
 		setLayout(pMainLayout);
 	}
 
-	void accept() override {}
-	void reset() override {}
+	void accept() override
+	{
+		std::string name = mpName->text().toStdString();
+		mpParent->setName(name);
+	}
+	
+	void reset() override
+	{
+		mpName->setText(mpParent->getName());
+	}
 
 private:
+	QLineEdit* mpName = nullptr;
+
 	cExperimentSensorInfo_VNIR3000N* const mpParent;
 };
 
@@ -542,11 +614,15 @@ cSensorWidget* cExperimentSensorInfo_VNIR3000N::widget()
 }
 
 void cExperimentSensorInfo_VNIR3000N::load(const nlohmann::json& jdoc)
-{}
+{
+	if (jdoc.contains("Name"))
+		mName = jdoc["Name"];
+}
 
 void cExperimentSensorInfo_VNIR3000N::save(nlohmann::json& jdoc)
 {
 	nlohmann::json vnir;
+	vnir["Name"] = mName;
 	vnir["Manufacturer"] = mManufacturer;
 	vnir["Model"] = mModel;
 	vnir["Serial Number"] = mSerialNumber;
@@ -560,6 +636,7 @@ void cExperimentSensorInfo_VNIR3000N::save(nlohmann::json& jdoc)
 
 cExperimentSensorInfo_SWIR384::cExperimentSensorInfo_SWIR384()
 {
+	mName = "SWIR-384";
 	mManufacturer = "HySpex";
 	mModel = "SWIR-384";
 	mSerialNumber = "200918";
@@ -574,8 +651,6 @@ const std::string& cExperimentSensorInfo_SWIR384::getManufacturer() const { retu
 const std::string& cExperimentSensorInfo_SWIR384::getModel() const { return mModel; }
 const std::string& cExperimentSensorInfo_SWIR384::getSerialNumber() const { return mSerialNumber; }
 
-QString	cExperimentSensorInfo_SWIR384::getName() const { return QString::fromStdString(mModel); }
-
 class cSensorWidget_SWIR384 : public cSensorWidget
 {
 public:
@@ -587,30 +662,45 @@ public:
 
 		QGridLayout* pGridLayout = new QGridLayout();
 
-		pText = new QLabel("Manufacturer");
+		pText = new QLabel("Name");
 		pGridLayout->addWidget(pText, 0, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
-		pGridLayout->addWidget(pText, 0, 1);
+		mpName = new QLineEdit(mpParent->getName());
+		pGridLayout->addWidget(mpName, 0, 1);
 
-		pText = new QLabel("Model");
+		pText = new QLabel("Manufacturer");
 		pGridLayout->addWidget(pText, 1, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
+		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
 		pGridLayout->addWidget(pText, 1, 1);
 
-		pText = new QLabel("Serial Number");
+		pText = new QLabel("Model");
 		pGridLayout->addWidget(pText, 2, 0);
-		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
 		pGridLayout->addWidget(pText, 2, 1);
+
+		pText = new QLabel("Serial Number");
+		pGridLayout->addWidget(pText, 3, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pGridLayout->addWidget(pText, 3, 1);
 
 		pMainLayout->addLayout(pGridLayout, 0);
 
 		setLayout(pMainLayout);
 	}
 
-	void accept() override {}
-	void reset() override {}
+	void accept() override
+	{
+		std::string name = mpName->text().toStdString();
+		mpParent->setName(name);
+	}
+
+	void reset() override 
+	{
+		mpName->setText(mpParent->getName());
+	}
 
 private:
+	QLineEdit* mpName = nullptr;
+
 	cExperimentSensorInfo_SWIR384* const mpParent;
 };
 
@@ -620,11 +710,15 @@ cSensorWidget* cExperimentSensorInfo_SWIR384::widget()
 }
 
 void cExperimentSensorInfo_SWIR384::load(const nlohmann::json& jdoc)
-{}
+{
+	if (jdoc.contains("Name"))
+		mName = jdoc["Name"];
+}
 
 void cExperimentSensorInfo_SWIR384::save(nlohmann::json& jdoc)
 {
 	nlohmann::json swir;
+	swir["Name"] = mName;
 	swir["Manufacturer"] = mManufacturer;
 	swir["Model"] = mModel;
 	swir["Serial Number"] = mSerialNumber;

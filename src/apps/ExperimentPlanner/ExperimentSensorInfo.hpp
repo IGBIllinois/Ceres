@@ -35,8 +35,10 @@ public:
 
 	virtual std::string getType() const = 0;
 
-	virtual QString getName() const = 0;
+	QString getName() const;
 	virtual cSensorWidget* widget() = 0;
+
+	void setName(const std::string& name);
 
 protected:
 	virtual void load(const nlohmann::json& jdoc) = 0;
@@ -44,6 +46,7 @@ protected:
 
 protected:
 	bool mDirty = false;
+	std::string mName;
 
 	friend class cExperimentFile;
 };
@@ -59,7 +62,6 @@ public:
 
 	std::string getType() const override;
 
-	QString getName() const override;
 	cSensorWidget* widget() override;
 
 protected:
@@ -85,7 +87,6 @@ public:
 	const std::string& getMode() const;
 	void setMode(const std::string& mode);
 
-	QString getName() const override;
 	cSensorWidget* widget() override;
 
 protected:
@@ -99,6 +100,7 @@ private:
 	std::string mMode;
 
 	/*
+	"Sensor Name": "OS-0-128",
 	"Manufacturer": "OUSTER",
 	"Model" : "OS0-128",
 	"Serial Number" : "992037000167",
@@ -122,7 +124,6 @@ public:
 	const std::string& getModel() const;
 	const std::string& getSerialNumber() const;
 
-	QString getName() const override;
 	cSensorWidget* widget() override;
 
 protected:
@@ -159,7 +160,6 @@ public:
 	void setImageSize(int width, int height);
 	void setFrameRate_fps(int fps);
 
-	QString getName() const override;
 	cSensorWidget* widget() override;
 
 protected:
@@ -191,7 +191,6 @@ public:
 	const std::string& getModel() const;
 	const std::string& getSerialNumber() const;
 
-	QString getName() const override;
 	cSensorWidget* widget() override;
 
 protected:
@@ -219,7 +218,6 @@ public:
 	const std::string& getModel() const;
 	const std::string& getSerialNumber() const;
 
-	QString getName() const override;
 	cSensorWidget* widget() override;
 
 protected:

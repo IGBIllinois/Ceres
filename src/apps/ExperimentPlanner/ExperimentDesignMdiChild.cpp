@@ -197,7 +197,7 @@ const std::string& cExperimentDesignMdiChild::getLayoutName() const
 
 void cExperimentDesignMdiChild::setLayoutName(const std::string& name)
 {
-    mMeasurementFile.setLayoutName(name);
+//    mMeasurementFile.setLayoutName(name);
 }
 
 void cExperimentDesignMdiChild::editMetaInfo()
