@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "SensorDefs.hpp"
+
 #include <QObject>
 
 #include <nlohmann/json.hpp>
@@ -9,16 +11,6 @@
 
 // Forward Declarations
 class cBlockDataFileWriter;
-
-namespace sensor
-{
-    enum class eStatus 
-    { UNKNOWN, CONFIGURED, INITIALIZED, CONNECTING, CONNECTED, WARM_UP, 
-        RUNNING, STOPPED, FAILED, REINITIALIZING, BUSY, WAITING, PENDING };
-
-    std::string to_string(eStatus status);
-    eStatus to_sensor_status(const std::string& str);
-}
 
 Q_DECLARE_METATYPE(sensor::eStatus)
 

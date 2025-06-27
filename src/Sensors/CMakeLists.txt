@@ -42,6 +42,12 @@ PRIVATE
     SensorController.cpp
 
 #
+# Base definitions for all Sensor Models
+#
+    SensorDefs.hpp
+    SensorDefs.cpp
+
+#
 # Abstract Base Class for all Sensor Models
 #
     SensorModel.hpp
