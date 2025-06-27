@@ -71,6 +71,7 @@ private:
     void onResearcher(const std::string& researcher) override;
     
     void onExperimentDoc(const std::string& doc) override;
+    void onTrialInfo(const std::string& trial) override;
     void onPermitInfo(const std::string& permit) override;
     void onPermitInfo(const std::string& authorization, const std::string& permit) override;
 
