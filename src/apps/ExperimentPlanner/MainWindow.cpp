@@ -37,6 +37,8 @@
 #include "ExperimentCtrlModel.hpp"
 #include "Spidercam/SpidercamModel.hpp"
 
+#include "ComputeSpidercamHeightDlg.hpp"
+
 #include "ExperimentFieldLayoutDlg.hpp"
 
 #include "RappFieldBoundary.hpp"
@@ -290,6 +292,7 @@ void cMainWindow::createMainMenu()
     mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
     mpEditMenu = mpUI->menuBar->addMenu(tr("&Edit"));
     mpGenerateMenu = mpUI->menuBar->addMenu(tr("&Generate"));
+    mpComputeMenu = mpUI->menuBar->addMenu(tr("&Compute"));
     mpPreferencesMenu = mpUI->menuBar->addMenu(tr("&Preferences"));
     mpSpidercamMenu = mpUI->menuBar->addMenu(tr("&Spidercam"));
     mpViewMenu = mpUI->menuBar->addMenu(tr("&View"));
@@ -450,6 +453,14 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem->setStatusTip(tr("Creates hyperspectral measurement file(s) from GPS plot point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
+
+    //
+    // Build the Compute Sub Menu
+    //
+    pMenuItem = new QAction(tr("Compute SpiderCam Height"), this);
+    pMenuItem->setStatusTip(tr("Compute the Spidercam heigth from single SpiderCam point and desired height above canopy"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onComputeSpidercamHeight);
+    mpComputeMenu->addAction(pMenuItem);
 
     //
     // Build the Preference Sub Menu
@@ -1168,6 +1179,17 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
 }
 
 /********************************************************************
+ * Slots associated with "Compute" menu actions
+ *******************************************************************/
+
+void cMainWindow::onComputeSpidercamHeight()
+{
+    cComputeSpidercamHeightDlg dlg(mGroundData, this);
+
+    dlg.exec();
+}
+
+/********************************************************************
  * Slots associated with "Preference" menu actions
  *******************************************************************/
 
@@ -1802,12 +1824,12 @@ void cMainWindow::LoadGpsData(QString fileName)
         rapp_points.emplace_back(x_mm , y_mm , z_mm);
     }
 
-    mData.addGroundPoints(rapp_points);
+    mGroundData.addGroundPoints(rapp_points);
 
-    auto data = mData.getGroundPoints();
+    auto data = mGroundData.getGroundPoints();
     auto mesh = computeGroundMesh(data);
 
-    mData.clearGroundMesh();
-    mData.addMeshData(mesh);
+    mGroundData.clearGroundMesh();
+    mGroundData.addMeshData(mesh);
 }
 

@@ -143,6 +143,9 @@ PRIVATE
     MeasurementTreeItem.hpp
     MeasurementTreeItem.cpp
 
+    ComputeSpidercamHeightDlg.hpp
+    ComputeSpidercamHeightDlg.cpp
+
 	FieldUtils.hpp
 	FieldUtils.cpp
 

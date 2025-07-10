@@ -70,10 +70,10 @@ cCreateHyperspectralExperimentFromSpiderCamDlg::~cCreateHyperspectralExperimentF
 void cCreateHyperspectralExperimentFromSpiderCamDlg::createControls_PointSelection()
 {
 	mpStartX_mm = new QLineEdit(this);
-	mpStartX_mm->setValidator(new QIntValidator(10000, 190000));
+	mpStartX_mm->setValidator(new QIntValidator(rfb::minMeasurementX_mm(), rfb::maxMeasurementX_mm()));
 
 	mpStartY_mm = new QLineEdit(this);
-	mpStartY_mm->setValidator(new QIntValidator(10000, 190000));
+	mpStartY_mm->setValidator(new QIntValidator(rfb::minMeasurementY_mm(), rfb::maxMeasurementY_mm()));
 
 	mpSampleXY = new QPushButton("Record X, Y", this);
 	mpSampleXY->setEnabled(false);
@@ -262,7 +262,7 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 	std::string title = mpTitle->text().toStdString();
 	if (title.empty())
 	{
-		QString msg = "The \"Experiment Title\" can not be blank.";
+		QString msg = "The \"Measurement Title\" can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
@@ -513,7 +513,7 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 		if (hasNumber)
 			nStringUtils::replaceIntAtEnd(title, startNum++);
 
-		pInfo->setExperimentName(title);
+		pInfo->setMeasurementName(title);
 		pInfo->setExperimentType(cExperimentFile::eExperimentType::HYPERSPECTRAL);
 		pInfo->setMetaData(mMetaInfo);
 		pInfo->setController(copy(mCtrlInfo));

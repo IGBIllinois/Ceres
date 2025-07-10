@@ -537,14 +537,14 @@ void cCreateHyperspectralExperimentDlg::onMetaInfoUpdate()
 {
 	cExperimentMetaInfoDlg dlg(mMetaInfo, this);
 
-	dlg.setExperimentTitle(mpTitle->text().toStdString());
+	dlg.setMeasurementTitle(mpTitle->text().toStdString());
 
 	auto result = dlg.exec();
 
 	if (result == QDialog::Rejected)
 		return;
 
-	mpTitle->setText(QString::fromStdString(dlg.getExperimentTitle()));
+	mpTitle->setText(QString::fromStdString(dlg.getMeasurementTitle()));
 }
 
 void cCreateHyperspectralExperimentDlg::onControllerUpdate()

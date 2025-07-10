@@ -108,6 +108,10 @@ private slots:
     void onGenerateHyperspectralScan_GPS();
     void onGenerateHyperspectralScan_PlotInfo();
 
+    // Slots associated with "Compute" menu actions
+private slots:
+    void onComputeSpidercamHeight();
+
 // Slots associated with "Preference" menu actions
 private slots:
     void onPreferenceDefaultMeasurementDirectory();
@@ -156,7 +160,7 @@ private:
     void LoadGpsData(QString fileName);
 
 private:
-    cRappGroundModel mData;
+    cRappGroundModel mGroundData;
     spidercam::sWorkingDimensions mLimits;
 
     QSettings mSettings;
@@ -173,6 +177,7 @@ private:
     QMenu* mpFileMenu = nullptr;
     QMenu* mpEditMenu = nullptr;
     QMenu* mpGenerateMenu = nullptr;
+    QMenu* mpComputeMenu = nullptr;
     QMenu* mpPreferencesMenu = nullptr;
     QMenu* mpSpidercamMenu = nullptr;
     QMenu* mpViewMenu = nullptr;
