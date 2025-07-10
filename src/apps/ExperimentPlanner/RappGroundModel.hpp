@@ -33,7 +33,7 @@ public:
 	void addMeshData(const std::vector<cRappTriangle>& mesh);
 
 	const std::vector<rfm::rappPoint_t>& getGroundPoints() const;
-	double getMeshHeight_mm(std::int32_t x_mm, std::int32_t y_mm);
+	double getMeshHeight_mm(std::int32_t x_mm, std::int32_t y_mm) const;
 
 private:
 	std::vector<rfm::rappPoint_t> mGroundPoints;

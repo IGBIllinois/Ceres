@@ -104,7 +104,7 @@ const std::vector<rfm::rappPoint_t>& cRappGroundModel::getGroundPoints() const
     return mGroundPoints;
 }
 
-double cRappGroundModel::getMeshHeight_mm(std::int32_t x_mm, std::int32_t y_mm)
+double cRappGroundModel::getMeshHeight_mm(std::int32_t x_mm, std::int32_t y_mm) const
 {
     if (mQuadTree)
     {
