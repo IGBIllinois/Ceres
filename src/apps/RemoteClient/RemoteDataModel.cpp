@@ -350,12 +350,15 @@ void cRemoteDataModel::onStartExperiment()
 
     if (!static_cast<bool>(mSerializer))
     {
-        emit statusMessage("Experiment Started: no data recording!");
+        emit statusMessage("Measurement Started: no data recording!");
         return;
     }
 
-    QString msg = "Experiment Started: ";
-    msg += QString::fromStdString(mExperimentTitle);
+    QString msg = "Measurement Started: ";
+    if (mMeasurementTitle.empty())
+        msg += QString::fromStdString(mExperimentTitle);
+    else
+        msg += QString::fromStdString(mMeasurementTitle);
     emit localLogMessage(logSTATUS, "Remote Client", msg);
 
     mSerializer.writeBeginHeader();
