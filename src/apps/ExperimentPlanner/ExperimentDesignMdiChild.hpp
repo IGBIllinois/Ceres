@@ -50,6 +50,12 @@ public:
 
     void reloadPath();
 
+    cExperimentFile::iterator  begin();
+    cExperimentFile::iterator  end();
+
+    cExperimentFile::const_iterator	begin() const;
+    cExperimentFile::const_iterator	end() const;
+
 signals:
     void experimentListNeedsUpdate();
 

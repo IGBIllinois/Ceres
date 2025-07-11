@@ -94,6 +94,7 @@ private slots:
     void onEditMoveMeasurementY();
     void onEditMoveMeasurementZ();
     void onEditShiftMeasurement();
+    void onEditRecomputeHeight();
 
     // Slots associated with "Generate" menu actions
 private slots:
@@ -111,6 +112,7 @@ private slots:
     // Slots associated with "Compute" menu actions
 private slots:
     void onComputeSpidercamHeight();
+    void onComputeSensorRange();
 
 // Slots associated with "Preference" menu actions
 private slots:

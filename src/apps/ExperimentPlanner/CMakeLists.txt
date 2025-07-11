@@ -146,6 +146,12 @@ PRIVATE
     ComputeSpidercamHeightDlg.hpp
     ComputeSpidercamHeightDlg.cpp
 
+    ComputeSensorRangeDlg.hpp
+    ComputeSensorRangeDlg.cpp
+
+    RecomputeSpidercamHeightDlg.hpp
+    RecomputeSpidercamHeightDlg.cpp
+
 	FieldUtils.hpp
 	FieldUtils.cpp
 

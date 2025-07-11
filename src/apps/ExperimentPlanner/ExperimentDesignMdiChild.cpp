@@ -431,6 +431,27 @@ void cExperimentDesignMdiChild::reloadPath()
     loadExperiment(mMeasurementFile);
 }
 
+
+cExperimentFile::iterator  cExperimentDesignMdiChild::begin()
+{
+    return mMeasurementFile.begin();
+}
+
+cExperimentFile::iterator  cExperimentDesignMdiChild::end()
+{
+    return mMeasurementFile.end();
+}
+
+cExperimentFile::const_iterator	cExperimentDesignMdiChild::begin() const
+{
+    return mMeasurementFile.begin();
+}
+
+cExperimentFile::const_iterator	cExperimentDesignMdiChild::end() const
+{
+    return mMeasurementFile.end();
+}
+
 void cExperimentDesignMdiChild::closeEvent(QCloseEvent *event)
 {
     if (mMeasurementFile.isDirty())

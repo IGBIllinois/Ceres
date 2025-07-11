@@ -38,6 +38,8 @@
 #include "Spidercam/SpidercamModel.hpp"
 
 #include "ComputeSpidercamHeightDlg.hpp"
+#include "ComputeSensorRangeDlg.hpp"
+#include "RecomputeSpidercamHeightDlg.hpp"
 
 #include "ExperimentFieldLayoutDlg.hpp"
 
@@ -406,6 +408,13 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditShiftMeasurement);
     mpEditMenu->addAction(pMenuItem);
 
+    mpEditMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Recompute Measure Height relative to Ground Elevation..."), this);
+    pMenuItem->setStatusTip(tr("Recompute the Spidercam Z position based on desired sensor height and ground elevation..."));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditRecomputeHeight);
+    mpEditMenu->addAction(pMenuItem);
+
 
     //
     // Build the Generate Sub Menu
@@ -460,6 +469,11 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem = new QAction(tr("Compute SpiderCam Height"), this);
     pMenuItem->setStatusTip(tr("Compute the Spidercam heigth from single SpiderCam point and desired height above canopy"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onComputeSpidercamHeight);
+    mpComputeMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Compute Sensor Height"), this);
+    pMenuItem->setStatusTip(tr("Compute the Sensor heigth based on SpiderCam position"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onComputeSensorRange);
     mpComputeMenu->addAction(pMenuItem);
 
     //
@@ -868,6 +882,59 @@ void cMainWindow::onEditShiftMeasurement()
     child->reloadPath();
 }
 
+void cMainWindow::onEditRecomputeHeight()
+{
+    cRecomputeSpidercamHeightDlg dlg;
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+        return;
+
+    auto* childSubWindow = mpMdiArea->currentSubWindow();
+    if (!childSubWindow)
+        return;
+
+    auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
+
+    auto height_mm = dlg.getHeight_mm();
+
+    int x_mm = 0;
+    int y_mm = 0;
+
+    for (auto& step : *child)
+    {
+        auto movement = dynamic_cast<cMeasurementStep_Movement*>(step.get());
+
+        if (movement)
+        {
+            if (movement->getX_mm().has_value())
+            {
+                x_mm = movement->getX_mm().value();
+            }
+
+            if (movement->getY_mm().has_value())
+            {
+                y_mm = movement->getY_mm().value();
+            }
+
+            if (movement->getZ_mm().has_value())
+            {
+                int z_mm = movement->getZ_mm().value();
+
+                if (z_mm < 7750)
+                {
+                    int ground_height_mm = static_cast<int>(mGroundData.getMeshHeight_mm(x_mm, y_mm));
+
+                    int new_z_mm = ground_height_mm + height_mm;
+                    movement->setZ_mm(new_z_mm);
+                }
+            }
+        }
+    }
+
+    child->reloadPath();
+}
 
 
 /********************************************************************
@@ -1185,6 +1252,13 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
 void cMainWindow::onComputeSpidercamHeight()
 {
     cComputeSpidercamHeightDlg dlg(mGroundData, this);
+
+    dlg.exec();
+}
+
+void cMainWindow::onComputeSensorRange()
+{
+    cComputeSensorRangeDlg dlg(mGroundData, this);
 
     dlg.exec();
 }
