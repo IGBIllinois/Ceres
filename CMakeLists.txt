@@ -156,7 +156,7 @@ find_package(Catch2 QUIET)
 # Find and include Qt
 set(Qt Qt5)
 
-find_package(${Qt} COMPONENTS Widgets Core Network Multimedia SerialPort PrintSupport REQUIRED)
+find_package(${Qt} REQUIRED COMPONENTS Widgets Core Network Multimedia SerialPort PrintSupport)
 GET_TARGET_PROPERTY(QMAKE_LOCATION Qt5::qmake LOCATION)
 
 if(WIN32)
@@ -190,6 +190,8 @@ find_package(ArenaSDK REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb ir weather)
+
+find_package(SDL3 REQUIRED)
 
 # Find package VTK
 find_package(VTK 9.0 REQUIRED COMPONENTS GUISupportQt IOLegacy)
