@@ -1,6 +1,8 @@
 
 #include "RemoteClientView.hpp"
 
+#include "../../Sensors/SensorDefs.hpp"
+
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QLabel>
@@ -170,6 +172,29 @@ void cRemoteClientView::updateLogMsg(int msg_type, const QString& device, const 
 
 	mpLogDevice->setText(device);
 	mpLogMessage->setText(msg);
+}
+
+void cRemoteClientView::clearRequiredSensors()
+{
+	mRequiredSensors.clear();
+}
+
+bool cRemoteClientView::addRequiredSensor(const QString& sensor)
+{
+	for (const auto& sensor_status : mSensorStatus)
+	{
+		if (sensor_status.mpSensorLabel->text() == sensor)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool cRemoteClientView::addRequiredSensors(const std::vector<QString>& sensors)
+{
+	return false;
 }
 
 void cRemoteClientView::tryReconnectPressed()

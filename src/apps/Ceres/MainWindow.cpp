@@ -26,6 +26,9 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QSound>
+#include <QtMultimedia/QMediaPlayer>
+#include <phonon4qt5/phonon/AudioOutput>
+#include <phonon4qt5/phonon/MediaSource>
 
 
 #include <cassert>
@@ -91,21 +94,7 @@ namespace
 //-----------------------------------------------------------------------------
 cMainWindow::cMainWindow(QWidget* parent) :
     QMainWindow(parent),
-    mpSplashScreen(nullptr),
-    mpMeasurements(nullptr),
-    mpExpLoad(nullptr),
-    mpExpRun(nullptr),
-    mpExpPause(nullptr),
-    mpExpStop(nullptr),
-    mpFileMenu(nullptr),
-    mpExperimentMenu(nullptr),
-    mpViewMenu(nullptr),
-    mpHelpMenu(nullptr),
-    mpFileBar(nullptr),
-    mpHobbsMeter(nullptr),
-    mpUI(new Ui::MainWindow),
-    mpModel(nullptr),
-    mpController(nullptr)
+    mpUI(new Ui::MainWindow)
 {
     mpUI->setupUi(this);
 
@@ -118,6 +107,8 @@ cMainWindow::cMainWindow(QWidget* parent) :
     auto exp_path = cwd / "Experiments";
     mDefaultDataPath = QString::fromLatin1(data_path.string().c_str());
     mExperimentFilesPath = QString::fromLatin1(exp_path.string().c_str());
+
+//    mpEndOfExperimentSound = new QSound("c:/igb/Ceres/extras/mixkit-rooster-crowing-in-the-morning.wav", this);
 }
 
 //-----------------------------------------------------------------------------
@@ -241,6 +232,10 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     statusBar()->addPermanentWidget(mpHobbsMeter);
 
     QTimer::singleShot(1000, mpModel, &cDataModel::startDataThread);
+
+//    mpEndOfExperimentSound = new QMediaPlayer();
+//    mpEndOfExperimentSound->setMedia(QUrl::fromLocalFile("c:/igb/Ceres/extras/mixkit-rooster-crowing-in-the-morning.wav"));
+//    mpEndOfExperimentSound->setVolume(100);
 }
 
 //-----------------------------------------------------------------------------
@@ -482,7 +477,47 @@ void cMainWindow::onSetExperimentActions(bool load, bool run, bool pause, bool s
 //-----------------------------------------------------------------------------
 void cMainWindow::helpAbout()
 {
+    if (!mpEndOfExperimentSound)
+    {
+        try
+        {
+            qInfo() << "Creating QMediaPlayer";
+//            mpEndOfExperimentSound = new QMediaPlayer;
+//            mpEndOfExperimentSound = Phonon::createPlayer(Phonon::NoCategory, Phonon::MediaSource("c:/igb/Ceres/extras/mixkit-rooster-crowing-in-the-morning.wav"));
+//            Phonon::AudioOutput audio(Phonon::NoCategory);
+//            Phonon::createPath(mpEndOfExperimentSound, &audio);
 
+/*
+            const QUrl url = QUrl(QLatin1String("file:///somepath/somefile"));
+            MediaSource src(url);
+            MediaObject obj;
+            obj.setCurrentSource(src);
+            VideoWidget video;
+            video.show();
+            AudioOutput audio(VideoCategory);
+            Phonon::createPath(&obj, &video);
+            Phonon::createPath(&obj, &audio);
+            obj.play();
+*/
+
+            qInfo() << "Calling setMedia";
+//            mpEndOfExperimentSound->setMedia(QUrl::fromLocalFile("c:/igb/Ceres/extras/mixkit-rooster-crowing-in-the-morning.wav"));
+            qInfo() << "Calling setVolume";
+//            mpEndOfExperimentSound->setVolume(100);
+        }
+        catch (std::exception& e)
+        {
+            qCritical() << e.what();
+        }
+        catch (...)
+        {
+            qCritical() << "Unknown error";
+        }
+    }
+
+    qInfo() << "Calling play";
+//    mpEndOfExperimentSound->play();
+//    QSound::play("c:/igb/Ceres/extras/mixkit-rooster-crowing-in-the-morning.wav");
 }
 
 void cMainWindow::onStatusUpdate(QString msg)
@@ -565,7 +600,28 @@ void cMainWindow::onExperimentCompleted()
 
     emit experimentStopped();
 
-    QSound::play(":/ripe.illinois.edu/end_experiment.wav");
+/*
+#include <phonon/audiooutput.h>
+#include <phonon/mediaobject.h>
+#include <phonon/mediasource.h>
+#include <phonon/videowidget.h>
+
+    using namespace Phonon;
+
+    const QUrl url = QUrl( QLatin1String("file:///somepath/somefile") );
+    MediaSource src( url );
+    MediaObject obj;
+    obj.setCurrentSource( src );
+    VideoWidget video;
+    video.show();
+    AudioOutput audio( VideoCategory );
+    Phonon::createPath( &obj, &video );
+    Phonon::createPath( &obj, &audio );
+    obj.play();
+*/
+
+    QSound::play("c:/igb/Ceres/extras/mixkit-rooster-crowing-in-the-morning.wav");
+
     onStatusUpdate("Measurement completed!");
 }
 

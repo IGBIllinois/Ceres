@@ -37,6 +37,13 @@ public:
     void updateStatusMsg(const QString& msg);
     void updateLogMsg(int msg_type, const QString& device, const QString& msg);
 
+    void clearRequiredSensors();
+    bool addRequiredSensor(const QString& sensor);
+    bool addRequiredSensors(const std::vector<QString>& sensors);
+
+signals:
+    void sensorFaultDetected();
+
 public slots:
     void dockLocationChanged(Qt::DockWidgetArea area);
     void topLevelChanged(bool topLevel);
@@ -77,4 +84,6 @@ protected:
     QLabel*    mpLogDeviceLabel;
     QLineEdit* mpLogDevice;
     QTextEdit* mpLogMessage;
+
+    std::vector<QString> mRequiredSensors;
 };

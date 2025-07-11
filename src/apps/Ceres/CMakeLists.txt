@@ -122,6 +122,7 @@ target_link_libraries(Ceres PRIVATE ExperimentControllers)
 target_link_libraries(Ceres PRIVATE Sensors)
 target_link_libraries(Ceres PRIVATE Utilities)
 target_link_libraries(Ceres PRIVATE common)
+target_link_libraries(Ceres PRIVATE SDL3::SDL3_static)
 
 #vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
 

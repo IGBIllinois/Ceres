@@ -8,6 +8,8 @@
 #include <QMainWindow>
 #include <QString>
 
+#include <SDL3/SDL.h>
+
 #include <nlohmann/json.hpp>
 
 
@@ -19,6 +21,7 @@ class QMenu;
 class QTextEdit;
 class QLineEdit;
 class QToolBar;
+class QSound;
 QT_END_NAMESPACE
 
 
@@ -72,10 +75,14 @@ public slots:
 private slots:
     void fileRefresh();
     void fileAddExperiment();
+
+private slots:
     void onExperimentLoad();
     void onExperimentRun();
     void onExperimentPause();
     void onExperimentStop();
+
+private slots:
     void helpAbout();
     void onSetExperimentActions(bool load, bool run, bool pause, bool stop);
 
@@ -96,35 +103,39 @@ private:
 
     void startDataModel(const nlohmann::json& configDoc);
 
-    cCeresSplashScreen* mpSplashScreen;
+    cCeresSplashScreen* mpSplashScreen = nullptr;
 
-    cMeasurementManager* mpMeasurements;
+    cMeasurementManager* mpMeasurements = nullptr;
 
     QString mDefaultDataPath;
     QString mExperimentFilesPath;
 
-    QMenu* mpFileMenu;
-    QMenu* mpExperimentMenu;
+    QMenu* mpFileMenu = nullptr;
+    QMenu* mpExperimentMenu = nullptr;
 
-    QAction* mpExpLoad;
-    QAction* mpExpRun;
-    QAction* mpExpPause;
-    QAction* mpExpStop;
+    QAction* mpExpLoad = nullptr;
+    QAction* mpExpRun = nullptr;
+    QAction* mpExpPause = nullptr;
+    QAction* mpExpStop = nullptr;
 
-    QMenu* mpViewMenu;
-    QMenu* mpSensorMenu;
-    QMenu* mpHelpMenu;
+    QMenu* mpViewMenu = nullptr;
+    QMenu* mpSensorMenu = nullptr;
+    QMenu* mpHelpMenu = nullptr;
 
-    QToolBar* mpFileBar;
+    QToolBar* mpFileBar = nullptr;
 
-    cHobbsMeter* mpHobbsMeter;
+    cHobbsMeter* mpHobbsMeter = nullptr;
 
-    Ui::MainWindow* mpUI;
+    Ui::MainWindow* mpUI = nullptr;
     QString mCurrentFile;
 
-    cCtrlDataModel* mpModel;
+    cCtrlDataModel* mpModel = nullptr;
 
-    cExperimentControlView* mpController;
+    cExperimentControlView* mpController = nullptr;
+
+//    QSound* mpEndOfExperimentSound = nullptr;
+//    QMediaPlayer* mpEndOfExperimentSound = nullptr;
+    SDL_AudioSpec* mpEndOfExperimentSound = nullptr;
 
     std::string mBatchFileName;
     std::vector<std::filesystem::path> mBatchProcess;
