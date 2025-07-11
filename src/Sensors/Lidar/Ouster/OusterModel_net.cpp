@@ -358,6 +358,36 @@ void cOusterModel_net::changeLidarMode(QString mode_str)
     if (mConfigParameters.lidar_mode == mode)
         return;
 
+    switch (mode)
+    {
+    case ouster::eLIDAR_MODE::MODE_1024x10:
+    case ouster::eLIDAR_MODE::MODE_1024x20:
+        DOWN_MEASUREMENT_ID = 512;
+        break;
+    case ouster::eLIDAR_MODE::MODE_2048x10:
+        DOWN_MEASUREMENT_ID = 1024;
+        break;
+    case ouster::eLIDAR_MODE::MODE_512x10:
+    case ouster::eLIDAR_MODE::MODE_512x20:
+        DOWN_MEASUREMENT_ID = 512;
+        break;
+    }
+
+    switch (mode)
+    {
+    case ouster::eLIDAR_MODE::MODE_1024x10:
+    case ouster::eLIDAR_MODE::MODE_2048x10:
+    case ouster::eLIDAR_MODE::MODE_512x10:
+        mMaxBadFrameCount = 10;
+        mMaxRangeFrameCount = 10;
+        break;
+    case ouster::eLIDAR_MODE::MODE_1024x20:
+    case ouster::eLIDAR_MODE::MODE_512x20:
+        mMaxBadFrameCount = 20;
+        mMaxRangeFrameCount = 20;
+        break;
+    }
+
     mCmdQueue.push(new cOusterAsyncCmd_PauseDataCollection(this));
     mCmdQueue.push(new cOusterAsyncCmd_SetLidarMode(this, mode));
     mCmdQueue.push(new cOusterAsyncCmd_Reinitialize(this));
@@ -414,6 +444,7 @@ bool cOusterModel_net::startCommunications()
 
     cOusterImuStream_Qt::clear();
     cOusterLidarStream_Qt::clear();
+    mBadFrameCount = 0;
 
     mConnected = true;
 
@@ -436,6 +467,7 @@ void cOusterModel_net::stopCommunications()
     setStatus(sensor::eStatus::STOPPED);
 
     mConnected = false;
+    mBadFrameCount = 0;
 }
 
 void cOusterModel_net::pauseCommunications()
@@ -510,6 +542,49 @@ void cOusterModel_net::onNewData(const ouster::imu_data_t& data)
 
 void cOusterModel_net::onNewData(uint16_t frameID, const cOusterLidarData& data)
 {
+    const auto& test = data.channel(DOWN_MEASUREMENT_ID, DOWN_MEASUREMENT_CHN);
+    if (test.range_mm > 0)
+    {
+        mBadFrameCount = 0;
+
+        if (getStatus() != sensor::eStatus::RUNNING)
+            setStatus(sensor::eStatus::RUNNING);
+    }
+    else
+    {
+        ++mBadFrameCount;
+
+        if ((mBadFrameCount > mMaxBadFrameCount) && (getStatus() == sensor::eStatus::RUNNING))
+            setStatus(sensor::eStatus::STOPPED);
+    }
+
+    ++mRangeFrameCount;
+    double range_mm = test.range_mm;
+
+    range_mm += data.channel(DOWN_MEASUREMENT_ID - 1, DOWN_MEASUREMENT_CHN - 1).range_mm;
+    range_mm += data.channel(DOWN_MEASUREMENT_ID - 1, DOWN_MEASUREMENT_CHN ).range_mm;
+    range_mm += data.channel(DOWN_MEASUREMENT_ID - 1, DOWN_MEASUREMENT_CHN + 1).range_mm;
+
+    range_mm += data.channel(DOWN_MEASUREMENT_ID, DOWN_MEASUREMENT_CHN - 1).range_mm;
+    range_mm += data.channel(DOWN_MEASUREMENT_ID, DOWN_MEASUREMENT_CHN + 1).range_mm;
+
+    range_mm += data.channel(DOWN_MEASUREMENT_ID + 1, DOWN_MEASUREMENT_CHN - 1).range_mm;
+    range_mm += data.channel(DOWN_MEASUREMENT_ID + 1, DOWN_MEASUREMENT_CHN).range_mm;
+    range_mm += data.channel(DOWN_MEASUREMENT_ID + 1, DOWN_MEASUREMENT_CHN + 1).range_mm;
+
+    range_mm /= 9.0;
+
+    mSumRangeData += range_mm;
+
+    if (mRangeFrameCount > mMaxRangeFrameCount)
+    {
+        int range_mm = static_cast<int>(mSumRangeData / mRangeFrameCount) + mRangeOffset_mm;
+        emit updateRangeData(range_mm);
+
+        mRangeFrameCount = 0;
+        mSumRangeData = 0.0;
+    }
+
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mSerializer.write(mDeviceID, frameID, data);

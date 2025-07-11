@@ -76,6 +76,8 @@ signals:
     void updateImuData();
     void updateLidarData();
 
+    void updateRangeData(int range_mm);
+
 
 public slots:
     virtual void changeAzimuthWindow(double min_deg, double max_deg) = 0;
@@ -87,8 +89,19 @@ protected:
     virtual void onNewData(uint16_t frameID, const cOusterLidarData& data) = 0;
 
 protected:
-    int mImuDataCounter;
-    int mLidarDataCounter;
+    int mImuDataCounter = 0;
+    int mLidarDataCounter = 0;
+
+    int DOWN_MEASUREMENT_ID = 512;
+    int DOWN_MEASUREMENT_CHN = 64;
+
+    int mBadFrameCount = 0;
+    int mMaxBadFrameCount = 10;
+
+    int mRangeFrameCount = 0;
+    int mMaxRangeFrameCount = 10;
+    double mSumRangeData = 0.0;
+    int mRangeOffset_mm = 0;
 
     ouster::config_param_2_t		mConfigParameters;
     ouster::sensor_info_2_t		    mSensorInfo;

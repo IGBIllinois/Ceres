@@ -34,6 +34,7 @@ public slots:
 	void onLidarIntrinsicsUpdated();
 	void onDataFormatUpdated();
 	void onAzimuthWindowUpdated();
+	void onRangeUpdated(int range_mm);
 
 
 private:
@@ -54,6 +55,8 @@ private:
 	QLabel*    mpMaxAzimuthAngleLabel = nullptr;
 	QLineEdit* mpMaxAzimuthAngle_deg = nullptr;
 
+	QLabel*    mpRangeLabel = nullptr;
+	QLineEdit* mpRange_mm = nullptr;
 
 	cOusterModel* mpModel;
 };

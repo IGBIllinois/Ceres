@@ -57,6 +57,10 @@ void cOusterStatusView::createWidgets()
 	mpLidarMode = new QLineEdit(this);
 	mpLidarMode->setReadOnly(true);
 
+	mpRangeLabel = new QLabel("Range to Ground (mm):", this);
+	mpRange_mm = new QLineEdit(this);
+	mpRange_mm->setReadOnly(true);
+
 	mpMinAzimuthAngleLabel = new QLabel("Min (deg):", this);
 	mpMinAzimuthAngle_deg = new QLineEdit(this);
 	mpMinAzimuthAngle_deg->setReadOnly(true);
@@ -100,6 +104,16 @@ void cOusterStatusView::doLayout()
 
 	modeBox->setLayout(modeLayout);
 	mainLayout->addWidget(modeBox);
+
+	QGroupBox* rangeBox = new QGroupBox("Measurement Info");
+
+	auto* rangeLayout = new QHBoxLayout();
+
+	rangeLayout->addWidget(mpRangeLabel);
+	rangeLayout->addWidget(mpRange_mm);
+
+	rangeBox->setLayout(rangeLayout);
+	mainLayout->addWidget(rangeBox);
 
 	mainLayout->addStretch();
 
@@ -154,5 +168,10 @@ void cOusterStatusView::onAzimuthWindowUpdated()
 
 	mpMinAzimuthAngle_deg->setText(QString::number(window.min_deg));
 	mpMaxAzimuthAngle_deg->setText(QString::number(window.max_deg));
+}
+
+void cOusterStatusView::onRangeUpdated(int range_mm)
+{
+	mpRange_mm->setText(QString::number(range_mm));
 }
 

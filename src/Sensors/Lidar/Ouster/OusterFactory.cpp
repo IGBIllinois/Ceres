@@ -57,6 +57,7 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
         QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterStatusView::onLidarIntrinsicsUpdated);
         QObject::connect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterStatusView::onDataFormatUpdated);
         QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterStatusView::onAzimuthWindowUpdated);
+        QObject::connect(pModel, &cOusterModel::updateRangeData, pView, &cOusterStatusView::onRangeUpdated);
 
         auto* pController = new cOusterController(pModel);
 
