@@ -24,6 +24,10 @@ PRIVATE
     BasicExperimentStates.hpp
     BasicExperimentStates.cpp
 
+    MarkerInterfaces.hpp
+    MarkerExperimentStates.hpp
+    MarkerExperimentStates.cpp
+
     ExperimentStateRemoteInterface.hpp
     ExperimentStateRemoteInterface.cpp
 

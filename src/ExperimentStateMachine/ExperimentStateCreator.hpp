@@ -16,6 +16,10 @@ class cExperimentStateCreator
 {
 public:
     virtual cExperimentState* createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent) = 0;
+
+protected:
+    cExperimentStateCreator() = default;
+    virtual ~cExperimentStateCreator() = default;
 };
 
 
