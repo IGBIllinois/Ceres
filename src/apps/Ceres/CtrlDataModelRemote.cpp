@@ -9,6 +9,7 @@
 #include "TimestampProvider.hpp"
 #include "SensorPropertyPage.hpp"
 #include "ExperimentStateCreator.hpp"
+#include "MarkerExperimentStates.hpp"
 
 #include <QDockWidget>
 #include <QTime>
@@ -172,8 +173,11 @@ bool cCtrlDataModelRemote::systemReady() const
 }
 
 
+
 void cCtrlDataModelRemote::updatePosition(spidercam::sPosition_1_t pos)
 {
+    mDollyPosition = pos;
+
     if (!mConnected) return;
 
     sendSpidercamPosition(pos);
@@ -507,6 +511,35 @@ void cCtrlDataModelRemote::startExperiment()
     emit statusMessage(msg);
 }
 
+cExperimentState* cCtrlDataModelRemote::createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent)
+{
+    if (type == "marker")
+    {
+        std::string marker_type = stateDoc["marker type"];
+
+        if (marker_type == "start position")
+            return new cExperimentState_MarkStartPosition(this);
+
+        if (marker_type == "end position")
+            return new cExperimentState_MarkEndPosition(this);
+    }
+
+    return nullptr;
+}
+
+void cCtrlDataModelRemote::recordStartPosition()
+{
+    if (!mConnected) return;
+
+    sendSpidercamStartPosition(mDollyPosition);
+}
+
+void cCtrlDataModelRemote::recordEndPosition()
+{
+    if (!mConnected) return;
+
+    sendSpidercamEndPosition(mDollyPosition);
+}
 
 /**********************************************************
  * TCP Socket Methods

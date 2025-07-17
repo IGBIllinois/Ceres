@@ -219,6 +219,18 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onSpidercamPosition(data);
         break;
     }
+    case ePacketType::SPIDER_CAM_START_POSITION:
+    {
+        auto data = to_spidercam_start_position_1(hdr.length, buffer);
+        onSpidercamStartPosition(data);
+        break;
+    }
+    case ePacketType::SPIDER_CAM_END_POSITION:
+    {
+        auto data = to_spidercam_end_position_1(hdr.length, buffer);
+        onSpidercamEndPosition(data);
+        break;
+    }
     case ePacketType::WIND_DATA:
     {
         sWindData_t data = to_wind_data_1(hdr.length, buffer);
@@ -263,6 +275,7 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     {
         break;
     }
+
     }
 }
 

@@ -59,6 +59,8 @@ public:
     void encodeEndOfExperimentInfo();
 
     void encodeSpidercamPosition(const spidercam::sPosition_1_t& pos);
+    void encodeSpidercamStartPosition(const spidercam::sPosition_1_t& pos);
+    void encodeSpidercamEndPosition(const spidercam::sPosition_1_t& pos);
 
     void encodeWindData(bool valid, double wind_speed_mps, double wind_direction_deg);
     void encodeTemperatureData(double temp_C);
@@ -105,6 +107,8 @@ public:
     void sendStopDataRecording();
 
     void sendSpidercamPosition(const spidercam::sPosition_1_t& pos);
+    void sendSpidercamStartPosition(const spidercam::sPosition_1_t& pos);
+    void sendSpidercamEndPosition(const spidercam::sPosition_1_t& pos);
 
     void sendWindData(bool valid, double wind_speed_mps, double wind_direction_deg);
     void sendTemperatureData(double temp_C);

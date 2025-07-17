@@ -116,6 +116,8 @@ private:
     // Spidercam Data
     //-----------------------------------------------------
     void onPosition(spidercam::sPosition_1_t position) override;
+    void onStartPosition(spidercam::sPosition_1_t position) override;
+    void onEndPosition(spidercam::sPosition_1_t position) override;
 
     //-----------------------------------------------------
     // Weather Data

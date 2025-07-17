@@ -3,6 +3,7 @@
 
 #include "DataModel.hpp"
 #include "CtrlDataThread.hpp"
+#include "ExperimentStateCreator.hpp"
 
 #include <QObject>
 #include <QThread>
@@ -30,7 +31,7 @@ namespace experiment
  * data acquisition.
  * 
  *****************************************************************************/
-class cCtrlDataModel : public cDataModel
+class cCtrlDataModel : public cDataModel, public cExperimentStateCreator
 {
     Q_OBJECT
 

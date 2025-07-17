@@ -788,6 +788,29 @@ void cRemoteDataModel::onSpidercamPosition(const spidercam::sPosition_1_t& pos)
     }
 }
 
+void cRemoteDataModel::onSpidercamStartPosition(const spidercam::sPosition_1_t& pos)
+{
+    if (static_cast<bool>(mSpidercamSerializer))
+    {
+        QString msg = "Start position marked.";
+        emit localLogMessage(logSTATUS, "Remote Client", msg);
+
+        mSpidercamSerializer.writeStartPosition(pos);
+    }
+}
+
+void cRemoteDataModel::onSpidercamEndPosition(const spidercam::sPosition_1_t& pos)
+{
+    if (static_cast<bool>(mSpidercamSerializer))
+    {
+        QString msg = "End position marked.";
+        emit localLogMessage(logSTATUS, "Remote Client", msg);
+
+        mSpidercamSerializer.writeEndPosition(pos);
+    }
+}
+
+
 void cRemoteDataModel::onWindData(bool valid, double wind_speed_mps, double wind_direction_deg)
 {
     mWindDataValid = valid;

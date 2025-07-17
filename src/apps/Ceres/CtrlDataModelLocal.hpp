@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CtrlDataModel.hpp"
+
 #include <cbdf/BlockDataFile.hpp>
 #include <cbdf/ExperimentSerializer.hpp>
 
@@ -26,6 +27,9 @@ public:
     void closeDataFile() override;
 
     void startExperiment() override;
+
+protected:
+    cExperimentState* createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent) override;
 
 protected:
     void endDataRecording() override;

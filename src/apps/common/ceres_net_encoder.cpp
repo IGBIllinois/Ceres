@@ -259,6 +259,24 @@ void cCeresNetEncoder::encodeSpidercamPosition(const spidercam::sPosition_1_t& p
     }
 }
 
+void cCeresNetEncoder::encodeSpidercamStartPosition(const spidercam::sPosition_1_t& pos)
+{
+    if (encode_spidercam_start_pos(pos, mBuffer) < 0)
+    {
+        sendData();
+        encode_spidercam_start_pos(pos, mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeSpidercamEndPosition(const spidercam::sPosition_1_t& pos)
+{
+    if (encode_spidercam_end_pos(pos, mBuffer) < 0)
+    {
+        sendData();
+        encode_spidercam_end_pos(pos, mBuffer);
+    }
+}
+
 void cCeresNetEncoder::encodeWindData(bool valid, double wind_speed_mps, double wind_direction_deg)
 {
     if (encode_wind_data(valid, wind_speed_mps, wind_direction_deg, mBuffer) < 0)
@@ -446,6 +464,18 @@ void cCeresNetEncoder::sendStopDataRecording()
 void cCeresNetEncoder::sendSpidercamPosition(const spidercam::sPosition_1_t& pos)
 {
     encode_spidercam_pos(pos, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendSpidercamStartPosition(const spidercam::sPosition_1_t& pos)
+{
+    encode_spidercam_start_pos(pos, mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendSpidercamEndPosition(const spidercam::sPosition_1_t& pos)
+{
+    encode_spidercam_end_pos(pos, mBuffer);
     sendData();
 }
 

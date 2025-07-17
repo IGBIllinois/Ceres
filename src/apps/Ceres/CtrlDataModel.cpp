@@ -73,6 +73,9 @@ void cCtrlDataModel::addExperimentControlModel(cExperimentControlModel* pControl
     {
         mThread.mpController = pControlModel;
         QObject::connect(mThread.mpController, &cExperimentControlModel::experimentStateChanged, this, &cCtrlDataModel::onExperimentStateChange);
+
+        mThread.mpController->addStateCreator(this);
+
         mThread.mpController->moveToThread(&mThread);
     }
 }

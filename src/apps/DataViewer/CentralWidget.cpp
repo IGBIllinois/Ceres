@@ -510,6 +510,14 @@ void cCentralWidget::onPosition(spidercam::sPosition_1_t pos)
     mpDollySpeed_mmps->setText(QString::number(pos.speed_mmps));
 }
 
+void cCentralWidget::onStartPosition(spidercam::sPosition_1_t position)
+{
+}
+
+void cCentralWidget::onEndPosition(spidercam::sPosition_1_t position)
+{
+}
+
 //-----------------------------------------------------------------------------
 // Weather Parser Data
 //-----------------------------------------------------------------------------

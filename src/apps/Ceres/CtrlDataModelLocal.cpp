@@ -343,6 +343,12 @@ void cCtrlDataModelLocal::startExperiment()
     mThread.mpController->startExperiment();
 }
 
+cExperimentState* cCtrlDataModelLocal::createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent)
+{
+    return nullptr;
+}
+
+
 /***   Signals handlers   ****/
 void cCtrlDataModelLocal::onHeartbeat()
 {

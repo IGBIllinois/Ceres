@@ -77,6 +77,8 @@ protected:
     virtual void onStopDataRecording() = 0;
 
     virtual void onSpidercamPosition(const spidercam::sPosition_1_t& pos) = 0;
+    virtual void onSpidercamStartPosition(const spidercam::sPosition_1_t& pos) = 0;
+    virtual void onSpidercamEndPosition(const spidercam::sPosition_1_t& pos) = 0;
 
     virtual void onWindData(bool valid, double wind_speed_mps, double wind_direction_deg) = 0;
     virtual void onTemperatureData(double temp_C) = 0;

@@ -69,6 +69,8 @@ enum class ePacketType : uint16_t
 	MEASUREMENT_TITLE,
 
 	SPIDER_CAM_DATA = 1000,
+	SPIDER_CAM_START_POSITION,
+	SPIDER_CAM_END_POSITION,
 
 	WIND_DATA	= 1100,
 	TEMPERATURE_DATA,
@@ -244,6 +246,12 @@ int encode_sensor_property_connect_info(const std::string& sensor,
  **********************************************************/
 spidercam::sPosition_1_t to_spidercam_position_1(std::uint16_t length, const net_buffer_view& buffer);
 int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer);
+
+spidercam::sPosition_1_t to_spidercam_start_position_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_spidercam_start_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer);
+
+spidercam::sPosition_1_t to_spidercam_end_position_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_spidercam_end_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer);
 
 
 /**********************************************************

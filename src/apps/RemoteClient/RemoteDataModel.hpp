@@ -147,6 +147,9 @@ private slots:
     void onStopDataRecording() override;
 
     void onSpidercamPosition(const spidercam::sPosition_1_t& pos) override;
+    void onSpidercamStartPosition(const spidercam::sPosition_1_t& pos) override;
+    void onSpidercamEndPosition(const spidercam::sPosition_1_t& pos) override;
+
     void onWindData(bool valid, double wind_speed_mps, double wind_direction_deg) override;
     void onTemperatureData(double temp_C) override;
     void onRelativeHumidityData(double rh_pct) override;

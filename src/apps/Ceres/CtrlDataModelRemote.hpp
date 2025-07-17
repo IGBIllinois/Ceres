@@ -4,6 +4,8 @@
 #include "CtrlDataModel.hpp"
 #include "ceres_net_decoder.hpp"
 #include "ceres_net_encoder.hpp"
+#include "ExperimentStateCreator.hpp"
+#include "MarkerInterfaces.hpp"
 
 #include <spidercam/spidercam_types.hpp>
 
@@ -26,7 +28,8 @@ class cExperimentStateCreator;
 
 
 class cCtrlDataModelRemote : public cCtrlDataModel, 
-    protected cCeresNetDecoder, protected cCeresNetEncoder
+    protected cCeresNetDecoder, protected cCeresNetEncoder, 
+    private iMarkerStartPosition, private iMarkerEndPosition
 {
     Q_OBJECT
 
@@ -62,6 +65,9 @@ public:
     bool isConnected() const;
 
 protected:
+    cExperimentState* createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent) override;
+
+protected:
     void dataRecordingStateChange(bool record) override;
     void endDataRecording() override;
 
@@ -86,6 +92,10 @@ private slots:
     void hostFound();
     void stateChanged(QAbstractSocket::SocketState socketState);
     void processNewCommand();
+
+private:
+    void recordStartPosition() override;
+    void recordEndPosition() override;
 
 /*
  * Send data over the TCP socket
@@ -124,12 +134,14 @@ private:
  *
  */
 private:
-    bool   mWindSpeedValid;
-    double mWindSpeed_mps;
-    double mWind_dir_deg;
-    double mTemperature_C;
-    double mRH_pct;
-    double mPAR_umole;
+    spidercam::sPosition_1_t mDollyPosition;
+
+    bool   mWindSpeedValid = false;
+    double mWindSpeed_mps = 0.0;
+    double mWind_dir_deg = 0.0;
+    double mTemperature_C = 0.0;
+    double mRH_pct = 0.0;
+    double mPAR_umole = 0.0;
 
 private:
     bool mConnected = false;
@@ -137,11 +149,11 @@ private:
     bool mExperimentTypeConfirmed = false;
     bool mExperimentInfoConfirmed = false;
 
-    cRemoteClientView* mpView;
+    cRemoteClientView* mpView = nullptr;
 
     QString  mHostName;
-    uint16_t mPort;
-    bool     mUseIpv6;
+    uint16_t mPort = 0;
+    bool     mUseIpv6 = false;
     QString  mLocalIp;
 
     std::string  mLocalIpAddress;

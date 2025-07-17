@@ -1364,6 +1364,126 @@ int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer
     return pckt_size;
 }
 
+spidercam::sPosition_1_t to_spidercam_start_position_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    Spidercam_Start_Position_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+
+    spidercam::sPosition_1_t data;
+
+    data.X_mm = pckt.x_mm();
+    data.Y_mm = pckt.y_mm();
+    data.Z_mm = pckt.z_mm();
+    data.pan_deg = pckt.pan_deg();
+    data.pitch_deg = pckt.pitch_deg();
+    data.roll_gimbal_deg = pckt.roll_deg();
+    data.timestamp = pckt.timestamp();
+
+    data.speed_mmps = 0;
+    data.focus = 0;
+    data.height_mm = data.Z_mm;
+    data.iris = 0;
+    data.pan_speed_dps = 0.0;
+    data.roll_deg = data.roll_gimbal_deg;
+    data.tilt_deg = 0;
+    data.tilt_speed_dps = 0;
+
+    return data;
+}
+
+int encode_spidercam_start_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer)
+{
+    Spidercam_Start_Position_1 pckt;
+
+    pckt.set_datavalid(true);
+    pckt.set_x_mm(pos.X_mm);
+    pckt.set_y_mm(pos.Y_mm);
+    pckt.set_z_mm(pos.Z_mm);
+    pckt.set_pan_deg(pos.pan_deg);
+    pckt.set_pitch_deg(pos.pitch_deg);
+    pckt.set_roll_deg(pos.roll_gimbal_deg);
+    pckt.set_timestamp(pos.timestamp);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SPIDER_CAM_START_POSITION);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
+spidercam::sPosition_1_t to_spidercam_end_position_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    Spidercam_End_Position_1 pckt;
+    pckt.ParseFromArray(buffer.data(), length);
+
+    spidercam::sPosition_1_t data;
+
+    data.X_mm = pckt.x_mm();
+    data.Y_mm = pckt.y_mm();
+    data.Z_mm = pckt.z_mm();
+    data.pan_deg = pckt.pan_deg();
+    data.pitch_deg = pckt.pitch_deg();
+    data.roll_gimbal_deg = pckt.roll_deg();
+    data.timestamp = pckt.timestamp();
+
+    data.speed_mmps = 0;
+    data.focus = 0;
+    data.height_mm = data.Z_mm;
+    data.iris = 0;
+    data.pan_speed_dps = 0.0;
+    data.roll_deg = data.roll_gimbal_deg;
+    data.tilt_deg = 0;
+    data.tilt_speed_dps = 0;
+
+    return data;
+}
+
+int encode_spidercam_end_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer)
+{
+    Spidercam_End_Position_1 pckt;
+
+    pckt.set_datavalid(true);
+    pckt.set_x_mm(pos.X_mm);
+    pckt.set_y_mm(pos.Y_mm);
+    pckt.set_z_mm(pos.Z_mm);
+    pckt.set_pan_deg(pos.pan_deg);
+    pckt.set_pitch_deg(pos.pitch_deg);
+    pckt.set_roll_deg(pos.roll_gimbal_deg);
+    pckt.set_timestamp(pos.timestamp);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::SPIDER_CAM_END_POSITION);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
 
 /*
  * Weather Packets
