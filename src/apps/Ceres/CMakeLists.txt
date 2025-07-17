@@ -79,9 +79,15 @@ PRIVATE
     CtrlDataThread.cpp
     CtrlDataModel.hpp
     CtrlDataModel.cpp
-	
+
+    Sound.hpp
+    Sound.cpp
+
     HobbsMeter.hpp
     HobbsMeter.cpp
+
+    CeresOptionsDlg.hpp
+    CeresOptionsDlg.cpp
 
     MainWindow.hpp
     MainWindow.cpp

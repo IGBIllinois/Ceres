@@ -7,8 +7,9 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QSettings>
 
-#include <SDL3/SDL.h>
+#include <Sound.hpp>
 
 #include <nlohmann/json.hpp>
 
@@ -21,7 +22,6 @@ class QMenu;
 class QTextEdit;
 class QLineEdit;
 class QToolBar;
-class QSound;
 QT_END_NAMESPACE
 
 
@@ -73,6 +73,7 @@ public slots:
     void onExperimentCompleted();
 
 private slots:
+    //! File Menu Actions
     void fileRefresh();
     void fileAddExperiment();
 
@@ -81,6 +82,10 @@ private slots:
     void onExperimentRun();
     void onExperimentPause();
     void onExperimentStop();
+
+private slots:
+    //! Settings Menu Actions
+    void settingsOptions();
 
 private slots:
     void helpAbout();
@@ -103,6 +108,9 @@ private:
 
     void startDataModel(const nlohmann::json& configDoc);
 
+private:
+    QSettings mSettings;
+
     cCeresSplashScreen* mpSplashScreen = nullptr;
 
     cMeasurementManager* mpMeasurements = nullptr;
@@ -112,6 +120,7 @@ private:
 
     QMenu* mpFileMenu = nullptr;
     QMenu* mpExperimentMenu = nullptr;
+    QMenu* mpSettingMenu = nullptr;
 
     QAction* mpExpLoad = nullptr;
     QAction* mpExpRun = nullptr;
@@ -133,9 +142,7 @@ private:
 
     cExperimentControlView* mpController = nullptr;
 
-//    QSound* mpEndOfExperimentSound = nullptr;
-//    QMediaPlayer* mpEndOfExperimentSound = nullptr;
-    SDL_AudioSpec* mpEndOfExperimentSound = nullptr;
+    cSound mEndOfExperimentSound;
 
     std::string mBatchFileName;
     std::vector<std::filesystem::path> mBatchProcess;
