@@ -184,4 +184,22 @@ private:
 	bool mUsingMps = false;
 };
 
+/// <summary>
+/// Measurement Step: Set Marker
+/// </summary>
+class cMeasurementStep_Marker : public cMeasurementStep
+{
+	Q_OBJECT
+
+public:
+	cMeasurementStep_Marker() = default;
+
+	cBaseStep* graphicsItem(const int id) const override;
+
+protected:
+	void load(const nlohmann::json& jdoc) override;
+	nlohmann::json save() override;
+};
+
+
 

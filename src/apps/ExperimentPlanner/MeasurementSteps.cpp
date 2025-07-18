@@ -31,6 +31,9 @@ std::shared_ptr<cMeasurementStep> basic::create_step(const std::string& type)
 	if (type == "movement")
 		return std::make_shared<cMeasurementStep_Movement>();
 
+	if (type == "marker")
+		return std::make_shared<cMeasurementStep_Marker>();
+
 	return std::shared_ptr<cMeasurementStep>();
 }
 
@@ -707,6 +710,40 @@ QString cMeasurementStep_Movement::generateComment() const
 		return QString("Recording: On");
 
 	return QString();
+}
+
+
+/********************************************************************
+ *
+ * Measurement Step: Marker
+ *
+ ********************************************************************/
+
+cBaseStep* cMeasurementStep_Marker::graphicsItem(const int id) const
+{
+	auto step = new cProcessStep(id);
+	step->setTitle("Marker");
+
+	return step;
+}
+
+void cMeasurementStep_Marker::load(const nlohmann::json& jdoc)
+{
+	using namespace nlohmann;
+
+	std::string marker_type = jdoc["marker type"];
+
+}
+
+nlohmann::json cMeasurementStep_Marker::save()
+{
+	nlohmann::json entry;
+
+	entry["type"] = "marker";
+
+	mDirty = false;
+
+	return entry;
 }
 
 
