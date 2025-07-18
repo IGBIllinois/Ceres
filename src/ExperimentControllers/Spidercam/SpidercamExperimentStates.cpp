@@ -49,6 +49,11 @@ bool cSpidercamExperimentState::recording()
 
 void cSpidercamExperimentState::run()
 {
+	mErrorDetected = mController.linkError();
+
+	if (mErrorDetected)
+		return;
+
 	mBusy = mController.isBusy();
 	mIsConsoleConnected = mController.isConsoleConnected();
 	mIsMoving = mController.isMoving();
@@ -97,6 +102,9 @@ void cSpidercamExperimentState::stop()
 
 cExperimentState::eRESULT cSpidercamExperimentState::finished()
 {
+	if (mErrorDetected)
+		return eRESULT::ABORT;
+
 	mIsConsoleConnected = mController.isConsoleConnected();
 	mIsSetPointEnabled = mController.isSetPointEnabled();
 	mInError = mController.isInError();
@@ -268,6 +276,7 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 
 bool cSpidercamExperimentState_Movement::initialize()
 {
+	mErrorDetected = false;
 	mMotionDetected = false;
 	mMoveCommandSent = false;
 	mStopCommandSent = false;
@@ -442,6 +451,7 @@ bool cSpidercamExperimentState_DeltaMovement::configure(const nlohmann::json& st
 
 bool cSpidercamExperimentState_DeltaMovement::initialize()
 {
+	mErrorDetected = false;
 	mMotionDetected = false;
 	mMoveCommandSent = false;
 	mStopCommandSent = false;

@@ -28,6 +28,8 @@ protected:
 	const spidercam::sPosition_1_t& mDollyPos;
 	iSpidercamController& mController;
 
+	bool mErrorDetected = false;
+
 	bool mMotionDetected = false;
 	bool mMoveCommandSent = false;
 	bool mStopCommandSent = false;

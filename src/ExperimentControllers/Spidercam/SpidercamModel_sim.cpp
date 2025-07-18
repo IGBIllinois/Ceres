@@ -140,6 +140,11 @@ bool cSpidercamModel_sim::systemReady() const
     return true;
 }
 
+bool cSpidercamModel_sim::linkError() const
+{
+    return false;
+}
+
 bool cSpidercamModel_sim::isBusy() const
 {
     return (mFlags & BUSY) != 0;

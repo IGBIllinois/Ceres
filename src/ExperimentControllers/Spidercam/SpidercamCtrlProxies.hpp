@@ -13,6 +13,8 @@ class iSpidercamController
 public:
 	iSpidercamController() = default;
 
+	virtual bool linkError() const = 0;
+
 	virtual bool isBusy() const = 0;
 	virtual bool isConsoleConnected() const = 0;
 	virtual bool isMoving() const = 0;
@@ -38,6 +40,8 @@ public:
 	cSpidercamCtrlProxy(MODEL* pModel) : mpModel(pModel) {};
 	~cSpidercamCtrlProxy() = default;
 
+	bool linkError() const override;
+
 	bool isBusy() const override;
 	bool isConsoleConnected() const override;
 	bool isMoving() const override;
@@ -56,6 +60,12 @@ private:
 	MODEL* mpModel = nullptr;
 };
 
+
+template<class MODEL>
+inline bool cSpidercamCtrlProxy<MODEL>::linkError() const
+{
+	return mpModel->linkError();
+};
 
 template<class MODEL>
 inline bool cSpidercamCtrlProxy<MODEL>::isBusy() const

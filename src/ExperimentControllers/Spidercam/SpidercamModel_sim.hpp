@@ -39,6 +39,8 @@ public:
 	void stopCommunications() override;
 
 public:
+	bool linkError() const;
+
 	bool isBusy() const;
 	bool isConsoleConnected() const;
 	bool isMoving() const;
