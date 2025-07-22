@@ -49,17 +49,17 @@ bool cSpidercamExperimentState::recording()
 
 void cSpidercamExperimentState::run()
 {
-	mErrorDetected = mController.linkError();
-
-	if (mErrorDetected)
-		return;
-
 	mBusy = mController.isBusy();
 	mIsConsoleConnected = mController.isConsoleConnected();
 	mIsMoving = mController.isMoving();
 	mIsSetPointEnabled = mController.isSetPointEnabled();
 	mInError = mController.isInError();
 	mInScriptMode = mController.isInScriptMode();
+	mErrorDetected = mInError || mController.linkError();
+
+	if (mErrorDetected)
+		return;
+
 
 	bool readyForMotion = mIsConsoleConnected && mIsSetPointEnabled && !mBusy; // && !mInError;
 
