@@ -8,6 +8,24 @@
 
 cSound::cSound()
 {
+	int count = 0;
+
+	SDL_AudioDeviceID* ids = SDL_GetAudioPlaybackDevices(&count);
+
+	if (ids && (count > 0))
+	{
+		for (int i = 0; i < count; ++i)
+		{
+			sAudioDevice device;
+			device.audio_device_ID = ids[i];
+			device.audio_device_name = SDL_GetAudioDeviceName(device.audio_device_ID);
+
+			mAudioDevices.push_back(device);
+		}
+	}
+
+	if (ids)
+		SDL_free(ids);
 }
 
 cSound::~cSound()
@@ -20,6 +38,15 @@ cSound::~cSound()
 	}
 }
 
+const std::vector<sAudioDevice>& cSound::getAudioDevices() const
+{
+	return mAudioDevices;
+}
+
+bool cSound::setPlaybackDevice(SDL_AudioDeviceID id)
+{
+
+}
 
 bool cSound::open(const std::string& filename)
 {
@@ -92,4 +119,45 @@ void cSound::play()
 	}
 
 }
+
+bool cSound::test(SDL_AudioDeviceID id, const std::string& filename)
+{
+	SDL_AudioSpec spec;
+	char* wav_path = nullptr;
+	uint8_t* wav_data = nullptr;
+	uint32_t wav_data_len = 0;
+
+	SDL_asprintf(&wav_path, filename.c_str());
+	if (!SDL_LoadWAV(wav_path, &spec, &wav_data, &wav_data_len))
+	{
+		SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
+		return false;
+	}
+
+	SDL_free(wav_path);  /* done with this string. */
+
+	/* Create our audio stream in the same format as the .wav file. It'll convert to what the audio hardware wants. */
+	SDL_AudioStream* pAudioStream = SDL_OpenAudioDeviceStream(id, &spec, NULL, NULL);
+	if (!pAudioStream)
+	{
+		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
+		return false;
+	}
+	auto result = SDL_PutAudioStreamData(pAudioStream, wav_data, wav_data_len);
+	if (!result)
+	{
+		std::string msg = SDL_GetError();
+	}
+
+	result = SDL_ResumeAudioStreamDevice(pAudioStream);
+	if (!result)
+	{
+		std::string msg = SDL_GetError();
+	}
+
+	SDL_ClearAudioStream(pAudioStream);
+	SDL_free(wav_data);
+	SDL_DestroyAudioStream(pAudioStream);
+}
+
 
