@@ -53,6 +53,7 @@ public slots:
 
     void onLocalStatusUpdate(QString msg);
     void onLocalLogMessage(uint8_t type, QString device, QString msg);
+    void onSensorLogMessage(uint8_t type, QString device, QString instance, QString msg);
 
 private slots:
     void onSettingDefaultDataPath();

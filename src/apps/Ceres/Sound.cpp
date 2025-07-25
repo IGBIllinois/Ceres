@@ -45,7 +45,16 @@ const std::vector<sAudioDevice>& cSound::getAudioDevices() const
 
 bool cSound::setPlaybackDevice(SDL_AudioDeviceID id)
 {
+	for (const auto& device : mAudioDevices)
+	{
+		if (device.audio_device_ID == id)
+		{
+			mAudioDeviceID = id;
+			return true;
+		}
+	}
 
+	return false;
 }
 
 bool cSound::open(const std::string& filename)
@@ -158,6 +167,8 @@ bool cSound::test(SDL_AudioDeviceID id, const std::string& filename)
 	SDL_ClearAudioStream(pAudioStream);
 	SDL_free(wav_data);
 	SDL_DestroyAudioStream(pAudioStream);
+
+	return true;
 }
 
 

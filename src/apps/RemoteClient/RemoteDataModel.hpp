@@ -62,6 +62,7 @@ signals:
 
     void localStatusMessage(QString msg) const;
     void localLogMessage(quint8 type, QString device, QString msg);
+    void sensorLogMessage(quint8 type, QString sensor, QString instance, QString msg);
 
 /*
  * Signals handlers from the timer

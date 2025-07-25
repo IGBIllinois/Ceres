@@ -68,10 +68,10 @@ void cRemoteClientCentalWindow::logMessage(uint8_t type, QString device, QString
     {
     case 0:
         mpLogWindow->logStatusMessage(device, msg);
-        break;
+            break;
     case 1:
         mpLogWindow->logInfoMessage(device, msg);
-        break;
+            break;
     case 2:
         mpLogWindow->logWarningMessage(device, msg);
         break;
@@ -80,6 +80,35 @@ void cRemoteClientCentalWindow::logMessage(uint8_t type, QString device, QString
         break;
     default:
         mpLogWindow->logMessage(device, msg);
+        break;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void cRemoteClientCentalWindow::logMessage(uint8_t type, QString device, QString instance, QString msg)
+{
+    if (instance.isEmpty())
+    {
+        logMessage(type, device, msg);
+        return;
+    }
+
+    switch (type)
+    {
+    case 0:
+        mpLogWindow->logStatusMessage(device + ":" + instance, msg);
+        break;
+    case 1:
+        mpLogWindow->logInfoMessage(device + ":" + instance, msg);
+        break;
+    case 2:
+        mpLogWindow->logWarningMessage(device + ":" + instance, msg);
+        break;
+    case 3:
+        mpLogWindow->logErrorMessage(device + ":" + instance, msg);
+        break;
+    default:
+        mpLogWindow->logMessage(device + ":" + instance, msg);
         break;
     }
 }
