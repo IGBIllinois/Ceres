@@ -47,9 +47,15 @@ signals:
     void velCovGeodeticStateChanged(bool valid);
     void posProjectedStateChanged(bool valid);
     void receiverTimeStateChanged(bool valid);
+    void diffCorrStateChanged(bool valid);
     void rtcmDatumStateChanged(bool valid);
+    void ntripStateChanged(bool valid);
+    void receiverStatusStateChanged(bool valid);
+    void wifiClientStateChanged(bool valid);
+    void wifiClientConnectionChanged(int state, int powerLevel_dBm, int errorCode);
     void solutionTypeChanged(int solution_type);
     void positionChanged(int x_mm, int y_mm, int z_mm);
+//    void wifiStateChanged(int state, int powerLevel_dBm);
 
 signals:
     void updateGeodeticPVT(double timestamp_s,

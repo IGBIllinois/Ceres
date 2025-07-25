@@ -35,13 +35,27 @@ void cSsnxStatusView::createWidgets()
 	mpPvtCartesianValid = new QLedIndicator("Cartesian Position/Velocity/Time Valid", this);
 	mpPvtGeodeticValid  = new QLedIndicator("Geodetic Position/Velocity/Time Valid", this);
 
-	mpPosCovGeodeticValid = new QLedIndicator("Geodetic Position Covariance Matrix Valid", this);
-	mpVelCovGeodeticValid = new QLedIndicator("Geodetic Velocity Covariance Matrix Valid", this);
+//	mpPosCovGeodeticValid = new QLedIndicator("Geodetic Position Covariance Matrix Valid", this);
+//	mpVelCovGeodeticValid = new QLedIndicator("Geodetic Velocity Covariance Matrix Valid", this);
 
 	mpPosProjectedValid = new QLedIndicator("Projected Position Valid", this);
 	mpReceiverTimeValid = new QLedIndicator("Receiver Time Valid", this);
 
 	mpRtcmDatumValid = new QLedIndicator("RTCM Datum Valid", this);
+	mpWifiClientValid = new QLedIndicator("Wifi Client Valid", this);
+	mpNtripClientValid = new QLedIndicator("NTRIP Valid", this);
+	mpReceiverStatusValid = new QLedIndicator("Receiver Status Valid", this);
+
+	mpWifiConnectionStatus = new QMultiStateLedIndicator("Wifi Connection", this);
+	mpWifiConnectionStatus->setStateStyle(0, Qt::red, Qt::SolidPattern);
+	mpWifiConnectionStatus->setStateStyle(1, Qt::yellow, Qt::SolidPattern);
+	mpWifiConnectionStatus->setStateStyle(2, Qt::green, Qt::SolidPattern);
+
+	mpWifiPowerLevel_dBm = new QLineEdit();
+	mpWifiPowerLevel_dBm->setReadOnly(true);
+
+	mpWifiErrorCode = new QLineEdit();
+	mpWifiErrorCode->setReadOnly(true);
 
 	mpLatitude_deg = new QLineEdit();
 	mpLatitude_deg->setReadOnly(true);
@@ -123,8 +137,11 @@ void cSsnxStatusView::doLayout()
 	auto* packetInfoLayout = new QGridLayout();
 	packetInfoLayout->addWidget(mpPvtCartesianValid, 0, 0);
 	packetInfoLayout->addWidget(mpPvtGeodeticValid, 0, 1);
-	packetInfoLayout->addWidget(mpPosCovGeodeticValid, 0, 2);
-	packetInfoLayout->addWidget(mpVelCovGeodeticValid, 0, 3);
+//	packetInfoLayout->addWidget(mpPosCovGeodeticValid, 0, 2);
+//	packetInfoLayout->addWidget(mpVelCovGeodeticValid, 0, 3);
+	packetInfoLayout->addWidget(mpReceiverStatusValid, 0, 2);
+	packetInfoLayout->addWidget(mpWifiClientValid, 0, 3);
+	packetInfoLayout->addWidget(mpNtripClientValid, 0, 4);
 	packetInfoLayout->addWidget(mpPosProjectedValid, 1, 0);
 	packetInfoLayout->addWidget(mpReceiverTimeValid, 1, 1);
 	packetInfoLayout->addWidget(mpRtcmDatumValid, 1, 2);
@@ -132,6 +149,24 @@ void cSsnxStatusView::doLayout()
 	packetBox->setLayout(packetInfoLayout);
 
 	mainLayout->addWidget(packetBox);
+
+	mainLayout->addSpacing(10);
+
+	QGroupBox* receiverBox = new QGroupBox("Receiver Information");
+
+	auto* wifiLayout = new QHBoxLayout();
+
+	wifiLayout->addWidget(mpWifiConnectionStatus);
+	text = new QLabel("Power Level (dBm)");
+	wifiLayout->addWidget(text);
+	wifiLayout->addWidget(mpWifiPowerLevel_dBm);
+	text = new QLabel("Error Code");
+	wifiLayout->addWidget(text);
+	wifiLayout->addWidget(mpWifiErrorCode);
+
+	receiverBox->setLayout(wifiLayout);
+
+	mainLayout->addWidget(receiverBox);
 
 	mainLayout->addSpacing(10);
 
@@ -311,12 +346,12 @@ void cSsnxStatusView::onPvtGeodeticStateChange(bool valid)
 
 void cSsnxStatusView::onPosCovGeodeticStateChange(bool valid)
 {
-	mpPosCovGeodeticValid->setState(valid);
+//	mpPosCovGeodeticValid->setState(valid);
 }
 
 void cSsnxStatusView::onVelCovGeodeticStateChange(bool valid)
 {
-	mpVelCovGeodeticValid->setState(valid);
+//	mpVelCovGeodeticValid->setState(valid);
 }
 
 void cSsnxStatusView::onPosProjectedStateChange(bool valid)
@@ -332,6 +367,33 @@ void cSsnxStatusView::onReceiverTimeStateChange(bool valid)
 void cSsnxStatusView::onRtcmDatumStateChange(bool valid)
 {
 	mpRtcmDatumValid->setState(valid);
+}
+
+void cSsnxStatusView::onWifiConnectionChange(int state, int powerLevel_dBm, int errorCode)
+{
+	mpWifiConnectionStatus->changeState(state);
+
+	if (powerLevel_dBm < -127)
+		mpWifiPowerLevel_dBm->setText("---");
+	else
+		mpWifiPowerLevel_dBm->setText(QString::number(powerLevel_dBm));
+
+	mpWifiErrorCode->setText(QString::number(errorCode));
+}
+
+void cSsnxStatusView::onNtripStateChange(bool valid)
+{
+	mpNtripClientValid->setState(valid);
+}
+
+void cSsnxStatusView::onWifiClientStateChange(bool valid)
+{
+	mpWifiClientValid->setState(valid);
+}
+
+void cSsnxStatusView::onReceiverStatusStateChange(bool valid)
+{
+	mpReceiverStatusValid->setState(valid);
 }
 
 void cSsnxStatusView::onGeodeticPVT_Change(double timestamp_s,

@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 // Forward Declaration
 class cSsnxModel;
 class QLedIndicator;
+class QMultiStateLedIndicator;
 class QButtonIndicator;
 
 
@@ -37,6 +38,11 @@ public slots:
 	void onPosProjectedStateChange(bool valid);
 	void onReceiverTimeStateChange(bool valid);
 	void onRtcmDatumStateChange(bool valid);
+	void onWifiClientStateChange(bool valid);
+	void onReceiverStatusStateChange(bool valid);
+	void onNtripStateChange(bool valid);
+
+	void onWifiConnectionChange(int state, int powerLevel_dBm, int errorCode);
 	void onSolutionTypeChange(int solution_type);
 	void onPositionChange(int x_mm, int y_mm, int z_mm);
 	void onGeodeticPVT_Change(double timestamp_s,
@@ -50,11 +56,18 @@ public slots:
 private:
 	QLedIndicator* mpPvtCartesianValid = nullptr;
 	QLedIndicator* mpPvtGeodeticValid = nullptr;
-	QLedIndicator* mpPosCovGeodeticValid = nullptr;
-	QLedIndicator* mpVelCovGeodeticValid = nullptr;
+//	QLedIndicator* mpPosCovGeodeticValid = nullptr;
+//	QLedIndicator* mpVelCovGeodeticValid = nullptr;
 	QLedIndicator* mpPosProjectedValid = nullptr;
 	QLedIndicator* mpReceiverTimeValid = nullptr;
 	QLedIndicator* mpRtcmDatumValid = nullptr;
+	QLedIndicator* mpWifiClientValid = nullptr;
+	QLedIndicator* mpNtripClientValid = nullptr;
+	QLedIndicator* mpReceiverStatusValid = nullptr;
+
+	QMultiStateLedIndicator* mpWifiConnectionStatus = nullptr;
+	QLineEdit* mpWifiPowerLevel_dBm = nullptr;
+	QLineEdit* mpWifiErrorCode = nullptr;
 
 	QLineEdit* mpLatitude_deg = nullptr;
 	QLineEdit* mpLongitude_deg = nullptr;

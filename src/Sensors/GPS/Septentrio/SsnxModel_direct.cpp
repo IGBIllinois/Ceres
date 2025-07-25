@@ -51,16 +51,18 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
 {
     emit statusMessage("Connecting to SSNX GPS receiver...");
 
+    std::string portname;
+
     try
     {
         auto serial_port = jsonCfg["serial_port"];
 
 #if defined(WIN32)
-        std::string portname = serial_port["windows"];
+        portname = serial_port["windows"];
 #elif defined(__APPLE_CC__)
-        std::string portname = serial_port["macOS"];
+        portname = serial_port["macOS"];
 #else
-        std::string portname = serial_port["linux"];
+        portname = serial_port["linux"];
 #endif
 
         mSerialPort.setPort(QSerialPortInfo(QString::fromStdString(portname)));
@@ -86,7 +88,10 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
         return false;
     }
 
-    return cSsnxModel::configure(jsonCfg);
+    auto result = cSsnxModel::configure(jsonCfg);
+
+
+    return result;
 }
 
 bool cSsnxModel_direct::startCommunications()
@@ -124,6 +129,7 @@ void cSsnxModel_direct::writeDataHeader()
 void cSsnxModel_direct::closeConnection()
 {
     mSerialPort.close();
+    logMessage(logERROR, "Serial connection to GPS is closed!");
 }
 
 bool cSsnxModel_direct::isConnected()
@@ -415,6 +421,13 @@ void cSsnxModel_direct::receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt)
     emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
 }
 
+void cSsnxModel_direct::diffCorrIn(const ssnx::gps::DiffCorrIn_1_t& diff_corr)
+{
+    mDiffCorrValid = diff_corr.dataValid;
+    if (mDiffCorrValid.HasChanged())
+        emit diffCorrStateChanged(mDiffCorrValid);
+}
+
 void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
 {
     mRtcmDatumValid = rtcm.dataValid;
@@ -431,10 +444,64 @@ void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
 
 void cSsnxModel_direct::receiverStatus(const ssnx::gps::ReceiverStatus_2_t& status)
 {
+    mReceiverStatusValid = status.dataValid;
+    if (mReceiverStatusValid.HasChanged())
+        emit receiverStatusStateChanged(mReceiverStatusValid);
 }
 
 void cSsnxModel_direct::ntripClientStatus(const ssnx::gps::NTRIP_ClientStatus_1_t& status)
 {
+    mNtripClientValid = status.dataValid;
+    if (mNtripClientValid.HasChanged())
+        emit ntripStateChanged(mNtripClientValid);
+    
+    /*
+    if (status.clients.empty())
+    {
+        mNtripClientValid = false;
+    }
+    else
+    {
+        auto& client = status.clients.front();
+        if (client.Status == ssnx::gps::eNTRIP_Status::RUNNING)
+        {
+            mNtripClientValid = true;;
+        }
+        else
+        {
+            mNtripClientValid = false;
+        }
+    }
+
+    if (mNtripClientValid.HasChanged())
+        emit ntripStateChanged(mNtripClientValid);
+*/
+}
+
+void cSsnxModel_direct::wifiClientStatus(const ssnx::gps::WIFI_ClientStatus_1_t& status)
+{
+    mWifiClientValid = status.dataValid;
+    if (mWifiClientValid.HasChanged())
+        emit wifiClientStateChanged(mWifiClientValid);
+
+    if (status.dataValid)
+    {
+        switch (status.Status)
+        {
+        case ssnx::gps::eWIFI_Status::CONNECTED: mWifiConnection = 2; break;
+        case ssnx::gps::eWIFI_Status::CONNECTING: mWifiConnection = 1; break;
+        case ssnx::gps::eWIFI_Status::NOT_CONNECTED: mWifiConnection = 0; break;
+        }
+    }
+    else
+        mWifiConnection = 0;
+
+    mWifiPowerLevel = status.PowerLevel_dBm;
+
+    mWifiErrorCode = static_cast<uint8_t>(status.ErrorCode);
+
+    if (mWifiConnection.HasChanged() || mWifiPowerLevel.HasChanged() || mWifiErrorCode.HasChanged())
+        emit wifiClientConnectionChanged(mWifiConnection, mWifiPowerLevel, mWifiErrorCode);
 }
 
 

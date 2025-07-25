@@ -47,6 +47,10 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
             QObject::connect(pModel, &cSsnxModel::posProjectedStateChanged, pView, &cSsnxStatusView::onPosProjectedStateChange);
             QObject::connect(pModel, &cSsnxModel::receiverTimeStateChanged, pView, &cSsnxStatusView::onReceiverTimeStateChange);
             QObject::connect(pModel, &cSsnxModel::rtcmDatumStateChanged, pView, &cSsnxStatusView::onRtcmDatumStateChange);
+            QObject::connect(pModel, &cSsnxModel::receiverStatusStateChanged, pView, &cSsnxStatusView::onReceiverStatusStateChange);
+            QObject::connect(pModel, &cSsnxModel::wifiClientStateChanged, pView, &cSsnxStatusView::onWifiClientStateChange);
+            QObject::connect(pModel, &cSsnxModel::wifiClientConnectionChanged, pView, &cSsnxStatusView::onWifiConnectionChange);
+            QObject::connect(pModel, &cSsnxModel::ntripStateChanged, pView, &cSsnxStatusView::onNtripStateChange);
             QObject::connect(pModel, &cSsnxModel::solutionTypeChanged, pView, &cSsnxStatusView::onSolutionTypeChange);
             QObject::connect(pModel, &cSsnxModel::positionChanged, pView, &cSsnxStatusView::onPositionChange);
             QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxStatusView::onGeodeticPVT_Change);

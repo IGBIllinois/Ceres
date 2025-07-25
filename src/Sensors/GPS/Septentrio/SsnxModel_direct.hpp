@@ -45,9 +45,11 @@ protected:
     void velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov) override;
     void posProjected(const ssnx::gps::POS_Projected_1_t& pvt) override;
     void receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt) override;
+    void diffCorrIn(const ssnx::gps::DiffCorrIn_1_t& diff_corr) override;
     void rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm) override;
     void receiverStatus(const ssnx::gps::ReceiverStatus_2_t& status) override;
     void ntripClientStatus(const ssnx::gps::NTRIP_ClientStatus_1_t& status) override;
+    void wifiClientStatus(const ssnx::gps::WIFI_ClientStatus_1_t& status) override;
 
 private:
     void closeConnection() override;
@@ -103,12 +105,21 @@ private:
 
     sPosPojected_t mPosPojected;
 
+
+    edge_detect<uint8_t> mWifiConnection;
+    edge_detect<int8_t> mWifiPowerLevel;
+    edge_detect<uint8_t> mWifiErrorCode;
+
     edge_detect<bool> mPvtCartesianValid;
     edge_detect<bool> mPvtGeodeticValid;
     edge_detect<bool> mPosCovGeodeticValid;
     edge_detect<bool> mVelCovGeodeticValid;
     edge_detect<bool> mPosProjectedValid;
     edge_detect<bool> mReceiverTimeValid;
+    edge_detect<bool> mDiffCorrValid;
     edge_detect<bool> mRtcmDatumValid;
+    edge_detect<bool> mNtripClientValid;
+    edge_detect<bool> mWifiClientValid;
+    edge_detect<bool> mReceiverStatusValid;
 };
 
