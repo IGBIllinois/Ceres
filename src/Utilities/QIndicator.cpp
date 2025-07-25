@@ -183,6 +183,112 @@ void QLedIndicator::paintEvent(QPaintEvent* event)
 }
 
 
+/////////////////////////////////////////////////////////////////////
+// M U L T I   S T A T E   L E D   I N D I C A T O R
+/////////////////////////////////////////////////////////////////////
+QMultiStateLedIndicator::QMultiStateLedIndicator(const QString& text, QWidget* parent)
+	:
+	QMultiStateLedIndicator(parent)
+{
+	mText.setText(text);
+
+	auto text_size = mText.size();
+	setFixedSize(mLedSize + mMargin + text_size.width(), mLedSize + mMargin);
+}
+
+QMultiStateLedIndicator::QMultiStateLedIndicator(QWidget* parent)
+	:
+	QWidget(parent)
+{
+
+	for (auto& style : mLedStyle)
+	{
+		style.ledColor = Qt::transparent;
+		style.ledPattern = Qt::NoBrush;
+	}
+
+	mMargin = 10;
+	mLedSize = 12;
+	setFixedSize(mLedSize + mMargin, mLedSize + mMargin);
+}
+
+QMultiStateLedIndicator::~QMultiStateLedIndicator()
+{
+}
+
+void QMultiStateLedIndicator::setText(const QString& text)
+{
+	mText.setText(text);
+
+	auto text_size = mText.size();
+	setFixedSize(mLedSize + mMargin + text_size.width(), mLedSize + mMargin);
+
+	update();
+}
+
+QString QMultiStateLedIndicator::text() const
+{
+	return mText.text();
+}
+
+void QMultiStateLedIndicator::setStateColor(uint8_t state, QColor onColor)
+{
+	mLedStyle[state].ledColor = onColor;
+	update();
+}
+
+void QMultiStateLedIndicator::setStatePattern(uint8_t state, Qt::BrushStyle onPattern)
+{
+	mLedStyle[state].ledPattern = onPattern;
+	update();
+}
+
+uint8_t QMultiStateLedIndicator::getState() const
+{
+	return mState;
+}
+
+void QMultiStateLedIndicator::setState(uint8_t state)
+{
+	mState = state;
+	update();
+
+	emit stateChanged(mState);
+}
+
+void QMultiStateLedIndicator::changeState(int state)
+{
+	if ((state < 0) || (state > 255)) return;
+	setState(static_cast<uint8_t>(state));
+}
+
+int  QMultiStateLedIndicator::margin() const { return mMargin; }
+
+void QMultiStateLedIndicator::setMargin(int margin)
+{
+	mMargin = margin < 0 ? 0 : margin;
+}
+
+void QMultiStateLedIndicator::setLedSize(int size)
+{
+	mLedSize = size < 0 ? 0 : size;
+
+	auto text_size = mText.size();
+	setFixedSize(mLedSize + mMargin + text_size.width(), mLedSize + mMargin);
+
+	update();
+}
+
+void QMultiStateLedIndicator::paintEvent(QPaintEvent* event)
+{
+	QPainter p(this);
+
+	p.setBrush(QBrush(mLedStyle[mState].ledColor, mLedStyle[mState].ledPattern));
+	p.drawEllipse(0, 0, mLedSize, mLedSize);
+	p.drawStaticText(mLedSize + 5, 0, mText);
+}
+
+
 
 /////////////////////////////////////////////////////////////////////
 // B U T T O N   I N D I C A T O R

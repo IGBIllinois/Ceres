@@ -5,6 +5,8 @@
 #include <QStaticText>
 #include <QTextOption>
 
+#include <array>
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
     class QStyleOptionButton;
@@ -67,6 +69,68 @@ private:
 
     QColor  mLedOffColor;
     Qt::BrushStyle mLedOffPattern;
+
+    int mLedSize;
+    int mMargin;
+};
+
+
+/**
+ * An multi state LED based indicator
+ *
+ * A multi state indicator with text.  The indicator has the following layout:
+ *
+ *      o  Text
+ *
+ * The circle will show the state color/pattern.
+ */
+class QMultiStateLedIndicator : public QWidget
+{
+    Q_OBJECT
+
+public:
+    QMultiStateLedIndicator(QWidget* parent = nullptr);
+    QMultiStateLedIndicator(const QString& text, QWidget* parent = nullptr);
+    virtual ~QMultiStateLedIndicator();
+
+    void setText(const QString& text);
+    QString text() const;
+
+    uint8_t getState() const;
+    void setState(uint8_t state);
+
+    void setStateColor(uint8_t state, QColor onColor);
+    void setStatePattern(uint8_t state, Qt::BrushStyle onPattern);
+
+    int  margin() const;
+    void setMargin(int margin);
+
+    /*
+     * Sets the size of the LED circle.
+     */
+    void setLedSize(int size);
+
+signals:
+    void stateChanged(int state);
+
+public slots:
+    void changeState(int state);
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
+private:
+    QStaticText mText;
+
+    int    mState = 0;
+
+    struct sPaintInfo_t
+    {
+        QColor  ledColor;
+        Qt::BrushStyle ledPattern;
+    };
+
+    std::array<sPaintInfo_t, 256> mLedStyle;
 
     int mLedSize;
     int mMargin;
