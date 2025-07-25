@@ -41,9 +41,11 @@ public:
 
     void setOnColor(QColor onColor);
     void setOnPattern(Qt::BrushStyle onPattern);
+    void setOnStyle(QColor onColor, Qt::BrushStyle onPattern);
 
     void setOffColor(QColor offColor);
     void setOffPattern(Qt::BrushStyle offPattern);
+    void setOffStyle(QColor offColor, Qt::BrushStyle offPattern);
 
     int  margin() const;
     void setMargin(int margin);
@@ -101,6 +103,7 @@ public:
 
     void setStateColor(uint8_t state, QColor onColor);
     void setStatePattern(uint8_t state, Qt::BrushStyle onPattern);
+    void setStateStyle(uint8_t state, QColor onColor, Qt::BrushStyle onPattern);
 
     int  margin() const;
     void setMargin(int margin);

@@ -134,6 +134,13 @@ void QLedIndicator::setOnPattern(Qt::BrushStyle onPattern)
 	update();
 }
 
+void QLedIndicator::setOnStyle(QColor onColor, Qt::BrushStyle onPattern)
+{
+	mLedOnColor = onColor;
+	mLedOnPattern = onPattern;
+	update();
+}
+
 void QLedIndicator::setOffColor(QColor offColor)
 {
 	mLedOffColor = offColor;
@@ -142,6 +149,13 @@ void QLedIndicator::setOffColor(QColor offColor)
 
 void QLedIndicator::setOffPattern(Qt::BrushStyle offPattern)
 {
+	mLedOffPattern = offPattern;
+	update();
+}
+
+void QLedIndicator::setOffStyle(QColor offColor, Qt::BrushStyle offPattern)
+{
+	mLedOffColor = offColor;
 	mLedOffPattern = offPattern;
 	update();
 }
@@ -239,6 +253,13 @@ void QMultiStateLedIndicator::setStateColor(uint8_t state, QColor onColor)
 
 void QMultiStateLedIndicator::setStatePattern(uint8_t state, Qt::BrushStyle onPattern)
 {
+	mLedStyle[state].ledPattern = onPattern;
+	update();
+}
+
+void QMultiStateLedIndicator::setStateStyle(uint8_t state, QColor onColor, Qt::BrushStyle onPattern)
+{
+	mLedStyle[state].ledColor = onColor;
 	mLedStyle[state].ledPattern = onPattern;
 	update();
 }
