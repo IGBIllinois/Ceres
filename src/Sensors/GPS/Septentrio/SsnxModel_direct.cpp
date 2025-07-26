@@ -4,6 +4,8 @@
 
 #include "../GpsUtils.hpp"
 
+#include <ssnx/ssn_utils.hpp>
+
 #include <QtSerialPort/QSerialPortInfo>
 
 #include <functional>
@@ -38,13 +40,18 @@ void cSsnxModel_direct::updateViews()
 {
     emit sensorStatusChanging(q_name(), q_instance(), getStatus());
 
-    emit pvtCartesianStateChanged(mPvtCartesianValid);
-    emit pvtGeodeticStateChanged(mPvtGeodeticValid);
-    emit posCovGeodeticStateChanged(mPosCovGeodeticValid);
-    emit velCovGeodeticStateChanged(mVelCovGeodeticValid);
-    emit posProjectedStateChanged(mPosProjectedValid);
-    emit receiverTimeStateChanged(mReceiverTimeValid);
-    emit rtcmDatumStateChanged(mRtcmDatumValid);
+    emit pvtCartesianDataValid(mPvtCartesianValid);
+    emit pvtGeodeticDataValid(mPvtGeodeticValid);
+    emit posCovGeodeticDataValid(mPosCovGeodeticValid);
+    emit velCovGeodeticDataValid(mVelCovGeodeticValid);
+    emit posProjectedDataValid(mPosProjectedValid);
+    emit receiverTimeDataValid(mReceiverTimeValid);
+    emit rtcmDatumDataValid(mRtcmDatumValid);
+    emit diffCorrDataValid(mDiffCorrValid);
+    emit rtcmDatumDataValid(mRtcmDatumValid);
+    emit ntripClientDataValid(mNtripClientValid);
+    emit receiverStatusDataValid(mReceiverStatusValid);
+    emit wifiClientDataValid(mWifiClientValid);
 }
 
 bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
@@ -242,7 +249,7 @@ void cSsnxModel_direct::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t& pvt)
 {
     mPvtCartesianValid = pvt.dataValid;
     if (mPvtCartesianValid.HasChanged())
-        emit pvtCartesianStateChanged(mPvtCartesianValid);
+        emit pvtCartesianDataValid(mPvtCartesianValid);
 
     mCartesianPVT.dataValid = pvt.dataValid;
     mCartesianPVT.timestamp_s = pvt.timestamp_s;
@@ -274,7 +281,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
 {
     mPvtGeodeticValid = pvt.dataValid;
     if (mPvtGeodeticValid.HasChanged())
-        emit pvtGeodeticStateChanged(mPvtGeodeticValid);
+        emit pvtGeodeticDataValid(mPvtGeodeticValid);
 
     mPvtValid = pvt.dataValid;
     mPvtTimestamp_s = pvt.timestamp_s;
@@ -347,7 +354,7 @@ void cSsnxModel_direct::posCovGeodetic(const ssnx::gps::PosCovGeodetic_1_t& cov)
 {
     mPosCovGeodeticValid = cov.dataValid;
     if (mPosCovGeodeticValid.HasChanged())
-        emit posCovGeodeticStateChanged(mPosCovGeodeticValid);
+        emit posCovGeodeticDataValid(mPosCovGeodeticValid);
 
     if (!cov.dataValid) return;
 
@@ -361,7 +368,7 @@ void cSsnxModel_direct::velCovGeodetic(const ssnx::gps::VelCovGeodetic_1_t& cov)
 {
     mVelCovGeodeticValid = cov.dataValid;
     if (mVelCovGeodeticValid.HasChanged())
-        emit velCovGeodeticStateChanged(mVelCovGeodeticValid);
+        emit velCovGeodeticDataValid(mVelCovGeodeticValid);
 
     if (!cov.dataValid) return;
 
@@ -375,7 +382,7 @@ void cSsnxModel_direct::posProjected(const ssnx::gps::POS_Projected_1_t& pvt)
 {
     mPosProjectedValid = pvt.dataValid;
     if (mPosProjectedValid.HasChanged())
-        emit posProjectedStateChanged(mPosProjectedValid);
+        emit posProjectedDataValid(mPosProjectedValid);
 
     mPosPojected.dataValid = pvt.dataValid;
     mPosPojected.timestamp_s = pvt.timestamp_s;
@@ -398,7 +405,7 @@ void cSsnxModel_direct::receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt)
 {
     mReceiverTimeValid = pvt.dataValid;
     if (mReceiverTimeValid.HasChanged())
-        emit receiverTimeStateChanged(mReceiverTimeValid);
+        emit receiverTimeDataValid(mReceiverTimeValid);
 
     mTimeValid = pvt.dataValid;
     mRxTimestamp_s = pvt.timestamp_s;
@@ -425,14 +432,14 @@ void cSsnxModel_direct::diffCorrIn(const ssnx::gps::DiffCorrIn_1_t& diff_corr)
 {
     mDiffCorrValid = diff_corr.dataValid;
     if (mDiffCorrValid.HasChanged())
-        emit diffCorrStateChanged(mDiffCorrValid);
+        emit diffCorrDataValid(mDiffCorrValid);
 }
 
 void cSsnxModel_direct::rtcmDatum(const ssnx::gps::RtcmDatum_1_t& rtcm)
 {
     mRtcmDatumValid = rtcm.dataValid;
     if (mRtcmDatumValid.HasChanged())
-        emit rtcmDatumStateChanged(mRtcmDatumValid);
+        emit rtcmDatumDataValid(mRtcmDatumValid);
 
     if (!rtcm.dataValid) return;
 
@@ -446,53 +453,52 @@ void cSsnxModel_direct::receiverStatus(const ssnx::gps::ReceiverStatus_2_t& stat
 {
     mReceiverStatusValid = status.dataValid;
     if (mReceiverStatusValid.HasChanged())
-        emit receiverStatusStateChanged(mReceiverStatusValid);
+        emit receiverStatusDataValid(mReceiverStatusValid);
+
+    int error_code = 0;
+    error_code |= status.RxError.Congestion ? 0x01 : 0x00;
+    error_code |= status.RxError.CpuOverload ? 0x02 : 0x00;
+    error_code |= status.RxError.InvalidConfig ? 0x04 : 0x00;
+    error_code |= status.RxError.MissedEvent ? 0x08 : 0x00;
+    error_code |= status.RxError.OutOfGeoFence ? 0x10 : 0x00;
+    error_code |= status.RxError.Software ? 0x20 : 0x00;
+    error_code |= status.RxError.Watchdog ? 0x40 : 0x00;
+
+    mReceiverError = error_code;
+    if (mReceiverError.HasChanged())
+        emit receiverStatusChanged(mReceiverError);
 }
 
 void cSsnxModel_direct::ntripClientStatus(const ssnx::gps::NTRIP_ClientStatus_1_t& status)
 {
     mNtripClientValid = status.dataValid;
     if (mNtripClientValid.HasChanged())
-        emit ntripStateChanged(mNtripClientValid);
+        emit ntripClientDataValid(mNtripClientValid);
     
-    /*
     if (status.clients.empty())
     {
-        mNtripClientValid = false;
+        mNtripClientStatus = 0;
+        mNtripClientError = 0;
     }
     else
     {
         auto& client = status.clients.front();
-        if (client.Status == ssnx::gps::eNTRIP_Status::RUNNING)
-        {
-            mNtripClientValid = true;;
-        }
-        else
-        {
-            mNtripClientValid = false;
-        }
+        mNtripClientStatus = ssnx::to_uint8(client.Status);
+        mNtripClientError = ssnx::to_uint8(client.ErrorCode);
     }
 
-    if (mNtripClientValid.HasChanged())
-        emit ntripStateChanged(mNtripClientValid);
-*/
+    if (mNtripClientStatus.HasChanged() || mNtripClientError.HasChanged())
+        emit ntripClientStatusChanged(mNtripClientStatus, mNtripClientError);
 }
 
 void cSsnxModel_direct::wifiClientStatus(const ssnx::gps::WIFI_ClientStatus_1_t& status)
 {
     mWifiClientValid = status.dataValid;
     if (mWifiClientValid.HasChanged())
-        emit wifiClientStateChanged(mWifiClientValid);
+        emit wifiClientDataValid(mWifiClientValid);
 
     if (status.dataValid)
-    {
-        switch (status.Status)
-        {
-        case ssnx::gps::eWIFI_Status::CONNECTED: mWifiConnection = 2; break;
-        case ssnx::gps::eWIFI_Status::CONNECTING: mWifiConnection = 1; break;
-        case ssnx::gps::eWIFI_Status::NOT_CONNECTED: mWifiConnection = 0; break;
-        }
-    }
+        mWifiConnection = ssnx::to_uint8(status.Status);
     else
         mWifiConnection = 0;
 

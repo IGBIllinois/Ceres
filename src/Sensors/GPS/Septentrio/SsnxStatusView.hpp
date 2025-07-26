@@ -42,6 +42,8 @@ public slots:
 	void onReceiverStatusStateChange(bool valid);
 	void onNtripStateChange(bool valid);
 
+	void onReceiverStateChange(int errorCode);
+	void onNtripClientChange(int state, int errorCode);
 	void onWifiConnectionChange(int state, int powerLevel_dBm, int errorCode);
 	void onSolutionTypeChange(int solution_type);
 	void onPositionChange(int x_mm, int y_mm, int z_mm);
@@ -64,6 +66,17 @@ private:
 	QLedIndicator* mpWifiClientValid = nullptr;
 	QLedIndicator* mpNtripClientValid = nullptr;
 	QLedIndicator* mpReceiverStatusValid = nullptr;
+
+	QLedIndicator* mpRxErrorCongestion = nullptr;
+	QLedIndicator* mpRxErrorCpuOverload = nullptr;
+	QLedIndicator* mpRxErrorInvalidConfig = nullptr;
+	QLedIndicator* mpRxErrorMissedEvent = nullptr;
+	QLedIndicator* mpRxErrorOutOfGeoFence = nullptr;
+	QLedIndicator* mpRxErrorSoftware = nullptr;
+	QLedIndicator* mpRxErrorWatchdog = nullptr;
+
+	QLineEdit* mpNtripState = nullptr;
+	QLineEdit* mpNtripErrorCode = nullptr;
 
 	QMultiStateLedIndicator* mpWifiConnectionStatus = nullptr;
 	QLineEdit* mpWifiPowerLevel_dBm = nullptr;

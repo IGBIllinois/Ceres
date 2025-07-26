@@ -41,17 +41,20 @@ public:
     void disableDataRecording() override;
 
 signals:
-    void pvtCartesianStateChanged(bool valid);
-    void pvtGeodeticStateChanged(bool valid);
-    void posCovGeodeticStateChanged(bool valid);
-    void velCovGeodeticStateChanged(bool valid);
-    void posProjectedStateChanged(bool valid);
-    void receiverTimeStateChanged(bool valid);
-    void diffCorrStateChanged(bool valid);
-    void rtcmDatumStateChanged(bool valid);
-    void ntripStateChanged(bool valid);
-    void receiverStatusStateChanged(bool valid);
-    void wifiClientStateChanged(bool valid);
+    void pvtCartesianDataValid(bool valid);
+    void pvtGeodeticDataValid(bool valid);
+    void posCovGeodeticDataValid(bool valid);
+    void velCovGeodeticDataValid(bool valid);
+    void posProjectedDataValid(bool valid);
+    void receiverTimeDataValid(bool valid);
+    void diffCorrDataValid(bool valid);
+    void rtcmDatumDataValid(bool valid);
+    void ntripClientDataValid(bool valid);
+    void receiverStatusDataValid(bool valid);
+    void wifiClientDataValid(bool valid);
+
+    void receiverStatusChanged(int errorCode);
+    void ntripClientStatusChanged(int state, int errorCode);
     void wifiClientConnectionChanged(int state, int powerLevel_dBm, int errorCode);
     void solutionTypeChanged(int solution_type);
     void positionChanged(int x_mm, int y_mm, int z_mm);

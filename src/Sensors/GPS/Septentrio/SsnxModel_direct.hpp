@@ -105,6 +105,10 @@ private:
 
     sPosPojected_t mPosPojected;
 
+    edge_detect<int> mReceiverError;
+
+    edge_detect<uint8_t> mNtripClientStatus;
+    edge_detect<uint8_t> mNtripClientError;
 
     edge_detect<uint8_t> mWifiConnection;
     edge_detect<int8_t> mWifiPowerLevel;

@@ -7,6 +7,8 @@
 
 #include "../GpsUtils.hpp"
 
+#include <ssnx/ssn_utils.hpp>
+
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QLabel>
@@ -46,13 +48,53 @@ void cSsnxStatusView::createWidgets()
 	mpNtripClientValid = new QLedIndicator("NTRIP Valid", this);
 	mpReceiverStatusValid = new QLedIndicator("Receiver Status Valid", this);
 
-	mpWifiConnectionStatus = new QMultiStateLedIndicator("Wifi Connection", this);
+	mpRxErrorCongestion = new QLedIndicator("Congestion", this);
+	mpRxErrorCpuOverload = new QLedIndicator("Cpu Overload", this);
+	mpRxErrorInvalidConfig = new QLedIndicator("Invalid Config", this);
+	mpRxErrorMissedEvent = new QLedIndicator("Missed Event", this);
+	mpRxErrorOutOfGeoFence = new QLedIndicator("Out Of Geo Fence", this);
+	mpRxErrorSoftware = new QLedIndicator("Software", this);
+	mpRxErrorWatchdog = new QLedIndicator("Watchdog", this);
+
+	mpRxErrorCongestion->setLedSize(8);
+	mpRxErrorCpuOverload->setLedSize(8);
+	mpRxErrorInvalidConfig->setLedSize(8);
+	mpRxErrorMissedEvent->setLedSize(8);
+	mpRxErrorOutOfGeoFence->setLedSize(8);
+	mpRxErrorSoftware->setLedSize(8);
+	mpRxErrorWatchdog->setLedSize(8);
+
+	mpRxErrorCongestion->setOnColor(Qt::red);
+	mpRxErrorCpuOverload->setOnColor(Qt::red);
+	mpRxErrorInvalidConfig->setOnColor(Qt::red);
+	mpRxErrorMissedEvent->setOnColor(Qt::red);
+	mpRxErrorOutOfGeoFence->setOnColor(Qt::red);
+	mpRxErrorSoftware->setOnColor(Qt::red);
+	mpRxErrorWatchdog->setOnColor(Qt::red);
+
+	mpRxErrorCongestion->setOffColor(Qt::transparent);
+	mpRxErrorCpuOverload->setOffColor(Qt::transparent);
+	mpRxErrorInvalidConfig->setOffColor(Qt::transparent);
+	mpRxErrorMissedEvent->setOffColor(Qt::transparent);
+	mpRxErrorOutOfGeoFence->setOffColor(Qt::transparent);
+	mpRxErrorSoftware->setOffColor(Qt::transparent);
+	mpRxErrorWatchdog->setOffColor(Qt::transparent);
+
+
+	mpNtripState = new QLineEdit();
+	mpNtripState->setReadOnly(true);
+
+	mpNtripErrorCode = new QLineEdit();
+	mpNtripErrorCode->setReadOnly(true);
+
+	mpWifiConnectionStatus = new QMultiStateLedIndicator("Connection", this);
 	mpWifiConnectionStatus->setStateStyle(0, Qt::red, Qt::SolidPattern);
 	mpWifiConnectionStatus->setStateStyle(1, Qt::yellow, Qt::SolidPattern);
 	mpWifiConnectionStatus->setStateStyle(2, Qt::green, Qt::SolidPattern);
 
 	mpWifiPowerLevel_dBm = new QLineEdit();
 	mpWifiPowerLevel_dBm->setReadOnly(true);
+	mpWifiPowerLevel_dBm->setMaxLength(100);
 
 	mpWifiErrorCode = new QLineEdit();
 	mpWifiErrorCode->setReadOnly(true);
@@ -150,25 +192,68 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addWidget(packetBox);
 
-	mainLayout->addSpacing(10);
+	mainLayout->addSpacing(5);
+
+	auto* statusLayout = new QHBoxLayout();
 
 	QGroupBox* receiverBox = new QGroupBox("Receiver Information");
 
-	auto* wifiLayout = new QHBoxLayout();
+	auto* rxErrorLayout = new QGridLayout();
 
-	wifiLayout->addWidget(mpWifiConnectionStatus);
+	rxErrorLayout->addWidget(mpRxErrorCongestion, 0, 0);
+	rxErrorLayout->addWidget(mpRxErrorCpuOverload, 0, 1);
+	rxErrorLayout->addWidget(mpRxErrorInvalidConfig, 0, 2);
+	rxErrorLayout->addWidget(mpRxErrorMissedEvent, 0, 3);
+	rxErrorLayout->addWidget(mpRxErrorOutOfGeoFence, 1, 0);
+	rxErrorLayout->addWidget(mpRxErrorSoftware, 1, 1);
+	rxErrorLayout->addWidget(mpRxErrorWatchdog, 1, 2);
+
+	receiverBox->setLayout(rxErrorLayout);
+	statusLayout->addWidget(receiverBox);
+	statusLayout->addSpacing(5);
+
+	QGroupBox* wifiBox = new QGroupBox("Wifi Information");
+
+	auto* wifiLayout = new QVBoxLayout();
+
+	auto* wifiConnectLayout = new QHBoxLayout();
+
+	wifiConnectLayout->addWidget(mpWifiConnectionStatus);
 	text = new QLabel("Power Level (dBm)");
-	wifiLayout->addWidget(text);
-	wifiLayout->addWidget(mpWifiPowerLevel_dBm);
+	wifiConnectLayout->addWidget(text);
+	wifiConnectLayout->addWidget(mpWifiPowerLevel_dBm);
+
+	wifiLayout->addLayout(wifiConnectLayout);
+
+	auto* wifiErrorLayout = new QHBoxLayout();
+
 	text = new QLabel("Error Code");
-	wifiLayout->addWidget(text);
-	wifiLayout->addWidget(mpWifiErrorCode);
+	wifiErrorLayout->addWidget(text);
+	wifiErrorLayout->addWidget(mpWifiErrorCode, 1);
 
-	receiverBox->setLayout(wifiLayout);
+	wifiLayout->addLayout(wifiErrorLayout);
 
-	mainLayout->addWidget(receiverBox);
+	wifiBox->setLayout(wifiLayout);
+	statusLayout->addWidget(wifiBox);
+	statusLayout->addSpacing(5);
 
-	mainLayout->addSpacing(10);
+	QGroupBox* ntripBox = new QGroupBox("NTRIP Information");
+
+	auto* ntripLayout = new QGridLayout();
+
+	text = new QLabel("Status");
+	ntripLayout->addWidget(text, 0, 0);
+	ntripLayout->addWidget(mpNtripState, 0, 1);
+	text = new QLabel("Error Code");
+	ntripLayout->addWidget(text, 1, 0);
+	ntripLayout->addWidget(mpNtripErrorCode, 1, 1);
+
+	ntripBox->setLayout(ntripLayout);
+	statusLayout->addWidget(ntripBox);
+
+	mainLayout->addLayout(statusLayout);
+
+	mainLayout->addSpacing(5);
 
 	QGroupBox* geodeticBox = new QGroupBox("Geodetic Position");
 
@@ -192,7 +277,7 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addWidget(geodeticBox);
 
-	mainLayout->addSpacing(10);
+	mainLayout->addSpacing(5);
 
 	QGroupBox* speedBox = new QGroupBox("GPS Speeds");
 
@@ -216,7 +301,7 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addWidget(speedBox);
 
-	mainLayout->addSpacing(10);
+	mainLayout->addSpacing(5);
 
 	QGroupBox* infoBox = new QGroupBox("GPS Information");
 
@@ -250,7 +335,7 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addWidget(infoBox);
 
-	mainLayout->addSpacing(10);
+	mainLayout->addSpacing(5);
 
 	QGroupBox* timeBox = new QGroupBox("GPS Time");
 
@@ -274,7 +359,7 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addWidget(timeBox);
 
-	mainLayout->addSpacing(10);
+	mainLayout->addSpacing(5);
 
 	QGroupBox* posBox = new QGroupBox("Approximate Spidercam Position");
 
@@ -297,7 +382,7 @@ void cSsnxStatusView::doLayout()
 
 	mainLayout->addWidget(posBox);
 
-	mainLayout->addSpacing(10);
+	mainLayout->addSpacing(5);
 
 	QGroupBox* refBox = new QGroupBox("Reference Position");
 
@@ -369,6 +454,23 @@ void cSsnxStatusView::onRtcmDatumStateChange(bool valid)
 	mpRtcmDatumValid->setState(valid);
 }
 
+void cSsnxStatusView::onReceiverStateChange(int error_code)
+{
+	mpRxErrorCongestion->setState(error_code & 0x01);
+	mpRxErrorCpuOverload->setState(error_code & 0x02);
+	mpRxErrorInvalidConfig->setState(error_code & 0x04);
+	mpRxErrorMissedEvent->setState(error_code & 0x08);
+	mpRxErrorOutOfGeoFence->setState(error_code & 0x10);
+	mpRxErrorSoftware->setState(error_code & 0x20);
+	mpRxErrorWatchdog->setState(error_code & 0x40);
+}
+
+void cSsnxStatusView::onNtripClientChange(int state, int errorCode)
+{
+	mpNtripState->setText(QString::fromStdString(ssnx::to_string(ssnx::to_ntrip_status(state))));
+	mpNtripErrorCode->setText(QString::fromStdString(ssnx::to_string(ssnx::to_ntrip_error_code(errorCode))));
+}
+
 void cSsnxStatusView::onWifiConnectionChange(int state, int powerLevel_dBm, int errorCode)
 {
 	mpWifiConnectionStatus->changeState(state);
@@ -378,7 +480,7 @@ void cSsnxStatusView::onWifiConnectionChange(int state, int powerLevel_dBm, int 
 	else
 		mpWifiPowerLevel_dBm->setText(QString::number(powerLevel_dBm));
 
-	mpWifiErrorCode->setText(QString::number(errorCode));
+	mpWifiErrorCode->setText(QString::fromStdString(ssnx::to_string(ssnx::to_wifi_error_code(errorCode))));
 }
 
 void cSsnxStatusView::onNtripStateChange(bool valid)
