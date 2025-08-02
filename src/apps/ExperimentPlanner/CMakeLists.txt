@@ -107,9 +107,6 @@ PRIVATE
     MeasurementSteps_Ssnx.hpp
     MeasurementSteps_Ssnx.cpp
 
-    GpsFileReader.hpp
-    GpsFileReader.cpp
-	
     CreateLidarExperimentDlg.hpp
     CreateLidarExperimentDlg.cpp
     CreateLidarExperimentFromSpiderCamPointDlg.hpp
@@ -160,6 +157,9 @@ PRIVATE
 
 	RappTriangle.hpp
 	RappTriangle.cpp
+
+	RappAerialModel.hpp
+	RappAerialModel.cpp
 
 	RappGroundModel.hpp
 	RappGroundModel.cpp
