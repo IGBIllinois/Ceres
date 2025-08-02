@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 
 struct sSpiderCamPosition_t
 {
@@ -23,9 +24,12 @@ public:
 
 	void loadFromFile(const std::string& filename);
 
+	const std::optional<sSpiderCamPosition_t>& GetRefPoint() const;
+
 	const positions_t& GetPoints() const;
 
 private:
+	std::optional<sSpiderCamPosition_t> mRefPoint;
 	positions_t mPoints;
 };
 
