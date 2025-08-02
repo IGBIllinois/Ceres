@@ -104,6 +104,7 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
 bool cSsnxModel_direct::startCommunications()
 {
     emit statusMessage("Trying to establishing GPS connection...");
+    logMessage(logINFO, "Trying to establishing GPS connection...");
 
     if (!mSerialPort.open(QIODevice::ReadWrite))
     {
@@ -114,7 +115,10 @@ bool cSsnxModel_direct::startCommunications()
     forcePromptRequest();
 //    sendPromptRequest();
 
-    setStatus(sensor::eStatus::CONNECTING);
+    if (mSerialPort.waitForBytesWritten(1000))
+        setStatus(sensor::eStatus::CONNECTING);
+    else
+        setStatus(sensor::eStatus::PENDING);
 
     return true;
 }

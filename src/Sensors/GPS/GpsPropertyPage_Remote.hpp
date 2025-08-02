@@ -17,6 +17,7 @@ class cGpsPropertyPage_Remote : public cGpsPropertyPage,
 
 public:
     cGpsPropertyPage_Remote(QWidget* parent = nullptr);
+    explicit cGpsPropertyPage_Remote(const std::string& instance, QWidget* parent = nullptr);
     ~cGpsPropertyPage_Remote() = default;
 
 public:

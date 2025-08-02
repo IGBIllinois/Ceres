@@ -13,6 +13,7 @@ class cSsnxPropertyPage_Remote : public cGpsPropertyPage_Remote
 
 public:
     cSsnxPropertyPage_Remote(QWidget* parent = nullptr);
+    explicit cSsnxPropertyPage_Remote(const std::string& instance, QWidget* parent = nullptr);
     ~cSsnxPropertyPage_Remote() = default;
 
 public:

@@ -22,6 +22,7 @@ class cGpsPropertyPage : public cSensorPropertyPage, public cExperimentStateCrea
 {
 public:
     cGpsPropertyPage(QWidget* parent = nullptr);
+    explicit cGpsPropertyPage(const std::string& instance, QWidget* parent = nullptr);
     ~cGpsPropertyPage() = default;
 
     void createWidgets() override;

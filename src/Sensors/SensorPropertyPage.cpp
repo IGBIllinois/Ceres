@@ -20,8 +20,19 @@ cSensorPropertyPage::cSensorPropertyPage(QWidget* parent)
     connect(mpButtons, &QDialogButtonBox::clicked, this, &cSensorPropertyPage::buttonClicked);
 }
 
+cSensorPropertyPage::cSensorPropertyPage(const std::string& instance, QWidget* parent)
+    : cSensorPropertyPage(parent)
+{
+    mInstance = instance;
+}
+
 cSensorPropertyPage::~cSensorPropertyPage()
 {
+}
+
+const std::string cSensorPropertyPage::instance() const
+{
+    return mInstance;
 }
 
 void cSensorPropertyPage::setTitle(const QString& text)

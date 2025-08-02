@@ -7,6 +7,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QHostInfo>
 
+#include <string>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -25,7 +26,10 @@ class cSensorPropertyPage : public QDialog
 
 public:
 	cSensorPropertyPage(QWidget* parent = nullptr);
+	explicit cSensorPropertyPage(const std::string& instance, QWidget* parent = nullptr);
 	virtual ~cSensorPropertyPage();
+
+	const std::string instance() const;
 
 public:
 	QAction* showAction() const;
@@ -51,6 +55,8 @@ protected slots:
 	void buttonClicked(QAbstractButton* button);
 
 protected:
+	std::string mInstance;
+
 	QDialogButtonBox* mpButtons;
 
 private:

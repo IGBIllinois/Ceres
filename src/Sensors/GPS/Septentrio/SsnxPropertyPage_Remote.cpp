@@ -9,6 +9,9 @@ cSsnxPropertyPage_Remote::cSsnxPropertyPage_Remote(QWidget* parent)
 	: cGpsPropertyPage_Remote(parent)
 {}
 
+cSsnxPropertyPage_Remote::cSsnxPropertyPage_Remote(const std::string& instance, QWidget* parent)
+	: cGpsPropertyPage_Remote(instance, parent)
+{}
 
 cExperimentState* cSsnxPropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
@@ -18,6 +21,18 @@ cExperimentState* cSsnxPropertyPage_Remote::createState(const std::string& type,
 		auto port = getPort();
 		auto localIp = getLocalIpAddress();
 		auto use_IpV6 = usingIpV6();
+
+		std::string instance;
+		if (entry.contains("instance"))
+		{
+			instance = entry["instance"];
+		}
+
+		if (!instance.empty())
+		{
+			if (instance != this->instance())
+				return nullptr;
+		}
 
 		std::string cmd = entry["command"];
 

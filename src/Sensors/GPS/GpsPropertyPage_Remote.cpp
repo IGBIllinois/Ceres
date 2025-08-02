@@ -19,6 +19,11 @@ cGpsPropertyPage_Remote::cGpsPropertyPage_Remote(QWidget* parent)
 		cGpsPropertiesNetEncoder(255)
 {}
 
+cGpsPropertyPage_Remote::cGpsPropertyPage_Remote(const std::string& instance, QWidget* parent)
+	: cGpsPropertyPage(instance, parent), cSensorPropertyPageRemoteInterface(parent),
+	cGpsPropertiesNetEncoder(255)
+{
+}
 
 void cGpsPropertyPage_Remote::onConnect()
 {

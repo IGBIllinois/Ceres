@@ -13,6 +13,10 @@ cGpsPropertyPage::cGpsPropertyPage(QWidget* parent)
 	: cSensorPropertyPage(parent)
 {}
 
+cGpsPropertyPage::cGpsPropertyPage(const std::string& instance, QWidget* parent)
+	: cSensorPropertyPage(instance, parent)
+{}
+
 void cGpsPropertyPage::createWidgets()
 {
 	/** Acquisition Info */

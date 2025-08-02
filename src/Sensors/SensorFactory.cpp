@@ -121,3 +121,33 @@ cSensorPropertyPage* create_sensor_property_page(
 
     return nullptr;
 }
+
+cSensorPropertyPage* create_sensor_property_page(const std::string& sensor_id, const std::string& instance,
+    const std::string& model, uint32_t version,
+    const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
+{
+    if (instance.empty())
+        create_sensor_property_page(sensor_id, model, version, remote_ip_address, port, local_ip_address);
+
+    cSensorPropertyPage* result = nullptr;
+
+    result = gps::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
+    if (result) return result;
+
+    result = lidar::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
+    if (result) return result;
+
+//    result = rgb::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
+//    if (result) return result;
+
+//    result = hyperspectral::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
+//    if (result) return result;
+
+//    result = ir::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
+//    if (result) return result;
+
+//    result = tof::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
+//    if (result) return result;
+
+    return nullptr;
+}
