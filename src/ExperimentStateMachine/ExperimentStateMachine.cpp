@@ -8,9 +8,33 @@
 #include <QThread>
 
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <stdexcept>
 
 Q_DECLARE_METATYPE(experiment::eState)
 
+
+namespace
+{
+    class invalid_include_file : public std::exception
+    {
+    public:
+        invalid_include_file() = default;
+        ~invalid_include_file() = default;
+    };
+
+    void delete_states(std::vector<cExperimentState*>& states)
+    {
+        for (cExperimentState* state : states)
+        {
+            delete state;
+            state = nullptr;
+        }
+
+        states.clear();
+    }
+}
 
 cExperimentStateMachine::cExperimentStateMachine(QObject* parent)
 :
@@ -107,6 +131,7 @@ void cExperimentStateMachine::clearExperiment()
         mVariableTable->clear();
 }
 
+
 cExperimentState* cExperimentStateMachine::createState(const std::string& type, const nlohmann::json& expDoc)
 {
     if (type == "delay")
@@ -119,7 +144,7 @@ cExperimentState* cExperimentStateMachine::createState(const std::string& type, 
 }
 
 
-bool cExperimentStateMachine::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
+bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const std::string& expName, const nlohmann::json& expDoc)
 {
     using namespace experiment;
     using namespace nlohmann;
@@ -138,6 +163,25 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
     {
         for (auto entry : expDoc)
         {
+            if (entry.contains("include"))
+            {
+                std::string filename = entry["include"];
+
+                std::vector<cExperimentState*> states = loadMeasurementStates(exp_path, filename);
+
+                for (auto* state : states)
+                {
+                    if (state)
+                    {
+                        mExperimentStates.push_back(std::move(state));
+                    }
+                }
+
+                states.clear();
+
+                continue;
+            }
+
             std::string type = entry["type"];
 
             cExperimentState* pState = createState(type, entry);
@@ -163,6 +207,14 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
             }
         }
     }
+    catch (const invalid_include_file&)
+    {
+        emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
+        return false;
+    }
     catch (const detail::parse_error& e)
     {
         QString msg = "Experiment \"";
@@ -171,6 +223,9 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
         emitStatusMessage(msg);
 
         emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
         return false;
     }
     catch (const detail::type_error& e)
@@ -181,6 +236,9 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
         emitStatusMessage(msg);
 
         emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
         return false;
     }
     catch (const detail::exception& e)
@@ -191,6 +249,9 @@ bool cExperimentStateMachine::loadExperiment(const std::string& expName, const n
         emitStatusMessage(msg);
 
         emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
         return false;
     }
 
@@ -376,3 +437,126 @@ void cExperimentStateMachine::updateExperimentStateMachine()
     }
 }
 
+std::vector<cExperimentState*> cExperimentStateMachine::loadMeasurementStates(const std::string& root_path, const std::string& include_filename)
+{
+    using namespace experiment;
+    using namespace nlohmann;
+
+    std::filesystem::path includeFile = include_filename;
+
+    if (includeFile.is_relative())
+    {
+        std::filesystem::path rootPath = root_path;
+
+        includeFile = rootPath / includeFile;
+    }
+
+    std::ifstream in;
+    in.open(includeFile);
+
+    if (!in.is_open())
+    {
+        throw invalid_include_file();
+    }
+
+    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
+
+    if (!jsonDoc.contains("experiment"))
+    {
+        return std::vector<cExperimentState*>();
+    }
+
+    nlohmann::json expDoc = jsonDoc["experiment"];
+
+    std::vector<cExperimentState*> states;
+
+    try
+    {
+        for (auto entry : expDoc)
+        {
+            std::string type = entry["type"];
+
+            if (type == "include")
+            {
+                std::string filename = entry["filename"];
+
+                std::vector<cExperimentState*> states = loadMeasurementStates(root_path, filename);
+
+                for (auto* state : states)
+                {
+                    if (state)
+                    {
+                        state->attachVariableTable(mVariableTable);
+                        state->configure(entry);
+                        states.push_back(state);
+                    }
+                }
+
+                continue;
+            }
+
+            cExperimentState* pState = createState(type, entry);
+
+            if (!pState)
+            {
+                for (auto* creator : mStateCreators)
+                {
+                    pState = creator->createState(type, entry, this);
+
+                    if (pState)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (pState)
+            {
+                pState->attachVariableTable(mVariableTable);
+                pState->configure(entry);
+                states.push_back(pState);
+            }
+        }
+    }
+    catch (const invalid_include_file& )
+    {
+        delete_states(states);
+        throw;
+    }
+    catch (const detail::parse_error& e)
+    {
+        QString msg = "Experiment include file \"";
+        msg += QString::fromStdString(include_filename);
+        msg += "\" failed to load due to parse error.";
+        emitStatusMessage(msg);
+
+        delete_states(states);
+
+        throw invalid_include_file();
+    }
+    catch (const detail::type_error& e)
+    {
+        QString msg = "Experiment include file \"";
+        msg += QString::fromStdString(include_filename);
+        msg += "\" failed to load due to type error.";
+        emitStatusMessage(msg);
+
+        delete_states(states);
+
+        throw invalid_include_file();
+    }
+    catch (const detail::exception& e)
+    {
+        QString msg = "Experiment include file \"";
+        msg += QString::fromStdString(include_filename);
+        msg += "\" failed to load due to unknown error.";
+        emitStatusMessage(msg);
+
+        delete_states(states);
+
+        throw invalid_include_file();
+    }
+
+
+    return states;
+}

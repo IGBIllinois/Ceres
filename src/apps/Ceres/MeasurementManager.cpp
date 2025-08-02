@@ -78,6 +78,9 @@ void cMeasurementManager::loadMeasurements()
             {
                 auto* pItem = new cMeasurementTreeItem(this, entry.path());
             }
+            catch (const invalid_experiment_file&)
+            {
+            }
             catch (const std::exception& e)
             {
             }
@@ -103,6 +106,9 @@ void cMeasurementManager::loadMeasurements(cMeasurementTreeItem& root, const std
             try
             {
                 auto* pItem = new cMeasurementTreeItem(&root, entry.path());
+            }
+            catch (const invalid_experiment_file&)
+            {
             }
             catch (const std::invalid_argument&)
             {

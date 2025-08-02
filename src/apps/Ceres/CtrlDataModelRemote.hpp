@@ -59,7 +59,7 @@ public:
     bool isDataFileOpen() const override;
     void closeDataFile();
 
-    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc) override;
+    bool loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc) override;
     void startExperiment() override;
 
     bool isConnected() const;

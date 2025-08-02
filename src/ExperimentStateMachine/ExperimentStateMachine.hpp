@@ -30,7 +30,7 @@ public:
     /*
      * Load an experiment from JSON file.
      */
-    bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
+    bool loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc);
 
     /*
      * Is there an experiment (state machine) loaded in the experiment
@@ -90,6 +90,8 @@ public:
 
 protected:
     cExperimentStateMachine(QObject* parent = nullptr);
+
+    std::vector<cExperimentState*> loadMeasurementStates(const std::string& root_path, const std::string& include_filename);
 
     virtual cExperimentState* createState(const std::string& type, const nlohmann::json& expState);
 

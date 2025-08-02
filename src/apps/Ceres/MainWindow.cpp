@@ -306,9 +306,12 @@ bool cMainWindow::loadMeasurement(const cMeasurementTreeItem& measurement)
     msg += measurement.getFilename();
     onStatusUpdate(msg);
 
-    std::string name = measurement.text(0).toStdString();
+    std::filesystem::path fullFilename = measurement.getFilename().toStdString();
+    std::string path = fullFilename.parent_path().string();
+    std::string name = fullFilename.filename().replace_extension().string();
+
     auto expDoc = measurement.getMeasurementDocument();
-    if (!mpModel->loadExperiment(name, expDoc))
+    if (!mpModel->loadExperiment(path, name, expDoc))
     {
         return false;
     }
@@ -319,6 +322,8 @@ bool cMainWindow::loadMeasurement(const cMeasurementTreeItem& measurement)
 bool cMainWindow::loadMeasurement(const std::filesystem::path& measurement_file)
 {
     using namespace nlohmann;
+
+    std::string path = measurement_file.parent_path().string();
 
     std::ifstream in;
     in.open(measurement_file);
@@ -360,7 +365,7 @@ bool cMainWindow::loadMeasurement(const std::filesystem::path& measurement_file)
     msg += QString::fromStdString(measurement_file.string());
     onStatusUpdate(msg);
 
-    if (!mpModel->loadExperiment(name, jsonDoc))
+    if (!mpModel->loadExperiment(path, name, jsonDoc))
     {
         QString msg = "Measurement \"";
         msg += QString::fromStdString(name);

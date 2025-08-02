@@ -66,7 +66,7 @@ public:
 
     bool isExperimentLoaded() const;
     bool experimentRequiresDataFile() const;
-    virtual bool loadExperiment(const std::string& expName, const nlohmann::json& expDoc);
+    virtual bool loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc);
     virtual bool unloadExperiment();
 
     virtual void startExperiment() = 0;

@@ -190,7 +190,7 @@ bool cPlannerDataModel::experimentRequiresDataFile() const
     return mThread.mpController->experimentRequiresDataFile();
 }
 
-bool cPlannerDataModel::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
+bool cPlannerDataModel::loadExperiment(const std::string& expPath, const std::string& expName, const nlohmann::json& expDoc)
 {
     using namespace nlohmann;
 
@@ -212,7 +212,7 @@ bool cPlannerDataModel::loadExperiment(const std::string& expName, const nlohman
             return false;
         }
 
-        if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
+        if (mThread.mpController->loadExperiment(expPath, expName, expDoc["experiment"]))
         {
             if (expDoc.contains("measurement name"))
                 mMeasurementTitle = static_cast<std::string>(expDoc["measurement name"]);

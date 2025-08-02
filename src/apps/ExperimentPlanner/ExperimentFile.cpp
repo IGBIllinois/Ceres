@@ -273,6 +273,11 @@ void cExperimentFile::open(const std::string& file_name)
 		{
 			std::shared_ptr<cMeasurementStep> step;
 
+			if (entry.contains("include"))
+			{
+				continue;
+			}
+
 			std::string type = entry["type"];
 
 			step = basic::create_step(type);

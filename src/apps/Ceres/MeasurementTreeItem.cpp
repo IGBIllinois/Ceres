@@ -36,11 +36,10 @@ cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidget* parent, const std::files
 
     else if (jsonDoc.contains("experiment_name"))
         measurement_name = jsonDoc["experiment_name"];
-
-    if (measurement_name.empty())
+    else
     {
         in.close();
-        throw std::invalid_argument("File is not an measurement file.");
+        throw invalid_experiment_file();
     }
 
     QString name = QString::fromStdString(measurement_name);
@@ -83,8 +82,13 @@ cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidgetItem* parent, const std::f
         measurement_name = jsonDoc["measurement_name"];
     else if (jsonDoc.contains("experiment name"))
         measurement_name = jsonDoc["experiment name"];
-    else
+    else if (jsonDoc.contains("experiment_name"))
         measurement_name = jsonDoc["experiment_name"];
+    else
+    {
+        in.close();
+        throw invalid_experiment_file();
+    }
 
     QString name = QString::fromStdString(measurement_name);
     setText(0, name);

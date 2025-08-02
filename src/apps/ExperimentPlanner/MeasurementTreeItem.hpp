@@ -6,6 +6,14 @@
 
 #include <nlohmann/json.hpp>
 #include <filesystem>
+#include <stdexcept>
+
+class invalid_experiment_file : public std::exception
+{
+public:
+	invalid_experiment_file() = default;
+	~invalid_experiment_file() = default;
+};
 
 class cMeasurementTreeItem : public QTreeWidgetItem
 {

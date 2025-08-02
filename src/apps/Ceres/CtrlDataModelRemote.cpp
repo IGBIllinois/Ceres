@@ -386,12 +386,12 @@ void cCtrlDataModelRemote::dataRecordingStateChange(bool record)
     }
 }
 
-bool cCtrlDataModelRemote::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
+bool cCtrlDataModelRemote::loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc)
 {
     if (!isConnected())
         return false;
 
-    bool result = cCtrlDataModel::loadExperiment(expName, expDoc);
+    bool result = cCtrlDataModel::loadExperiment(exp_path, exp_name, expDoc);
     if (!result) return false;
 
     mExperimentTypeConfirmed = false;
@@ -763,8 +763,12 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     const std::string& model, uint32_t version, const std::string& name, const std::string& instance,
     const std::string& ip_address, uint16_t port)
 {
-    cSensorPropertyPage* page = create_sensor_property_page(sensor,
-        model, version, ip_address, port, mLocalIpAddress);
+    cSensorPropertyPage* page = nullptr;
+
+    if (instance.empty())
+        page = create_sensor_property_page(sensor, model, version, ip_address, port, mLocalIpAddress);
+    else
+        page = create_sensor_property_page(sensor, instance, model, version, ip_address, port, mLocalIpAddress);
 
     if (!page) return;
 

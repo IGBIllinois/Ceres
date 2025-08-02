@@ -174,7 +174,7 @@ bool cCtrlDataModel::experimentRequiresDataFile() const
     return mThread.mpController->experimentRequiresDataFile();
 }
 
-bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::json& expDoc)
+bool cCtrlDataModel::loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc)
 {
     using namespace nlohmann;
 
@@ -214,7 +214,7 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         }
 */
 
-        if (mThread.mpController->loadExperiment(expName, expDoc["experiment"]))
+        if (mThread.mpController->loadExperiment(exp_path, exp_name, expDoc["experiment"]))
         {
             mMeasurementTitle.clear();
             mPrincipalInvestigator.clear();
@@ -398,9 +398,9 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         QString msg = "Parse Error: ";
         msg += e.what();
         msg += "\n\n";
-        msg += "Skipping experiment: " + QString::fromStdString(expName);
+        msg += "Skipping experiment: " + QString::fromStdString(exp_name);
 
-        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(expName), msg);
+        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(exp_name), msg);
         mb.exec();
 
         return false;
@@ -410,9 +410,9 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         QString msg = "Type Error: ";
         msg += e.what();
         msg += "\n\n";
-        msg += "Skipping experiment: " + QString::fromStdString(expName);
+        msg += "Skipping experiment: " + QString::fromStdString(exp_name);
 
-        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(expName), msg);
+        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(exp_name), msg);
         mb.exec();
 
         return false;
@@ -422,9 +422,9 @@ bool cCtrlDataModel::loadExperiment(const std::string& expName, const nlohmann::
         QString msg = "Unknown Error: ";
         msg += e.what();
         msg += "\n\n";
-        msg += "Skipping experiment: " + QString::fromStdString(expName);
+        msg += "Skipping experiment: " + QString::fromStdString(exp_name);
 
-        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(expName), msg);
+        QMessageBox mb(QMessageBox::Critical, QString::fromStdString(exp_name), msg);
         mb.exec();
 
         return false;
