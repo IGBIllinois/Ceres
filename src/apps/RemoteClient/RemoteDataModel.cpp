@@ -609,7 +609,8 @@ void cRemoteDataModel::onEndOfResearcherList()
 
 void cRemoteDataModel::onResearcher(const std::string& researcher)
 {
-    mResearchers.push_back(researcher);
+    if (std::find(mResearchers.begin(), mResearchers.end(), researcher) == mResearchers.end())
+        mResearchers.push_back(researcher);
 
 #ifdef LOG_EXPERIMENT_INFO
     QString msg = "Researchers: ";
@@ -661,7 +662,8 @@ void cRemoteDataModel::onEndOfEventNumberList()
 
 void cRemoteDataModel::onEventNumber(const std::string& event_num)
 {
-    mEventNumbers.push_back(event_num);
+    if (std::find(mEventNumbers.begin(), mEventNumbers.end(), event_num) == mEventNumbers.end())
+        mEventNumbers.push_back(event_num);
 
 #ifdef LOG_EXPERIMENT_INFO
     QString msg = "Event Numbers: ";
@@ -709,7 +711,8 @@ void cRemoteDataModel::onEndOfTreatmentList()
 
 void cRemoteDataModel::onTreatment(const std::string& treatment)
 {
-    mTreatments.push_back(treatment);
+    if (std::find(mTreatments.begin(), mTreatments.end(), treatment) == mTreatments.end())
+        mTreatments.push_back(treatment);
 
 #ifdef LOG_EXPERIMENT_INFO
     QString msg = "Treatment: ";
@@ -728,7 +731,8 @@ void cRemoteDataModel::onEndOfCommentList()
 
 void cRemoteDataModel::onComment(const std::string& comment)
 {
-    mComments.push_back(comment);
+    if (std::find(mComments.begin(), mComments.end(), comment) == mComments.end())
+        mComments.push_back(comment);
 
 #ifdef LOG_EXPERIMENT_INFO
     QString msg = "Comments: ";
