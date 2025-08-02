@@ -479,14 +479,21 @@ void cMainWindow::createSubMenusAndActions()
     //
     // Build the Preference Sub Menu
     //
-    pMenuItem = new QAction(tr("Default Measurement Directory"), this);
-    pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading measurement files"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultMeasurementDirectory);
-    mpPreferencesMenu->addAction(pMenuItem);
-
     pMenuItem = new QAction(tr("Load Ground Data"), this);
     pMenuItem->setStatusTip(tr("Load the GPS based ground data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceLoadGroundMesh);
+    mpPreferencesMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Load Aerial Data"), this);
+    pMenuItem->setStatusTip(tr("Load the GPS based aerial data"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceLoadAerialMesh);
+    mpPreferencesMenu->addAction(pMenuItem);
+   
+    mpPreferencesMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Default Measurement Directory"), this);
+    pMenuItem->setStatusTip(tr("Sets the default directory for saving/loading measurement files"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onPreferenceDefaultMeasurementDirectory);
     mpPreferencesMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Default Field Layout File"), this);
@@ -1303,6 +1310,26 @@ void cMainWindow::onPreferenceLoadGroundMesh()
     mSettings.setValue("Defaults/groundMeshFile", fileName);
 }
 
+void cMainWindow::onPreferenceLoadAerialMesh()
+{
+    QString savedFileName = mSettings.value("Defaults/aerialMeshFile").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import Aerial Data..."), savedFileName,
+        "Aerial CSV Files (*.csv)");
+
+    // Open file
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+
+    // Return on Cancel
+    if (!file.exists())
+        return;
+
+    LoadAerialData(fileName);
+
+    mSettings.setValue("Defaults/aerialMeshFile", fileName);
+}
+
 void cMainWindow::onPreferenceDefaultFieldLayoutFile()
 {
     QString layoutFile = QFileDialog::getOpenFileName(this, tr("Select the Field Layout File..."), mFieldLayoutFile,
@@ -1910,4 +1937,41 @@ void cMainWindow::LoadGpsData(QString fileName)
     mGroundData.clearGroundMesh();
     mGroundData.addMeshData(mesh);
 }
+
+//-----------------------------------------------------------------------------
+void cMainWindow::LoadAerialData(QString fileName)
+{
+    // Open file
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+
+    // Return on Cancel
+    if (!file.exists())
+        return;
+
+    cGpsFileReader gps;
+    gps.loadFromFile(fileName.toStdString());
+
+    auto points = gps.GetPoints();
+
+    std::vector<rfm::rappPoint_t> rapp_points;
+
+    for (const auto& point : points)
+    {
+        std::int32_t x_mm = point.x_m * nConstants::M_TO_MM;
+        std::int32_t y_mm = point.y_m * nConstants::M_TO_MM;
+        std::int32_t z_mm = point.z_m * nConstants::M_TO_MM;
+
+        rapp_points.emplace_back(x_mm, y_mm, z_mm);
+    }
+
+    mAerialData.addAerialPoints(rapp_points);
+
+    auto data = mAerialData.getAerialPoints();
+    auto mesh = computeGroundMesh(data);
+
+    mAerialData.clearAerialMesh();
+    mAerialData.addMeshData(mesh);
+}
+
 

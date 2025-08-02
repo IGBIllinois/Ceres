@@ -4,6 +4,7 @@
 #include "ExperimentFile.hpp"
 
 #include "RappGroundModel.hpp"
+#include "RappAerialModel.hpp"
 
 #include <spidercam/spidercam_types.hpp>
 
@@ -118,6 +119,7 @@ private slots:
 private slots:
     void onPreferenceDefaultMeasurementDirectory();
     void onPreferenceLoadGroundMesh();
+    void onPreferenceLoadAerialMesh();
     void onPreferenceDefaultFieldLayoutFile();
     void onPreferenceDefaultPlotSplitDirectory();
     void onPreferenceDefaultFieldBoundaries();
@@ -160,9 +162,11 @@ private:
 
 private:
     void LoadGpsData(QString fileName);
+    void LoadAerialData(QString fileName);
 
 private:
     cRappGroundModel mGroundData;
+    cRappAerialModel mAerialData;
     spidercam::sWorkingDimensions mLimits;
 
     QSettings mSettings;
