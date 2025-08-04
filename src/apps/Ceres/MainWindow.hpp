@@ -142,6 +142,7 @@ private:
 
     cExperimentControlView* mpController = nullptr;
 
+    cSound mExperimentErrorSound;
     cSound mEndOfExperimentSound;
 
     std::string mBatchFileName;

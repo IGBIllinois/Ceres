@@ -13,13 +13,24 @@ struct sAudioDevice
     std::string audio_device_name;
 };
 
+class cAudioDevices
+{
+public:
+    cAudioDevices();
+    ~cAudioDevices();
+
+    const std::vector<sAudioDevice>& getAudioDevices() const;
+
+private:
+    std::vector<sAudioDevice> mAudioDevices;
+};
+
+
 class cSound
 {
 public:
     cSound();
     ~cSound();
-
-    const std::vector<sAudioDevice>& getAudioDevices() const;
 
     bool setPlaybackDevice(SDL_AudioDeviceID id);
 

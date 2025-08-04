@@ -1,6 +1,8 @@
 
 #include "CeresOptionsDlg.hpp"
 
+#include "Sound.hpp"
+
 #include <QLayout>
 #include <QLabel>
 #include <QCheckBox>
@@ -10,6 +12,7 @@
 #include <QGroupBox>
 #include <QDialogButtonBox>
 #include <QFileDialog>
+#include <QComboBox>
 
 
 cCeresOptionsDlg::cCeresOptionsDlg(QWidget* parent)
@@ -25,14 +28,24 @@ cCeresOptionsDlg::cCeresOptionsDlg(QWidget* parent)
 cCeresOptionsDlg::~cCeresOptionsDlg()
 {}
 
-QString cCeresOptionsDlg::wavFilename() const
+QString cCeresOptionsDlg::endOfExperimentWavFilename() const
 {
-	return mpWavFilename->text();
+	return mpEndOfExperimentWavFilename->text();
 }
 
-void cCeresOptionsDlg::setWavFilename(QString filename)
+void cCeresOptionsDlg::setEndOfExperimentWavFilename(QString filename)
 {
-	mpWavFilename->setText(filename);
+	mpEndOfExperimentWavFilename->setText(filename);
+}
+
+QString cCeresOptionsDlg::experimentErrorWavFilename() const
+{
+	return mpExperimentErrorWavFilename->text();
+}
+
+void cCeresOptionsDlg::setExperimentErrorWavFilename(QString filename)
+{
+	mpExperimentErrorWavFilename->setText(filename);
 }
 
 QString cCeresOptionsDlg::fieldLayoutFilename() const
@@ -42,7 +55,7 @@ QString cCeresOptionsDlg::fieldLayoutFilename() const
 
 void cCeresOptionsDlg::setFieldLayoutFilename(QString filename)
 {
-	mpWavFilename->setText(filename);
+	mpFieldLayoutFilename->setText(filename);
 }
 
 QString cCeresOptionsDlg::experimentPath() const
@@ -52,14 +65,24 @@ QString cCeresOptionsDlg::experimentPath() const
 
 void cCeresOptionsDlg::setExperimentPath(QString path)
 {
-	mpWavFilename->setText(path);
+	mpDefaultExperimentPath->setText(path);
 }
 
 void cCeresOptionsDlg::createControls()
 {
-	mpWavFilename = new QLineEdit(this);
-	mpBrowseWavFile = new QPushButton("Browse", this);
-	connect(mpBrowseWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::browseWavFiles);
+	mpEndOfExperimentWavFilename = new QLineEdit(this);
+	mpEndOfExperimentWavFilename->setMinimumWidth(300);
+	mpBrowseEndOfExperimentWavFile = new QPushButton("Browse", this);
+	connect(mpBrowseEndOfExperimentWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::browseEndOfExperimentWavFile);
+	mpTestEndOfExperimentWavFile = new QPushButton("Test", this);
+	connect(mpTestEndOfExperimentWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::testEndOfExperimentWavFiles);
+
+	mpExperimentErrorWavFilename = new QLineEdit(this);
+	mpExperimentErrorWavFilename->setMinimumWidth(300);
+	mpBrowseExperimentErrorWavFile = new QPushButton("Browse", this);
+	connect(mpBrowseExperimentErrorWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::browseExperimentErrorWavFile);
+	mpTestExperimentErrorWavFile = new QPushButton("Test", this);
+	connect(mpTestExperimentErrorWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::testExperimentErrorWavFiles);
 
 	mpFieldLayoutFilename = new QLineEdit(this);
 	mpBrowseFieldLayout = new QPushButton("Browse", this);
@@ -68,6 +91,18 @@ void cCeresOptionsDlg::createControls()
 	mpDefaultExperimentPath = new QLineEdit(this);
 	mpBrowseExperimentPath = new QPushButton("Browse", this);
 	connect(mpBrowseExperimentPath, &QPushButton::pressed, this, &cCeresOptionsDlg::browseExperimentPath);
+
+	mpEndOfExperimentAudioID = new QComboBox(this);
+	mpExperimentErrorAudioID = new QComboBox(this);
+
+	cAudioDevices audio_devices;
+	auto devices = audio_devices.getAudioDevices();
+
+	for (const auto& device : devices)
+	{
+		mpEndOfExperimentAudioID->addItem(QString::fromStdString(device.audio_device_name), device.audio_device_ID);
+		mpExperimentErrorAudioID->addItem(QString::fromStdString(device.audio_device_name), device.audio_device_ID);
+	}
 }
 
 void cCeresOptionsDlg::createLayout()
@@ -78,14 +113,55 @@ void cCeresOptionsDlg::createLayout()
 	QGroupBox* pGroupBox = new QGroupBox(tr("End of Experiment"));
 	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+	QVBoxLayout* pWavLayout = new QVBoxLayout();
+
 	QHBoxLayout* pSoundLayout = new QHBoxLayout();
 
 	text = new QLabel("WAV File : ");
 	pSoundLayout->addWidget(text);
-	pSoundLayout->addWidget(mpWavFilename);
-	pSoundLayout->addWidget(mpBrowseWavFile);
+	pSoundLayout->addWidget(mpEndOfExperimentWavFilename);
+	pSoundLayout->addWidget(mpBrowseEndOfExperimentWavFile);
+	pSoundLayout->addWidget(mpTestEndOfExperimentWavFile);
 
-	pGroupBox->setLayout(pSoundLayout);
+	pWavLayout->addLayout(pSoundLayout);
+
+	QHBoxLayout* pOutputLayout = new QHBoxLayout();
+
+	text = new QLabel("Audio Device : ");
+	pOutputLayout->addWidget(text);
+	pOutputLayout->addWidget(mpEndOfExperimentAudioID);
+
+	pWavLayout->addLayout(pOutputLayout);
+
+	pGroupBox->setLayout(pWavLayout);
+	pMainLayout->addWidget(pGroupBox);
+
+	pMainLayout->addSpacing(5);
+
+	pGroupBox = new QGroupBox(tr("Experiment Error"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	pWavLayout = new QVBoxLayout();
+
+	pSoundLayout = new QHBoxLayout();
+
+	text = new QLabel("WAV File : ");
+	pSoundLayout->addWidget(text);
+	pSoundLayout->addWidget(mpExperimentErrorWavFilename);
+	pSoundLayout->addWidget(mpBrowseExperimentErrorWavFile);
+	pSoundLayout->addWidget(mpTestExperimentErrorWavFile);
+
+	pWavLayout->addLayout(pSoundLayout);
+
+	pOutputLayout = new QHBoxLayout();
+
+	text = new QLabel("Audio Device : ");
+	pOutputLayout->addWidget(text);
+	pOutputLayout->addWidget(mpExperimentErrorAudioID);
+
+	pWavLayout->addLayout(pOutputLayout);
+
+	pGroupBox->setLayout(pWavLayout);
 	pMainLayout->addWidget(pGroupBox);
 
 	pMainLayout->addSpacing(10);
@@ -123,9 +199,9 @@ void cCeresOptionsDlg::createLayout()
 	setLayout(pMainLayout);
 }
 
-void cCeresOptionsDlg::browseWavFiles()
+void cCeresOptionsDlg::browseEndOfExperimentWavFile()
 {
-	QString defaultDirectory = mpWavFilename->text();
+	QString defaultDirectory = mpEndOfExperimentWavFilename->text();
 
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Load WAV file"), defaultDirectory,
 		"Wav Files (*.wav)");
@@ -133,7 +209,20 @@ void cCeresOptionsDlg::browseWavFiles()
 	if (fileName.isEmpty())
 		return;
 
-	mpWavFilename->setText(fileName);
+	mpEndOfExperimentWavFilename->setText(fileName);
+}
+
+void cCeresOptionsDlg::browseExperimentErrorWavFile()
+{
+	QString defaultDirectory = mpExperimentErrorWavFilename->text();
+
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Load WAV file"), defaultDirectory,
+		"Wav Files (*.wav)");
+
+	if (fileName.isEmpty())
+		return;
+
+	mpExperimentErrorWavFilename->setText(fileName);
 }
 
 void cCeresOptionsDlg::browseFieldLayout()
@@ -151,5 +240,38 @@ void cCeresOptionsDlg::browseFieldLayout()
 
 void cCeresOptionsDlg::browseExperimentPath()
 {
+}
 
+void cCeresOptionsDlg::testEndOfExperimentWavFiles()
+{
+	std::string wavFilename = mpEndOfExperimentWavFilename->text().toStdString();
+
+	if (wavFilename.empty())
+		return;
+
+	SDL_AudioDeviceID id = mpEndOfExperimentAudioID->currentData().toInt();
+
+	if (mTestSound.is_open())
+		mTestSound.close();
+
+	mTestSound.setPlaybackDevice(id);
+	if (mTestSound.open(wavFilename))
+		mTestSound.play();
+}
+
+void cCeresOptionsDlg::testExperimentErrorWavFiles()
+{
+	std::string wavFilename = mpExperimentErrorWavFilename->text().toStdString();
+
+	if (wavFilename.empty())
+		return;
+
+	SDL_AudioDeviceID id = mpExperimentErrorAudioID->currentData().toInt();
+
+	if (mTestSound.is_open())
+		mTestSound.close();
+
+	mTestSound.setPlaybackDevice(id);
+	if (mTestSound.open(wavFilename))
+		mTestSound.play();
 }

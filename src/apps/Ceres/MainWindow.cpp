@@ -110,6 +110,11 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     if (!wav_file_name.isEmpty())
         mEndOfExperimentSound.open(wav_file_name.toStdString());
+
+    wav_file_name = mSettings.value("Defaults/Options/ExperimentErrorWavFilename").toString();
+
+    if (!wav_file_name.isEmpty())
+        mExperimentErrorSound.open(wav_file_name.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -481,17 +486,21 @@ void cMainWindow::settingsOptions()
 {
     auto* pDlg = new cCeresOptionsDlg();
 
-    auto wav_file_name = mSettings.value("Defaults/Options/EndOfExperimentWavFilename").toString();
+    auto end_wav_file_name = mSettings.value("Defaults/Options/EndOfExperimentWavFilename").toString();
 
-    pDlg->setWavFilename(wav_file_name);
+    pDlg->setEndOfExperimentWavFilename(end_wav_file_name);
+
+    auto error_wav_file_name = mSettings.value("Defaults/Options/ExperimentErrorWavFilename").toString();
+
+    pDlg->setExperimentErrorWavFilename(error_wav_file_name);
 
     auto result = pDlg->exec();
 
     if (result == QDialog::Accepted)
     {
-        auto filename = pDlg->wavFilename();
+        auto filename = pDlg->endOfExperimentWavFilename();
 
-        if (wav_file_name != filename)
+        if (end_wav_file_name != filename)
         {
             mSettings.setValue("Defaults/Options/EndOfExperimentWavFilename", filename);
 
@@ -499,6 +508,18 @@ void cMainWindow::settingsOptions()
                 close();
 
             mEndOfExperimentSound.open(filename.toStdString());
+        }
+
+        filename = pDlg->experimentErrorWavFilename();
+
+        if (error_wav_file_name != filename)
+        {
+            mSettings.setValue("Defaults/Options/ExperimentErrorWavFilename", filename);
+
+            if (mExperimentErrorSound.is_open())
+                close();
+
+            mExperimentErrorSound.open(filename.toStdString());
         }
     }
 
@@ -568,6 +589,9 @@ void cMainWindow::onExperimentTerminated()
     emit setExperimentActions(true, true, false, false);
 
     emit experimentStopped();
+
+    if (mExperimentErrorSound.is_open())
+        mExperimentErrorSound.play();
 
     emit showMessage("Measurement stopped!");
 }
