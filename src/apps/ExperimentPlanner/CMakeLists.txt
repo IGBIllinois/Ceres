@@ -146,6 +146,9 @@ PRIVATE
     ComputeSensorRangeDlg.hpp
     ComputeSensorRangeDlg.cpp
 
+    ComputeReferenceHeightDlg.hpp
+    ComputeReferenceHeightDlg.cpp
+
     RecomputeSpidercamHeightDlg.hpp
     RecomputeSpidercamHeightDlg.cpp
 

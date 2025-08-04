@@ -15,16 +15,21 @@
 #include <QDialogButtonBox>
 #include <QMessageBox>
 #include <QMenu>
+#include <QFileDialog>
 
 #include <string>
+
 
 namespace fs = std::filesystem;
 
 std::shared_ptr<cMeasurementStep> basic::create_step(const std::string& type)
 {
+	if (type == "include")
+		return std::make_shared<cMeasurementStep_Include>();
+
 	if (type == "delay")
 		return std::make_shared<cMeasurementStep_Delay>();
-	
+
 	if (type == "pause")
 		return std::make_shared<cMeasurementStep_Pause>();
 
@@ -52,6 +57,80 @@ bool cMeasurementStep::isDirty() const
 	return mDirty;
 }
 
+
+
+/********************************************************************
+ *
+ * Measurement Step: Include
+ *
+ ********************************************************************/
+
+std::string cMeasurementStep_Include::getIncludeFilename() const { return mFilename; };
+
+void cMeasurementStep_Include::setIncludeFilename(const std::string& filename)
+{
+	mFilename = filename;
+}
+
+void cMeasurementStep_Include::setDefaultPath(const std::string& path)
+{
+	mDefaultPath = path;
+}
+
+cBaseStep* cMeasurementStep_Include::graphicsItem(const int id) const
+{
+	auto step = new cProcessStep(id);
+	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_Include::onEdit);
+	connect(this, &cMeasurementStep_Include::onDescriptionChange, step, &cProcessStep::setSubHeading1);
+
+	step->setTitle("Include");
+
+	auto description = generateDescription();
+	step->setSubHeading1(description);
+
+	return step;
+}
+
+bool cMeasurementStep_Include::onEdit()
+{
+	QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Measurement Include File"), 
+		QString::fromStdString(mFilename), "Measurement Files (*.json *.inc)");
+
+	if (fileName.isEmpty())
+		return false;
+
+	mFilename = fileName.toStdString();
+
+	emit redraw();
+
+	return true;
+}
+
+void cMeasurementStep_Include::load(const nlohmann::json& jdoc)
+{
+	using namespace nlohmann;
+	mFilename = jdoc["include"];
+}
+
+nlohmann::json cMeasurementStep_Include::save()
+{
+	nlohmann::json entry;
+
+	entry["include"] = mFilename;
+
+	mDirty = false;
+
+	return entry;
+}
+
+QString cMeasurementStep_Include::generateDescription() const
+{
+	QString description = "Filename: ";
+
+	description += QString::fromStdString(mFilename);
+
+	return description;
+}
 
 
 /********************************************************************

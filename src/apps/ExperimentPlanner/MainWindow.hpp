@@ -114,6 +114,7 @@ private slots:
 private slots:
     void onComputeSpidercamHeight();
     void onComputeSensorRange();
+    void onComputeReferenceHeight();
 
 // Slots associated with "Preference" menu actions
 private slots:
@@ -168,6 +169,7 @@ private:
     cRappGroundModel mGroundData;
     cRappAerialModel mAerialData;
     spidercam::sWorkingDimensions mLimits;
+    int mReferenceHeight_mm = 0;
 
     QSettings mSettings;
 

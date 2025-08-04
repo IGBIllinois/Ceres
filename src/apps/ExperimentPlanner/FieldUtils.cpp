@@ -105,3 +105,84 @@ std::vector<cRappTriangle> computeGroundMesh(const std::vector<rfm::rappPoint_t>
     return std::move(data);
 }
 
+
+//-----------------------------------------------------------------------------
+std::vector<cRappTriangle> computeMesh(const std::vector<rfm::rappPoint_t>& points, int32_t max_separation_mm)
+{
+    vtkDoubleArray* x = vtkDoubleArray::New();
+    vtkDoubleArray* y = vtkDoubleArray::New();
+    vtkDoubleArray* z = vtkDoubleArray::New();
+
+    for (const auto& point : points)
+    {
+        x->InsertNextTuple1(point.x_mm);
+        y->InsertNextTuple1(point.y_mm);
+        z->InsertNextTuple1(point.z_mm);
+    }
+
+    vtkNew<vtkTable> table;
+    table->AddColumn(x);
+    table->AddColumn(y);
+    table->AddColumn(z);
+
+    // Convert to a table view of the data
+    vtkNew<vtkTableToPolyData> tablePoints;
+    tablePoints->SetInputData(table);
+    tablePoints->SetXColumnIndex(0);
+    tablePoints->SetYColumnIndex(1);
+    tablePoints->SetZColumnIndex(2);
+    tablePoints->Update();
+
+    // Triangulate the grid points.
+    vtkNew<vtkDelaunay2D> delaunay;
+    delaunay->SetInputData(tablePoints->GetOutput());
+    delaunay->Update();
+    vtkSmartPointer<vtkPolyData> mesh = delaunay->GetOutput();
+
+    std::vector<cRappTriangle> data;
+
+    auto m = mesh->GetNumberOfCells();
+    vtkIdList* pts = vtkIdList::New();
+    for (vtkIdType i = 0; i < m; ++i)
+    {
+        mesh->GetCellPoints(i, pts);
+        auto p1_id = pts->GetId(0);
+        auto p2_id = pts->GetId(1);
+        auto p3_id = pts->GetId(2);
+
+        double d_mm = (points[p1_id].x_mm - points[p2_id].x_mm) * (points[p1_id].x_mm - points[p2_id].x_mm);
+        d_mm += (points[p1_id].y_mm - points[p2_id].y_mm) * (points[p1_id].y_mm - points[p2_id].y_mm);
+        d_mm = sqrt(d_mm);
+
+        if (d_mm > max_separation_mm)
+        {
+            continue;
+        }
+
+        d_mm = (points[p1_id].x_mm - points[p3_id].x_mm) * (points[p1_id].x_mm - points[p3_id].x_mm);
+        d_mm += (points[p1_id].y_mm - points[p3_id].y_mm) * (points[p1_id].y_mm - points[p3_id].y_mm);
+        d_mm = sqrt(d_mm);
+
+        if (d_mm > max_separation_mm)
+        {
+            continue;
+        }
+
+        d_mm = (points[p3_id].x_mm - points[p2_id].x_mm) * (points[p3_id].x_mm - points[p2_id].x_mm);
+        d_mm += (points[p3_id].y_mm - points[p2_id].y_mm) * (points[p3_id].y_mm - points[p2_id].y_mm);
+        d_mm = sqrt(d_mm);
+
+        if (d_mm > max_separation_mm)
+        {
+            continue;
+        }
+
+        data.emplace_back(points[p1_id], points[p2_id], points[p3_id]);
+    }
+
+    pts->Delete();
+
+    return std::move(data);
+}
+
+

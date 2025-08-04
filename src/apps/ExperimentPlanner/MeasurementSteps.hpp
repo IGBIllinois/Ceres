@@ -52,6 +52,44 @@ protected:
 };
 
 /// <summary>
+/// Measurement Include: Include addition measure steps
+/// </summary>
+class cMeasurementStep_Include : public cMeasurementStep
+{
+	Q_OBJECT
+
+public:
+	cMeasurementStep_Include() = default;
+
+	std::string getIncludeFilename() const;
+
+	bool isRecording() const { return false; }
+
+	void setIncludeFilename(const std::string& filename);
+
+	void setDefaultPath(const std::string& path);
+
+	cBaseStep* graphicsItem(const int id) const override;
+
+signals:
+	void onDescriptionChange(const QString& desc);
+
+public slots:
+	bool onEdit();
+
+protected:
+	void load(const nlohmann::json& jdoc) override;
+	nlohmann::json save() override;
+
+private:
+	QString generateDescription() const;
+
+private:
+	std::string mDefaultPath;
+	std::string mFilename;
+};
+
+/// <summary>
 /// Measurement Step: Simple Time Delay
 /// </summary>
 class cMeasurementStep_Delay : public cMeasurementStep

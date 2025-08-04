@@ -27,10 +27,12 @@ public:
 	virtual ~cRecomputeSpidercamHeightDlg();
 
 	int32_t getHeight_mm() const;
+	int32_t getReferenceHeight_mm() const;
 
 	void setSensorOffset(int32_t offset_mm);
 	void setCanopyHeight_agl(int32_t height_mm);
 	void setDesiredHeight_agl(int32_t height_mm);
+	void setReferenceHeight_mm(int32_t height_mm);
 
 private slots:
 	void accept() override;
@@ -44,6 +46,7 @@ private:
 	QLineEdit* mpSensorOffset_mm = nullptr;
 	QLineEdit* mpCanopyHeight_mm = nullptr;
 	QLineEdit* mpDesiredHeight_mm = nullptr;
+	QLineEdit* mpReferenceHeight_mm = nullptr;
 
 	int32_t mHeight = rfm::INVALID_HEIGHT;
 };

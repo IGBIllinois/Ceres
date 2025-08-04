@@ -182,6 +182,9 @@ void cExperimentFile::open(const std::string& file_name)
 		return;
 	}
 
+	fs::path fn = file_name;
+	std::string path = fn.parent_path().string();
+
 	mFileName = file_name;
 
 	if (configDoc.contains("measurement name"))
@@ -254,7 +257,7 @@ void cExperimentFile::open(const std::string& file_name)
 	std::shared_ptr<cExperimentSensorInfo> pSensor;
 	for (std::string sensor : sensors)
 	{
-		pSensor = createSensor(sensor);
+ 		pSensor = createSensor(sensor);
 
 		if (!pSensor)
 			continue;
@@ -275,6 +278,17 @@ void cExperimentFile::open(const std::string& file_name)
 
 			if (entry.contains("include"))
 			{
+				auto inc_step = std::make_shared<cMeasurementStep_Include>();
+				inc_step->setDefaultPath(path);
+
+				step = inc_step;
+
+				if (step)
+				{
+					step->load(entry);
+					mSteps.push_back(step);
+				}
+
 				continue;
 			}
 

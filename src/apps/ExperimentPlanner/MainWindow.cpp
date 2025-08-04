@@ -39,6 +39,7 @@
 
 #include "ComputeSpidercamHeightDlg.hpp"
 #include "ComputeSensorRangeDlg.hpp"
+#include "ComputeReferenceHeightDlg.hpp"
 #include "RecomputeSpidercamHeightDlg.hpp"
 
 #include "ExperimentFieldLayoutDlg.hpp"
@@ -140,6 +141,12 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     if (!fileName.isEmpty())
         LoadGpsData(fileName);
+
+
+    fileName = mSettings.value("Defaults/aerialMeshFile").toString();
+
+    if (!fileName.isEmpty())
+        LoadAerialData(fileName);
 
     mLimits.minX_mm = 10'000;
     mLimits.maxX_mm = 190'000;
@@ -474,6 +481,11 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem = new QAction(tr("Compute Sensor Height"), this);
     pMenuItem->setStatusTip(tr("Compute the Sensor heigth based on SpiderCam position"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onComputeSensorRange);
+    mpComputeMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Compute Reference Height"), this);
+    pMenuItem->setStatusTip(tr("Compute the reference heigth based on SpiderCam current position"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onComputeReferenceHeight);
     mpComputeMenu->addAction(pMenuItem);
 
     //
@@ -893,6 +905,8 @@ void cMainWindow::onEditRecomputeHeight()
 {
     cRecomputeSpidercamHeightDlg dlg;
 
+    dlg.setReferenceHeight_mm(mReferenceHeight_mm);
+
     auto result = dlg.exec();
 
     if (result == QDialog::Rejected)
@@ -905,6 +919,7 @@ void cMainWindow::onEditRecomputeHeight()
     auto* child = static_cast<cExperimentDesignMdiChild*>(childSubWindow->widget());
 
     auto height_mm = dlg.getHeight_mm();
+    auto ref_height_mm = dlg.getReferenceHeight_mm();
 
     int x_mm = 0;
     int y_mm = 0;
@@ -932,8 +947,9 @@ void cMainWindow::onEditRecomputeHeight()
                 if (z_mm < 7750)
                 {
                     int ground_height_mm = static_cast<int>(mGroundData.getMeshHeight_mm(x_mm, y_mm));
+                    int dolly_offset_mm = static_cast<int>(mAerialData.getDollyOffset_mm(x_mm, y_mm, ref_height_mm));
 
-                    int new_z_mm = ground_height_mm + height_mm;
+                    int new_z_mm = ground_height_mm + height_mm + dolly_offset_mm;
                     movement->setZ_mm(new_z_mm);
                 }
             }
@@ -1268,6 +1284,21 @@ void cMainWindow::onComputeSensorRange()
     cComputeSensorRangeDlg dlg(mGroundData, this);
 
     dlg.exec();
+}
+
+void cMainWindow::onComputeReferenceHeight()
+{
+
+    cComputeReferenceHeightDlg dlg(mGroundData, mAerialData, this);
+
+    dlg.setReferenceHeight_mm(mReferenceHeight_mm);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Accepted)
+    {
+        mReferenceHeight_mm = dlg.getReferenceHeight_mm();
+    }
 }
 
 /********************************************************************
@@ -1954,6 +1985,12 @@ void cMainWindow::LoadAerialData(QString fileName)
 
     auto points = gps.GetPoints();
 
+    if (gps.GetRefPoint().has_value())
+    {
+        auto ref_point = gps.GetRefPoint().value();
+        mReferenceHeight_mm = ref_point.z_m * nConstants::M_TO_MM;
+    }
+
     std::vector<rfm::rappPoint_t> rapp_points;
 
     for (const auto& point : points)
@@ -1968,7 +2005,7 @@ void cMainWindow::LoadAerialData(QString fileName)
     mAerialData.addAerialPoints(rapp_points);
 
     auto data = mAerialData.getAerialPoints();
-    auto mesh = computeGroundMesh(data);
+    auto mesh = computeMesh(data, 15000);
 
     mAerialData.clearAerialMesh();
     mAerialData.addMeshData(mesh);

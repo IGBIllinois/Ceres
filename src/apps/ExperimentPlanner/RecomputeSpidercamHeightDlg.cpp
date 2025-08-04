@@ -39,6 +39,14 @@ int32_t cRecomputeSpidercamHeightDlg::getHeight_mm() const
 	return mHeight;
 }
 
+int32_t cRecomputeSpidercamHeightDlg::getReferenceHeight_mm() const
+{
+	if (mpReferenceHeight_mm->text().isEmpty())
+		return rfm::INVALID_HEIGHT;
+
+	return mpReferenceHeight_mm->text().toInt();
+}
+
 void cRecomputeSpidercamHeightDlg::setSensorOffset(int32_t offset_mm)
 {
 	mpSensorOffset_mm->setText(QString::number(offset_mm));
@@ -57,6 +65,11 @@ void cRecomputeSpidercamHeightDlg::setDesiredHeight_agl(int32_t height_mm)
 	compute();
 }
 
+void cRecomputeSpidercamHeightDlg::setReferenceHeight_mm(int32_t height_mm)
+{
+	mpReferenceHeight_mm->setText(QString::number(height_mm));
+}
+
 void cRecomputeSpidercamHeightDlg::createControls()
 {
 	mpSensorOffset_mm = new QLineEdit(this);
@@ -69,6 +82,9 @@ void cRecomputeSpidercamHeightDlg::createControls()
 
 	mpDesiredHeight_mm = new QLineEdit(this);
 	mpDesiredHeight_mm->setValidator(new QIntValidator(-2000, 10000));
+
+	mpReferenceHeight_mm = new QLineEdit(this);
+	mpReferenceHeight_mm->setValidator(new QIntValidator(2000, 10000));
 }
 
 void cRecomputeSpidercamHeightDlg::createLayout()
@@ -90,6 +106,9 @@ void cRecomputeSpidercamHeightDlg::createLayout()
 	pText = new QLabel("Desired Height Above Plant Canopy (mm)");
 	pGridLayout->addWidget(pText, 4, 0);
 	pGridLayout->addWidget(mpDesiredHeight_mm, 4, 1);
+	pText = new QLabel("Reference Height for Dolly Droop (mm)");
+	pGridLayout->addWidget(pText, 6, 0);
+	pGridLayout->addWidget(mpReferenceHeight_mm, 6, 1);
 
 	pMainLayout->addLayout(pGridLayout);
 
