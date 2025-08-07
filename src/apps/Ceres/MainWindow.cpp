@@ -530,7 +530,6 @@ void cMainWindow::settingsOptions()
 //-----------------------------------------------------------------------------
 void cMainWindow::helpAbout()
 {
-    mEndOfExperimentSound.play();
 }
 
 void cMainWindow::onStatusUpdate(QString msg)

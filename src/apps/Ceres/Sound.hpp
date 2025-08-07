@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+
+bool testSound(SDL_AudioDeviceID id, const std::string& filename);
+
 struct sAudioDevice
 {
     SDL_AudioDeviceID audio_device_ID = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
@@ -40,8 +43,6 @@ public:
     bool is_open();
 
     void play();
-
-    bool test(SDL_AudioDeviceID id, const std::string& filename);
 
 private:
     SDL_AudioStream* mpAudioStream = nullptr;

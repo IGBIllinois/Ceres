@@ -6,6 +6,26 @@
 #include <vector>
 //#include <SDL3/SDL.h>
 
+static SDL_AudioStream* g_pAudioStream = nullptr;
+static uint8_t* g_pWavData = nullptr;
+static SDL_AudioDeviceID g_AudioDevice = 0;
+
+/* things that are playing sound (the audiostream itself, plus the original data, so we can refill to loop. */
+typedef struct Sound 
+{
+	Uint8* wav_data = nullptr;
+	Uint32 wav_data_len = 0;
+	SDL_AudioStream* stream = nullptr;
+} Sound;
+
+static void SDLCALL FreeTheAudioStream(void* userdata, SDL_AudioStream* astream, int additional_amount, int total_amount)
+{
+//	SDL_ClearAudioStream(g_pAudioStream);
+//	SDL_free(g_pWavData);
+//	SDL_DestroyAudioStream(g_pAudioStream);
+//	g_pAudioStream = nullptr;
+//	g_pWavData = nullptr;
+}
 
 cAudioDevices::cAudioDevices()
 {
@@ -159,15 +179,70 @@ void cSound::play()
 
 }
 
-bool cSound::test(SDL_AudioDeviceID id, const std::string& filename)
+bool testSound(SDL_AudioDeviceID id, const std::string& filename)
 {
+	if ((g_pAudioStream) || (g_pWavData))
+		return false;
+
+	/* open the default audio device in whatever format it prefers; our audio streams will adjust to it. */
+	g_AudioDevice = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+	if (g_AudioDevice == 0)
+	{
+		SDL_Log("Couldn't open audio device: %s", SDL_GetError());
+		return false;
+	}
+
+	float gain = SDL_GetAudioDeviceGain(g_AudioDevice);
+
+
+	bool retval = false;
+	SDL_AudioSpec spec;
+	char* wav_path = NULL;
+	Sound sound;
+
+	/* Load the .wav files from wherever the app is being run from. */
+	SDL_asprintf(&wav_path, "%s%s", SDL_GetBasePath(), filename.c_str());  /* allocate a string of the full file path */
+	if (!SDL_LoadWAV(wav_path, &spec, &sound.wav_data, &sound.wav_data_len)) {
+		SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
+		return false;
+	}
+
+	/* Create an audio stream. Set the source format to the wav's format (what
+	   we'll input), leave the dest format NULL here (it'll change to what the
+	   device wants once we bind it). */
+	sound.stream = SDL_CreateAudioStream(&spec, NULL);
+	if (!sound.stream) 
+	{
+		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
+	}
+	else if (!SDL_BindAudioStream(g_AudioDevice, sound.stream)) {  /* once bound, it'll start playing when there is data available! */
+		SDL_Log("Failed to bind '%s' stream to device: %s", filename.c_str(), SDL_GetError());
+	}
+	else {
+		retval = true;  /* success! */
+	}
+
+	SDL_free(wav_path);  /* done with this string. */
+
+	auto result = SDL_PutAudioStreamData(sound.stream, sound.wav_data, (int)sound.wav_data_len);
+	if (!result)
+	{
+		std::string msg = SDL_GetError();
+	}
+
+	result = SDL_ResumeAudioStreamDevice(sound.stream);
+	if (!result)
+	{
+		std::string msg = SDL_GetError();
+	}
+
+#if 0
 	SDL_AudioSpec spec;
 	char* wav_path = nullptr;
-	uint8_t* wav_data = nullptr;
 	uint32_t wav_data_len = 0;
 
 	SDL_asprintf(&wav_path, filename.c_str());
-	if (!SDL_LoadWAV(wav_path, &spec, &wav_data, &wav_data_len))
+	if (!SDL_LoadWAV(wav_path, &spec, &g_pWavData, &wav_data_len))
 	{
 		SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
 		return false;
@@ -178,27 +253,27 @@ bool cSound::test(SDL_AudioDeviceID id, const std::string& filename)
 	float gain = SDL_GetAudioDeviceGain(id);
 
 	/* Create our audio stream in the same format as the .wav file. It'll convert to what the audio hardware wants. */
-	SDL_AudioStream* pAudioStream = SDL_OpenAudioDeviceStream(id, &spec, NULL, NULL);
-	if (!pAudioStream)
+	g_pAudioStream = SDL_OpenAudioDeviceStream(id, &spec, FreeTheAudioStream, NULL);
+
+	if (!g_pAudioStream)
 	{
 		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
+		SDL_free(g_pWavData);
+		g_pWavData = nullptr;
 		return false;
 	}
-	auto result = SDL_PutAudioStreamData(pAudioStream, wav_data, wav_data_len);
+	auto result = SDL_PutAudioStreamData(g_pAudioStream, g_pWavData, wav_data_len);
 	if (!result)
 	{
 		std::string msg = SDL_GetError();
 	}
 
-	result = SDL_ResumeAudioStreamDevice(pAudioStream);
+	result = SDL_ResumeAudioStreamDevice(g_pAudioStream);
 	if (!result)
 	{
 		std::string msg = SDL_GetError();
 	}
-
-	SDL_ClearAudioStream(pAudioStream);
-	SDL_free(wav_data);
-	SDL_DestroyAudioStream(pAudioStream);
+#endif
 
 	return true;
 }
