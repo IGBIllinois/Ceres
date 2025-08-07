@@ -73,7 +73,7 @@ cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidgetItem* parent, const std::f
         throw std::invalid_argument("Could not open file.");
     }
 
-    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
+    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, true, true);
 
     std::string measurement_name;
 

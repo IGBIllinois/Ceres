@@ -162,7 +162,7 @@ void cComputeReferenceHeightDlg::compute()
 
 	auto diff_height_mm = z_mm - (ground_height_mm + geometric_height_mm);
 
-	int32_t reference_height_mm = aerial_height_mm - diff_height_mm;
+	int32_t reference_height_mm = aerial_height_mm + diff_height_mm;
 
 	mpReferenceHeight_mm->setText(QString::number(reference_height_mm));
 }

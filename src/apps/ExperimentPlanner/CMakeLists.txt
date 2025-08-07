@@ -149,6 +149,9 @@ PRIVATE
     ComputeReferenceHeightDlg.hpp
     ComputeReferenceHeightDlg.cpp
 
+    ComputeGroundHeightDlg.hpp
+    ComputeGroundHeightDlg.cpp
+
     RecomputeSpidercamHeightDlg.hpp
     RecomputeSpidercamHeightDlg.cpp
 
@@ -157,20 +160,6 @@ PRIVATE
 
 	GpsFileReader.hpp
 	GpsFileReader.cpp
-
-	RappTriangle.hpp
-	RappTriangle.cpp
-
-	RappAerialModel.hpp
-	RappAerialModel.cpp
-
-	RappGroundModel.hpp
-	RappGroundModel.cpp
-
-	QuadTree.hpp
-	QuadTree.cpp
-	QuadNode.hpp
-	QuadNode.cpp
 
     FieldBoundaryDlg.hpp
     FieldBoundaryDlg.cpp

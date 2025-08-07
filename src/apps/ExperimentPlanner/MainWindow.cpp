@@ -37,6 +37,7 @@
 #include "ExperimentCtrlModel.hpp"
 #include "Spidercam/SpidercamModel.hpp"
 
+#include "ComputeGroundHeightDlg.hpp"
 #include "ComputeSpidercamHeightDlg.hpp"
 #include "ComputeSensorRangeDlg.hpp"
 #include "ComputeReferenceHeightDlg.hpp"
@@ -473,6 +474,11 @@ void cMainWindow::createSubMenusAndActions()
     //
     // Build the Compute Sub Menu
     //
+    pMenuItem = new QAction(tr("Compute Ground Height"), this);
+    pMenuItem->setStatusTip(tr("Compute the ground height at a given SpiderCam point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onComputeGroundHeight);
+    mpComputeMenu->addAction(pMenuItem);
+
     pMenuItem = new QAction(tr("Compute SpiderCam Height"), this);
     pMenuItem->setStatusTip(tr("Compute the Spidercam heigth from single SpiderCam point and desired height above canopy"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onComputeSpidercamHeight);
@@ -1271,6 +1277,12 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
 /********************************************************************
  * Slots associated with "Compute" menu actions
  *******************************************************************/
+void cMainWindow::onComputeGroundHeight()
+{
+    cComputeGroundHeightDlg dlg(mGroundData, this);
+
+    dlg.exec();
+}
 
 void cMainWindow::onComputeSpidercamHeight()
 {

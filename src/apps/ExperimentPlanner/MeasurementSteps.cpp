@@ -810,7 +810,8 @@ void cMeasurementStep_Marker::load(const nlohmann::json& jdoc)
 {
 	using namespace nlohmann;
 
-	std::string marker_type = jdoc["marker type"];
+	if (jdoc.contains("marker type"))
+		std::string marker_type = jdoc["marker type"];
 
 }
 

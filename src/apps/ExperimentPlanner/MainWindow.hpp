@@ -112,6 +112,7 @@ private slots:
 
     // Slots associated with "Compute" menu actions
 private slots:
+    void onComputeGroundHeight();
     void onComputeSpidercamHeight();
     void onComputeSensorRange();
     void onComputeReferenceHeight();
