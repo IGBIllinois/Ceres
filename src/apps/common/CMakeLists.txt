@@ -64,6 +64,9 @@ PRIVATE
 	RappGroundModel.hpp
 	RappGroundModel.cpp
 
+	GpsFileReader.hpp
+	GpsFileReader.cpp
+
 	${PROTO_HDRS}
 	${PROTO_SRCS}
 	ceres_remote_client.proto

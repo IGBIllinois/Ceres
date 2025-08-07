@@ -158,9 +158,6 @@ PRIVATE
 	FieldUtils.hpp
 	FieldUtils.cpp
 
-	GpsFileReader.hpp
-	GpsFileReader.cpp
-
     FieldBoundaryDlg.hpp
     FieldBoundaryDlg.cpp
 
