@@ -192,6 +192,7 @@ find_package(Protobuf REQUIRED)
 find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb ir weather)
 
 find_package(SDL3 REQUIRED)
+find_package(csv2 REQUIRED)
 
 # Find package VTK
 find_package(VTK 9.0 REQUIRED COMPONENTS GUISupportQt IOLegacy)
