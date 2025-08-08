@@ -59,6 +59,9 @@ public:
 
     virtual bool systemReady() const;
 
+    bool isInBatchMode() const;
+    void setBatchMode(bool mode);
+
     bool isExperimentRunning();
     bool isExperimentPaused();
 

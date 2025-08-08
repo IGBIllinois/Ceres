@@ -142,6 +142,23 @@ bool cCtrlDataModel::systemReady() const
     return mThread.mpController->systemReady();
 }
 
+
+bool cCtrlDataModel::isInBatchMode() const
+{
+    if (!mThread.mpController)
+        return false;
+
+    return mThread.mpController->inBatchMode();
+}
+
+void cCtrlDataModel::setBatchMode(bool mode)
+{
+    if (!mThread.mpController)
+        return;
+
+    mThread.mpController->setBatchMode(mode);
+}
+
 bool cCtrlDataModel::isExperimentRunning()
 {
     if (!mThread.mpController)

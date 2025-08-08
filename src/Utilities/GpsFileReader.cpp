@@ -125,6 +125,5 @@ void cGpsFileReader::loadFromFile(const std::string& filename)
 
 		mPoints.emplace_back(point);
 	}
-
 }
 

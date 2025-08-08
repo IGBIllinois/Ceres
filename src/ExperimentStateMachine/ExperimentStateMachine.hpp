@@ -28,6 +28,12 @@ public:
     void clearStateCreators();
 
     /*
+     * In batch mode, variables will be preserved between runs.
+     */
+    bool inBatchMode() const;
+    void setBatchMode(bool mode);
+
+    /*
      * Load an experiment from JSON file.
      */
     bool loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc);
@@ -103,12 +109,17 @@ protected:
     /**
      * A flag to signal that an experiment is active
      */
-    bool mRunning;
-    bool mPaused;
+    bool mRunning = false;
+    bool mPaused = false;
 
-    edge_detect<bool>	mRecording;
+    edge_detect<bool>	mRecording = false;
 
 private:
+    /**
+     * A flag to signal we are in "batch mode" and should not clear the variable table
+     */
+    bool mBatchMode = false;
+
     std::mutex mStateCreatorsMutex;
     std::vector<cExperimentStateCreator*> mStateCreators;
 

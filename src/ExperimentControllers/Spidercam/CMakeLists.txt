@@ -29,8 +29,6 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
     SpidercamDollyStatus.cpp
     SpidercamToolbar.hpp
     SpidercamToolbar.cpp
-    SpidercamExperimentStates.hpp
-    SpidercamExperimentStates.cpp
     SpidercamScanArea.hpp
     SpidercamScanArea.cpp
     SpidercamView.hpp
@@ -44,6 +42,25 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
     SpidercamUtils.cpp
 
     SpidercamCtrlFactory.cpp
+
+#
+# Spidercam State Machine files
+#
+    SpidercamExperimentStates.hpp
+    SpidercamExperimentStates.cpp
+
+#
+# Aerial Compensation States for the experiment state machine
+# 
+# The spidercam dolly droops in the middle of the field.  The
+# aerial compensation states provide the necessary data to
+# compensate for the droop
+#
+    AerialCompensationDlg.hpp
+    AerialCompensationDlg.cpp
+    AerialCompensationStates.hpp
+    AerialCompensationStates.cpp
+	
 )
 
 

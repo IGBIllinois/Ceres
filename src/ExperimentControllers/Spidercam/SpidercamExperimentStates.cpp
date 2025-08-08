@@ -1,7 +1,11 @@
 
 #include "SpidercamExperimentStates.hpp"
 #include "SpidercamCtrlProxies.hpp"
+#include "../../ExperimentStateMachine/ExperimentVariableTable.hpp"
 #include "../../Utilities/Constants.hpp"
+#include "../../Utilities/RappFieldBoundary.hpp"
+#include "../../Utilities/RappFieldModel.hpp"
+
 
 #include <QMessageBox>
 
@@ -178,7 +182,18 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 			mY_mm = -1.0;
 		}
 
-		if (pos.contains("z (mm)"))
+		if (pos.contains("height acl (mm)"))
+		{
+			double canopy_height_mm = 0;
+			auto variables = mVariables.lock();
+
+			variables->get("", canopy_height_mm);
+		}
+		else if (pos.contains("height agl (mm)"))
+		{
+
+		}
+		else if (pos.contains("z (mm)"))
 		{
 			mZ_mm = static_cast<uint32_t>(pos["z (mm)"].get<double>());
 		}

@@ -50,23 +50,6 @@ PRIVATE
 	RemoteClientNetEncoder.hpp
 	RemoteClientNetEncoder.cpp
 
-	QuadTree.hpp
-	QuadTree.cpp
-	QuadNode.hpp
-	QuadNode.cpp
-
-	RappTriangle.hpp
-	RappTriangle.cpp
-
-	RappAerialModel.hpp
-	RappAerialModel.cpp
-
-	RappGroundModel.hpp
-	RappGroundModel.cpp
-
-	GpsFileReader.hpp
-	GpsFileReader.cpp
-
 	${PROTO_HDRS}
 	${PROTO_SRCS}
 	ceres_remote_client.proto

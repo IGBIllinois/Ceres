@@ -48,6 +48,16 @@ cExperimentStateMachine::cExperimentStateMachine(QObject* parent)
     qRegisterMetaType<experiment::eState>();
 }
 
+bool cExperimentStateMachine::inBatchMode() const
+{
+    return mBatchMode;
+}
+
+void cExperimentStateMachine::setBatchMode(bool mode)
+{
+    mBatchMode = mode;
+}
+
 void cExperimentStateMachine::addStateCreator(cExperimentStateCreator* pCreator)
 {
     std::lock_guard<std::mutex> lock{mStateCreatorsMutex};
@@ -127,7 +137,7 @@ void cExperimentStateMachine::clearExperiment()
 
     mExperimentStates.clear();
 
-    if (mVariableTable)
+    if (!mBatchMode && mVariableTable)
         mVariableTable->clear();
 }
 
@@ -156,7 +166,9 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
 
     mpActiveState = nullptr;
 
-    mVariableTable = std::make_shared<cExperimentVariableTable>();
+    if (!mVariableTable)
+        mVariableTable = std::make_shared<cExperimentVariableTable>();
+
     mExperimentStates.push_back(new cExperimentState_Dummy());
 
     try

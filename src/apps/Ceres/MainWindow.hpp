@@ -74,8 +74,7 @@ public slots:
 
 private slots:
     //! File Menu Actions
-    void fileRefresh();
-    void fileAddExperiment();
+    void onFileRefresh();
 
 private slots:
     void onExperimentLoad();
@@ -85,7 +84,9 @@ private slots:
 
 private slots:
     //! Settings Menu Actions
-    void settingsOptions();
+    void onSettingsOptions();
+    void onSettingsLoadGroundMesh();
+    void onSettingsLoadAerialMesh();
 
 private slots:
     void helpAbout();

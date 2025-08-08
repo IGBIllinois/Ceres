@@ -23,6 +23,8 @@
 #include "SensorModel.hpp"
 #include "SensorPropertyPage.hpp"
 
+#include "RappFieldModel.hpp"
+
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
@@ -233,6 +235,14 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
         exit(EXIT_FAILURE);
     }
 
+    QString groundFileName = mSettings.value("Defaults/groundMeshFile").toString();
+    if (!groundFileName.isEmpty())
+        nRFM::load_ground_data(groundFileName.toStdString());
+
+    QString aerialFileName = mSettings.value("Defaults/aerialMeshFile").toString();
+    if (!aerialFileName.isEmpty())
+        nRFM::load_aerial_data(aerialFileName.toStdString());
+
     mpSplashScreen = nullptr;
 
     statusBar()->addPermanentWidget(mpHobbsMeter);
@@ -241,18 +251,11 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::fileRefresh()
+void cMainWindow::onFileRefresh()
 {
     mpMeasurements->refresh();
 
     emit refreshDisplay();
-}
-
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-void cMainWindow::fileAddExperiment()
-{
 }
 
 //-----------------------------------------------------------------------------
@@ -298,6 +301,8 @@ void cMainWindow::onExperimentLoad()
 
     auto measurementFile = mBatchProcess.front();
     mBatchProcess.erase(mBatchProcess.begin());
+
+    mpModel->setBatchMode(mBatchProcess.size() > 1);
 
     loadMeasurement(measurementFile);
 }
@@ -482,7 +487,7 @@ void cMainWindow::onSetExperimentActions(bool load, bool run, bool pause, bool s
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::settingsOptions()
+void cMainWindow::onSettingsOptions()
 {
     auto* pDlg = new cCeresOptionsDlg();
 
@@ -525,6 +530,28 @@ void cMainWindow::settingsOptions()
 
     pDlg->deleteLater();
 
+}
+
+void cMainWindow::onSettingsLoadGroundMesh()
+{
+    QString savedFileName = mSettings.value("Defaults/groundMeshFile").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import Ground Data..."), savedFileName,
+        "GPS CSV Files (*.csv)");
+
+    if (nRFM::load_ground_data(fileName.toStdString()))
+        mSettings.setValue("Defaults/groundMeshFile", fileName);
+}
+
+void cMainWindow::onSettingsLoadAerialMesh()
+{
+    QString savedFileName = mSettings.value("Defaults/aerialMeshFile").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import Aerial Data..."), savedFileName,
+        "Aerial CSV Files (*.csv)");
+
+    if (nRFM::load_aerial_data(fileName.toStdString()))
+        mSettings.setValue("Defaults/aerialMeshFile", fileName);
 }
 
 //-----------------------------------------------------------------------------
@@ -585,6 +612,8 @@ void cMainWindow::onExperimentTerminated()
     mBatchFileName.clear();
     mBatchProcess.clear();
 
+    mpModel->setBatchMode(false);
+
     emit setExperimentActions(true, true, false, false);
 
     emit experimentStopped();
@@ -603,6 +632,8 @@ void cMainWindow::onExperimentCompleted()
     {
         auto measurementFile = mBatchProcess.front();
         mBatchProcess.erase(mBatchProcess.begin());
+
+        mpModel->setBatchMode(mBatchProcess.size() > 1);
 
         if (loadMeasurement(measurementFile))
         {
@@ -640,7 +671,7 @@ void cMainWindow::createSubMenusAndActions()
     // Build the File Menu
     pMenuItem = new QAction(tr("Refresh"), this);
     pMenuItem->setStatusTip(tr("Refresh the experiment window"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::fileRefresh);
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileRefresh);
     mpFileMenu->addAction(pMenuItem);
 
     mpFileMenu->addSeparator();
@@ -686,8 +717,21 @@ void cMainWindow::createSubMenusAndActions()
 
     // Build the Settings Menu
     pMenuItem = new QAction(tr("Options"), this);
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::settingsOptions);
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onSettingsOptions);
     mpSettingMenu->addAction(pMenuItem);
+
+    mpSettingMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Load Ground Data"), this);
+    pMenuItem->setStatusTip(tr("Load the GPS based ground data"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onSettingsLoadGroundMesh);
+    mpSettingMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Load Aerial Data"), this);
+    pMenuItem->setStatusTip(tr("Load the GPS based aerial data"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onSettingsLoadAerialMesh);
+    mpSettingMenu->addAction(pMenuItem);
+
 
     // Build the Help Menu
     pMenuItem = new QAction(tr("&About"), this);

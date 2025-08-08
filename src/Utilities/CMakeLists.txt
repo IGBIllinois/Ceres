@@ -21,7 +21,13 @@ PUBLIC
 	net_packet_encoder.hpp
 	net_packet_decoder.hpp
 
+	RappAerialModel.hpp
+	RappGroundModel.hpp
+
     RappFieldBoundary.hpp
+	RappFieldModel.hpp
+
+	GpsFileReader.hpp
 
 PRIVATE
 	ColorGradient.cpp
@@ -35,10 +41,29 @@ PRIVATE
 	net_packet_encoder.cpp
 	net_packet_decoder.cpp
 
+	QuadTree.hpp
+	QuadTree.cpp
+	QuadNode.hpp
+	QuadNode.cpp
+
+	RappTriangle.hpp
+	RappTriangle.cpp
+
+	RappAerialModel.cpp
+	RappGroundModel.cpp
+
+	GpsFileReader.cpp
+
+	RappFieldModel.cpp
     RappFieldBoundary.cpp
 )
 
+target_include_directories(Utilities PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
+
 target_link_libraries(Utilities PRIVATE ${Qt}::Widgets)
+target_link_libraries(Utilities PRIVATE ${VTK_LIBRARIES} )
+
+vtk_module_autoinit(TARGETS Utilities MODULES ${VTK_LIBRARIES})
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
