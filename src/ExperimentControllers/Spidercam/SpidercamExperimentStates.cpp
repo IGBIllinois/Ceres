@@ -1,6 +1,7 @@
 
 #include "SpidercamExperimentStates.hpp"
 #include "SpidercamCtrlProxies.hpp"
+#include "AerialCompensationDlg.hpp"
 #include "../../ExperimentStateMachine/ExperimentVariableTable.hpp"
 #include "../../Utilities/Constants.hpp"
 #include "../../Utilities/RappFieldBoundary.hpp"
@@ -144,6 +145,7 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 :
 	cSpidercamExperimentState(pos, controller, tolerance_mm)
 {
+	mReferenceHeight_mm = nRFM::reference_height_mm();
 }
 
 bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
@@ -184,14 +186,126 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 
 		if (pos.contains("height acl (mm)"))
 		{
-			double canopy_height_mm = 0;
+			double aboveCanopy_mm = pos["height acl (mm)"].get<double>();
+
+			int32_t sensor_offset_mm = -10000;
+			int32_t canopy_height_mm = -10000;
+
 			auto variables = mVariables.lock();
 
-			variables->get("", canopy_height_mm);
+			if (variables->contains("canopy_height_mm"))
+				variables->get("canopy_height_mm", canopy_height_mm);
+
+			if (variables->contains("sensor_offset_mm"))
+				variables->get("sensor_offset_mm", sensor_offset_mm);
+
+			if (variables->contains("reference_height_mm"))
+				variables->get("reference_height_mm", mReferenceHeight_mm);
+
+			if ((sensor_offset_mm == -10000) || (canopy_height_mm == -10000))
+			{
+				cAboveCanopyHeightDlg* pDlg = new cAboveCanopyHeightDlg();
+
+				if (canopy_height_mm != -10000)
+					pDlg->setCanopyHeight_mm(canopy_height_mm);
+				if (sensor_offset_mm != -10000)
+					pDlg->setSensorOffset_mm(sensor_offset_mm);
+				pDlg->setReferenceHeight_mm(mReferenceHeight_mm);
+
+				auto result = pDlg->exec();
+
+				if (result == QDialog::Rejected)
+				{
+					pDlg->deleteLater();
+					return false;
+				}
+
+				canopy_height_mm = pDlg->getCanopyHeight_mm();
+				sensor_offset_mm = pDlg->getSensorOffset_mm();
+				mReferenceHeight_mm = pDlg->getReferenceHeight_mm();
+
+				if (!variables->set("canopy_height_mm", canopy_height_mm))
+					variables->add("canopy_height_mm", canopy_height_mm);
+
+				if (!variables->set("sensor_offset_mm", sensor_offset_mm))
+					variables->add("sensor_offset_mm", sensor_offset_mm);
+
+				if (!variables->set("reference_height_mm", mReferenceHeight_mm))
+					variables->add("reference_height_mm", mReferenceHeight_mm);
+
+				pDlg->deleteLater();
+			}
+
+			mHeight_mm = static_cast<uint32_t>(aboveCanopy_mm) + canopy_height_mm + sensor_offset_mm;
+
+			if (!mX_NeedsInitialization && !mY_NeedsInitialization)
+			{
+				mZ_mm = nRFM::compute_dolly_height_mm(mHeight_mm, mX_mm, mY_mm, mReferenceHeight_mm);
+				mACH_NeedsInitialization = false;
+			}
+			else
+			{
+				mACH_NeedsInitialization = true;
+			}
+
+			mZ_NeedsInitialization = false;
 		}
 		else if (pos.contains("height agl (mm)"))
 		{
+			double aboveGround_mm = pos["height agl (mm)"].get<double>();
 
+			int32_t sensor_offset_mm = -10000;
+			int32_t reference_height_mm = -10000;
+
+			auto variables = mVariables.lock();
+
+			if (variables->contains("sensor_offset_mm"))
+				variables->get("sensor_offset_mm", sensor_offset_mm);
+
+			if (variables->contains("reference_height_mm"))
+				variables->get("reference_height_mm", reference_height_mm);
+
+			if (sensor_offset_mm == -10000)
+			{
+				cAboveGroundHeightDlg* pDlg = new cAboveGroundHeightDlg();
+
+				if (sensor_offset_mm != -10000)
+					pDlg->setSensorOffset_mm(sensor_offset_mm);
+				pDlg->setReferenceHeight_mm(reference_height_mm);
+
+				auto result = pDlg->exec();
+
+				if (result == QDialog::Rejected)
+				{
+					pDlg->deleteLater();
+					return false;
+				}
+
+				sensor_offset_mm = pDlg->getSensorOffset_mm();
+				reference_height_mm = pDlg->getReferenceHeight_mm();
+
+				if (!variables->set("sensor_offset_mm", sensor_offset_mm))
+					variables->add("sensor_offset_mm", sensor_offset_mm);
+
+				if (!variables->set("reference_height_mm", reference_height_mm))
+					variables->set("reference_height_mm", reference_height_mm);
+
+				pDlg->deleteLater();
+			}
+
+			mHeight_mm = static_cast<uint32_t>(aboveGround_mm) + sensor_offset_mm;
+
+			if (!mX_NeedsInitialization && !mY_NeedsInitialization)
+			{
+				mZ_mm = nRFM::compute_dolly_height_mm(mHeight_mm, mX_mm, mY_mm, reference_height_mm);
+				mAGH_NeedsInitialization = false;
+			}
+			else
+			{
+				mAGH_NeedsInitialization = true;
+			}
+
+			mZ_NeedsInitialization = false;
 		}
 		else if (pos.contains("z (mm)"))
 		{
@@ -310,6 +424,16 @@ bool cSpidercamExperimentState_Movement::initialize()
 	if (mY_NeedsInitialization)
 	{
 		mY_mm = mController.getLastKnownPosition().Y_mm;
+	}
+
+	if (mACH_NeedsInitialization)
+	{
+		mZ_mm = nRFM::compute_dolly_height_mm(mHeight_mm, mX_mm, mY_mm, mReferenceHeight_mm);
+	}
+
+	if (mAGH_NeedsInitialization)
+	{
+		mZ_mm = nRFM::compute_dolly_height_mm(mHeight_mm, mX_mm, mY_mm, mReferenceHeight_mm);
 	}
 
 	if (mZ_NeedsInitialization)

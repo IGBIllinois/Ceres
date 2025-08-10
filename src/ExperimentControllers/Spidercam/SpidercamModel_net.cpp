@@ -2,6 +2,7 @@
 #include "SpidercamModel_net.hpp"
 #include "../../Utilities/Constants.hpp"
 #include "ExperimentTypes.hpp"
+#include "AerialCompensationStates.hpp"
 
 
 cSpidercamModel_net::cSpidercamModel_net(QObject* parent)
@@ -87,6 +88,12 @@ cExperimentState* cSpidercamModel_net::createState(const std::string& type, cons
 {
     if (type == "movement")
         return new cSpidercamExperimentState_Movement(mCurrentPosition, *(mpProxy.get()), mPositionTolerance_mm);
+
+    if (type == "above ground height")
+        return new cExperimentState_AGH();
+
+    if (type == "above canopy height")
+        return new cExperimentState_ACH();
 
     return cExperimentControlModel::createState(type, expDoc);
 }

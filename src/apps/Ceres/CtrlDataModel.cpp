@@ -159,6 +159,14 @@ void cCtrlDataModel::setBatchMode(bool mode)
     mThread.mpController->setBatchMode(mode);
 }
 
+void cCtrlDataModel::clearVariableTable()
+{
+    if (!mThread.mpController)
+        return;
+
+    mThread.mpController->clearVariableTable();
+}
+
 bool cCtrlDataModel::isExperimentRunning()
 {
     if (!mThread.mpController)

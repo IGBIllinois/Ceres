@@ -78,7 +78,7 @@ void cMeasurementManager::loadMeasurements()
             {
                 auto* pItem = new cMeasurementTreeItem(this, entry.path());
             }
-            catch (const invalid_experiment_file&)
+            catch (const invalid_experiment_file& e)
             {
             }
             catch (const std::exception& e)

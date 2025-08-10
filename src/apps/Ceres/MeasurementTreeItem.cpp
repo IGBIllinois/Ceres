@@ -21,22 +21,39 @@ cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidget* parent, const std::files
         throw std::invalid_argument("Could not open file.");
     }
 
-    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
-
     std::string measurement_name;
 
-    if (jsonDoc.contains("measurement name"))
-        measurement_name = jsonDoc["measurement name"];
+    try
+    {
+        nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, true, true);
 
-    else if (jsonDoc.contains("measurement_name"))
-        measurement_name = jsonDoc["measurement_name"];
+        if (jsonDoc.contains("measurement name"))
+            measurement_name = jsonDoc["measurement name"];
 
-    else if (jsonDoc.contains("experiment name"))
-        measurement_name = jsonDoc["experiment name"];
+        else if (jsonDoc.contains("measurement_name"))
+            measurement_name = jsonDoc["measurement_name"];
 
-    else if (jsonDoc.contains("experiment_name"))
-        measurement_name = jsonDoc["experiment_name"];
-    else
+        else if (jsonDoc.contains("experiment name"))
+            measurement_name = jsonDoc["experiment name"];
+
+        else if (jsonDoc.contains("experiment_name"))
+            measurement_name = jsonDoc["experiment_name"];
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+        QString msg = "Parsing error in ";
+        msg += measurement_file.c_str();
+        msg += ".\n";
+        msg += e.what();
+
+        QMessageBox mb(QMessageBox::Critical, "Measurement File Error", msg);
+        mb.exec();
+
+        in.close();
+        throw invalid_experiment_file();
+    }
+
+    if (measurement_name.empty())
     {
         in.close();
         throw invalid_experiment_file();
@@ -72,19 +89,36 @@ cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidgetItem* parent, const std::f
         throw std::invalid_argument("Could not open file.");
     }
 
-    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
-
     std::string measurement_name;
 
-    if (jsonDoc.contains("measurement name"))
-        measurement_name = jsonDoc["measurement name"];
-    else if (jsonDoc.contains("measurement_name"))
-        measurement_name = jsonDoc["measurement_name"];
-    else if (jsonDoc.contains("experiment name"))
-        measurement_name = jsonDoc["experiment name"];
-    else if (jsonDoc.contains("experiment_name"))
-        measurement_name = jsonDoc["experiment_name"];
-    else
+    try
+    {
+        nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, true, true);
+
+        if (jsonDoc.contains("measurement name"))
+            measurement_name = jsonDoc["measurement name"];
+        else if (jsonDoc.contains("measurement_name"))
+            measurement_name = jsonDoc["measurement_name"];
+        else if (jsonDoc.contains("experiment name"))
+            measurement_name = jsonDoc["experiment name"];
+        else if (jsonDoc.contains("experiment_name"))
+            measurement_name = jsonDoc["experiment_name"];
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+        QString msg = "Parsing error in ";
+        msg += measurement_file.c_str();
+        msg += ".\n";
+        msg += e.what();
+
+        QMessageBox mb(QMessageBox::Critical, "Measurement File Error", msg);
+        mb.exec();
+
+        in.close();
+        throw invalid_experiment_file();
+    }
+
+    if (measurement_name.empty())
     {
         in.close();
         throw invalid_experiment_file();

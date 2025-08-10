@@ -26,7 +26,6 @@ cExperimentState_AGH::~cExperimentState_AGH()
 bool cExperimentState_AGH::configure(const nlohmann::json& stateDoc)
 {
 	int32_t sensor_offset_mm = 0;
-	int32_t desired_height_mm = -1;
 	int32_t reference_height_mm = nRFM::reference_height_mm();
 
 	auto variables = mVariables.lock();
@@ -42,17 +41,8 @@ bool cExperimentState_AGH::configure(const nlohmann::json& stateDoc)
 		}
 	}
 
-	if (variables->contains("desired_height_mm"))
-		variables->get("desired_height_mm", desired_height_mm);
-	else
-	{
-		if (stateDoc.contains("defaults"))
-		{
-			auto defaults = stateDoc["defaults"];
-			if (defaults.contains("desired_height_mm"))
-				desired_height_mm = defaults["desired_height_mm"];
-		}
-	}
+	if (variables->contains("reference_height_mm"))
+		variables->get("reference_height_mm", reference_height_mm);
 
 
 	// We are in the data thread.  Any GUI object must exists in the
@@ -60,33 +50,21 @@ bool cExperimentState_AGH::configure(const nlohmann::json& stateDoc)
 	mpDlg = new cAboveGroundHeightDlg();
 
 	mpDlg->setSensorOffset_mm(sensor_offset_mm);
-	mpDlg->setDesiredHeight_mm(desired_height_mm);
 	mpDlg->setReferenceHeight_mm(reference_height_mm);
 
-	auto r = mpDlg->exec();
-	auto result = mpDlg->result();
+	auto result = mpDlg->exec();
 
-	if (result == cAboveGroundHeightDlg::eRESULT::ABORT)
+	if (result == QDialog::Rejected)
 		return false;
 
 	sensor_offset_mm = mpDlg->getSensorOffset_mm();
-	desired_height_mm = mpDlg->getDesiredHeight_mm();
 	reference_height_mm = mpDlg->getReferenceHeight_mm();
 
 	if (!variables->set("sensor_offset_mm", sensor_offset_mm))
 		variables->add("sensor_offset_mm", sensor_offset_mm);
 
-	if (!variables->set("desired_height_mm", desired_height_mm))
-		variables->add("desired_height_mm", desired_height_mm);
-
 	if (!variables->set("reference_height_mm", reference_height_mm))
 		variables->set("reference_height_mm", reference_height_mm);
-
-	int32_t height_mm = mpDlg->getHeight_mm();
-
-
-	//	mpDlg->moveToThread(QApplication::instance()->thread());
-//	QObject::connect(this, &cExperimentState_AGH::showDlg, mpDlg, &cAboveGroundHeightDlg::showDlg);
 
 	return true;
 }
@@ -132,11 +110,65 @@ cExperimentState_ACH::~cExperimentState_ACH()
 
 bool cExperimentState_ACH::configure(const nlohmann::json& stateDoc)
 {
+	int32_t sensor_offset_mm = 0;
+	int32_t canopy_height_mm = 0;
+	int32_t reference_height_mm = nRFM::reference_height_mm();
+
+	auto variables = mVariables.lock();
+
+	if (variables->contains("canopy_height_mm"))
+		variables->get("canopy_height_mm", canopy_height_mm);
+	else
+	{
+		if (stateDoc.contains("defaults"))
+		{
+			auto defaults = stateDoc["defaults"];
+			if (defaults.contains("canopy_height_mm"))
+				canopy_height_mm = defaults["canopy_height_mm"];
+		}
+	}
+
+	if (variables->contains("sensor_offset_mm"))
+		variables->get("sensor_offset_mm", sensor_offset_mm);
+	else
+	{
+		if (stateDoc.contains("defaults"))
+		{
+			auto defaults = stateDoc["defaults"];
+			if (defaults.contains("sensor_offset_mm"))
+				sensor_offset_mm = defaults["sensor_offset_mm"];
+		}
+	}
+
+	if (variables->contains("reference_height_mm"))
+		variables->get("reference_height_mm", reference_height_mm);
+
+
 	// We are in the data thread.  Any GUI object must exists in the
 	// QApplication thread!
 	mpDlg = new cAboveCanopyHeightDlg();
-	mpDlg->moveToThread(QApplication::instance()->thread());
-	QObject::connect(this, &cExperimentState_ACH::showDlg, mpDlg, &cAboveCanopyHeightDlg::showDlg);
+
+	mpDlg->setCanopyHeight_mm(canopy_height_mm);
+	mpDlg->setSensorOffset_mm(sensor_offset_mm);
+	mpDlg->setReferenceHeight_mm(reference_height_mm);
+
+	auto result = mpDlg->exec();
+
+	if (result == QDialog::Rejected)
+		return false;
+
+	canopy_height_mm = mpDlg->getCanopyHeight_mm();
+	sensor_offset_mm = mpDlg->getSensorOffset_mm();
+	reference_height_mm = mpDlg->getReferenceHeight_mm();
+
+	if (!variables->set("canopy_height_mm", canopy_height_mm))
+		variables->add("canopy_height_mm", canopy_height_mm);
+
+	if (!variables->set("sensor_offset_mm", sensor_offset_mm))
+		variables->add("sensor_offset_mm", sensor_offset_mm);
+
+	if (!variables->set("reference_height_mm", reference_height_mm))
+		variables->set("reference_height_mm", reference_height_mm);
 
 	return true;
 }
@@ -153,8 +185,6 @@ bool cExperimentState_ACH::recording()
 
 bool cExperimentState_ACH::initialize()
 {
-	emit showDlg();
-
 	return true;
 }
 
@@ -164,11 +194,6 @@ void cExperimentState_ACH::stop() {}
 
 cExperimentState::eRESULT cExperimentState_ACH::finished()
 {
-	auto result = mpDlg->result();
-
-	if (result == cAboveCanopyHeightDlg::eRESULT::NONE)
-		return eRESULT::WAITING;
-
-	return result == cAboveCanopyHeightDlg::eRESULT::ABORT ? eRESULT::ABORT : eRESULT::DONE;
+	return eRESULT::DONE;
 }
 

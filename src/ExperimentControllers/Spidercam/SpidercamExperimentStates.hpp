@@ -67,6 +67,11 @@ public:
 	bool initialize() override;
 
 private:
+	int32_t mHeight_mm = 0;
+	int32_t mReferenceHeight_mm = 0;
+	bool mAGH_NeedsInitialization = false;
+	bool mACH_NeedsInitialization = false;
+
 	bool mX_NeedsInitialization = false;
 	bool mY_NeedsInitialization = false;
 	bool mZ_NeedsInitialization = false;

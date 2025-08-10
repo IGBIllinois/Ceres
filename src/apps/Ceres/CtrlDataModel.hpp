@@ -62,6 +62,8 @@ public:
     bool isInBatchMode() const;
     void setBatchMode(bool mode);
 
+    void clearVariableTable();
+
     bool isExperimentRunning();
     bool isExperimentPaused();
 

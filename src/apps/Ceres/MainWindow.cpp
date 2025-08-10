@@ -302,7 +302,7 @@ void cMainWindow::onExperimentLoad()
     auto measurementFile = mBatchProcess.front();
     mBatchProcess.erase(mBatchProcess.begin());
 
-    mpModel->setBatchMode(mBatchProcess.size() > 1);
+    mpModel->setBatchMode(mBatchProcess.size() > 0);
 
     loadMeasurement(measurementFile);
 }
@@ -633,14 +633,15 @@ void cMainWindow::onExperimentCompleted()
         auto measurementFile = mBatchProcess.front();
         mBatchProcess.erase(mBatchProcess.begin());
 
-        mpModel->setBatchMode(mBatchProcess.size() > 1);
-
         if (loadMeasurement(measurementFile))
         {
             onExperimentRun();
             return;
         }
     }
+
+    mpModel->setBatchMode(false);
+    mpModel->clearVariableTable();
 
     emit setExperimentActions(true, true, false, false);
 

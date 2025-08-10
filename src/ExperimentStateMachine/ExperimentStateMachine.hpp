@@ -77,6 +77,13 @@ public:
      */
     bool isRecording();
 
+    /*
+     * Clear the experiment variable table
+     */
+    void clearVariableTable();
+
+
+
 signals:
     void experimentStatus(QString msg);
     void experimentStateChanged(experiment::eState state);
@@ -104,6 +111,9 @@ protected:
     void recordingStateChanged(bool recording);
 
     virtual void emitStatusMessage(const QString& msg) = 0;
+
+private:
+    void addVariables(const nlohmann::json& variables);
 
 protected:
     /**

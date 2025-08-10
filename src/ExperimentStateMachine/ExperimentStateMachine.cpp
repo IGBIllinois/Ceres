@@ -141,6 +141,13 @@ void cExperimentStateMachine::clearExperiment()
         mVariableTable->clear();
 }
 
+void cExperimentStateMachine::clearVariableTable()
+{
+    if (mRunning) return;
+
+    if (mVariableTable)
+        mVariableTable->clear();
+}
 
 cExperimentState* cExperimentStateMachine::createState(const std::string& type, const nlohmann::json& expDoc)
 {
@@ -175,6 +182,14 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
     {
         for (auto entry : expDoc)
         {
+            if (entry.contains("variables"))
+            {
+                const auto& variables = entry["variables"];
+                addVariables(variables);
+
+                continue;
+            }
+
             if (entry.contains("include"))
             {
                 std::string filename = entry["include"];
@@ -214,8 +229,8 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
             if (pState)
             {
                 pState->attachVariableTable(mVariableTable);
-                pState->configure(entry);
-                mExperimentStates.push_back(pState);
+                if (pState->configure(entry))
+                    mExperimentStates.push_back(pState);
             }
         }
     }
@@ -277,6 +292,44 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
     emitStatusMessage(msg);
 
     return true;
+}
+
+void cExperimentStateMachine::addVariables(const nlohmann::json& variables)
+{
+    if (variables.empty())
+        return;
+
+    auto items = variables.items();
+
+    for (auto it = items.begin(); it != items.end(); ++it)
+    {
+        auto name = it.key();
+        auto value = it.value();
+
+        if (mVariableTable->contains(name))
+        {
+            if (value.is_number_float())
+                mVariableTable->set(name, value.get<double>());
+            else if (value.is_number_unsigned())
+                mVariableTable->set(name, value.get<unsigned int>());
+            else if (value.is_number_integer())
+                mVariableTable->set(name, value.get<int>());
+            else if (value.is_boolean())
+                mVariableTable->set(name, value.get<bool>());
+        }
+        else
+        {
+            if (value.is_number_float())
+                mVariableTable->add(name, value.get<double>());
+            else if (value.is_number_unsigned())
+                mVariableTable->add(name, value.get<unsigned int>());
+            else if (value.is_number_integer())
+                mVariableTable->add(name, value.get<int>());
+            else if (value.is_boolean())
+                mVariableTable->add(name, value.get<bool>());
+        }
+
+    }
 }
 
 
@@ -486,26 +539,35 @@ std::vector<cExperimentState*> cExperimentStateMachine::loadMeasurementStates(co
     {
         for (auto entry : expDoc)
         {
-            std::string type = entry["type"];
-
-            if (type == "include")
+            if (entry.contains("variables"))
             {
-                std::string filename = entry["filename"];
-
-                std::vector<cExperimentState*> states = loadMeasurementStates(root_path, filename);
-
-                for (auto* state : states)
-                {
-                    if (state)
-                    {
-                        state->attachVariableTable(mVariableTable);
-                        state->configure(entry);
-                        states.push_back(state);
-                    }
-                }
+                const auto& variables = entry["variables"];
+                addVariables(variables);
 
                 continue;
             }
+
+            if (entry.contains("include"))
+            {
+                std::string filename = entry["include"];
+
+                std::vector<cExperimentState*> include_states = loadMeasurementStates(root_path, filename);
+
+                for (auto* state : include_states)
+                {
+                    if (state)
+                    {
+                        states.push_back(std::move(state));
+                    }
+                }
+
+                include_states.clear();
+
+                continue;
+            }
+
+
+            std::string type = entry["type"];
 
             cExperimentState* pState = createState(type, entry);
 
@@ -525,8 +587,8 @@ std::vector<cExperimentState*> cExperimentStateMachine::loadMeasurementStates(co
             if (pState)
             {
                 pState->attachVariableTable(mVariableTable);
-                pState->configure(entry);
-                states.push_back(pState);
+                if (pState->configure(entry))
+                    states.push_back(pState);
             }
         }
     }
