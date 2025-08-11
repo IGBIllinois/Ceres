@@ -134,10 +134,9 @@ void cReferenceHeightDlg::createLayout()
 
 void cReferenceHeightDlg::accept()
 {
-
-	if (!mpGeometricHeight_mm->text().isEmpty())
+	if (!mpReferenceHeight_mm->text().isEmpty())
 	{
-		int32_t reference_height_mm = mpGeometricHeight_mm->text().toInt();
+		int32_t reference_height_mm = mpReferenceHeight_mm->text().toInt();
 		nRFM::set_reference_height_mm(reference_height_mm);
 	}
 
