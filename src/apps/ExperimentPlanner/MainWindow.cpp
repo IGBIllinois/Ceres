@@ -1300,7 +1300,6 @@ void cMainWindow::onComputeSensorRange()
 
 void cMainWindow::onComputeReferenceHeight()
 {
-
     cComputeReferenceHeightDlg dlg(mGroundData, mAerialData, this);
 
     dlg.setReferenceHeight_mm(mReferenceHeight_mm);
