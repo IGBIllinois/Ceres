@@ -13,6 +13,11 @@ namespace nRFM
 
 	int ground_height_mm(int x_mm, int y_mm);
 
+	int set_reference_height_mm(int geometric_height_mm, int x_mm, int y_mm, int z_mm);
+	void set_reference_height_mm(int reference_height_mm);
+
+	int compute_reference_height_mm(int geometric_height_mm, int x_mm, int y_mm, int z_mm);
+
 	int dolly_offset_mm(int x_mm, int y_mm);
 	int dolly_offset_mm(int x_mm, int y_mm, int ref_height_mm);
 

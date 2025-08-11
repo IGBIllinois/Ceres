@@ -177,6 +177,53 @@ int nRFM::reference_height_mm()
     return gReferenceHeight_mm;
 }
 
+void nRFM::set_reference_height_mm(int reference_height_mm)
+{
+    if (reference_height_mm > 10000)
+        return;
+
+    if (reference_height_mm < 4000)
+        return;
+
+    gReferenceHeight_mm = reference_height_mm;
+}
+
+int nRFM::set_reference_height_mm(int geometric_height_mm, int x_mm, int y_mm, int z_mm)
+{
+    int32_t ground_height_mm = static_cast<int32_t>(gGroundModel.getMeshHeight_mm(x_mm, y_mm)) + 1;
+    int32_t aerial_height_mm = static_cast<int32_t>(gAerialModel.getMeshHeight_mm(x_mm, y_mm));
+
+    if (aerial_height_mm == rfm::INVALID_HEIGHT)
+    {
+        return 0;
+    }
+
+    auto diff_height_mm = z_mm - (ground_height_mm + geometric_height_mm);
+
+    int32_t reference_height_mm = aerial_height_mm + diff_height_mm;
+
+    gReferenceHeight_mm = reference_height_mm;
+
+    return reference_height_mm;
+}
+
+int nRFM::compute_reference_height_mm(int geometric_height_mm, int x_mm, int y_mm, int z_mm)
+{
+    int32_t ground_height_mm = static_cast<int32_t>(gGroundModel.getMeshHeight_mm(x_mm, y_mm)) + 1;
+    int32_t aerial_height_mm = static_cast<int32_t>(gAerialModel.getMeshHeight_mm(x_mm, y_mm));
+
+    if (aerial_height_mm == rfm::INVALID_HEIGHT)
+    {
+        return rfm::INVALID_HEIGHT;
+    }
+
+    auto diff_height_mm = z_mm - (ground_height_mm + geometric_height_mm);
+
+    int32_t reference_height_mm = aerial_height_mm + diff_height_mm;
+
+    return reference_height_mm;
+}
+
 int nRFM::ground_height_mm(int x_mm, int y_mm)
 {
     return static_cast<int>(gGroundModel.getMeshHeight_mm(x_mm, y_mm));
