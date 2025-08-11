@@ -87,6 +87,7 @@ private slots:
     void onSettingsOptions();
     void onSettingsLoadGroundMesh();
     void onSettingsLoadAerialMesh();
+    void onSettingsReferenceHeight();
 
 private slots:
     void helpAbout();

@@ -89,6 +89,9 @@ PRIVATE
     CeresOptionsDlg.hpp
     CeresOptionsDlg.cpp
 
+    ReferenceHeightDlg.hpp
+    ReferenceHeightDlg.cpp
+
     MainWindow.hpp
     MainWindow.cpp
 

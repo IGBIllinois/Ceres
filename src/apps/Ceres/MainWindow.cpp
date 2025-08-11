@@ -5,6 +5,7 @@
 
 #include "CeresSplashScreen.hpp"
 #include "CeresOptionsDlg.hpp"
+#include "ReferenceHeightDlg.hpp"
 
 #include "CtrlDataModel.hpp"
 #include "CtrlDataModelLocal.hpp"
@@ -18,6 +19,7 @@
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentCtrlView.hpp"
 #include "ExperimentCtrlModel.hpp"
+#include "Spidercam/SpidercamView.hpp"
 
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
@@ -554,6 +556,22 @@ void cMainWindow::onSettingsLoadAerialMesh()
         mSettings.setValue("Defaults/aerialMeshFile", fileName);
 }
 
+void cMainWindow::onSettingsReferenceHeight()
+{
+    cReferenceHeightDlg dlg(this);
+
+    dlg.setReferenceHeight_mm(nRFM::reference_height_mm());
+
+    cSpidercamView* pView = dynamic_cast<cSpidercamView*>(mpController);
+
+    if (pView)
+    {
+        dlg.setPosition(pView->x_mm(), pView->y_mm(), pView->z_mm());
+    }
+
+    auto result = dlg.exec();
+}
+
 //-----------------------------------------------------------------------------
 void cMainWindow::helpAbout()
 {
@@ -733,6 +751,12 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onSettingsLoadAerialMesh);
     mpSettingMenu->addAction(pMenuItem);
 
+    mpSettingMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Set Reference Height"), this);
+    pMenuItem->setStatusTip(tr("Set the reference height using the geometric height at the current location"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onSettingsReferenceHeight);
+    mpSettingMenu->addAction(pMenuItem);
 
     // Build the Help Menu
     pMenuItem = new QAction(tr("&About"), this);
