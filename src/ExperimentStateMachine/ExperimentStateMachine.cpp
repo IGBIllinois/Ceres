@@ -230,7 +230,18 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
             {
                 pState->attachVariableTable(mVariableTable);
                 if (pState->configure(entry))
+                {
                     mExperimentStates.push_back(pState);
+                }
+                else
+                {
+                    emit experimentStateChanged(eState::EXP_ERROR);
+
+                    mExperimentStates.push_back(pState);
+                    delete_states(mExperimentStates);
+
+                    return false;
+                }
             }
         }
     }
