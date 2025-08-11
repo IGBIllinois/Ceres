@@ -21,6 +21,7 @@ namespace
     cRappGroundModel gGroundModel;
 
     static int gReferenceHeight_mm = rfm::INVALID_HEIGHT;
+    static int gAerialMeasurementHeight_mm = rfm::INVALID_HEIGHT;
 
     std::vector<cRappTriangle> compute_mesh(const std::vector<rfm::rappPoint_t>& points, int32_t max_separation_mm = 10000)
     {
@@ -148,6 +149,7 @@ bool nRFM::load_aerial_data(const std::string& fileName)
     {
         auto ref_point = gps.GetRefPoint().value();
         gReferenceHeight_mm = ref_point.z_m * nConstants::M_TO_MM;
+        gAerialMeasurementHeight_mm = gReferenceHeight_mm;
     }
 
     std::vector<rfm::rappPoint_t> rapp_points;
@@ -179,10 +181,10 @@ int nRFM::reference_height_mm()
 
 void nRFM::set_reference_height_mm(int reference_height_mm)
 {
-    if (reference_height_mm > 10000)
+    if (reference_height_mm > (gAerialMeasurementHeight_mm*1.5))
         return;
 
-    if (reference_height_mm < 4000)
+    if (reference_height_mm < (gAerialMeasurementHeight_mm*0.5))
         return;
 
     gReferenceHeight_mm = reference_height_mm;

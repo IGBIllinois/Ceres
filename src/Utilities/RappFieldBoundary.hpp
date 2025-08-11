@@ -62,11 +62,17 @@ namespace rfb
 	uint32_t minY_mm();
 	uint32_t maxY_mm();
 
+	uint32_t minZ_mm();
+	uint32_t maxZ_mm();
+
 	uint32_t minMeasurementX_mm();
 	uint32_t maxMeasurementX_mm();
 
 	uint32_t minMeasurementY_mm();
 	uint32_t maxMeasurementY_mm();
+
+	uint32_t minMeasurementZ_mm();
+	uint32_t maxMeasurementZ_mm();
 
 	bool withinBoundary(const rfm::planePoint_t& point);
 	bool withinBoundary(const rfm::rappPoint_t& point);
@@ -75,6 +81,8 @@ namespace rfb
 	bool withinMeasurementBoundary(const rfm::planePoint_t& point);
 	bool withinMeasurementBoundary(const rfm::rappPoint_t& point);
 	bool withinMeasurementBoundary(const std::int32_t x_mm, const std::int32_t y_mm);
+	bool withinMeasurementBoundary(const std::int32_t x_mm, const std::int32_t y_mm, const std::int32_t z_mm);
+	bool withinMeasurementHeight(const std::int32_t z_mm);
 
 	rfm::rappPoint_t toRappCoordinates(const rfm::planePoint_t& point);
 	rfm::rappPoint_t fromStatePlane( double northing_ft, const double easting_ft, const double elevation_ft);

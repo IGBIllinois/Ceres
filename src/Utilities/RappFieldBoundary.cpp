@@ -94,6 +94,11 @@ uint32_t rfb::minY_mm()
 	return mRappTowerLocations[0].y_mm;
 }
 
+uint32_t rfb::minZ_mm()
+{
+	return 0;
+}
+
 uint32_t rfb::maxX_mm()
 {
 	return mRappTowerLocations[2].x_mm;
@@ -102,6 +107,11 @@ uint32_t rfb::maxX_mm()
 uint32_t rfb::maxY_mm()
 {
 	return mRappTowerLocations[2].y_mm;
+}
+
+uint32_t rfb::maxZ_mm()
+{
+	return 10000;
 }
 
 
@@ -123,6 +133,16 @@ uint32_t rfb::minMeasurementY_mm()
 uint32_t rfb::maxMeasurementY_mm()
 {
 	return mRappTowerLocations[2].y_mm - measurementOffset_mm;
+}
+
+uint32_t rfb::minMeasurementZ_mm()
+{
+	return 1000;
+}
+
+uint32_t rfb::maxMeasurementZ_mm()
+{
+	return 9000;
 }
 
 
@@ -165,6 +185,28 @@ bool rfb::withinMeasurementBoundary(const std::int32_t x_mm, const std::int32_t 
 		return false;
 
 	if ((y_mm < minMeasurementY_mm()) || (y_mm > maxMeasurementY_mm()))
+		return false;
+
+	return true;
+}
+
+bool rfb::withinMeasurementBoundary(const std::int32_t x_mm, const std::int32_t y_mm, const std::int32_t z_mm)
+{
+	if ((x_mm < minMeasurementX_mm()) || (x_mm > maxMeasurementX_mm()))
+		return false;
+
+	if ((y_mm < minMeasurementY_mm()) || (y_mm > maxMeasurementY_mm()))
+		return false;
+
+	if ((z_mm < minMeasurementZ_mm()) || (z_mm > maxMeasurementZ_mm()))
+		return false;
+
+	return true;
+}
+
+bool rfb::withinMeasurementHeight(const std::int32_t z_mm)
+{
+	if ((z_mm < minMeasurementZ_mm()) || (z_mm > maxMeasurementZ_mm()))
 		return false;
 
 	return true;
