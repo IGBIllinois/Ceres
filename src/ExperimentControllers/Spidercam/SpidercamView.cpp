@@ -68,6 +68,11 @@ cSpidercamView::~cSpidercamView()
 {
 }
 
+int32_t cSpidercamView::x_mm() const { return mX_mm; }
+int32_t cSpidercamView::y_mm() const { return mY_mm; }
+int32_t cSpidercamView::z_mm() const { return mZ_mm; }
+
+
 void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 {
 	try
@@ -108,6 +113,10 @@ void cSpidercamView::updateLimits(spidercam::sWorkingDimensions limits)
 void cSpidercamView::updatePosition(spidercam::sPosition_1_t pos)
 {
 	mpScanArea->updateDollyPosition(pos.X_mm, pos.Y_mm);
+
+	mX_mm = pos.X_mm;
+	mY_mm = pos.Y_mm;
+	mZ_mm = pos.Z_mm;
 
 	mpX_m->setText(QString::number(pos.X_mm * nConstants::MM_TO_M, 'f', 3));
 	mpY_m->setText(QString::number(pos.Y_mm * nConstants::MM_TO_M, 'f', 3));

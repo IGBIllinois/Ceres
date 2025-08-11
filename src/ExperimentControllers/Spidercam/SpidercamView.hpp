@@ -20,12 +20,15 @@ public:
 	cSpidercamView();
 	~cSpidercamView();
 
+    int32_t x_mm() const;
+    int32_t y_mm() const;
+    int32_t z_mm() const;
+
     /*
      * Apply any configuration parameters to the experiment
      * controller view.
      */
     void configure(const nlohmann::json& jsonCfg) override;
-
 
 public slots:
 	void updateLimits(spidercam::sWorkingDimensions limits);
@@ -44,6 +47,10 @@ private:
     double mMaxY_mm = 0;
     double mMinHeight_mm = 0;
     double mMaxHeight_mm = 0;
+
+    int32_t mX_mm = 0;
+    int32_t mY_mm = 0;
+    int32_t mZ_mm = 0;
 
     std::string mLayoutFilename;
 
