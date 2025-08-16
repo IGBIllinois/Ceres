@@ -100,6 +100,22 @@ void cHySpexSWIR_384_Model::writeDataHeader()
     mSerializer.writeBadPixelCorrection(mDeviceID, mBadPixelCorrectionData);
 }
 
+void cHySpexSWIR_384_Model::onStartingReferenceMeasurement()
+{
+    if (mIsRecording && mSerializer)
+    {
+        mSerializer.writeBeginOfReference(mDeviceID);
+    }
+}
+
+void cHySpexSWIR_384_Model::onEndingReferenceMeasurement()
+{
+    if (mIsRecording && mSerializer)
+    {
+        mSerializer.writeEndOfReference(mDeviceID);
+    }
+}
+
 
 
 

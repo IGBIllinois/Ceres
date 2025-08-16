@@ -9,6 +9,9 @@
 #include "SensorFactory.hpp"
 #include "SensorModel.hpp"
 #include "SensorStatusView.hpp"
+#include "SensorInterfaces.hpp"
+
+#include "Hyperspectral/HySpex/HySpexCamera_Model.hpp"
 
 #include <QtWidgets>
 #include <QMessageBox>
@@ -511,7 +514,30 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
 
 
         QObject::connect(widgets.pModel, &cSensorModel::statusMessage,  this, &cRemoteClientWindow::onStatusUpdate);
-        QObject::connect(widgets.pModel, &cSensorModel::elogMessage,     this, &cRemoteClientWindow::onLogMessage);
+        QObject::connect(widgets.pModel, &cSensorModel::elogMessage,    this, &cRemoteClientWindow::onLogMessage);
+
+
+/*
+        cHySpexCameraModel* pReferenceMarker = dynamic_cast<cHySpexCameraModel*>(widgets.pModel);
+
+        if (pReferenceMarker)
+        {
+            // We need to use the old style of connecting the signal to the slot
+            QObject::connect(&mMainModel, &cRemoteDataModel::startingReferenceMeasurement, pReferenceMarker, &cHySpexCameraModel::onStartingReferenceMeasurement);
+            QObject::connect(&mMainModel, SIGNAL(endingReferenceMeasurement()), dynamic_cast<QObject*>(pReferenceMarker), SLOT(onEndingReferenceMeasurement()));
+        }
+*/
+
+
+        auto* pReferenceMarker = dynamic_cast<iReferenceMarker*>(widgets.pModel);
+
+        if (pReferenceMarker)
+        {
+            // We need to use the old style of connecting the signal to the slot
+            QObject::connect(&mMainModel, SIGNAL(startingReferenceMeasurement()), dynamic_cast<QObject*>(pReferenceMarker), SLOT(onStartingReferenceMeasurement()));
+            QObject::connect(&mMainModel, SIGNAL(endingReferenceMeasurement()), dynamic_cast<QObject*>(pReferenceMarker), SLOT(onEndingReferenceMeasurement()));
+        }
+
 
         if (widgets.pStatusBar)
         {

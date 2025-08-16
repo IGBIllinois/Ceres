@@ -39,6 +39,11 @@ public:
 signals:
     void backgroundComplete();
 
+
+protected:
+    void onStartingReferenceMeasurement() override;
+    void onEndingReferenceMeasurement() override;
+
 protected:
     cHySpexSWIR_384_Serializer mSerializer;
 

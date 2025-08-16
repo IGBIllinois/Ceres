@@ -48,9 +48,6 @@ public:
 	const eExperimentType getExperimentType() const;
 	void setExperimentType(eExperimentType type);
 
-	const std::string& getLayoutName() const;
-//	void setLayoutName(const std::string& name);
-
 	bool isDirty() const;
 
 	void clear();
@@ -107,7 +104,6 @@ private:
 
 	std::string	mExperimentName;
 	std::string	mMeasurementName;
-	std::string	mLayoutName;
 
 	eExperimentType mExperimentType = eExperimentType::UNKNOWN;
 

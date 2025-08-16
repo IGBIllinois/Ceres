@@ -184,6 +184,23 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 			mY_mm = -1.0;
 		}
 
+		if (!mX_NeedsInitialization && !mY_NeedsInitialization)
+		{
+			if (!rfb::withinMeasurementBoundary(mX_mm, mY_mm))
+			{
+				QString msg = "Spidercam Movement Error: The desired position x_mm, ";
+				msg += QString::number(mX_mm);
+				msg += ", and y_mm, ";
+				msg += QString::number(mY_mm);
+				msg += ", is outside of the measurement boundary.";
+
+				QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+				mb.exec();
+
+				return false;
+			}
+		}
+
 		if (pos.contains("height acl (mm)"))
 		{
 			double aboveCanopy_mm = pos["height acl (mm)"].get<double>();
@@ -241,6 +258,19 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 			if (!mX_NeedsInitialization && !mY_NeedsInitialization)
 			{
 				mZ_mm = nRFM::compute_dolly_height_mm(mHeight_mm, mX_mm, mY_mm, mReferenceHeight_mm);
+
+				if (!rfb::withinMeasurementHeight(mZ_mm))
+				{
+					QString msg = "Above Canopy Height Error: Computed z_mm, ";
+					msg += QString::number(mZ_mm);
+					msg += ", is outside of the measurement boundary.";
+
+					QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+					mb.exec();
+
+					return false;
+				}
+
 				mACH_NeedsInitialization = false;
 			}
 			else
@@ -298,6 +328,18 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 			if (!mX_NeedsInitialization && !mY_NeedsInitialization)
 			{
 				mZ_mm = nRFM::compute_dolly_height_mm(mHeight_mm, mX_mm, mY_mm, reference_height_mm);
+				if (!rfb::withinMeasurementHeight(mZ_mm))
+				{
+					QString msg = "Above Ground Height Error: Computed z_mm, ";
+					msg += QString::number(mZ_mm);
+					msg += ", is outside of the measurement boundary.";
+
+					QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+					mb.exec();
+
+					return false;
+				}
+
 				mAGH_NeedsInitialization = false;
 			}
 			else
@@ -310,10 +352,34 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 		else if (pos.contains("z (mm)"))
 		{
 			mZ_mm = static_cast<uint32_t>(pos["z (mm)"].get<double>());
+
+			if (!rfb::withinMeasurementHeight(mZ_mm))
+			{
+				QString msg = "Spidercam Movement Error: The desired z_mm, ";
+				msg += QString::number(mZ_mm);
+				msg += ", is outside of the measurement boundary.";
+
+				QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+				mb.exec();
+
+				return false;
+			}
 		}
 		else if (pos.contains("z (m)"))
 		{
 			mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
+
+			if (!rfb::withinMeasurementHeight(mZ_mm))
+			{
+				QString msg = "Spidercam Movement Error: The desired z_mm, ";
+				msg += QString::number(mZ_mm);
+				msg += ", is outside of the measurement boundary.";
+
+				QMessageBox mb(QMessageBox::Critical, "SpiderCam Experiment State Error", msg);
+				mb.exec();
+
+				return false;
+			}
 		}
 		else
 		{

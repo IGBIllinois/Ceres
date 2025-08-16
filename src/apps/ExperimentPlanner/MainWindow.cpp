@@ -774,8 +774,6 @@ void cMainWindow::onEditAddMeasurementToLayout()
     auto new_layout = dlg.getLayout();
 
     mpFieldLayout->replaceLayout(original, new_layout);
-
-    child->setLayoutName(new_layout.caption.label.toStdString());
 }
 
 void cMainWindow::onEditMoveMeasurementX()

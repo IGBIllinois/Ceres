@@ -34,7 +34,6 @@ cExperimentFile& cExperimentFile::operator=(const cExperimentFile& rhs)
 
 	mExperimentName = rhs.mExperimentName;
 	mMeasurementName = rhs.mMeasurementName;
-	mLayoutName = mLayoutName;
 
 	mMetaInfo = rhs.mMetaInfo;
 
@@ -95,19 +94,6 @@ void cExperimentFile::setExperimentType(eExperimentType type)
 	mExperimentType = type;
 }
 
-const std::string& cExperimentFile::getLayoutName() const
-{
-	return mLayoutName;
-}
-
-/*
-void cExperimentFile::setLayoutName(const std::string& name)
-{
-	mDirty = mLayoutName != name;
-	mLayoutName = name;
-}
-*/
-
 bool cExperimentFile::isDirty() const
 {
 	if (mMetaInfo.isDirty())
@@ -134,7 +120,6 @@ bool cExperimentFile::isDirty() const
 void cExperimentFile::clear()
 {
 	mFileName.clear();
-	mLayoutName.clear();
 	mExperimentName.clear();
 	mMeasurementName.clear();
 
@@ -204,6 +189,12 @@ void cExperimentFile::open(const std::string& file_name)
 	if (mMeasurementName.empty() && !mExperimentName.empty())
 	{
 		mMeasurementName = mExperimentName;
+
+		auto pos = mExperimentName.find("_Pass");
+		if (pos != std::string::npos)
+		{
+			mExperimentName.erase(pos);
+		}
 	}
 
 	if (!mMeasurementName.empty() && mExperimentName.empty())
@@ -230,15 +221,6 @@ void cExperimentFile::open(const std::string& file_name)
 	}
 	else
 		mExperimentType = eExperimentType::UNKNOWN;
-
-	if (configDoc.contains("layout name"))
-	{
-		mLayoutName = configDoc["layout name"];
-	}
-	else if (configDoc.contains("layout_name"))
-	{
-		mLayoutName = configDoc["layout_name"];
-	}
 
 	mMetaInfo.load(configDoc);
 
@@ -369,9 +351,6 @@ void cExperimentFile::buildDocument(nlohmann::json& configDoc)
 
 	if (!mMeasurementName.empty())
 		configDoc["measurement_name"] = mMeasurementName;
-
-	if (!mLayoutName.empty())
-		configDoc["layout_name"] = mLayoutName;
 
 	mMetaInfo.save(configDoc);
 

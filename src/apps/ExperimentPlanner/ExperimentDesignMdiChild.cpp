@@ -190,16 +190,6 @@ void cExperimentDesignMdiChild::setMeasurementFile(const cExperimentFile& file)
         onExperimentChange();
 }
 
-const std::string& cExperimentDesignMdiChild::getLayoutName() const
-{
-    return mMeasurementFile.getLayoutName();
-}
-
-void cExperimentDesignMdiChild::setLayoutName(const std::string& name)
-{
-//    mMeasurementFile.setLayoutName(name);
-}
-
 void cExperimentDesignMdiChild::editMetaInfo()
 {
     cExperimentMetaInfoDlg dlg(mMeasurementFile.getMetaData(), this);

@@ -17,6 +17,11 @@ PUBLIC
  
 PRIVATE
 #
+# Interfaces to be used by various sensor models
+#
+    SensorInterfaces.hpp
+
+#
 # General Encoder View-Model-Controller files
 #
     PvtModel.hpp

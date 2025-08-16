@@ -3,6 +3,8 @@
 
 #include "HySpexDataTypes.hpp"
 
+#include "../../SensorInterfaces.hpp"
+
 #include "../HyperspectralModel.hpp"
 #include "../HyperspectralData.hpp"
 
@@ -14,9 +16,10 @@
 #include <mutex>
 
 
-class cHySpexCameraModel : public cHyperspectralModel
+class cHySpexCameraModel : public cHyperspectralModel, public iReferenceMarker
 {
     Q_OBJECT
+    Q_INTERFACES(iReferenceMarker)
 
 public:
     cHySpexCameraModel(const std::string& name, QObject* parent = nullptr);
@@ -155,6 +158,10 @@ signals:
     void newSpectralDistributionData();
 
     void newImageData();
+
+public slots:
+    virtual void onStartingReferenceMeasurement() = 0;
+    virtual void onEndingReferenceMeasurement() = 0;
 
 public:
     enum class eCompute { NONE, PERCENT_SATURATION, PERCENT_BAND, FOCUS,

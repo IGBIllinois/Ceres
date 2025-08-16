@@ -85,7 +85,6 @@ void cExperimentFieldLayoutDlg::setExperiment(const cExperimentFile& experiment)
 	if (mEndY_m < mStartY_m)
 		std::swap(mStartY_m, mEndY_m);
 
-	mName = QString::fromStdString(experiment.getLayoutName());
 	QString label = mName;
 
 	if (mName.isEmpty())

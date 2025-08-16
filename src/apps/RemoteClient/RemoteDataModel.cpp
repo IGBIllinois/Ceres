@@ -178,6 +178,7 @@ void cRemoteDataModel::sendLogMessage(uint8_t type, const std::string& device, c
     cCeresRemoteClientNetEncoder::sendLogMessage(type, device, instance, msg);
 }
 
+
 /********************************************************************
  * Packet Handlers
  *******************************************************************/

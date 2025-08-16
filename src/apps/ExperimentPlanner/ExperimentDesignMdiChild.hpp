@@ -31,9 +31,6 @@ public:
     const cExperimentFile& getMeasurementFile() const;
     void setMeasurementFile(const cExperimentFile& file);
 
-    const std::string& getLayoutName() const;
-    void setLayoutName(const std::string& name);
-
     void editMetaInfo();
     void editCtrlInfo();
     void editSensorInfo();

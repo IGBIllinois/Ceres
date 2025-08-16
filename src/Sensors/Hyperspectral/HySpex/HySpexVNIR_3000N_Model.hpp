@@ -41,6 +41,10 @@ signals:
     void backgroundComplete();
 
 protected:
+    void onStartingReferenceMeasurement() override;
+    void onEndingReferenceMeasurement() override;
+
+protected:
     cHySpexVNIR_3000N_Serializer mSerializer;
 
 private:

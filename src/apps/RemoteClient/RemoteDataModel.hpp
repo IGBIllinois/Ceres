@@ -64,6 +64,10 @@ signals:
     void localLogMessage(quint8 type, QString device, QString msg);
     void sensorLogMessage(quint8 type, QString sensor, QString instance, QString msg);
 
+signals:
+    void startingReferenceMeasurement();
+    void endingReferenceMeasurement();
+
 /*
  * Signals handlers from the timer
  */

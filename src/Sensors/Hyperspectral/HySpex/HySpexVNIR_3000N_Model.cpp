@@ -102,5 +102,20 @@ void cHySpexVNIR_3000N_Model::writeDataHeader()
     mSerializer.writeBadPixelCorrection(mDeviceID, mBadPixelCorrectionData);
 }
 
+void cHySpexVNIR_3000N_Model::onStartingReferenceMeasurement()
+{
+    if (mIsRecording && mSerializer)
+    {
+        mSerializer.writeBeginOfReference(mDeviceID);
+    }
+}
+
+void cHySpexVNIR_3000N_Model::onEndingReferenceMeasurement()
+{
+    if (mIsRecording && mSerializer)
+    {
+        mSerializer.writeEndOfReference(mDeviceID);
+    }
+}
 
 
