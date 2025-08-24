@@ -39,6 +39,10 @@ protected:
     void onDisconnect() override;
 
 protected:
+    void createWidgets() override;
+    void enableControls(bool enable) override;
+    void buttonClicked(QAbstractButton* button) override;
+
     void showPage() override;
 
     void doCalcBackground() override;

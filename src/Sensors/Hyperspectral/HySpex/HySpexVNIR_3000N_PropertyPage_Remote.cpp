@@ -9,6 +9,8 @@
 #include <QTime>
 #include <QCoreApplication>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QDialogButtonBox>
 
 
 cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWidget* parent)
@@ -62,9 +64,60 @@ cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::
 }
 
 
+void cHySpexVNIR_3000N_PropertyPage_Remote::createWidgets()
+{
+	cHySpexVNIR_3000N_PropertyPage::createWidgets();
+
+	mpButtons->addButton("ReTry", QDialogButtonBox::ButtonRole::HelpRole);
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::enableControls(bool enable)
+{
+	cHySpexVNIR_3000N_PropertyPage::enableControls(enable);
+
+	auto* ok = mpButtons->button(QDialogButtonBox::Ok);
+	//	auto* cancel = mpButtons->button(QDialogButtonBox::Cancel);
+	auto* apply = mpButtons->button(QDialogButtonBox::Apply);
+
+	if (ok) ok->setEnabled(enable);
+	//	if (cancel) cancel->setEnabled(enable);
+	if (apply) apply->setEnabled(enable);
+}
+
+void cHySpexVNIR_3000N_PropertyPage_Remote::buttonClicked(QAbstractButton* button)
+{
+	auto text = button->text().toStdString();
+	if (text == "ReTry")
+	{
+		if (!mConnected)
+		{
+			if (!openConnection())
+			{
+				QMessageBox::warning(this, "Ceres",
+					"Could not connect to the VNIR 3000N controller.",
+					QMessageBox::Ok);
+			}
+		}
+		else
+		{
+			if (mpLenses->count() == 0)
+			{
+				queryLensNames();
+			}
+
+			queryState();
+		}
+
+		return;
+	}
+
+	cHySpexVNIR_3000N_PropertyPage::buttonClicked(button);
+}
+
+
 void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
 {
-	setEnabled(false);
+	enableControls(false);
 
 	if (mpLenses->count() == 0)
 	{
@@ -73,7 +126,7 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onConnect()
 
 	queryState();
 
-	setEnabled(true);
+	enableControls(true);
 	update();
 }
 
@@ -134,7 +187,7 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onCommandReply(eCommandReply reply)
 void cHySpexVNIR_3000N_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
 {
 	mBackgroundValid = true;
-	setEnabled(true);
+	enableControls(true);
 	update();
 }
 
@@ -148,7 +201,6 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::showPage()
 		QMessageBox::warning(this, "Ceres",
 			"Could not connect to the VNIR 3000N controller.",
 			QMessageBox::Ok);
-
 	}
 
 	cHySpexVNIR_3000N_PropertyPage::showPage();
@@ -159,14 +211,14 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doCalcBackground()
 	if (!mConnected)
 		return;
 
-	setEnabled(false);
+	enableControls(false);
 	update();
 
 	sendChangedData();
 
 	calcBackground();
 
-	setEnabled(true);
+	enableControls(true);
 	update();
 }
 
@@ -190,7 +242,7 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::doApply()
 
 	sendChangedData();
 
-	setEnabled(true);
+	enableControls(true);
 	update();
 }
 

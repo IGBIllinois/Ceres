@@ -26,6 +26,8 @@ public:
 
     void createWidgets() override;
 
+    void enableControls(bool enable) override;
+
     virtual void doCalcBackground() = 0;
 
 public:

@@ -48,6 +48,19 @@ void cHySpexCamera_PropertyPage::createWidgets()
 	connect(mpDoBackground, &QPushButton::pressed, this, &cHySpexCamera_PropertyPage::doCalcBackground);
 }
 
+void cHySpexCamera_PropertyPage::enableControls(bool enable)
+{
+	mpLenses->setEnabled(enable);
+	mpAvgFrames->setEnabled(enable);
+	mpFramePeriod_us->setEnabled(enable);
+	mpMinFramePeriod_us->setEnabled(enable);
+	mpIntegrationTime_us->setEnabled(enable);
+	mpMaxIntegrationTime_us->setEnabled(enable);
+	mpNumBackgrounds->setEnabled(enable);
+
+	mpDoBackground->setEnabled(enable);
+}
+
 QGroupBox* cHySpexCamera_PropertyPage::getLensLayout()
 {
 	QGroupBox* lensBox = new QGroupBox("Lens");

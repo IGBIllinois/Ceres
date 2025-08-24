@@ -39,8 +39,13 @@ public:
 
 protected:
     void onConnect() override;
+    void onDisconnect() override;
 
 protected:
+    void createWidgets() override;
+    void enableControls(bool enable) override;
+    void buttonClicked(QAbstractButton* button) override;
+
     void showPage() override;
 
     void doCalcBackground() override;
@@ -49,13 +54,24 @@ protected:
     void doCancel() override;
     void doApply() override;
 
+    void reject() override;
+
 protected:
     void sendChangedData(bool* pNeedsUpdate = nullptr);
+    void queryState();
+    void queryLensNames();
+    void setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
+    void setLensName(const std::string& lens_name);
+    void setNumOfBackgrounds(int num_backgrounds);
+    void calcBackground();
+
+private:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
 
 private:
-    bool mWaitingForBackgroundReply = false;
+    bool mAcquisitionParametersValid = false;
+    bool mBackgroundValid = false;
 };
 
 

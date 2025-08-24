@@ -5,6 +5,13 @@
 
 #include <QLineEdit>
 #include <QComboBox>
+#include <QTimer>
+#include <QTime>
+#include <QCoreApplication>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QDialogButtonBox>
+
 
 cHySpexSWIR_384_PropertyPage_Remote::cHySpexSWIR_384_PropertyPage_Remote(QWidget* parent)
 	: cHySpexSWIR_384_PropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
@@ -56,12 +63,78 @@ cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::st
 	return nullptr;
 }
 
+void cHySpexSWIR_384_PropertyPage_Remote::createWidgets()
+{
+	cHySpexSWIR_384_PropertyPage::createWidgets();
+
+	mpButtons->addButton("ReTry", QDialogButtonBox::ButtonRole::HelpRole);
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::enableControls(bool enable)
+{
+	cHySpexSWIR_384_PropertyPage::enableControls(enable);
+
+	auto* ok = mpButtons->button(QDialogButtonBox::Ok);
+//	auto* cancel = mpButtons->button(QDialogButtonBox::Cancel);
+	auto* apply = mpButtons->button(QDialogButtonBox::Apply);
+
+	if (ok) ok->setEnabled(enable);
+//	if (cancel) cancel->setEnabled(enable);
+	if (apply) apply->setEnabled(enable);
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::buttonClicked(QAbstractButton* button)
+{
+	auto text = button->text().toStdString();
+	if (text == "ReTry")
+	{
+		if (!mConnected)
+		{
+			if (!openConnection())
+			{
+				QMessageBox::warning(this, "Ceres",
+					"Could not connect to the SWIR 384 controller.",
+					QMessageBox::Ok);
+			}
+		}
+		else
+		{
+			if (mpLenses->count() == 0)
+			{
+				queryLensNames();
+			}
+
+			queryState();
+		}
+
+		return;
+	}
+
+	cHySpexSWIR_384_PropertyPage::buttonClicked(button);
+}
+
 
 void cHySpexSWIR_384_PropertyPage_Remote::onConnect()
 {
-	setEnabled(false);
-	cHySpexSWIR_384_PropertiesNetEncoder::sendQueryLensNames();
-	cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+	enableControls(false);
+
+	if (mpLenses->count() == 0)
+	{
+		queryLensNames();
+	}
+
+	queryState();
+
+	enableControls(true);
+	update();
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::onDisconnect()
+{
+	mpLenses->clear();
+	mAcquisitionParametersValid = false;
+
+	doCancel();
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::onCurrentState(bool valid, 
@@ -71,6 +144,8 @@ void cHySpexSWIR_384_PropertyPage_Remote::onCurrentState(bool valid,
 	const std::string& lens_name)
 {
 	if (!valid) return;
+
+	mAcquisitionParametersValid = true;
 
 	mpAvgFrames->setText(QString::number(average_frames));
 	mpFramePeriod_us->setText(QString::number(frame_period_us));
@@ -94,11 +169,6 @@ void cHySpexSWIR_384_PropertyPage_Remote::onCurrentState(bool valid,
 			break;
 		}
 	}
-
-	if (!mWaitingForBackgroundReply)
-		setEnabled(true);
-
-	update();
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::onLensNames(const std::vector<std::string>& names)
@@ -116,8 +186,8 @@ void cHySpexSWIR_384_PropertyPage_Remote::onCommandReply(eCommandReply reply)
 
 void cHySpexSWIR_384_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
 {
-	mWaitingForBackgroundReply = false;
-	setEnabled(true);
+	mBackgroundValid = true;
+	enableControls(true);
 	update();
 }
 
@@ -126,7 +196,13 @@ void cHySpexSWIR_384_PropertyPage_Remote::onShutterState(eShutterState state)
 
 void cHySpexSWIR_384_PropertyPage_Remote::showPage()
 {
-	openConnection();
+	if (!openConnection())
+	{
+		QMessageBox::warning(this, "Ceres",
+			"Could not connect to the SWIR 384 controller.",
+			QMessageBox::Ok);
+	}
+
 	cHySpexSWIR_384_PropertyPage::showPage();
 }
 
@@ -135,13 +211,15 @@ void cHySpexSWIR_384_PropertyPage_Remote::doCalcBackground()
 	if (!mConnected)
 		return;
 
-	mWaitingForBackgroundReply = true;
+	enableControls(false);
+	update();
 
-	setEnabled(false);
+	sendChangedData();
 
-	doApply();
+	calcBackground();
 
-	sendCalcBackground();
+	enableControls(true);
+	update();
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::doOK()
@@ -168,12 +246,20 @@ void cHySpexSWIR_384_PropertyPage_Remote::doApply()
 
 	if (needs_update)
 	{
-		setEnabled(false);
+		enableControls(false);
 		sendQueryState();
 		update();
 	}
 }
 
+void cHySpexSWIR_384_PropertyPage_Remote::reject()
+{
+	doCancel();
+}
+
+/*
+ * Network communications methods
+ */
 void cHySpexSWIR_384_PropertyPage_Remote::sendChangedData(bool* pNeedsUpdate)
 {
 	if (!mConnected)
@@ -203,6 +289,125 @@ void cHySpexSWIR_384_PropertyPage_Remote::sendChangedData(bool* pNeedsUpdate)
 
 	if (pNeedsUpdate)
 		*pNeedsUpdate = needs_update;
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::queryState()
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::queryLensNames()
+{
+	// We are going to try to get the lens names three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryLensNames();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mpLenses->count() > 0)
+				return;
+		}
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexSWIR_384_PropertiesNetEncoder::sendAcquisitionParameters(average_frame, frame_period_us, integration_time_us);
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::setLensName(const std::string& lens_name)
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexSWIR_384_PropertiesNetEncoder::sendLensName(lens_name);
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::setNumOfBackgrounds(int num_backgrounds)
+{
+	mAcquisitionParametersValid = false;
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexSWIR_384_PropertiesNetEncoder::sendNumOfBackgrounds(num_backgrounds);
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mAcquisitionParametersValid)
+				return;
+		}
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::calcBackground()
+{
+	mBackgroundValid = false;
+
+	int secs = static_cast<int>(3 * mDefaultNumBackgrounds * mDefaultAverageFrames * (mDefaultFramePeriod_us / 1'000'000.0));
+
+	// We are going to try to get the acquisition parameters three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexSWIR_384_PropertiesNetEncoder::sendCalcBackground();
+
+		QTime delayTime = QTime::currentTime().addSecs(secs);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mBackgroundValid)
+				return;
+		}
+	}
+
+	cHySpexSWIR_384_PropertiesNetEncoder::sendStopBackground();
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

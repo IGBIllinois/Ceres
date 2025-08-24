@@ -51,6 +51,9 @@ void cSensorPropertyPage::hidePage()
     hide();
 }
 
+void cSensorPropertyPage::enableControls(bool enable)
+{}
+
 QAction* cSensorPropertyPage::showAction() const
 {
     return mpShowAction;
@@ -209,6 +212,11 @@ void cSensorPropertyPageRemoteInterface::disconnected()
 
 void cSensorPropertyPageRemoteInterface::errorOccurred(QAbstractSocket::SocketError socketError)
 {
+    if ((socketError == QAbstractSocket::RemoteHostClosedError) ||
+        (socketError == QAbstractSocket::NetworkError))
+    {
+        mConnected = false;
+    }
 }
 
 void cSensorPropertyPageRemoteInterface::hostFound()

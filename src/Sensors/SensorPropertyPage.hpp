@@ -36,6 +36,8 @@ public:
 
 	void setTitle(const QString& text);
 
+	virtual void enableControls(bool enable);
+
 	virtual void createWidgets() = 0;
 	virtual void doLayout() = 0;
 
@@ -52,7 +54,7 @@ public slots:
 	virtual void showPage();
 
 protected slots:
-	void buttonClicked(QAbstractButton* button);
+	virtual void buttonClicked(QAbstractButton* button);
 
 protected:
 	std::string mInstance;
