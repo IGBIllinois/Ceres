@@ -45,6 +45,7 @@ void cBatchExpConfirmDlg::initialize(const cMeasurementTreeItem* pRoot)
         }
         else
         {
+            auto m = pExp->childCount();
             auto* item = new cMeasurementTreeItem(mpMeasurements, pExp->text(0));
             loadExperiments(item, pExp);
             item->setCheckState(0, Qt::Checked);
@@ -69,7 +70,7 @@ void cBatchExpConfirmDlg::initialize(const cMeasurementTreeItem* pRoot)
 }
 
 void cBatchExpConfirmDlg::loadExperiments(cMeasurementTreeItem* pRoot,
-                                            const cMeasurementTreeItem* pBranch)
+                                            cMeasurementTreeItem* pBranch)
 {
     auto n = pBranch->childCount();
     for (int i = 0; i < n; ++i)
@@ -82,7 +83,7 @@ void cBatchExpConfirmDlg::loadExperiments(cMeasurementTreeItem* pRoot,
         }
         else
         {
-            auto* item = new cMeasurementTreeItem(mpMeasurements, pExp->text(0));
+            auto* item = new cMeasurementTreeItem(pRoot, pExp->text(0));
             loadExperiments(item, pExp);
             item->setCheckState(0, Qt::Checked);
         }

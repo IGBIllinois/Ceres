@@ -35,7 +35,7 @@ private slots:
 
 private:
 	void loadExperiments(cMeasurementTreeItem* pRoot,
-						 const cMeasurementTreeItem* pBranch);
+						 cMeasurementTreeItem* pBranch);
 
 	std::vector<std::filesystem::path> getSelectedMeasurements(cMeasurementTreeItem* pRoot);
 
