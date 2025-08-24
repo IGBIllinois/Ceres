@@ -77,6 +77,9 @@ enum class ePacketType : uint16_t
 	RELATIVE_HUMIDITY_DATA,
 	PAR_DATA,
 	WEATHER_DATA,
+
+	MARKER_REFERENCE_START = 1200,
+	MARKER_REFERENCE_END,
 };
 
 
@@ -290,3 +293,13 @@ sWeatherData_t to_weather_data_1(std::uint16_t length, const net_buffer_view& bu
 int encode_weather_data(bool wind_valid, double wind_speed_mps, double wind_direction_deg, 
 	double temp_C, double rh_pct, double par_umole, net_buffer& buffer);
 
+
+/**********************************************************
+ * Marker Data packets utilities
+ **********************************************************/
+
+bool to_marker_reference_start_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_marker_reference_start(net_buffer& buffer);
+
+bool to_marker_reference_end_1(std::uint16_t length, const net_buffer_view& buffer);
+int encode_marker_reference_end(net_buffer& buffer);

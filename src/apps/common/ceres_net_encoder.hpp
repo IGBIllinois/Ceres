@@ -70,6 +70,9 @@ public:
     void encodeWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
         double temp_C, double rh_pct, double par_umole);
 
+    void encodeMarkerReferenceStart();
+    void encodeMarkerReferenceEnd();
+
 
     /*
      * The send methods will encode the packet into the data buffer and will automatically
@@ -117,5 +120,8 @@ public:
 
     void sendWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
         double temp_C, double rh_pct, double par_umole);
+
+    void sendMarkerReferenceStart();
+    void sendMarkerReferenceEnd();
 };
 

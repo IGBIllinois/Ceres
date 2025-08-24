@@ -522,6 +522,12 @@ cExperimentState* cCtrlDataModelRemote::createState(const std::string& type, con
 
         if (marker_type == "end position")
             return new cExperimentState_MarkEndPosition(this);
+
+        if (marker_type == "start reference")
+            return new cExperimentState_MarkStartReference(this);
+
+        if (marker_type == "end reference")
+            return new cExperimentState_MarkEndReference(this);
     }
 
     return nullptr;
@@ -539,6 +545,20 @@ void cCtrlDataModelRemote::recordEndPosition()
     if (!mConnected) return;
 
     sendSpidercamEndPosition(mDollyPosition);
+}
+
+void cCtrlDataModelRemote::recordStartReference()
+{
+    if (!mConnected) return;
+
+    sendMarkerReferenceStart();
+}
+
+void cCtrlDataModelRemote::recordEndReference()
+{
+    if (!mConnected) return;
+
+    sendMarkerReferenceEnd();
 }
 
 /**********************************************************

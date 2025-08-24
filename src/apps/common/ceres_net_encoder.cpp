@@ -323,6 +323,24 @@ void cCeresNetEncoder::encodeWeatherData(bool valid, double wind_speed_mps, doub
     }
 }
 
+void cCeresNetEncoder::encodeMarkerReferenceStart()
+{
+    if (encode_marker_reference_start(mBuffer) < 0)
+    {
+        sendData();
+        encode_marker_reference_start(mBuffer);
+    }
+}
+
+void cCeresNetEncoder::encodeMarkerReferenceEnd()
+{
+    if (encode_marker_reference_end(mBuffer) < 0)
+    {
+        sendData();
+        encode_marker_reference_end(mBuffer);
+    }
+}
+
 void cCeresNetEncoder::encodeEndOfExperimentInfo()
 {
     if (encode_end_of_experiment_info(mBuffer) < 0)
@@ -510,3 +528,13 @@ void cCeresNetEncoder::sendWeatherData(bool valid, double wind_speed_mps, double
     sendData();
 }
 
+void cCeresNetEncoder::sendMarkerReferenceStart()
+{
+    encode_marker_reference_start(mBuffer);
+    sendData();
+}
+
+void cCeresNetEncoder::sendMarkerReferenceEnd()
+{
+    encode_marker_reference_end(mBuffer);
+}

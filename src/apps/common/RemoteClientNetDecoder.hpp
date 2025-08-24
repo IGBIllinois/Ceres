@@ -88,6 +88,9 @@ protected:
     virtual void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
         double temp_C, double rh_pct, double par_umole) = 0;
 
+    virtual void onMarkerReferenceStart() = 0;
+    virtual void onMarkerReferenceEnd() = 0;
+
 /*
  * The Ceres Remote Client application sends these packets and should never receive them!
  */

@@ -29,7 +29,8 @@ class cExperimentStateCreator;
 
 class cCtrlDataModelRemote : public cCtrlDataModel, 
     protected cCeresNetDecoder, protected cCeresNetEncoder, 
-    private iMarkerStartPosition, private iMarkerEndPosition
+    private iMarkerStartPosition, private iMarkerEndPosition,
+    private iMarkerStartReference, private iMarkerEndReference
 {
     Q_OBJECT
 
@@ -96,6 +97,8 @@ private slots:
 private:
     void recordStartPosition() override;
     void recordEndPosition() override;
+    void recordStartReference() override;
+    void recordEndReference() override;
 
 /*
  * Send data over the TCP socket

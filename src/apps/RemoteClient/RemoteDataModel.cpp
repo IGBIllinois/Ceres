@@ -900,6 +900,17 @@ void cRemoteDataModel::onWeatherData(bool valid, double wind_speed_mps, double w
     }
 }
 
+void cRemoteDataModel::onMarkerReferenceStart()
+{
+    emit startingReferenceMeasurement();
+}
+
+void cRemoteDataModel::onMarkerReferenceEnd()
+{
+    emit endingReferenceMeasurement();
+}
+
+
 void cRemoteDataModel::onHeartbeat()
 {
     if (mIsRecording && static_cast<bool>(mSerializer))

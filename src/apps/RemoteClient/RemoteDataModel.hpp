@@ -163,6 +163,9 @@ private slots:
     void onWeatherData(bool valid, double wind_speed_mps, double wind_direction_deg,
         double temp_C, double rh_pct, double par_umole) override;
 
+    void onMarkerReferenceStart() override;
+    void onMarkerReferenceEnd() override;
+
 private:
     void clearExperimentInfo();
 

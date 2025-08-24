@@ -269,6 +269,17 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         onMeasurementTitle(to_measurement_title_1(packet));
         break;
     }
+    case ePacketType::MARKER_REFERENCE_START:
+    {
+        onMarkerReferenceStart();
+        break;
+    }
+    case ePacketType::MARKER_REFERENCE_END:
+    {
+        onMarkerReferenceEnd();
+        break;
+    }
+
 
     case ePacketType::EXPERIMENT_INFO_REPLY:
     case ePacketType::DATA_RECORDING_STATE:

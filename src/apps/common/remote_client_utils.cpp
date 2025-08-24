@@ -1679,3 +1679,48 @@ int encode_weather_data(bool wind_data_valid, double wind_speed_mps, double wind
     return pckt_size;
 }
 
+bool to_marker_reference_start_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    return length == 0;
+}
+
+int encode_marker_reference_start(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::MARKER_REFERENCE_START);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
+}
+
+bool to_marker_reference_end_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    return length == 0;
+}
+
+int encode_marker_reference_end(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::MARKER_REFERENCE_END);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+
+    return pckt_size;
+}
