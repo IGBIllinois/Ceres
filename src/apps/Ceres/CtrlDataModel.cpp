@@ -417,6 +417,10 @@ bool cCtrlDataModel::loadExperiment(const std::string& exp_path, const std::stri
 
             mExperimentDoc = to_string(expDoc);
         }
+        else
+        {
+            return false;
+        }
     }
     catch (const detail::parse_error& e)
     {

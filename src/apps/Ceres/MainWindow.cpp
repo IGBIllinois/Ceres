@@ -627,14 +627,16 @@ void cMainWindow::onLogMessage(uint8_t type, QString device, QString instance, Q
 
 void cMainWindow::onExperimentTerminated()
 {
-    mBatchFileName.clear();
     mBatchProcess.clear();
 
     mpModel->setBatchMode(false);
+    mpModel->clearVariableTable();
 
     emit setExperimentActions(true, true, false, false);
 
     emit experimentStopped();
+
+    mBatchFileName.clear();
 
     if (mExperimentErrorSound.is_open())
         mExperimentErrorSound.play();

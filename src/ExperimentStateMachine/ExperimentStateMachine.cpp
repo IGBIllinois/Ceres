@@ -296,6 +296,7 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
     mExperimentName = expName;
 
     emit experimentStateChanged(eState::LOADED);
+    emit experimentStatus(QString("Loading experiment info..."));
 
     QString msg = "Experiment \"";
     msg += QString::fromStdString(mExperimentName);
