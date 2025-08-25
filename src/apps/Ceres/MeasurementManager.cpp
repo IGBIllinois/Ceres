@@ -60,9 +60,6 @@ const cMeasurementTreeItem* cMeasurementManager::measurements() const
 
 void cMeasurementManager::loadMeasurements()
 {
-//    mpExperimentItems = new cExperimentTreeItem(this, "Experiments");
-
-//    loadExperiments(*mpExperimentItems, mExperimentPath);
     for (auto entry : fs::directory_iterator(mMeasurementPath))
     {
         if (entry.is_directory())
@@ -86,8 +83,6 @@ void cMeasurementManager::loadMeasurements()
             }
         }
     }
-
-//    addTopLevelItem(mpExperimentItems);
 }
 
 void cMeasurementManager::loadMeasurements(cMeasurementTreeItem& root, const std::filesystem::path& path)
