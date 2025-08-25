@@ -70,6 +70,7 @@ private:
     int sendOutgoingData(const char* data, std::size_t len) override;
 
 private:
+    bool mReconnectActive = false;
     bool mAcquisitionParametersValid = false;
     bool mBackgroundValid = false;
 };

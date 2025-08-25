@@ -12,6 +12,11 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 
+namespace
+{
+	const QString ReTry = "ReConnect";
+}
+
 
 cHySpexSWIR_384_PropertyPage_Remote::cHySpexSWIR_384_PropertyPage_Remote(QWidget* parent)
 	: cHySpexSWIR_384_PropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
@@ -67,7 +72,7 @@ void cHySpexSWIR_384_PropertyPage_Remote::createWidgets()
 {
 	cHySpexSWIR_384_PropertyPage::createWidgets();
 
-	mpButtons->addButton("ReTry", QDialogButtonBox::ButtonRole::HelpRole);
+	mpButtons->addButton(ReTry, QDialogButtonBox::ButtonRole::HelpRole);
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::enableControls(bool enable)
@@ -75,18 +80,16 @@ void cHySpexSWIR_384_PropertyPage_Remote::enableControls(bool enable)
 	cHySpexSWIR_384_PropertyPage::enableControls(enable);
 
 	auto* ok = mpButtons->button(QDialogButtonBox::Ok);
-//	auto* cancel = mpButtons->button(QDialogButtonBox::Cancel);
 	auto* apply = mpButtons->button(QDialogButtonBox::Apply);
 
 	if (ok) ok->setEnabled(enable);
-//	if (cancel) cancel->setEnabled(enable);
 	if (apply) apply->setEnabled(enable);
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::buttonClicked(QAbstractButton* button)
 {
-	auto text = button->text().toStdString();
-	if (text == "ReTry")
+	auto text = button->text();
+	if (text == ReTry)
 	{
 		if (!mConnected)
 		{
@@ -99,12 +102,28 @@ void cHySpexSWIR_384_PropertyPage_Remote::buttonClicked(QAbstractButton* button)
 		}
 		else
 		{
-			if (mpLenses->count() == 0)
+			mReconnectActive = true;
+
+			button->setEnabled(false);
+
+			closeConnection();
+
+			QTime delayTime = QTime::currentTime().addSecs(5);
+			while (QTime::currentTime() < delayTime)
 			{
-				queryLensNames();
+				QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 			}
 
-			queryState();
+			if (!openConnection())
+			{
+				QMessageBox::warning(this, "Ceres",
+					"Could not connect to the SWIR 384 controller.",
+					QMessageBox::Ok);
+			}
+
+			button->setEnabled(true);
+
+			mReconnectActive = false;
 		}
 
 		return;
@@ -131,6 +150,9 @@ void cHySpexSWIR_384_PropertyPage_Remote::onConnect()
 
 void cHySpexSWIR_384_PropertyPage_Remote::onDisconnect()
 {
+	if (mReconnectActive)
+		return;
+
 	mpLenses->clear();
 	mAcquisitionParametersValid = false;
 

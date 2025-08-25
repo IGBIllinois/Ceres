@@ -29,6 +29,9 @@ public:
     ~cAxisCommunicationsPropertyPage() = default;
 
     void createWidgets() override;
+
+    void enableControls(bool enable) override;
+    
     void doLayout() override;
 
 public:

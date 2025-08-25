@@ -6,12 +6,87 @@
 #include <QString>
 #include <QLineEdit>
 #include <QComboBox>
+#include <QTimer>
+#include <QTime>
+#include <QCoreApplication>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QDialogButtonBox>
+
+namespace
+{
+	const QString ReTry = "ReConnect";
+}
 
 
 cAxisCommunicationsPropertyPage_Remote::cAxisCommunicationsPropertyPage_Remote(QWidget* parent)
 	: cAxisCommunicationsPropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
 		cAxisPropertiesNetEncoder(255)
 {}
+
+void cAxisCommunicationsPropertyPage_Remote::createWidgets()
+{
+	cAxisCommunicationsPropertyPage::createWidgets();
+
+	mpButtons->addButton(ReTry, QDialogButtonBox::ButtonRole::HelpRole);
+}
+
+void cAxisCommunicationsPropertyPage_Remote::enableControls(bool enable)
+{
+	cAxisCommunicationsPropertyPage::enableControls(enable);
+
+	auto* ok = mpButtons->button(QDialogButtonBox::Ok);
+	auto* apply = mpButtons->button(QDialogButtonBox::Apply);
+
+	if (ok) ok->setEnabled(enable);
+	if (apply) apply->setEnabled(enable);
+}
+
+void cAxisCommunicationsPropertyPage_Remote::buttonClicked(QAbstractButton* button)
+{
+	auto text = button->text();
+	if (text == ReTry)
+	{
+		if (!mConnected)
+		{
+			if (!openConnection())
+			{
+				QMessageBox::warning(this, "Ceres",
+					"Could not connect to the Axis Communications F44 controller.",
+					QMessageBox::Ok);
+			}
+		}
+		else
+		{
+			mReconnectActive = true;
+
+			button->setEnabled(false);
+
+			closeConnection();
+
+			QTime delayTime = QTime::currentTime().addSecs(5);
+			while (QTime::currentTime() < delayTime)
+			{
+				QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			}
+
+			if (!openConnection())
+			{
+				QMessageBox::warning(this, "Ceres",
+					"Could not connect to the Axis Communications F44 controller.",
+					QMessageBox::Ok);
+			}
+
+			button->setEnabled(true);
+
+			mReconnectActive = false;
+		}
+
+		return;
+	}
+
+	cAxisCommunicationsPropertyPage::buttonClicked(button);
+}
 
 void cAxisCommunicationsPropertyPage_Remote::onConnect()
 {
@@ -84,7 +159,13 @@ void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t 
 
 void cAxisCommunicationsPropertyPage_Remote::showPage()
 {
-	openConnection();
+	if (!openConnection())
+	{
+		QMessageBox::warning(this, "Ceres",
+			"Could not connect to the Axis Communications F44 controller.",
+			QMessageBox::Ok);
+	}
+
 	cAxisCommunicationsPropertyPage::showPage();
 }
 
@@ -124,6 +205,11 @@ void cAxisCommunicationsPropertyPage_Remote::doApply()
 	{
 		sendSetFrameRate_fps(fps);
 	}
+}
+
+void cAxisCommunicationsPropertyPage_Remote::reject()
+{
+	doCancel();
 }
 
 void cAxisCommunicationsPropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

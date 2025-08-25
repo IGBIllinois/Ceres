@@ -35,6 +35,14 @@ void cAxisCommunicationsPropertyPage::createWidgets()
 	connect(mpGrabImage, &QPushButton::pressed, this, &cAxisCommunicationsPropertyPage::requestImage);
 }
 
+void cAxisCommunicationsPropertyPage::enableControls(bool enable)
+{
+	mpCameraId->setEnabled(enable);
+	mpImageSizes->setEnabled(enable);
+	mpFrameRate_fps->setEnabled(enable);
+	mpGrabImage->setEnabled(enable);
+}
+
 void cAxisCommunicationsPropertyPage::doLayout()
 {
 	QVBoxLayout* pMainLayout = new QVBoxLayout();

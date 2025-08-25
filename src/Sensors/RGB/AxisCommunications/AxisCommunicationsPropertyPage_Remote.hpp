@@ -32,15 +32,24 @@ protected:
     void requestImage() override;
 
 protected:
+    void createWidgets() override;
+    void enableControls(bool enable) override;
+    void buttonClicked(QAbstractButton* button) override;
+
     void showPage() override;
+
     void doOK() override;
     void doCancel() override;
     void doApply() override;
+
+    void reject() override;
 
 protected:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
 
+private:
+    bool mReconnectActive = false;
 };
 
 
