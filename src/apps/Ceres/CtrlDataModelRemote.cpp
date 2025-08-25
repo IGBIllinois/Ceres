@@ -401,25 +401,6 @@ bool cCtrlDataModelRemote::loadExperiment(const std::string& exp_path, const std
     // three times.
     for (int i = 0; i < 3; ++i)
     {
-/*
- * Code is deprecated as it cause required buffer to grow
- 
-        if (mSpecies.empty())
-        {
-            if (mResearchers.empty())
-                encodeExperimentInfo(mExperimentTitle, "", mCultivar, mExperimentDoc);
-            else
-                encodeExperimentInfo(mExperimentTitle, mResearchers[0], mCultivar, mExperimentDoc);
-        }
-        else
-        {
-            if (mResearchers.empty())
-                encodeExperimentInfo(mExperimentTitle, "", mSpecies, mCultivar, mExperimentDoc);
-            else
-                encodeExperimentInfo(mExperimentTitle, mResearchers[0], mSpecies, mCultivar, mExperimentDoc);
-        }
-*/
-
         encodeExperimentTitle(mExperimentTitle);
 
         if (!mMeasurementTitle.empty())
