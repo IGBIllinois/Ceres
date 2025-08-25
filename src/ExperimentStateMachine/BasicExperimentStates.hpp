@@ -17,7 +17,7 @@ public:
 
 	QString getStatusStr() override
 	{
-		return QString();
+		return QString("Loading experiment info...");
 	}
 
 	bool configure(const nlohmann::json& stateDoc) override { return true;  };
