@@ -2,9 +2,9 @@
 #include "HySpexSWIR_384_Model_direct.hpp"
 #include "Constants.hpp"
 
-#include <HySpexConnect/hyspex_utils.hpp>
-#include <HySpexConnect/SWIR384.hpp>
-#include <HySpexConnect/HySpexExceptions.hpp>
+#include <hyspex_connect/hyspex_utils.hpp>
+#include <hyspex_connect/SWIR384.hpp>
+#include <hyspex_connect/HySpexExceptions.hpp>
 
 
 #include <QDebug>

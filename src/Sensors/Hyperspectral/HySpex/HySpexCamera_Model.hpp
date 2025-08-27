@@ -8,7 +8,7 @@
 #include "../HyperspectralModel.hpp"
 #include "../HyperspectralData.hpp"
 
-#include <HySpexConnect/HySpexData.hpp>
+#include <hyspex_connect/HySpexData.hpp>
 
 #include <QObject>
 

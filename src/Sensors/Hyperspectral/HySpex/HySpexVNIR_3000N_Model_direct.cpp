@@ -2,8 +2,8 @@
 #include "HySpexVNIR_3000N_Model_direct.hpp"
 #include "Constants.hpp"
 
-#include <HySpexConnect/hyspex_utils.hpp>
-#include <HySpexConnect/VNIR3000N.hpp>
+#include <hyspex_connect/hyspex_utils.hpp>
+#include <hyspex_connect/VNIR3000N.hpp>
 
 #include <QDebug>
 

@@ -6,7 +6,7 @@
 
 #include "Constants.hpp"
 
-#include <HySpexConnect/HySpexData.hpp>
+#include <hyspex_connect/HySpexData.hpp>
 
 #include <valarray>
 

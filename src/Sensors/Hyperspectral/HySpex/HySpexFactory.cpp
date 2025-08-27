@@ -17,7 +17,7 @@
 #include "HySpexSWIR_384_StatusView.hpp"
 #include "HySpexSWIR_384_PropertyPage_Remote.hpp"
 
-#include <HySpexConnect/HySpexCameraFactory.hpp>
+#include <hyspex_connect/HySpexCameraFactory.hpp>
 
 #include <QWidget>
 #include <QString>

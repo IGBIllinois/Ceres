@@ -2,7 +2,7 @@
 #include "HySpexVNIR_3000N_Model_simulation.hpp"
 #include "Constants.hpp"
 
-#include <HySpexConnect/hyspex_utils.hpp>
+#include <hyspex_connect/hyspex_utils.hpp>
 
 #include <QDebug>
 

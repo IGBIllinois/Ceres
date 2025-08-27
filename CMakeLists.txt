@@ -180,7 +180,7 @@ find_package(ssnx2net REQUIRED)
 
 find_package(spidercam REQUIRED)
 
-find_package(HySpexConnect REQUIRED)
+find_package(hyspex_connect REQUIRED)
 find_package(HySpex REQUIRED)
 find_package(Spinnaker REQUIRED)
 
