@@ -262,16 +262,10 @@ void cHySpexSWIR_384_PropertyPage_Remote::doApply()
 	if (!mConnected)
 		return;
 
-	bool needs_update = false;
+	sendChangedData();
 
-	sendChangedData(&needs_update);
-
-	if (needs_update)
-	{
-		enableControls(false);
-		sendQueryState();
-		update();
-	}
+	enableControls(true);
+	update();
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::reject()
@@ -282,35 +276,35 @@ void cHySpexSWIR_384_PropertyPage_Remote::reject()
 /*
  * Network communications methods
  */
-void cHySpexSWIR_384_PropertyPage_Remote::sendChangedData(bool* pNeedsUpdate)
+void cHySpexSWIR_384_PropertyPage_Remote::sendChangedData()
 {
 	if (!mConnected)
 		return;
 
-	bool needs_update = false;
-
 	auto frames = mpAvgFrames->text().toInt();
 	auto frame_period_us = mpFramePeriod_us->text().toInt();
 	auto integration_time_us = mpIntegrationTime_us->text().toInt();
+	auto num_backgrounds = mpNumBackgrounds->text().toInt();
+
+	if ((mDefaultAverageFrames != frames)
+		|| (mDefaultFramePeriod_us != frame_period_us)
+		|| (mDefaultIntegrationTime_us != integration_time_us)
+		|| (mDefaultNumBackgrounds != num_backgrounds))
+	{
+		enableControls(false);
+	}
 
 	if ((mDefaultAverageFrames != frames)
 		|| (mDefaultFramePeriod_us != frame_period_us)
 		|| (mDefaultIntegrationTime_us != integration_time_us))
 	{
-		sendAcquisitionParameters(frames, frame_period_us, integration_time_us);
-		needs_update = true;
+		setAcquisitionParameters(frames, frame_period_us, integration_time_us);
 	}
-
-	auto num_backgrounds = mpNumBackgrounds->text().toInt();
 
 	if (mDefaultNumBackgrounds != num_backgrounds)
 	{
-		sendNumOfBackgrounds(num_backgrounds);
-		needs_update = true;
+		setNumOfBackgrounds(num_backgrounds);
 	}
-
-	if (pNeedsUpdate)
-		*pNeedsUpdate = needs_update;
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::queryState()

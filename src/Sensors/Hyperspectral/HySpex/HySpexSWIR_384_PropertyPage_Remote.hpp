@@ -57,7 +57,7 @@ protected:
     void reject() override;
 
 protected:
-    void sendChangedData(bool* pNeedsUpdate = nullptr);
+    void sendChangedData();
     void queryState();
     void queryLensNames();
     void setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
