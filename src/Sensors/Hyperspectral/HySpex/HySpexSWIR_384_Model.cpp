@@ -102,16 +102,24 @@ void cHySpexSWIR_384_Model::writeDataHeader()
 
 void cHySpexSWIR_384_Model::onStartingReferenceMeasurement()
 {
-    if (mIsRecording && mSerializer)
+//    if (mIsRecording && mSerializer)
+    if (mSerializer)
     {
+        QString msg = "SWIR 384 received the start of reference measurement.";
+        logMessage(logINFO, msg);
+
         mSerializer.writeBeginOfReference(mDeviceID);
     }
 }
 
 void cHySpexSWIR_384_Model::onEndingReferenceMeasurement()
 {
-    if (mIsRecording && mSerializer)
+//    if (mIsRecording && mSerializer)
+    if (mSerializer)
     {
+        QString msg = "SWIR 384 received the end of reference measurement.";
+        logMessage(logINFO, msg);
+
         mSerializer.writeEndOfReference(mDeviceID);
     }
 }
