@@ -80,6 +80,18 @@ bool cHySpexCameraModel::configure(const nlohmann::json& jsonCfg)
         throw std::logic_error("Missing \"lens\" entry.");
     mLens = jsonCfg["lens"];
 
+    if (jsonCfg.contains("average frames"))
+        mAverageFrames = jsonCfg["average frames"];
+
+    if (jsonCfg.contains("frame period (us)"))
+        mFramePeriod_us = jsonCfg["frame period (us)"];
+
+    if (jsonCfg.contains("integration time (us)"))
+        mIntegrationTime_us = jsonCfg["integration time (us)"];
+
+    if (jsonCfg.contains("number of backgrounds"))
+        mNumBackgrounds = jsonCfg["number of backgrounds"];
+    
     return cHyperspectralModel::configure(jsonCfg);
 }
 

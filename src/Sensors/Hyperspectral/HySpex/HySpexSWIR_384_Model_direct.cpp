@@ -201,13 +201,37 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mShutterStatus = mCamera->getShutterStatus();
     emit shutterStatusChanged();
 
+    auto averageFrames = mCamera->getAverageFrames();
+    if ((mAverageFrames > 0) && (mAverageFrames != averageFrames))
+    {
+        mCamera->setAverageFrames(mAverageFrames);
+    }
+
 	mAverageFrames = mCamera->getAverageFrames();
     emit avgFramesChanged(mAverageFrames);
 
-	mFramePeriod_us = mCamera->getFramePeriod_us();
+    auto framePeriod_us = mCamera->getFramePeriod_us();
     mMinFramePeriod_us = mCamera->getMinimumFramePeriod_us();
     emit minFramePeriodChanged(mMinFramePeriod_us);
 
+    if ((mFramePeriod_us > 0) && (mFramePeriod_us != framePeriod_us) && (mFramePeriod_us >= mMinFramePeriod_us))
+    {
+        // We might need to reset the integration time based on the request frame period!
+        auto maxIntegrationTime_us = mMaxIntegrationTime_us;
+        mMaxIntegrationTime_us = mCamera->getMaxIntegrationTime_us(mFramePeriod_us);
+
+        auto integrationTime_us = mCamera->getIntegrationTime_us();
+
+        if (integrationTime_us > mMaxIntegrationTime_us)
+        {
+            integrationTime_us = mMaxIntegrationTime_us;
+            mCamera->setIntegrationTime_us(integrationTime_us);
+        }
+
+        mCamera->setFramePeriod_us(mFramePeriod_us);
+    }
+
+    mFramePeriod_us = mCamera->getFramePeriod_us();
     if (mFramePeriod_us < mMinFramePeriod_us)
     {
         mCamera->setFramePeriod_us(mMinFramePeriod_us);
@@ -215,10 +239,16 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     }
     emit framePeriodChanged(mFramePeriod_us);
 
-    mIntegrationTime_us = mCamera->getIntegrationTime_us();
+    std::uint32_t integrationTime_us = mCamera->getIntegrationTime_us();
     mMaxIntegrationTime_us = mCamera->getMaxIntegrationTime_us(mFramePeriod_us);
     emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
 
+    if ((mIntegrationTime_us > 0) && (mIntegrationTime_us != integrationTime_us) && (mIntegrationTime_us < mMaxIntegrationTime_us))
+    {
+        mCamera->setIntegrationTime_us(mIntegrationTime_us);
+    }
+
+    mIntegrationTime_us = mCamera->getIntegrationTime_us();
     if (mIntegrationTime_us > mMaxIntegrationTime_us)
     {
         mCamera->setIntegrationTime_us(mMaxIntegrationTime_us);
