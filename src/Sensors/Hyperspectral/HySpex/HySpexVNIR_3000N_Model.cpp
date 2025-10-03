@@ -36,16 +36,16 @@ bool cHySpexVNIR_3000N_Model::configure(const nlohmann::json& jsonCfg)
 {
     try
     {
+        return cHySpexCameraModel::configure(jsonCfg);
     }
     catch (const std::exception& e)
     {
         QString msg = "Error in the \"hyspex\" configuration: ";
         msg.append(e.what());
         logMessage(logERROR, msg);
-        return false;
     }
 
-    return cHySpexCameraModel::configure(jsonCfg);
+    return false;
 }
 
 void cHySpexVNIR_3000N_Model::enableDataRecording(cBlockDataFileWriter& file)
