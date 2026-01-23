@@ -7,12 +7,12 @@
 #include <LucidVisionLabsConnect/LucidCameraFactory.hpp>
 #include <LucidVisionLabsConnect/LucidTritonCamera.hpp>
 
-//#include "AxisCommunicationsModel_F44.hpp"
-//#include "AxisCommunicationsView_F44.hpp"
-//#include "AxisCommunicationsStatusView.hpp"
-//#include "AxisCommunicationsController.hpp"
-//#include "AxisCommunicationsPropertyPage.hpp"
-//#include "AxisCommunicationsPropertyPage_Remote.hpp"
+#include "LucidVisionLabsRgbModel_Triton.hpp"
+#include "LucidVisionLabsRgbView_Triton.hpp"
+#include "LucidVisionLabsRgbStatusView.hpp"
+#include "LucidVisionLabsRgbController.hpp"
+#include "LucidVisionLabsRgbPropertyPage.hpp"
+#include "LucidVisionLabsRgbPropertyPage_Remote.hpp"
 
 #include <QWidget>
 #include <QString>

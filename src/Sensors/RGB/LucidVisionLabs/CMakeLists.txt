@@ -1,10 +1,10 @@
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#source_group("Resources" FILES lucid_vision_labs_communications_properties.proto)
+source_group("Resources" FILES lucid_vision_labs_rgb_properties.proto)
 
 # Generate the header/source files needed from the protobuf
-#protobuf_generate_cpp(LUCID_VISION_RGB_PROTO_SRCS LUCID_VISION_RGB_PROTO_HDRS DESCRIPTORS PROTO_DESCS lucid_vision_labs_rgb_properties.proto)
+protobuf_generate_cpp(LUCID_VISION_RGB_PROTO_SRCS LUCID_VISION_RGB_PROTO_HDRS DESCRIPTORS PROTO_DESCS lucid_vision_labs_rgb_properties.proto)
 
 # Add the public header files to use the library
 set(LUCID_VISION_RGB_PUBLIC_HEADERS
@@ -19,46 +19,46 @@ set(LUCID_VISION_RGB_SOURCE_FILES
 #
 # Lucid Vision Labs packet utilities
 #
-#	axis_communications_packet_utils.hpp
-#	axis_communications_packet_utils.cpp
+	lucid_vision_labs_rgb_packet_utils.hpp
+	lucid_vision_labs_rgb_packet_utils.cpp
 	
 # Lucid Vision Labs Property Page Code
-#	AxisPropertiesNetDecoder.hpp
-#	AxisPropertiesNetDecoder.cpp
-#	AxisPropertiesNetEncoder.hpp
-#	AxisPropertiesNetEncoder.cpp
-#	AxisCommunicationsPropertyPage_Remote.hpp
-#	AxisCommunicationsPropertyPage_Remote.cpp
-#	AxisCommunicationsPropertyPage.hpp
-#	AxisCommunicationsPropertyPage.cpp
+	LucidRgbPropertiesNetDecoder.hpp
+	LucidRgbPropertiesNetDecoder.cpp
+	LucidRgbPropertiesNetEncoder.hpp
+	LucidRgbPropertiesNetEncoder.cpp
+	LucidVisionLabsRgbPropertyPage_Remote.hpp
+	LucidVisionLabsRgbPropertyPage_Remote.cpp
+	LucidVisionLabsRgbPropertyPage.hpp
+	LucidVisionLabsRgbPropertyPage.cpp
 	
 	
 # Lucid Vision Labs Controller Code
 
-#	AxisControllerNetDecoder.hpp
-#	AxisControllerNetDecoder.cpp
-#	AxisControllerNetEncoder.hpp
-#	AxisControllerNetEncoder.cpp
-#   AxisCommunicationsController.hpp
-#   AxisCommunicationsController.cpp
+	LucidRgbControllerNetDecoder.hpp
+	LucidRgbControllerNetDecoder.cpp
+	LucidRgbControllerNetEncoder.hpp
+	LucidRgbControllerNetEncoder.cpp
+    LucidVisionLabsRgbController.hpp
+    LucidVisionLabsRgbController.cpp
 
 #
 # Lucid Vision Labs RGB Cameras
 #
-#	AxisCommunicationsView_F44.hpp
-#	AxisCommunicationsView_F44.cpp
+	LucidVisionLabsRgbView_Triton.hpp
+	LucidVisionLabsRgbView_Triton.cpp
 	LucidVisionLabsRgbModel_Triton.hpp
 	LucidVisionLabsRgbModel_Triton.cpp
-#	AxisCommunicationsView.hpp
-#	AxisCommunicationsView.cpp
-#	AxisCommunicationsStatusView.hpp
-#	AxisCommunicationsStatusView.cpp
+	LucidVisionLabsRgbView.hpp
+	LucidVisionLabsRgbView.cpp
+	LucidVisionLabsRgbStatusView.hpp
+	LucidVisionLabsRgbStatusView.cpp
 	LucidVisionLabsRgbModel.hpp
 	LucidVisionLabsRgbModel.cpp
-#	AxisCamera.hpp
-#	AxisCamera.cpp
-#	AxisCommunicationsUtils.hpp
-#	AxisCommunicationsUtils.cpp
+	TritonCamera.hpp
+	TritonCamera.cpp
+	LucidVisionLabsRgbUtils.hpp
+	LucidVisionLabsRgbUtils.cpp
 	LucidVisionLabsRgbCameraFactory.cpp
 )
 

@@ -1,0 +1,37 @@
+/*
+ * The AxisPropertiesNetDecoder is used to decode TCP packets 
+ * from the AxisControllerNetEncoder.
+ * You will need to override various virtual methods!
+ */
+
+#pragma once
+
+#include "net_packet_decoder.hpp"
+
+#include <string>
+
+
+class cAxisPropertiesNetDecoder : public cNetworkDecoder
+{
+public:
+
+    cAxisPropertiesNetDecoder() = default;
+    virtual ~cAxisPropertiesNetDecoder() = default;
+
+protected:
+    /*
+     * Controller ----> Property Page
+     */
+    virtual void onCameraId(uint8_t id) = 0;
+    virtual void onImageSize(uint16_t width, uint16_t height) = 0;
+    virtual void onFrameRate(uint8_t fps) = 0;
+    virtual void onCurrentState(bool valid, uint8_t id,
+        uint16_t width, uint16_t height, uint8_t fps) = 0;
+    virtual void onCurrentState(bool valid, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) = 0;
+
+protected:
+    void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
+};
+
+
