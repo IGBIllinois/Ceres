@@ -41,13 +41,33 @@ if(WIN32)
     NAMES GenICam.h
     HINTS
       "$ENV{GENICAM}/include/"
+      "$ENV{LUCID_GENICAM_PATH}/library/CPP/include/"
       "${CMAKE_INSTALL_PREFIX}/include/GenICam"
     )
+
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	  find_path(GenICam_LIBRARY_DIR
+		NAMES GCBase_MD_VC140_v3_3_LUCID.lib
+		HINTS
+		  "$ENV{GENICAM}/lib64"
+		  "$ENV{LUCID_GENICAM_PATH}/library/CPP/lib/Win64_x64"
+		  "${CMAKE_INSTALL_PREFIX}/lib64"
+		)
+  elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+	  find_path(GenICam_LIBRARY_DIR
+		NAMES GCBase_MD_VC140_v3_3_LUCID.lib
+		HINTS
+		  "$ENV{GENICAM}/lib"
+		  "$ENV{LUCID_GENICAM_PATH}/library/CPP/lib/Win32_i86"
+		  "${CMAKE_INSTALL_PREFIX}/lib"
+		)
+  endif()
 
   find_path(ArenaSDK_INCLUDE_DIR
     NAMES Arena/ArenaApi.h ArenaApi.h
     HINTS
       "$ENV{ARENA_SDK}/include/"
+      "$ENV{LUCID_DEV_ROOT}/include/"
       "${CMAKE_INSTALL_PREFIX}/include/ArenaSDK"
     )
 
@@ -56,6 +76,7 @@ if(WIN32)
       NAMES Arena_v140.lib
       HINTS
         "$ENV{ARENA_SDK}/lib64/Arena"
+	"$ENV{LUCID_DEV_ROOT}/lib64/Arena"
         "${CMAKE_INSTALL_PREFIX}/lib64"
       )
 
@@ -64,9 +85,17 @@ if(WIN32)
       NAMES Arena_v140.lib
       HINTS
         "$ENV{ARENA_SDK}/lib/Arena"
+	"$ENV{LUCID_DEV_ROOT}/lib/Arena"
         "${CMAKE_INSTALL_PREFIX}/lib"
       )
   endif()
+
+  find_library(GenICam_LIBRARY
+    NAMES GCBase_MD_VC140_v3_3_LUCID.lib GenApi_MD_VC140_v3_3_LUCID.lib
+    PATHS
+      ${GenICam_LIBRARY_DIR}
+	NO_DEFAULT_PATH
+    )
 
   find_library(Arena_LIBRARY
     NAMES Arena_v140.lib
@@ -93,6 +122,13 @@ if(WIN32)
     NAMES Save_v140.lib
     PATHS
       ${ArenaSDK_LIBRARY_DIR}
+      NO_DEFAULT_PATH
+    )
+
+  find_library(GenICam_DEBUG_LIBRARY
+    NAMES GCBase_MDd_VC140_v3_3_LUCID.lib  GenApi_MDd_VC140_v3_3_LUCID.lib
+    PATHS
+      ${GenICam_LIBRARY_DIR}
 	NO_DEFAULT_PATH
     )
 
@@ -128,16 +164,17 @@ else()
   find_path(GenICam_INCLUDE_DIR
     NAMES GenICam.h
     HINTS
-	  "$ENV{GENICAM}/include"
-	)
+    	"$ENV{GENICAM}/include"
+    	"$ENV{LUCID_GENICAM_PATH}/library/CPP/include/"
+    )
 
 endif()
 
-link_directories(${ArenaSDK_LIBRARY_DIR})
+link_directories(${ArenaSDK_LIBRARY_DIR} ${GenICam_LIBRARY_DIR})
 
 set(ArenaSDK_INCLUDE_DIRS ${ArenaSDK_INCLUDE_DIR} ${GenICam_INCLUDE_DIR})
-set(ArenaSDK_LIBRARIES ${Arena_LIBRARY} ${ArenaUI_LIBRARY} ${GenTL_LIBRARY} ${Save_LIBRARY})
-set(ArenaSDK_DEBUG_LIBRARIES ${Arena_DEBUG_LIBRARY} ${ArenaUI_DEBUG_LIBRARY} ${GenTL_DEBUG_LIBRARY} ${Save_DEBUG_LIBRARY})
+set(ArenaSDK_LIBRARIES ${Arena_LIBRARY} ${ArenaUI_LIBRARY} ${GenTL_LIBRARY} ${Save_LIBRARY} ${GenICam_LIBRARY})
+set(ArenaSDK_DEBUG_LIBRARIES ${Arena_DEBUG_LIBRARY} ${ArenaUI_DEBUG_LIBRARY} ${GenTL_DEBUG_LIBRARY} ${Save_DEBUG_LIBRARY} ${GenICam_DEBUG_LIBRARY})
 
 message(STATUS "ArenaSDK_INCLUDE_DIRS=${ArenaSDK_INCLUDE_DIRS}")
 message(STATUS "ArenaSDK_LIBRARY_DIR=${ArenaSDK_LIBRARY_DIR}")
