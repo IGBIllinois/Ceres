@@ -11,7 +11,7 @@
 #include <QImage>
 
 
-namespace axis
+namespace lucid
 {
     std::string to_string(rgb::eIMAGE_FORMAT format);
     rgb::eIMAGE_FORMAT to_image_format(const std::string& str);

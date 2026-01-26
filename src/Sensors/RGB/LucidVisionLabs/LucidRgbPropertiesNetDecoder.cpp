@@ -5,7 +5,7 @@
 #include "net_buffer.hpp"
 
 
-void cAxisPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
+void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
     switch (static_cast<ePacketType>(hdr.id))
     {

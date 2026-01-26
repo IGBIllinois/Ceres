@@ -19,21 +19,21 @@ namespace
 }
 
 
-cAxisCommunicationsPropertyPage_Remote::cAxisCommunicationsPropertyPage_Remote(QWidget* parent)
-	: cAxisCommunicationsPropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
-		cAxisPropertiesNetEncoder(255)
+cLucidVisionLabsRgbPropertyPage_Remote::cLucidVisionLabsRgbPropertyPage_Remote(QWidget* parent)
+	: cLucidVisionLabsRgbPropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
+		cLucidRgbPropertiesNetEncoder(255)
 {}
 
-void cAxisCommunicationsPropertyPage_Remote::createWidgets()
+void cLucidVisionLabsRgbPropertyPage_Remote::createWidgets()
 {
-	cAxisCommunicationsPropertyPage::createWidgets();
+	cLucidVisionLabsRgbPropertyPage::createWidgets();
 
 	mpButtons->addButton(ReTry, QDialogButtonBox::ButtonRole::HelpRole);
 }
 
-void cAxisCommunicationsPropertyPage_Remote::enableControls(bool enable)
+void cLucidVisionLabsRgbPropertyPage_Remote::enableControls(bool enable)
 {
-	cAxisCommunicationsPropertyPage::enableControls(enable);
+	cLucidVisionLabsRgbPropertyPage::enableControls(enable);
 
 	auto* ok = mpButtons->button(QDialogButtonBox::Ok);
 	auto* apply = mpButtons->button(QDialogButtonBox::Apply);
@@ -42,7 +42,7 @@ void cAxisCommunicationsPropertyPage_Remote::enableControls(bool enable)
 	if (apply) apply->setEnabled(enable);
 }
 
-void cAxisCommunicationsPropertyPage_Remote::buttonClicked(QAbstractButton* button)
+void cLucidVisionLabsRgbPropertyPage_Remote::buttonClicked(QAbstractButton* button)
 {
 	auto text = button->text();
 	if (text == ReTry)
@@ -85,20 +85,20 @@ void cAxisCommunicationsPropertyPage_Remote::buttonClicked(QAbstractButton* butt
 		return;
 	}
 
-	cAxisCommunicationsPropertyPage::buttonClicked(button);
+	cLucidVisionLabsRgbPropertyPage::buttonClicked(button);
 }
 
-void cAxisCommunicationsPropertyPage_Remote::onConnect()
+void cLucidVisionLabsRgbPropertyPage_Remote::onConnect()
 {
-	cAxisPropertiesNetEncoder::sendQueryState();
+	cLucidRgbPropertiesNetEncoder::sendQueryState();
 }
 
-void cAxisCommunicationsPropertyPage_Remote::requestImage()
+void cLucidVisionLabsRgbPropertyPage_Remote::requestImage()
 {
-	cAxisPropertiesNetEncoder::sendGrabImage();
+	cLucidRgbPropertiesNetEncoder::sendGrabImage();
 }
 
-void cAxisCommunicationsPropertyPage_Remote::onCameraId(uint8_t id)
+void cLucidVisionLabsRgbPropertyPage_Remote::onCameraId(uint8_t id)
 {
 	if ((id == 0) || (id > 4))
 		return;
@@ -107,7 +107,7 @@ void cAxisCommunicationsPropertyPage_Remote::onCameraId(uint8_t id)
 	mDefaultCameraId = id;
 }
 
-void cAxisCommunicationsPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
+void cLucidVisionLabsRgbPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
 {
 	QString image_size = QString::number(width);
 	image_size += "x";
@@ -126,7 +126,7 @@ void cAxisCommunicationsPropertyPage_Remote::onImageSize(uint16_t width, uint16_
 	}
 }
 
-void cAxisCommunicationsPropertyPage_Remote::onFrameRate(uint8_t fps)
+void cLucidVisionLabsRgbPropertyPage_Remote::onFrameRate(uint8_t fps)
 {
 	if ((fps == 0) || (fps > 30))
 		return;
@@ -135,7 +135,7 @@ void cAxisCommunicationsPropertyPage_Remote::onFrameRate(uint8_t fps)
 	mDefaultFrameRate_fps = fps;
 }
 
-void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t id,
+void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t id,
 	uint16_t width, uint16_t height, uint8_t fps)
 {
 	if (!valid) return;
@@ -145,7 +145,7 @@ void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t 
 	onFrameRate(fps);
 }
 
-void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t active_id,
+void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t active_id,
 	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
 {
 	if (!valid) return;
@@ -157,7 +157,7 @@ void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t 
 	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
 }
 
-void cAxisCommunicationsPropertyPage_Remote::showPage()
+void cLucidVisionLabsRgbPropertyPage_Remote::showPage()
 {
 	if (!openConnection())
 	{
@@ -166,23 +166,23 @@ void cAxisCommunicationsPropertyPage_Remote::showPage()
 			QMessageBox::Ok);
 	}
 
-	cAxisCommunicationsPropertyPage::showPage();
+	cLucidVisionLabsRgbPropertyPage::showPage();
 }
 
-void cAxisCommunicationsPropertyPage_Remote::doOK()
+void cLucidVisionLabsRgbPropertyPage_Remote::doOK()
 {
 	doApply();
 	closeConnection();
-	cAxisCommunicationsPropertyPage::doOK();
+	cLucidVisionLabsRgbPropertyPage::doOK();
 }
 
-void cAxisCommunicationsPropertyPage_Remote::doCancel()
+void cLucidVisionLabsRgbPropertyPage_Remote::doCancel()
 {
 	closeConnection();
-	cAxisCommunicationsPropertyPage::doCancel();
+	cLucidVisionLabsRgbPropertyPage::doCancel();
 }
 
-void cAxisCommunicationsPropertyPage_Remote::doApply()
+void cLucidVisionLabsRgbPropertyPage_Remote::doApply()
 {
 	if (!mConnected)
 		return;
@@ -196,7 +196,7 @@ void cAxisCommunicationsPropertyPage_Remote::doApply()
 	auto image_size = mpImageSizes->currentText();
 	if (image_size.compare(mDefaultImageSize) != 0)
 	{
-		auto is = axis::to_image_size(image_size.toStdString());
+		auto is = lucid::to_image_size(image_size.toStdString());
 		sendSetImageSize(is.width, is.height);
 	}
 
@@ -207,17 +207,17 @@ void cAxisCommunicationsPropertyPage_Remote::doApply()
 	}
 }
 
-void cAxisCommunicationsPropertyPage_Remote::reject()
+void cLucidVisionLabsRgbPropertyPage_Remote::reject()
 {
 	doCancel();
 }
 
-void cAxisCommunicationsPropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
+void cLucidVisionLabsRgbPropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
 {
-	cAxisPropertiesNetDecoder::decode(pBuffer, buf_length);
+	cLucidRgbPropertiesNetDecoder::decode(pBuffer, buf_length);
 }
 
-int cAxisCommunicationsPropertyPage_Remote::sendOutgoingData(const char* data, std::size_t len)
+int cLucidVisionLabsRgbPropertyPage_Remote::sendOutgoingData(const char* data, std::size_t len)
 {
 	return cSensorPropertyPageRemoteInterface::sendOutgoingData(data, len);
 }

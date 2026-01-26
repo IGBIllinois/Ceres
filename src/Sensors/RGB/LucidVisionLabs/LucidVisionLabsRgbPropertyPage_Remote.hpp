@@ -1,5 +1,5 @@
 /*
- * The AxisCommunicationsPropertyPage to control the Axis Communications WebCams
+ * The LucidVisionLabsRgbPropertyPage to control the Lucid Vision Labs Triton RGB cameras
  * connected to a remote computer.
  */
 
@@ -9,14 +9,14 @@
 #include "LucidRgbPropertiesNetDecoder.hpp"
 #include "LucidRgbPropertiesNetEncoder.hpp"
 
-class cAxisCommunicationsPropertyPage_Remote : public cAxisCommunicationsPropertyPage,
+class cLucidVisionLabsRgbPropertyPage_Remote : public cLucidVisionLabsRgbPropertyPage,
     public cSensorPropertyPageRemoteInterface, 
-    private cAxisPropertiesNetDecoder, private cAxisPropertiesNetEncoder
+    private cLucidRgbPropertiesNetDecoder, private cLucidRgbPropertiesNetEncoder
 {
 
 public:
-    cAxisCommunicationsPropertyPage_Remote(QWidget* parent = nullptr);
-    ~cAxisCommunicationsPropertyPage_Remote() = default;
+    cLucidVisionLabsRgbPropertyPage_Remote(QWidget* parent = nullptr);
+    ~cLucidVisionLabsRgbPropertyPage_Remote() = default;
 
 public:
     void onCameraId(uint8_t id) override;

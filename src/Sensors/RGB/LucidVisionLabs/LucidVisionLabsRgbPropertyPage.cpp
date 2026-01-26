@@ -9,12 +9,12 @@
 #include <QPushButton>
 
 
-cAxisCommunicationsPropertyPage::cAxisCommunicationsPropertyPage(QWidget* parent)
+cLucidVisionLabsRgbPropertyPage::cLucidVisionLabsRgbPropertyPage(QWidget* parent)
 	: cSensorPropertyPage(parent)
 {
 }
 
-void cAxisCommunicationsPropertyPage::createWidgets()
+void cLucidVisionLabsRgbPropertyPage::createWidgets()
 {
 	mpCameraIdLabel = new QLabel("Camera ID:", this);
 	mpCameraId = new QLineEdit(this);
@@ -32,10 +32,10 @@ void cAxisCommunicationsPropertyPage::createWidgets()
 	mpFrameRate_fps = new QLineEdit(this);
 
 	mpGrabImage = new QPushButton("Grab Image", this);
-	connect(mpGrabImage, &QPushButton::pressed, this, &cAxisCommunicationsPropertyPage::requestImage);
+	connect(mpGrabImage, &QPushButton::pressed, this, &cLucidVisionLabsRgbPropertyPage::requestImage);
 }
 
-void cAxisCommunicationsPropertyPage::enableControls(bool enable)
+void cLucidVisionLabsRgbPropertyPage::enableControls(bool enable)
 {
 	mpCameraId->setEnabled(enable);
 	mpImageSizes->setEnabled(enable);
@@ -43,7 +43,7 @@ void cAxisCommunicationsPropertyPage::enableControls(bool enable)
 	mpGrabImage->setEnabled(enable);
 }
 
-void cAxisCommunicationsPropertyPage::doLayout()
+void cLucidVisionLabsRgbPropertyPage::doLayout()
 {
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
 
@@ -70,10 +70,10 @@ void cAxisCommunicationsPropertyPage::doLayout()
 	setLayout(pMainLayout);
 }
 
-cExperimentState* cAxisCommunicationsPropertyPage::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
+cExperimentState* cLucidVisionLabsRgbPropertyPage::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 	return nullptr;
 }
 
-void cAxisCommunicationsPropertyPage::requestImage()
+void cLucidVisionLabsRgbPropertyPage::requestImage()
 { }

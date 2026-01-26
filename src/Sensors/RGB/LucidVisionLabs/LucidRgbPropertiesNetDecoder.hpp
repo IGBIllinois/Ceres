@@ -1,5 +1,5 @@
 /*
- * The AxisPropertiesNetDecoder is used to decode TCP packets 
+ * The LucidRgbPropertiesNetDecoder is used to decode TCP packets 
  * from the AxisControllerNetEncoder.
  * You will need to override various virtual methods!
  */
@@ -11,12 +11,12 @@
 #include <string>
 
 
-class cAxisPropertiesNetDecoder : public cNetworkDecoder
+class cLucidRgbPropertiesNetDecoder : public cNetworkDecoder
 {
 public:
 
-    cAxisPropertiesNetDecoder() = default;
-    virtual ~cAxisPropertiesNetDecoder() = default;
+    cLucidRgbPropertiesNetDecoder() = default;
+    virtual ~cLucidRgbPropertiesNetDecoder() = default;
 
 protected:
     /*

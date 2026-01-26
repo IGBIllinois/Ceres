@@ -1,5 +1,5 @@
 /*
- * The AxisCommunicationsPropertyPage to control the Axis Communications WebCams.
+ * The LucidVisionLabsRgbPropertyPage to control the Axis Communications WebCams.
  */
 
 #pragma once
@@ -20,13 +20,13 @@ class QPushButton;
 QT_END_NAMESPACE
 
 
-class cAxisCommunicationsPropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
+class cLucidVisionLabsRgbPropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
 {
     Q_OBJECT
 
 public:
-    cAxisCommunicationsPropertyPage(QWidget* parent = nullptr);
-    ~cAxisCommunicationsPropertyPage() = default;
+    cLucidVisionLabsRgbPropertyPage(QWidget* parent = nullptr);
+    ~cLucidVisionLabsRgbPropertyPage() = default;
 
     void createWidgets() override;
 

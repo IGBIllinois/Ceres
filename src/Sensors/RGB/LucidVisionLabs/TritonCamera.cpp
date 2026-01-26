@@ -104,7 +104,7 @@ bool cTritonCamera::startGrabbing()
         query.addQueryItem("fps", QString::number(mFramesPerSeconds));
 
     if (mImageSize != rgb::sImageSize_t())
-        query.addQueryItem("resolution", QString::fromStdString(axis::to_string(mImageSize)));
+        query.addQueryItem("resolution", QString::fromStdString(lucid::to_string(mImageSize)));
 
     mCurrentUrl.setQuery(query);
 

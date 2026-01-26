@@ -176,7 +176,7 @@ namespace
     };
 }
 
-std::string axis::to_string(rgb::eIMAGE_FORMAT format)
+std::string lucid::to_string(rgb::eIMAGE_FORMAT format)
 {
     switch (format)
     {
@@ -197,7 +197,7 @@ std::string axis::to_string(rgb::eIMAGE_FORMAT format)
 }
 
 
-rgb::eIMAGE_FORMAT axis::to_image_format(const std::string& str)
+rgb::eIMAGE_FORMAT lucid::to_image_format(const std::string& str)
 {
     if (str == "mjpeg")
         return rgb::eIMAGE_FORMAT::MJPEG;
@@ -210,7 +210,7 @@ rgb::eIMAGE_FORMAT axis::to_image_format(const std::string& str)
 }
 
 
-std::string axis::to_string(rgb::sImageSize_t size)
+std::string lucid::to_string(rgb::sImageSize_t size)
 {
     std::string result = std::to_string(size.width);
     result += "x";
@@ -219,7 +219,7 @@ std::string axis::to_string(rgb::sImageSize_t size)
     return result;
 }
 
-rgb::sImageSize_t axis::to_image_size(const std::string& str)
+rgb::sImageSize_t lucid::to_image_size(const std::string& str)
 {
     rgb::sImageSize_t image_size;
 
@@ -235,7 +235,7 @@ rgb::sImageSize_t axis::to_image_size(const std::string& str)
     return image_size;
 }
 
-void axis::to_buffer(const QBitmap& img, cBitmapBuffer& out)
+void lucid::to_buffer(const QBitmap& img, cBitmapBuffer& out)
 {
     cImageWriteAdapter imageBuffer(&out);
 
@@ -247,7 +247,7 @@ void axis::to_buffer(const QBitmap& img, cBitmapBuffer& out)
     imageWriter.write(img.toImage());
 }
 
-void axis::to_buffer(const QImage& img, cJpegBuffer& out)
+void lucid::to_buffer(const QImage& img, cJpegBuffer& out)
 {
     cImageWriteAdapter imageBuffer(&out);
 
@@ -259,7 +259,7 @@ void axis::to_buffer(const QImage& img, cJpegBuffer& out)
     imageWriter.write(img);
 }
 
-void axis::to_buffer(const QImage& img, cMpegFrameBuffer& out)
+void lucid::to_buffer(const QImage& img, cMpegFrameBuffer& out)
 {
     cImageWriteAdapter imageBuffer(&out);
 
@@ -271,7 +271,7 @@ void axis::to_buffer(const QImage& img, cMpegFrameBuffer& out)
     imageWriter.write(img);
 }
 
-void axis::to_image(const cBitmapBuffer& in, QBitmap& out)
+void lucid::to_image(const cBitmapBuffer& in, QBitmap& out)
 {
     cImageReadAdapter imageBuffer(&in);
 
@@ -295,7 +295,7 @@ void axis::to_image(const cBitmapBuffer& in, QBitmap& out)
     out.fromImage(image);
 }
 
-void axis::to_image(const cJpegBuffer& in, QImage& out)
+void lucid::to_image(const cJpegBuffer& in, QImage& out)
 {
     cImageReadAdapter imageBuffer(&in);
 
@@ -314,7 +314,7 @@ void axis::to_image(const cJpegBuffer& in, QImage& out)
 #endif
 }
 
-void axis::to_image(const cMpegFrameBuffer& img, QImage& out)
+void lucid::to_image(const cMpegFrameBuffer& img, QImage& out)
 {
     cImageReadAdapter imageBuffer(&img);
 

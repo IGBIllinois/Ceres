@@ -1,5 +1,5 @@
 /*
- * The AxisPropertiesNetEncoder is used to encode TCP packets
+ * The LucidRgbPropertiesNetEncoder is used to encode TCP packets
  * to send to the AxisControllerNetDecoder.
  */
 
@@ -10,12 +10,12 @@
 #include <cstddef>
 
 
-class cAxisPropertiesNetEncoder : public cNetworkEncoder
+class cLucidRgbPropertiesNetEncoder : public cNetworkEncoder
 {
 
 public:
-    cAxisPropertiesNetEncoder(std::size_t capacity);
-    ~cAxisPropertiesNetEncoder() = default;
+    cLucidRgbPropertiesNetEncoder(std::size_t capacity);
+    ~cLucidRgbPropertiesNetEncoder() = default;
 
     /*
      * Property Page ----> Controller
