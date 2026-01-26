@@ -21,8 +21,10 @@ set(LUCID_VISION_RGB_SOURCE_FILES
 #
 	lucid_vision_labs_rgb_packet_utils.hpp
 	lucid_vision_labs_rgb_packet_utils.cpp
-	
+
+#	
 # Lucid Vision Labs Property Page Code
+#
 	LucidRgbPropertiesNetDecoder.hpp
 	LucidRgbPropertiesNetDecoder.cpp
 	LucidRgbPropertiesNetEncoder.hpp
@@ -32,9 +34,9 @@ set(LUCID_VISION_RGB_SOURCE_FILES
 	LucidVisionLabsRgbPropertyPage.hpp
 	LucidVisionLabsRgbPropertyPage.cpp
 	
-	
+#	
 # Lucid Vision Labs Controller Code
-
+#
 	LucidRgbControllerNetDecoder.hpp
 	LucidRgbControllerNetDecoder.cpp
 	LucidRgbControllerNetEncoder.hpp

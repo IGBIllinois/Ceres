@@ -19,22 +19,45 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 #
 # Teledyne FLIR packet utilities
 #
-	
-# Teledyne FLIR Property Page Code
-	
-	
-# Teledyne FLIR Controller Code
+	teledyne_flir_packet_utils.hpp
+	teledyne_flir_packet_utils.cpp
 
+#	
+# Teledyne FLIR Property Page Code
+#
+	TeledyneFlirPropertiesNetDecoder.hpp
+	TeledyneFlirPropertiesNetDecoder.cpp
+	TeledyneFlirPropertiesNetEncoder.hpp
+	TeledyneFlirPropertiesNetEncoder.cpp
+	TeledyneFlirPropertyPage_Remote.hpp
+	TeledyneFlirPropertyPage_Remote.cpp
+	TeledyneFlirPropertyPage.hpp
+	TeledyneFlirPropertyPage.cpp
+	
+	
+#
+# Teledyne FLIR Controller Code
+#
+	TeledyneFlirControllerNetDecoder.hpp
+	TeledyneFlirControllerNetDecoder.cpp
+	TeledyneFlirControllerNetEncoder.hpp
+	TeledyneFlirControllerNetEncoder.cpp
+    TeledyneFlirController.hpp
+    TeledyneFlirController.cpp
 
 #
 # Teledyne FLIR Video Cameras
 #
 	TeledyneFlirCameraView.hpp
 	TeledyneFlirCameraView.cpp
-#	TeledyneFlirStatusView.hpp
-#	TeledyneFlirStatusView.cpp
+	TeledyneFlirStatusView.hpp
+	TeledyneFlirStatusView.cpp
 	TeledyneFlirCameraModel.hpp
 	TeledyneFlirCameraModel.cpp
+	TeledyneFlirCameraModel_T1300.hpp
+	TeledyneFlirCameraModel_T1300.cpp
+	TeledyneFlirUtils.hpp
+	TeledyneFlirUtils.cpp
 	TeledyneFlirFactory.cpp
 )
 
