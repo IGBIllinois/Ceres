@@ -9,11 +9,18 @@
 #include <QtSerialPort/QSerialPortInfo>
 
 #include <functional>
+#include <chrono>
+
 
 #define USE_LOG_MESSAGE
 
 
 using namespace ssnx;
+using namespace std::chrono;
+
+
+static std::chrono::nanoseconds TIMEOUT = std::chrono::seconds(10);
+
 
 cSsnxModel_direct::cSsnxModel_direct(QObject* parent)
 :
@@ -119,6 +126,8 @@ bool cSsnxModel_direct::startCommunications()
         setStatus(sensor::eStatus::CONNECTING);
     else
         setStatus(sensor::eStatus::PENDING);
+
+    mLastReceived = std::chrono::high_resolution_clock::now();
 
     return true;
 }
@@ -231,9 +240,33 @@ void cSsnxModel_direct::sentAsciiCommand(const std::string& command)
 int cSsnxModel_direct::readIncomingData(std::string& data)
 {
     auto n = mSerialPort.bytesAvailable();
-    if (n == 0) return 0;
+    if (n == 0)
+    {
+        auto now = std::chrono::high_resolution_clock::now();
+
+        auto interval = now - mLastReceived;
+
+        if (interval > TIMEOUT)
+        {
+            forcePromptRequest();
+
+            if (mSerialPort.waitForBytesWritten(1000))
+                setStatus(sensor::eStatus::CONNECTING);
+            else
+                setStatus(sensor::eStatus::PENDING);
+
+            mLastReceived = std::chrono::high_resolution_clock::now();
+        }
+
+        return 0;
+    }
+
+    mLastReceived = std::chrono::high_resolution_clock::now();
 
     QByteArray buffer = mSerialPort.readAll();
+
+    if (buffer.isEmpty())
+        return 0;
 
     data.append(buffer.toStdString());
 

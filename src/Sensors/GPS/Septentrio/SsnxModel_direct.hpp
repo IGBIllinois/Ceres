@@ -9,6 +9,8 @@
 
 #include <ssnx/ssn_com.hpp>
 
+#include <chrono>
+
 
 class cSsnxModel_direct : public cSsnxModel, public cSsnCom
 {
@@ -125,5 +127,7 @@ private:
     edge_detect<bool> mNtripClientValid;
     edge_detect<bool> mWifiClientValid;
     edge_detect<bool> mReceiverStatusValid;
+
+    std::chrono::high_resolution_clock::time_point mLastReceived;
 };
 
