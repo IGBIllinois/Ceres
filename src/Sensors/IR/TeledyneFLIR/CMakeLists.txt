@@ -54,8 +54,8 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 	TeledyneFlirStatusView.cpp
 	TeledyneFlirCameraModel.hpp
 	TeledyneFlirCameraModel.cpp
-	TeledyneFlirCameraModel_T1300.hpp
-	TeledyneFlirCameraModel_T1300.cpp
+	TeledyneFlirCameraModel_T1K.hpp
+	TeledyneFlirCameraModel_T1K.cpp
 	TeledyneFlirUtils.hpp
 	TeledyneFlirUtils.cpp
 	TeledyneFlirFactory.cpp
@@ -91,6 +91,10 @@ PRIVATE
 
     ${TELEDYNE_FLIR_PROTO_HDRS}
 	${TELEDYNE_FLIR_PROTO_SRCS}
+
+	ColorTable.hpp
+	ColorTable.cpp
+
 	teledyne_flir_properties.proto
 )
 
@@ -108,6 +112,7 @@ target_link_libraries(teledyne_flir_static PRIVATE TeledyneAtlasConnect::Teledyn
 target_link_libraries(teledyne_flir_static PRIVATE ExperimentStateMachine)
 target_link_libraries(teledyne_flir_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(teledyne_flir_static PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(teledyne_flir_static PRIVATE AtlasSDK::Atlas)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
