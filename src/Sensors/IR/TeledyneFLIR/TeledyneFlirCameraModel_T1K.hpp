@@ -3,17 +3,24 @@
 
 #include "TeledyneFlirCameraModel.hpp"
 #include "Timers.hpp"
+#include "ColorTable.hpp"
+
+#include <cbdf/TeledyneFlirSerializer.hpp>
 
 #include <vector>
+#include <memory>
+
+// Forward Declarations
+class cTeledyneFlirCamera;
 
 
-class cTeledyneFlirCameraModel_T1300 : public cTeledyneFlirCameraModel
+class cTeledyneFlirCameraModel_T1K : public cTeledyneFlirCameraModel
 {
     Q_OBJECT
 
 public:
-    cTeledyneFlirCameraModel_T1300(QObject* parent = nullptr);
-    virtual ~cTeledyneFlirCameraModel_T1300();
+    cTeledyneFlirCameraModel_T1K(std::unique_ptr<cTeledyneFlirCamera> camera, QObject* parent = nullptr);
+    virtual ~cTeledyneFlirCameraModel_T1K();
 
     /*
      * Returns a device identifier used by the sensor.  The ids are
@@ -59,7 +66,13 @@ protected slots:
 
     virtual void processReply(const std::string& reply) {};
 
+protected:
+    cColorTable mColorTable;
+
 private:
+    std::unique_ptr<cTeledyneFlirCamera> mCamera;
+
+    cTeledyneFlirSerializer mSerializer;
 
 private:
     const uint8_t mInstanceID;

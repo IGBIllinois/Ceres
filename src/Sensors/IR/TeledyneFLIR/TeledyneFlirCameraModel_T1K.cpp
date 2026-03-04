@@ -1,38 +1,41 @@
 
-#include "TeledyneFlirCameraModel_T1300.hpp"
+#include "TeledyneFlirCameraModel_T1K.hpp"
+
+#include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
 
 #define USE_LOG_MESSAGE
 
 
 namespace
 {
-    static uint8_t teledyne_flir_t1300_instance_id = 0;
+    static uint8_t teledyne_flir_t1k_instance_id = 0;
 }
 
 
-cTeledyneFlirCameraModel_T1300::cTeledyneFlirCameraModel_T1300(QObject* parent)
+cTeledyneFlirCameraModel_T1K::cTeledyneFlirCameraModel_T1K(std::unique_ptr<cTeledyneFlirCamera> camera, QObject* parent)
 :
-    cTeledyneFlirCameraModel("T1300 FLIR Camera", parent),
-    mInstanceID(++teledyne_flir_t1300_instance_id)
+    cTeledyneFlirCameraModel("T1K FLIR Camera", parent),
+    mInstanceID(++teledyne_flir_t1k_instance_id)
 {
-    mModel = "Triton Camera";
+    mCamera.reset(camera.release());
+    mModel = mCamera->modelName();
 }
 
-cTeledyneFlirCameraModel_T1300::~cTeledyneFlirCameraModel_T1300()
+cTeledyneFlirCameraModel_T1K::~cTeledyneFlirCameraModel_T1K()
 {
 	stopCommunications();
 }
 
-uint8_t cTeledyneFlirCameraModel_T1300::device_id() const
+uint8_t cTeledyneFlirCameraModel_T1K::device_id() const
 {
     return mInstanceID;
 }
 
-void cTeledyneFlirCameraModel_T1300::updateViews()
+void cTeledyneFlirCameraModel_T1K::updateViews()
 {
 }
 
-bool cTeledyneFlirCameraModel_T1300::configure(const nlohmann::json& jsonCfg)
+bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)
 {
 //    size_t buffer_size = max_image_size.height * max_image_size.width;
 
@@ -43,18 +46,18 @@ bool cTeledyneFlirCameraModel_T1300::configure(const nlohmann::json& jsonCfg)
     return true;
 }
 
-void cTeledyneFlirCameraModel_T1300::enableDataRecording(cBlockDataFileWriter& file)
+void cTeledyneFlirCameraModel_T1K::enableDataRecording(cBlockDataFileWriter& file)
 {
 //    mSerializer.attach(&file);
 }
 
-void cTeledyneFlirCameraModel_T1300::disableDataRecording()
+void cTeledyneFlirCameraModel_T1K::disableDataRecording()
 {
     cTeledyneFlirCameraModel::disableDataRecording();
 //    mSerializer.detach();
 }
 
-void cTeledyneFlirCameraModel_T1300::writeDataHeader()
+void cTeledyneFlirCameraModel_T1K::writeDataHeader()
 {
 //    mSerializer.writeActiveCameraId(mInstanceID, mpActiveCamera->cameraID());
 //    auto size = mpActiveCamera->getImageSize();
@@ -62,7 +65,7 @@ void cTeledyneFlirCameraModel_T1300::writeDataHeader()
 //    mSerializer.writeFramesPerSecond(mInstanceID, mpActiveCamera->getFramesPerSeconds());
 }
 
-bool cTeledyneFlirCameraModel_T1300::startCommunications()
+bool cTeledyneFlirCameraModel_T1K::startCommunications()
 {
     if (!mConnected) return false;
 
@@ -71,13 +74,13 @@ bool cTeledyneFlirCameraModel_T1300::startCommunications()
 	return true;
 }
 
-void cTeledyneFlirCameraModel_T1300::stopCommunications()
+void cTeledyneFlirCameraModel_T1K::stopCommunications()
 {
     if (!mConnected) return;
     setStatus(sensor::eStatus::STOPPED);
 }
 
-void cTeledyneFlirCameraModel_T1300::errorHappend(int id, QString msg)
+void cTeledyneFlirCameraModel_T1K::errorHappend(int id, QString msg)
 {
     QString full_msg = "Camera ";
     full_msg += QString::number(id);
