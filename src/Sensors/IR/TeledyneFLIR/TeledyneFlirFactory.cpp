@@ -3,11 +3,15 @@
 
 #include "TeledyneFlirFactory.hpp"
 
+#include <TeledyneAtlasConnect/TeledyneFlirCameraFactory.hpp>
+#include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
 
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
 #include <QMetaType>
+#include <QDebug>
+
 
 // Example of how to declare a metatype in Qt
 //Q_DECLARE_METATYPE(ouster::sensor_info_t);
@@ -70,7 +74,40 @@ sSensorWidgets create_teledyne_flir_XXX_sensor(const nlohmann::json& sensorInfo,
 sSensorWidgets teledyne_flir::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
+
+    if (!sensorInfo.contains("protocol"))
+    {
+        qCritical() << "The \"protocol\" entry is missing from the \"teledyne_flir\" sensor section.  ";
+        qCritical() << "Valid values are: usb, network, or emulator";
+        return sSensorWidgets();
+    }
+
+    cTeledyneFlirCameraFactory factory;
+
+    std::string protocol = sensorInfo["protocol"];
+
+    factory.discoverCameras(protocol);
+
+    if (factory.empty())
+    {
+        qCritical() << "No cameras were found!";
+        return sSensorWidgets();
+    }
+
+    if (!sensorInfo.contains("sensor"))
+    {
+        qCritical() << "The \"sensor\" entry is missing from the \"teledyne_flir\" sensor section.  ";
+        qCritical() << "Valid values are: UVC Camera";
+        return sSensorWidgets();
+    }
+
     std::string sensor = sensorInfo["sensor"];
+
+    auto camera = factory.getCamera(sensor);
+
+    if (!camera)
+        return 0;
+
 
     if (sensor == "XXX")
         return sSensorWidgets(); //create_axis_communications_f44_sensor(sensorInfo, no_visualization);

@@ -1,7 +1,7 @@
 
 #include "TeledyneFlirController.hpp"
 #include "TeledyneFlirCameraModel.hpp"
-#include "TeledyneFlirCameraModel_T1300.hpp"
+#include "TeledyneFlirCameraModel_T1K.hpp"
 
 #include <cassert>
 
@@ -94,52 +94,52 @@ void cAxisCommunicationsController::onSetMode(ouster::eLIDAR_MODE mode)
 */
 
 /******************************************************************************
- * Teledyne FLIR Controller T1300
+ * Teledyne FLIR Controller T1K
  ******************************************************************************/
 
-cTeledyneFlirController_T1300::cTeledyneFlirController_T1300(cTeledyneFlirCameraModel_T1300* model, QObject* parent)
+cTeledyneFlirController_T1K::cTeledyneFlirController_T1K(cTeledyneFlirCameraModel_T1K* model, QObject* parent)
     :
     cSensorController(parent), cTeledyneFlirControllerNetEncoder(512), mpModel(model)
 {
     assert(mpModel);
 }
 
-const char* cTeledyneFlirController_T1300::descriptor() const
+const char* cTeledyneFlirController_T1K::descriptor() const
 {
     return mpModel->descriptor();
 }
 
-const std::string& cTeledyneFlirController_T1300::manufacturer() const
+const std::string& cTeledyneFlirController_T1K::manufacturer() const
 {
     return mpModel->manufacturer();
 }
 
-const std::string& cTeledyneFlirController_T1300::model() const
+const std::string& cTeledyneFlirController_T1K::model() const
 {
     return mpModel->model();
 }
 
-const std::string& cTeledyneFlirController_T1300::serial_number() const
+const std::string& cTeledyneFlirController_T1K::serial_number() const
 {
     return mpModel->serial_number();
 }
 
-const std::string& cTeledyneFlirController_T1300::name() const
+const std::string& cTeledyneFlirController_T1K::name() const
 {
     return mpModel->name();
 }
 
-const std::string& cTeledyneFlirController_T1300::instance() const
+const std::string& cTeledyneFlirController_T1K::instance() const
 {
     return mpModel->instance();
 }
 
-bool cTeledyneFlirController_T1300::has_instance() const
+bool cTeledyneFlirController_T1K::has_instance() const
 {
     return mpModel->has_instance();
 }
 
-void cTeledyneFlirController_T1300::processStream(const void* pBuffer, std::size_t buf_length)
+void cTeledyneFlirController_T1K::processStream(const void* pBuffer, std::size_t buf_length)
 {
     if (!pBuffer)
         return;
@@ -161,7 +161,7 @@ void cTeledyneFlirController_T1300::processStream(const void* pBuffer, std::size
     }
 }
 
-void cTeledyneFlirController_T1300::onQueryState()
+void cTeledyneFlirController_T1K::onQueryState()
 {
 /*
     auto id = mpModel->getActiveCameraID();
@@ -177,12 +177,12 @@ void cTeledyneFlirController_T1300::onQueryState()
 */
 }
 
-void cTeledyneFlirController_T1300::onQueryCameraId()
+void cTeledyneFlirController_T1K::onQueryCameraId()
 {
 //    sendActiveCameraId(mpModel->getActiveCameraID());
 }
 
-void cTeledyneFlirController_T1300::onQueryImageSize()
+void cTeledyneFlirController_T1K::onQueryImageSize()
 {
 /*
     auto image_size = mpModel->getActiveImageSize();
@@ -190,23 +190,23 @@ void cTeledyneFlirController_T1300::onQueryImageSize()
 */
 }
 
-void cTeledyneFlirController_T1300::onQueryFrameRate()
+void cTeledyneFlirController_T1K::onQueryFrameRate()
 {
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
 
-void cTeledyneFlirController_T1300::onGrabImage()
+void cTeledyneFlirController_T1K::onGrabImage()
 {
 //    mpModel->requestImage();
 }
 
-void cTeledyneFlirController_T1300::setCameraId(uint8_t id)
+void cTeledyneFlirController_T1K::setCameraId(uint8_t id)
 {
 //    mpModel->setActiveCamera(id);
 //    sendActiveCameraId(mpModel->getActiveCameraID());
 }
 
-void cTeledyneFlirController_T1300::setImageSize(uint16_t width, uint16_t height)
+void cTeledyneFlirController_T1K::setImageSize(uint16_t width, uint16_t height)
 {
 //    rgb::sImageSize_t image_size = {width, height};
 
@@ -214,7 +214,7 @@ void cTeledyneFlirController_T1300::setImageSize(uint16_t width, uint16_t height
 //    sendImageSize(image_size.width, image_size.height);
 }
 
-void cTeledyneFlirController_T1300::setFrameRate(uint8_t fps)
+void cTeledyneFlirController_T1K::setFrameRate(uint8_t fps)
 {
 //    mpModel->setActiveFramesRate_fps(fps);
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());

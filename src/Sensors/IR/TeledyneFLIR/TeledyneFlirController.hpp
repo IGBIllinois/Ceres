@@ -6,7 +6,7 @@
 #include "TeledyneFlirControllerNetEncoder.hpp"
 
 class cTeledyneFlirCameraModel;
-class cTeledyneFlirCameraModel_T1300;
+class cTeledyneFlirCameraModel_T1K;
 
 
 class cTeledyneFlirController : public cSensorController,
@@ -55,16 +55,16 @@ private:
 
 
 /******************************************************************************
- * Teledyne FLIR Controller T1300
+ * Teledyne FLIR Controller T1K for T1K series of FLIR cameras
  ******************************************************************************/
 
-class cTeledyneFlirController_T1300 : public cSensorController,
+class cTeledyneFlirController_T1K : public cSensorController,
     private cTeledyneFlirControllerNetDecoder, private cTeledyneFlirControllerNetEncoder
 {
     Q_OBJECT
 
 public:
-    cTeledyneFlirController_T1300(cTeledyneFlirCameraModel_T1300* model, QObject* parent = nullptr);
+    cTeledyneFlirController_T1K(cTeledyneFlirCameraModel_T1K* model, QObject* parent = nullptr);
 
 public:
     const char* descriptor() const override;
@@ -106,7 +106,7 @@ protected:
     }
 
 private:
-    cTeledyneFlirCameraModel_T1300* mpModel = nullptr;
+    cTeledyneFlirCameraModel_T1K* mpModel = nullptr;
 };
 
 
