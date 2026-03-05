@@ -27,5 +27,5 @@ private:
 	virtual void setDockedSize();
 
 protected:
-	cRgbImageWidget* mpImage;
+	cRgbImageWidget* mpImage = nullptr;
 };
