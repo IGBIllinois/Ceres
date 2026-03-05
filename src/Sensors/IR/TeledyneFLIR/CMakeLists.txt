@@ -50,6 +50,8 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 #
 	TeledyneFlirCameraView.hpp
 	TeledyneFlirCameraView.cpp
+	TeledyneFlirCameraView_T1K.hpp
+	TeledyneFlirCameraView_T1K.cpp
 	TeledyneFlirStatusView.hpp
 	TeledyneFlirStatusView.cpp
 	TeledyneFlirCameraModel.hpp

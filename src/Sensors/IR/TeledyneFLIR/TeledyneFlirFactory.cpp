@@ -2,6 +2,8 @@
  */
 
 #include "TeledyneFlirFactory.hpp"
+#include "TeledyneFlirCameraModel_T1K.hpp"
+#include "TeledyneFlirCameraView_T1K.hpp"
 
 #include <TeledyneAtlasConnect/TeledyneFlirCameraFactory.hpp>
 #include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
@@ -16,65 +18,8 @@
 // Example of how to declare a metatype in Qt
 //Q_DECLARE_METATYPE(ouster::sensor_info_t);
 
-/*
-sSensorWidgets create_teledyne_flir_XXX_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
+sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, const nlohmann::json& sensorInfo, bool no_visualization)
 {
-    // Create the Ouster model and view...
-    cAxisCommunicationsModel_F44* pModel = nullptr;
-
-    std::string protocol = sensorInfo["protocol"];
-
-    if (protocol == "net")
-        pModel = new cAxisCommunicationsModel_F44();
-    else if (protocol == "file")
-        pModel = new cAxisCommunicationsModel_F44();
-
-    if (!pModel)
-        throw std::runtime_error("Axis F44: Unknown protocol type!");
-
-
-    if (no_visualization)
-    {
-        if (protocol == "net")
-        {
-            auto* pView = new cAxisCommunicationsStatusView(pModel);
-            pView->createWidgets();
-            pView->doLayout();
-
-            QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::cameraIdChanged, pView, &cAxisCommunicationsStatusView::onCameraIdChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged, pView, &cAxisCommunicationsStatusView::onFrameRateChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged, pView, &cAxisCommunicationsStatusView::onImageSizeChange);
-
-            auto* pController = new cAxisCommunicationsController_F44(pModel);
-            return sSensorWidgets(pModel, pController, pView);
-        }
-
-        return sSensorWidgets(pModel);
-    }
-
-    auto* dockWidget = new QDockWidget();
-    auto* pView = new cAxisCommunicationsView_F44(pModel, dockWidget);
-    pView->initialize();
-
-    dockWidget->setWindowTitle(pView->windowTitle());
-    dockWidget->setWidget(pView);
-    QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cAxisCommunicationsView::dockLocationChanged);
-    QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cAxisCommunicationsView::topLevelChanged);
-
-    QObject::connect(pModel, &cAxisCommunicationsModel_F44::enableCamera, pView, &cAxisCommunicationsView_F44::enableCamera);
-    QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage, pView, &cAxisCommunicationsView::imageUpdated);
-
-    QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
-
-    return sSensorWidgets(pModel, dockWidget);
-}
-*/
-
-sSensorWidgets teledyne_flir::create_sensor(const nlohmann::json& sensorInfo,
-    bool no_visualization)
-{
-
     if (!sensorInfo.contains("protocol"))
     {
         qCritical() << "The \"protocol\" entry is missing from the \"teledyne_flir\" sensor section.  ";
@@ -94,6 +39,55 @@ sSensorWidgets teledyne_flir::create_sensor(const nlohmann::json& sensorInfo,
         return sSensorWidgets();
     }
 
+    auto camera = factory.getCamera(sensorName);
+
+    if (!camera)
+        return sSensorWidgets();
+
+    // Create the Teledyne FLIR T1K model and view...
+    cTeledyneFlirCameraModel_T1K* pModel = new cTeledyneFlirCameraModel_T1K(std::move(camera));
+
+    if (no_visualization)
+    {
+/*
+        if (protocol == "net")
+        {
+            auto* pView = new cAxisCommunicationsStatusView(pModel);
+            pView->createWidgets();
+            pView->doLayout();
+
+            QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::cameraIdChanged, pView, &cAxisCommunicationsStatusView::onCameraIdChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged, pView, &cAxisCommunicationsStatusView::onFrameRateChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged, pView, &cAxisCommunicationsStatusView::onImageSizeChange);
+
+            auto* pController = new cAxisCommunicationsController_F44(pModel);
+            return sSensorWidgets(pModel, pController, pView);
+        }
+*/
+
+        return sSensorWidgets(pModel);
+    }
+
+    auto* dockWidget = new QDockWidget();
+    auto* pView = new cTeledyneFlirCameraView_T1K(pModel, dockWidget);
+//    pView->initialize();
+
+    dockWidget->setWindowTitle(pView->windowTitle());
+    dockWidget->setWidget(pView);
+//    QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cAxisCommunicationsView::dockLocationChanged);
+//    QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cAxisCommunicationsView::topLevelChanged);
+
+//    QObject::connect(pModel, &cAxisCommunicationsModel_F44::enableCamera, pView, &cAxisCommunicationsView_F44::enableCamera);
+//    QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage, pView, &cAxisCommunicationsView::imageUpdated);
+
+//    QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
+
+    return sSensorWidgets(pModel, dockWidget);
+}
+
+sSensorWidgets teledyne_flir::create_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
+{
     if (!sensorInfo.contains("sensor"))
     {
         qCritical() << "The \"sensor\" entry is missing from the \"teledyne_flir\" sensor section.  ";
@@ -103,14 +97,8 @@ sSensorWidgets teledyne_flir::create_sensor(const nlohmann::json& sensorInfo,
 
     std::string sensor = sensorInfo["sensor"];
 
-    auto camera = factory.getCamera(sensor);
-
-    if (!camera)
-        return 0;
-
-
-    if (sensor == "XXX")
-        return sSensorWidgets(); //create_axis_communications_f44_sensor(sensorInfo, no_visualization);
+    if ((sensor == "UVC Camera") || (sensor.starts_with("Emulated")))
+        return create_teledyne_flir_TIK_sensor(sensor, sensorInfo, no_visualization);
 
     return sSensorWidgets();
 }

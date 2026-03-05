@@ -1,6 +1,7 @@
 
 #include "IrCameraView.hpp"
 
+#include <QResizeEvent>
 #include <string>
 
 
@@ -8,6 +9,7 @@ cIrCameraView::cIrCameraView(QWidget* parent)
 :
     QAbstractScrollArea(parent)
 {
+    mpImage = new cThermalImageWidget(this);
 }
 
 cIrCameraView::~cIrCameraView()
@@ -50,5 +52,11 @@ void cIrCameraView::topLevelChanged(bool topLevel)
     {
         setFloatingSize();
     }
+}
+
+void cIrCameraView::resizeEvent(QResizeEvent* e)
+{
+    QAbstractScrollArea::resizeEvent(e);
+    mpImage->resizeImage(e->size().width(), e->size().height());
 }
 

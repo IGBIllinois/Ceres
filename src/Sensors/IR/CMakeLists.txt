@@ -11,6 +11,9 @@ set(IR_CAMERA_PUBLIC_HEADERS
 # Add the public header files to use the library
 set(IR_CAMERA_SOURCE_FILES
 
+    ThermalImageWidget.hpp
+    ThermalImageWidget.cpp
+
 #
 # General IR Camera View-Model-Controller files
 #

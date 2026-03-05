@@ -14,7 +14,7 @@ cTeledyneFlirCameraView::cTeledyneFlirCameraView(cTeledyneFlirCameraModel* pMode
     cIrCameraView(parent),
     mpModel(pModel)
 {
-    setWindowTitle("IR Camera");
+    setWindowTitle("Teledyne FLIR Camera");
 }
 
 cTeledyneFlirCameraView::~cTeledyneFlirCameraView()
@@ -23,5 +23,8 @@ cTeledyneFlirCameraView::~cTeledyneFlirCameraView()
 
 void cTeledyneFlirCameraView::imageUpdated(const QImage& image)
 {
+    mpImage->setImage(image);
+    if (!isHidden())
+        mpImage->repaint();
 }
 
