@@ -119,12 +119,10 @@ void cOneShotTimer::start()
 	mStartTime = std::chrono::high_resolution_clock::now();
 }
 
-/*
 void cOneShotTimer::stop()
 {
 	mRunning = false;
 }
-*/
 
 bool cOneShotTimer::elapsed()
 {

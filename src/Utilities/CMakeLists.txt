@@ -28,6 +28,8 @@ PUBLIC
 	RappFieldModel.hpp
 
 	GpsFileReader.hpp
+	
+    TimestampProvider.hpp
 
 PRIVATE
 	ColorGradient.cpp
@@ -56,6 +58,8 @@ PRIVATE
 
 	RappFieldModel.cpp
     RappFieldBoundary.cpp
+
+    TimestampProvider.cpp
 )
 
 target_include_directories(Utilities PRIVATE ${CMAKE_INSTALL_PREFIX}/include)

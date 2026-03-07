@@ -48,6 +48,7 @@ public:
 	void time_ms(uint32_t interval_ms);
 
 	void start();
+	void stop();
 
 	bool elapsed();
 
