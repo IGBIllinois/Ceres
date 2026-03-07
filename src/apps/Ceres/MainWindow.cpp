@@ -1064,6 +1064,11 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         }
         catch (const std::exception& e)
         {
+            QString msg = "Sensor: ";
+            msg += QString::fromStdString(type);
+            msg += "\n";
+            msg += e.what();
+            onErrorMessage("Configuration Error", msg);
             validSensor = false;
         }
 
