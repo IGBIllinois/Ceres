@@ -31,9 +31,6 @@ PRIVATE
     DataThread.hpp
     DataThread.cpp
 	
-    TimestampProvider.hpp
-    TimestampProvider.cpp
-	
     CeresSplashScreen.hpp
     CeresSplashScreen.cpp
 
