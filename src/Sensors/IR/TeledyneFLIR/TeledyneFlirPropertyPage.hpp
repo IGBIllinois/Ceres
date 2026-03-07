@@ -41,8 +41,8 @@ protected slots:
     virtual void requestImage();
 
 protected:
-    QLabel* mpCameraIdLabel = nullptr;
-    QLineEdit* mpCameraId = nullptr;
+    QLabel* mpModeLabel = nullptr;
+    QComboBox* mpMode = nullptr;
 
     QLabel* mpImageSizeLabel = nullptr;
     QComboBox* mpImageSizes = nullptr;
@@ -50,9 +50,12 @@ protected:
     QLabel* mpFrameRateLabel = nullptr;
     QLineEdit* mpFrameRate_fps = nullptr;
 
-    int mDefaultCameraId = -1;
+    QLabel* mpFrameIntervalLabel = nullptr;
+    QLineEdit* mpFrameInterval_s = nullptr;
+
     QString mDefaultImageSize;
     int  mDefaultFrameRate_fps = -1;
+    int  mDefaultFrameInterval_s = -1;
 
     QPushButton* mpGrabImage = nullptr;
 };

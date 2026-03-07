@@ -16,7 +16,7 @@ int encode_query(teledyne_eQuery query, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::QUERY_STATE);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::QUERY_STATE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -27,27 +27,32 @@ int encode_query(teledyne_eQuery query, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int encode_query_current_state(net_buffer& buffer)
+int flir::encode_query_current_state(net_buffer& buffer)
 {
     return encode_query(eQUERY_STATE, buffer);
 }
 
-int encode_query_active_camera_id(net_buffer& buffer)
+int flir::encode_query_camera_mode(net_buffer& buffer)
 {
-    return encode_query(eQUERY_ACTIVE_CAMERA_ID, buffer);
+    return encode_query(eQUERY_MODE, buffer);
 }
 
-int encode_query_image_size(net_buffer& buffer)
+int flir::encode_query_image_size(net_buffer& buffer)
 {
     return encode_query(eQUERY_IMAGE_SIZE, buffer);
 }
 
-int encode_query_frame_rate(net_buffer& buffer)
+int flir::encode_query_frame_rate(net_buffer& buffer)
 {
     return encode_query(eQUERY_FRAME_RATE, buffer);
 }
 
-int encode_grab_image(net_buffer& buffer)
+int flir::encode_query_frame_interval(net_buffer& buffer)
+{
+    return encode_query(eQUERY_FRAME_INTERVAL, buffer);
+}
+
+int flir::encode_grab_image(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::GRAB_IMAGE);
@@ -60,22 +65,22 @@ int encode_grab_image(net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-uint8_t to_active_camera_id_t(const teledyne_ActiveCameraIdMessage_1& pckt)
+uint8_t flir::to_camera_mode_t(const teledyne_CameraModeMessage_1& pckt)
 {
-    return static_cast<uint8_t>(pckt.camera_id());
+    return static_cast<uint8_t>(pckt.mode());
 }
 
-int encode_active_camera_id(uint8_t id, net_buffer& buffer)
+int flir::encode_camera_mode(uint8_t mode, net_buffer& buffer)
 {
-    teledyne_ActiveCameraIdMessage_1 pckt;
+    teledyne_CameraModeMessage_1 pckt;
 
-    pckt.set_camera_id(id);
+    pckt.set_mode(mode);
 
     std::string str;
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::ACTIVE_CAMERA_ID);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::CAMERA_MODE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -87,7 +92,7 @@ int encode_active_camera_id(uint8_t id, net_buffer& buffer)
 }
 
 
-sImageSize to_image_size_t(const teledyne_ImageSizeMessage_1& pckt)
+flir::sImageSize flir::to_image_size_t(const teledyne_ImageSizeMessage_1& pckt)
 {
     sImageSize image_size;
     image_size.width = pckt.width();
@@ -95,7 +100,7 @@ sImageSize to_image_size_t(const teledyne_ImageSizeMessage_1& pckt)
     return image_size;
 }
 
-int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
+int flir::encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
 {
     teledyne_ImageSizeMessage_1 pckt;
 
@@ -106,7 +111,7 @@ int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::IMAGE_SIZE);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::IMAGE_SIZE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -117,12 +122,12 @@ int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-uint8_t to_frame_rate_t(const teledyne_FrameRateMessage_1& pckt)
+double flir::to_frame_rate_t(const teledyne_FrameRateMessage_1& pckt)
 {
-    return static_cast<uint8_t>(pckt.frames_per_second());
+    return pckt.frames_per_second();
 }
 
-int encode_frame_rate(uint8_t fps, net_buffer& buffer)
+int flir::encode_frame_rate(double fps, net_buffer& buffer)
 {
     teledyne_FrameRateMessage_1 pckt;
 
@@ -132,7 +137,33 @@ int encode_frame_rate(uint8_t fps, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::FRAMES_PER_SECOND);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAMES_PER_SECOND);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+uint32_t flir::to_frame_interval_t(const teledyne_FrameIntervalMessage_1& pckt)
+{
+    return pckt.frames_interval_ms();
+}
+
+int flir::encode_frame_interval(uint32_t interval_ms, net_buffer& buffer)
+{
+    teledyne_FrameIntervalMessage_1 pckt;
+
+    pckt.set_frames_interval_ms(interval_ms);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAMES_INTERVAL_MS);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -144,82 +175,50 @@ int encode_frame_rate(uint8_t fps, net_buffer& buffer)
 }
 
 
-sCurrentState to_current_state_t(const teledyne_StateMessage_1& pckt)
+flir::sCurrentState flir::to_current_state_t(const teledyne_StateMessage_1& pckt)
 {
     sCurrentState state;
 
     state.valid = pckt.valid();
-    state.active_camera_id = pckt.camera_id();
+    state.mode = pckt.mode();
     state.width = pckt.width();
     state.height = pckt.height();
     state.frames_per_second = pckt.frames_per_second();
-    state.min_camera_id = 0;
-    state.max_camera_id = 0;
+    state.frames_interval_ms = pckt.frames_interval_ms();
+
+    if (pckt.has_min_frames_per_second())
+        state.min_frames_per_second = pckt.min_frames_per_second();
+
+    if (pckt.has_max_frames_per_second())
+        state.max_frames_per_second = pckt.max_frames_per_second();
 
     return state;
 }
 
-int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
-    uint16_t height, uint8_t fps, net_buffer& buffer)
+int flir::encode_current_state(bool valid, uint8_t mode, uint16_t width, uint16_t height, 
+    double fps, uint32_t interval_ms, std::optional<double> min_fps, std::optional<double> max_fps, net_buffer& buffer)
 {
     teledyne_StateMessage_1 pckt;
 
     pckt.set_valid(valid);
-    pckt.set_camera_id(camera_id);
+    pckt.set_mode(mode);
     pckt.set_width(width);
     pckt.set_height(height);
     pckt.set_frames_per_second(fps);
+    pckt.set_frames_interval_ms(interval_ms);
+
+    if (min_fps.has_value())
+        pckt.set_min_frames_per_second(min_fps.value());
+
+    if (max_fps.has_value())
+        pckt.set_max_frames_per_second(max_fps.value());
 
     std::string str;
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::CURRENT_STATE);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::CURRENT_STATE);
     hdr.revision = 1;
-    hdr.length = str.length();
-    set_timestamp(&hdr.timestamp);
-
-    buffer << hdr;
-    buffer.write(str);
-
-    return sizeof(sPacketHeader_t) + hdr.length;
-}
-
-
-sCurrentState to_current_state_t(const teledyne_StateMessage_2& pckt)
-{
-    sCurrentState state;
-
-    state.valid = pckt.valid();
-    state.active_camera_id = pckt.active_camera_id();
-    state.width = pckt.width();
-    state.height = pckt.height();
-    state.frames_per_second = pckt.frames_per_second();
-    state.min_camera_id = pckt.min_camera_id();
-    state.max_camera_id = pckt.max_camera_id();
-
-    return state;
-}
-
-int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
-    uint16_t height, uint8_t fps, uint8_t min_camera_id, uint8_t max_camera_id, net_buffer& buffer)
-{
-    teledyne_StateMessage_2 pckt;
-
-    pckt.set_valid(valid);
-    pckt.set_active_camera_id(camera_id);
-    pckt.set_width(width);
-    pckt.set_height(height);
-    pckt.set_frames_per_second(fps);
-    pckt.set_min_camera_id(min_camera_id);
-    pckt.set_max_camera_id(max_camera_id);
-
-    std::string str;
-    pckt.SerializeToString(&str);
-
-    sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::CURRENT_STATE);
-    hdr.revision = 2;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 

@@ -91,7 +91,7 @@ bool cHySpexCameraModel::configure(const nlohmann::json& jsonCfg)
 
     if (jsonCfg.contains("number of backgrounds"))
         mNumBackgrounds = jsonCfg["number of backgrounds"];
-    
+
     return cHyperspectralModel::configure(jsonCfg);
 }
 

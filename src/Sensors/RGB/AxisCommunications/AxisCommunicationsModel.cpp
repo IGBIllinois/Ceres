@@ -10,10 +10,13 @@
 
 #include <nlohmann/json.hpp>
 
-QByteArray to_QByteArray(const nlohmann::json& jsonDoc)
+namespace
 {
-    std::string s = jsonDoc.dump();
-    return QByteArray(s.c_str(), s.size());
+    QByteArray to_QByteArray(const nlohmann::json& jsonDoc)
+    {
+        std::string s = jsonDoc.dump();
+        return QByteArray(s.c_str(), s.size());
+    }
 }
 
 cAxisCommunicationsModel::cAxisCommunicationsModel(const std::string& name, QObject* parent)

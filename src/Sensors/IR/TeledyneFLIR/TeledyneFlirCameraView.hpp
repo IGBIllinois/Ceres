@@ -18,6 +18,9 @@ public:
 	cTeledyneFlirCameraView(cTeledyneFlirCameraModel* pModel, QWidget* parent = nullptr);
 	virtual ~cTeledyneFlirCameraView();
 
+//	void createWidgets() override;
+//	void doLayout() override;
+
 public slots:
 	virtual void imageUpdated(const QImage& image);
 

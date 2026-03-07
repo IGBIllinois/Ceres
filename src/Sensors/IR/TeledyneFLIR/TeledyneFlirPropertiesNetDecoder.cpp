@@ -4,6 +4,7 @@
 #include "teledyne_flir_packet_utils.hpp"
 #include "net_buffer.hpp"
 
+using namespace flir;
 
 void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
@@ -14,12 +15,12 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
     {
         break;
     }
-    case ePacketType::ACTIVE_CAMERA_ID:
+    case ePacketType::CAMERA_MODE:
     {
-        teledyne_ActiveCameraIdMessage_1 packet;
+        teledyne_CameraModeMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
-        auto id = to_active_camera_id_t(packet);
-        onCameraId(id);
+        auto id = to_camera_mode_t(packet);
+        onMode(id);
         break;
     }
     case ePacketType::IMAGE_SIZE:
@@ -38,30 +39,22 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         onFrameRate(fps);
         break;
     }
+    case ePacketType::FRAMES_INTERVAL_MS:
+    {
+        teledyne_FrameIntervalMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto interval_ms = to_frame_interval_t(packet);
+        onFrameInterval(interval_ms);
+        break;
+    }
     case ePacketType::CURRENT_STATE:
     {
-        switch (hdr.revision)
-        {
-        case 1:
-        {
-            teledyne_StateMessage_1 packet;
-            packet.ParseFromArray(buffer.data(), hdr.length);
-            auto state = to_current_state_t(packet);
-            onCurrentState(state.valid, state.active_camera_id, state.width,
-                state.height, state.frames_per_second);
-            break;
-        }
-        case 2:
-        {
-            teledyne_StateMessage_2 packet;
-            packet.ParseFromArray(buffer.data(), hdr.length);
-            auto state = to_current_state_t(packet);
-            onCurrentState(state.valid, state.active_camera_id, state.width,
-                state.height, state.frames_per_second, state.min_camera_id, state.max_camera_id);
-            break;
-        }
-        }
-
+        teledyne_StateMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto state = to_current_state_t(packet);
+        onCurrentState(state.valid, state.mode, state.width,
+            state.height, state.frames_per_second, state.frames_interval_ms,
+            state.min_frames_per_second, state.max_frames_per_second);
         break;
     }
     }

@@ -2,8 +2,13 @@
  */
 
 #include "TeledyneFlirFactory.hpp"
+#include "TeledyneFlirIDs.hpp"
 #include "TeledyneFlirCameraModel_T1K.hpp"
 #include "TeledyneFlirCameraView_T1K.hpp"
+#include "TeledyneFlirStatusView.hpp"
+#include "TeledyneFlirController.hpp"
+#include "TeledyneFlirPropertyPage.hpp"
+#include "TeledyneFlirPropertyPage_Remote.hpp"
 
 #include <TeledyneAtlasConnect/TeledyneFlirCameraFactory.hpp>
 #include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
@@ -49,37 +54,31 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
 
     if (no_visualization)
     {
-/*
-        if (protocol == "net")
-        {
-            auto* pView = new cAxisCommunicationsStatusView(pModel);
-            pView->createWidgets();
-            pView->doLayout();
+        auto* pView = new cTeledyneFlirStatusView(pModel);
+        pView->createWidgets();
+        pView->doLayout();
 
-            QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::cameraIdChanged, pView, &cAxisCommunicationsStatusView::onCameraIdChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged, pView, &cAxisCommunicationsStatusView::onFrameRateChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged, pView, &cAxisCommunicationsStatusView::onImageSizeChange);
+        QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::modeChanged, pView, &cTeledyneFlirStatusView::onModeChange);
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::frameIntervalChanged, pView, &cTeledyneFlirStatusView::onFrameIntervalChange);
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::frameRateChanged, pView, &cTeledyneFlirStatusView::onFrameRateChange);
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::imageSizeChanged, pView, &cTeledyneFlirStatusView::onImageSizeChange);
 
-            auto* pController = new cAxisCommunicationsController_F44(pModel);
-            return sSensorWidgets(pModel, pController, pView);
-        }
-*/
-
-        return sSensorWidgets(pModel);
+        auto* pController = new cTeledyneFlirController_T1K(pModel);
+        return sSensorWidgets(pModel, pController, pView);
     }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cTeledyneFlirCameraView_T1K(pModel, dockWidget);
-//    pView->initialize();
+    pView->initialize();
 
     dockWidget->setWindowTitle(pView->windowTitle());
     dockWidget->setWidget(pView);
-//    QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cAxisCommunicationsView::dockLocationChanged);
-//    QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cAxisCommunicationsView::topLevelChanged);
+    QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cTeledyneFlirCameraView::dockLocationChanged);
+    QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cTeledyneFlirCameraView::topLevelChanged);
 
 //    QObject::connect(pModel, &cAxisCommunicationsModel_F44::enableCamera, pView, &cAxisCommunicationsView_F44::enableCamera);
-//    QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage, pView, &cAxisCommunicationsView::imageUpdated);
+    QObject::connect(pModel, &cTeledyneFlirCameraModel::onNewImage, pView, &cTeledyneFlirCameraView::imageUpdated);
 
 //    QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
 
@@ -130,6 +129,12 @@ cSensorPropertyPage* teledyne_flir::create_sensor_property_page(
     const std::string& model, uint32_t version,
     const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
+    if (model == teledyne_flir_id)
+    {
+        auto page = new cTeledyneFlirPropertyPage_Remote();
+        page->initialize(remote_ip_address, port, false, local_ip_address);
+        return page;
+    }
 
     return nullptr;
 }

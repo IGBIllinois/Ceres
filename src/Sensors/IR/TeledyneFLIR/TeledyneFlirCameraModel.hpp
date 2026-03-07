@@ -1,28 +1,30 @@
 
 #pragma once
 
-//#include "../RgbTypes.hpp"
 #include "../IrCameraModel.hpp"
-//#include "AxisCommunicationsUtils.hpp"
+#include "Timers.hpp"
+#include "ColorTable.hpp"
 
-//#include <cbdf/ImageBuffers.hpp>
+#include <TeledyneAtlasConnect/TeledyneAtlasData.hpp>
+
 #include <cbdf/TeledyneFlirSerializer.hpp>
 
-#include <QNetworkReply>
-#include <QUrl>
-#include <QBitmap>
+#include <QImage>
 
 #include <vector>
+#include <optional>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
-class QNetworkAccessManager;
 QT_END_NAMESPACE
 
 
 class cTeledyneFlirCameraModel : public cIrCameraModel
 {
     Q_OBJECT
+
+public:
+    enum eMode { SINGLE = 0, TIME_LAPSE = 1, CONTINUOUS = 2 };
 
 public:
     /*
@@ -41,35 +43,57 @@ public:
      */
     uint16_t data_class_id() const override;
 
-    bool isConnected() const { return mConnected; }
-
-
     bool configure(const nlohmann::json& jsonCfg) override;
 
-    /*
-     * Starts/Stops communication with the endpoint.
-     * These methods are called inside the QThread so that
-     * all of the communication happens within the same thread!
-     */
-    bool startCommunications() override;
-    void stopCommunications() override;
+    eMode mode() const;
+    virtual void setMode(eMode mode);
 
-    void update() override;
+    double frameRate_Hz() const;
+    virtual void setFrameRate_Hz(double frame_rate_hz);
 
+    uint32_t frameInterval_ms() const;
+    virtual void setFrameInterval_ms(uint32_t frame_interval_ms);
+
+    void takePhoto(bool send_image = false);
 
 signals:
     void onNewImage(const QImage& image);
+    void modeChanged(int mode);
+    void frameIntervalChanged(int interval_ms);
+    void frameRateChanged(double rate_fps);
+    void imageSizeChanged(int width, int height);
 
-protected slots:
+public slots:
+    void requestMode(int mode);
+    void requestImage();
 
 protected:
     cTeledyneFlirCameraModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cTeledyneFlirCameraModel();
 
-protected:
-    bool mConnected;
+    virtual bool updateFrameInterval(uint32_t frame_interval_ms) = 0;
+    virtual bool updateFrameRate(double frame_rate_fps) = 0;
 
-    QImage mCurrentImage;
+protected:
+    eMode mMode = eMode::SINGLE;
+    bool mPhotoRequested = false;
+
+    double mFrameRate_fps = 0;
+    std::optional<double> mMinFrameRate_fps = 0;
+    std::optional<double> mMaxFrameRate_fps = 0;
+
+    uint32_t mFrameInterval_ms = 0;
+    cOneShotTimer mFrameTimer;
+
+    uint16_t mImageWidth = 0;
+    uint16_t mImageHeight = 0;
+
+    bool mImageRequested = false;
+
+    nTeledyneAtlasConnect::cThermalImage mCurrentImage;
+
+    cColorTable mColorTable;
+    QImage mColorizedImage;
 
     cTeledyneFlirSerializer mSerializer;
 };

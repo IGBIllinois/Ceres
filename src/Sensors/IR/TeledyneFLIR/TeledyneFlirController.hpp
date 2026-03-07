@@ -29,8 +29,6 @@ public:
 
 protected:
     void onQueryState() override;
-//    void onSetAzimuthWindow(double min_deg, double max_deg) override;
-//    void onSetMode(ouster::eLIDAR_MODE mode) override;
 
 protected:
     /**
@@ -78,14 +76,16 @@ public:
 
 protected:
     void onQueryState() override;
-    void onQueryCameraId() override;
+    void onQueryMode() override;
     void onQueryImageSize() override;
     void onQueryFrameRate() override;
+    void onQueryFrameInterval() override;
     void onGrabImage() override;
 
-    void setCameraId(uint8_t id) override;
+    void setMode(uint8_t mode) override;
     void setImageSize(uint16_t width, uint16_t height) override;
-    void setFrameRate(uint8_t fps) override;
+    void setFrameRate_Hz(double fps) override;
+    void setFrameInterval_ms(uint32_t interval_ms) override;
 
 
 protected:

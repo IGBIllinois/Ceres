@@ -9,6 +9,9 @@
 #include "TeledyneFlirPropertiesNetDecoder.hpp"
 #include "TeledyneFlirPropertiesNetEncoder.hpp"
 
+#include <optional>
+
+
 class cTeledyneFlirPropertyPage_Remote : public cTeledyneFlirPropertyPage,
     public cSensorPropertyPageRemoteInterface, 
     private cTeledyneFlirPropertiesNetDecoder, private cTeledyneFlirPropertiesNetEncoder
@@ -19,13 +22,13 @@ public:
     ~cTeledyneFlirPropertyPage_Remote() = default;
 
 public:
-    void onCameraId(uint8_t id) override;
+    void onMode(uint8_t mode) override;
     void onImageSize(uint16_t width, uint16_t height) override;
-    void onFrameRate(uint8_t fps) override;
-    void onCurrentState(bool valid, uint8_t id,
-        uint16_t width, uint16_t height, uint8_t fps) override;
-    void onCurrentState(bool valid, uint8_t active_id,
-        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
+    void onFrameRate(double fps) override;
+    void onFrameInterval(uint32_t interval_ms) override;
+    void onCurrentState(bool valid, uint8_t mode,
+        uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
+        std::optional<double> min_fps, std::optional<double> max_fps) override;
 
 protected:
     void onConnect() override;

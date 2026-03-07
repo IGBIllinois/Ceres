@@ -15,9 +15,10 @@ enum teledyne_eQuery
 {
   eQUERY_UNSPECIFIED = 0;
   eQUERY_STATE = 1;
-  eQUERY_ACTIVE_CAMERA_ID = 2;
+  eQUERY_MODE = 2;
   eQUERY_IMAGE_SIZE = 3;
   eQUERY_FRAME_RATE = 4;
+  eQUERY_FRAME_INTERVAL = 5;
 }
 
 message teledyne_QueryMessage_1 
@@ -25,9 +26,9 @@ message teledyne_QueryMessage_1
 	teledyne_eQuery query = 1;
 }
 
-message teledyne_ActiveCameraIdMessage_1
+message teledyne_CameraModeMessage_1
 {
-    uint32 camera_id = 1;
+    uint32 mode = 1;
 }
 
 message teledyne_ImageSizeMessage_1 
@@ -38,27 +39,24 @@ message teledyne_ImageSizeMessage_1
 
 message teledyne_FrameRateMessage_1 
 {
-	uint32 frames_per_second = 1;
+	double frames_per_second = 1;
+}
+
+message teledyne_FrameIntervalMessage_1 
+{
+	uint32 frames_interval_ms = 1;
 }
 
 message teledyne_StateMessage_1 
 {
 	bool   valid = 1;
-	uint32 camera_id = 2;
+	uint32 mode = 2;
 	uint32 width = 3;
 	uint32 height = 4;
-    uint32 frames_per_second = 5;
-}
-
-message teledyne_StateMessage_2
-{
-	bool   valid = 1;
-	uint32 active_camera_id = 2;
-	uint32 width = 3;
-	uint32 height = 4;
-    uint32 frames_per_second = 5;
-	uint32 min_camera_id = 6;
-	uint32 max_camera_id = 7;
+    double frames_per_second = 5;
+    uint32 frames_interval_ms = 6;
+    optional double min_frames_per_second = 7;
+    optional double max_frames_per_second = 8;
 }
 
 

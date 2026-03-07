@@ -5,6 +5,7 @@
 #include "teledyne_flir_packet_utils.hpp"
 #include "net_buffer.hpp"
 
+using namespace flir;
 
 void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
@@ -23,21 +24,23 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         {
         case eQUERY_STATE:
             return onQueryState();
-        case eQUERY_ACTIVE_CAMERA_ID:
-            return onQueryCameraId();
+        case eQUERY_MODE:
+            return onQueryMode();
         case eQUERY_IMAGE_SIZE:
             return onQueryImageSize();
         case eQUERY_FRAME_RATE:
             return onQueryFrameRate();
+        case eQUERY_FRAME_INTERVAL:
+            return onQueryFrameInterval();
         }
         break;
     }
-    case ePacketType::ACTIVE_CAMERA_ID:
+    case ePacketType::CAMERA_MODE:
     {
-        teledyne_ActiveCameraIdMessage_1 packet;
+        teledyne_CameraModeMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
-        auto id = to_active_camera_id_t(packet);
-        setCameraId(id);
+        auto mode = to_camera_mode_t(packet);
+        setMode(mode);
         break;
     }
     case ePacketType::IMAGE_SIZE:
@@ -53,7 +56,15 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         teledyne_FrameRateMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto fps = to_frame_rate_t(packet);
-        setFrameRate(fps);
+        setFrameRate_Hz(fps);
+        break;
+    }
+    case ePacketType::FRAMES_INTERVAL_MS:
+    {
+        teledyne_FrameIntervalMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto interval_ms = to_frame_interval_t(packet);
+        setFrameInterval_ms(interval_ms);
         break;
     }
     case ePacketType::GRAB_IMAGE:

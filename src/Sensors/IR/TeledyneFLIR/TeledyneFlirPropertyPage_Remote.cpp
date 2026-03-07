@@ -98,13 +98,12 @@ void cTeledyneFlirPropertyPage_Remote::requestImage()
 	cTeledyneFlirPropertiesNetEncoder::sendGrabImage();
 }
 
-void cTeledyneFlirPropertyPage_Remote::onCameraId(uint8_t id)
+void cTeledyneFlirPropertyPage_Remote::onMode(uint8_t mode)
 {
-	if ((id == 0) || (id > 4))
+	if ((mode < 0) || (mode > 2))
 		return;
 
-	mpCameraId->setText(QString::number(id));
-	mDefaultCameraId = id;
+	mpMode->setCurrentIndex(mode);
 }
 
 void cTeledyneFlirPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
@@ -126,7 +125,7 @@ void cTeledyneFlirPropertyPage_Remote::onImageSize(uint16_t width, uint16_t heig
 	}
 }
 
-void cTeledyneFlirPropertyPage_Remote::onFrameRate(uint8_t fps)
+void cTeledyneFlirPropertyPage_Remote::onFrameRate(double fps)
 {
 	if ((fps == 0) || (fps > 30))
 		return;
@@ -135,26 +134,41 @@ void cTeledyneFlirPropertyPage_Remote::onFrameRate(uint8_t fps)
 	mDefaultFrameRate_fps = fps;
 }
 
-void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t id,
-	uint16_t width, uint16_t height, uint8_t fps)
+void cTeledyneFlirPropertyPage_Remote::onFrameInterval(uint32_t interval_ms)
 {
-	if (!valid) return;
-
-	onCameraId(id);
-	onImageSize(width, height);
-	onFrameRate(fps);
+	mpFrameInterval_s->setText(QString::number(interval_ms * 0.001f));
 }
 
-void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t active_id,
-	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
+
+void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
+	uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
+	std::optional<double> min_fps, std::optional<double> max_fps)
 {
 	if (!valid) return;
 
-	onCameraId(active_id);
+	onMode(mode);
 	onImageSize(width, height);
 	onFrameRate(fps);
+	onFrameInterval(interval_ms);
 
-	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
+	switch (mode)
+	{
+	case 0:
+		mpFrameRate_fps->setEnabled(false);
+		mpFrameInterval_s->setEnabled(false);
+		break;
+	case 1:
+		mpFrameRate_fps->setEnabled(false);
+		mpFrameInterval_s->setEnabled(true);
+		break;
+	case 2:
+		mpFrameInterval_s->setEnabled(false);
+		mpFrameRate_fps->setEnabled(true);
+		break;
+	}
+
+	if (min_fps.has_value() && max_fps.has_value())
+		mpFrameRate_fps->setValidator(new QDoubleValidator(min_fps.value(), max_fps.value(), 2));
 }
 
 void cTeledyneFlirPropertyPage_Remote::showPage()
@@ -187,11 +201,11 @@ void cTeledyneFlirPropertyPage_Remote::doApply()
 	if (!mConnected)
 		return;
 
-	uint8_t id = mpCameraId->text().toInt();
-	if (mDefaultCameraId != id)
-	{
-		sendSetCameraId(id);
-	}
+//	uint8_t id = mpMode->text().toInt();
+//	if (mDefaultCameraId != id)
+//	{
+//		sendSetCameraId(id);
+//	}
 
 	auto image_size = mpImageSizes->currentText();
 	if (image_size.compare(mDefaultImageSize) != 0)

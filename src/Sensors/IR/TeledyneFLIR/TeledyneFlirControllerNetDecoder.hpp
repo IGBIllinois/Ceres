@@ -24,14 +24,16 @@ protected:
      * Property Page ----> Controller
      */
     virtual void onQueryState() = 0;
-    virtual void onQueryCameraId() = 0;
+    virtual void onQueryMode() = 0;
     virtual void onQueryImageSize() = 0;
     virtual void onQueryFrameRate() = 0;
+    virtual void onQueryFrameInterval() = 0;
     virtual void onGrabImage() = 0;
 
-    virtual void setCameraId(uint8_t id) = 0;
+    virtual void setMode(uint8_t mode) = 0;
     virtual void setImageSize(uint16_t width, uint16_t height) = 0;
-    virtual void setFrameRate(uint8_t fps) = 0;
+    virtual void setFrameRate_Hz(double fps) = 0;
+    virtual void setFrameInterval_ms(uint32_t interval_ms) = 0;
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;

@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <memory>
+#include <optional>
 
 // Forward Declarations
 class cTeledyneFlirCamera;
@@ -24,7 +25,7 @@ public:
 
     /*
      * Returns a device identifier used by the sensor.  The ids are
-     * only unique within a device type: Axis Communications F44 RGB Camera
+     * only unique within a device type: Teledyne FLIR T1K Camera
      */
     uint8_t device_id() const override;
 
@@ -56,9 +57,6 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
-signals:
-    void enableCamera(int id);
-
 public slots:
 
 protected slots:
@@ -67,10 +65,18 @@ protected slots:
     virtual void processReply(const std::string& reply) {};
 
 protected:
+    bool updateFrameInterval(uint32_t frame_interval_ms) override;
+    bool updateFrameRate(double frame_rate_fps) override;
+
+    void update() override;
+
+protected:
     cColorTable mColorTable;
 
 private:
     std::unique_ptr<cTeledyneFlirCamera> mCamera;
+
+    bool mIsRunning = false;
 
     cTeledyneFlirSerializer mSerializer;
 

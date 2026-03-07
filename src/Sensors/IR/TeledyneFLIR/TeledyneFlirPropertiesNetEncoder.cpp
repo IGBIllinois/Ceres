@@ -3,6 +3,7 @@
 #include "TeledyneFlirPropertiesNetEncoder.hpp"
 #include "teledyne_flir_packet_utils.hpp"
 
+using namespace flir;
 
 cTeledyneFlirPropertiesNetEncoder::cTeledyneFlirPropertiesNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
@@ -14,9 +15,9 @@ void cTeledyneFlirPropertiesNetEncoder::sendQueryState()
     sendData();
 }
 
-void cTeledyneFlirPropertiesNetEncoder::sendSetCameraId(uint8_t id)
+void cTeledyneFlirPropertiesNetEncoder::sendSetMode(uint8_t mode)
 {
-    encode_active_camera_id(id, mBuffer);
+    encode_camera_mode(mode, mBuffer);
     sendData();
 }
 
@@ -26,9 +27,15 @@ void cTeledyneFlirPropertiesNetEncoder::sendSetImageSize(uint16_t width, uint16_
     sendData();
 }
 
-void cTeledyneFlirPropertiesNetEncoder::sendSetFrameRate_fps(uint8_t fps)
+void cTeledyneFlirPropertiesNetEncoder::sendSetFrameRate_fps(double fps)
 {
     encode_frame_rate(fps, mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirPropertiesNetEncoder::sendSetFrameInterval_ms(uint32_t interval_ms)
+{
+    encode_frame_interval(interval_ms, mBuffer);
     sendData();
 }
 

@@ -9,6 +9,7 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QComboBox>
 
 #include <string>
 
@@ -26,15 +27,21 @@ void cTeledyneFlirStatusView::createWidgets()
 {
 	cSensorStatusView::createWidgets();
 
-	mpCameraIdLabel = new QLabel("Camera ID:", this);
-	mpCameraId = new QLineEdit(this);
-	mpCameraId->setReadOnly(true);
+	mpModeLabel = new QLabel("Mode:", this);
+	mpMode = new QComboBox(this);
+	mpMode->addItem("Photo");
+	mpMode->addItem("Time Lapse");
+	mpMode->addItem("Continuous");
 
 	mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
 	mpImageSizes = new QLineEdit(this);
 	mpImageSizes->setReadOnly(true);
 
-	mpFrameRateLabel = new QLabel("Frames per Second:", this);
+	mpFrameIntervalLabel = new QLabel("Frame Interval (sec):", this);
+	mpFrameInterval_s = new QLineEdit(this);
+	mpFrameInterval_s->setReadOnly(true);
+
+	mpFrameRateLabel = new QLabel("Frame Rate (f/s):", this);
 	mpFrameRate_fps = new QLineEdit(this);
 	mpFrameRate_fps->setReadOnly(true);
 
@@ -54,11 +61,14 @@ void cTeledyneFlirStatusView::doLayout()
 
 	auto* cameraInfoLayout = new QHBoxLayout();
 
-	cameraInfoLayout->addWidget(mpCameraIdLabel);
-	cameraInfoLayout->addWidget(mpCameraId);
+	cameraInfoLayout->addWidget(mpModeLabel);
+	cameraInfoLayout->addWidget(mpMode);
 
 	cameraInfoLayout->addWidget(mpImageSizeLabel);
 	cameraInfoLayout->addWidget(mpImageSizes);
+
+	cameraInfoLayout->addWidget(mpFrameIntervalLabel);
+	cameraInfoLayout->addWidget(mpFrameInterval_s);
 
 	cameraInfoLayout->addWidget(mpFrameRateLabel);
 	cameraInfoLayout->addWidget(mpFrameRate_fps);
@@ -71,18 +81,21 @@ void cTeledyneFlirStatusView::doLayout()
 
 	mainLayout->addWidget(infoBox);
 
-//	mainLayout->addWidget(mpImage, 1);
-//	mainLayout->addStretch();
-
 	setLayout(mainLayout);
 }
 
-void cTeledyneFlirStatusView::onCameraIdChange(int id)
+void cTeledyneFlirStatusView::onModeChange(int mode)
 {
-	mpCameraId->setText(QString::number(id));
+	if ((mode < 0) || (mode >= mpMode->maxCount()))
+	mpMode->setCurrentIndex(mode);
 }
 
-void cTeledyneFlirStatusView::onFrameRateChange(int rate_fps)
+void cTeledyneFlirStatusView::onFrameIntervalChange(int interval_ms)
+{
+	mpFrameInterval_s->setText(QString::number(interval_ms * 0.001f));
+}
+
+void cTeledyneFlirStatusView::onFrameRateChange(double rate_fps)
 {
 	mpFrameRate_fps->setText(QString::number(rate_fps));
 }
@@ -107,5 +120,4 @@ void cTeledyneFlirStatusView::imageUpdated(const QImage& image)
 void cTeledyneFlirStatusView::resizeEvent(QResizeEvent* e)
 {
 	cSensorStatusView::resizeEvent(e);
-//	mpImage->resizeImage(e->size().width(), e->size().height());
 }

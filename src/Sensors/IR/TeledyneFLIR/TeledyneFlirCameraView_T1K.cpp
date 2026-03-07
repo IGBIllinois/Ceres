@@ -19,3 +19,7 @@ cTeledyneFlirCameraView_T1K::~cTeledyneFlirCameraView_T1K()
 {
 }
 
+void cTeledyneFlirCameraView_T1K::initialize()
+{
+
+}

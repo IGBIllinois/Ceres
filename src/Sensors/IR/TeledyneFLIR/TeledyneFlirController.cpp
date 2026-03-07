@@ -163,23 +163,21 @@ void cTeledyneFlirController_T1K::processStream(const void* pBuffer, std::size_t
 
 void cTeledyneFlirController_T1K::onQueryState()
 {
-/*
-    auto id = mpModel->getActiveCameraID();
-    auto image_size = mpModel->getActiveImageSize();
-    auto fps = mpModel->getActiveFramesRate_fps();
+    auto mode = mpModel->mode();
+//    auto image_size = mpModel->getActiveImageSize();
+    auto fps = mpModel->frameRate_Hz();
 
-    bool valid = (id >= 0) && (fps > 0);
+//    bool valid = (id >= 0) && (fps > 0);
 
-    int minID = mpModel->getMinCameraID();
-    int maxID = mpModel->getMaxCameraID();
+//    int minID = mpModel->getMinCameraID();
+//    int maxID = mpModel->getMaxCameraID();
 
-    sendCurrentState(valid, id, image_size.width, image_size.height, fps, minID, maxID);
-*/
+//    sendCurrentState(valid, id, image_size.width, image_size.height, fps, minID, maxID);
 }
 
-void cTeledyneFlirController_T1K::onQueryCameraId()
+void cTeledyneFlirController_T1K::onQueryMode()
 {
-//    sendActiveCameraId(mpModel->getActiveCameraID());
+    sendCameraMode(static_cast<uint8_t>(mpModel->mode()));
 }
 
 void cTeledyneFlirController_T1K::onQueryImageSize()
@@ -195,12 +193,17 @@ void cTeledyneFlirController_T1K::onQueryFrameRate()
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
 
+void cTeledyneFlirController_T1K::onQueryFrameInterval()
+{
+//    sendFrameInterval(mpModel->getActiveFrameInterval_s());
+}
+
 void cTeledyneFlirController_T1K::onGrabImage()
 {
 //    mpModel->requestImage();
 }
 
-void cTeledyneFlirController_T1K::setCameraId(uint8_t id)
+void cTeledyneFlirController_T1K::setMode(uint8_t mode)
 {
 //    mpModel->setActiveCamera(id);
 //    sendActiveCameraId(mpModel->getActiveCameraID());
@@ -214,10 +217,16 @@ void cTeledyneFlirController_T1K::setImageSize(uint16_t width, uint16_t height)
 //    sendImageSize(image_size.width, image_size.height);
 }
 
-void cTeledyneFlirController_T1K::setFrameRate(uint8_t fps)
+void cTeledyneFlirController_T1K::setFrameRate_Hz(double fps)
 {
 //    mpModel->setActiveFramesRate_fps(fps);
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());
+}
+
+void cTeledyneFlirController_T1K::setFrameInterval_ms(uint32_t interval_ms)
+{
+//    mpModel->setActiveFrameInterval_s(fps);
+//    sendFrameInterval(mpModel->getActiveFrameInterval_s());
 }
 
 

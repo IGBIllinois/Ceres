@@ -22,9 +22,10 @@ public:
      */
 
     void sendQueryState();
-    void sendSetCameraId(uint8_t id);
+    void sendSetMode(uint8_t mode);
     void sendSetImageSize(uint16_t width, uint16_t height);
-    void sendSetFrameRate_fps(uint8_t fps);
+    void sendSetFrameRate_fps(double fps);
+    void sendSetFrameInterval_ms(uint32_t interval_ms);
     void sendGrabImage();
 };
 

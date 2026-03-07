@@ -8,6 +8,7 @@
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QLineEdit;
+class QComboBox;
 class QPushButton;
 QT_END_NAMESPACE
 
@@ -29,24 +30,26 @@ signals:
 	void requestImage();
 
 public slots:
-	void onCameraIdChange(int id);
-	void onFrameRateChange(int rate_fps);
+	void onModeChange(int mode);
+	void onFrameIntervalChange(int interval_ms);
+	void onFrameRateChange(double rate_fps);
 	void onImageSizeChange(int width, int height);
 	void imageUpdated(const QImage& image);
 
 	void resizeEvent(QResizeEvent*) override;
 
 private:
-	QLabel* mpCameraIdLabel = nullptr;
-	QLineEdit* mpCameraId = nullptr;
+	QLabel* mpModeLabel = nullptr;
+	QComboBox* mpMode = nullptr;
 
 	QLabel* mpImageSizeLabel = nullptr;
 	QLineEdit* mpImageSizes = nullptr;
+
+	QLabel* mpFrameIntervalLabel = nullptr;
+	QLineEdit* mpFrameInterval_s = nullptr;
 
 	QLabel* mpFrameRateLabel = nullptr;
 	QLineEdit* mpFrameRate_fps = nullptr;
 
 	QPushButton* mpGrabImage = nullptr;
-
-//	cRgbImageWidget* mpImage = nullptr;
 };
