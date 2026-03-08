@@ -79,8 +79,11 @@ protected:
     bool mPhotoRequested = false;
 
     double mFrameRate_fps = 0;
-    std::optional<double> mMinFrameRate_fps = 0;
-    std::optional<double> mMaxFrameRate_fps = 0;
+    std::optional<double> mMinFrameRate_fps;
+    std::optional<double> mMaxFrameRate_fps;
+
+    std::optional<float> mMinThermalRange_K;
+    std::optional<float> mMaxThermalRange_K;
 
     uint32_t mFrameInterval_ms = 0;
     cOneShotTimer mFrameTimer;

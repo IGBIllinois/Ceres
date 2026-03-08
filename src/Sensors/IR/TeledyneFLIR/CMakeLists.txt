@@ -31,6 +31,10 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 	TeledyneFlirPropertiesNetEncoder.cpp
 	TeledyneFlirPropertyPage_Remote.hpp
 	TeledyneFlirPropertyPage_Remote.cpp
+
+	TeledyneFlirPropertyPage_Local.hpp
+	TeledyneFlirPropertyPage_Local.cpp
+
 	TeledyneFlirPropertyPage.hpp
 	TeledyneFlirPropertyPage.cpp
 	

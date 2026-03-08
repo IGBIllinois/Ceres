@@ -22,15 +22,6 @@ void cTeledyneFlirPropertyPage::createWidgets()
 	mpMode->addItem("Time Lapse");
 	mpMode->addItem("Video");
 
-	mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
-	mpImageSizes = new QComboBox(this);
-	mpImageSizes->addItem("1920x1080");
-	mpImageSizes->addItem("1280x720");
-	mpImageSizes->addItem("1024x768");
-	mpImageSizes->addItem("1024x640");
-	mpImageSizes->addItem("800x600");
-	mpImageSizes->addItem("640x480");
-
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
 
@@ -44,7 +35,6 @@ void cTeledyneFlirPropertyPage::createWidgets()
 void cTeledyneFlirPropertyPage::enableControls(bool enable)
 {
 	mpMode->setEnabled(enable);
-	mpImageSizes->setEnabled(enable);
 	mpFrameRate_fps->setEnabled(enable);
 	mpFrameInterval_s->setEnabled(enable);
 	mpGrabImage->setEnabled(enable);
@@ -58,11 +48,6 @@ void cTeledyneFlirPropertyPage::doLayout()
 	idLayout->addWidget(mpModeLabel);
 	idLayout->addWidget(mpMode);
 	pMainLayout->addLayout(idLayout);
-
-	auto* sizeLayout = new QHBoxLayout();
-	sizeLayout->addWidget(mpImageSizeLabel);
-	sizeLayout->addWidget(mpImageSizes);
-	pMainLayout->addLayout(sizeLayout);
 
 	auto* frLayout = new QHBoxLayout();
 	frLayout->addWidget(mpFrameRateLabel);
@@ -87,5 +72,3 @@ cExperimentState* cTeledyneFlirPropertyPage::createState(const std::string& type
 	return nullptr;
 }
 
-void cTeledyneFlirPropertyPage::requestImage()
-{ }

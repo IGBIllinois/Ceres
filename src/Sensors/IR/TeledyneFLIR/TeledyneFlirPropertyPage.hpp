@@ -38,14 +38,11 @@ public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 protected slots:
-    virtual void requestImage();
+    virtual void requestImage() = 0;
 
 protected:
     QLabel* mpModeLabel = nullptr;
     QComboBox* mpMode = nullptr;
-
-    QLabel* mpImageSizeLabel = nullptr;
-    QComboBox* mpImageSizes = nullptr;
 
     QLabel* mpFrameRateLabel = nullptr;
     QLineEdit* mpFrameRate_fps = nullptr;
@@ -53,7 +50,6 @@ protected:
     QLabel* mpFrameIntervalLabel = nullptr;
     QLineEdit* mpFrameInterval_s = nullptr;
 
-    QString mDefaultImageSize;
     int  mDefaultFrameRate_fps = -1;
     int  mDefaultFrameInterval_s = -1;
 

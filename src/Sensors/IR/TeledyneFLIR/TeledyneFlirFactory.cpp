@@ -9,6 +9,7 @@
 #include "TeledyneFlirController.hpp"
 #include "TeledyneFlirPropertyPage.hpp"
 #include "TeledyneFlirPropertyPage_Remote.hpp"
+#include "TeledyneFlirPropertyPage_Local.hpp"
 
 #include <TeledyneAtlasConnect/TeledyneFlirCameraFactory.hpp>
 #include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
@@ -82,7 +83,9 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
 
 //    QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
 
-    return sSensorWidgets(pModel, dockWidget);
+    auto page = new cTeledyneFlirPropertyPage_Local(pModel);
+
+    return sSensorWidgets(pModel, dockWidget, page);
 }
 
 sSensorWidgets teledyne_flir::create_sensor(const nlohmann::json& sensorInfo, bool no_visualization)

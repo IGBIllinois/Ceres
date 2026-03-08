@@ -8,6 +8,7 @@ QT_BEGIN_NAMESPACE
 class QPaintEvent;
 QT_END_NAMESPACE
 
+// Forward Declaration
 class cTeledyneFlirCameraModel;
 
 class cTeledyneFlirCameraView : public cIrCameraView

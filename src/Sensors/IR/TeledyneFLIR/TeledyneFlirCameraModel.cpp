@@ -9,6 +9,7 @@
 #include <QEventLoop>
 #include <QByteArray>
 #include <QUrlQuery>
+#include <QImage>
 
 #include <nlohmann/json.hpp>
 

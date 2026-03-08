@@ -19,7 +19,8 @@ cTeledyneFlirCameraModel_T1K::cTeledyneFlirCameraModel_T1K(std::unique_ptr<cTele
     cTeledyneFlirCameraModel("T1K FLIR Camera", parent),
     mInstanceID(++teledyne_flir_t1k_instance_id)
 {
-    mCamera.reset(camera.release());
+    mCamera = std::move(camera);
+
     mModel = mCamera->modelName();
     mSerialNumber = mCamera->serialNumber();
 
@@ -27,13 +28,21 @@ cTeledyneFlirCameraModel_T1K::cTeledyneFlirCameraModel_T1K(std::unique_ptr<cTele
     mMinFrameRate_fps = mCamera->getMinFrameRate_Hz();
     mMaxFrameRate_fps = mCamera->getMaxFrameRate_Hz();
 
-    auto min_K = mCamera->getThermalRangeMin_K();
-    auto max_K = mCamera->getThermalRangeMax_K();
+    mMinThermalRange_K = mCamera->getThermalRangeMin_K();
+    mMaxThermalRange_K = mCamera->getThermalRangeMax_K();
 
-    if (min_K.has_value() && max_K.has_value())
-        mColorTable.setRange(min_K.value(), max_K.value());
+    if (mMinThermalRange_K.has_value() && mMaxThermalRange_K.has_value())
+        mColorTable.setRange(mMinThermalRange_K.value(), mMaxThermalRange_K.value());
     else
         mColorTable.setRange(250, 400);
+
+    auto width = mCamera->width();
+    if (width > 0)
+        mImageWidth = static_cast<uint16_t>(width);
+
+    auto height = mCamera->height();
+    if (height > 0)
+        mImageHeight = static_cast<uint16_t>(height);
 }
 
 cTeledyneFlirCameraModel_T1K::~cTeledyneFlirCameraModel_T1K()
@@ -54,9 +63,9 @@ bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)
 {
     bool result = cTeledyneFlirCameraModel::configure(jsonCfg);
 
-//    size_t buffer_size = max_image_size.height * max_image_size.width;
+    size_t buffer_size = mImageHeight * mImageWidth * sizeof(double);
 
-//    mSerializer.setBufferCapacity(buffer_size + 1024);
+    mSerializer.setBufferCapacity(buffer_size + 1024);
 
     if (result)
         setStatus(sensor::eStatus::CONFIGURED);
@@ -79,10 +88,71 @@ void cTeledyneFlirCameraModel_T1K::disableDataRecording()
 
 void cTeledyneFlirCameraModel_T1K::writeDataHeader()
 {
-//    mSerializer.writeActiveCameraId(mInstanceID, mpActiveCamera->cameraID());
-//    auto size = mpActiveCamera->getImageSize();
-//    mSerializer.writeImageSize(mInstanceID, size.width, size.height);
-//    mSerializer.writeFramesPerSecond(mInstanceID, mpActiveCamera->getFramesPerSeconds());
+    auto dev_id = device_id();
+
+    auto str = mCamera->modelName();
+    if (!str.empty())
+        mSerializer.writeModelName(dev_id, str);
+
+    str = mCamera->filter();
+    if (!str.empty())
+        mSerializer.writeFilter(dev_id, str);
+
+    str = mCamera->lens();
+    if (!str.empty())
+        mSerializer.writeLens(dev_id, str);
+
+    str = mCamera->serialNumber();
+    if (!str.empty())
+        mSerializer.writeSerialNumber(dev_id, str);
+
+    str = mCamera->programVersion();
+    if (!str.empty())
+        mSerializer.writeProgramVersion(dev_id, str);
+
+    str = mCamera->articleNumber();
+    if (!str.empty())
+        mSerializer.writeArticleNumber(dev_id, str);
+
+    str = mCamera->calibrationTitle();
+    if (!str.empty())
+        mSerializer.writeCalibrationTitle(dev_id, str);
+
+    str = mCamera->lensSerialNumber();
+    if (!str.empty())
+        mSerializer.writeLensSerialNumber(dev_id, str);
+
+    str = mCamera->arcFileVersion();
+    if (!str.empty())
+        mSerializer.writeArcFileVersion(dev_id, str);
+
+    str = mCamera->arcDateTime();
+    if (!str.empty())
+        mSerializer.writeArcDateTime(dev_id, str);
+
+    str = mCamera->arcSignature();
+    if (!str.empty())
+        mSerializer.writeArcSignature(dev_id, str);
+
+    str = mCamera->countryCode();
+    if (!str.empty())
+        mSerializer.writeCountryCode(dev_id, str);
+
+    mSerializer.writeFrameRate_Hz(dev_id, mFrameRate_fps);
+
+    if (mMinFrameRate_fps.has_value() && mMaxFrameRate_fps.has_value())
+        mSerializer.writeFrameRateRange_Hz(dev_id, mMinFrameRate_fps.value(), mMaxFrameRate_fps.value());
+
+    if (mMinThermalRange_K.has_value() && mMaxThermalRange_K.has_value())
+        mSerializer.writeThermalRange_K(dev_id, mMinThermalRange_K.value(), mMaxThermalRange_K.value());
+
+    auto fov = mCamera->getHorizonalFoV_deg();
+    if (fov.has_value())
+        mSerializer.writeHorizonalFoV_deg(dev_id, fov.value());
+    
+    auto fl = mCamera->getFocalLength();
+    if (fl.has_value())
+        mSerializer.writeFocalLength(dev_id, fl.value());
 }
 
 bool cTeledyneFlirCameraModel_T1K::startCommunications()
@@ -184,6 +254,8 @@ void cTeledyneFlirCameraModel_T1K::update()
                 auto color = mColorTable.getColor(i);
 
                 qRgb(color.red, color.green, color.blue);
+
+//                mColorizedImage.
 
                 //                mColorizedImage.setColor(i, )
                 //                QImage mColorizedImage;

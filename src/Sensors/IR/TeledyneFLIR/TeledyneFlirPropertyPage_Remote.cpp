@@ -108,21 +108,6 @@ void cTeledyneFlirPropertyPage_Remote::onMode(uint8_t mode)
 
 void cTeledyneFlirPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
 {
-	QString image_size = QString::number(width);
-	image_size += "x";
-	image_size += QString::number(height);
-
-	auto n = mpImageSizes->count();
-	for (int i = 0; i < n; ++i)
-	{
-		auto data = mpImageSizes->itemText(i);
-		if (0 == data.compare(image_size))
-		{
-			mDefaultImageSize = image_size;
-			mpImageSizes->setCurrentIndex(i);
-			break;
-		}
-	}
 }
 
 void cTeledyneFlirPropertyPage_Remote::onFrameRate(double fps)
@@ -206,13 +191,6 @@ void cTeledyneFlirPropertyPage_Remote::doApply()
 //	{
 //		sendSetCameraId(id);
 //	}
-
-	auto image_size = mpImageSizes->currentText();
-	if (image_size.compare(mDefaultImageSize) != 0)
-	{
-//BAF		auto is = teledyne::to_image_size(image_size.toStdString());
-//		sendSetImageSize(is.width, is.height);
-	}
 
 	uint8_t fps = mpFrameRate_fps->text().toInt();
 	if (mDefaultFrameRate_fps != fps)
