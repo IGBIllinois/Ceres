@@ -78,13 +78,13 @@ private:
 private:
     const int mCameraID;
 
-    QBuffer* mpImageBuffer;
-    QImageReader* mpImageReader;
-    QImage* mpCurrentImage;
+    QBuffer* mpImageBuffer = nullptr;
+    QImageReader* mpImageReader = nullptr;
+    QImage* mpCurrentImage = nullptr;
 
-    QNetworkAccessManager* mpDownloadManager;
-    QNetworkRequest* mpRequest;
-    QNetworkReply* mpReply;
+    QNetworkAccessManager* mpDownloadManager = nullptr;
+    QNetworkRequest* mpRequest = nullptr;
+    QNetworkReply* mpReply = nullptr;
     QByteArray  mNetworkData;
     QUrl mCurrentUrl;
     GrabbingState mCurrentState;

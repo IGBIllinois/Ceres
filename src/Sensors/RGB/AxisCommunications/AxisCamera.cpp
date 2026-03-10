@@ -14,10 +14,7 @@
 
 cAxisCamera::cAxisCamera(int id, QObject* parent)
 :
-    QObject(parent), mCameraID(id),
-    mpImageBuffer(nullptr), mpImageReader(nullptr), mpCurrentImage(nullptr),
-    mpDownloadManager(nullptr), mpRequest(nullptr), mpReply(nullptr)
-
+    QObject(parent), mCameraID(id)
 {
     mpImageReader = new QImageReader();
     mpImageReader->setAutoDetectImageFormat(true);
@@ -40,6 +37,8 @@ cAxisCamera::cAxisCamera(int id, QObject* parent)
 
 cAxisCamera::~cAxisCamera()
 {
+    delete mpImageReader;   mpImageReader = nullptr;
+    delete mpCurrentImage;  mpCurrentImage = nullptr;
 }
 
 
