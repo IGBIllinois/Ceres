@@ -22,9 +22,10 @@ namespace
     }
 }
 
+
 cTeledyneFlirCameraModel::cTeledyneFlirCameraModel(const std::string& name, QObject* parent)
 :
-    cIrCameraModel(name, parent), mColorizedImage(400, 600, QImage::Format::Format_RGB888)
+    cIrCameraModel(name, parent), mColorizedImage(640, 480, QImage::Format_RGB888)
 {
     mManufacturer = "Teledyne";
 }
@@ -93,8 +94,11 @@ bool cTeledyneFlirCameraModel::configure(const nlohmann::json& jsonCfg)
     else
         throw std::logic_error("Unknown \"mode\" entry!  Values can be \"photo\", \"time lapse\", or \"video\".");
 
-    setFrameInterval_ms(frame_interval_ms);
-    setFrameRate_Hz(frame_rate_fps);
+    if (frame_interval_ms > 0)
+        setFrameInterval_ms(frame_interval_ms);
+
+    if (frame_rate_fps > 0)
+        setFrameRate_Hz(frame_rate_fps);
 
     return cIrCameraModel::configure(jsonCfg);
 }
@@ -112,14 +116,17 @@ void cTeledyneFlirCameraModel::setMode(eMode mode)
         emit modeChanged(static_cast<int>(mMode));
 }
 
-double  cTeledyneFlirCameraModel::frameRate_Hz() const { return mFrameRate_fps; }
+double  cTeledyneFlirCameraModel::frameRate_Hz() const 
+{
+    return mFrameRate_fps; 
+}
 
 void cTeledyneFlirCameraModel::setFrameRate_Hz(double frame_rate_hz)
 {
     if (mMinFrameRate_fps.has_value())
     {
         if (frame_rate_hz < mMinFrameRate_fps.value())
-        frame_rate_hz = mMinFrameRate_fps.value();
+            frame_rate_hz = mMinFrameRate_fps.value();
     }
     else if (frame_rate_hz < 0)
         frame_rate_hz = 0;
@@ -172,12 +179,23 @@ void cTeledyneFlirCameraModel::requestImage()
     mImageRequested = true;
 }
 
+void cTeledyneFlirCameraModel::requestImages(bool auto_emit)
+{
+    mAutoEmitImages = auto_emit;
+}
+
 void cTeledyneFlirCameraModel::takePhoto(bool send_image)
 {
     if (mMode == eMode::SINGLE)
     {
         mPhotoRequested = true;
         mImageRequested = true;
+        mAutoEmitImages = false;
     }
+}
+
+const QImage& cTeledyneFlirCameraModel::getCurrentImage() const
+{
+    return mColorizedImage;
 }
 

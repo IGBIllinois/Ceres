@@ -44,11 +44,17 @@ protected:
     QLabel* mpModeLabel = nullptr;
     QComboBox* mpMode = nullptr;
 
+    QLabel* mpImageSizeLabel = nullptr;
+    QLineEdit* mpImageSize = nullptr;
+
     QLabel* mpFrameRateLabel = nullptr;
     QLineEdit* mpFrameRate_fps = nullptr;
 
     QLabel* mpFrameIntervalLabel = nullptr;
     QLineEdit* mpFrameInterval_s = nullptr;
+
+    QLabel* mpThermalRangeLabel = nullptr;
+    QLineEdit* mpThermalRange = nullptr;
 
     int  mDefaultFrameRate_fps = -1;
     int  mDefaultFrameInterval_s = -1;

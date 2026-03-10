@@ -11,6 +11,14 @@
 #include <memory>
 #include <optional>
 
+
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QByteArray;
+class QBuffer;
+class QImageReader;
+QT_END_NAMESPACE
+
 // Forward Declarations
 class cTeledyneFlirCamera;
 
@@ -57,6 +65,12 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
+    /*
+     * General accessors and control of basic camera functions
+     */
+    uint16_t maxImageWidth() const;
+    uint16_t maxImageHeight() const;
+
 public slots:
 
 protected slots:
@@ -83,4 +97,13 @@ private:
 private:
     const uint8_t mInstanceID;
 };
+
+
+/******************************************************************************
+ *  I M P L E M E N T A T I O N   D E T A I L S
+ *****************************************************************************/
+
+
+inline uint16_t cTeledyneFlirCameraModel_T1K::maxImageWidth() const { return mImageWidth; }
+inline uint16_t cTeledyneFlirCameraModel_T1K::maxImageHeight() const { return mImageHeight; }
 

@@ -48,7 +48,7 @@ void cTeledyneFlirStatusView::createWidgets()
 	mpGrabImage = new QPushButton("Grab Image", this);
 	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirStatusView::requestImage);
 
-//	mpImage = new cRgbImageWidget(this);
+	mpThermalImage = new cThermalImageWidget(this);
 }
 
 void cTeledyneFlirStatusView::doLayout()
@@ -81,7 +81,18 @@ void cTeledyneFlirStatusView::doLayout()
 
 	mainLayout->addWidget(infoBox);
 
+	mainLayout->addWidget(mpThermalImage, 1);
+
 	setLayout(mainLayout);
+}
+
+
+void cTeledyneFlirStatusView::onSensorNameChanging(QString old_name, QString new_name, QString instance)
+{
+	if (new_name.isEmpty())
+		return;
+
+	setWindowTitle(new_name);
 }
 
 void cTeledyneFlirStatusView::onModeChange(int mode)
@@ -111,13 +122,14 @@ void cTeledyneFlirStatusView::onImageSizeChange(int width, int height)
 
 void cTeledyneFlirStatusView::imageUpdated(const QImage& image)
 {
-//	mpImage->setImage(image);
+	mpThermalImage->setImage(image);
 
-//	if (!isHidden())
-//		mpImage->repaint();
+	if (!isHidden())
+		mpThermalImage->repaint();
 }
 
 void cTeledyneFlirStatusView::resizeEvent(QResizeEvent* e)
 {
 	cSensorStatusView::resizeEvent(e);
+	mpThermalImage->resizeImage(e->size().width(), e->size().height());
 }

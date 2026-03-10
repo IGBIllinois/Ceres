@@ -18,5 +18,8 @@ public:
 	cTeledyneFlirCameraView_T1K(cTeledyneFlirCameraModel_T1K* pModel, QWidget* parent = nullptr);
 	virtual ~cTeledyneFlirCameraView_T1K();
 
-	void initialize();
+	void initialize() override;
+
+private:
+	cTeledyneFlirCameraModel_T1K* mpModel = nullptr;
 };

@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../Sensors/SensorStatusView.hpp"
-//#include "RgbImageWidget.hpp"
+#include "ThermalImageWidget.hpp"
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -30,6 +30,7 @@ signals:
 	void requestImage();
 
 public slots:
+	void onSensorNameChanging(QString old_name, QString new_name, QString instance);
 	void onModeChange(int mode);
 	void onFrameIntervalChange(int interval_ms);
 	void onFrameRateChange(double rate_fps);
@@ -52,4 +53,6 @@ private:
 	QLineEdit* mpFrameRate_fps = nullptr;
 
 	QPushButton* mpGrabImage = nullptr;
+
+	cThermalImageWidget* mpThermalImage = nullptr;
 };

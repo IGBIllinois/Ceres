@@ -6,6 +6,7 @@
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
+class QPaintEvent;
 QT_END_NAMESPACE
 
 class cThermalImageWidget : public QWidget
@@ -16,12 +17,15 @@ public:
 	cThermalImageWidget(QWidget* parent = nullptr);
 	virtual ~cThermalImageWidget();
 
+	bool maintainingAspectRatio() const;
+	void maintainAspectRatio(bool enable);
+
 	const QImage& getImage() const;
 	void setImage(const QImage& image);
 
 	void resizeImage(int width, int height);
 
-protected:
+	void resizeEvent(QResizeEvent*) override;
 	void paintEvent(QPaintEvent* event) override;
 
 private:
@@ -29,4 +33,5 @@ private:
 	int mWindowHeight = -1;
 	int mWindowWidth = -1;
 	double mAspectRatio = 1.0;
+	bool mMaintainAspectRatio = false;
 };

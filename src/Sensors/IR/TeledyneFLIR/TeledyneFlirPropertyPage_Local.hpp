@@ -11,6 +11,7 @@
 
  // Forward Declaration
 class cTeledyneFlirCameraModel;
+class cTeledyneFlirCameraModel_T1K;
 
 
 class cTeledyneFlirPropertyPage_Local : public cTeledyneFlirPropertyPage
@@ -41,4 +42,17 @@ private:
     cTeledyneFlirCameraModel* mpModel;
 };
 
+
+class cTeledyneFlirPropertyPage_T1K_Local : public cTeledyneFlirPropertyPage_Local
+{
+public:
+    cTeledyneFlirPropertyPage_T1K_Local(cTeledyneFlirCameraModel_T1K* pModel, QWidget* parent = nullptr);
+    ~cTeledyneFlirPropertyPage_T1K_Local() = default;
+
+protected:
+    void showPage() override;
+
+private:
+    cTeledyneFlirCameraModel_T1K* mpModel;
+};
 

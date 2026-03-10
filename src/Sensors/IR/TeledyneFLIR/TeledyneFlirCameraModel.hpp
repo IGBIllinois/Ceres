@@ -45,6 +45,10 @@ public:
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
+    /*
+     * General accessors and control of basic camera functions
+     */
+
     eMode mode() const;
     virtual void setMode(eMode mode);
 
@@ -54,7 +58,12 @@ public:
     uint32_t frameInterval_ms() const;
     virtual void setFrameInterval_ms(uint32_t frame_interval_ms);
 
+    std::optional<float> minThermalValue_K() const;
+    std::optional<float> maxThermalValue_K() const;
+
     void takePhoto(bool send_image = false);
+
+    const QImage& getCurrentImage() const;
 
 signals:
     void onNewImage(const QImage& image);
@@ -66,6 +75,7 @@ signals:
 public slots:
     void requestMode(int mode);
     void requestImage();
+    void requestImages(bool auto_emit);
 
 protected:
     cTeledyneFlirCameraModel(const std::string& name, QObject* parent = nullptr);
@@ -92,6 +102,7 @@ protected:
     uint16_t mImageHeight = 0;
 
     bool mImageRequested = false;
+    bool mAutoEmitImages = false;
 
     nTeledyneAtlasConnect::cThermalImage mCurrentImage;
 
@@ -100,4 +111,13 @@ protected:
 
     cTeledyneFlirSerializer mSerializer;
 };
+
+
+/******************************************************************************
+ *  I M P L E M E N T A T I O N   D E T A I L S
+ *****************************************************************************/
+
+
+inline std::optional<float> cTeledyneFlirCameraModel::minThermalValue_K() const { return mMinThermalRange_K; }
+inline std::optional<float> cTeledyneFlirCameraModel::maxThermalValue_K() const { return mMaxThermalRange_K; }
 

@@ -9,7 +9,7 @@ cIrCameraView::cIrCameraView(QWidget* parent)
 :
     QAbstractScrollArea(parent)
 {
-    mpImage = new cThermalImageWidget(this);
+    mpThermalImage = new cThermalImageWidget(this);
 }
 
 cIrCameraView::~cIrCameraView()
@@ -54,9 +54,4 @@ void cIrCameraView::topLevelChanged(bool topLevel)
     }
 }
 
-void cIrCameraView::resizeEvent(QResizeEvent* e)
-{
-    QAbstractScrollArea::resizeEvent(e);
-    mpImage->resizeImage(e->size().width(), e->size().height());
-}
 

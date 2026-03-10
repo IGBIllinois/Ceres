@@ -24,14 +24,13 @@ public slots:
 public slots:
 	void dockLocationChanged(Qt::DockWidgetArea area);
 	void topLevelChanged(bool topLevel);
-	void resizeEvent(QResizeEvent*) override;
 
 private:
 	virtual void setFloatingSize();
 	virtual void setDockedSize();
 
 protected:
-	cThermalImageWidget* mpImage = nullptr;
+	cThermalImageWidget* mpThermalImage = nullptr;
 
 private:
 	cColorGradient mColorGradient;

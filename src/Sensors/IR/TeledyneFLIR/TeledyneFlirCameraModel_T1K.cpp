@@ -5,6 +5,9 @@
 
 #include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
 
+#include <QBuffer>
+#include <QImageReader>
+
 #define USE_LOG_MESSAGE
 
 
@@ -57,10 +60,18 @@ uint8_t cTeledyneFlirCameraModel_T1K::device_id() const
 
 void cTeledyneFlirCameraModel_T1K::updateViews()
 {
+    emit sensorStatusChanging(q_name(), q_instance(), getStatus());
+
+    emit modeChanged(static_cast<int>(mMode));
+    emit frameIntervalChanged(mFrameInterval_ms);
+    emit frameRateChanged(mFrameRate_fps);
+    emit imageSizeChanged(mImageWidth, mImageHeight);
 }
 
 bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)
 {
+    updateName(mCamera->modelName());
+
     bool result = cTeledyneFlirCameraModel::configure(jsonCfg);
 
     size_t buffer_size = mImageHeight * mImageWidth * sizeof(double);
@@ -190,7 +201,10 @@ bool cTeledyneFlirCameraModel_T1K::updateFrameInterval(uint32_t frame_interval_m
 
 bool cTeledyneFlirCameraModel_T1K::updateFrameRate(double frame_rate_fps)
 {
-    return true;
+    if (frame_rate_fps == mFrameRate_fps)
+        return true;
+
+    return mCamera->setFrameRate_Hz(frame_rate_fps);
 }
 
 void cTeledyneFlirCameraModel_T1K::update()
@@ -242,25 +256,31 @@ void cTeledyneFlirCameraModel_T1K::update()
 
     if (newData)
     {
-        if (mSerializer)
+        if (mIsRecording && static_cast<bool>(mSerializer))
         {
             mSerializer.writeThermalImage(mInstanceID, mCurrentImage);
         }
 
-        if (mImageRequested)
+        if (mImageRequested || mAutoEmitImages)
         {
-            for (std::size_t i = 0; i < mCurrentImage.size(); ++i)
+            mColorizedImage = QImage(mCurrentImage.width(), mCurrentImage.height(), QImage::Format_RGB888);
+
+            // Access raw pixel data
+            uchar* image_data = mColorizedImage.bits();
+            int bytesPerLine = mColorizedImage.bytesPerLine();
+
+            for (uint i = 0; i < mCurrentImage.size(); ++i)
             {
-                auto color = mColorTable.getColor(i);
+                auto color = mColorTable.getColor(mCurrentImage[i]);
 
-                qRgb(color.red, color.green, color.blue);
-
-//                mColorizedImage.
-
-                //                mColorizedImage.setColor(i, )
-                //                QImage mColorizedImage;
+                uchar* pixel = &image_data[i * 3];
+                pixel[0] = color.red;
+                pixel[1] = color.green;
+                pixel[2] = color.blue;
             }
 
+            emit onNewImage(mColorizedImage);
+            mImageRequested = false;
         }
     }
 }

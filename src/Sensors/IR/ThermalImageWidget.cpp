@@ -9,11 +9,24 @@ cThermalImageWidget::cThermalImageWidget(QWidget* parent)
 :
     QWidget(parent)
 {
+    setAutoFillBackground(true);
+    setBackgroundRole(QPalette::ColorRole::Base);
 }
 
 cThermalImageWidget::~cThermalImageWidget()
 {
 }
+
+bool cThermalImageWidget::maintainingAspectRatio() const
+{
+    return mMaintainAspectRatio;
+}
+
+void cThermalImageWidget::maintainAspectRatio(bool enable)
+{
+    mMaintainAspectRatio = enable;
+}
+
 
 const QImage& cThermalImageWidget::getImage() const
 {
@@ -32,8 +45,17 @@ void cThermalImageWidget::resizeImage(int width, int height)
     mWindowHeight = height;
 }
 
+void cThermalImageWidget::resizeEvent(QResizeEvent* e)
+{
+    QWidget::resizeEvent(e);
+    resizeImage(e->size().width(), e->size().height());
+}
+
 void cThermalImageWidget::paintEvent(QPaintEvent* event)
 {
+    QWidget::paintEvent(event);
+
+    auto* engine = paintEngine();
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -41,18 +63,20 @@ void cThermalImageWidget::paintEvent(QPaintEvent* event)
     {
         QRect rect(0, 0, mWindowWidth, mWindowHeight);
 
-        int w = mWindowHeight * mAspectRatio;
-        int h = mWindowWidth / mAspectRatio;
-
-        if (w < mWindowWidth)
+        if (mMaintainAspectRatio)
         {
-            rect.setWidth(w);
-        }
-        else if (h < mWindowHeight)
-        {
-            rect.setHeight(h);
-        }
+            int w = mWindowHeight * mAspectRatio;
+            int h = mWindowWidth / mAspectRatio;
 
+            if (w < mWindowWidth)
+            {
+                rect.setWidth(w);
+            }
+            else if (h < mWindowHeight)
+            {
+                rect.setHeight(h);
+            }
+        }
 
         painter.drawImage(rect, mCurrentImage);
     }

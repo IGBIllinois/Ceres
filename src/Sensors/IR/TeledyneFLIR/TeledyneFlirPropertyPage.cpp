@@ -22,11 +22,19 @@ void cTeledyneFlirPropertyPage::createWidgets()
 	mpMode->addItem("Time Lapse");
 	mpMode->addItem("Video");
 
+	mpImageSizeLabel = new QLabel("Image Size (w x d):", this);
+	mpImageSize = new QLineEdit(this);
+	mpImageSize->setReadOnly(true);
+
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
 
 	mpFrameIntervalLabel = new QLabel("Frame Interval (s):", this);;
 	mpFrameInterval_s = new QLineEdit(this);
+
+	mpThermalRangeLabel = new QLabel("Thermal Range (K):", this);
+	mpThermalRange = new QLineEdit(this);
+	mpThermalRange->setReadOnly(true);
 
 	mpGrabImage = new QPushButton("Grab Image", this);
 	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirPropertyPage::requestImage);
@@ -44,20 +52,14 @@ void cTeledyneFlirPropertyPage::doLayout()
 {
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
 
-	auto* idLayout = new QHBoxLayout();
-	idLayout->addWidget(mpModeLabel);
-	idLayout->addWidget(mpMode);
-	pMainLayout->addLayout(idLayout);
+	auto* pLayout = new QFormLayout();
 
-	auto* frLayout = new QHBoxLayout();
-	frLayout->addWidget(mpFrameRateLabel);
-	frLayout->addWidget(mpFrameRate_fps);
-	pMainLayout->addLayout(frLayout);
-
-	auto* fiLayout = new QHBoxLayout();
-	fiLayout->addWidget(mpFrameIntervalLabel);
-	fiLayout->addWidget(mpFrameInterval_s);
-	pMainLayout->addLayout(fiLayout);
+	pLayout->addRow(mpModeLabel, mpMode);
+	pLayout->addRow(mpImageSizeLabel, mpImageSize);
+	pLayout->addRow(mpFrameRateLabel, mpFrameRate_fps);
+	pLayout->addRow(mpFrameIntervalLabel, mpFrameInterval_s);
+	pLayout->addRow(mpThermalRangeLabel, mpThermalRange);
+	pMainLayout->addLayout(pLayout);
 
 	pMainLayout->addWidget(mpGrabImage);
 	pMainLayout->addSpacing(10);

@@ -60,10 +60,14 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         pView->doLayout();
 
         QObject::connect(pModel, &cSensorModel::sensorStatusChanging, pView, &cSensorStatusView::onSensorStatusChange);
+        QObject::connect(pModel, &cSensorModel::sensorNameChanging, pView, &cTeledyneFlirStatusView::onSensorNameChanging);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::modeChanged, pView, &cTeledyneFlirStatusView::onModeChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::frameIntervalChanged, pView, &cTeledyneFlirStatusView::onFrameIntervalChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::frameRateChanged, pView, &cTeledyneFlirStatusView::onFrameRateChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::imageSizeChanged, pView, &cTeledyneFlirStatusView::onImageSizeChange);
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::onNewImage, pView, &cTeledyneFlirStatusView::imageUpdated);
+
+        QObject::connect(pView, &cTeledyneFlirStatusView::requestImage, pModel, &cTeledyneFlirCameraModel::requestImage);
 
         auto* pController = new cTeledyneFlirController_T1K(pModel);
         return sSensorWidgets(pModel, pController, pView);
@@ -78,12 +82,15 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
     QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cTeledyneFlirCameraView::dockLocationChanged);
     QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cTeledyneFlirCameraView::topLevelChanged);
 
-//    QObject::connect(pModel, &cAxisCommunicationsModel_F44::enableCamera, pView, &cAxisCommunicationsView_F44::enableCamera);
+    QObject::connect(pModel, &cTeledyneFlirCameraModel::sensorNameChanging, pView, &cTeledyneFlirCameraView::onSensorNameChanging);
+    QObject::connect(pModel, &cTeledyneFlirCameraModel::modeChanged, pView, &cTeledyneFlirCameraView::onModeChange);
+    QObject::connect(pModel, &cTeledyneFlirCameraModel::imageSizeChanged, pView, &cTeledyneFlirCameraView::onImageSizeChange);
     QObject::connect(pModel, &cTeledyneFlirCameraModel::onNewImage, pView, &cTeledyneFlirCameraView::imageUpdated);
 
-//    QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
+    QObject::connect(pView, &cTeledyneFlirCameraView::requestImage, pModel, &cTeledyneFlirCameraModel::requestImage);
+    QObject::connect(pView, &cTeledyneFlirCameraView::requestImages, pModel, &cTeledyneFlirCameraModel::requestImages);
 
-    auto page = new cTeledyneFlirPropertyPage_Local(pModel);
+    auto page = new cTeledyneFlirPropertyPage_T1K_Local(pModel);
 
     return sSensorWidgets(pModel, dockWidget, page);
 }
