@@ -21,7 +21,7 @@ class cExperimentStateMachine : public QObject
     Q_OBJECT
 
 public:
-	virtual ~cExperimentStateMachine() = default;
+	virtual ~cExperimentStateMachine();
 
     void addStateCreator(cExperimentStateCreator* pCreator);
     void removeStateCreator(cExperimentStateCreator* pCreator);

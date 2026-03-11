@@ -48,6 +48,29 @@ cExperimentStateMachine::cExperimentStateMachine(QObject* parent)
     qRegisterMetaType<experiment::eState>();
 }
 
+cExperimentStateMachine::~cExperimentStateMachine()
+{
+    mStateCreators.clear();
+
+    std::lock_guard<std::mutex> lock{ mPendingDeleteMutex };
+
+    for (std::size_t i = 0; i < mExperimentStates.size(); ++i)
+    {
+        mPendingDelete.emplace_back(mExperimentStates[i]);
+        mExperimentStates[i] = nullptr;
+    }
+
+    mExperimentStates.clear();
+
+    for (auto state : mPendingDelete)
+    {
+        delete state;
+    }
+
+    mPendingDelete.clear();
+}
+
+
 bool cExperimentStateMachine::inBatchMode() const
 {
     return mBatchMode;
