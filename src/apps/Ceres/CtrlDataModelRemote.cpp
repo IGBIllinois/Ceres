@@ -59,7 +59,7 @@ cCtrlDataModelRemote::~cCtrlDataModelRemote()
         
     stopDataThread();
 
-    mStateCreators.clear();
+//    mStateCreators.clear();
 
     for (auto* page : mPropertyPages)
     {
@@ -575,7 +575,7 @@ void cCtrlDataModelRemote::disconnected()
 
     for (auto* page : mPropertyPages)
     {
-        emit removeSensorPropertyPage(page->showAction());
+        removeSensorPropertyPage(page);
         page->deleteLater();
     }
     mPropertyPages.clear();
@@ -749,15 +749,7 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     connect(page, &cSensorPropertyPage::statusMessage, this, &cDataModel::statusMessage);
     mPropertyPages.push_back(page);
 
-    emit addSensorPropertyPage(page->showAction());
-
-    cExperimentStateCreator* creator = dynamic_cast<cExperimentStateCreator*>(page);
-
-    if (creator)
-    {
-        mStateCreators.push_back(creator);
-        mThread.mpController->addStateCreator(creator);
-    }
+    addSensorPropertyPage(page);
 }
 
 void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor,
@@ -784,15 +776,7 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     connect(page, &cSensorPropertyPage::statusMessage, this, &cDataModel::statusMessage);
     mPropertyPages.push_back(page);
 
-    emit addSensorPropertyPage(page->showAction());
-
-    cExperimentStateCreator* creator = dynamic_cast<cExperimentStateCreator*>(page);
-
-    if (creator)
-    {
-        mStateCreators.push_back(creator);
-        mThread.mpController->addStateCreator(creator);
-    }
+    addSensorPropertyPage(page);
 }
 
 void cCtrlDataModelRemote::onUnknownID(uint16_t id)

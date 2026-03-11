@@ -1,6 +1,7 @@
 
 #include "CtrlDataModel.hpp"
 #include "SensorModel.hpp"
+#include "SensorPropertyPage.hpp"
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 
@@ -102,12 +103,32 @@ void cCtrlDataModel::addSensor(cSensorModel* pSensor)
 
 void cCtrlDataModel::addSensorPropertyPage(cSensorPropertyPage* pPage)
 {
-    //TODO
+    if (!pPage) return;
+
+    emit connectToSensorMenu(pPage->showAction());
+
+    cExperimentStateCreator* creator = dynamic_cast<cExperimentStateCreator*>(pPage);
+
+    if (creator)
+    {
+//        mStateCreators.push_back(creator);
+        mThread.mpController->addStateCreator(creator);
+    }
 }
 
 void cCtrlDataModel::removeSensorPropertyPage(cSensorPropertyPage* pPage)
 {
-    //TODO
+    if (!pPage) return;
+
+    emit disconnectFromSensorMenu(pPage->showAction());
+
+    cExperimentStateCreator* creator = dynamic_cast<cExperimentStateCreator*>(pPage);
+
+    if (creator)
+    {
+//        mStateCreators.push_back(creator);
+        mThread.mpController->removeStateCreator(creator);
+    }
 }
 
 void cCtrlDataModel::startDataThread()

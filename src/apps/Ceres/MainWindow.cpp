@@ -868,11 +868,6 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         QObject::connect(pModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
         QObject::connect(pModel, &cDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-        QObject::connect(pModel, &cCtrlDataModelRemote::addSensorPropertyPage,
-                        this, &cMainWindow::addSensorPropertyPage);
-        QObject::connect(pModel, &cCtrlDataModelRemote::removeSensorPropertyPage,
-                        this, &cMainWindow::removeSensorPropertyPage);
-
         auto* dockWidget = new QDockWidget();
         pModel->createView(dockWidget);
 
@@ -892,6 +887,10 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 
         mpModel = pModel;
     }
+
+
+    QObject::connect(mpModel, &cCtrlDataModel::connectToSensorMenu, this, &cMainWindow::addSensorPropertyPage);
+    QObject::connect(mpModel, &cCtrlDataModel::disconnectFromSensorMenu, this, &cMainWindow::removeSensorPropertyPage);
 
     QObject::connect(mpModel, &cCtrlDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
     QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
@@ -1102,7 +1101,8 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
         {
             widgets.pPropertyPage->createWidgets();
             widgets.pPropertyPage->doLayout();
-            mpSensorMenu->addAction(widgets.pPropertyPage->showAction());
+
+            mpModel->addSensorPropertyPage(widgets.pPropertyPage);
         }
     }
 }

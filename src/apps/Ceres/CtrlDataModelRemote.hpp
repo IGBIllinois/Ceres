@@ -22,6 +22,7 @@ class QAction;
 class QDockWidget;
 QT_END_NAMESPACE
 
+// Forward Declarations
 class cRemoteClientView;
 class cSensorPropertyPage;
 class cExperimentStateCreator;
@@ -71,10 +72,6 @@ protected:
 protected:
     void dataRecordingStateChange(bool record) override;
     void endDataRecording() override;
-
-signals:
-    void addSensorPropertyPage(QAction* pAction);
-    void removeSensorPropertyPage(QAction* pAction);
 
 public slots:
     void updatePosition(spidercam::sPosition_1_t pos);
@@ -166,7 +163,6 @@ private:
     QByteArray mReplyBuffer;
 
     std::vector<cSensorPropertyPage*>     mPropertyPages;
-    std::vector<cExperimentStateCreator*> mStateCreators;
 };
 
 

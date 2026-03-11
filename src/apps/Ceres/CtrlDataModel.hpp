@@ -15,6 +15,11 @@
 
 #include <nlohmann/json.hpp>
 
+// Qt Forward Declaration
+QT_BEGIN_NAMESPACE
+class QAction;
+QT_END_NAMESPACE
+
 // Forward Declarations
 class cExperimentControlModel;
 class cSensorModel;
@@ -79,6 +84,9 @@ public:
     void terminateExperiment();
 
 signals:
+    void connectToSensorMenu(QAction* pAction);
+    void disconnectFromSensorMenu(QAction* pAction);
+
     void experimentTerminated();
     void experimentCompleted();
 
@@ -118,7 +126,7 @@ protected:
 
     cCtrlDataThread mThread;
 
-    std::vector<cSensorPropertyPage*> mPropertyPages;
+//    std::vector<cExperimentStateCreator*> mStateCreators;
 
 private:
     void doMeasurementCleanup();
