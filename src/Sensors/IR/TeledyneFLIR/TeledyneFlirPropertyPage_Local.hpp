@@ -21,6 +21,9 @@ public:
     cTeledyneFlirPropertyPage_Local(cTeledyneFlirCameraModel* pModel, QWidget* parent = nullptr);
     ~cTeledyneFlirPropertyPage_Local() = default;
 
+public:
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
+
 protected:
     void requestImage() override;
 

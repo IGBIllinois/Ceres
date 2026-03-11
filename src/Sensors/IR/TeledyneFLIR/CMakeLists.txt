@@ -49,8 +49,15 @@ set(TELEDYNE_FLIR_SOURCE_FILES
     TeledyneFlirController.hpp
     TeledyneFlirController.cpp
 
+
 #
-# Teledyne FLIR Video Cameras
+# Teledyne FLIR Experiment State Files
+#
+	TeledyneFlirExperimentStates.hpp
+	TeledyneFlirExperimentStates.cpp
+
+#
+# Teledyne FLIR Cameras General Files
 #
 	TeledyneFlirCameraView.hpp
 	TeledyneFlirCameraView.cpp

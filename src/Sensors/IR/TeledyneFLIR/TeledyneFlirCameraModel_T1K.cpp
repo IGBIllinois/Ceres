@@ -232,6 +232,7 @@ void cTeledyneFlirCameraModel_T1K::update()
                 mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
                 newData = true;
                 mPhotoRequested = false;
+                emit photoTaken();
             }
         }
         break;

@@ -52,15 +52,18 @@ int flir::encode_query_frame_interval(net_buffer& buffer)
     return encode_query(eQUERY_FRAME_INTERVAL, buffer);
 }
 
+int flir::encode_query_thermal_range(net_buffer& buffer)
+{
+    return encode_query(eQUERY_THERMAL_RANGE, buffer);
+}
+
 int flir::encode_grab_image(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::GRAB_IMAGE);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::GRAB_IMAGE);
     hdr.revision = 1;
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
-
-    buffer << hdr;
 
     return sizeof(sPacketHeader_t) + hdr.length;
 }
@@ -137,7 +140,7 @@ int flir::encode_frame_rate(double fps, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAMES_PER_SECOND);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAME_RATE_HZ);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -163,7 +166,38 @@ int flir::encode_frame_interval(uint32_t interval_ms, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAMES_INTERVAL_MS);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAME_INTERVAL_MS);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+flir::sThermalRange flir::to_thermal_range_t(const teledyne_ThermalRangeMessage_1& pckt)
+{
+    sThermalRange range;
+
+    range.min_thermal_value_K = pckt.min_thermal_value_k();
+    range.max_thermal_value_K = pckt.max_thermal_value_k();
+
+    return range;
+}
+int flir::encode_thermal_range(float min_value_K, float max_value_K, net_buffer& buffer)
+{
+    teledyne_ThermalRangeMessage_1 pckt;
+
+    pckt.set_min_thermal_value_k(min_value_K);
+    pckt.set_max_thermal_value_k(max_value_K);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::THERMAL_RANGE_K);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -192,11 +226,18 @@ flir::sCurrentState flir::to_current_state_t(const teledyne_StateMessage_1& pckt
     if (pckt.has_max_frames_per_second())
         state.max_frames_per_second = pckt.max_frames_per_second();
 
+    if (pckt.has_min_thermal_value_k())
+        state.min_thermal_value_K = pckt.min_thermal_value_k();
+
+    if (pckt.has_max_thermal_value_k())
+        state.max_thermal_value_K = pckt.max_thermal_value_k();
+
     return state;
 }
 
 int flir::encode_current_state(bool valid, uint8_t mode, uint16_t width, uint16_t height, 
-    double fps, uint32_t interval_ms, std::optional<double> min_fps, std::optional<double> max_fps, net_buffer& buffer)
+    double fps, uint32_t interval_ms, std::optional<double> min_fps, std::optional<double> max_fps, 
+    std::optional<float> min_K, std::optional<float> max_K, net_buffer& buffer)
 {
     teledyne_StateMessage_1 pckt;
 
@@ -213,6 +254,12 @@ int flir::encode_current_state(bool valid, uint8_t mode, uint16_t width, uint16_
     if (max_fps.has_value())
         pckt.set_max_frames_per_second(max_fps.value());
 
+    if (min_K.has_value())
+        pckt.set_min_thermal_value_k(min_K.value());
+
+    if (max_K.has_value())
+        pckt.set_max_thermal_value_k(max_K.value());
+
     std::string str;
     pckt.SerializeToString(&str);
 
@@ -228,5 +275,109 @@ int flir::encode_current_state(bool valid, uint8_t mode, uint16_t width, uint16_
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+bool flir::to_take_photo_t(const teledyne_TakePhoto_1& pckt)
+{
+    return pckt.update_view();
+}
 
+int flir::encode_take_photo(bool update_view, net_buffer& buffer)
+{
+    teledyne_TakePhoto_1 pckt;
+
+    pckt.set_update_view(update_view);
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::TAKE_PHOTO);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+flir::eReply flir::to_reply_t(const teledyne_Reply_1& pckt)
+{
+    switch (pckt.reply())
+    {
+    case eReply_FAILED: return eReply::FAILED;
+    case eReply_ABORTED: return eReply::ABORTED;
+    case eReply_PENDING: return eReply::PENDING;
+    }
+
+    return eReply::GOOD;
+}
+
+int encode_reply(flir::eReply reply, flir::ePacketType packet_type, net_buffer& buffer)
+{
+    teledyne_Reply_1 pckt;
+
+    switch (reply)
+    {
+    default:
+    case flir::eReply::GOOD:
+        pckt.set_reply(eReply_GOOD);
+        break;
+    case flir::eReply::FAILED:
+        pckt.set_reply(eReply_FAILED);
+        break;
+    case flir::eReply::ABORTED:
+        pckt.set_reply(eReply_ABORTED);
+        break;
+    case flir::eReply::PENDING:
+        pckt.set_reply(eReply_PENDING);
+        break;
+    }
+
+    std::string str;
+    pckt.SerializeToString(&str);
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(packet_type);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+/*
+int flir::encode_camera_mode_reply(eReply reply, net_buffer& buffer)
+{
+    return encode_reply(reply, flir::ePacketType::CAMERA_MODE_REPLY, buffer);
+}
+
+int flir::encode_image_size_reply(eReply reply, net_buffer& buffer)
+{
+    return encode_reply(reply, flir::ePacketType::IMAGE_SIZE_REPLY, buffer);
+}
+
+int flir::encode_frame_rate_reply(eReply reply, net_buffer& buffer)
+{
+    return encode_reply(reply, flir::ePacketType::FRAME_RATE_REPLY, buffer);
+}
+
+int flir::encode_frame_interval_reply(eReply reply, net_buffer& buffer)
+{
+    return encode_reply(reply, flir::ePacketType::FRAME_INTERVAL_REPLY, buffer);
+}
+
+int flir::encode_thermal_range_reply(eReply reply, net_buffer& buffer)
+{
+    return encode_reply(reply, flir::ePacketType::THERMAL_RANGE_REPLY, buffer);
+}
+*/
+
+int flir::encode_take_photo_reply(eReply reply, net_buffer& buffer)
+{
+    return encode_reply(reply, flir::ePacketType::TAKE_PHOTO_REPLY, buffer);
+}
 

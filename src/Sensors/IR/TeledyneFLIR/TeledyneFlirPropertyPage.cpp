@@ -69,8 +69,4 @@ void cTeledyneFlirPropertyPage::doLayout()
 	setLayout(pMainLayout);
 }
 
-cExperimentState* cTeledyneFlirPropertyPage::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
-{
-	return nullptr;
-}
 

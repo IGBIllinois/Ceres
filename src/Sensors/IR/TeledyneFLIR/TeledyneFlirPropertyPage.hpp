@@ -34,9 +34,6 @@ public:
     
     void doLayout() override;
 
-public:
-    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
-
 protected slots:
     virtual void requestImage() = 0;
 

@@ -70,6 +70,9 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         QObject::connect(pView, &cTeledyneFlirStatusView::requestImage, pModel, &cTeledyneFlirCameraModel::requestImage);
 
         auto* pController = new cTeledyneFlirController_T1K(pModel);
+
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::photoTaken, pController, &cTeledyneFlirController_T1K::onPhotoTaken);
+
         return sSensorWidgets(pModel, pController, pView);
     }
 

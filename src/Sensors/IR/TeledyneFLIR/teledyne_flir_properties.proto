@@ -8,7 +8,7 @@ syntax = "proto3";
 
 
 /******************************************************************************
- * Property Page <-> Sensor Controller
+ * Enums used in various messages
  *****************************************************************************/
 
 enum teledyne_eQuery 
@@ -19,7 +19,21 @@ enum teledyne_eQuery
   eQUERY_IMAGE_SIZE = 3;
   eQUERY_FRAME_RATE = 4;
   eQUERY_FRAME_INTERVAL = 5;
+  eQUERY_THERMAL_RANGE = 6;
 }
+
+ enum teledyne_eReply
+{
+    eReply_GOOD = 0;
+    eReply_FAILED = 1;
+    eReply_ABORTED = 2;
+    eReply_PENDING = 3;
+}
+
+
+/******************************************************************************
+ * Property Page <-> Sensor Controller
+ *****************************************************************************/
 
 message teledyne_QueryMessage_1 
 {
@@ -47,6 +61,27 @@ message teledyne_FrameIntervalMessage_1
 	uint32 frames_interval_ms = 1;
 }
 
+message teledyne_ThermalRangeMessage_1 
+{
+	float min_thermal_value_K = 1;
+	float max_thermal_value_K = 2;
+}
+
+
+/******************************************************************************
+ * Property Page -> Sensor Controller
+ *****************************************************************************/
+
+ message teledyne_TakePhoto_1 
+{
+	bool update_view = 1;
+}
+
+
+/******************************************************************************
+ * Sensor Controller -> Property Page
+ *****************************************************************************/
+
 message teledyne_StateMessage_1 
 {
 	bool   valid = 1;
@@ -57,6 +92,13 @@ message teledyne_StateMessage_1
     uint32 frames_interval_ms = 6;
     optional double min_frames_per_second = 7;
     optional double max_frames_per_second = 8;
+    optional float min_thermal_value_K = 9;
+    optional float max_thermal_value_K = 10;
+}
+
+message teledyne_Reply_1 
+{
+	teledyne_eReply reply = 1;
 }
 
 

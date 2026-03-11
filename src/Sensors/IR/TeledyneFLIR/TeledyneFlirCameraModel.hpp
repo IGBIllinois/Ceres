@@ -58,15 +58,20 @@ public:
     uint32_t frameInterval_ms() const;
     virtual void setFrameInterval_ms(uint32_t frame_interval_ms);
 
+    std::optional<double> minFrameRate_fps() const;
+    std::optional<double> maxFrameRate_fps() const;
+
     std::optional<float> minThermalValue_K() const;
     std::optional<float> maxThermalValue_K() const;
 
-    void takePhoto(bool send_image = false);
+    uint16_t imageWidth() const;
+    uint16_t imageHeight() const;
 
     const QImage& getCurrentImage() const;
 
 signals:
     void onNewImage(const QImage& image);
+    void photoTaken();
     void modeChanged(int mode);
     void frameIntervalChanged(int interval_ms);
     void frameRateChanged(double rate_fps);
@@ -74,8 +79,12 @@ signals:
 
 public slots:
     void requestMode(int mode);
+    void requestFrameRate_Hz(double frame_rate_hz);
+    void requestFrameInterval_ms(uint32_t frame_interval_ms);
     void requestImage();
     void requestImages(bool auto_emit);
+
+    void takePhoto(bool update_view = false);
 
 protected:
     cTeledyneFlirCameraModel(const std::string& name, QObject* parent = nullptr);
@@ -117,7 +126,11 @@ protected:
  *  I M P L E M E N T A T I O N   D E T A I L S
  *****************************************************************************/
 
+inline std::optional<double> cTeledyneFlirCameraModel::minFrameRate_fps() const { return mMinFrameRate_fps; }
+inline std::optional<double> cTeledyneFlirCameraModel::maxFrameRate_fps() const { return mMaxFrameRate_fps; }
 
 inline std::optional<float> cTeledyneFlirCameraModel::minThermalValue_K() const { return mMinThermalRange_K; }
 inline std::optional<float> cTeledyneFlirCameraModel::maxThermalValue_K() const { return mMaxThermalRange_K; }
 
+inline uint16_t cTeledyneFlirCameraModel::imageWidth() const { return mImageWidth; }
+inline uint16_t cTeledyneFlirCameraModel::imageHeight() const { return mImageHeight; }

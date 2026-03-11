@@ -4,6 +4,8 @@
 #include "TeledyneFlirCameraModel.hpp"
 #include "TeledyneFlirCameraModel_T1K.hpp"
 #include "TeledyneFlirUtils.hpp"
+#include "TeledyneFlirExperimentStates.hpp"
+#include "StringUtils.hpp"
 
 #include <QString>
 #include <QLineEdit>
@@ -20,6 +22,48 @@ cTeledyneFlirPropertyPage_Local::cTeledyneFlirPropertyPage_Local(cTeledyneFlirCa
 	: cTeledyneFlirPropertyPage(parent), mpModel(pModel)
 {
 	assert(mpModel);
+}
+
+cExperimentState* cTeledyneFlirPropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
+{
+	if (nStringUtils::iequal(type, "Teledyne FLIR"))
+	{
+		std::string cmd = entry["command"];
+
+		if (cmd == "configure")
+		{
+			auto* pState = new cTeledyneFlirCamera_Configure_Local(mpModel, parent);
+
+			QObject::connect(pState, &cTeledyneFlirCamera_Configure_Local::requestMode,				mpModel, &cTeledyneFlirCameraModel::requestMode);
+			QObject::connect(pState, &cTeledyneFlirCamera_Configure_Local::requestFrameRate_Hz,		mpModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
+			QObject::connect(pState, &cTeledyneFlirCamera_Configure_Local::requestFrameInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestFrameInterval_ms);
+
+			QObject::connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,			pState, &cTeledyneFlirCamera_Configure_Local::modeChanged);
+			QObject::connect(mpModel, &cTeledyneFlirCameraModel::frameIntervalChanged,	pState, &cTeledyneFlirCamera_Configure_Local::frameIntervalChanged);
+			QObject::connect(mpModel, &cTeledyneFlirCameraModel::frameRateChanged,		pState, &cTeledyneFlirCamera_Configure_Local::frameRateChanged);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if (cmd == "take photo")
+		{
+			auto* pState = new cTeledyneFlirCamera_TakePhoto_Local(mpModel, parent);
+
+			QObject::connect(pState, &cTeledyneFlirCamera_TakePhoto_Local::takePhoto, mpModel, &cTeledyneFlirCameraModel::takePhoto);
+			QObject::connect(pState, &cTeledyneFlirCamera_TakePhoto_Local::updateView, mpModel, &cTeledyneFlirCameraModel::requestImage);
+			QObject::connect(mpModel, &cTeledyneFlirCameraModel::photoTaken, pState, &cTeledyneFlirCamera_TakePhoto_Local::onPhotoTaken);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+	}
+
+	return nullptr;
 }
 
 void cTeledyneFlirPropertyPage_Local::createWidgets()

@@ -168,11 +168,24 @@ void cTeledyneFlirCameraModel::setFrameInterval_ms(uint32_t frame_interval_ms)
 
 void cTeledyneFlirCameraModel::requestMode(int mode)
 {
-    if ((mode < eMode::SINGLE) || (mode > eMode::CONTINUOUS))
-        return;
+    if ((mode >= eMode::SINGLE) && (mode <= eMode::CONTINUOUS))
+        setMode(static_cast<eMode>(mode));
 
-    setMode(static_cast<eMode>(mode));
+    emit modeChanged(static_cast<int>(mMode));
 }
+
+void cTeledyneFlirCameraModel::requestFrameRate_Hz(double frame_rate_hz)
+{
+    setFrameRate_Hz(frame_rate_hz);
+    emit frameRateChanged(mFrameRate_fps);
+}
+
+void cTeledyneFlirCameraModel::requestFrameInterval_ms(uint32_t frame_interval_ms)
+{
+    setFrameInterval_ms(frame_interval_ms);
+    emit frameIntervalChanged(mFrameInterval_ms);
+}
+
 
 void cTeledyneFlirCameraModel::requestImage()
 {
@@ -184,12 +197,12 @@ void cTeledyneFlirCameraModel::requestImages(bool auto_emit)
     mAutoEmitImages = auto_emit;
 }
 
-void cTeledyneFlirCameraModel::takePhoto(bool send_image)
+void cTeledyneFlirCameraModel::takePhoto(bool update_view)
 {
     if (mMode == eMode::SINGLE)
     {
         mPhotoRequested = true;
-        mImageRequested = true;
+        mImageRequested = update_view;
         mAutoEmitImages = false;
     }
 }

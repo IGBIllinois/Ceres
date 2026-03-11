@@ -9,11 +9,14 @@ cTeledyneFlirControllerNetEncoder::cTeledyneFlirControllerNetEncoder(std::size_t
     : cNetworkEncoder(capacity)
 {}
 
-void cTeledyneFlirControllerNetEncoder::sendCurrentState(bool valid, uint8_t active_camera_id,
-    uint16_t width, uint16_t height, uint8_t fps, uint16_t interval_s,
-    uint8_t min_fps, uint8_t max_fps)
+void cTeledyneFlirControllerNetEncoder::sendCurrentState(bool valid, uint8_t mode,
+    uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
+    std::optional<double> min_fps, std::optional<double> max_fps,
+    std::optional<float> min_K, std::optional<float> max_K)
 {
-    encode_current_state(valid, active_camera_id, width, height, fps, interval_s, min_fps, max_fps, mBuffer);
+    encode_current_state(valid, mode, width, height, fps, interval_ms,
+        min_fps, max_fps, min_K, max_K, mBuffer);
+
     sendData();
 }
 
@@ -40,4 +43,17 @@ void cTeledyneFlirControllerNetEncoder::sendFrameInterval_ms(uint32_t interval_m
     encode_frame_interval(interval_ms, mBuffer);
     sendData();
 }
+
+void cTeledyneFlirControllerNetEncoder::sendThermalRange_K(float min_value_K, float max_value_K)
+{
+    encode_thermal_range(min_value_K, max_value_K, mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirControllerNetEncoder::sendTakePhotoReply()
+{
+    encode_take_photo_reply(flir::eReply::GOOD, mBuffer);
+    sendData();
+}
+
 

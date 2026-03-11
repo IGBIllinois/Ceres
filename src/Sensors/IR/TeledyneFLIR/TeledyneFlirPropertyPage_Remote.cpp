@@ -2,6 +2,8 @@
 
 #include "TeledyneFlirPropertyPage_Remote.hpp"
 #include "TeledyneFlirUtils.hpp"
+#include "TeledyneFlirExperimentStates.hpp"
+#include "StringUtils.hpp"
 
 #include <QString>
 #include <QLineEdit>
@@ -23,6 +25,42 @@ cTeledyneFlirPropertyPage_Remote::cTeledyneFlirPropertyPage_Remote(QWidget* pare
 	: cTeledyneFlirPropertyPage(parent), cSensorPropertyPageRemoteInterface(parent),
 		cTeledyneFlirPropertiesNetEncoder(255)
 {}
+
+
+cExperimentState* cTeledyneFlirPropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
+{
+	if (nStringUtils::iequal(type, "Teledyne FLIR"))
+	{
+		auto hostname = getHostname();
+		auto port = getPort();
+		auto localIp = getLocalIpAddress();
+		auto use_IpV6 = usingIpV6();
+
+		std::string cmd = entry["command"];
+
+		if (cmd == "configure")
+		{
+			auto* pState = new cTeledyneFlirCamera_Configure_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if (cmd == "take photo")
+		{
+			auto* pState = new cTeledyneFlirCamera_TakePhoto_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+	}
+
+	return nullptr;
+}
 
 void cTeledyneFlirPropertyPage_Remote::createWidgets()
 {
@@ -52,7 +90,7 @@ void cTeledyneFlirPropertyPage_Remote::buttonClicked(QAbstractButton* button)
 			if (!openConnection())
 			{
 				QMessageBox::warning(this, "Ceres",
-					"Could not connect to the Axis Communications F44 controller.",
+					"Could not connect to the Teledyne FLIR controller.",
 					QMessageBox::Ok);
 			}
 		}
@@ -73,7 +111,7 @@ void cTeledyneFlirPropertyPage_Remote::buttonClicked(QAbstractButton* button)
 			if (!openConnection())
 			{
 				QMessageBox::warning(this, "Ceres",
-					"Could not connect to the Axis Communications F44 controller.",
+					"Could not connect to the Teledyne FLIR controller.",
 					QMessageBox::Ok);
 			}
 
@@ -108,6 +146,12 @@ void cTeledyneFlirPropertyPage_Remote::onMode(uint8_t mode)
 
 void cTeledyneFlirPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
 {
+	QString image_size = QString::number(width);
+	image_size += " x ";
+	image_size += QString::number(height);
+
+	mpImageSize->setText(image_size);
+	mpImageSize->setEnabled(false);
 }
 
 void cTeledyneFlirPropertyPage_Remote::onFrameRate(double fps)
@@ -124,10 +168,26 @@ void cTeledyneFlirPropertyPage_Remote::onFrameInterval(uint32_t interval_ms)
 	mpFrameInterval_s->setText(QString::number(interval_ms * 0.001f));
 }
 
+void cTeledyneFlirPropertyPage_Remote::onThermalRange(float min_value_K, float max_value_K)
+{
+	if ((min_value_K > 0) && (max_value_K > 0))
+	{
+		QString thermal_range = QString::number(min_value_K);
+		thermal_range += " to ";
+		thermal_range += QString::number(max_value_K);
+
+		mpThermalRange->setText(thermal_range);
+	}
+	else
+		mpThermalRange->setText("Unknown");
+
+	mpThermalRange->setEnabled(false);
+}
 
 void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
 	uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
-	std::optional<double> min_fps, std::optional<double> max_fps)
+	std::optional<double> min_fps, std::optional<double> max_fps,
+	std::optional<float> min_K, std::optional<float> max_K)
 {
 	if (!valid) return;
 
@@ -154,6 +214,17 @@ void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
 
 	if (min_fps.has_value() && max_fps.has_value())
 		mpFrameRate_fps->setValidator(new QDoubleValidator(min_fps.value(), max_fps.value(), 2));
+
+	if (min_K.has_value() && max_K.has_value())
+	{
+		QString thermal_range = QString::number(min_K.value());
+		thermal_range += " to ";
+		thermal_range += QString::number(max_K.value());
+
+		mpThermalRange->setText(thermal_range);
+	}
+	else
+		mpThermalRange->setText("Unknown");
 }
 
 void cTeledyneFlirPropertyPage_Remote::showPage()
@@ -185,12 +256,6 @@ void cTeledyneFlirPropertyPage_Remote::doApply()
 {
 	if (!mConnected)
 		return;
-
-//	uint8_t id = mpMode->text().toInt();
-//	if (mDefaultCameraId != id)
-//	{
-//		sendSetCameraId(id);
-//	}
 
 	uint8_t fps = mpFrameRate_fps->text().toInt();
 	if (mDefaultFrameRate_fps != fps)

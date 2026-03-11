@@ -22,11 +22,18 @@ public:
      */
 
     void sendQueryState();
+    void sendQueryMode();
+    void sendQueryImageSize();
+    void sendQueryFrameRate();
+    void sendQueryFrameInterval();
+    void sendQueryThermalRange();
+
     void sendSetMode(uint8_t mode);
     void sendSetImageSize(uint16_t width, uint16_t height);
     void sendSetFrameRate_fps(double fps);
     void sendSetFrameInterval_ms(uint32_t interval_ms);
     void sendGrabImage();
+    void sendTakePhoto(bool update_view);
 };
 
 

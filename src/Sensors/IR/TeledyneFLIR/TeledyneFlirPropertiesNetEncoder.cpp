@@ -15,6 +15,36 @@ void cTeledyneFlirPropertiesNetEncoder::sendQueryState()
     sendData();
 }
 
+void cTeledyneFlirPropertiesNetEncoder::sendQueryMode()
+{
+    encode_query_camera_mode(mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirPropertiesNetEncoder::sendQueryImageSize()
+{
+    encode_query_image_size(mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirPropertiesNetEncoder::sendQueryFrameRate()
+{
+    encode_query_frame_rate(mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirPropertiesNetEncoder::sendQueryFrameInterval()
+{
+    encode_query_frame_interval(mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirPropertiesNetEncoder::sendQueryThermalRange()
+{
+    encode_query_thermal_range(mBuffer);
+    sendData();
+}
+
 void cTeledyneFlirPropertiesNetEncoder::sendSetMode(uint8_t mode)
 {
     encode_camera_mode(mode, mBuffer);
@@ -42,6 +72,12 @@ void cTeledyneFlirPropertiesNetEncoder::sendSetFrameInterval_ms(uint32_t interva
 void cTeledyneFlirPropertiesNetEncoder::sendGrabImage()
 {
     encode_grab_image(mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirPropertiesNetEncoder::sendTakePhoto(bool update_view)
+{
+    encode_take_photo(update_view, mBuffer);
     sendData();
 }
 

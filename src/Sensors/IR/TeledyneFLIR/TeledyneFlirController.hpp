@@ -74,18 +74,24 @@ public:
     const std::string& instance() const override;
     bool has_instance() const override;
 
+public slots:
+    void onPhotoTaken();
+
 protected:
     void onQueryState() override;
     void onQueryMode() override;
     void onQueryImageSize() override;
     void onQueryFrameRate() override;
     void onQueryFrameInterval() override;
+    void onQueryThermalRange() override;
     void onGrabImage() override;
+    void onTakePhoto(bool updateView) override;
 
     void setMode(uint8_t mode) override;
     void setImageSize(uint16_t width, uint16_t height) override;
     void setFrameRate_Hz(double fps) override;
     void setFrameInterval_ms(uint32_t interval_ms) override;
+    void setThermalRange_K(float min_value_K, float max_value_K) override;
 
 
 protected:

@@ -27,9 +27,13 @@ protected:
     virtual void onImageSize(uint16_t width, uint16_t height) = 0;
     virtual void onFrameRate(double fps) = 0;
     virtual void onFrameInterval(uint32_t interval_ms) = 0;
+    virtual void onThermalRange(float min_value_K, float max_value_K) = 0;
     virtual void onCurrentState(bool valid, uint8_t mode,
         uint16_t width, uint16_t height, double fps, uint32_t interval_ms, 
-        std::optional<double> min_fps, std::optional<double> max_fps) = 0;
+        std::optional<double> min_fps, std::optional<double> max_fps,
+        std::optional<float> min_K, std::optional<float> max_K) = 0;
+
+    virtual void onTakePhotoReply(bool error) = 0;
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;

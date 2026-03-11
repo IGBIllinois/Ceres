@@ -161,18 +161,25 @@ void cTeledyneFlirController_T1K::processStream(const void* pBuffer, std::size_t
     }
 }
 
+void cTeledyneFlirController_T1K::onPhotoTaken()
+{
+    sendTakePhotoReply();
+}
+
+
 void cTeledyneFlirController_T1K::onQueryState()
 {
     auto mode = mpModel->mode();
-//    auto image_size = mpModel->getActiveImageSize();
-    auto fps = mpModel->frameRate_Hz();
 
-//    bool valid = (id >= 0) && (fps > 0);
+    auto width = mpModel->imageWidth();
+    auto height = mpModel->imageHeight();
 
-//    int minID = mpModel->getMinCameraID();
-//    int maxID = mpModel->getMaxCameraID();
+    double fps = mpModel->frameRate_Hz();
+    uint32_t interval_ms = mpModel->frameInterval_ms();
 
-//    sendCurrentState(valid, id, image_size.width, image_size.height, fps, minID, maxID);
+    sendCurrentState(true, static_cast<uint8_t>(mode), width, height, fps, interval_ms,
+        mpModel->minFrameRate_fps(), mpModel->maxFrameRate_fps(),
+        mpModel->minThermalValue_K(), mpModel->maxThermalValue_K());
 }
 
 void cTeledyneFlirController_T1K::onQueryMode()
@@ -182,31 +189,47 @@ void cTeledyneFlirController_T1K::onQueryMode()
 
 void cTeledyneFlirController_T1K::onQueryImageSize()
 {
-/*
-    auto image_size = mpModel->getActiveImageSize();
-    sendImageSize(image_size.width, image_size.height);
-*/
+    auto width = mpModel->imageWidth();
+    auto height = mpModel->imageHeight();
+
+    sendImageSize(width, height);
 }
 
 void cTeledyneFlirController_T1K::onQueryFrameRate()
 {
-//    sendFrameRate(mpModel->getActiveFramesRate_fps());
+    sendFrameRate_Hz(mpModel->frameRate_Hz());
 }
 
 void cTeledyneFlirController_T1K::onQueryFrameInterval()
 {
-//    sendFrameInterval(mpModel->getActiveFrameInterval_s());
+    sendFrameInterval_ms(mpModel->frameInterval_ms());
+}
+
+void cTeledyneFlirController_T1K::onQueryThermalRange()
+{
+    float minValue_K = mpModel->minThermalValue_K().value_or(-1.0f);
+    float maxValue_K = mpModel->maxThermalValue_K().value_or(-1.0f);
+
+    sendThermalRange_K(minValue_K, maxValue_K);
 }
 
 void cTeledyneFlirController_T1K::onGrabImage()
 {
-//    mpModel->requestImage();
+    if (mpModel->mode() == cTeledyneFlirCameraModel::SINGLE)
+        mpModel->takePhoto(true);
+    else
+        mpModel->requestImage();
+}
+
+void cTeledyneFlirController_T1K::onTakePhoto(bool update_view)
+{
+    mpModel->takePhoto(update_view);
 }
 
 void cTeledyneFlirController_T1K::setMode(uint8_t mode)
 {
-//    mpModel->setActiveCamera(id);
-//    sendActiveCameraId(mpModel->getActiveCameraID());
+    mpModel->setMode(static_cast<cTeledyneFlirCameraModel::eMode>(mode));
+    sendCameraMode(static_cast<uint8_t>(mpModel->mode()));
 }
 
 void cTeledyneFlirController_T1K::setImageSize(uint16_t width, uint16_t height)
@@ -214,19 +237,33 @@ void cTeledyneFlirController_T1K::setImageSize(uint16_t width, uint16_t height)
 //    rgb::sImageSize_t image_size = {width, height};
 
 //    mpModel->setActiveImageSize(image_size);
-//    sendImageSize(image_size.width, image_size.height);
+
+    width = mpModel->imageWidth();
+    height = mpModel->imageHeight();
+
+    sendImageSize(width, height);
 }
 
 void cTeledyneFlirController_T1K::setFrameRate_Hz(double fps)
 {
-//    mpModel->setActiveFramesRate_fps(fps);
-//    sendFrameRate(mpModel->getActiveFramesRate_fps());
+    mpModel->setFrameRate_Hz(fps);
+    sendFrameRate_Hz(mpModel->frameRate_Hz());
 }
 
 void cTeledyneFlirController_T1K::setFrameInterval_ms(uint32_t interval_ms)
 {
-//    mpModel->setActiveFrameInterval_s(fps);
-//    sendFrameInterval(mpModel->getActiveFrameInterval_s());
+    mpModel->setFrameInterval_ms(interval_ms);
+    sendFrameInterval_ms(mpModel->frameInterval_ms());
+}
+
+void cTeledyneFlirController_T1K::setThermalRange_K(float min_value_K, float max_value_K)
+{
+    //    mpModel->setActiveFrameInterval_s(fps);
+
+    float minValue_K = mpModel->minThermalValue_K().value_or(-1.0f);
+    float maxValue_K = mpModel->maxThermalValue_K().value_or(-1.0f);
+
+    sendThermalRange_K(minValue_K, maxValue_K);
 }
 
 

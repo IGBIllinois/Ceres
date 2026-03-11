@@ -31,7 +31,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         onImageSize(data.width, data.height);
         break;
     }
-    case ePacketType::FRAMES_PER_SECOND:
+    case ePacketType::FRAME_RATE_HZ:
     {
         teledyne_FrameRateMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
@@ -39,12 +39,20 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         onFrameRate(fps);
         break;
     }
-    case ePacketType::FRAMES_INTERVAL_MS:
+    case ePacketType::FRAME_INTERVAL_MS:
     {
         teledyne_FrameIntervalMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto interval_ms = to_frame_interval_t(packet);
         onFrameInterval(interval_ms);
+        break;
+    }
+    case ePacketType::THERMAL_RANGE_K:
+    {
+        teledyne_ThermalRangeMessage_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto range_K = to_thermal_range_t(packet);
+        onThermalRange(range_K.min_thermal_value_K, range_K.max_thermal_value_K);
         break;
     }
     case ePacketType::CURRENT_STATE:
@@ -54,7 +62,16 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         auto state = to_current_state_t(packet);
         onCurrentState(state.valid, state.mode, state.width,
             state.height, state.frames_per_second, state.frames_interval_ms,
-            state.min_frames_per_second, state.max_frames_per_second);
+            state.min_frames_per_second, state.max_frames_per_second,
+            state.min_thermal_value_K, state.max_thermal_value_K);
+        break;
+    }
+    case ePacketType::TAKE_PHOTO_REPLY:
+    {
+        teledyne_Reply_1 packet;
+        packet.ParseFromArray(buffer.data(), hdr.length);
+        auto reply = to_reply_t(packet);
+        onTakePhotoReply(reply != flir::eReply::GOOD);
         break;
     }
     }
