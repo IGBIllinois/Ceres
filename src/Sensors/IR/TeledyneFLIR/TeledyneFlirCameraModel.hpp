@@ -27,6 +27,8 @@ public:
     enum eMode { SINGLE = 0, TIME_LAPSE = 1, CONTINUOUS = 2 };
 
 public:
+    virtual ~cTeledyneFlirCameraModel();
+
     /*
      * Returns a string used as a descriptor of the sensor.
      */
@@ -82,13 +84,12 @@ public slots:
     void requestFrameRate_Hz(double frame_rate_hz);
     void requestFrameInterval_ms(uint32_t frame_interval_ms);
     void requestImage();
-    void requestImages(bool auto_emit);
+    void requestImages(bool update_view);
 
     void takePhoto(bool update_view = false);
 
 protected:
     cTeledyneFlirCameraModel(const std::string& name, QObject* parent = nullptr);
-    virtual ~cTeledyneFlirCameraModel();
 
     virtual bool updateFrameInterval(uint32_t frame_interval_ms) = 0;
     virtual bool updateFrameRate(double frame_rate_fps) = 0;

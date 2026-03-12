@@ -35,7 +35,7 @@ public:
     void doLayout() override;
 
 protected slots:
-    virtual void requestImage() = 0;
+    virtual void onGrabImagePressed() = 0;
 
 protected:
     QLabel* mpModeLabel = nullptr;
@@ -52,9 +52,6 @@ protected:
 
     QLabel* mpThermalRangeLabel = nullptr;
     QLineEdit* mpThermalRange = nullptr;
-
-    int  mDefaultFrameRate_fps = -1;
-    int  mDefaultFrameInterval_s = -1;
 
     QPushButton* mpGrabImage = nullptr;
 };

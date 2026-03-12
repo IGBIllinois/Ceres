@@ -34,11 +34,11 @@ public:
         std::optional<double> min_fps, std::optional<double> max_fps,
         std::optional<float> min_K, std::optional<float> max_K) override;
 
-    void onTakePhotoReply(bool error)  override {};
+    void onTakePhotoReply(bool error)  override;
 
 protected:
     void onConnect() override;
-    void requestImage() override;
+    void onGrabImagePressed() override;
 
 protected:
     void createWidgets() override;
@@ -58,6 +58,10 @@ protected:
     int sendOutgoingData(const char* data, std::size_t len) override;
 
 private:
+    uint8_t  mDefaultMode = 255;
+    double   mDefaultFrameRate_fps = 0;
+    uint32_t mDefaultFrameInterval_ms = 0;
+
     bool mReconnectActive = false;
 };
 

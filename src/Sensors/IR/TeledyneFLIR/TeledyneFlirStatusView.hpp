@@ -27,7 +27,12 @@ public:
 	void doLayout() override;
 
 signals:
+	void requestMode(int mode);
+	void requestFrameRate_Hz(double frame_rate_hz);
+	void requestFrameInterval_ms(uint32_t frame_interval_ms);
+
 	void requestImage();
+	void requestImages(bool update_view);
 
 public slots:
 	void onSensorNameChanging(QString old_name, QString new_name, QString instance);
@@ -38,6 +43,11 @@ public slots:
 	void imageUpdated(const QImage& image);
 
 	void resizeEvent(QResizeEvent*) override;
+
+protected slots:
+	void modeTextChanged(const QString&);
+	void frameRateEditingFinished();
+	void frameIntervalEditingFinished();
 
 private:
 	QLabel* mpModeLabel = nullptr;

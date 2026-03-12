@@ -156,6 +156,9 @@ bool cTeledyneFlirCamera_Configure_Remote::configure(const nlohmann::json& state
 
 cExperimentState::eRESULT cTeledyneFlirCamera_Configure_Remote::finished()
 {
+	if (mWaitingForConfiguration)
+		return cExperimentState::eRESULT::WAITING;
+
 	if (mWaitingForMode || mWaitingForFrameRate || mWaitingForInterval)
 		return cExperimentState::eRESULT::WAITING;
 
@@ -199,6 +202,8 @@ void cTeledyneFlirCamera_Configure_Remote::onCurrentState(bool valid, uint8_t mo
 
 	if (mWaitingForInterval)
 		sendSetFrameInterval_ms(mFrameInterval_ms);
+
+	mWaitingForConfiguration = false;
 }
 
 void cTeledyneFlirCamera_Configure_Remote::onConnect()

@@ -131,9 +131,15 @@ void cTeledyneFlirPropertyPage_Remote::onConnect()
 	cTeledyneFlirPropertiesNetEncoder::sendQueryState();
 }
 
-void cTeledyneFlirPropertyPage_Remote::requestImage()
+void cTeledyneFlirPropertyPage_Remote::onGrabImagePressed()
 {
-	cTeledyneFlirPropertiesNetEncoder::sendGrabImage();
+	if (mpMode->currentIndex() == 0)
+	{
+		mpGrabImage->setEnabled(false);
+		cTeledyneFlirPropertiesNetEncoder::sendTakePhoto(true);
+	}
+	else
+		cTeledyneFlirPropertiesNetEncoder::sendGrabImage();
 }
 
 void cTeledyneFlirPropertyPage_Remote::onMode(uint8_t mode)
@@ -141,6 +147,7 @@ void cTeledyneFlirPropertyPage_Remote::onMode(uint8_t mode)
 	if ((mode < 0) || (mode > 2))
 		return;
 
+	mDefaultMode = mode;
 	mpMode->setCurrentIndex(mode);
 }
 
@@ -159,12 +166,13 @@ void cTeledyneFlirPropertyPage_Remote::onFrameRate(double fps)
 	if ((fps == 0) || (fps > 30))
 		return;
 
-	mpFrameRate_fps->setText(QString::number(fps));
 	mDefaultFrameRate_fps = fps;
+	mpFrameRate_fps->setText(QString::number(fps));
 }
 
 void cTeledyneFlirPropertyPage_Remote::onFrameInterval(uint32_t interval_ms)
 {
+	mDefaultFrameInterval_ms = interval_ms;
 	mpFrameInterval_s->setText(QString::number(interval_ms * 0.001f));
 }
 
@@ -190,6 +198,10 @@ void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
 	std::optional<float> min_K, std::optional<float> max_K)
 {
 	if (!valid) return;
+
+	mDefaultMode = mode;
+	mDefaultFrameRate_fps = fps;
+	mDefaultFrameInterval_ms = interval_ms;
 
 	onMode(mode);
 	onImageSize(width, height);
@@ -227,6 +239,11 @@ void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
 		mpThermalRange->setText("Unknown");
 }
 
+void cTeledyneFlirPropertyPage_Remote::onTakePhotoReply(bool error)
+{
+	mpGrabImage->setEnabled(true);
+}
+
 void cTeledyneFlirPropertyPage_Remote::showPage()
 {
 	if (!openConnection())
@@ -257,10 +274,22 @@ void cTeledyneFlirPropertyPage_Remote::doApply()
 	if (!mConnected)
 		return;
 
-	uint8_t fps = mpFrameRate_fps->text().toInt();
+	uint8_t mode = static_cast<uint8_t>(mpMode->currentIndex());
+	if ((mDefaultMode < 200) && (mDefaultMode != mode))
+	{
+		sendSetMode(mode);
+	}
+
+	double fps = mpFrameRate_fps->text().toDouble();
 	if (mDefaultFrameRate_fps != fps)
 	{
 		sendSetFrameRate_fps(fps);
+	}
+
+	uint32_t interval_ms = static_cast<uint32_t>(mpFrameInterval_s->text().toDouble() * 1000.0);
+	if (mDefaultFrameInterval_ms != interval_ms)
+	{
+		sendSetFrameInterval_ms(interval_ms);
 	}
 }
 

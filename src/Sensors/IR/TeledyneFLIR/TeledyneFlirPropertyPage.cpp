@@ -37,7 +37,7 @@ void cTeledyneFlirPropertyPage::createWidgets()
 	mpThermalRange->setReadOnly(true);
 
 	mpGrabImage = new QPushButton("Grab Image", this);
-	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirPropertyPage::requestImage);
+	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirPropertyPage::onGrabImagePressed);
 }
 
 void cTeledyneFlirPropertyPage::enableControls(bool enable)

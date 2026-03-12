@@ -25,15 +25,14 @@ public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 protected:
-    void requestImage() override;
-
-protected:
     void createWidgets() override;
     void doLayout() override;
 
     void enableControls(bool enable) override;
 
     void showPage() override;
+
+    void onGrabImagePressed() override;
 
     void doOK() override;
     void doCancel() override;

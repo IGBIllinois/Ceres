@@ -90,7 +90,7 @@ void cTeledyneFlirPropertyPage_Local::enableControls(bool enable)
 	if (apply) apply->setEnabled(enable);
 }
 
-void cTeledyneFlirPropertyPage_Local::requestImage()
+void cTeledyneFlirPropertyPage_Local::onGrabImagePressed()
 {
 	mpModel->requestImage();
 }

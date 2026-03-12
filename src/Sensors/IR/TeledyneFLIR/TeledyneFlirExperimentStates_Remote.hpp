@@ -97,7 +97,7 @@ private:
 	int mFrameInterval_ms = -1;
 	double mFrameRate_fps = -1;
 
-	bool mUpdateConfiguration = true;
+	bool mWaitingForConfiguration = true;
 
 	bool mWaitingForMode = false;
 	bool mWaitingForFrameRate = false;

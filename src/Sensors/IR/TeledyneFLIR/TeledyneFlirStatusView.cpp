@@ -32,6 +32,7 @@ void cTeledyneFlirStatusView::createWidgets()
 	mpMode->addItem("Photo");
 	mpMode->addItem("Time Lapse");
 	mpMode->addItem("Continuous");
+	connect(mpMode, &QComboBox::currentTextChanged, this, &cTeledyneFlirStatusView::modeTextChanged);
 
 	mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
 	mpImageSizes = new QLineEdit(this);
@@ -40,10 +41,12 @@ void cTeledyneFlirStatusView::createWidgets()
 	mpFrameIntervalLabel = new QLabel("Frame Interval (sec):", this);
 	mpFrameInterval_s = new QLineEdit(this);
 	mpFrameInterval_s->setReadOnly(true);
+	connect(mpFrameInterval_s, &QLineEdit::editingFinished, this, &cTeledyneFlirStatusView::frameIntervalEditingFinished);
 
 	mpFrameRateLabel = new QLabel("Frame Rate (f/s):", this);
 	mpFrameRate_fps = new QLineEdit(this);
 	mpFrameRate_fps->setReadOnly(true);
+	connect(mpFrameRate_fps, &QLineEdit::editingFinished, this, &cTeledyneFlirStatusView::frameRateEditingFinished);
 
 	mpGrabImage = new QPushButton("Grab Image", this);
 	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirStatusView::requestImage);
@@ -98,6 +101,7 @@ void cTeledyneFlirStatusView::onSensorNameChanging(QString old_name, QString new
 void cTeledyneFlirStatusView::onModeChange(int mode)
 {
 	if ((mode < 0) || (mode >= mpMode->maxCount()))
+		return;
 	mpMode->setCurrentIndex(mode);
 }
 
@@ -132,4 +136,27 @@ void cTeledyneFlirStatusView::resizeEvent(QResizeEvent* e)
 {
 	cSensorStatusView::resizeEvent(e);
 	mpThermalImage->resizeImage(e->size().width(), e->size().height());
+}
+
+void cTeledyneFlirStatusView::modeTextChanged(const QString& text)
+{
+	if (text == "Photo")
+		emit requestMode(0);
+	else if (text == "Time Lapse")
+		emit requestMode(1);
+	else if (text == "Continuous")
+		emit requestMode(2);
+}
+
+void cTeledyneFlirStatusView::frameRateEditingFinished()
+{
+	double frame_rate_hz = mpFrameRate_fps->text().toDouble();
+	emit requestFrameRate_Hz(frame_rate_hz);
+}
+
+void cTeledyneFlirStatusView::frameIntervalEditingFinished()
+{
+	uint32_t frame_interval_ms = static_cast<uint32_t>(mpFrameInterval_s->text().toDouble() * 1000.0);
+
+	emit requestFrameInterval_ms(frame_interval_ms);
 }

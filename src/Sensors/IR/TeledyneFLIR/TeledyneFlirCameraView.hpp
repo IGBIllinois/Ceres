@@ -30,7 +30,7 @@ public:
 
 signals:
 	void requestImage();
-	void requestImages(bool auto_emit);
+	void requestImages(bool update_view);
 
 public slots:
 	void onSensorNameChanging(QString old_name, QString new_name, QString instance);

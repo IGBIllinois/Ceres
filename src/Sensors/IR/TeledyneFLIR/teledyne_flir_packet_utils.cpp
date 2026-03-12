@@ -65,7 +65,9 @@ int flir::encode_grab_image(net_buffer& buffer)
     hdr.length = 0;
     set_timestamp(&hdr.timestamp);
 
-    return sizeof(sPacketHeader_t) + hdr.length;
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t);
 }
 
 uint8_t flir::to_camera_mode_t(const teledyne_CameraModeMessage_1& pckt)
