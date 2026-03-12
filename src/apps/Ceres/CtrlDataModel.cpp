@@ -111,7 +111,6 @@ void cCtrlDataModel::addSensorPropertyPage(cSensorPropertyPage* pPage)
 
     if (creator)
     {
-//        mStateCreators.push_back(creator);
         mThread.mpController->addStateCreator(creator);
     }
 }
@@ -126,7 +125,6 @@ void cCtrlDataModel::removeSensorPropertyPage(cSensorPropertyPage* pPage)
 
     if (creator)
     {
-//        mStateCreators.push_back(creator);
         mThread.mpController->removeStateCreator(creator);
     }
 }
