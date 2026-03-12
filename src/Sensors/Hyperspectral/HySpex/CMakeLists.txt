@@ -54,6 +54,10 @@ set(HYSPEX_SOURCE_FILES
 	HySpexVNIR_3000N_PropertiesNetEncoder.cpp
 	HySpexVNIR_3000N_PropertyPage_Remote.hpp
 	HySpexVNIR_3000N_PropertyPage_Remote.cpp
+
+	HySpexVNIR_3000N_PropertyPage_Local.hpp
+	HySpexVNIR_3000N_PropertyPage_Local.cpp
+
 	HySpexVNIR_3000N_PropertyPage.hpp
 	HySpexVNIR_3000N_PropertyPage.cpp
 
@@ -88,6 +92,10 @@ set(HYSPEX_SOURCE_FILES
 	HySpexSWIR_384_PropertiesNetEncoder.cpp
 	HySpexSWIR_384_PropertyPage_Remote.hpp
 	HySpexSWIR_384_PropertyPage_Remote.cpp
+
+	HySpexSWIR_384_PropertyPage_Local.hpp
+	HySpexSWIR_384_PropertyPage_Local.cpp
+
 	HySpexSWIR_384_PropertyPage.hpp
 	HySpexSWIR_384_PropertyPage.cpp
 
@@ -95,8 +103,10 @@ set(HYSPEX_SOURCE_FILES
 #
 # HySpex Experiment State Files
 #
-	HySpexExperimentStates.hpp
-	HySpexExperimentStates.cpp
+	HySpexExperimentStates_Local.hpp
+	HySpexExperimentStates_Local.cpp
+	HySpexExperimentStates_Remote.hpp
+	HySpexExperimentStates_Remote.cpp
 	
 #
 # HySpex Cameras General Files

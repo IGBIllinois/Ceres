@@ -1,5 +1,5 @@
 
-#include "HySpexExperimentStates.hpp"
+#include "HySpexExperimentStates_Remote.hpp"
 #include "HySpexVNIR_3000N_PropertyPage_Remote.hpp"
 #include "HySpexSWIR_384_PropertyPage_Remote.hpp"
 

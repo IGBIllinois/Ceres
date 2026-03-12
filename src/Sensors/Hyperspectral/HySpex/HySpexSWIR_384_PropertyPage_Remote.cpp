@@ -1,7 +1,7 @@
 
 
 #include "HySpexSWIR_384_PropertyPage_Remote.hpp"
-#include "HySpexExperimentStates.hpp"
+#include "HySpexExperimentStates_Remote.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
