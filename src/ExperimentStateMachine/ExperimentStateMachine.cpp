@@ -97,7 +97,8 @@ void cExperimentStateMachine::removeStateCreator(cExperimentStateCreator* pCreat
 
     auto it = std::remove(mStateCreators.begin(), mStateCreators.end(), pCreator);
 
-    mStateCreators.erase(it);
+    if (it != mStateCreators.end())
+        mStateCreators.erase(it);
 }
 
 void cExperimentStateMachine::clearStateCreators()
