@@ -53,8 +53,10 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 #
 # Teledyne FLIR Experiment State Files
 #
-	TeledyneFlirExperimentStates.hpp
-	TeledyneFlirExperimentStates.cpp
+	TeledyneFlirExperimentStates_Local.hpp
+	TeledyneFlirExperimentStates_Local.cpp
+	TeledyneFlirExperimentStates_Remote.hpp
+	TeledyneFlirExperimentStates_Remote.cpp
 
 #
 # Teledyne FLIR Cameras General Files

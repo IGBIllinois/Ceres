@@ -4,7 +4,7 @@
 #include "TeledyneFlirCameraModel.hpp"
 #include "TeledyneFlirCameraModel_T1K.hpp"
 #include "TeledyneFlirUtils.hpp"
-#include "TeledyneFlirExperimentStates.hpp"
+#include "TeledyneFlirExperimentStates_Local.hpp"
 #include "StringUtils.hpp"
 
 #include <QString>

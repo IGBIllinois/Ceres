@@ -2,7 +2,7 @@
 
 #include "TeledyneFlirPropertyPage_Remote.hpp"
 #include "TeledyneFlirUtils.hpp"
-#include "TeledyneFlirExperimentStates.hpp"
+#include "TeledyneFlirExperimentStates_Remote.hpp"
 #include "StringUtils.hpp"
 
 #include <QString>
