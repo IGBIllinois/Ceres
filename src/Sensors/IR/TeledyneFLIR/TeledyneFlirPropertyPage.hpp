@@ -35,6 +35,7 @@ public:
     void doLayout() override;
 
 protected slots:
+    void modeTextChanged(const QString& text);
     virtual void onGrabImagePressed() = 0;
 
 protected:

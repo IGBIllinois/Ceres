@@ -21,6 +21,7 @@ void cTeledyneFlirPropertyPage::createWidgets()
 	mpMode->addItem("Photo");
 	mpMode->addItem("Time Lapse");
 	mpMode->addItem("Video");
+	connect(mpMode, &QComboBox::currentTextChanged, this, &cTeledyneFlirPropertyPage::modeTextChanged);
 
 	mpImageSizeLabel = new QLabel("Image Size (w x d):", this);
 	mpImageSize = new QLineEdit(this);
@@ -67,6 +68,25 @@ void cTeledyneFlirPropertyPage::doLayout()
 	pMainLayout->addWidget(mpButtons);
 
 	setLayout(pMainLayout);
+}
+
+void cTeledyneFlirPropertyPage::modeTextChanged(const QString& text)
+{
+	if (text == "Photo")
+	{
+		mpFrameRate_fps->setEnabled(false);
+		mpFrameInterval_s->setEnabled(false);
+	}
+	else if (text == "Time Lapse")
+	{
+		mpFrameRate_fps->setEnabled(false);
+		mpFrameInterval_s->setEnabled(true);
+	}
+	else if (text == "Video")
+	{
+		mpFrameInterval_s->setEnabled(false);
+		mpFrameRate_fps->setEnabled(true);
+	}
 }
 
 

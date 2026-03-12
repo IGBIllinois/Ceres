@@ -16,7 +16,6 @@ class cTeledyneFlirPropertyPage_Remote : public cTeledyneFlirPropertyPage,
     public cSensorPropertyPageRemoteInterface, 
     private cTeledyneFlirPropertiesNetDecoder, private cTeledyneFlirPropertiesNetEncoder
 {
-
 public:
     cTeledyneFlirPropertyPage_Remote(QWidget* parent = nullptr);
     ~cTeledyneFlirPropertyPage_Remote() = default;
