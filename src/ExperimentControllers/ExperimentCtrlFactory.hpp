@@ -18,16 +18,17 @@ class QToolBar;
 
 struct sExperimentControllerWidgets
 {
-	cExperimentControlModel* pModel;
-	cExperimentControlView* pView;
-	QDockWidget* pDockableView;
-	QStatusBar* pStatusBar;
-	QToolBar* pToolBar;
+	// Mandatory components
+	cExperimentControlModel* pModel = nullptr;
+	cExperimentControlView*	 pView = nullptr;
+
+	// Optional components
+	QDockWidget* pDockableView = nullptr;
+	QStatusBar*  pStatusBar = nullptr;
+	QToolBar*    pToolBar = nullptr;
 	// Future: property page
 
-	sExperimentControllerWidgets() : pModel(nullptr), pView(nullptr), pDockableView(nullptr),
-		pStatusBar(nullptr), pToolBar(nullptr)
-	{}
+	sExperimentControllerWidgets() {}
 
 	sExperimentControllerWidgets(cExperimentControlModel* model, cExperimentControlView* view, 
 		QDockWidget* dock = nullptr, QStatusBar* status = nullptr, QToolBar* toolbar = nullptr)

@@ -975,13 +975,13 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
         mpController, &cExperimentControlView::experimentStateChanging);
 
-    mpModel->addExperimentControlModel(pModel);
-
     if (configDoc.contains(name))
     {
         pModel->configure(configDoc[name]);
         mpController->configure(configDoc[name]);
     }
+
+    mpModel->addExperimentControlModel(pModel);
 
     setCentralWidget(mpController);
 

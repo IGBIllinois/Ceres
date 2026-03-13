@@ -21,13 +21,18 @@ class QToolBar;
 
 struct sSensorWidgets
 {
-	cSensorModel*			pModel = nullptr;
-	QDockWidget*			pDockableView = nullptr;
-	QStatusBar*				pStatusBar = nullptr;
-	QToolBar*				pToolBar = nullptr;
-	cSensorPropertyPage*	pPropertyPage = nullptr;
-	cSensorController*		pController = nullptr;
-	cSensorStatusView*		pRemoteStatusView = nullptr;
+	// Mandatory component
+	cSensorModel*	pModel = nullptr;
+
+	// Optional components for the local sensors
+	QDockWidget*		 pDockableView = nullptr;
+	QStatusBar*			 pStatusBar = nullptr;
+	QToolBar*			 pToolBar = nullptr;
+	cSensorPropertyPage* pPropertyPage = nullptr;
+
+	// Only used for the remote client
+	cSensorController*	pController = nullptr;
+	cSensorStatusView*	pRemoteStatusView = nullptr;
 
 	sSensorWidgets() = default;
 
