@@ -233,7 +233,6 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
 sSensorWidgets hyspex::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
-
     if (!sensorInfo.contains("sensor"))
     {
         qCritical() << "The \"sensor\" entry is missing from the \"hyspex\" sensor section.  ";
