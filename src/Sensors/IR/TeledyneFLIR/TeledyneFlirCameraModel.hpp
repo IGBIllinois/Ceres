@@ -54,11 +54,13 @@ public:
     eMode mode() const;
     virtual void setMode(eMode mode);
 
+    // Get/Set the frame rate when the mode is set to continuous
     double frameRate_Hz() const;
     virtual void setFrameRate_Hz(double frame_rate_hz);
 
-    uint32_t frameInterval_ms() const;
-    virtual void setFrameInterval_ms(uint32_t frame_interval_ms);
+    // Get/Set the lapse interval (the time between images) when the mode is set to time-lapse
+    uint32_t lapseInterval_ms() const;
+    virtual void setLapseInterval_ms(uint32_t interval_ms);
 
     std::optional<double> minFrameRate_fps() const;
     std::optional<double> maxFrameRate_fps() const;
@@ -75,14 +77,14 @@ signals:
     void onNewImage(const QImage& image);
     void photoTaken();
     void modeChanged(int mode);
-    void frameIntervalChanged(int interval_ms);
+    void lapseIntervalChanged(int interval_ms);
     void frameRateChanged(double rate_fps);
     void imageSizeChanged(int width, int height);
 
 public slots:
     void requestMode(int mode);
     void requestFrameRate_Hz(double frame_rate_hz);
-    void requestFrameInterval_ms(uint32_t frame_interval_ms);
+    void requestLapseInterval_ms(uint32_t interval_ms);
     void requestImage();
     void requestImages(bool update_view);
 
@@ -91,7 +93,7 @@ public slots:
 protected:
     cTeledyneFlirCameraModel(const std::string& name, QObject* parent = nullptr);
 
-    virtual bool updateFrameInterval(uint32_t frame_interval_ms) = 0;
+    virtual bool updateLapseInterval(uint32_t interval_ms) = 0;
     virtual bool updateFrameRate(double frame_rate_fps) = 0;
 
 protected:
@@ -105,8 +107,8 @@ protected:
     std::optional<float> mMinThermalRange_K;
     std::optional<float> mMaxThermalRange_K;
 
-    uint32_t mFrameInterval_ms = 0;
-    cOneShotTimer mFrameTimer;
+    uint32_t mLapseInterval_ms = 0;
+    cOneShotTimer mTimeLapseTimer;
 
     uint16_t mImageWidth = 0;
     uint16_t mImageHeight = 0;

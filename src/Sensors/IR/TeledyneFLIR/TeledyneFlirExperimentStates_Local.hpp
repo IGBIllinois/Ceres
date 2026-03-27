@@ -54,16 +54,16 @@ public:
 signals:
 	void requestMode(int mode);
 	void requestFrameRate_Hz(double frame_rate_hz);
-	void requestFrameInterval_ms(uint32_t frame_interval_ms);
+	void requestLapseInterval_ms(uint32_t frame_interval_ms);
 
 public slots:
 	void modeChanged(int mode);
-	void frameIntervalChanged(int interval_ms);
+	void lapseIntervalChanged(int interval_ms);
 	void frameRateChanged(double rate_fps);
 
 private:
 	int mMode = 0;
-	int mFrameInterval_ms = 0;
+	int mLapseInterval_ms = 0;
 	double mFrameRate_fps = 0;
 
 	bool mUpdateConfiguration = true;

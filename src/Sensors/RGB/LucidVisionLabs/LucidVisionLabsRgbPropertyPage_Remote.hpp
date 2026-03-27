@@ -29,7 +29,12 @@ public:
 
 protected:
     void onConnect() override;
-    void requestImage() override;
+    void onGrabImagePressed() override;
+    void exposureTimeSelectorChanged(const QString&) override;
+    void exposureAutoModeChanged(const QString&) override;
+    void pixelFormatChanged(const QString&) override;
+    void gainAutoModeChanged(const QString&) override;
+    void balanceWhiteAutoModeChanged(const QString&) override;
 
 protected:
     void createWidgets() override;

@@ -4,6 +4,11 @@
 #include "../RgbTypes.hpp"
 #include "../RgbCameraModel.hpp"
 
+#include <LucidVisionLabsConnect/LucidVisionLabsData.hpp>
+
+#include <cbdf/LucidTritonSerializer.hpp>
+
+#include <QImage>
 
 
 class cLucidVisionLabsRgbModel : public cRgbCameraModel
@@ -23,17 +28,11 @@ public:
     static const char* data_type() { return "rgb"; };
 
     /*
-     * Returns a string used as a protocol descriptor of the
-     * type sensor.
-     */
-    static const char* protocol() { return "http"; };
-
-    /*
      * Returns the class identifier used by the sensor's serializer
      */
     uint16_t data_class_id() const override;
 
-    bool isConnected() const { return mConnected; }
+//    bool isConnected() const { return mConnected; }
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
@@ -45,16 +44,27 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
-    void update() override;
+    uint16_t imageWidth() const;
+    uint16_t imageHeight() const;
+
+    const QImage& getCurrentImage() const;
 
 signals:
     void onNewImage(const QImage& image);
-    void cameraIdChanged(int id);
-    void frameRateChanged(int rate_fps);
+    void photoTaken();
+    void modeChanged(int mode);
+    void frameIntervalChanged(int interval_ms);
+    void frameRateChanged(double rate_fps);
     void imageSizeChanged(int width, int height);
 
 public slots:
-    void requestImage();
+    virtual void requestMode(int mode) = 0;
+    virtual void requestFrameRate_Hz(double frame_rate_hz) = 0;
+    virtual void requestFrameInterval_ms(uint32_t frame_interval_ms) = 0;
+    virtual void requestImage() = 0;
+    virtual void requestImages(bool update_view) = 0;
+
+    virtual void takePhoto(bool update_view = false) = 0;
 
 protected slots:
  
@@ -63,6 +73,28 @@ protected:
     virtual ~cLucidVisionLabsRgbModel();
 
 protected:
-    bool mConnected = false;
+    std::string mFamilyName;
+    std::string mModelVersion;
+    std::string mFirmwareVersion;
+    std::string mMacAddress;
+    std::string mIpAddress;
+
+    eMode mMode = eMode::SINGLE;
+    bool mPhotoRequested = false;
+
+    double mFrameRate_fps = 0;
+
+    uint16_t mImageWidth = 0;
+    uint16_t mImageHeight = 0;
+
+    bool mImageRequested = false;
+    bool mAutoEmitImages = false;
+
+    nLucidVisionLabsConnect::cRgbImage mCurrentImage;
+
+    QImage mImage;
+    std::vector<uint8_t> mImageBuffer;
+
+    cLucidTritonSerializer mSerializer;
 };
 

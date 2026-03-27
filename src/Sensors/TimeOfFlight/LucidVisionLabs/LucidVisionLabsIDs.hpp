@@ -3,4 +3,5 @@
 
 
 static const char* lucid_vision_labs_id = "lucid_vision_labs";
+static const char* lucid_helios_id = "helios";
 

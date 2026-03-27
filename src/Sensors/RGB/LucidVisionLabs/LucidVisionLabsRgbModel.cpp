@@ -2,15 +2,16 @@
 #include "LucidVisionLabsRgbModel.hpp"
 #include "LucidVisionLabsIDs.hpp"
 
+#include "StringUtils.hpp"
+
 #include <nlohmann/json.hpp>
+
 
 cLucidVisionLabsRgbModel::cLucidVisionLabsRgbModel(const std::string& name, QObject* parent)
 :
     cRgbCameraModel(name, parent)
 {
     mManufacturer = "Lucid Vision Labs";
-
-    mConnected = false;
 }
 
 cLucidVisionLabsRgbModel::~cLucidVisionLabsRgbModel()
@@ -25,12 +26,63 @@ const char* cLucidVisionLabsRgbModel::descriptor() const
 
 uint16_t cLucidVisionLabsRgbModel::data_class_id() const
 {
-    return 0; // mSerializer.classID();
+    return mSerializer.classID();
 }
 
 bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
 {
-    mConnected = true;
+    if (!jsonCfg.contains("mode"))
+        throw std::logic_error("Missing \"mode\" entry!  Values can be \"photo\", \"time lapse\", or \"video\".");
+    auto mode = jsonCfg["mode"];
+
+    double frame_rate_fps = -1;
+
+    if (jsonCfg.contains("frame rate (hz)"))
+        frame_rate_fps = jsonCfg["frame rate (hz)"];
+
+    int32_t lapse_interval_ms = -1;
+
+    if (jsonCfg.contains("lapse interval (s)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"] * 1000);
+    else if (jsonCfg.contains("lapse interval (ms)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"]);
+
+    if (jsonCfg.contains("interval (s)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"] * 1000);
+    else if (jsonCfg.contains("interval (ms)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (ms)"]);
+
+    if (nStringUtils::iequal(mode, "photo"))
+    {
+        setMode(eMode::SINGLE);
+    }
+    else if (nStringUtils::iequal(mode, "time lapse") || nStringUtils::iequal(mode, "time-lapse"))
+    {
+        setMode(eMode::TIME_LAPSE);
+
+        if (lapse_interval_ms < 0)
+        {
+            throw std::logic_error("Missing \"interval (ms)\" entry!");
+        }
+    }
+    else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))
+    {
+        setMode(eMode::CONTINUOUS);
+
+        if (frame_rate_fps < 0)
+        {
+            throw std::logic_error("Missing \"frame rate (hz)\" entry!");
+        }
+
+    }
+    else
+        throw std::logic_error("Unknown \"mode\" entry!  Values can be \"photo\", \"time lapse\", or \"video\".");
+
+    if (lapse_interval_ms > 0)
+        setLapseInterval_ms(lapse_interval_ms);
+
+    if (frame_rate_fps > 0)
+        setFrameRate_Hz(frame_rate_fps);
 
     return cRgbCameraModel::configure(jsonCfg);
 }
@@ -48,7 +100,4 @@ void cLucidVisionLabsRgbModel::requestImage()
 {
 }
 
-void cLucidVisionLabsRgbModel::update()
-{
-}
 

@@ -115,7 +115,7 @@ void cTeledyneFlirController::onQueryFrameRate()
 
 void cTeledyneFlirController::onQueryFrameInterval()
 {
-    sendFrameInterval_ms(mpModel->frameInterval_ms());
+    sendFrameInterval_ms(mpModel->lapseInterval_ms());
 }
 
 
@@ -168,7 +168,7 @@ void cTeledyneFlirController_T1K::onQueryState()
     auto height = mpModel->imageHeight();
 
     double fps = mpModel->frameRate_Hz();
-    uint32_t interval_ms = mpModel->frameInterval_ms();
+    uint32_t interval_ms = mpModel->lapseInterval_ms();
 
     sendCurrentState(true, static_cast<uint8_t>(mode), width, height, fps, interval_ms,
         mpModel->minFrameRate_fps(), mpModel->maxFrameRate_fps(),

@@ -75,23 +75,23 @@ bool cTeledyneFlirCamera_Configure_Local::configure(const nlohmann::json& stateD
 			mWaitingForFrameRate = mFrameRate_fps != mpModel->frameRate_Hz();
 		}
 
-		int32_t frame_interval_ms = -1;
+		int32_t lapse_interval_ms = -1;
 
-		if (stateDoc.contains("frame interval (s)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["frame interval (s)"] * 1000);
-		else if (stateDoc.contains("frame interval (ms)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["frame interval (s)"]);
+		if (stateDoc.contains("lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"] * 1000);
+		else if (stateDoc.contains("lapse interval (ms)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"]);
 
 		if (stateDoc.contains("interval (s)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"] * 1000);
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"] * 1000);
 		else if (stateDoc.contains("interval (ms)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["interval (ms)"]);
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (ms)"]);
 
-		if (frame_interval_ms > 0)
+		if (lapse_interval_ms > 0)
 		{
-			mFrameInterval_ms = frame_interval_ms;
+			mLapseInterval_ms = lapse_interval_ms;
 
-			mWaitingForInterval = mFrameInterval_ms != mpModel->frameInterval_ms();
+			mWaitingForInterval = mLapseInterval_ms != mpModel->lapseInterval_ms();
 		}
 	}
 	catch (const detail::parse_error& e)
@@ -139,7 +139,7 @@ void cTeledyneFlirCamera_Configure_Local::run()
 			emit requestFrameRate_Hz(mFrameRate_fps);
 
 		if (mWaitingForInterval)
-			emit requestFrameInterval_ms(mFrameInterval_ms);
+			emit requestLapseInterval_ms(mLapseInterval_ms);
 
 		mUpdateConfiguration = false;
 	}
@@ -161,7 +161,7 @@ void cTeledyneFlirCamera_Configure_Local::modeChanged(int mode)
 	mWaitingForMode = false;
 }
 
-void cTeledyneFlirCamera_Configure_Local::frameIntervalChanged(int interval_ms)
+void cTeledyneFlirCamera_Configure_Local::lapseIntervalChanged(int interval_ms)
 {
 	mWaitingForInterval = false;
 }

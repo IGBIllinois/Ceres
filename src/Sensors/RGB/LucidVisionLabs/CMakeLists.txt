@@ -31,6 +31,10 @@ set(LUCID_VISION_RGB_SOURCE_FILES
 	LucidRgbPropertiesNetEncoder.cpp
 	LucidVisionLabsRgbPropertyPage_Remote.hpp
 	LucidVisionLabsRgbPropertyPage_Remote.cpp
+
+	LucidVisionLabsRgbPropertyPage_Local.hpp
+	LucidVisionLabsRgbPropertyPage_Local.cpp
+
 	LucidVisionLabsRgbPropertyPage.hpp
 	LucidVisionLabsRgbPropertyPage.cpp
 	
@@ -101,6 +105,7 @@ target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${COMMON_INCLUDE
 target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${RGB_INCLUDE_DIR})
 target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
+target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${ArenaSDK_INCLUDE_DIRS})
 
 #target_link_libraries(lucid_vision_labs_rgb_static PRIVATE cbdf::rgb)
 
@@ -111,6 +116,9 @@ target_link_libraries(lucid_vision_labs_rgb_static PRIVATE ExperimentStateMachin
 target_link_libraries(lucid_vision_labs_rgb_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(lucid_vision_labs_rgb_static PRIVATE LucidVisionLabsConnect::LucidVisionLabsConnect_static)
 target_link_libraries(lucid_vision_labs_rgb_static PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(lucid_vision_labs_rgb_static PRIVATE ArenaSDK::Arena)
+target_link_libraries(lucid_vision_labs_rgb_static PRIVATE ArenaSDK::GenTL)
+target_link_libraries(lucid_vision_labs_rgb_static PRIVATE ArenaSDK::Save)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
@@ -118,3 +126,5 @@ target_link_libraries(lucid_vision_labs_rgb_static PRIVATE ${Protobuf_LIBRARIES}
 set_property(TARGET lucid_vision_labs_rgb_static PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 set_target_properties(lucid_vision_labs_rgb_static PROPERTIES FOLDER "Sensors/RGB_Camera/LucidVisionLabs")
+
+message(STATUS "ArenaSDK_INCLUDE_DIRS = ${ArenaSDK_INCLUDE_DIRS}")

@@ -48,6 +48,8 @@ PRIVATE
     ${RGB_CAMERA_SOURCE_FILES}
 )
 
+target_include_directories(rgb_camera_static PRIVATE ${UTILITIES_INCLUDE_DIR})
+
 target_link_libraries(rgb_camera_static PRIVATE cbdf::rgb)
 target_link_libraries(rgb_camera_static PUBLIC ${Qt}::Multimedia)
 target_link_libraries(rgb_camera_static PRIVATE nlohmann_json::nlohmann_json)

@@ -52,7 +52,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::buttonClicked(QAbstractButton* butt
 			if (!openConnection())
 			{
 				QMessageBox::warning(this, "Ceres",
-					"Could not connect to the Axis Communications F44 controller.",
+					"Could not connect to the Lucid Vision Labs controller.",
 					QMessageBox::Ok);
 			}
 		}
@@ -93,9 +93,34 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onConnect()
 	cLucidRgbPropertiesNetEncoder::sendQueryState();
 }
 
-void cLucidVisionLabsRgbPropertyPage_Remote::requestImage()
+void cLucidVisionLabsRgbPropertyPage_Remote::onGrabImagePressed()
 {
 	cLucidRgbPropertiesNetEncoder::sendGrabImage();
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::exposureTimeSelectorChanged(const QString&)
+{
+
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::exposureAutoModeChanged(const QString&)
+{
+
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::pixelFormatChanged(const QString&)
+{
+
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::gainAutoModeChanged(const QString&)
+{
+
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::balanceWhiteAutoModeChanged(const QString&)
+{
+
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::onCameraId(uint8_t id)
@@ -103,8 +128,8 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onCameraId(uint8_t id)
 	if ((id == 0) || (id > 4))
 		return;
 
-	mpCameraId->setText(QString::number(id));
-	mDefaultCameraId = id;
+//	mpCameraId->setText(QString::number(id));
+//	mDefaultCameraId = id;
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
@@ -113,6 +138,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onImageSize(uint16_t width, uint16_
 	image_size += "x";
 	image_size += QString::number(height);
 
+/*
 	auto n = mpImageSizes->count();
 	for (int i = 0; i < n; ++i)
 	{
@@ -124,6 +150,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onImageSize(uint16_t width, uint16_
 			break;
 		}
 	}
+*/
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::onFrameRate(uint8_t fps)
@@ -131,8 +158,8 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onFrameRate(uint8_t fps)
 	if ((fps == 0) || (fps > 30))
 		return;
 
-	mpFrameRate_fps->setText(QString::number(fps));
-	mDefaultFrameRate_fps = fps;
+//	mpFrameRate_fps->setText(QString::number(fps));
+//	mDefaultFrameRate_fps = fps;
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t id,
@@ -154,7 +181,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t 
 	onImageSize(width, height);
 	onFrameRate(fps);
 
-	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
+//	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::showPage()
@@ -187,6 +214,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::doApply()
 	if (!mConnected)
 		return;
 
+/*
 	uint8_t id = mpCameraId->text().toInt();
 	if (mDefaultCameraId != id)
 	{
@@ -205,6 +233,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::doApply()
 	{
 		sendSetFrameRate_fps(fps);
 	}
+*/
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::reject()

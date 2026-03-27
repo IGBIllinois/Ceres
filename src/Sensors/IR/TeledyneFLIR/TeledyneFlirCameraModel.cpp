@@ -56,17 +56,17 @@ bool cTeledyneFlirCameraModel::configure(const nlohmann::json& jsonCfg)
     if (jsonCfg.contains("frame rate (hz)"))
         frame_rate_fps = jsonCfg["frame rate (hz)"];
 
-    int32_t frame_interval_ms = -1;
+    int32_t lapse_interval_ms = -1;
 
-    if (jsonCfg.contains("frame interval (s)"))
-        frame_interval_ms = static_cast<int32_t>(jsonCfg["frame interval (s)"] * 1000);
-    else if (jsonCfg.contains("frame interval (ms)"))
-        frame_interval_ms = static_cast<int32_t>(jsonCfg["frame interval (s)"]);
+    if (jsonCfg.contains("lapse interval (s)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"] * 1000);
+    else if (jsonCfg.contains("lapse interval (ms)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"]);
 
     if (jsonCfg.contains("interval (s)"))
-        frame_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"] * 1000);
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"] * 1000);
     else if (jsonCfg.contains("interval (ms)"))
-        frame_interval_ms = static_cast<int32_t>(jsonCfg["interval (ms)"]);
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (ms)"]);
 
     if (nStringUtils::iequal(mode, "photo"))
     {
@@ -76,7 +76,7 @@ bool cTeledyneFlirCameraModel::configure(const nlohmann::json& jsonCfg)
     {
         setMode(eMode::TIME_LAPSE);
 
-        if (frame_interval_ms < 0)
+        if (lapse_interval_ms < 0)
         {
             throw std::logic_error("Missing \"interval (ms)\" entry!");
         }
@@ -94,8 +94,8 @@ bool cTeledyneFlirCameraModel::configure(const nlohmann::json& jsonCfg)
     else
         throw std::logic_error("Unknown \"mode\" entry!  Values can be \"photo\", \"time lapse\", or \"video\".");
 
-    if (frame_interval_ms > 0)
-        setFrameInterval_ms(frame_interval_ms);
+    if (lapse_interval_ms > 0)
+        setLapseInterval_ms(lapse_interval_ms);
 
     if (frame_rate_fps > 0)
         setFrameRate_Hz(frame_rate_fps);
@@ -148,21 +148,21 @@ void cTeledyneFlirCameraModel::setFrameRate_Hz(double frame_rate_hz)
     }
 }
 
-uint32_t cTeledyneFlirCameraModel::frameInterval_ms() const { return mFrameInterval_ms; }
+uint32_t cTeledyneFlirCameraModel::lapseInterval_ms() const { return mLapseInterval_ms; }
 
-void cTeledyneFlirCameraModel::setFrameInterval_ms(uint32_t frame_interval_ms)
+void cTeledyneFlirCameraModel::setLapseInterval_ms(uint32_t interval_ms)
 {
-    if (frame_interval_ms < 100) 
-        frame_interval_ms = 100;
+    if (interval_ms < 100)
+        interval_ms = 100;
 
-    bool changing = frame_interval_ms != mFrameInterval_ms;
+    bool changing = interval_ms != mLapseInterval_ms;
 
-    if (updateFrameInterval(frame_interval_ms))
+    if (updateLapseInterval(interval_ms))
     {
-        mFrameInterval_ms = frame_interval_ms;
+        mLapseInterval_ms = interval_ms;
 
         if (changing)
-            emit frameIntervalChanged(mFrameInterval_ms);
+            emit lapseIntervalChanged(mLapseInterval_ms);
     }
 }
 
@@ -180,10 +180,10 @@ void cTeledyneFlirCameraModel::requestFrameRate_Hz(double frame_rate_hz)
     emit frameRateChanged(mFrameRate_fps);
 }
 
-void cTeledyneFlirCameraModel::requestFrameInterval_ms(uint32_t frame_interval_ms)
+void cTeledyneFlirCameraModel::requestLapseInterval_ms(uint32_t interval_ms)
 {
-    setFrameInterval_ms(frame_interval_ms);
-    emit frameIntervalChanged(mFrameInterval_ms);
+    setLapseInterval_ms(interval_ms);
+    emit lapseIntervalChanged(mLapseInterval_ms);
 }
 
 

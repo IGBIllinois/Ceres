@@ -43,6 +43,7 @@ public:
     void updateViews() override;
 
     bool configure(const nlohmann::json& jsonCfg) override;
+    bool initialize() override;
 
     /*
      * Attach/Detach the serializer.
@@ -71,6 +72,7 @@ public:
     uint16_t maxImageWidth() const;
     uint16_t maxImageHeight() const;
 
+
 public slots:
 
 protected slots:
@@ -79,7 +81,7 @@ protected slots:
     virtual void processReply(const std::string& reply) {};
 
 protected:
-    bool updateFrameInterval(uint32_t frame_interval_ms) override;
+    bool updateLapseInterval(uint32_t interval_ms) override;
     bool updateFrameRate(double frame_rate_fps) override;
 
     void update() override;

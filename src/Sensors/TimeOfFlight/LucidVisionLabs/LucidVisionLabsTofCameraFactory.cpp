@@ -2,27 +2,25 @@
  */
 
 #include "LucidVisionLabsTofCameraFactory.hpp"
+#include "LucidVisionLabsIDs.hpp"
 
 #include <LucidVisionLabsConnect/LucidCameraFactory.hpp>
 #include <LucidVisionLabsConnect/LucidHeliosCamera.hpp>
 
-//#include "AxisCommunicationsModel_F44.hpp"
-//#include "AxisCommunicationsView_F44.hpp"
-//#include "AxisCommunicationsStatusView.hpp"
-//#include "AxisCommunicationsController.hpp"
-//#include "AxisCommunicationsPropertyPage.hpp"
-//#include "AxisCommunicationsPropertyPage_Remote.hpp"
+
+#include "StringUtils.hpp"
 
 #include <QWidget>
 #include <QString>
 #include <QDockWidget>
 #include <QMetaType>
+#include <QDebug>
 
 // Example of how to declare a metatype in Qt
 //Q_DECLARE_METATYPE(ouster::sensor_info_t);
 
 #if 0
-sSensorWidgets create_lucid_vision_labs_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
+sSensorWidgets create_helios_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
     // Create the Ouster model and view...
     cAxisCommunicationsModel_F44* pModel = nullptr;
@@ -79,16 +77,17 @@ sSensorWidgets create_lucid_vision_labs_sensor(const nlohmann::json& sensorInfo,
 sSensorWidgets lucid_vision_labs_tof::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
-    std::string instance = sensorInfo["instance"];
-
-    cLucidCameraFactory factory;
-
-    auto camera = factory.getHeliosCamera(instance);
+    if (!sensorInfo.contains("sensor"))
+    {
+        qCritical() << "The \"sensor\" entry is missing from the \"lucid_vision_labs\" sensor section.  ";
+        qCritical() << "Valid values are: helios.";
+        return sSensorWidgets();
+    }
 
     std::string sensor = sensorInfo["sensor"];
 
-//    if (sensor == "HTR0035")
-//        return create_axis_communications_f44_sensor(sensorInfo, no_visualization);
+//    if (nStringUtils::iequal(sensor, lucid_helios_id))
+//        return create_helios_sensor(sensorInfo, no_visualization);
 
     return sSensorWidgets();
 }

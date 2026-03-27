@@ -62,27 +62,27 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         QObject::connect(pModel, &cSensorModel::sensorStatusChanging,             pView, &cSensorStatusView::onSensorStatusChange);
         QObject::connect(pModel, &cSensorModel::sensorNameChanging,               pView, &cTeledyneFlirStatusView::onSensorNameChanging);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::modeChanged,          pView, &cTeledyneFlirStatusView::onModeChange);
-        QObject::connect(pModel, &cTeledyneFlirCameraModel::frameIntervalChanged, pView, &cTeledyneFlirStatusView::onFrameIntervalChange);
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::lapseIntervalChanged, pView, &cTeledyneFlirStatusView::onFrameIntervalChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::frameRateChanged,     pView, &cTeledyneFlirStatusView::onFrameRateChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::imageSizeChanged,     pView, &cTeledyneFlirStatusView::onImageSizeChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::onNewImage,           pView, &cTeledyneFlirStatusView::imageUpdated);
 
         QObject::connect(pView, &cTeledyneFlirStatusView::requestMode,             pModel, &cTeledyneFlirCameraModel::requestMode);
         QObject::connect(pView, &cTeledyneFlirStatusView::requestFrameRate_Hz,     pModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
-        QObject::connect(pView, &cTeledyneFlirStatusView::requestFrameInterval_ms, pModel, &cTeledyneFlirCameraModel::requestFrameInterval_ms);
+        QObject::connect(pView, &cTeledyneFlirStatusView::requestFrameInterval_ms, pModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
         QObject::connect(pView, &cTeledyneFlirStatusView::requestImage,            pModel, &cTeledyneFlirCameraModel::requestImage);
 
         auto* pController = new cTeledyneFlirController_T1K(pModel);
 
         QObject::connect(pModel, &cTeledyneFlirCameraModel::modeChanged,          pController, &cTeledyneFlirController::modeChanged);
-        QObject::connect(pModel, &cTeledyneFlirCameraModel::frameIntervalChanged, pController, &cTeledyneFlirController::frameIntervalChanged);
+        QObject::connect(pModel, &cTeledyneFlirCameraModel::lapseIntervalChanged, pController, &cTeledyneFlirController::frameIntervalChanged);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::frameRateChanged,     pController, &cTeledyneFlirController::frameRateChanged);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::imageSizeChanged,     pController, &cTeledyneFlirController::imageSizeChanged);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::photoTaken,           pController, &cTeledyneFlirController::photoTaken);
 
         QObject::connect(pController, &cTeledyneFlirController::requestMode,             pModel, &cTeledyneFlirCameraModel::requestMode);
         QObject::connect(pController, &cTeledyneFlirController::requestFrameRate_Hz,     pModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
-        QObject::connect(pController, &cTeledyneFlirController::requestFrameInterval_ms, pModel, &cTeledyneFlirCameraModel::requestFrameInterval_ms);
+        QObject::connect(pController, &cTeledyneFlirController::requestFrameInterval_ms, pModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
         QObject::connect(pController, &cTeledyneFlirController::requestImage,            pModel, &cTeledyneFlirCameraModel::requestImage);
         QObject::connect(pController, &cTeledyneFlirController::requestImages,           pModel, &cTeledyneFlirCameraModel::requestImages);
         QObject::connect(pController, &cTeledyneFlirController::requestPhoto,            pModel, &cTeledyneFlirCameraModel::takePhoto);

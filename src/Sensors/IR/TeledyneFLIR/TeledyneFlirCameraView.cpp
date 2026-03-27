@@ -3,7 +3,6 @@
 #include "Constants.hpp"
 #include "TeledyneFlirCameraModel.hpp"
 
-
 #include <QLineEdit>
 #include <QLabel>
 #include <QGroupBox>

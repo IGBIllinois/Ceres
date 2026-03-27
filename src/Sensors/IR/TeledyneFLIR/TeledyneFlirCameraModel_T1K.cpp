@@ -63,7 +63,7 @@ void cTeledyneFlirCameraModel_T1K::updateViews()
     emit sensorStatusChanging(q_name(), q_instance(), getStatus());
 
     emit modeChanged(static_cast<int>(mMode));
-    emit frameIntervalChanged(mFrameInterval_ms);
+    emit lapseIntervalChanged(mLapseInterval_ms);
     emit frameRateChanged(mFrameRate_fps);
     emit imageSizeChanged(mImageWidth, mImageHeight);
 }
@@ -82,6 +82,13 @@ bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)
         setStatus(sensor::eStatus::CONFIGURED);
     else
         setStatus(sensor::eStatus::FAILED);
+
+    return result;
+}
+
+bool cTeledyneFlirCameraModel_T1K::initialize()
+{
+    bool result = cTeledyneFlirCameraModel::initialize();
 
     return result;
 }
@@ -176,14 +183,14 @@ bool cTeledyneFlirCameraModel_T1K::startCommunications()
 
     setStatus(sensor::eStatus::RUNNING);
 
-    mFrameTimer.start();
+    mTimeLapseTimer.start();
 
 	return true;
 }
 
 void cTeledyneFlirCameraModel_T1K::stopCommunications()
 {
-    mFrameTimer.stop();
+    mTimeLapseTimer.stop();
 
     mCamera->stop();
 
@@ -192,9 +199,9 @@ void cTeledyneFlirCameraModel_T1K::stopCommunications()
     mIsRunning = false;
 }
 
-bool cTeledyneFlirCameraModel_T1K::updateFrameInterval(uint32_t frame_interval_ms)
+bool cTeledyneFlirCameraModel_T1K::updateLapseInterval(uint32_t interval_ms)
 {
-    mFrameTimer.time_ms(frame_interval_ms);
+    mTimeLapseTimer.time_ms(interval_ms);
 
     return true;
 }
@@ -237,12 +244,12 @@ void cTeledyneFlirCameraModel_T1K::update()
         }
         break;
     case eMode::TIME_LAPSE:
-        if (mFrameTimer.elapsed() && mCamera->isNewImageReady())
+        if (mTimeLapseTimer.elapsed() && mCamera->isNewImageReady())
         {
             mCurrentImage = mCamera->getImage();
             mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
             newData = true;
-            mFrameTimer.start();
+            mTimeLapseTimer.start();
         }
         break;
     case eMode::CONTINUOUS:

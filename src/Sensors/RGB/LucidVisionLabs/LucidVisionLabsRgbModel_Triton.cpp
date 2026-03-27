@@ -1,8 +1,14 @@
 
 #include "LucidVisionLabsRgbModel_Triton.hpp"
 
-#define USE_LOG_MESSAGE
+#include <LucidVisionLabsConnect/LucidTritonCamera.hpp>
 
+#include <Arena/ArenaAPI.h>
+
+#include "TimestampProvider.hpp"
+
+
+#define USE_LOG_MESSAGE
 
 namespace
 {
@@ -10,12 +16,21 @@ namespace
 }
 
 
-cLucidVisionLabsRgbModel_Triton::cLucidVisionLabsRgbModel_Triton(QObject* parent)
+cLucidVisionLabsRgbModel_Triton::cLucidVisionLabsRgbModel_Triton(std::unique_ptr<cLucidTritonCamera> camera, QObject* parent)
 :
     cLucidVisionLabsRgbModel("Triton Camera", parent),
-    mInstanceID(++lucid_vision_labs_triton_instance_id)
+    mInstanceID(++lucid_vision_labs_triton_instance_id), 
+    mCamera(std::move(camera))
 {
-    mModel = "Triton Camera";
+    mModel = mCamera->getModelName();
+    mManufacturer = mCamera->getVendorName();
+    mSerialNumber = mCamera->getSerialNumber();
+    mFamilyName = mCamera->getFamilyName();
+    mModelVersion = mCamera->getVersion();
+    mFirmwareVersion = mCamera->getFirmwareVersion();
+    mMacAddress = mCamera->getMacAddress();
+    mIpAddress = mCamera->getIpAddress();
+
 }
 
 cLucidVisionLabsRgbModel_Triton::~cLucidVisionLabsRgbModel_Triton()
@@ -28,18 +43,45 @@ uint8_t cLucidVisionLabsRgbModel_Triton::device_id() const
     return mInstanceID;
 }
 
+void cLucidVisionLabsRgbModel_Triton::setMode(eMode mode)
+{
+    bool changing = mode != mMode;
+
+    mMode = mode;
+
+    if (changing)
+        emit modeChanged(static_cast<int>(mMode));
+}
+
+void cLucidVisionLabsRgbModel_Triton::setFrameRate_Hz(double frame_rate_hz)
+{
+
+}
+
+void cLucidVisionLabsRgbModel_Triton::setLapseInterval_ms(uint32_t interval_ms)
+{
+
+}
+
 void cLucidVisionLabsRgbModel_Triton::updateViews()
 {
 }
 
 bool cLucidVisionLabsRgbModel_Triton::configure(const nlohmann::json& jsonCfg)
 {
+    setInstanceName(mModel);
+
 //    size_t buffer_size = max_image_size.height * max_image_size.width;
 
 //    mSerializer.setBufferCapacity(buffer_size + 1024);
 
     setStatus(sensor::eStatus::CONFIGURED);
 
+    return true;
+}
+
+bool cLucidVisionLabsRgbModel_Triton::initialize()
+{
     return true;
 }
 
@@ -64,17 +106,132 @@ void cLucidVisionLabsRgbModel_Triton::writeDataHeader()
 
 bool cLucidVisionLabsRgbModel_Triton::startCommunications()
 {
-    if (!mConnected) return false;
+    if (mCamera->isConnected())
+    {
+        setStatus(sensor::eStatus::CONNECTED);
+
+        return true;
+    }
 
     setStatus(sensor::eStatus::CONNECTING);
 
-	return true;
+	return false;
 }
 
 void cLucidVisionLabsRgbModel_Triton::stopCommunications()
 {
-    if (!mConnected) return;
     setStatus(sensor::eStatus::STOPPED);
+}
+
+void cLucidVisionLabsRgbModel_Triton::requestMode(int mode)
+{
+
+}
+
+void cLucidVisionLabsRgbModel_Triton::requestFrameRate_Hz(double frame_rate_hz)
+{
+
+}
+
+void cLucidVisionLabsRgbModel_Triton::requestFrameInterval_ms(uint32_t frame_interval_ms)
+{
+
+}
+
+void cLucidVisionLabsRgbModel_Triton::requestImage()
+{
+
+}
+
+void cLucidVisionLabsRgbModel_Triton::requestImages(bool update_view)
+{
+
+}
+
+void cLucidVisionLabsRgbModel_Triton::takePhoto(bool update_view)
+{
+
+}
+
+void cLucidVisionLabsRgbModel_Triton::update()
+{
+//    if (!mIsRunning) return;
+
+    if (!mCamera->isConnected())
+    {
+        setStatus(sensor::eStatus::FAILED);
+
+//        mIsRunning = false;
+        return;
+    }
+
+    bool newData = false;
+
+    switch (mMode)
+    {
+    case eMode::SINGLE:
+        if (mPhotoRequested)
+        {
+            auto* pImage = mCamera->getImage(0);
+
+            if (pImage)
+            {
+                updateCurrentImage(pImage);
+
+                newData = true;
+                mPhotoRequested = false;
+                emit photoTaken();
+            }
+        }
+        break;
+    case eMode::TIME_LAPSE:
+        if (mTimeLapseTimer.elapsed())
+        {
+            auto* pImage = mCamera->getImage(0);
+
+            if (pImage)
+            {
+                updateCurrentImage(pImage);
+                newData = true;
+                mTimeLapseTimer.start();
+            }
+        }
+        break;
+    case eMode::CONTINUOUS:
+        auto* pImage = mCamera->getImage(0);
+
+        if (pImage)
+        {
+            updateCurrentImage(pImage);
+            newData = true;
+        }
+        break;
+    }
+
+    if (newData)
+    {
+        if (mIsRecording && static_cast<bool>(mSerializer))
+        {
+            mSerializer.writeImage(mInstanceID, mCurrentImage);
+        }
+
+        if (mImageRequested || mAutoEmitImages)
+        {
+            constexpr double scale = 255.0 / 65535.0;
+
+            mImageBuffer.resize(mCurrentImage.size());
+
+            for (std::size_t i = 0; i < mCurrentImage.size(); ++i)
+            {
+                mImageBuffer[i] = static_cast<uint8_t>(mCurrentImage[i] * scale);
+            }
+
+            mImage = QImage(mImageBuffer.data(), mCurrentImage.width(), mCurrentImage.height(), QImage::Format_RGB888);
+
+            emit onNewImage(mImage);
+            mImageRequested = false;
+        }
+    }
 }
 
 void cLucidVisionLabsRgbModel_Triton::errorHappend(int id, QString msg)
@@ -87,3 +244,20 @@ void cLucidVisionLabsRgbModel_Triton::errorHappend(int id, QString msg)
     setStatus(sensor::eStatus::FAILED);
 }
 
+void cLucidVisionLabsRgbModel_Triton::updateCurrentImage(Arena::IImage* pImage)
+{
+    auto pConverted = Arena::ImageFactory::Convert(pImage, RGB16);
+
+    auto height = pConverted->GetHeight();
+    auto width = pConverted->GetWidth();
+    auto bits = pConverted->GetBitsPerPixel();
+    auto id = pConverted->GetFrameId();
+
+    mCurrentImage.setData(pConverted->GetData(), width, height, bits);
+
+    Arena::ImageFactory::Destroy(pConverted);
+    mCamera->requeueBuffer(pImage);
+
+    mCurrentImage.setFrameID(id);
+    mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
+}

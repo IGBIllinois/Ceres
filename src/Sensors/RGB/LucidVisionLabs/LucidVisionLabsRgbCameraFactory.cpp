@@ -2,7 +2,7 @@
  */
 
 #include "LucidVisionLabsRgbCameraFactory.hpp"
-
+#include "LucidVisionLabsIDs.hpp"
 
 #include <LucidVisionLabsConnect/LucidCameraFactory.hpp>
 #include <LucidVisionLabsConnect/LucidTritonCamera.hpp>
@@ -11,8 +11,10 @@
 #include "LucidVisionLabsRgbView_Triton.hpp"
 #include "LucidVisionLabsRgbStatusView.hpp"
 #include "LucidVisionLabsRgbController.hpp"
-#include "LucidVisionLabsRgbPropertyPage.hpp"
 #include "LucidVisionLabsRgbPropertyPage_Remote.hpp"
+#include "LucidVisionLabsRgbPropertyPage_Local.hpp"
+
+#include "StringUtils.hpp"
 
 #include <QWidget>
 #include <QString>
@@ -22,28 +24,32 @@
 // Example of how to declare a metatype in Qt
 //Q_DECLARE_METATYPE(ouster::sensor_info_t);
 
-#if 0
-sSensorWidgets create_lucid_vision_labs_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
+sSensorWidgets create_triton_sensor(const nlohmann::json& sensorInfo, bool no_visualization)
 {
-    // Create the Ouster model and view...
-    cAxisCommunicationsModel_F44* pModel = nullptr;
+    if (!sensorInfo.contains("serial_number"))
+    {
+        qCritical() << "The \"serial_number\" entry is missing from the \"lucid_vision_labs\" sensor section.";
+        return sSensorWidgets();
+    }
 
-    std::string protocol = sensorInfo["protocol"];
+    std::string serial_number = sensorInfo["serial_number"];
 
-    if (protocol == "net")
-        pModel = new cAxisCommunicationsModel_F44();
-    else if (protocol == "file")
-        pModel = new cAxisCommunicationsModel_F44();
+    cLucidCameraFactory factory;
 
-    if (!pModel)
-        throw std::runtime_error("Axis F44: Unknown protocol type!");
+    auto camera = factory.getTritonCamera(serial_number);
 
+    if (!camera)
+        return sSensorWidgets();
+
+    // Create the Triton model and view...
+    cLucidVisionLabsRgbModel_Triton* pModel = new cLucidVisionLabsRgbModel_Triton(std::move(camera));
 
     if (no_visualization)
     {
+/*
         if (protocol == "net")
         {
-            auto* pView = new cAxisCommunicationsStatusView(pModel);
+            auto* pView = new cLucidVisionLabsRgbStatusView(pModel);
             pView->createWidgets();
             pView->doLayout();
 
@@ -55,41 +61,47 @@ sSensorWidgets create_lucid_vision_labs_sensor(const nlohmann::json& sensorInfo,
             auto* pController = new cAxisCommunicationsController_F44(pModel);
             return sSensorWidgets(pModel, pController, pView);
         }
-
+*/
         return sSensorWidgets(pModel);
     }
 
     auto* dockWidget = new QDockWidget();
-    auto* pView = new cAxisCommunicationsView_F44(pModel, dockWidget);
+    auto* pView = new cLucidVisionLabsRgbView_Triton(pModel, dockWidget);
     pView->initialize();
 
     dockWidget->setWindowTitle(pView->windowTitle());
     dockWidget->setWidget(pView);
-    QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cAxisCommunicationsView::dockLocationChanged);
-    QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cAxisCommunicationsView::topLevelChanged);
 
-    QObject::connect(pModel, &cAxisCommunicationsModel_F44::enableCamera, pView, &cAxisCommunicationsView_F44::enableCamera);
-    QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage, pView, &cAxisCommunicationsView::imageUpdated);
+    QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cLucidVisionLabsRgbView::dockLocationChanged);
+    QObject::connect(dockWidget, &QDockWidget::topLevelChanged,     pView, &cLucidVisionLabsRgbView::topLevelChanged);
 
-    QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel::sensorNameChanging, pView, &cLucidVisionLabsRgbView::onSensorNameChanging);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel::modeChanged,        pView, &cLucidVisionLabsRgbView::onModeChange);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel::imageSizeChanged,   pView, &cLucidVisionLabsRgbView::onImageSizeChange);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel::onNewImage,         pView, &cLucidVisionLabsRgbView::imageUpdated);
 
-    return sSensorWidgets(pModel, dockWidget);
+    QObject::connect(pView, &cLucidVisionLabsRgbView::requestImage,  pModel, &cLucidVisionLabsRgbModel::requestImage);
+    QObject::connect(pView, &cLucidVisionLabsRgbView::requestImages, pModel, &cLucidVisionLabsRgbModel::requestImages);
+
+    auto page = new cLucidVisionLabsRgbPropertyPage_Local(pModel);
+
+    return sSensorWidgets(pModel, dockWidget, page);
 }
-#endif
 
 sSensorWidgets lucid_vision_labs_rgb::create_sensor(const nlohmann::json& sensorInfo,
     bool no_visualization)
 {
-    std::string instance = sensorInfo["instance"];
-
-    cLucidCameraFactory factory;
-
-    auto camera = factory.getTritonCamera(instance);
+    if (!sensorInfo.contains("sensor"))
+    {
+        qCritical() << "The \"sensor\" entry is missing from the \"lucid_vision_labs\" sensor section.  ";
+        qCritical() << "Valid values are: triton.";
+        return sSensorWidgets();
+    }
 
     std::string sensor = sensorInfo["sensor"];
 
-//    if (sensor == "HTR0035")
-//        return create_axis_communications_f44_sensor(sensorInfo, no_visualization);
+    if (nStringUtils::iequal(sensor, lucid_triton_id))
+        return create_triton_sensor(sensorInfo, no_visualization);
 
     return sSensorWidgets();
 }

@@ -36,10 +36,10 @@ cExperimentState* cTeledyneFlirPropertyPage_Local::createState(const std::string
 
 			QObject::connect(pState, &cTeledyneFlirCamera_Configure_Local::requestMode,				mpModel, &cTeledyneFlirCameraModel::requestMode);
 			QObject::connect(pState, &cTeledyneFlirCamera_Configure_Local::requestFrameRate_Hz,		mpModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
-			QObject::connect(pState, &cTeledyneFlirCamera_Configure_Local::requestFrameInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestFrameInterval_ms);
+			QObject::connect(pState, &cTeledyneFlirCamera_Configure_Local::requestLapseInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
 
 			QObject::connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,			pState, &cTeledyneFlirCamera_Configure_Local::modeChanged);
-			QObject::connect(mpModel, &cTeledyneFlirCameraModel::frameIntervalChanged,	pState, &cTeledyneFlirCamera_Configure_Local::frameIntervalChanged);
+			QObject::connect(mpModel, &cTeledyneFlirCameraModel::lapseIntervalChanged,	pState, &cTeledyneFlirCamera_Configure_Local::lapseIntervalChanged);
 			QObject::connect(mpModel, &cTeledyneFlirCameraModel::frameRateChanged,		pState, &cTeledyneFlirCamera_Configure_Local::frameRateChanged);
 
 			if (parent)
@@ -112,7 +112,7 @@ void cTeledyneFlirPropertyPage_Local::showPage()
 
 	mpFrameRate_fps->setText(QString::number(mpModel->frameRate_Hz(), static_cast<char>(103), 4));
 
-	double interval_s = mpModel->frameInterval_ms() * 0.001;
+	double interval_s = mpModel->lapseInterval_ms() * 0.001;
 	mpFrameInterval_s->setText(QString::number(interval_s, static_cast<char>(103), 4));
 
 	std::optional<float> minValue_K = mpModel->minThermalValue_K();
@@ -155,7 +155,7 @@ void cTeledyneFlirPropertyPage_Local::doApply()
 	case 1:
 	{
 		uint32_t interval_ms = static_cast<uint32_t>(mpFrameInterval_s->text().toDouble() * 0.001);
-		mpModel->setFrameInterval_ms(interval_ms);
+		mpModel->setLapseInterval_ms(interval_ms);
 		mpModel->setMode(cTeledyneFlirCameraModel::TIME_LAPSE);
 		break;
 	}
