@@ -76,7 +76,7 @@ if(WIN32)
       NAMES Arena_v140.lib
       HINTS
         "$ENV{ARENA_SDK}/lib64/Arena"
-	"$ENV{LUCID_DEV_ROOT}/lib64/Arena"
+	    "$ENV{LUCID_DEV_ROOT}/lib64/Arena"
         "${CMAKE_INSTALL_PREFIX}/lib64"
       )
 
@@ -85,7 +85,7 @@ if(WIN32)
       NAMES Arena_v140.lib
       HINTS
         "$ENV{ARENA_SDK}/lib/Arena"
-	"$ENV{LUCID_DEV_ROOT}/lib/Arena"
+	    "$ENV{LUCID_DEV_ROOT}/lib/Arena"
         "${CMAKE_INSTALL_PREFIX}/lib"
       )
   endif()
