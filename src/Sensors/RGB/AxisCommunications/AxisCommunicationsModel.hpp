@@ -78,7 +78,6 @@ public:
 
     void update() override;
 
-
 signals:
     void onNewImage(const QImage& image);
     void cameraIdChanged(int id);

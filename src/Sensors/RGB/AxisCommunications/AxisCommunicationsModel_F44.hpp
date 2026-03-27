@@ -85,6 +85,13 @@ protected slots:
 
     virtual void processReply(const std::string& reply) {};
 
+protected:
+    // Unlike most other RGB cameras, the Axis Communication F44 system does not support
+    // the various modes
+    void setMode(eMode mode)  override {};
+    void setFrameRate_Hz(double frame_rate_hz) override {};
+    void setLapseInterval_ms(uint32_t interval_ms)  override {};
+
 private:
     QByteArray mImageData;
     QBuffer mImageBuffer;
