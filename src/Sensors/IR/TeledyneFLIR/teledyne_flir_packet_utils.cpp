@@ -47,9 +47,9 @@ int flir::encode_query_frame_rate(net_buffer& buffer)
     return encode_query(eQUERY_FRAME_RATE, buffer);
 }
 
-int flir::encode_query_frame_interval(net_buffer& buffer)
+int flir::encode_query_lapse_interval(net_buffer& buffer)
 {
-    return encode_query(eQUERY_FRAME_INTERVAL, buffer);
+    return encode_query(eQUERY_LAPSE_INTERVAL, buffer);
 }
 
 int flir::encode_query_thermal_range(net_buffer& buffer)
@@ -153,22 +153,22 @@ int flir::encode_frame_rate(double fps, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-uint32_t flir::to_frame_interval_t(const teledyne_FrameIntervalMessage_1& pckt)
+uint32_t flir::to_lapse_interval_t(const teledyne_LapseIntervalMessage_1& pckt)
 {
-    return pckt.frames_interval_ms();
+    return pckt.lapse_interval_ms();
 }
 
-int flir::encode_frame_interval(uint32_t interval_ms, net_buffer& buffer)
+int flir::encode_lapse_interval(uint32_t interval_ms, net_buffer& buffer)
 {
-    teledyne_FrameIntervalMessage_1 pckt;
+    teledyne_LapseIntervalMessage_1 pckt;
 
-    pckt.set_frames_interval_ms(interval_ms);
+    pckt.set_lapse_interval_ms(interval_ms);
 
     std::string str;
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAME_INTERVAL_MS);
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::LAPSE_INTERVAL_MS);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -220,7 +220,7 @@ flir::sCurrentState flir::to_current_state_t(const teledyne_StateMessage_1& pckt
     state.width = pckt.width();
     state.height = pckt.height();
     state.frames_per_second = pckt.frames_per_second();
-    state.frames_interval_ms = pckt.frames_interval_ms();
+    state.lapse_interval_ms = pckt.lapse_interval_ms();
 
     if (pckt.has_min_frames_per_second())
         state.min_frames_per_second = pckt.min_frames_per_second();
@@ -248,7 +248,7 @@ int flir::encode_current_state(bool valid, uint8_t mode, uint16_t width, uint16_
     pckt.set_width(width);
     pckt.set_height(height);
     pckt.set_frames_per_second(fps);
-    pckt.set_frames_interval_ms(interval_ms);
+    pckt.set_lapse_interval_ms(interval_ms);
 
     if (min_fps.has_value())
         pckt.set_min_frames_per_second(min_fps.value());

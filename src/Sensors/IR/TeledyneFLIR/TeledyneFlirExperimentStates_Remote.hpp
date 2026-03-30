@@ -46,7 +46,7 @@ private:
 	void onMode(uint8_t id) override {};
 	void onImageSize(uint16_t width, uint16_t height) override {};
 	void onFrameRate(double fps) override {};
-	void onFrameInterval(uint32_t interval_ms) override {};
+	void onLapseInterval(uint32_t interval_ms) override {};
 	void onThermalRange(float min_value_K, float max_value_K) override {};
 	void onCurrentState(bool valid, uint8_t mode,
 		uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
@@ -84,7 +84,7 @@ public:
 private:
 	void onMode(uint8_t id) override;
 	void onFrameRate(double fps) override;
-	void onFrameInterval(uint32_t interval_ms) override;
+	void onLapseInterval(uint32_t interval_ms) override;
 	void onCurrentState(bool valid, uint8_t mode,
 		uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
 		std::optional<double> min_fps, std::optional<double> max_fps,
@@ -94,7 +94,7 @@ private:
 
 private:
 	int mMode = -1;
-	int mFrameInterval_ms = -1;
+	int mLapseInterval_ms = -1;
 	double mFrameRate_fps = -1;
 
 	bool mWaitingForConfiguration = true;

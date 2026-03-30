@@ -38,9 +38,9 @@ void cTeledyneFlirControllerNetEncoder::sendFrameRate_Hz(double fps)
     sendData();
 }
 
-void cTeledyneFlirControllerNetEncoder::sendFrameInterval_ms(uint32_t interval_ms)
+void cTeledyneFlirControllerNetEncoder::sendLapseInterval_ms(uint32_t interval_ms)
 {
-    encode_frame_interval(interval_ms, mBuffer);
+    encode_lapse_interval(interval_ms, mBuffer);
     sendData();
 }
 

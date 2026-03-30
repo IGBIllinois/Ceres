@@ -25,7 +25,7 @@ public:
     void sendCameraMode(uint8_t mode);
     void sendImageSize(uint16_t width, uint16_t height);
     void sendFrameRate_Hz(double fps);
-    void sendFrameInterval_ms(uint32_t interval_ms);
+    void sendLapseInterval_ms(uint32_t interval_ms);
     void sendThermalRange_K(float min_value_K, float max_value_K);
     void sendTakePhotoReply();
 };

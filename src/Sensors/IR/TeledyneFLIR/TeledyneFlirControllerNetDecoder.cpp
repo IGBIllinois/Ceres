@@ -30,8 +30,8 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
             return onQueryImageSize();
         case eQUERY_FRAME_RATE:
             return onQueryFrameRate();
-        case eQUERY_FRAME_INTERVAL:
-            return onQueryFrameInterval();
+        case eQUERY_LAPSE_INTERVAL:
+            return onQueryLapseInterval();
         case eQUERY_THERMAL_RANGE:
             return onQueryThermalRange();
         }
@@ -61,12 +61,12 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         setFrameRate_Hz(fps);
         break;
     }
-    case ePacketType::FRAME_INTERVAL_MS:
+    case ePacketType::LAPSE_INTERVAL_MS:
     {
-        teledyne_FrameIntervalMessage_1 packet;
+        teledyne_LapseIntervalMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
-        auto interval_ms = to_frame_interval_t(packet);
-        setFrameInterval_ms(interval_ms);
+        auto interval_ms = to_lapse_interval_t(packet);
+        setLapseInterval_ms(interval_ms);
         break;
     }
     case ePacketType::THERMAL_RANGE_K:

@@ -30,7 +30,7 @@ public:
 signals:
     void requestMode(int mode);
     void requestFrameRate_Hz(double frame_rate_hz);
-    void requestFrameInterval_ms(uint32_t frame_interval_ms);
+    void requestLapseInterval_ms(uint32_t interval_ms);
     void requestImage();
     void requestImages(bool update_view);
     void requestPhoto(bool update_view);
@@ -38,7 +38,7 @@ signals:
 public slots:
     void photoTaken();
     void modeChanged(int mode);
-    void frameIntervalChanged(int interval_ms);
+    void lapseIntervalChanged(int interval_ms);
     void frameRateChanged(double rate_fps);
     void imageSizeChanged(int width, int height);
 
@@ -46,12 +46,12 @@ protected:
     void onQueryMode() override;
     void onQueryImageSize() override;
     void onQueryFrameRate() override;
-    void onQueryFrameInterval() override;
+    void onQueryLapseInterval() override;
 
     void setMode(uint8_t mode) override;
     void setImageSize(uint16_t width, uint16_t height) override;
     void setFrameRate_Hz(double fps) override;
-    void setFrameInterval_ms(uint32_t interval_ms) override;
+    void setLapseInterval_ms(uint32_t interval_ms) override;
 
 protected:
     /**

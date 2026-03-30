@@ -58,13 +58,16 @@ bool cTeledyneFlirCameraModel::configure(const nlohmann::json& jsonCfg)
 
     int32_t lapse_interval_ms = -1;
 
-    if (jsonCfg.contains("lapse interval (s)"))
-        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"] * 1000);
+    if (jsonCfg.contains("time-lapse interval (s)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["time-lapse interval (s)"] * 1000.0);
+    else if (jsonCfg.contains("time-lapse interval (ms)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["time-lapse interval (s)"]);
+    else if (jsonCfg.contains("lapse interval (s)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"] * 1000.0);
     else if (jsonCfg.contains("lapse interval (ms)"))
         lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"]);
-
-    if (jsonCfg.contains("interval (s)"))
-        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"] * 1000);
+    else if (jsonCfg.contains("interval (s)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"] * 1000.0);
     else if (jsonCfg.contains("interval (ms)"))
         lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (ms)"]);
 
@@ -170,20 +173,16 @@ void cTeledyneFlirCameraModel::requestMode(int mode)
 {
     if ((mode >= eMode::SINGLE) && (mode <= eMode::CONTINUOUS))
         setMode(static_cast<eMode>(mode));
-
-    emit modeChanged(static_cast<int>(mMode));
 }
 
 void cTeledyneFlirCameraModel::requestFrameRate_Hz(double frame_rate_hz)
 {
     setFrameRate_Hz(frame_rate_hz);
-    emit frameRateChanged(mFrameRate_fps);
 }
 
 void cTeledyneFlirCameraModel::requestLapseInterval_ms(uint32_t interval_ms)
 {
     setLapseInterval_ms(interval_ms);
-    emit lapseIntervalChanged(mLapseInterval_ms);
 }
 
 

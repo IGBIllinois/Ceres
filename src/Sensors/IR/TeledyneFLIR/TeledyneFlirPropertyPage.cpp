@@ -30,8 +30,8 @@ void cTeledyneFlirPropertyPage::createWidgets()
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
 
-	mpFrameIntervalLabel = new QLabel("Frame Interval (s):", this);;
-	mpFrameInterval_s = new QLineEdit(this);
+	mpLapseIntervalLabel = new QLabel("Time-Lapse Interval (s):", this);;
+	mpLapseInterval_s = new QLineEdit(this);
 
 	mpThermalRangeLabel = new QLabel("Thermal Range (K):", this);
 	mpThermalRange = new QLineEdit(this);
@@ -45,7 +45,7 @@ void cTeledyneFlirPropertyPage::enableControls(bool enable)
 {
 	mpMode->setEnabled(enable);
 	mpFrameRate_fps->setEnabled(enable);
-	mpFrameInterval_s->setEnabled(enable);
+	mpLapseInterval_s->setEnabled(enable);
 	mpGrabImage->setEnabled(enable);
 }
 
@@ -58,7 +58,7 @@ void cTeledyneFlirPropertyPage::doLayout()
 	pLayout->addRow(mpModeLabel, mpMode);
 	pLayout->addRow(mpImageSizeLabel, mpImageSize);
 	pLayout->addRow(mpFrameRateLabel, mpFrameRate_fps);
-	pLayout->addRow(mpFrameIntervalLabel, mpFrameInterval_s);
+	pLayout->addRow(mpLapseIntervalLabel, mpLapseInterval_s);
 	pLayout->addRow(mpThermalRangeLabel, mpThermalRange);
 	pMainLayout->addLayout(pLayout);
 
@@ -75,16 +75,16 @@ void cTeledyneFlirPropertyPage::modeTextChanged(const QString& text)
 	if (text == "Photo")
 	{
 		mpFrameRate_fps->setEnabled(false);
-		mpFrameInterval_s->setEnabled(false);
+		mpLapseInterval_s->setEnabled(false);
 	}
 	else if (text == "Time Lapse")
 	{
 		mpFrameRate_fps->setEnabled(false);
-		mpFrameInterval_s->setEnabled(true);
+		mpLapseInterval_s->setEnabled(true);
 	}
 	else if (text == "Video")
 	{
-		mpFrameInterval_s->setEnabled(false);
+		mpLapseInterval_s->setEnabled(false);
 		mpFrameRate_fps->setEnabled(true);
 	}
 }

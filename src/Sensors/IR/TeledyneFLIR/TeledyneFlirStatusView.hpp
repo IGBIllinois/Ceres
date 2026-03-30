@@ -29,7 +29,7 @@ public:
 signals:
 	void requestMode(int mode);
 	void requestFrameRate_Hz(double frame_rate_hz);
-	void requestFrameInterval_ms(uint32_t frame_interval_ms);
+	void requestLapseInterval_ms(uint32_t interval_ms);
 
 	void requestImage();
 	void requestImages(bool update_view);
@@ -37,7 +37,7 @@ signals:
 public slots:
 	void onSensorNameChanging(QString old_name, QString new_name, QString instance);
 	void onModeChange(int mode);
-	void onFrameIntervalChange(int interval_ms);
+	void onLapseIntervalChange(int interval_ms);
 	void onFrameRateChange(double rate_fps);
 	void onImageSizeChange(int width, int height);
 	void imageUpdated(const QImage& image);
@@ -47,7 +47,7 @@ public slots:
 protected slots:
 	void modeTextChanged(const QString&);
 	void frameRateEditingFinished();
-	void frameIntervalEditingFinished();
+	void lapseIntervalEditingFinished();
 
 private:
 	QLabel* mpModeLabel = nullptr;
@@ -56,8 +56,8 @@ private:
 	QLabel* mpImageSizeLabel = nullptr;
 	QLineEdit* mpImageSizes = nullptr;
 
-	QLabel* mpFrameIntervalLabel = nullptr;
-	QLineEdit* mpFrameInterval_s = nullptr;
+	QLabel* mpLapseIntervalLabel = nullptr;
+	QLineEdit* mpLapseInterval_s = nullptr;
 
 	QLabel* mpFrameRateLabel = nullptr;
 	QLineEdit* mpFrameRate_fps = nullptr;

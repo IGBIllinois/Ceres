@@ -35,7 +35,7 @@ void cTeledyneFlirPropertiesNetEncoder::sendQueryFrameRate()
 
 void cTeledyneFlirPropertiesNetEncoder::sendQueryFrameInterval()
 {
-    encode_query_frame_interval(mBuffer);
+    encode_query_lapse_interval(mBuffer);
     sendData();
 }
 
@@ -63,9 +63,9 @@ void cTeledyneFlirPropertiesNetEncoder::sendSetFrameRate_fps(double fps)
     sendData();
 }
 
-void cTeledyneFlirPropertiesNetEncoder::sendSetFrameInterval_ms(uint32_t interval_ms)
+void cTeledyneFlirPropertiesNetEncoder::sendSetLapseInterval_ms(uint32_t interval_ms)
 {
-    encode_frame_interval(interval_ms, mBuffer);
+    encode_lapse_interval(interval_ms, mBuffer);
     sendData();
 }
 

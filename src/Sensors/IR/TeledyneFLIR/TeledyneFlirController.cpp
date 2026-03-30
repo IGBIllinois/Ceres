@@ -58,9 +58,9 @@ void cTeledyneFlirController::modeChanged(int mode)
     sendCameraMode(mode);
 }
 
-void cTeledyneFlirController::frameIntervalChanged(int interval_ms)
+void cTeledyneFlirController::lapseIntervalChanged(int interval_ms)
 {
-    sendFrameInterval_ms(interval_ms);
+    sendLapseInterval_ms(interval_ms);
 }
 
 void cTeledyneFlirController::frameRateChanged(double rate_fps)
@@ -113,9 +113,9 @@ void cTeledyneFlirController::onQueryFrameRate()
     sendFrameRate_Hz(mpModel->frameRate_Hz());
 }
 
-void cTeledyneFlirController::onQueryFrameInterval()
+void cTeledyneFlirController::onQueryLapseInterval()
 {
-    sendFrameInterval_ms(mpModel->lapseInterval_ms());
+    sendLapseInterval_ms(mpModel->lapseInterval_ms());
 }
 
 
@@ -137,9 +137,9 @@ void cTeledyneFlirController::setFrameRate_Hz(double fps)
     emit requestFrameRate_Hz(fps);
 }
 
-void cTeledyneFlirController::setFrameInterval_ms(uint32_t interval_ms)
+void cTeledyneFlirController::setLapseInterval_ms(uint32_t interval_ms)
 {
-    emit requestFrameInterval_ms(interval_ms);
+    emit requestLapseInterval_ms(interval_ms);
 }
 
 

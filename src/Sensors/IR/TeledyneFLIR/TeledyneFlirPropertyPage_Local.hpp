@@ -16,6 +16,7 @@ class cTeledyneFlirCameraModel_T1K;
 
 class cTeledyneFlirPropertyPage_Local : public cTeledyneFlirPropertyPage
 {
+    Q_OBJECT
 
 public:
     cTeledyneFlirPropertyPage_Local(cTeledyneFlirCameraModel* pModel, QWidget* parent = nullptr);
@@ -23,6 +24,14 @@ public:
 
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
+
+signals:
+    void requestMode(int mode);
+    void requestFrameRate_Hz(double frame_rate_hz);
+    void requestLapseInterval_ms(uint32_t interval_ms);
+    void requestImage();
+    void requestImages(bool update_view);
+    void requestPhoto(bool update_view);
 
 protected:
     void createWidgets() override;

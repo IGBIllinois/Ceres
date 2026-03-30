@@ -48,8 +48,8 @@ protected:
     QLabel* mpFrameRateLabel = nullptr;
     QLineEdit* mpFrameRate_fps = nullptr;
 
-    QLabel* mpFrameIntervalLabel = nullptr;
-    QLineEdit* mpFrameInterval_s = nullptr;
+    QLabel* mpLapseIntervalLabel = nullptr;
+    QLineEdit* mpLapseInterval_s = nullptr;
 
     QLabel* mpThermalRangeLabel = nullptr;
     QLineEdit* mpThermalRange = nullptr;

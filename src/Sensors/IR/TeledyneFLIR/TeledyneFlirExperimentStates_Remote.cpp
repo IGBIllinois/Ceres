@@ -103,21 +103,24 @@ bool cTeledyneFlirCamera_Configure_Remote::configure(const nlohmann::json& state
 			mFrameRate_fps = stateDoc["frame rate (hz)"];
 		}
 
-		int32_t frame_interval_ms = -1;
+		int32_t lapse_interval_ms = -1;
 
-		if (stateDoc.contains("frame interval (s)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["frame interval (s)"] * 1000);
-		else if (stateDoc.contains("frame interval (ms)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["frame interval (s)"]);
-
-		if (stateDoc.contains("interval (s)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"] * 1000);
+		if (stateDoc.contains("time-lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"] * 1000.0);
+		else if (stateDoc.contains("time-lapse interval (ms)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"]);
+		else if (stateDoc.contains("lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"] * 1000.0);
+		else if (stateDoc.contains("lapse interval (ms)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"]);
+		else if (stateDoc.contains("interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"] * 1000.0);
 		else if (stateDoc.contains("interval (ms)"))
-			frame_interval_ms = static_cast<int32_t>(stateDoc["interval (ms)"]);
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (ms)"]);
 
-		if (frame_interval_ms > 0)
+		if (lapse_interval_ms > 0)
 		{
-			mFrameInterval_ms = frame_interval_ms;
+			mLapseInterval_ms = lapse_interval_ms;
 		}
 	}
 	catch (const detail::parse_error& e)
@@ -175,7 +178,7 @@ void cTeledyneFlirCamera_Configure_Remote::onFrameRate(double fps)
 	mWaitingForFrameRate = false;
 }
 
-void cTeledyneFlirCamera_Configure_Remote::onFrameInterval(uint32_t interval_ms)
+void cTeledyneFlirCamera_Configure_Remote::onLapseInterval(uint32_t interval_ms)
 {
 	mWaitingForInterval = false;
 }
@@ -191,8 +194,8 @@ void cTeledyneFlirCamera_Configure_Remote::onCurrentState(bool valid, uint8_t mo
 	if (mFrameRate_fps > 0)
 		mWaitingForFrameRate = mFrameRate_fps != fps;
 
-	if (mFrameInterval_ms > 0)
-		mWaitingForInterval = mFrameInterval_ms != interval_ms;
+	if (mLapseInterval_ms > 0)
+		mWaitingForInterval = mLapseInterval_ms != interval_ms;
 
 	if (mWaitingForMode)
 		sendSetMode(static_cast<uint8_t>(mMode));
@@ -201,7 +204,7 @@ void cTeledyneFlirCamera_Configure_Remote::onCurrentState(bool valid, uint8_t mo
 		sendSetFrameRate_fps(mFrameRate_fps);
 
 	if (mWaitingForInterval)
-		sendSetFrameInterval_ms(mFrameInterval_ms);
+		sendSetLapseInterval_ms(mLapseInterval_ms);
 
 	mWaitingForConfiguration = false;
 }

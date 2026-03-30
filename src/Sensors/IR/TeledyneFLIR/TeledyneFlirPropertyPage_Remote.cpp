@@ -170,10 +170,10 @@ void cTeledyneFlirPropertyPage_Remote::onFrameRate(double fps)
 	mpFrameRate_fps->setText(QString::number(fps));
 }
 
-void cTeledyneFlirPropertyPage_Remote::onFrameInterval(uint32_t interval_ms)
+void cTeledyneFlirPropertyPage_Remote::onLapseInterval(uint32_t interval_ms)
 {
-	mDefaultFrameInterval_ms = interval_ms;
-	mpFrameInterval_s->setText(QString::number(interval_ms * 0.001f));
+	mDefaultLapseInterval_ms = interval_ms;
+	mpLapseInterval_s->setText(QString::number(interval_ms * 0.001f));
 }
 
 void cTeledyneFlirPropertyPage_Remote::onThermalRange(float min_value_K, float max_value_K)
@@ -201,25 +201,25 @@ void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
 
 	mDefaultMode = mode;
 	mDefaultFrameRate_fps = fps;
-	mDefaultFrameInterval_ms = interval_ms;
+	mDefaultLapseInterval_ms = interval_ms;
 
 	onMode(mode);
 	onImageSize(width, height);
 	onFrameRate(fps);
-	onFrameInterval(interval_ms);
+	onLapseInterval(interval_ms);
 
 	switch (mode)
 	{
 	case 0:
 		mpFrameRate_fps->setEnabled(false);
-		mpFrameInterval_s->setEnabled(false);
+		mpLapseInterval_s->setEnabled(false);
 		break;
 	case 1:
 		mpFrameRate_fps->setEnabled(false);
-		mpFrameInterval_s->setEnabled(true);
+		mpLapseInterval_s->setEnabled(true);
 		break;
 	case 2:
-		mpFrameInterval_s->setEnabled(false);
+		mpLapseInterval_s->setEnabled(false);
 		mpFrameRate_fps->setEnabled(true);
 		break;
 	}
@@ -286,10 +286,10 @@ void cTeledyneFlirPropertyPage_Remote::doApply()
 		sendSetFrameRate_fps(fps);
 	}
 
-	uint32_t interval_ms = static_cast<uint32_t>(mpFrameInterval_s->text().toDouble() * 1000.0);
-	if (mDefaultFrameInterval_ms != interval_ms)
+	uint32_t interval_ms = static_cast<uint32_t>(mpLapseInterval_s->text().toDouble() * 1000.0);
+	if (mDefaultLapseInterval_ms != interval_ms)
 	{
-		sendSetFrameInterval_ms(interval_ms);
+		sendSetLapseInterval_ms(interval_ms);
 	}
 }
 

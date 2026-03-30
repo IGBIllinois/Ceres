@@ -27,7 +27,7 @@ namespace flir
 		CAMERA_MODE = 1,
 		IMAGE_SIZE,
 		FRAME_RATE_HZ,
-		FRAME_INTERVAL_MS,
+		LAPSE_INTERVAL_MS,
 		THERMAL_RANGE_K,
 
 		// Property Page -> Controller
@@ -49,7 +49,7 @@ namespace flir
 	int encode_query_camera_mode(net_buffer& buffer);
 	int encode_query_image_size(net_buffer& buffer);
 	int encode_query_frame_rate(net_buffer& buffer);
-	int encode_query_frame_interval(net_buffer& buffer);
+	int encode_query_lapse_interval(net_buffer& buffer);
 	int encode_query_thermal_range(net_buffer& buffer);
 	int encode_grab_image(net_buffer& buffer);
 
@@ -69,8 +69,8 @@ namespace flir
 	double to_frame_rate_t(const teledyne_FrameRateMessage_1& pckt);
 	int encode_frame_rate(double fps, net_buffer& buffer);
 
-	uint32_t to_frame_interval_t(const teledyne_FrameIntervalMessage_1& pckt);
-	int encode_frame_interval(uint32_t interval_ms, net_buffer& buffer);
+	uint32_t to_lapse_interval_t(const teledyne_LapseIntervalMessage_1& pckt);
+	int encode_lapse_interval(uint32_t interval_ms, net_buffer& buffer);
 
 	struct sThermalRange
 	{
@@ -88,7 +88,7 @@ namespace flir
 		uint16_t width;
 		uint16_t height;
 		double   frames_per_second;
-		uint32_t frames_interval_ms;
+		uint32_t lapse_interval_ms;
 		std::optional<double> min_frames_per_second;
 		std::optional<double> max_frames_per_second;
 		std::optional<float> min_thermal_value_K;

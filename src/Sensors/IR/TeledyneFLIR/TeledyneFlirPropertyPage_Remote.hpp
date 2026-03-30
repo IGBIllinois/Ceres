@@ -26,7 +26,7 @@ public:
     void onMode(uint8_t mode) override;
     void onImageSize(uint16_t width, uint16_t height) override;
     void onFrameRate(double fps) override;
-    void onFrameInterval(uint32_t interval_ms) override;
+    void onLapseInterval(uint32_t interval_ms) override;
     void onThermalRange(float min_value_K, float max_value_K) override;
     void onCurrentState(bool valid, uint8_t mode,
         uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
@@ -59,7 +59,7 @@ protected:
 private:
     uint8_t  mDefaultMode = 255;
     double   mDefaultFrameRate_fps = 0;
-    uint32_t mDefaultFrameInterval_ms = 0;
+    uint32_t mDefaultLapseInterval_ms = 0;
 
     bool mReconnectActive = false;
 };

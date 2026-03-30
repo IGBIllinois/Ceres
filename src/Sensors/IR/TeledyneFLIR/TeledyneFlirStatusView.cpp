@@ -38,10 +38,10 @@ void cTeledyneFlirStatusView::createWidgets()
 	mpImageSizes = new QLineEdit(this);
 	mpImageSizes->setReadOnly(true);
 
-	mpFrameIntervalLabel = new QLabel("Frame Interval (sec):", this);
-	mpFrameInterval_s = new QLineEdit(this);
-	mpFrameInterval_s->setReadOnly(true);
-	connect(mpFrameInterval_s, &QLineEdit::editingFinished, this, &cTeledyneFlirStatusView::frameIntervalEditingFinished);
+	mpLapseIntervalLabel = new QLabel("Time-Lapse Interval (sec):", this);
+	mpLapseInterval_s = new QLineEdit(this);
+	mpLapseInterval_s->setReadOnly(true);
+	connect(mpLapseInterval_s, &QLineEdit::editingFinished, this, &cTeledyneFlirStatusView::lapseIntervalEditingFinished);
 
 	mpFrameRateLabel = new QLabel("Frame Rate (f/s):", this);
 	mpFrameRate_fps = new QLineEdit(this);
@@ -70,8 +70,8 @@ void cTeledyneFlirStatusView::doLayout()
 	cameraInfoLayout->addWidget(mpImageSizeLabel);
 	cameraInfoLayout->addWidget(mpImageSizes);
 
-	cameraInfoLayout->addWidget(mpFrameIntervalLabel);
-	cameraInfoLayout->addWidget(mpFrameInterval_s);
+	cameraInfoLayout->addWidget(mpLapseIntervalLabel);
+	cameraInfoLayout->addWidget(mpLapseInterval_s);
 
 	cameraInfoLayout->addWidget(mpFrameRateLabel);
 	cameraInfoLayout->addWidget(mpFrameRate_fps);
@@ -105,9 +105,9 @@ void cTeledyneFlirStatusView::onModeChange(int mode)
 	mpMode->setCurrentIndex(mode);
 }
 
-void cTeledyneFlirStatusView::onFrameIntervalChange(int interval_ms)
+void cTeledyneFlirStatusView::onLapseIntervalChange(int interval_ms)
 {
-	mpFrameInterval_s->setText(QString::number(interval_ms * 0.001f));
+	mpLapseInterval_s->setText(QString::number(interval_ms * 0.001f));
 }
 
 void cTeledyneFlirStatusView::onFrameRateChange(double rate_fps)
@@ -154,9 +154,9 @@ void cTeledyneFlirStatusView::frameRateEditingFinished()
 	emit requestFrameRate_Hz(frame_rate_hz);
 }
 
-void cTeledyneFlirStatusView::frameIntervalEditingFinished()
+void cTeledyneFlirStatusView::lapseIntervalEditingFinished()
 {
-	uint32_t frame_interval_ms = static_cast<uint32_t>(mpFrameInterval_s->text().toDouble() * 1000.0);
+	uint32_t interval_ms = static_cast<uint32_t>(mpLapseInterval_s->text().toDouble() * 1000.0);
 
-	emit requestFrameInterval_ms(frame_interval_ms);
+	emit requestLapseInterval_ms(interval_ms);
 }

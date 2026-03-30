@@ -39,12 +39,12 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         onFrameRate(fps);
         break;
     }
-    case ePacketType::FRAME_INTERVAL_MS:
+    case ePacketType::LAPSE_INTERVAL_MS:
     {
-        teledyne_FrameIntervalMessage_1 packet;
+        teledyne_LapseIntervalMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);
-        auto interval_ms = to_frame_interval_t(packet);
-        onFrameInterval(interval_ms);
+        auto interval_ms = to_lapse_interval_t(packet);
+        onLapseInterval(interval_ms);
         break;
     }
     case ePacketType::THERMAL_RANGE_K:
@@ -61,7 +61,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         packet.ParseFromArray(buffer.data(), hdr.length);
         auto state = to_current_state_t(packet);
         onCurrentState(state.valid, state.mode, state.width,
-            state.height, state.frames_per_second, state.frames_interval_ms,
+            state.height, state.frames_per_second, state.lapse_interval_ms,
             state.min_frames_per_second, state.max_frames_per_second,
             state.min_thermal_value_K, state.max_thermal_value_K);
         break;
