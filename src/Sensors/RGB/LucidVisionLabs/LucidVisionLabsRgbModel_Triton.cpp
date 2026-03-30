@@ -65,6 +65,10 @@ void cLucidVisionLabsRgbModel_Triton::setLapseInterval_ms(uint32_t interval_ms)
 
 void cLucidVisionLabsRgbModel_Triton::updateViews()
 {
+    emit modeChanged(static_cast<int>(mMode));
+    emit lapseIntervalChanged(mLapseInterval_ms);
+    emit frameRateChanged(mFrameRate_fps);
+    emit imageSizeChanged(mImageWidth, mImageHeight);
 }
 
 bool cLucidVisionLabsRgbModel_Triton::configure(const nlohmann::json& jsonCfg)
@@ -133,7 +137,7 @@ void cLucidVisionLabsRgbModel_Triton::requestFrameRate_Hz(double frame_rate_hz)
 
 }
 
-void cLucidVisionLabsRgbModel_Triton::requestFrameInterval_ms(uint32_t frame_interval_ms)
+void cLucidVisionLabsRgbModel_Triton::requestLapseInterval_ms(uint32_t frame_interval_ms)
 {
 
 }

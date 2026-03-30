@@ -65,13 +65,10 @@ public:
 
     void update() override;
 
-signals:
-    void enableCamera(int id);
-
 public slots:
     void requestMode(int mode) override;
     void requestFrameRate_Hz(double frame_rate_hz) override;
-    void requestFrameInterval_ms(uint32_t frame_interval_ms) override;
+    void requestLapseInterval_ms(uint32_t interval_ms) override;
     void requestImage() override;
     void requestImages(bool update_view) override;
 

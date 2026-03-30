@@ -53,14 +53,14 @@ signals:
     void onNewImage(const QImage& image);
     void photoTaken();
     void modeChanged(int mode);
-    void frameIntervalChanged(int interval_ms);
+    void lapseIntervalChanged(int interval_ms);
     void frameRateChanged(double rate_fps);
     void imageSizeChanged(int width, int height);
 
 public slots:
     virtual void requestMode(int mode) = 0;
     virtual void requestFrameRate_Hz(double frame_rate_hz) = 0;
-    virtual void requestFrameInterval_ms(uint32_t frame_interval_ms) = 0;
+    virtual void requestLapseInterval_ms(uint32_t interval_ms) = 0;
     virtual void requestImage() = 0;
     virtual void requestImages(bool update_view) = 0;
 
@@ -79,10 +79,7 @@ protected:
     std::string mMacAddress;
     std::string mIpAddress;
 
-    eMode mMode = eMode::SINGLE;
     bool mPhotoRequested = false;
-
-    double mFrameRate_fps = 0;
 
     uint16_t mImageWidth = 0;
     uint16_t mImageHeight = 0;

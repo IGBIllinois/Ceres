@@ -14,10 +14,23 @@ class cLucidVisionLabsRgbModel_Triton;
 
 class cLucidVisionLabsRgbPropertyPage_Local : public cLucidVisionLabsRgbPropertyPage
 {
+    Q_OBJECT
 
 public:
     cLucidVisionLabsRgbPropertyPage_Local(cLucidVisionLabsRgbModel* pModel, QWidget* parent = nullptr);
     ~cLucidVisionLabsRgbPropertyPage_Local() = default;
+
+signals:
+    void changeMode(int mode);
+    void changeFrameRate_Hz(double frame_rate_hz);
+    void changeLapseInterval_ms(uint32_t interval_ms);
+
+/*
+    virtual void requestImage() = 0;
+    virtual void requestImages(bool update_view) = 0;
+
+    virtual void takePhoto(bool update_view = false) = 0;
+*/
 
 protected:
     void exposureTimeSelectorChanged(const QString&) override;

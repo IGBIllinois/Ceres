@@ -2,6 +2,7 @@
 
 #include "LucidVisionLabsRgbPropertyPage_Local.hpp"
 #include "LucidVisionLabsRgbUtils.hpp"
+#include "LucidVisionLabsRgbModel.hpp"
 
 #include <QString>
 #include <QLineEdit>
@@ -87,6 +88,16 @@ void cLucidVisionLabsRgbPropertyPage_Local::doCancel()
 
 void cLucidVisionLabsRgbPropertyPage_Local::doApply()
 {
+	auto currentMode = mpModel->mode();
+
+	if (currentMode != mpMode->currentIndex())
+	{
+		emit changeMode(mpMode->currentIndex());
+	}
+
+//	double frameRate_Hz() const;
+//	uint32_t lapseInterval_ms() const;
+
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local::reject()
