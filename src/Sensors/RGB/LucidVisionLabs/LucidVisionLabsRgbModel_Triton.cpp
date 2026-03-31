@@ -129,7 +129,27 @@ void cLucidVisionLabsRgbModel_Triton::stopCommunications()
 
 void cLucidVisionLabsRgbModel_Triton::requestMode(int mode)
 {
+    if ((mode < eMode::SINGLE) || (eMode::CONTINUOUS < mode))
+        return;
 
+    auto camera_mode = mCamera->acquisitionMode();
+
+    if (mCamera->isStreaming())
+    {
+        mCamera->stopStream();
+    }
+
+    mCamera->acquisitionMode(nLucidVisionLabsConnect::eAcquisitionMode::SINGLE_FRAME);
+
+    if (!mCamera->startStream())
+    {
+        return;
+    }
+
+    if (!mCamera->isStreaming())
+    {
+        return;
+    }
 }
 
 void cLucidVisionLabsRgbModel_Triton::requestFrameRate_Hz(double frame_rate_hz)

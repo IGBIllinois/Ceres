@@ -1,6 +1,7 @@
 
 
 #include "TeledyneFlirPropertyPage_Remote.hpp"
+#include "TeledyneFlirIDs.hpp"
 #include "TeledyneFlirUtils.hpp"
 #include "TeledyneFlirExperimentStates_Remote.hpp"
 #include "StringUtils.hpp"
@@ -29,7 +30,7 @@ cTeledyneFlirPropertyPage_Remote::cTeledyneFlirPropertyPage_Remote(QWidget* pare
 
 cExperimentState* cTeledyneFlirPropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
-	if (nStringUtils::iequal(type, "Teledyne FLIR"))
+	if (nStringUtils::iequal(type, teledyne_flir_id))
 	{
 		auto hostname = getHostname();
 		auto port = getPort();

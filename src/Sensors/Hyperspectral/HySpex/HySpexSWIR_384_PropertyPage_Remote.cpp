@@ -1,7 +1,10 @@
 
 
 #include "HySpexSWIR_384_PropertyPage_Remote.hpp"
+#include "HySpexIDs.hpp"
 #include "HySpexExperimentStates_Remote.hpp"
+
+#include "StringUtils.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
@@ -25,7 +28,7 @@ cHySpexSWIR_384_PropertyPage_Remote::cHySpexSWIR_384_PropertyPage_Remote(QWidget
 
 cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
-	if (type == "SWIR-384")
+	if (nStringUtils::iequal(type, swir_384_id))
 	{
 		auto hostname = getHostname();
 		auto port = getPort();

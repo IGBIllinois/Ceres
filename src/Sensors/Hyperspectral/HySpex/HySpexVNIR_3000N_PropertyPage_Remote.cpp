@@ -1,7 +1,10 @@
 
 
 #include "HySpexVNIR_3000N_PropertyPage_Remote.hpp"
+#include "HySpexIDs.hpp"
 #include "HySpexExperimentStates_Remote.hpp"
+
+#include "StringUtils.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
@@ -25,7 +28,7 @@ cHySpexVNIR_3000N_PropertyPage_Remote::cHySpexVNIR_3000N_PropertyPage_Remote(QWi
 
 cExperimentState* cHySpexVNIR_3000N_PropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
-	if (type == "VNIR-3000N")
+	if (nStringUtils::iequal(type, vnir_3000N_id))
 	{
 		auto hostname = getHostname();
 		auto port = getPort();

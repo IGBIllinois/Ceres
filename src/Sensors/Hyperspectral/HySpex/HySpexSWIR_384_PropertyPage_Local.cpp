@@ -1,7 +1,10 @@
 
 
 #include "HySpexSWIR_384_PropertyPage_Local.hpp"
+#include "HySpexIDs.hpp"
 #include "HySpexExperimentStates_Local.hpp"
+
+#include "StringUtils.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
@@ -21,7 +24,7 @@ cHySpexSWIR_384_PropertyPage_Local::cHySpexSWIR_384_PropertyPage_Local(QWidget* 
 cExperimentState* cHySpexSWIR_384_PropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 /*
-	if (type == "SWIR-384")
+	if (nStringUtils::iequal(type, swir_384_id))
 	{
 		auto hostname = getHostname();
 		auto port = getPort();

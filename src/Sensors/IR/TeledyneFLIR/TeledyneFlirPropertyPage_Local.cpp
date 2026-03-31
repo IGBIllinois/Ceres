@@ -1,6 +1,7 @@
 
 
 #include "TeledyneFlirPropertyPage_Local.hpp"
+#include "TeledyneFlirIDs.hpp"
 #include "TeledyneFlirCameraModel.hpp"
 #include "TeledyneFlirCameraModel_T1K.hpp"
 #include "TeledyneFlirUtils.hpp"
@@ -26,7 +27,7 @@ cTeledyneFlirPropertyPage_Local::cTeledyneFlirPropertyPage_Local(cTeledyneFlirCa
 
 cExperimentState* cTeledyneFlirPropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
-	if (nStringUtils::iequal(type, "Teledyne FLIR"))
+	if (nStringUtils::iequal(type, teledyne_flir_id))
 	{
 		std::string cmd = entry["command"];
 

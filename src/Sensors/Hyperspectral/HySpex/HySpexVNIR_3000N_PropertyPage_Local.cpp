@@ -1,7 +1,10 @@
 
 
 #include "HySpexVNIR_3000N_PropertyPage_Local.hpp"
+#include "HySpexIDs.hpp"
 #include "HySpexExperimentStates_Local.hpp"
+
+#include "StringUtils.hpp"
 
 #include <QLineEdit>
 #include <QComboBox>
@@ -20,7 +23,7 @@ cHySpexVNIR_3000N_PropertyPage_Local::cHySpexVNIR_3000N_PropertyPage_Local(QWidg
 cExperimentState* cHySpexVNIR_3000N_PropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 /*
-	if (type == "VNIR-3000N")
+	if (nStringUtils::iequal(type, vnir_3000N_id))
 	{
 		auto hostname = getHostname();
 		auto port = getPort();
