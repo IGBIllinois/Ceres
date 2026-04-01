@@ -60,6 +60,7 @@ target_link_libraries(ExperimentControllers PRIVATE ${Qt}::Widgets)
 target_link_libraries(ExperimentControllers PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(ExperimentControllers PRIVATE cbdf::ctrl)
 target_link_libraries(ExperimentControllers PRIVATE SpidercamCtrl_static)
+target_link_libraries(ExperimentControllers PRIVATE CartCtrl_static)
 target_link_libraries(ExperimentControllers PRIVATE ExperimentStateMachine)
 
 set_target_properties(ExperimentControllers PROPERTIES FOLDER "ExperimentControllers")
@@ -67,4 +68,7 @@ set_target_properties(ExperimentControllers PROPERTIES FOLDER "ExperimentControl
 
 # Add the Spidercam Control library source code directory
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Spidercam)
+
+# Add the Cart Control library source code directory
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Cart)
 
