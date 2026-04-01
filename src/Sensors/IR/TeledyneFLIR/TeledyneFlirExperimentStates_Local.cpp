@@ -11,7 +11,7 @@
 
 
 /*******************************************************************/
-/**  Base Class for Teledyne FLIR Local HySpex Experiment States  **/
+/**  Base Class for Teledyne FLIR Local Experiment States  **/
 /*******************************************************************/
 cTeledyneFlirCameraExperimentState_Local::cTeledyneFlirCameraExperimentState_Local(cTeledyneFlirCameraModel* pModel, QObject* parent)
 	: QObject(parent), mpModel(pModel)
@@ -70,22 +70,32 @@ bool cTeledyneFlirCamera_Configure_Local::configure(const nlohmann::json& stateD
 
 		if (stateDoc.contains("frame rate (hz)"))
 		{
-			mFrameRate_fps = stateDoc["frame rate (hz)"];
+			mFrameRate_fps = stateDoc["frame rate (hz)"].get<double>();
 
 			mWaitingForFrameRate = mFrameRate_fps != mpModel->frameRate_Hz();
 		}
 
 		int32_t lapse_interval_ms = -1;
 
-		if (stateDoc.contains("lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"] * 1000);
-		else if (stateDoc.contains("lapse interval (ms)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"]);
+		if (stateDoc.contains("time lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["time lapse interval (s)"].get<float>() * 1000.0);
+		else if (stateDoc.contains("time lapse interval (ms)"))
+			lapse_interval_ms = stateDoc["time lapse interval (ms)"].get<int32_t>();
 
-		if (stateDoc.contains("interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"] * 1000);
+		else if (stateDoc.contains("time-lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"].get<float>() * 1000.0);
+		else if (stateDoc.contains("time-lapse interval (ms)"))
+			lapse_interval_ms = stateDoc["time-lapse interval (ms)"].get<int32_t>();
+
+		else if (stateDoc.contains("lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"].get<float>() * 1000.0);
+		else if (stateDoc.contains("lapse interval (ms)"))
+			lapse_interval_ms = stateDoc["lapse interval (ms)"].get<int32_t>();
+
+		else if (stateDoc.contains("interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"].get<float>() * 1000.0);
 		else if (stateDoc.contains("interval (ms)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (ms)"]);
+			lapse_interval_ms = stateDoc["interval (ms)"].get<int32_t>();
 
 		if (lapse_interval_ms > 0)
 		{

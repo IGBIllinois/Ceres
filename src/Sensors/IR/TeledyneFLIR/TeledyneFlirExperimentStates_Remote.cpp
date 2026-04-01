@@ -106,17 +106,24 @@ bool cTeledyneFlirCamera_Configure_Remote::configure(const nlohmann::json& state
 		int32_t lapse_interval_ms = -1;
 
 		if (stateDoc.contains("time-lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"] * 1000.0);
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"].get<float>() * 1000.0);
 		else if (stateDoc.contains("time-lapse interval (ms)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"]);
+			lapse_interval_ms = stateDoc["time-lapse interval (ms)"].get<int32_t>();
+
+		else if (stateDoc.contains("time lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["time lapse interval (s)"].get<float>() * 1000.0);
+		else if (stateDoc.contains("time lapse interval (ms)"))
+			lapse_interval_ms = stateDoc["time lapse interval (ms)"].get<int32_t>();
+
 		else if (stateDoc.contains("lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"] * 1000.0);
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"].get<float>() * 1000.0);
 		else if (stateDoc.contains("lapse interval (ms)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"]);
+			lapse_interval_ms = stateDoc["lapse interval (ms)"].get<int32_t>();
+
 		else if (stateDoc.contains("interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"] * 1000.0);
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"].get<float>() * 1000.0);
 		else if (stateDoc.contains("interval (ms)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (ms)"]);
+			lapse_interval_ms = stateDoc["interval (ms)"].get<int32_t>();
 
 		if (lapse_interval_ms > 0)
 		{
