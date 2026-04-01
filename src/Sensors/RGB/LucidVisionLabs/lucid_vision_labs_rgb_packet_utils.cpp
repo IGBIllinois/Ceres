@@ -33,7 +33,7 @@ int encode_query_current_state(net_buffer& buffer)
 
 int encode_query_active_camera_id(net_buffer& buffer)
 {
-    return encode_query(eQUERY_ACTIVE_CAMERA_ID, buffer);
+    return 0;
 }
 
 int encode_query_image_size(net_buffer& buffer)
@@ -74,7 +74,7 @@ int encode_active_camera_id(uint8_t id, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::ACTIVE_CAMERA_ID);
+    hdr.id = 0; // static_cast<uint16_t>(ePacketType::ACTIVE_CAMERA_ID);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -131,7 +131,7 @@ int encode_frame_rate(uint8_t fps, net_buffer& buffer)
     pckt.SerializeToString(&str);
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::FRAMES_PER_SECOND);
+    hdr.id = static_cast<uint16_t>(ePacketType::FRAME_RATE_HZ);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);

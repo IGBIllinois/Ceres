@@ -49,6 +49,14 @@ set(LUCID_VISION_RGB_SOURCE_FILES
     LucidVisionLabsRgbController.cpp
 
 #
+# Lucid Vision Labs Experiment State Files
+#
+    LucidVisionLabsRgbExperimentStates_Local.hpp
+	LucidVisionLabsRgbExperimentStates_Local.cpp
+	LucidVisionLabsRgbExperimentStates_Remote.hpp
+	LucidVisionLabsRgbExperimentStates_Remote.cpp
+
+#
 # Lucid Vision Labs RGB Cameras
 #
 	LucidVisionLabsRgbView_Triton.hpp
@@ -98,7 +106,7 @@ PRIVATE
 
     ${LUCID_VISION_RGB_PROTO_HDRS}
 	${LUCID_VISION_RGB_PROTO_SRCS}
-#	lucid_vision_labs_properties.proto
+	lucid_vision_labs_rgb_properties.proto
 )
 
 target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${COMMON_INCLUDE_DIR})

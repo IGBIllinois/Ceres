@@ -21,13 +21,20 @@ enum class ePacketType : uint16_t
 {
 	UNKNOWN = 0,
 
-	QUERY_STATE,
-	ACTIVE_CAMERA_ID,
+	// Property Page <-> Controller
+	CAMERA_MODE = 1,
 	IMAGE_SIZE,
-	FRAMES_PER_SECOND,
+	FRAME_RATE_HZ,
+	LAPSE_INTERVAL_MS,
 
-	CURRENT_STATE,
+	// Property Page -> Controller
+	QUERY_STATE = 1000,
+	TAKE_PHOTO,
 	GRAB_IMAGE,
+
+	// Controller -> Property Page
+	CURRENT_STATE = 2000,
+	TAKE_PHOTO_REPLY,
 };
 
 
@@ -36,7 +43,6 @@ enum class ePacketType : uint16_t
  **********************************************************/
 
 int encode_query_current_state(net_buffer& buffer);
-int encode_query_active_camera_id(net_buffer& buffer);
 int encode_query_image_size(net_buffer& buffer);
 int encode_query_frame_rate(net_buffer& buffer);
 int encode_grab_image(net_buffer& buffer);

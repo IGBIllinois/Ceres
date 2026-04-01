@@ -24,6 +24,23 @@ void cLucidVisionLabsRgbPropertyPage_Local::createWidgets()
 	cLucidVisionLabsRgbPropertyPage::createWidgets();
 }
 
+void cLucidVisionLabsRgbPropertyPage_Local::doLayout()
+{
+	QString title = QString::fromStdString(mpModel->name());
+
+	auto instance = mpModel->instance();
+
+	if (!instance.empty())
+	{
+		title += ":";
+		title += QString::fromStdString(instance);
+	}
+
+	setTitle(title);
+
+	cLucidVisionLabsRgbPropertyPage::doLayout();
+}
+
 void cLucidVisionLabsRgbPropertyPage_Local::onGrabImagePressed()
 {
 
@@ -72,6 +89,24 @@ void cLucidVisionLabsRgbPropertyPage_Local::buttonClicked(QAbstractButton* butto
 
 void cLucidVisionLabsRgbPropertyPage_Local::showPage()
 {
+	switch (mpModel->mode())
+	{
+	case cLucidVisionLabsRgbModel::SINGLE:
+		mpMode->setCurrentIndex(0);
+		break;
+	case cLucidVisionLabsRgbModel::TIME_LAPSE:
+		mpMode->setCurrentIndex(1);
+		break;
+	case cLucidVisionLabsRgbModel::CONTINUOUS:
+		mpMode->setCurrentIndex(2);
+		break;
+	}
+
+	mpFrameRate_fps->setText(QString::number(mpModel->frameRate_Hz(), static_cast<char>(103), 4));
+
+	double interval_s = mpModel->lapseInterval_ms() * 0.001;
+	mpLapseInterval_s->setText(QString::number(interval_s, static_cast<char>(103), 4));
+
 	cLucidVisionLabsRgbPropertyPage::showPage();
 }
 

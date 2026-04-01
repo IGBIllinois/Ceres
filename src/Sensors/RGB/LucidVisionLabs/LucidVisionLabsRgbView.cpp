@@ -85,7 +85,7 @@ void cLucidVisionLabsRgbView::initialize()
 	mainLayout->addLayout(statusLayout);
 
 	// Don't use any alignment on adding this widget.  For some reason the widget won't paint!
-//	mainLayout->addWidget(mpThermalImage, 1);
+	mainLayout->addWidget(mpImage, 1);
 
 	viewport->setLayout(mainLayout);
 
@@ -97,7 +97,21 @@ void cLucidVisionLabsRgbView::onSensorNameChanging(QString old_name, QString new
     if (new_name.isEmpty())
         return;
 
-    setWindowTitle(new_name);
+	QString title = "RGB Camera";
+	title += " - ";
+	title += new_name;
+
+	if (!instance.isEmpty())
+	{
+		title += ":";
+		title += instance;
+	}
+	
+	setWindowTitle(title);
+
+	auto* parent = parentWidget();
+	if (parent)
+		parent->setWindowTitle(title);
 }
 
 void cLucidVisionLabsRgbView::onModeChange(int mode)

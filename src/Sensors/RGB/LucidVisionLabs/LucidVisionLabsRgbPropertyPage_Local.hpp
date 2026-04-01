@@ -41,6 +41,8 @@ protected:
 
 protected:
     void createWidgets() override;
+    void doLayout() override;
+
     void enableControls(bool enable) override;
     void buttonClicked(QAbstractButton* button) override;
 

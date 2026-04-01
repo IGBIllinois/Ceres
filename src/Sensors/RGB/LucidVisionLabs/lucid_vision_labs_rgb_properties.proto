@@ -15,9 +15,10 @@ enum lucid_eQuery
 {
   eQUERY_UNSPECIFIED = 0;
   eQUERY_STATE = 1;
-  eQUERY_ACTIVE_CAMERA_ID = 2;
+  eQUERY_MODE = 2;
   eQUERY_IMAGE_SIZE = 3;
   eQUERY_FRAME_RATE = 4;
+  eQUERY_LAPSE_INTERVAL = 5;
 }
 
 message lucid_QueryMessage_1 

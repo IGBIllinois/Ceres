@@ -73,15 +73,20 @@ void cLucidVisionLabsRgbModel_Triton::updateViews()
 
 bool cLucidVisionLabsRgbModel_Triton::configure(const nlohmann::json& jsonCfg)
 {
-    setInstanceName(mModel);
+    updateName(mModel);
 
-//    size_t buffer_size = max_image_size.height * max_image_size.width;
+    auto result = cLucidVisionLabsRgbModel::configure(jsonCfg);
 
-//    mSerializer.setBufferCapacity(buffer_size + 1024);
+    size_t buffer_size = mImageHeight * mImageWidth * sizeof(double);
 
-    setStatus(sensor::eStatus::CONFIGURED);
+    mSerializer.setBufferCapacity(buffer_size + 1024);
 
-    return true;
+    if (result)
+        setStatus(sensor::eStatus::CONFIGURED);
+    else
+        setStatus(sensor::eStatus::FAILED);
+
+    return result;
 }
 
 bool cLucidVisionLabsRgbModel_Triton::initialize()
@@ -91,13 +96,13 @@ bool cLucidVisionLabsRgbModel_Triton::initialize()
 
 void cLucidVisionLabsRgbModel_Triton::enableDataRecording(cBlockDataFileWriter& file)
 {
-//    mSerializer.attach(&file);
+    mSerializer.attach(&file);
 }
 
 void cLucidVisionLabsRgbModel_Triton::disableDataRecording()
 {
     cLucidVisionLabsRgbModel::disableDataRecording();
-//    mSerializer.detach();
+    mSerializer.detach();
 }
 
 void cLucidVisionLabsRgbModel_Triton::writeDataHeader()
@@ -186,6 +191,11 @@ void cLucidVisionLabsRgbModel_Triton::update()
         setStatus(sensor::eStatus::FAILED);
 
 //        mIsRunning = false;
+        return;
+    }
+
+    if (!mCamera->isStreaming())
+    {
         return;
     }
 

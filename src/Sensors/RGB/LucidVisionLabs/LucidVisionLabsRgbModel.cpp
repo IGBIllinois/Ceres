@@ -38,19 +38,19 @@ bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
     double frame_rate_fps = -1;
 
     if (jsonCfg.contains("frame rate (hz)"))
-        frame_rate_fps = jsonCfg["frame rate (hz)"];
+        frame_rate_fps = jsonCfg["frame rate (hz)"].get<double>();
 
     int32_t lapse_interval_ms = -1;
 
     if (jsonCfg.contains("lapse interval (s)"))
-        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"] * 1000);
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"].get<float>() * 1000.0);
     else if (jsonCfg.contains("lapse interval (ms)"))
-        lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"]);
+        lapse_interval_ms = jsonCfg["lapse interval (ms)"].get<int32_t>();
 
-    if (jsonCfg.contains("interval (s)"))
-        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"] * 1000);
+    else if (jsonCfg.contains("interval (s)"))
+        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"].get<float>() * 1000.0);
     else if (jsonCfg.contains("interval (ms)"))
-        lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (ms)"]);
+        lapse_interval_ms = jsonCfg["interval (ms)"].get<int32_t>();
 
     if (nStringUtils::iequal(mode, "photo"))
     {

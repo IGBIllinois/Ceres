@@ -55,8 +55,8 @@ protected:
     QLabel*    mpFrameRateLabel = nullptr;
     QLineEdit* mpFrameRate_fps = nullptr;
 
-    QLabel*    mpFrameIntervalLabel = nullptr;
-    QLineEdit* mpFrameInterval_s = nullptr;
+    QLabel*    mpLapseIntervalLabel = nullptr;
+    QLineEdit* mpLapseInterval_s = nullptr;
 
     QGroupBox* mpExposureInfo = nullptr;
     QLineEdit* mpAcqTime_Hz = nullptr;

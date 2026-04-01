@@ -14,14 +14,6 @@ void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, co
     {
         break;
     }
-    case ePacketType::ACTIVE_CAMERA_ID:
-    {
-        lucid_ActiveCameraIdMessage_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto id = to_active_camera_id_t(packet);
-        onCameraId(id);
-        break;
-    }
     case ePacketType::IMAGE_SIZE:
     {
         lucid_ImageSizeMessage_1 packet;
@@ -30,7 +22,7 @@ void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, co
         onImageSize(data.width, data.height);
         break;
     }
-    case ePacketType::FRAMES_PER_SECOND:
+    case ePacketType::FRAME_RATE_HZ:
     {
         lucid_FrameRateMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);

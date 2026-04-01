@@ -23,21 +23,11 @@ void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, co
         {
         case eQUERY_STATE:
             return onQueryState();
-        case eQUERY_ACTIVE_CAMERA_ID:
-            return onQueryCameraId();
         case eQUERY_IMAGE_SIZE:
             return onQueryImageSize();
         case eQUERY_FRAME_RATE:
             return onQueryFrameRate();
         }
-        break;
-    }
-    case ePacketType::ACTIVE_CAMERA_ID:
-    {
-        lucid_ActiveCameraIdMessage_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto id = to_active_camera_id_t(packet);
-        setCameraId(id);
         break;
     }
     case ePacketType::IMAGE_SIZE:
@@ -48,7 +38,7 @@ void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, co
         setImageSize(data.width, data.height);
         break;
     }
-    case ePacketType::FRAMES_PER_SECOND:
+    case ePacketType::FRAME_RATE_HZ:
     {
         lucid_FrameRateMessage_1 packet;
         packet.ParseFromArray(buffer.data(), hdr.length);

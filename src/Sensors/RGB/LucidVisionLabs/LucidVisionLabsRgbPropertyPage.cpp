@@ -29,8 +29,8 @@ void cLucidVisionLabsRgbPropertyPage::createWidgets()
     mpFrameRateLabel = new QLabel("Frames per Second:", this);
     mpFrameRate_fps = new QLineEdit(this);
 
-    mpFrameIntervalLabel = new QLabel("Frame Interval (s):", this);;
-    mpFrameInterval_s = new QLineEdit(this);
+    mpLapseIntervalLabel = new QLabel("Time-Lapse Interval (s):", this);;
+    mpLapseInterval_s = new QLineEdit(this);
 
     mpGrabImage = new QPushButton("Grab Image", this);
     connect(mpGrabImage, &QPushButton::pressed, this, &cLucidVisionLabsRgbPropertyPage::onGrabImagePressed);
@@ -186,7 +186,7 @@ void cLucidVisionLabsRgbPropertyPage::doLayout()
 
     pLayout->addRow(mpModeLabel, mpMode);
     pLayout->addRow(mpFrameRateLabel, mpFrameRate_fps);
-    pLayout->addRow(mpFrameIntervalLabel, mpFrameInterval_s);
+    pLayout->addRow(mpLapseIntervalLabel, mpLapseInterval_s);
     pMainLayout->addLayout(pLayout);
 
     pMainLayout->addSpacing(5);
@@ -240,16 +240,16 @@ void cLucidVisionLabsRgbPropertyPage::modeTextChanged(const QString& text)
     if (text == "Photo")
     {
         mpFrameRate_fps->setEnabled(false);
-        mpFrameInterval_s->setEnabled(false);
+        mpLapseInterval_s->setEnabled(false);
     }
     else if (text == "Time Lapse")
     {
         mpFrameRate_fps->setEnabled(false);
-        mpFrameInterval_s->setEnabled(true);
+        mpLapseInterval_s->setEnabled(true);
     }
     else if (text == "Video")
     {
-        mpFrameInterval_s->setEnabled(false);
+        mpLapseInterval_s->setEnabled(false);
         mpFrameRate_fps->setEnabled(true);
     }
 }
