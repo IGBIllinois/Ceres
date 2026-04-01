@@ -948,7 +948,14 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
 
     if ((pModel == nullptr) || (mpController == nullptr))
     {
-        //continue;
+        std::string msg = "Unknown experiment controller or controller not found: name is \"";
+        msg += name;
+        msg += "\".";
+
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+        mb.exec();
+
+        exit(EXIT_FAILURE);
     }
 
     QObject::connect(pModel, &cExperimentControlModel::updateControllerConnection,
