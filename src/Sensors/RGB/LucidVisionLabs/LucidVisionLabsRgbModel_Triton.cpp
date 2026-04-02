@@ -1,12 +1,14 @@
 
 #include "LucidVisionLabsRgbModel_Triton.hpp"
+#include "LucidVisionLabsRgbUtils.hpp"
 
 #include <LucidVisionLabsConnect/LucidTritonCamera.hpp>
-
-#include <Arena/ArenaAPI.h>
+#include <LucidVisionLabsConnect/LucidVisionLabsData.hpp>
 
 #include "TimestampProvider.hpp"
+#include "StringUtils.hpp"
 
+#include <Arena/ArenaAPI.h>
 
 #define USE_LOG_MESSAGE
 
@@ -30,7 +32,6 @@ cLucidVisionLabsRgbModel_Triton::cLucidVisionLabsRgbModel_Triton(std::unique_ptr
     mFirmwareVersion = mCamera->getFirmwareVersion();
     mMacAddress = mCamera->getMacAddress();
     mIpAddress = mCamera->getIpAddress();
-
 }
 
 cLucidVisionLabsRgbModel_Triton::~cLucidVisionLabsRgbModel_Triton()
@@ -63,6 +64,96 @@ void cLucidVisionLabsRgbModel_Triton::setLapseInterval_ms(uint32_t interval_ms)
 
 }
 
+nLucidVisionLabsConnect::nTriton::eExposureAuto cLucidVisionLabsRgbModel_Triton::exposureAuto() const
+{
+    return mCamera->exposureAuto();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::exposureAuto(nLucidVisionLabsConnect::nTriton::eExposureAuto mode)
+{
+    return mCamera->exposureAuto(mode);
+}
+
+double cLucidVisionLabsRgbModel_Triton::exposureTime_us() const
+{
+    return mCamera->exposureTime_us();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::exposureTime_us(double time)
+{
+    return mCamera->exposureTime_us(time);
+}
+
+nLucidVisionLabsConnect::nTriton::eExposureTimeSelector cLucidVisionLabsRgbModel_Triton::exposureTimeSelector() const
+{
+    return mCamera->exposureTimeSelector();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::exposureTimeSelector(nLucidVisionLabsConnect::nTriton::eExposureTimeSelector mode)
+{
+    return mCamera->exposureTimeSelector(mode);
+}
+
+nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto cLucidVisionLabsRgbModel_Triton::balanceWhiteAuto() const
+{
+    return mCamera->balanceWhiteAuto();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::balanceWhiteAuto(nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto mode)
+{
+    return mCamera->balanceWhiteAuto(mode);
+}
+
+float cLucidVisionLabsRgbModel_Triton::gain_dB() const
+{
+    return mCamera->gain_dB();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::gain_dB(float level_dB)
+{
+    return mCamera->gain_dB(level_dB);
+}
+
+nLucidVisionLabsConnect::nTriton::eGainAuto cLucidVisionLabsRgbModel_Triton::gainAuto() const
+{
+    return mCamera->gainAuto();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::gainAuto(nLucidVisionLabsConnect::nTriton::eGainAuto mode)
+{
+    return mCamera->gainAuto(mode);
+}
+
+float cLucidVisionLabsRgbModel_Triton::gamma() const
+{
+    return mCamera->gamma();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::gamma(float level)
+{
+    return mCamera->gamma(level);
+}
+
+bool cLucidVisionLabsRgbModel_Triton::gammaEnable() const
+{
+    return mCamera->gammaEnable();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::gammaEnable(bool enable)
+{
+    return mCamera->gammaEnable(enable);
+}
+
+nLucidVisionLabsConnect::nTriton::ePixelFormat cLucidVisionLabsRgbModel_Triton::pixelFormat() const
+{
+    return mCamera->pixelFormat();
+}
+
+bool cLucidVisionLabsRgbModel_Triton::pixelFormat(nLucidVisionLabsConnect::nTriton::ePixelFormat mode)
+{
+    return mCamera->pixelFormat(mode);
+}
+
 void cLucidVisionLabsRgbModel_Triton::updateViews()
 {
     emit modeChanged(static_cast<int>(mMode));
@@ -77,7 +168,71 @@ bool cLucidVisionLabsRgbModel_Triton::configure(const nlohmann::json& jsonCfg)
 
     auto result = cLucidVisionLabsRgbModel::configure(jsonCfg);
 
-    size_t buffer_size = mImageHeight * mImageWidth * sizeof(double);
+    if (jsonCfg.contains("pixel format"))
+    {
+        std::string pixel_format = jsonCfg["pixel format"];
+        mPixelFormat = lucid::to_pixel_format(pixel_format);
+        mCamera->pixelFormat(mPixelFormat);
+    }
+
+    if (jsonCfg.contains("exposure time (us)"))
+    {
+        mExposureTime_us = jsonCfg["exposure time (us)"].get<double>();
+        mCamera->exposureTime_us(mExposureTime_us);
+    }
+
+    if (jsonCfg.contains("exposure auto mode"))
+    {
+        std::string str = jsonCfg["exposure auto mode"];
+        mExposureAuto = lucid::to_exposure_auto(str);
+        mCamera->exposureAuto(mExposureAuto);
+    }
+
+    if (jsonCfg.contains("gain (dB)"))
+    {
+        mGain_dB = jsonCfg["gain (dB)"].get<double>();
+        mCamera->gain_dB(mGain_dB);
+    }
+
+    if (jsonCfg.contains("gain auto mode"))
+    {
+        std::string str = jsonCfg["gain auto mode"];
+        mGainAuto = lucid::to_gain_auto(str);
+        mCamera->gainAuto(mGainAuto);
+    }
+
+    if (jsonCfg.contains("balance white auto mode"))
+    {
+        std::string str = jsonCfg["balance white auto mode"];
+        mBalanceWhiteAuto = lucid::to_balance_white_auto(str);
+        mCamera->balanceWhiteAuto(mBalanceWhiteAuto);
+    }
+
+    if (jsonCfg.contains("gamma enable"))
+    {
+        mGammaEnable = jsonCfg["gamma enable"].get<bool>();
+        mCamera->gammaEnable(mGammaEnable);
+    }
+
+    if (jsonCfg.contains("gamma"))
+    {
+        mGamma = jsonCfg["gamma"].get<double>();
+        mCamera->gamma(mGamma);
+    }
+
+    mPixelFormat = mCamera->pixelFormat();
+    mExposureTime_us = mCamera->exposureTime_us();
+    mExposureAuto = mCamera->exposureAuto();
+    mGain_dB = mCamera->gain_dB();
+    mGainAuto = mCamera->gainAuto();
+    mBalanceWhiteAuto = mCamera->balanceWhiteAuto();
+    mGammaEnable = mCamera->gammaEnable();
+    mGamma = mCamera->gamma();
+
+    mImageWidth  = mCamera->width();
+    mImageHeight = mCamera->height();
+
+    size_t buffer_size = mImageHeight * mImageWidth * sizeof(nLucidVisionLabsConnect::cRgbImage::value_type);
 
     mSerializer.setBufferCapacity(buffer_size + 1024);
 

@@ -66,10 +66,7 @@ protected:
 
     QGroupBox* mpPixelFormatInfo = nullptr;
     QComboBox* mpPixelFormat = nullptr;
-    QLineEdit* mpWidth = nullptr;
-    QLineEdit* mpHeight = nullptr;
-    QLineEdit* mpOffsetX = nullptr;
-    QLineEdit* mpOffsetY = nullptr;
+    QLineEdit* mpImageSize = nullptr;
 
     QGroupBox* mpAnalogCtrlInfo = nullptr;
     QLineEdit* mpGain_dB = nullptr;

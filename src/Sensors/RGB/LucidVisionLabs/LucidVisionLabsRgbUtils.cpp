@@ -1,6 +1,8 @@
 
 #include "LucidVisionLabsRgbUtils.hpp"
 
+#include "StringUtils.hpp"
+
 #include <QImageWriter>
 #include <QImageReader>
 #include <QIODevice>
@@ -331,4 +333,105 @@ void lucid::to_image(const cMpegFrameBuffer& img, QImage& out)
 #else
     imageReader.read(&out);
 #endif
+}
+
+
+nLucidVisionLabsConnect::nTriton::ePixelFormat lucid::to_pixel_format(const std::string& pixel_format)
+{
+    using namespace nLucidVisionLabsConnect::nTriton;
+
+    if (nStringUtils::iequal(pixel_format, "Mono8"))            return ePixelFormat::Mono8;
+    if (nStringUtils::iequal(pixel_format, "Mono10"))           return ePixelFormat::Mono10;
+    if (nStringUtils::iequal(pixel_format, "Mono10p"))          return ePixelFormat::Mono10p;
+    if (nStringUtils::iequal(pixel_format, "Mono10Packed"))     return ePixelFormat::Mono10Packed;
+    if (nStringUtils::iequal(pixel_format, "Mono12"))           return ePixelFormat::Mono12;
+    if (nStringUtils::iequal(pixel_format, "Mono12p"))          return ePixelFormat::Mono12p;
+    if (nStringUtils::iequal(pixel_format, "Mono12Packed"))     return ePixelFormat::Mono12Packed;
+    if (nStringUtils::iequal(pixel_format, "Mono16"))           return ePixelFormat::Mono16;
+    if (nStringUtils::iequal(pixel_format, "BayerRG8"))         return ePixelFormat::BayerRG8;
+    if (nStringUtils::iequal(pixel_format, "BayerRG10"))        return ePixelFormat::BayerRG10;
+    if (nStringUtils::iequal(pixel_format, "BayerRG10p"))       return ePixelFormat::BayerRG10p;
+    if (nStringUtils::iequal(pixel_format, "BayerRG10Packed"))  return ePixelFormat::BayerRG10Packed;
+    if (nStringUtils::iequal(pixel_format, "BayerRG12"))        return ePixelFormat::BayerRG12;
+    if (nStringUtils::iequal(pixel_format, "BayerRG12p"))       return ePixelFormat::BayerRG12p;
+    if (nStringUtils::iequal(pixel_format, "BayerRG12Packed"))  return ePixelFormat::BayerRG12Packed;
+    if (nStringUtils::iequal(pixel_format, "BayerRG16"))        return ePixelFormat::BayerRG16;
+    if (nStringUtils::iequal(pixel_format, "RGB8"))             return ePixelFormat::RGB8;
+    if (nStringUtils::iequal(pixel_format, "BGR8"))             return ePixelFormat::BGR8;
+    if (nStringUtils::iequal(pixel_format, "YCbCr8"))           return ePixelFormat::YCbCr8;
+    if (nStringUtils::iequal(pixel_format, "YCbCr8_CbYCr"))     return ePixelFormat::YCbCr8_CbYCr;
+    if (nStringUtils::iequal(pixel_format, "YUV422_8"))         return ePixelFormat::YUV422_8;
+    if (nStringUtils::iequal(pixel_format, "YUV422_8_UYVY"))    return ePixelFormat::YUV422_8_UYVY;
+    if (nStringUtils::iequal(pixel_format, "YCbCr411_8"))       return ePixelFormat::YCbCr411_8;
+    if (nStringUtils::iequal(pixel_format, "YUV411_8_UYYVYY"))  return ePixelFormat::YUV411_8_UYYVYY;
+    if (nStringUtils::iequal(pixel_format, "QOI_Mono8"))        return ePixelFormat::QOI_Mono8;
+    if (nStringUtils::iequal(pixel_format, "QOI_BayerRG8"))     return ePixelFormat::QOI_BayerRG8;
+    if (nStringUtils::iequal(pixel_format, "QOI_RGB8"))         return ePixelFormat::QOI_RGB8;
+    if (nStringUtils::iequal(pixel_format, "QOI_BGR8"))         return ePixelFormat::QOI_BGR8;
+    if (nStringUtils::iequal(pixel_format, "QOI_YCbCr8"))       return ePixelFormat::QOI_YCbCr8;
+    if (nStringUtils::iequal(pixel_format, "QOI_YCbCr8_CbYC"))  return ePixelFormat::QOI_YCbCr8_CbYCr;
+
+    return ePixelFormat::BayerRG16;
+}
+
+nLucidVisionLabsConnect::nTriton::eExposureAutoAlgorithm lucid::to_exposure_auto_algorithm(const std::string& str)
+{
+    using namespace nLucidVisionLabsConnect::nTriton;
+
+    if (nStringUtils::iequal(str, "MEDIAN"))    return eExposureAutoAlgorithm::MEDIAN;
+    if (nStringUtils::iequal(str, "MEAN"))      return eExposureAutoAlgorithm::MEAN;
+
+    return eExposureAutoAlgorithm::MEAN;
+}
+
+nLucidVisionLabsConnect::nTriton::eExposureAutoLimitAuto lucid::to_exposure_auto_limit_auto(const std::string& str)
+{
+    using namespace nLucidVisionLabsConnect::nTriton;
+
+    if (nStringUtils::iequal(str, "OFF"))        return eExposureAutoLimitAuto::OFF;
+    if (nStringUtils::iequal(str, "CONTINUOUS")) return eExposureAutoLimitAuto::CONTINUOUS;
+
+    return eExposureAutoLimitAuto::OFF;
+}
+
+nLucidVisionLabsConnect::nTriton::eExposureAuto lucid::to_exposure_auto(const std::string& str)
+{
+    using namespace nLucidVisionLabsConnect::nTriton;
+
+    if (nStringUtils::iequal(str, "OFF"))        return eExposureAuto::OFF;
+    if (nStringUtils::iequal(str, "ONCE"))       return eExposureAuto::ONCE;
+    if (nStringUtils::iequal(str, "CONTINUOUS")) return eExposureAuto::CONTINUOUS;
+
+    return eExposureAuto::OFF;
+}
+
+nLucidVisionLabsConnect::nTriton::eExposureTimeSelector lucid::to_exposure_time_selector(const std::string& str)
+{
+    using namespace nLucidVisionLabsConnect::nTriton;
+
+    if (nStringUtils::iequal(str, "COMMON"))        return eExposureTimeSelector::COMMON;
+
+    return eExposureTimeSelector::COMMON;
+}
+
+nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto lucid::to_balance_white_auto(const std::string& str)
+{
+    using namespace nLucidVisionLabsConnect::nTriton;
+
+    if (nStringUtils::iequal(str, "OFF"))        return eBalanceWhiteAuto::OFF;
+    if (nStringUtils::iequal(str, "ONCE"))       return eBalanceWhiteAuto::ONCE;
+    if (nStringUtils::iequal(str, "CONTINUOUS")) return eBalanceWhiteAuto::CONTINUOUS;
+
+    return eBalanceWhiteAuto::OFF;
+}
+
+nLucidVisionLabsConnect::nTriton::eGainAuto lucid::to_gain_auto(const std::string& str)
+{
+    using namespace nLucidVisionLabsConnect::nTriton;
+
+    if (nStringUtils::iequal(str, "OFF"))        return eGainAuto::OFF;
+    if (nStringUtils::iequal(str, "ONCE"))       return eGainAuto::ONCE;
+    if (nStringUtils::iequal(str, "CONTINUOUS")) return eGainAuto::CONTINUOUS;
+
+    return eGainAuto::OFF;
 }

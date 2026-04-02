@@ -5,6 +5,7 @@
 #include "../RgbCameraModel.hpp"
 
 #include <LucidVisionLabsConnect/LucidVisionLabsData.hpp>
+#include <LucidVisionLabsConnect/LucidVisionLabsTypes.hpp>
 
 #include <cbdf/LucidTritonSerializer.hpp>
 
@@ -94,4 +95,12 @@ protected:
 
     cLucidTritonSerializer mSerializer;
 };
+
+
+/******************************************************************************
+ *  I M P L E M E N T A T I O N   D E T A I L S
+ *****************************************************************************/
+
+inline uint16_t cLucidVisionLabsRgbModel::imageWidth() const { return mImageWidth; }
+inline uint16_t cLucidVisionLabsRgbModel::imageHeight() const { return mImageHeight; }
 

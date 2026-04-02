@@ -104,14 +104,8 @@ void cLucidVisionLabsRgbPropertyPage::createWidgets()
     mpPixelFormat->setEnabled(false);
     connect(mpPixelFormat, &QComboBox::currentTextChanged, this, &cLucidVisionLabsRgbPropertyPage::pixelFormatChanged);
 
-    mpWidth = new QLineEdit(this);
-    mpWidth->setReadOnly(true);
-    mpHeight = new QLineEdit(this);
-    mpHeight->setReadOnly(true);
-    mpOffsetX = new QLineEdit(this);
-    mpOffsetX->setReadOnly(true);
-    mpOffsetY = new QLineEdit(this);
-    mpOffsetY->setReadOnly(true);
+    mpImageSize = new QLineEdit(this);
+    mpImageSize->setReadOnly(true);
 
     mpPixelFormatInfo = new QGroupBox("Pixel Format Info");
     auto* pixelInfoLayout = new QFormLayout();
@@ -119,17 +113,9 @@ void cLucidVisionLabsRgbPropertyPage::createWidgets()
     pLabel = new QLabel("Pixel Format");
     pixelInfoLayout->addRow(pLabel, mpPixelFormat);
 
-    pLabel = new QLabel("Width");
-    pixelInfoLayout->addRow(pLabel, mpWidth);
+    pLabel = new QLabel("Image Size");
+    pixelInfoLayout->addRow(pLabel, mpImageSize);
 
-    pLabel = new QLabel("Height");
-    pixelInfoLayout->addRow(pLabel, mpHeight);
-
-    pLabel = new QLabel("Offset X");
-    pixelInfoLayout->addRow(pLabel, mpOffsetX);
-
-    pLabel = new QLabel("Offset Y");
-    pixelInfoLayout->addRow(pLabel, mpOffsetY);
     mpPixelFormatInfo->setLayout(pixelInfoLayout);
 
 

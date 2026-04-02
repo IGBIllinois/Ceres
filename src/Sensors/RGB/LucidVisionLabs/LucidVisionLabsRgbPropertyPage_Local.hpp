@@ -60,4 +60,19 @@ private:
     cLucidVisionLabsRgbModel* mpModel;
 };
 
+class cLucidVisionLabsRgbPropertyPage_Local_Triton : public cLucidVisionLabsRgbPropertyPage_Local
+{
+    Q_OBJECT
+
+public:
+    cLucidVisionLabsRgbPropertyPage_Local_Triton(cLucidVisionLabsRgbModel_Triton* pModel, QWidget* parent = nullptr);
+    ~cLucidVisionLabsRgbPropertyPage_Local_Triton() = default;
+
+protected:
+    void showPage() override;
+
+private:
+    cLucidVisionLabsRgbModel_Triton* mpModel;
+};
+
 

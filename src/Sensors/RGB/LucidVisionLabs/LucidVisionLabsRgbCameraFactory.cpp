@@ -83,7 +83,7 @@ sSensorWidgets create_triton_sensor(const nlohmann::json& sensorInfo, bool no_vi
     QObject::connect(pView, &cLucidVisionLabsRgbView::requestImage,  pModel, &cLucidVisionLabsRgbModel::requestImage);
     QObject::connect(pView, &cLucidVisionLabsRgbView::requestImages, pModel, &cLucidVisionLabsRgbModel::requestImages);
 
-    auto page = new cLucidVisionLabsRgbPropertyPage_Local(pModel);
+    auto page = new cLucidVisionLabsRgbPropertyPage_Local_Triton(pModel);
 
     return sSensorWidgets(pModel, dockWidget, page);
 }

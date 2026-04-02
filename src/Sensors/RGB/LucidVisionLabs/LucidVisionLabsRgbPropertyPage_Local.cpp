@@ -3,10 +3,12 @@
 #include "LucidVisionLabsRgbPropertyPage_Local.hpp"
 #include "LucidVisionLabsRgbUtils.hpp"
 #include "LucidVisionLabsRgbModel.hpp"
+#include "LucidVisionLabsRgbModel_Triton.hpp"
 
 #include <QString>
 #include <QLineEdit>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QTimer>
 #include <QTime>
 #include <QCoreApplication>
@@ -107,6 +109,14 @@ void cLucidVisionLabsRgbPropertyPage_Local::showPage()
 	double interval_s = mpModel->lapseInterval_ms() * 0.001;
 	mpLapseInterval_s->setText(QString::number(interval_s, static_cast<char>(103), 4));
 
+	QString image_size = QString::number(mpModel->imageWidth());
+	image_size += " x ";
+	image_size += QString::number(mpModel->imageHeight());
+
+	mpImageSize->setText(image_size);
+
+	mpGrabImage->setEnabled(true);
+
 	cLucidVisionLabsRgbPropertyPage::showPage();
 }
 
@@ -138,4 +148,39 @@ void cLucidVisionLabsRgbPropertyPage_Local::doApply()
 void cLucidVisionLabsRgbPropertyPage_Local::reject()
 {
 	doCancel();
+}
+
+
+cLucidVisionLabsRgbPropertyPage_Local_Triton::cLucidVisionLabsRgbPropertyPage_Local_Triton(cLucidVisionLabsRgbModel_Triton* pModel, QWidget* parent)
+	: cLucidVisionLabsRgbPropertyPage_Local(pModel, parent), mpModel(pModel)
+{
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local_Triton::showPage()
+{
+	cLucidVisionLabsRgbPropertyPage_Local::showPage();
+
+	mpPixelFormat->setCurrentIndex(static_cast<int>(mpModel->pixelFormat()));
+	mpPixelFormat->setEnabled(true);
+
+	mpExposureTime_us->setText(QString::number(mpModel->exposureTime_us(), 'f', 2));
+	mpExposureTime_us->setEnabled(true);
+
+	mpExposureAutoMode->setCurrentIndex(static_cast<int>(mpModel->exposureAuto()));
+	mpExposureAutoMode->setEnabled(true);
+
+	mpGain_dB->setText(QString::number(mpModel->gain_dB(), 'f', 2));
+	mpGain_dB->setEnabled(true);
+
+	mpGainAutoMode->setCurrentIndex(static_cast<int>(mpModel->gainAuto()));
+	mpGainAutoMode->setEnabled(true);
+
+	mpBalanceWhiteAutoMode->setCurrentIndex(static_cast<int>(mpModel->balanceWhiteAuto()));
+	mpBalanceWhiteAutoMode->setEnabled(true);
+
+	mpGammaEnable->setChecked(mpModel->gammaEnable());
+	mpGammaEnable->setEnabled(true);
+
+	mpGamma->setText(QString::number(mpModel->gamma(), 'f', 2));
+	mpGamma->setEnabled(true);
 }
