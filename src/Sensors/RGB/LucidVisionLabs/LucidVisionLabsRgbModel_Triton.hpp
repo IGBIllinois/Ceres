@@ -6,8 +6,11 @@
 
 #include <LucidVisionLabsConnect/LucidVisionLabsTypes.hpp>
 
+#include <Arena/ArenaAPI.h>
+
 #include <vector>
 #include <memory>
+#include <optional>
 
 // Forward Declaration
 class cLucidTritonCamera;
@@ -18,7 +21,7 @@ namespace Arena
 }
 
 
-class cLucidVisionLabsRgbModel_Triton : public cLucidVisionLabsRgbModel
+class cLucidVisionLabsRgbModel_Triton : public cLucidVisionLabsRgbModel, public Arena::IImageCallback
 {
     Q_OBJECT
 
@@ -121,6 +124,22 @@ public:
 
     void update() override;
 
+signals:
+    void pixelFormatChanged(int mode);
+    void exposureChanged(int mode, double exposureTime_us);
+    void gainChanged(int mode, double gain_dB);
+    void balanceWhiteAutoChanged(int mode);
+    void gammaChanged(bool enabled, double gamma);
+
+public slots:
+    void pushStreamState();
+    void popStreamState();
+    void requestPixelFormat(int mode);
+    void requestExposure(int mode, double exposureTime_us);
+    void requestGain(int mode, double gain_dB);
+    void requestBalanceWhiteAuto(int mode);
+    void requestGamma(bool enable, double gamma);
+
 public slots:
     void requestMode(int mode) override;
     void requestFrameRate_Hz(double frame_rate_hz) override;
@@ -136,10 +155,15 @@ protected slots:
     virtual void processReply(const std::string& reply) {};
 
 private:
+    void OnImage(Arena::IImage* pImage) override;
+
+private:
     void updateCurrentImage(Arena::IImage* pImage);
 
 private:
     const uint8_t mInstanceID;
+
+    std::optional<bool> mStreamStateStack;
 
     nLucidVisionLabsConnect::nTriton::ePixelFormat mPixelFormat = nLucidVisionLabsConnect::nTriton::ePixelFormat::BayerRG16;
 

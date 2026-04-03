@@ -45,6 +45,7 @@ protected slots:
     virtual void pixelFormatChanged(const QString&) = 0;
     virtual void gainAutoModeChanged(const QString&) = 0;
     virtual void balanceWhiteAutoModeChanged(const QString&) = 0;
+    virtual void gammaEnableChanged(bool check) = 0;
 
     virtual void onGrabImagePressed() = 0;
 

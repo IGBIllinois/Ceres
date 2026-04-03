@@ -138,6 +138,7 @@ void cLucidVisionLabsRgbPropertyPage::createWidgets()
 
     mpGammaEnable = new QCheckBox(this);
     mpGammaEnable->setEnabled(false);
+    connect(mpGammaEnable, &QCheckBox::clicked, this, &cLucidVisionLabsRgbPropertyPage::gammaEnableChanged);
 
     mpGamma = new QLineEdit(this);
     mpGamma->setEnabled(false);

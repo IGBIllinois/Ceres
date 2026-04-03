@@ -31,6 +31,21 @@ signals:
 
     virtual void takePhoto(bool update_view = false) = 0;
 */
+    void pushStreamState();
+    void popStreamState();
+    void changePixelFormat(int mode);
+    void changeExposure(int mode, double exposureTime_us);
+    void changeGain(int mode, double gain_dB);
+    void changeBalanceWhiteAuto(int mode);
+    void changeGamma(bool enable, double gamma);
+
+
+public slots:
+    void pixelFormatUpdated(int mode);
+    void exposureUpdated(int mode, double exposureTime_us);
+    void gainUpdated(int mode, double gain_dB);
+    void balanceWhiteAutoUpdated(int mode);
+    void gammaUpdated(bool enabled, double gamma);
 
 protected:
     void exposureTimeSelectorChanged(const QString&) override;
@@ -38,6 +53,7 @@ protected:
     void pixelFormatChanged(const QString&) override;
     void gainAutoModeChanged(const QString&) override;
     void balanceWhiteAutoModeChanged(const QString&) override;
+    void gammaEnableChanged(bool check) override;
 
 protected:
     void createWidgets() override;

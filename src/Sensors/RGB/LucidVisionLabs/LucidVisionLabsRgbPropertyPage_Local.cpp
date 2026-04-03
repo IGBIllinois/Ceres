@@ -49,28 +49,62 @@ void cLucidVisionLabsRgbPropertyPage_Local::onGrabImagePressed()
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local::exposureTimeSelectorChanged(const QString&)
+{}
+
+void cLucidVisionLabsRgbPropertyPage_Local::exposureAutoModeChanged(const QString& text)
 {
-
-}
-
-void cLucidVisionLabsRgbPropertyPage_Local::exposureAutoModeChanged(const QString&)
-{
-
+	if (text == "Off")
+		mpExposureTime_us->setEnabled(true);
+	else
+		mpExposureTime_us->setEnabled(false);
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local::pixelFormatChanged(const QString&)
+{}
+
+void cLucidVisionLabsRgbPropertyPage_Local::gainAutoModeChanged(const QString& text)
 {
-
-}
-
-void cLucidVisionLabsRgbPropertyPage_Local::gainAutoModeChanged(const QString&)
-{
-
+	if (text == "Off")
+		mpGain_dB->setEnabled(true);
+	else
+		mpGain_dB->setEnabled(false);
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local::balanceWhiteAutoModeChanged(const QString&)
-{
+{}
 
+void cLucidVisionLabsRgbPropertyPage_Local::gammaEnableChanged(bool check)
+{
+	mpGamma->setEnabled(check);
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local::pixelFormatUpdated(int mode)
+{
+	mpPixelFormat->setCurrentIndex(mode);
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local::exposureUpdated(int mode, double exposureTime_us)
+{
+	mpExposureAutoMode->setCurrentIndex(mode);
+	mpExposureTime_us->setText(QString::number(exposureTime_us, 'f', 2));
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local::gainUpdated(int mode, double gain_dB)
+{
+	mpGainAutoMode->setCurrentIndex(mode);
+	mpGain_dB->setText(QString::number(gain_dB, 'f', 2));
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local::balanceWhiteAutoUpdated(int mode)
+{
+	mpBalanceWhiteAutoMode->setCurrentIndex(mode);
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local::gammaUpdated(bool enabled, double gamma)
+{
+	mpGammaEnable->setChecked(enabled);
+	mpGamma->setText(QString::number(gamma, 'f', 2));
+	mpGamma->setEnabled(enabled);
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local::enableControls(bool enable)
@@ -133,6 +167,16 @@ void cLucidVisionLabsRgbPropertyPage_Local::doCancel()
 
 void cLucidVisionLabsRgbPropertyPage_Local::doApply()
 {
+	emit pushStreamState();
+
+	emit changePixelFormat(mpPixelFormat->currentIndex());
+	emit changeExposure(mpExposureAutoMode->currentIndex(), mpExposureTime_us->text().toDouble());
+	emit changeGain(mpGainAutoMode->currentIndex(), mpGain_dB->text().toDouble());
+	emit changeBalanceWhiteAuto(mpBalanceWhiteAutoMode->currentIndex());
+	emit changeGamma(mpGammaEnable->isChecked(), mpGamma->text().toDouble());
+
+	emit popStreamState();
+
 	auto currentMode = mpModel->mode();
 
 	if (currentMode != mpMode->currentIndex())
@@ -149,6 +193,7 @@ void cLucidVisionLabsRgbPropertyPage_Local::reject()
 {
 	doCancel();
 }
+
 
 
 cLucidVisionLabsRgbPropertyPage_Local_Triton::cLucidVisionLabsRgbPropertyPage_Local_Triton(cLucidVisionLabsRgbModel_Triton* pModel, QWidget* parent)
@@ -182,5 +227,5 @@ void cLucidVisionLabsRgbPropertyPage_Local_Triton::showPage()
 	mpGammaEnable->setEnabled(true);
 
 	mpGamma->setText(QString::number(mpModel->gamma(), 'f', 2));
-	mpGamma->setEnabled(true);
+	mpGamma->setEnabled(mpModel->gammaEnable());
 }

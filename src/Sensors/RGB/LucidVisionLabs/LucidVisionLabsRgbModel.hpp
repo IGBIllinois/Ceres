@@ -38,6 +38,11 @@ public:
     bool configure(const nlohmann::json& jsonCfg) override;
 
     /*
+     * Emit all status messages to update all views
+     */
+    void updateViews() override;
+
+    /*
      * Starts/Stops communication with the endpoint.
      * These methods are called inside the QThread so that
      * all of the communication happens within the same thread!
@@ -64,11 +69,8 @@ public slots:
     virtual void requestLapseInterval_ms(uint32_t interval_ms) = 0;
     virtual void requestImage() = 0;
     virtual void requestImages(bool update_view) = 0;
-
     virtual void takePhoto(bool update_view = false) = 0;
 
-protected slots:
- 
 protected:
     cLucidVisionLabsRgbModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cLucidVisionLabsRgbModel();

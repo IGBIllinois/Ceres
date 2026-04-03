@@ -83,9 +83,23 @@ sSensorWidgets create_triton_sensor(const nlohmann::json& sensorInfo, bool no_vi
     QObject::connect(pView, &cLucidVisionLabsRgbView::requestImage,  pModel, &cLucidVisionLabsRgbModel::requestImage);
     QObject::connect(pView, &cLucidVisionLabsRgbView::requestImages, pModel, &cLucidVisionLabsRgbModel::requestImages);
 
-    auto page = new cLucidVisionLabsRgbPropertyPage_Local_Triton(pModel);
+    auto pPage = new cLucidVisionLabsRgbPropertyPage_Local_Triton(pModel);
 
-    return sSensorWidgets(pModel, dockWidget, page);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::pushStreamState,        pModel, &cLucidVisionLabsRgbModel_Triton::pushStreamState);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::popStreamState,         pModel, &cLucidVisionLabsRgbModel_Triton::popStreamState);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changePixelFormat,      pModel, &cLucidVisionLabsRgbModel_Triton::requestPixelFormat);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeExposure,         pModel, &cLucidVisionLabsRgbModel_Triton::requestExposure);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeGain,             pModel, &cLucidVisionLabsRgbModel_Triton::requestGain);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeBalanceWhiteAuto, pModel, &cLucidVisionLabsRgbModel_Triton::requestBalanceWhiteAuto);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeGamma,            pModel, &cLucidVisionLabsRgbModel_Triton::requestGamma);
+
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::pixelFormatChanged,      pPage, &cLucidVisionLabsRgbPropertyPage_Local::pixelFormatUpdated);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::exposureChanged,         pPage, &cLucidVisionLabsRgbPropertyPage_Local::exposureUpdated);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::gainChanged,             pPage, &cLucidVisionLabsRgbPropertyPage_Local::gainUpdated);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::balanceWhiteAutoChanged, pPage, &cLucidVisionLabsRgbPropertyPage_Local::balanceWhiteAutoUpdated);
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::gammaChanged,            pPage, &cLucidVisionLabsRgbPropertyPage_Local::gammaUpdated);
+
+    return sSensorWidgets(pModel, dockWidget, pPage);
 }
 
 sSensorWidgets lucid_vision_labs_rgb::create_sensor(const nlohmann::json& sensorInfo,

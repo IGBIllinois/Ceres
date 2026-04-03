@@ -54,11 +54,11 @@ bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
 
     if (nStringUtils::iequal(mode, "photo"))
     {
-        setMode(eMode::SINGLE);
+        mMode = eMode::SINGLE;
     }
     else if (nStringUtils::iequal(mode, "time lapse") || nStringUtils::iequal(mode, "time-lapse"))
     {
-        setMode(eMode::TIME_LAPSE);
+        mMode = eMode::TIME_LAPSE;
 
         if (lapse_interval_ms < 0)
         {
@@ -67,7 +67,7 @@ bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
     }
     else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))
     {
-        setMode(eMode::CONTINUOUS);
+        mMode = eMode::CONTINUOUS;
 
         if (frame_rate_fps < 0)
         {
@@ -85,6 +85,14 @@ bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
         setFrameRate_Hz(frame_rate_fps);
 
     return cRgbCameraModel::configure(jsonCfg);
+}
+
+void cLucidVisionLabsRgbModel::updateViews()
+{
+    emit modeChanged(static_cast<int>(mMode));
+    emit lapseIntervalChanged(mLapseInterval_ms);
+    emit frameRateChanged(mFrameRate_fps);
+    emit imageSizeChanged(mImageWidth, mImageHeight);
 }
 
 bool cLucidVisionLabsRgbModel::startCommunications()
