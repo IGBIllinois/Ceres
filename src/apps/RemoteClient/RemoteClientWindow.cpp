@@ -540,8 +540,6 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
         {
             mpCentralWindow->addTab(widgets.pRemoteStatusView, widgets.pRemoteStatusView->windowTitle());
             QObject::connect(widgets.pModel, &cSensorModel::sensorNameChanging, mpCentralWindow, &cRemoteClientCentalWindow::updateSensorName);
-
-            widgets.pModel->updateViews();
         }
 
         std::string entry = type;
@@ -563,6 +561,8 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
                 validSensor = false;
             }
         }
+
+        widgets.pModel->updateViews();
 
         mMainModel.addSensor(widgets.pModel);
     }
