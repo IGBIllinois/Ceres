@@ -1111,6 +1111,8 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
 
             mpModel->addSensorPropertyPage(widgets.pPropertyPage);
         }
+
+        widgets.pModel->updateViews();
     }
 }
 
