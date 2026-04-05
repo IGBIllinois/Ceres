@@ -82,6 +82,8 @@ protected:
     std::string mMacAddress;
     std::string mIpAddress;
 
+    bool mIsRunning = false;
+
     bool mPhotoRequested = false;
 
     uint16_t mImageWidth = 0;

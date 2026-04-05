@@ -68,12 +68,6 @@ bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
     else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))
     {
         mMode = eMode::CONTINUOUS;
-
-        if (frame_rate_fps < 0)
-        {
-            throw std::logic_error("Missing \"frame rate (hz)\" entry!");
-        }
-
     }
     else
         throw std::logic_error("Unknown \"mode\" entry!  Values can be \"photo\", \"time lapse\", or \"video\".");
@@ -89,6 +83,8 @@ bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
 
 void cLucidVisionLabsRgbModel::updateViews()
 {
+    emit sensorStatusChanging(q_name(), q_instance(), getStatus());
+
     emit modeChanged(static_cast<int>(mMode));
     emit lapseIntervalChanged(mLapseInterval_ms);
     emit frameRateChanged(mFrameRate_fps);
