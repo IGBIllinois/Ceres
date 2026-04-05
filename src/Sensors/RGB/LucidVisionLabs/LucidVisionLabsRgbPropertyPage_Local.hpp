@@ -21,18 +21,14 @@ public:
     ~cLucidVisionLabsRgbPropertyPage_Local() = default;
 
 signals:
+    void requestPhoto(bool update_view);
+
+signals:
+    void pushStreamState();
+    void popStreamState();
     void changeMode(int mode);
     void changeFrameRate_Hz(double frame_rate_hz);
     void changeLapseInterval_ms(uint32_t interval_ms);
-
-/*
-    virtual void requestImage() = 0;
-    virtual void requestImages(bool update_view) = 0;
-
-    virtual void takePhoto(bool update_view = false) = 0;
-*/
-    void pushStreamState();
-    void popStreamState();
     void changePixelFormat(int mode);
     void changeExposure(int mode, double exposureTime_us);
     void changeGain(int mode, double gain_dB);
@@ -41,6 +37,8 @@ signals:
 
 
 public slots:
+    void photoTaken();
+
     void pixelFormatUpdated(int mode);
     void exposureUpdated(int mode, double exposureTime_us);
     void gainUpdated(int mode, double gain_dB);

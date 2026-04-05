@@ -45,7 +45,8 @@ void cLucidVisionLabsRgbPropertyPage_Local::doLayout()
 
 void cLucidVisionLabsRgbPropertyPage_Local::onGrabImagePressed()
 {
-
+	mpGrabImage->setEnabled(false);
+	emit requestPhoto(true);
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local::exposureTimeSelectorChanged(const QString&)
@@ -76,6 +77,11 @@ void cLucidVisionLabsRgbPropertyPage_Local::balanceWhiteAutoModeChanged(const QS
 void cLucidVisionLabsRgbPropertyPage_Local::gammaEnableChanged(bool check)
 {
 	mpGamma->setEnabled(check);
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local::photoTaken()
+{
+	mpGrabImage->setEnabled(true);
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local::pixelFormatUpdated(int mode)

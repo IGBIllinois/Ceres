@@ -85,14 +85,20 @@ sSensorWidgets create_triton_sensor(const nlohmann::json& sensorInfo, bool no_vi
 
     auto pPage = new cLucidVisionLabsRgbPropertyPage_Local_Triton(pModel);
 
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::requestPhoto,           pModel, &cLucidVisionLabsRgbModel_Triton::takePhoto);
+
     QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::pushStreamState,        pModel, &cLucidVisionLabsRgbModel_Triton::pushStreamState);
     QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::popStreamState,         pModel, &cLucidVisionLabsRgbModel_Triton::popStreamState);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeMode,             pModel, &cLucidVisionLabsRgbModel_Triton::requestMode);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeFrameRate_Hz,     pModel, &cLucidVisionLabsRgbModel_Triton::requestFrameRate_Hz);
+    QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeLapseInterval_ms, pModel, &cLucidVisionLabsRgbModel_Triton::requestLapseInterval_ms);
     QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changePixelFormat,      pModel, &cLucidVisionLabsRgbModel_Triton::requestPixelFormat);
     QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeExposure,         pModel, &cLucidVisionLabsRgbModel_Triton::requestExposure);
     QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeGain,             pModel, &cLucidVisionLabsRgbModel_Triton::requestGain);
     QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeBalanceWhiteAuto, pModel, &cLucidVisionLabsRgbModel_Triton::requestBalanceWhiteAuto);
     QObject::connect(pPage, &cLucidVisionLabsRgbPropertyPage_Local::changeGamma,            pModel, &cLucidVisionLabsRgbModel_Triton::requestGamma);
 
+    QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::photoTaken,              pPage, &cLucidVisionLabsRgbPropertyPage_Local::photoTaken);
     QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::pixelFormatChanged,      pPage, &cLucidVisionLabsRgbPropertyPage_Local::pixelFormatUpdated);
     QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::exposureChanged,         pPage, &cLucidVisionLabsRgbPropertyPage_Local::exposureUpdated);
     QObject::connect(pModel, &cLucidVisionLabsRgbModel_Triton::gainChanged,             pPage, &cLucidVisionLabsRgbPropertyPage_Local::gainUpdated);

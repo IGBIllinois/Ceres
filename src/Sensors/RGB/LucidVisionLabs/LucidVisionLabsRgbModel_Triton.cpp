@@ -48,47 +48,34 @@ void cLucidVisionLabsRgbModel_Triton::setMode(eMode mode)
 {
     bool changing = mode != mMode;
 
-    if (mCamera->isStreaming())
+    bool is_streaming = mCamera->isStreaming();
+
+    if (is_streaming)
     {
         mCamera->stopStream();
     }
-
 
     switch (mode)
     {
     case cRgbCameraModel::eMode::SINGLE:
         mCamera->acquisitionMode(nLucidVisionLabsConnect::eAcquisitionMode::SINGLE_FRAME);
-        mCamera->triggerMode(nLucidVisionLabsConnect::eTriggerMode::ON);
-        mCamera->triggerArmed(true);
-        mCamera->acquisitionFrameRateEnable(true);
-        mCamera->acquisitionFrameRate_Hz(10.0);
-        mCamera->triggerSource(nLucidVisionLabsConnect::eTriggerSource::SOFTWARE);
         break;
     case cRgbCameraModel::eMode::TIME_LAPSE:
         mCamera->acquisitionMode(nLucidVisionLabsConnect::eAcquisitionMode::SINGLE_FRAME);
-//        mCamera->acquisitionFrameRateEnable(true);
-//        mCamera->acquisitionFrameRate_Hz(10.0);
-        mCamera->triggerSource(nLucidVisionLabsConnect::eTriggerSource::SOFTWARE);
-        mCamera->triggerMode(nLucidVisionLabsConnect::eTriggerMode::ON);
-        mCamera->triggerArmed(true);
 
         mTimeLapseTimer.time_ms(mLapseInterval_ms);
         mTimeLapseTimer.start();
 
-        mCamera->triggerSoftware();
         break;
     case cRgbCameraModel::eMode::CONTINUOUS:
         mCamera->acquisitionMode(nLucidVisionLabsConnect::eAcquisitionMode::CONTINUOUS);
-        mCamera->triggerMode(nLucidVisionLabsConnect::eTriggerMode::OFF);
-        mCamera->acquisitionFrameRate_Hz(mFrameRate_fps);
-        mCamera->triggerSource(nLucidVisionLabsConnect::eTriggerSource::ENCODER_0);
 
+        if (is_streaming)
+            mCamera->startStream();
         break;
     }
 
     mMode = mode;
-
-    mCamera->startStream();
 
     if (changing)
         emit modeChanged(static_cast<int>(mMode));
@@ -107,6 +94,7 @@ void cLucidVisionLabsRgbModel_Triton::setFrameRate_Hz(double frame_rate_hz)
             mCamera->stopStream();
         }
 
+        mCamera->acquisitionFrameRateEnable(true);
         mCamera->acquisitionFrameRate_Hz(frame_rate_hz);
         mFrameRate_fps = mCamera->acquisitionFrameRate_Hz();
 
@@ -114,6 +102,7 @@ void cLucidVisionLabsRgbModel_Triton::setFrameRate_Hz(double frame_rate_hz)
     }
     else
     {
+        mCamera->acquisitionFrameRateEnable(false);
         mFrameRate_fps = frame_rate_hz;
     }
 
@@ -122,6 +111,8 @@ void cLucidVisionLabsRgbModel_Triton::setFrameRate_Hz(double frame_rate_hz)
 
 void cLucidVisionLabsRgbModel_Triton::setLapseInterval_ms(uint32_t interval_ms)
 {
+    if (interval_ms < 500) interval_ms = 500;
+
     if (interval_ms == mLapseInterval_ms)
         return;
 
@@ -130,10 +121,8 @@ void cLucidVisionLabsRgbModel_Triton::setLapseInterval_ms(uint32_t interval_ms)
         mTimeLapseTimer.time_ms(interval_ms);
         mTimeLapseTimer.start();
     }
-    else
-    {
-        mLapseInterval_ms = interval_ms;
-    }
+
+    mLapseInterval_ms = interval_ms;
 
     emit lapseIntervalChanged(mLapseInterval_ms);
 }
@@ -249,6 +238,7 @@ bool cLucidVisionLabsRgbModel_Triton::configure(const nlohmann::json& jsonCfg)
         mCamera->stopStream();
     }
 
+    mFrameRate_fps = mCamera->acquisitionFrameRate_Hz();
     mPixelFormat = mCamera->pixelFormat();
     mExposureTime_us = mCamera->exposureTime_us();
     mExposureAuto = mCamera->exposureAuto();
@@ -340,13 +330,6 @@ bool cLucidVisionLabsRgbModel_Triton::configure(const nlohmann::json& jsonCfg)
             result &= mCamera->gamma(mGamma);
     }
 
-    mImageWidth  = mCamera->width();
-    mImageHeight = mCamera->height();
-
-    size_t buffer_size = mImageHeight * mImageWidth * sizeof(nLucidVisionLabsConnect::cRgbImage::value_type);
-
-    mSerializer.setBufferCapacity(buffer_size + 1024);
-
     if (result)
         setStatus(sensor::eStatus::CONFIGURED);
     else
@@ -357,7 +340,19 @@ bool cLucidVisionLabsRgbModel_Triton::configure(const nlohmann::json& jsonCfg)
 
 bool cLucidVisionLabsRgbModel_Triton::initialize()
 {
-    return true;
+    mCamera->acquisitionStartMode(nLucidVisionLabsConnect::eAcquisitionStartMode::NORMAL);
+    mCamera->triggerMode(nLucidVisionLabsConnect::eTriggerMode::OFF);
+    mCamera->triggerSource(nLucidVisionLabsConnect::eTriggerSource::LINE_0);
+    mCamera->triggerArmed(false);
+
+    mImageWidth = mCamera->width();
+    mImageHeight = mCamera->height();
+
+    size_t buffer_size = mImageHeight * mImageWidth * sizeof(nLucidVisionLabsConnect::cRgbImage::value_type);
+
+    mSerializer.setBufferCapacity(buffer_size + 1024);
+
+    return cLucidVisionLabsRgbModel::initialize();
 }
 
 void cLucidVisionLabsRgbModel_Triton::enableDataRecording(cBlockDataFileWriter& file)
@@ -383,6 +378,7 @@ bool cLucidVisionLabsRgbModel_Triton::startCommunications()
 {
     if (mCamera->isConnected())
     {
+        mCamera->registerImageCallback(this);
         mCamera->streamAutoNegotiatePacketSize(true);
         mCamera->enableStreamPacketResend(true);
 
@@ -390,14 +386,30 @@ bool cLucidVisionLabsRgbModel_Triton::startCommunications()
 
         if (!mCamera->isStreaming())
         {
-            if (!mCamera->startStream())
+            switch (mMode)
             {
-                setStatus(sensor::eStatus::FAILED);
-                return false;
+            case cRgbCameraModel::eMode::SINGLE:
+                break;
+            case cRgbCameraModel::eMode::TIME_LAPSE:
+                if (!mCamera->startStream())
+                {
+                    setStatus(sensor::eStatus::FAILED);
+                    return false;
+                }
+                break;
+            case cRgbCameraModel::eMode::CONTINUOUS:
+                if (!mCamera->startStream(100))
+                {
+                    setStatus(sensor::eStatus::FAILED);
+                    return false;
+                }
+                break;
             }
         }
 
         setStatus(sensor::eStatus::CONNECTED);
+
+        mIsRunning = true;
 
         return true;
     }
@@ -413,6 +425,13 @@ void cLucidVisionLabsRgbModel_Triton::stopCommunications()
     {
         mCamera->stopStream();
     }
+
+    if (mCamera)
+        mCamera->deregisterImageCallback(this);
+
+    //    mCamera->deregisterAllImageCallbacks();
+
+    mIsRunning = false;
 
     setStatus(sensor::eStatus::STOPPED);
 }
@@ -603,25 +622,18 @@ void cLucidVisionLabsRgbModel_Triton::requestImage()
 
 void cLucidVisionLabsRgbModel_Triton::requestImages(bool update_view)
 {
-
+    mAutoEmitImages = update_view;
 }
 
 void cLucidVisionLabsRgbModel_Triton::takePhoto(bool update_view)
 {
-    if (mMode == eMode::SINGLE)
-    {
-        mPhotoRequested = true;
-        mCamera->triggerSoftware();
-    }
-    else
-    {
-        mImageRequested = true;
-    }
+    mPhotoRequested = true;
+    mImageRequested = update_view;
 }
 
 void cLucidVisionLabsRgbModel_Triton::update()
 {
-//    if (!mIsRunning) return;
+    if (!mIsRunning) return;
 
     if (!mCamera->isConnected())
     {
@@ -629,80 +641,43 @@ void cLucidVisionLabsRgbModel_Triton::update()
         return;
     }
 
-    if (!mCamera->isStreaming())
-    {
-        return;
-    }
-
-    bool newData = false;
-
     switch (mMode)
     {
     case eMode::SINGLE:
         if (mPhotoRequested)
         {
-            auto* pImage = mCamera->getImage(0);
+            std::lock_guard<std::mutex> camera_guard(mCameraMutex);
 
-            if (pImage)
+            if (mCamera->isStreaming())
             {
-                updateCurrentImage(pImage);
-
-                newData = true;
-                mPhotoRequested = false;
-                emit photoTaken();
+                mCamera->stopStream();
             }
+
+            mCamera->acquisitionMode(nLucidVisionLabsConnect::eAcquisitionMode::SINGLE_FRAME);
+
+            mCamera->startStream();
+
+            mPhotoRequested = false;
         }
         break;
     case eMode::TIME_LAPSE:
         if (mTimeLapseTimer.elapsed())
         {
-            auto* pImage = mCamera->getImage(1000);
+            std::lock_guard<std::mutex> camera_guard(mCameraMutex);
 
-            if (pImage)
+            if (mCamera->isStreaming())
             {
-                updateCurrentImage(pImage);
-
-                mCamera->triggerSoftware();
-
-                newData = true;
-                mTimeLapseTimer.start();
+                mCamera->stopStream();
             }
+
+            mTimeLapseTimer.start();
+
+            mCamera->acquisitionMode(nLucidVisionLabsConnect::eAcquisitionMode::SINGLE_FRAME);
+            mCamera->startStream();
         }
         break;
     case eMode::CONTINUOUS:
-        auto* pImage = mCamera->getImage(0);
-
-        if (pImage)
-        {
-            updateCurrentImage(pImage);
-            newData = true;
-        }
         break;
-    }
-
-    if (newData)
-    {
-        if (mIsRecording && static_cast<bool>(mSerializer))
-        {
-            mSerializer.writeImage(mInstanceID, mCurrentImage);
-        }
-
-        if (mImageRequested || mAutoEmitImages)
-        {
-            constexpr double scale = 255.0 / 65535.0;
-
-            mImageBuffer.resize(mCurrentImage.size());
-
-            for (std::size_t i = 0; i < mCurrentImage.size(); ++i)
-            {
-                mImageBuffer[i] = static_cast<uint8_t>(mCurrentImage[i] * scale);
-            }
-
-            mImage = QImage(mImageBuffer.data(), mCurrentImage.width(), mCurrentImage.height(), QImage::Format_RGB888);
-
-            emit onNewImage(mImage);
-            mImageRequested = false;
-        }
     }
 }
 
@@ -716,71 +691,94 @@ void cLucidVisionLabsRgbModel_Triton::errorHappend(int id, QString msg)
     setStatus(sensor::eStatus::FAILED);
 }
 
-void cLucidVisionLabsRgbModel_Triton::updateCurrentImage(Arena::IImage* pImage)
-{
-    auto pConverted = Arena::ImageFactory::Convert(pImage, RGB16);
-
-    auto height = pConverted->GetHeight();
-    auto width = pConverted->GetWidth();
-    auto bits = pConverted->GetBitsPerPixel();
-    auto id = pConverted->GetFrameId();
-
-    mCurrentImage.setData(pConverted->GetData(), width, height, bits);
-
-    Arena::ImageFactory::Destroy(pConverted);
-    mCamera->requeueBuffer(pImage);
-
-    mCurrentImage.setFrameID(id);
-    mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
-}
-
 //-----------------------------------------------------------------------------
 void cLucidVisionLabsRgbModel_Triton::OnImage(Arena::IImage* pImage)
 {
     if (pImage->IsIncomplete())
     {
-
+        return;
     }
-    else if (pImage)
+
+    auto image_width = pImage->GetWidth();
+    auto image_height = pImage->GetHeight();
+
+    auto pConverted = Arena::ImageFactory::Convert(pImage, RGB16);
+
     {
-        auto pConverted = Arena::ImageFactory::Convert(pImage, RGB16);
+        std::lock_guard<std::mutex> camera_guard(mCameraMutex);
 
-        auto height = pConverted->GetHeight();
-        auto width = pConverted->GetWidth();
-        auto bits = pConverted->GetBitsPerPixel();
-        auto n = pConverted->GetPayloadSize();
-        auto id = pConverted->GetFrameId();
-        auto timestamp_ns = pConverted->GetTimestampNs();
+        mCamera->requeueBuffer(pImage);
+    }
 
-        mCurrentImage.setData(pConverted->GetData(), width, height, bits);
-        mCurrentImage.setFrameID(id);
-        mCurrentImage.setTimestamp_ns(timestamp_ns);
+    if ((mImageWidth != image_width) || (mImageHeight != image_height))
+    {
+        mImageWidth  = image_width;
+        mImageHeight = image_height;
 
-        Arena::ImageFactory::Destroy(pConverted);
+        emit imageSizeChanged(mImageWidth, mImageHeight);
+    }
 
+//    auto pConverted = Arena::ImageFactory::Convert(pImage, RGB16);
+
+    auto height = pConverted->GetHeight();
+    auto width = pConverted->GetWidth();
+    auto bits = pConverted->GetBitsPerPixel();
+    auto n = pConverted->GetPayloadSize();
+    auto id = pConverted->GetFrameId();
+    auto timestamp_ns = pConverted->GetTimestampNs();
+
+    mCurrentImage.setData(pConverted->GetData(), width, height, bits);
+    mCurrentImage.setFrameID(id);
+    mCurrentImage.setTimestamp_ns(timestamp_ns);
+
+    Arena::ImageFactory::Destroy(pConverted);
+
+    {
+        std::lock_guard<std::mutex> camera_guard(mCameraMutex);
+
+        if (mMode != eMode::CONTINUOUS)
+        {
+            mCamera->stopStream();
+        }
+    }
+
+
+    if (mIsRecording && static_cast<bool>(mSerializer))
+    {
+        mSerializer.writeImage(mInstanceID, mCurrentImage);
+    }
+
+    if (mImageRequested || mAutoEmitImages)
+    {
         constexpr double scale = 255.0 / 65535.0;
 
-/*
-        mImageBuffer.resize(rgb_image.size());
+        mImageBuffer.resize(mCurrentImage.size());
 
-        for (std::size_t i = 0; i < rgb_image.size(); ++i)
+        for (std::size_t i = 0; i < mCurrentImage.size(); ++i)
         {
-            mImageBuffer[i] = static_cast<uint8_t>(rgb_image[i] * scale);
+            mImageBuffer[i] = static_cast<uint8_t>(mCurrentImage[i] * scale);
         }
 
-        QImage* image = new QImage(mImageBuffer.data(), width, height, QImage::Format_RGB888);
+        mImage = QImage(mImageBuffer.data(), mCurrentImage.width(), mCurrentImage.height(), QImage::Format_RGB888);
 
-        if (image)
-            mpImage->setImage(*image);
-*/
-
-//        delete image;
+        emit onNewImage(mImage);
+        mImageRequested = false;
     }
 
-    mCamera->requeueBuffer(pImage);
-
-    mCamera->stopStream();
-
-    update();
+    switch (mMode)
+    {
+    case eMode::SINGLE:
+        emit photoTaken();
+        break;
+    case eMode::TIME_LAPSE:
+        if (mPhotoRequested)
+        {
+            emit photoTaken();
+            mPhotoRequested = false;
+        }
+        break;
+    case eMode::CONTINUOUS:
+        break;
+    }
 }
 

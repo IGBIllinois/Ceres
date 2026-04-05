@@ -31,6 +31,7 @@ void cLucidVisionLabsRgbPropertyPage::createWidgets()
 
     mpLapseIntervalLabel = new QLabel("Time-Lapse Interval (s):", this);;
     mpLapseInterval_s = new QLineEdit(this);
+    mpLapseInterval_s->setValidator( new QDoubleValidator(0.5, 300.0, 3) );
 
     mpGrabImage = new QPushButton("Grab Image", this);
     connect(mpGrabImage, &QPushButton::pressed, this, &cLucidVisionLabsRgbPropertyPage::onGrabImagePressed);

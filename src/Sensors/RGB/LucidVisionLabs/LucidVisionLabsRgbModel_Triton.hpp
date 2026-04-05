@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <optional>
+#include <mutex>
 
 // Forward Declaration
 class cLucidTritonCamera;
@@ -158,9 +159,6 @@ private:
     void OnImage(Arena::IImage* pImage) override;
 
 private:
-    void updateCurrentImage(Arena::IImage* pImage);
-
-private:
     const uint8_t mInstanceID;
 
     std::optional<bool> mStreamStateStack;
@@ -178,6 +176,7 @@ private:
     bool mGammaEnable = false;
     double mGamma = 1.0;
 
+    std::mutex mCameraMutex;
     std::unique_ptr<cLucidTritonCamera> mCamera;
 };
 

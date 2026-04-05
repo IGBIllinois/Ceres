@@ -10,6 +10,7 @@
 #include <cbdf/LucidTritonSerializer.hpp>
 
 #include <QImage>
+#include <QByteArray>
 
 
 class cLucidVisionLabsRgbModel : public cRgbCameraModel
@@ -81,6 +82,8 @@ protected:
     std::string mFirmwareVersion;
     std::string mMacAddress;
     std::string mIpAddress;
+
+    bool mIsRunning = false;
 
     bool mPhotoRequested = false;
 
