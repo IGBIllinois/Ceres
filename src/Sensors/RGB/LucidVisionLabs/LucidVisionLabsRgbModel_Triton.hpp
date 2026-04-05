@@ -158,7 +158,7 @@ private:
     void OnImage(Arena::IImage* pImage) override;
 
 private:
-    void updateCurrentImage(Arena::IImage* pImage);
+    void updateCurrentImage2(Arena::IImage* pImage);
 
 private:
     const uint8_t mInstanceID;
@@ -177,6 +177,8 @@ private:
 
     bool mGammaEnable = false;
     double mGamma = 1.0;
+
+    Arena::IImage* mpImage = nullptr;
 
     std::unique_ptr<cLucidTritonCamera> mCamera;
 };

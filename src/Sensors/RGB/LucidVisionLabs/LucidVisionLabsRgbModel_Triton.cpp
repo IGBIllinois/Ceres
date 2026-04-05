@@ -645,7 +645,7 @@ void cLucidVisionLabsRgbModel_Triton::update()
 
             if (pImage)
             {
-                updateCurrentImage(pImage);
+                updateCurrentImage2(pImage);
 
                 newData = true;
                 mPhotoRequested = false;
@@ -660,7 +660,7 @@ void cLucidVisionLabsRgbModel_Triton::update()
 
             if (pImage)
             {
-                updateCurrentImage(pImage);
+                updateCurrentImage2(pImage);
 
                 mCamera->triggerSoftware();
 
@@ -674,7 +674,7 @@ void cLucidVisionLabsRgbModel_Triton::update()
 
         if (pImage)
         {
-            updateCurrentImage(pImage);
+            updateCurrentImage2(pImage);
             newData = true;
         }
         break;
@@ -716,7 +716,7 @@ void cLucidVisionLabsRgbModel_Triton::errorHappend(int id, QString msg)
     setStatus(sensor::eStatus::FAILED);
 }
 
-void cLucidVisionLabsRgbModel_Triton::updateCurrentImage(Arena::IImage* pImage)
+void cLucidVisionLabsRgbModel_Triton::updateCurrentImage2(Arena::IImage* pImage)
 {
     auto pConverted = Arena::ImageFactory::Convert(pImage, RGB16);
 
