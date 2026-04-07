@@ -10,7 +10,6 @@
 #include <cbdf/LucidTritonSerializer.hpp>
 
 #include <QImage>
-#include <QByteArray>
 
 
 class cLucidVisionLabsRgbModel : public cRgbCameraModel

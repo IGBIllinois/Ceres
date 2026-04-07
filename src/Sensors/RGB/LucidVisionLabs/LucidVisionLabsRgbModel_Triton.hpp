@@ -161,6 +161,9 @@ private:
     bool updateImage();
 
 private:
+    void updateCurrentImage2(Arena::IImage* pImage);
+
+private:
     const uint8_t mInstanceID;
 
     std::optional<bool> mStreamStateStack;
@@ -181,7 +184,8 @@ private:
     std::mutex mImageMutex;
     Arena::IImage* mpTemporyImage = nullptr;
 
-    std::mutex mCameraMutex;
+    Arena::IImage* mpImage = nullptr;
+
     std::unique_ptr<cLucidTritonCamera> mCamera;
 };
 

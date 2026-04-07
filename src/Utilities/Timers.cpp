@@ -130,10 +130,6 @@ bool cOneShotTimer::elapsed()
 	auto now = std::chrono::high_resolution_clock::now();
 
 	auto diff = now - mStartTime;
-	if (diff > mInterval)
-	{
-		return true;
-	}
 
-	return false;
+	return (diff > mInterval);
 }
