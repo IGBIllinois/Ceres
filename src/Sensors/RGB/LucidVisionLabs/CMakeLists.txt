@@ -113,7 +113,8 @@ target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${COMMON_INCLUDE
 target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${RGB_INCLUDE_DIR})
 target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
-target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${ArenaSDK_INCLUDE_DIRS})
+target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${GenICam_INCLUDE_DIR})
+target_include_directories(lucid_vision_labs_rgb_static PRIVATE ${ArenaSDK_INCLUDE_DIR})
 
 #target_link_libraries(lucid_vision_labs_rgb_static PRIVATE cbdf::rgb)
 
@@ -136,3 +137,5 @@ set_property(TARGET lucid_vision_labs_rgb_static PROPERTY MSVC_RUNTIME_LIBRARY "
 set_target_properties(lucid_vision_labs_rgb_static PROPERTIES FOLDER "Sensors/RGB_Camera/LucidVisionLabs")
 
 message(STATUS "ArenaSDK_INCLUDE_DIRS = ${ArenaSDK_INCLUDE_DIRS}")
+message(STATUS "ArenaSDK_INCLUDE_DIR = ${ArenaSDK_INCLUDE_DIR}")
+message(STATUS "GenICam_INCLUDE_DIR = ${GenICam_INCLUDE_DIR}")

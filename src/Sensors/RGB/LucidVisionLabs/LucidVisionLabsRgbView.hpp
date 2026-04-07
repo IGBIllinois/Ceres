@@ -25,6 +25,7 @@ public:
 	virtual void initialize();
 
 signals:
+	void requestPhoto();
 	void requestImage();
 	void requestImages(bool update_view);
 

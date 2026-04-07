@@ -42,6 +42,7 @@ if(WIN32)
     HINTS
       "$ENV{GENICAM}/include/"
       "$ENV{LUCID_GENICAM_PATH}/library/CPP/include/"
+      "${CMAKE_INSTALL_PREFIX}/ArenaSDK/GenICam"
       "${CMAKE_INSTALL_PREFIX}/include/GenICam"
     )
 
@@ -69,6 +70,7 @@ if(WIN32)
       "$ENV{ARENA_SDK}/include/"
       "$ENV{LUCID_DEV_ROOT}/include/"
       "${CMAKE_INSTALL_PREFIX}/include/ArenaSDK"
+      "${CMAKE_INSTALL_PREFIX}/include/ArenaSDK/include"
     )
 
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)

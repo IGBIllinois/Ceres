@@ -6,12 +6,13 @@
 
 #include <LucidVisionLabsConnect/LucidVisionLabsTypes.hpp>
 
-#include <Arena/ArenaAPI.h>
+#include <Arena/ArenaApi.h>
 
 #include <vector>
 #include <memory>
 #include <optional>
 #include <mutex>
+#include <atomic>
 
 // Forward Declaration
 class cLucidTritonCamera;
@@ -153,28 +154,32 @@ public slots:
 protected slots:
     void errorHappend(int id, QString msg);
 
-    virtual void processReply(const std::string& reply) {};
+//    virtual void processReply(const std::string& reply) {};
 
 private:
     void OnImage(Arena::IImage* pImage) override;
+    bool updateImage();
 
 private:
     const uint8_t mInstanceID;
 
     std::optional<bool> mStreamStateStack;
 
-    nLucidVisionLabsConnect::nTriton::ePixelFormat mPixelFormat = nLucidVisionLabsConnect::nTriton::ePixelFormat::BayerRG16;
+    std::optional<nLucidVisionLabsConnect::nTriton::ePixelFormat> mPixelFormat;
 
-    double mExposureTime_us = 0.0;
-    nLucidVisionLabsConnect::nTriton::eExposureAuto mExposureAuto = nLucidVisionLabsConnect::nTriton::eExposureAuto::CONTINUOUS;
+    std::optional<double> mExposureTime_us;
+    std::optional<nLucidVisionLabsConnect::nTriton::eExposureAuto> mExposureAuto;
 
-    nLucidVisionLabsConnect::nTriton::eGainAuto mGainAuto = nLucidVisionLabsConnect::nTriton::eGainAuto::CONTINUOUS;
-    double mGain_dB = 0.0;
+    std::optional<nLucidVisionLabsConnect::nTriton::eGainAuto> mGainAuto;
+    std::optional<double> mGain_dB;
 
-    nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto mBalanceWhiteAuto = nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto::CONTINUOUS;
+    std::optional<nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto> mBalanceWhiteAuto;
 
-    bool mGammaEnable = false;
-    double mGamma = 1.0;
+    std::optional<bool> mGammaEnable;
+    std::optional<double> mGamma;
+
+    std::mutex mImageMutex;
+    Arena::IImage* mpTemporyImage = nullptr;
 
     std::mutex mCameraMutex;
     std::unique_ptr<cLucidTritonCamera> mCamera;

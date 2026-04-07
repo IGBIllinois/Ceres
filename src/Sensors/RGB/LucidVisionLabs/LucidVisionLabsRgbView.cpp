@@ -131,7 +131,11 @@ void cLucidVisionLabsRgbView::onImageSizeChange(int width, int height)
 void cLucidVisionLabsRgbView::onGrabImage()
 {
 	mpGrabImage->setEnabled(false);
-	emit requestImage();
+
+	if (0 == mpMode->currentIndex())
+		emit requestPhoto();
+	else
+		emit requestImage();
 }
 
 void cLucidVisionLabsRgbView::onGrabImages(bool state)
