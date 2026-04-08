@@ -161,31 +161,29 @@ private:
     bool updateImage();
 
 private:
-    void updateCurrentImage2(Arena::IImage* pImage);
-
-private:
     const uint8_t mInstanceID;
 
     std::optional<bool> mStreamStateStack;
 
-    std::optional<nLucidVisionLabsConnect::nTriton::ePixelFormat> mPixelFormat;
+    nLucidVisionLabsConnect::nTriton::ePixelFormat mPixelFormat = nLucidVisionLabsConnect::nTriton::ePixelFormat::BayerRG16;
 
-    std::optional<double> mExposureTime_us;
-    std::optional<nLucidVisionLabsConnect::nTriton::eExposureAuto> mExposureAuto;
+    double mExposureTime_us = 0;
+    nLucidVisionLabsConnect::nTriton::eExposureAuto mExposureAuto = nLucidVisionLabsConnect::nTriton::eExposureAuto::OFF;
 
-    std::optional<nLucidVisionLabsConnect::nTriton::eGainAuto> mGainAuto;
-    std::optional<double> mGain_dB;
+    nLucidVisionLabsConnect::nTriton::eGainAuto mGainAuto = nLucidVisionLabsConnect::nTriton::eGainAuto::OFF;
+    double mGain_dB = 0.0;
 
-    std::optional<nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto> mBalanceWhiteAuto;
+    nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto mBalanceWhiteAuto = nLucidVisionLabsConnect::nTriton::eBalanceWhiteAuto::OFF;
 
-    std::optional<bool> mGammaEnable;
-    std::optional<double> mGamma;
+    bool    mGammaEnable = false;
+    double  mGamma = 1.0;
+
+    bool mProcessImage = false;
 
     std::mutex mImageMutex;
     Arena::IImage* mpTemporyImage = nullptr;
 
-    Arena::IImage* mpImage = nullptr;
-
+    std::mutex mCameraMutex;
     std::unique_ptr<cLucidTritonCamera> mCamera;
 };
 

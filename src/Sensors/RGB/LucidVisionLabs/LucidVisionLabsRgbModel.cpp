@@ -78,6 +78,8 @@ bool cLucidVisionLabsRgbModel::configure(const nlohmann::json& jsonCfg)
     if (frame_rate_fps > 0)
         setFrameRate_Hz(frame_rate_fps);
 
+    setMode(mMode);
+
     return true;
 }
 
