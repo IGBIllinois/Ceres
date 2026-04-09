@@ -766,6 +766,21 @@ bool cLucidVisionLabsRgbModel_Triton::updateImage()
         mpTemporyImage = nullptr;
     }
 
+	if (pConverted)
+	{
+	    auto height = pConverted->GetHeight();
+	    auto width = pConverted->GetWidth();
+	    auto bits = pConverted->GetBitsPerPixel();
+	    auto id = pConverted->GetFrameId();
+
+	    mCurrentImage.setData(pConverted->GetData(), width, height, bits);
+
+    	Arena::ImageFactory::Destroy(pConverted);
+
+	    mCurrentImage.setFrameID(id);
+    	mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
+	}
+
     return false;
 }
 
