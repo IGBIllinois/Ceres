@@ -757,10 +757,10 @@ bool cLucidVisionLabsRgbModel_Triton::updateImage()
 
         if (!static_cast<bool>(mpTemporyImage)) return false;
 
-        //        image_width = mpTemporyImage->GetWidth();
-        //        image_height = mpTemporyImage->GetHeight();
+        image_width = mpTemporyImage->GetWidth();
+        image_height = mpTemporyImage->GetHeight();
 
-        auto pConverted = Arena::ImageFactory::Convert(mpTemporyImage, RGB16);
+        pConverted = Arena::ImageFactory::Convert(mpTemporyImage, RGB16);
 
         Arena::ImageFactory::Destroy(mpTemporyImage);
         mpTemporyImage = nullptr;
