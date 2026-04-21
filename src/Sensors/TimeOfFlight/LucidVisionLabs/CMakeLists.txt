@@ -107,7 +107,7 @@ target_link_libraries(lucid_vision_labs_tof_static PUBLIC ${Qt}::Network)
 target_link_libraries(lucid_vision_labs_tof_static PUBLIC ${Qt}::Multimedia)
 target_link_libraries(lucid_vision_labs_tof_static PRIVATE ExperimentStateMachine)
 target_link_libraries(lucid_vision_labs_tof_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(lucid_vision_labs_tof_static PRIVATE LucidVisionLabsConnect::LucidVisionLabsConnect_static)
+target_link_libraries(lucid_vision_labs_tof_static PRIVATE lucid_vision_labs_connect::LucidVisionLabsConnect_static)
 target_link_libraries(lucid_vision_labs_tof_static PRIVATE ${Protobuf_LIBRARIES})
 
 #

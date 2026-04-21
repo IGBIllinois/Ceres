@@ -184,10 +184,10 @@ find_package(hyspex_connect REQUIRED)
 find_package(HySpex REQUIRED)
 find_package(Spinnaker REQUIRED)
 
-find_package(LucidVisionLabsConnect REQUIRED)
+find_package(lucid_vision_labs_connect REQUIRED)
 find_package(ArenaSDK REQUIRED)
 
-find_package(TeledyneAtlasConnect REQUIRED)
+find_package(teledyne_atlas_connect REQUIRED)
 find_package(AtlasSDK REQUIRED)
 
 find_package(nlohmann_json REQUIRED)
