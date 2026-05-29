@@ -6,6 +6,7 @@
 #include "ExperimentVariableTable.hpp"
 
 #include <QThread>
+#include <QString>
 
 #include <algorithm>
 #include <filesystem>
@@ -382,7 +383,9 @@ void cExperimentStateMachine::startExperiment()
         emit experimentStateChanged(eState::RUNNING);
 
         QString msg;
-        msg.sprintf("Step %d: ", mActiveStateNumber);
+        msg  = "Step ";
+        msg += QString::number(mActiveStateNumber);
+        msg += ": ";
         msg += mpActiveState->getStatusStr();
         emit experimentStatus(msg);
 
@@ -511,7 +514,9 @@ void cExperimentStateMachine::updateExperimentStateMachine()
             if (mpActiveState->initialize())
             {
                 QString msg;
-                msg.sprintf("Step %d: ", mActiveStateNumber);
+                msg = "Step ";
+                msg += QString::number(mActiveStateNumber);
+                msg += ": ";
                 msg += mpActiveState->getStatusStr();
                 emit stateNumberChanged(mActiveStateNumber);
                 emit experimentStatus(msg);

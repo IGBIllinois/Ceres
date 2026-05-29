@@ -4,11 +4,13 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
+#include <qglobal.h>
+
 class cExperimentState;
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
-class QObject;
+    class QObject;
 QT_END_NAMESPACE
 
 
