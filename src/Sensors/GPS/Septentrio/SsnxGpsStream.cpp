@@ -2,6 +2,8 @@
 #include "SsnxGpsStream.hpp"
 
 #include <QtNetwork/QHostInfo>
+#include <QtCore>
+#include <QtLogging>
 
 
 cSsnxGpsStream::cSsnxGpsStream()
