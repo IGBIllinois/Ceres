@@ -8,7 +8,7 @@
 
 
 // Forward Declarations
-class cGpsPropertyPage_Remote;
+
 
 #include <optional>
 

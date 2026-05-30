@@ -1,6 +1,5 @@
 
 #include "GpsExperimentStates.hpp"
-#include "GpsPropertyPage_Remote.hpp"
 
 #include <QMessageBox>
 #include <QThread>
