@@ -9,7 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 
 
-include("SoftwareInformation/branding.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/SoftwareInformation/branding.cmake")
 
 
 set(ui_files
@@ -34,14 +34,18 @@ source_group("Resources" FILES
   ${platform_resource_files}
 )
 
-qt5_add_resources(UI_RESOURCES ceres.qrc OPTIONS "--verbose")
+if (${Qt} STREQUAL "Qt6")
+	qt6_add_resources(UI_RESOURCES ceres.qrc OPTIONS "--verbose")
+else()
+	qt5_add_resources(UI_RESOURCES ceres.qrc OPTIONS "--verbose")
+endif()
 
 #
 # Main Ceres Application
 #
 add_executable(Ceres WIN32 MACOSX_BUNDLE)
 
-#set_target_properties(Ceres PROPERTIES LANGUAGE C CXX)
+set_target_properties(Ceres PROPERTIES LANGUAGE CXX)
 
 target_compile_features(Ceres PRIVATE cxx_std_20)
 
@@ -132,6 +136,45 @@ target_link_libraries(Ceres PRIVATE Sensors)
 target_link_libraries(Ceres PRIVATE Utilities)
 target_link_libraries(Ceres PRIVATE common)
 target_link_libraries(Ceres PRIVATE SDL3::SDL3-static)
+target_link_libraries(Ceres PUBLIC ${Protobuf_LIBRARIES})
+target_link_libraries(Ceres PUBLIC utf8_range::utf8_range)
+target_link_libraries(Ceres PUBLIC
+    absl::absl_check
+    absl::absl_log
+    absl::algorithm
+    absl::base
+    absl::bind_front
+    absl::bits
+    absl::btree
+    absl::cleanup
+    absl::cord
+    absl::core_headers
+    absl::debugging
+    absl::die_if_null
+    absl::dynamic_annotations
+    absl::flags
+    absl::flat_hash_map
+    absl::flat_hash_set
+    absl::function_ref
+    absl::hash
+    absl::layout
+    absl::log_initialize
+    absl::log_globals
+    absl::log_severity
+    absl::memory
+    absl::node_hash_map
+    absl::node_hash_set
+    absl::optional
+    absl::random_distributions
+    absl::random_random
+    absl::span
+    absl::status
+    absl::statusor
+    absl::strings
+    absl::synchronization
+    absl::time
+    absl::utility
+)
 
 #vtk_module_autoinit(TARGETS Ceres MODULES ${VTK_LIBRARIES})
 

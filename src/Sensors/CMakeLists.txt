@@ -14,7 +14,7 @@ PUBLIC
 # Base Headers for all Sensor classes
 #
     SensorModel.hpp
- 
+
 PRIVATE
 #
 # Interfaces to be used by various sensor models
@@ -86,14 +86,14 @@ target_include_directories(Sensors PRIVATE ${COMMON_INCLUDE_DIR})
 
 target_link_libraries(Sensors PRIVATE ${Qt}::Core)
 target_link_libraries(Sensors PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(Sensors PRIVATE gps_static)
-target_link_libraries(Sensors PRIVATE lidar_static)
-target_link_libraries(Sensors PRIVATE weather_static)
-target_link_libraries(Sensors PRIVATE hyperspectral_static)
-target_link_libraries(Sensors PRIVATE rgb_camera_static)
-target_link_libraries(Sensors PRIVATE ir_camera_static)
-target_link_libraries(Sensors PRIVATE multispectral_static)
-target_link_libraries(Sensors PRIVATE tof_camera_static)
+target_link_libraries(Sensors PUBLIC gps_static)
+target_link_libraries(Sensors PUBLIC lidar_static)
+target_link_libraries(Sensors PUBLIC weather_static)
+target_link_libraries(Sensors PUBLIC hyperspectral_static)
+target_link_libraries(Sensors PUBLIC rgb_camera_static)
+target_link_libraries(Sensors PUBLIC ir_camera_static)
+target_link_libraries(Sensors PUBLIC multispectral_static)
+target_link_libraries(Sensors PUBLIC tof_camera_static)
 
 
 set_target_properties(Sensors PROPERTIES FOLDER "Sensors")

@@ -136,53 +136,53 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     mpSplashScreen = pSplashScreen;
 
     std::string cfgFileName = getCfgFilePath();
+
+    if (cfgFileName.empty())
+        exit(EXIT_FAILURE);
+
     nlohmann::json configDoc;
 
-    if (!cfgFileName.empty())
+    std::ifstream in;
+    in.open(cfgFileName);
+
+    if (!in.is_open())
     {
-        std::ifstream in;
-        in.open(cfgFileName);
+        QString msg = "Could not open ";
+        msg += cfgFileName.c_str();
+        msg += " for reading!";
 
-        if (!in.is_open())
-        {
-            QString msg = "Could not open ";
-            msg += cfgFileName.c_str();
-            msg += " for reading!";
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+        mb.exec();
 
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
+    }
 
-            exit(EXIT_FAILURE);
-        }
+    try
+    {
+        configDoc = nlohmann::json::parse(in, nullptr, true, true);
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+        QString msg = "Parsing error in ";
+        msg += cfgFileName.c_str();
+        msg += ".\n";
+        msg += e.what();
 
-        try
-        {
-            configDoc = nlohmann::json::parse(in, nullptr, true, true);
-        }
-        catch (const nlohmann::json::parse_error& e)
-        {
-            QString msg = "Parsing error in ";
-            msg += cfgFileName.c_str();
-            msg += ".\n";
-            msg += e.what();
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+        mb.exec();
 
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
+        exit(EXIT_FAILURE);
+    }
+    catch (const std::exception& e)
+    {
+        QString msg = "Unknown error in ";
+        msg += cfgFileName.c_str();
+        msg += ".\n";
+        msg += e.what();
 
-            exit(EXIT_FAILURE);
-        }
-        catch (const std::exception& e)
-        {
-            QString msg = "Unknown error in ";
-            msg += cfgFileName.c_str();
-            msg += ".\n";
-            msg += e.what();
+        QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
+        mb.exec();
 
-            QMessageBox mb(QMessageBox::Critical, "Configuration Error", msg);
-            mb.exec();
-
-            exit(EXIT_FAILURE);
-        }
+        exit(EXIT_FAILURE);
     }
 
     if (configDoc.contains("default data folder"))

@@ -35,7 +35,7 @@ target_include_directories(HySpexFocusTests PRIVATE ../../src/Sensors)
 target_include_directories(HySpexFocusTests PRIVATE ../../src/Utilities)
 
 target_link_libraries(HySpexFocusTests PRIVATE Catch2::Catch2WithMain)
-target_link_libraries(HySpexFocusTests PRIVATE hyspex_connect::hyspex_connect_minimal_static)
+target_link_libraries(HySpexFocusTests PRIVATE hyspex_connect::hyspex_connect_minimal)
 
 message(STATUS "CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
 

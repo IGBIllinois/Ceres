@@ -11,7 +11,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 
 
-include("SoftwareInformation/branding.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/SoftwareInformation/branding.cmake")
 
 
 set(ui_files
@@ -35,7 +35,11 @@ source_group("Resources" FILES
   ${platform_resource_files}
 )
 
-qt5_add_resources(UI_RESOURCES ceres_remote_client.qrc OPTIONS "--verbose")
+if (${Qt} STREQUAL "Qt6")
+	qt6_add_resources(UI_RESOURCES ceres_remote_client.qrc OPTIONS "--verbose")
+else()
+	qt5_add_resources(UI_RESOURCES ceres_remote_client.qrc OPTIONS "--verbose")
+endif()
 
 #
 # Ceres Remote Data Acquition Client
@@ -105,6 +109,8 @@ target_link_libraries(CeresRemoteClient PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(CeresRemoteClient PRIVATE Sensors)
 target_link_libraries(CeresRemoteClient PRIVATE Utilities)
 target_link_libraries(CeresRemoteClient PRIVATE common)
+target_link_libraries(CeresRemoteClient PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(CeresRemoteClient PRIVATE utf8_range::utf8_range)
 
 set_target_properties(CeresRemoteClient PROPERTIES FOLDER "Apps")
 

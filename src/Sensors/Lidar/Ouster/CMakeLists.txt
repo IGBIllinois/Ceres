@@ -110,10 +110,12 @@ target_include_directories(ouster_sensor_static PRIVATE ${EXPERIMENT_STATE_MACHI
 
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::Network)
+target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::OpenGL)
+target_link_libraries(ouster_sensor_static PUBLIC ${Qt}::OpenGLWidgets)
 target_link_libraries(ouster_sensor_static PRIVATE ExperimentStateMachine)
 target_link_libraries(ouster_sensor_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(ouster_sensor_static PRIVATE ouster::ouster_static)
-target_link_libraries(ouster_sensor_static INTERFACE ouster::OusterVisualization)
+target_link_libraries(ouster_sensor_static PRIVATE ouster_connect::ouster_connect_static)
+target_link_libraries(ouster_sensor_static PRIVATE ouster_connect::OusterVisualization)
 target_link_libraries(ouster_sensor_static PRIVATE ${Protobuf_LIBRARIES})
 
 

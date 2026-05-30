@@ -11,7 +11,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 
 
-include("SoftwareInformation/branding.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/SoftwareInformation/branding.cmake")
 
 
 set(ui_files
@@ -35,7 +35,12 @@ source_group("Resources" FILES
   ${platform_resource_files}
 )
 
-qt5_add_resources(UI_RESOURCES CeresDataViewer.qrc OPTIONS "--verbose")
+
+if (${Qt} STREQUAL "Qt6")
+	qt6_add_resources(UI_RESOURCES CeresDataViewer.qrc OPTIONS "--verbose")
+else()
+	qt5_add_resources(UI_RESOURCES CeresDataViewer.qrc OPTIONS "--verbose")
+endif()
 
 
 add_executable(CeresDataViewer WIN32 MACOSX_BUNDLE)
@@ -76,7 +81,7 @@ PRIVATE
 )
 
 
-target_include_directories(CeresDataViewer PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
+target_include_directories(CeresDataViewer PRIVATE ${CMAKE_PREFIX_PATH}/include)
 target_include_directories(CeresDataViewer PRIVATE ${UTILITIES_INCLUDE_DIR})
 #target_include_directories(CeresDataViewer PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
 target_include_directories(CeresDataViewer PRIVATE ${SENSORS_INCLUDE_DIR})
@@ -88,9 +93,16 @@ target_link_libraries(CeresDataViewer PRIVATE cbdf::gps cbdf::lidar cbdf::rgb cb
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Widgets)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Core)
 target_link_libraries(CeresDataViewer PRIVATE ${Qt}::Multimedia)
+target_link_libraries(CeresDataViewer PRIVATE ${Qt}::OpenGLWidgets)
+
+#target_link_libraries(CeresDataViewer PRIVATE gps_static)
+#target_link_libraries(CeresDataViewer PRIVATE ouster_sensor_static)
 
 target_link_libraries(CeresDataViewer PRIVATE Sensors)
 target_link_libraries(CeresDataViewer PRIVATE Utilities)
+
+target_link_libraries(CeresDataViewer PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(CeresDataViewer PRIVATE utf8_range::utf8_range)
 
 
 #

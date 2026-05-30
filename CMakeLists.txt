@@ -51,6 +51,9 @@ cmake_policy(SET CMP0091 NEW)
 # warn about deprecated stuff so that we may try fixing it
 SET(CMAKE_WARN_DEPRECATED 1)
 
+set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
+
+message(STATUS "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
 #******************************************************************************
 # PROJECT OPTIONS
@@ -154,10 +157,11 @@ find_package(Catch2 QUIET)
 
 
 # Find and include Qt
-set(Qt Qt5)
+set(Qt Qt6)
 
-find_package(${Qt} REQUIRED COMPONENTS Widgets Core Network Multimedia SerialPort PrintSupport)
-GET_TARGET_PROPERTY(QMAKE_LOCATION Qt5::qmake LOCATION)
+find_package(${Qt} REQUIRED COMPONENTS Widgets Core Network Multimedia SerialPort PrintSupport OpenGL OpenGLWidgets)
+
+GET_TARGET_PROPERTY(QMAKE_LOCATION ${Qt}::qmake LOCATION)
 
 if(WIN32)
     GET_FILENAME_COMPONENT(_qt_bin_dir "${QMAKE_LOCATION}" DIRECTORY)
@@ -173,12 +177,12 @@ endif(WIN32)
 find_package(QCustomPlot REQUIRED)
 
 # Find and include my libraries for data collection
-find_package(Ouster REQUIRED)
+find_package(ouster_connect REQUIRED)
 
-find_package(ssnx REQUIRED)
+find_package(ssnx_connect REQUIRED)
 find_package(ssnx2net REQUIRED)
 
-find_package(spidercam REQUIRED)
+find_package(spidercam_connect REQUIRED)
 
 find_package(hyspex_connect REQUIRED)
 find_package(HySpex REQUIRED)
@@ -191,11 +195,14 @@ find_package(teledyne_atlas_connect REQUIRED)
 find_package(AtlasSDK REQUIRED)
 
 find_package(nlohmann_json REQUIRED)
+
 find_package(Protobuf REQUIRED)
+find_package(utf8_range REQUIRED)
+
 find_package(CBDF REQUIRED cbdf info ctrl gps hyperspectral lidar rgb ir weather)
 
 find_package(SDL3 REQUIRED)
-find_package(csv2 REQUIRED)
+find_package(rapidcsv REQUIRED)
 
 # Find package VTK
 find_package(VTK 9.0 REQUIRED COMPONENTS GUISupportQt IOLegacy)

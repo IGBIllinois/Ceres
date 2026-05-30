@@ -32,6 +32,8 @@ set(SEPTENTRIO_SOURCE_FILES
 # Septertino GPS Property Page Code
 	SsnxPropertyPage_Remote.hpp
 	SsnxPropertyPage_Remote.cpp
+	SsnxPropertyPage.hpp
+	SsnxPropertyPage.cpp
 
 #
 # Septertino GPS receiver files
@@ -43,10 +45,7 @@ set(SEPTENTRIO_SOURCE_FILES
     SsnxStatusView.hpp
     SsnxStatusView.cpp
 
-    SsnxFactory.hpp
     SsnxFactory.cpp
-
-	${GPS_PROTO_HDRS}
 )
 
 
@@ -84,8 +83,8 @@ target_link_libraries(septentrio_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(septentrio_static PUBLIC ${Qt}::Network)
 target_link_libraries(septentrio_static PUBLIC ${Qt}::SerialPort)
 target_link_libraries(septentrio_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(septentrio_static PUBLIC ssnx2net::ssnx2net_static)
-target_link_libraries(septentrio_static PUBLIC ssnx::ssnx_static)
+target_link_libraries(septentrio_static PRIVATE ssnx2net::ssnx2net_static)
+target_link_libraries(septentrio_static PRIVATE ssnx_connect::ssnx_connect_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

@@ -69,7 +69,8 @@ target_include_directories(common PRIVATE ${UTILITIES_INCLUDE_DIR})
 
 target_link_libraries(common PRIVATE ${Qt}::Widgets)
 target_link_libraries(common PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(common PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(common PUBLIC ${Protobuf_LIBRARIES})
+target_link_libraries(common PUBLIC utf8_range::utf8_range)
 
 set_target_properties(common PROPERTIES FOLDER "Apps")
 

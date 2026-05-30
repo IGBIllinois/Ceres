@@ -5,7 +5,7 @@
 
 #include <cbdf/OusterParser.hpp>
 
-#include <ouster/ouster_defs.h>
+#include <ouster_connect/ouster_defs.h>
 
 #include <QObject>
 
