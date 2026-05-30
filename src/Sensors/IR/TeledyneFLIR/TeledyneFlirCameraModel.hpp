@@ -5,7 +5,7 @@
 #include "Timers.hpp"
 #include "ColorTable.hpp"
 
-#include <TeledyneAtlasConnect/TeledyneAtlasData.hpp>
+#include <teledyne_atlas_connect/TeledyneAtlasData.hpp>
 
 #include <cbdf/TeledyneFlirSerializer.hpp>
 

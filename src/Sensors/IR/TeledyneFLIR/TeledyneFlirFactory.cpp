@@ -11,8 +11,8 @@
 #include "TeledyneFlirPropertyPage_Remote.hpp"
 #include "TeledyneFlirPropertyPage_Local.hpp"
 
-#include <TeledyneAtlasConnect/TeledyneFlirCameraFactory.hpp>
-#include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
+#include <teledyne_atlas_connect/TeledyneFlirCameraFactory.hpp>
+#include <teledyne_atlas_connect/TeledyneFlirCamera.hpp>
 
 #include <QWidget>
 #include <QString>

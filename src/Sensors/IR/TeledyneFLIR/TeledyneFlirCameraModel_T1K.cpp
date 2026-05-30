@@ -3,7 +3,7 @@
 
 #include "TimestampProvider.hpp"
 
-#include <TeledyneAtlasConnect/TeledyneFlirCamera.hpp>
+#include <teledyne_atlas_connect/TeledyneFlirCamera.hpp>
 
 #include <QBuffer>
 #include <QImageReader>
