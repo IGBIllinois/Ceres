@@ -242,11 +242,14 @@ bool nStringUtils::endsWithInt(const std::string& str, int* pValue)
 
 void nStringUtils::replaceIntAtEnd(std::string& str, int value)
 {
+	int num_digits = 0;
 	auto it = str.rbegin();
 	for (; it != str.rend(); ++it)
 	{
 		if (!isdigit(*it))
 			break;
+
+		++num_digits;
 	}
 
 	if (it == str.rbegin())
@@ -255,5 +258,17 @@ void nStringUtils::replaceIntAtEnd(std::string& str, int value)
 	auto offset = std::distance(it, str.rend());
 	str.erase(offset);
 
-	str += std::to_string(value);
+	auto num = std::to_string(value);
+
+	if (num.length() < num_digits)
+	{
+		int num_zeros = num_digits - num.length();
+		while (num_zeros > 0)
+		{
+			str += '0';
+			--num_zeros;
+		}
+	}
+
+	str += num;
 }
