@@ -3,8 +3,8 @@
 
 #include "../LidarModel.hpp"
 
-#include <ouster/ouster_defs.h>
-#include <ouster/OusterLidarData.h>
+#include <ouster_connect/ouster_defs.h>
+#include <ouster_connect/OusterLidarData.h>
 
 #include <QObject>
 

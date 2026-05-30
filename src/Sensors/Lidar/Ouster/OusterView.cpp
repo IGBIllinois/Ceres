@@ -3,7 +3,7 @@
 #include "Constants.hpp"
 #include "OusterModel.hpp"
 
-#include <ouster/ouster_utils.h>
+#include <ouster_connect/ouster_utils.h>
 #include <string>
 
 

@@ -4,7 +4,7 @@
 #include "OusterModel.hpp"
 #include "OusterExperimentStates.hpp"
 
-#include <ouster/ouster_utils.h>
+#include <ouster_connect/ouster_utils.h>
 
 #include <QLineEdit>
 #include <QComboBox>

@@ -3,7 +3,7 @@
 
 #include "ColorGradient.hpp"
 
-#include <ouster/OusterVizWidget.hpp>
+#include <ouster_connect/OusterVizWidget.hpp>
 
 
 // Qt Forward Declaration

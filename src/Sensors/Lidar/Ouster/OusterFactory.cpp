@@ -10,7 +10,7 @@
 #include "OusterPropertyPage.hpp"
 #include "OusterPropertyPage_Local.hpp"
 #include "OusterPropertyPage_Remote.hpp"
-#include <ouster/ouster_defs.h>
+#include <ouster_connect/ouster_defs.h>
 
 #include <QWidget>
 #include <QString>

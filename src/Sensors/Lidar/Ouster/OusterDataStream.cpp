@@ -2,6 +2,8 @@
 #include "OusterDataStream.hpp"
 
 #include <QtNetwork/QHostInfo>
+#include <QtCore>
+#include <QtLogging>
 
 
 cOusterLidarStream_Qt::cOusterLidarStream_Qt(QObject* parent)

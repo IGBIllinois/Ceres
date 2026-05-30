@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ouster/OusterImuStream.h"
+#include "ouster_connect/OusterImuStream.h"
 
 #include <QByteArray>
 #include <QtNetwork/QUdpSocket>

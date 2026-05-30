@@ -2,6 +2,8 @@
 #include "OusterImuStream.hpp"
 
 #include <QtNetwork/QHostInfo>
+#include <QtCore>
+#include <QtLogging>
 
 
 cOusterImuStream_Qt::cOusterImuStream_Qt(QObject* parent)

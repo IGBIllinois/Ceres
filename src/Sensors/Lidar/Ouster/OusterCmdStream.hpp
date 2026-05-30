@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ouster/OusterCommandStream.h"
+#include <ouster_connect/OusterCommandStream.h>
 
 #include <fstream>
 

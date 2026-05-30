@@ -4,8 +4,8 @@
 #include "OusterModel_net.hpp"
 #include "Constants.hpp"
 
-#include <ouster/ouster_utils.h>
-#include <ouster/ouster_defs.h>
+#include <ouster_connect/ouster_utils.h>
+#include <ouster_connect/ouster_defs.h>
 #include <optional>
 #include <string>
 

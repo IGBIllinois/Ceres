@@ -9,8 +9,8 @@
 
 #include <cbdf/OusterSerializer.hpp>
 
-#include <ouster/ouster_defs.h>
-#include <ouster/OusterSensorDiscovery.h>
+#include <ouster_connect/ouster_defs.h>
+#include <ouster_connect/OusterSensorDiscovery.h>
 
 #include <QObject>
 #include <QTimer>

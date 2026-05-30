@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ouster/OusterLidarStream.h"
+#include "ouster_connect/OusterLidarStream.h"
 
 #include <QByteArray>
 #include <QtNetwork/QUdpSocket>

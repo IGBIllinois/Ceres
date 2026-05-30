@@ -3,7 +3,7 @@
 #include "OusterModel.hpp"
 #include "QIndicator.hpp"
 
-#include <ouster/ouster_utils.h>
+#include <ouster_connect/ouster_utils.h>
 
 #include <QCheckBox>
 #include <QLineEdit>
