@@ -2,7 +2,7 @@
 
 #include "OusterControllerNetEncoder.hpp"
 #include "ouster_packet_utils.hpp"
-#include <ouster/ouster_utils.h>
+#include <ouster_connect/ouster_utils.h>
 
 
 cOusterControllerNetEncoder::cOusterControllerNetEncoder(std::size_t capacity)

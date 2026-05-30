@@ -18,32 +18,38 @@ void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, co
     case ePacketType::QUERY_STATE:
     {
         lucid_QueryMessage_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        switch (packet.query())
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
-        case eQUERY_STATE:
-            return onQueryState();
-        case eQUERY_IMAGE_SIZE:
-            return onQueryImageSize();
-        case eQUERY_FRAME_RATE:
-            return onQueryFrameRate();
+            switch (packet.query())
+            {
+            case eQUERY_STATE:
+                return onQueryState();
+            case eQUERY_IMAGE_SIZE:
+                return onQueryImageSize();
+            case eQUERY_FRAME_RATE:
+                return onQueryFrameRate();
+            }
         }
         break;
     }
     case ePacketType::IMAGE_SIZE:
     {
         lucid_ImageSizeMessage_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto data = to_image_size_t(packet);
-        setImageSize(data.width, data.height);
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto data = to_image_size_t(packet);
+            setImageSize(data.width, data.height);
+        }
         break;
     }
     case ePacketType::FRAME_RATE_HZ:
     {
         lucid_FrameRateMessage_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        auto fps = to_frame_rate_t(packet);
-        setFrameRate(fps);
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto fps = to_frame_rate_t(packet);
+            setFrameRate(fps);
+        }
         break;
     }
     case ePacketType::GRAB_IMAGE:

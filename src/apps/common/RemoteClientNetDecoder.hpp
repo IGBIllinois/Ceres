@@ -8,7 +8,7 @@
 
 #include "net_packet_decoder.hpp"
 
-#include <spidercam/spidercam_types.hpp>
+#include <spidercam_connect/spidercam_types.hpp>
 
 #include <string>
 #include <ctime>

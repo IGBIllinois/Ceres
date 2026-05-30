@@ -9,7 +9,7 @@
 #include "Utilities.hpp"
 #include "net_packet_decoder.hpp"
 
-#include <ouster/ouster_defs.h>
+#include <ouster_connect/ouster_defs.h>
 
 #include <string>
 

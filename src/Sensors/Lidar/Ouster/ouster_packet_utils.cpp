@@ -13,7 +13,8 @@ int encode_query(ouster_eQuery query, net_buffer& buffer)
     pckt.set_query(query);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::QUERY_STATE);
@@ -61,7 +62,8 @@ int encode_azimuth_window(double min_deg, double max_deg, net_buffer& buffer)
     pckt.set_max_deg(max_deg);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::AZIMUTH_WINDOW);
@@ -87,7 +89,8 @@ int encode_lidar_mode(const std::string& mode, net_buffer& buffer)
     pckt.set_mode(mode);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::LIDAR_MODE);
@@ -133,7 +136,8 @@ int encode_current_state(bool valid, const std::string& mode,
     pckt.set_azimuth_max_deg(azimuth_max_deg);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::CURRENT_STATE);

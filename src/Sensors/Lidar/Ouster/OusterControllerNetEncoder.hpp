@@ -3,7 +3,7 @@
 
 #include "net_packet_encoder.hpp"
 
-#include <ouster/ouster_defs.h>
+#include <ouster_connect/ouster_defs.h>
 
 
 class cOusterControllerNetEncoder : public cNetworkEncoder

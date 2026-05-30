@@ -12,7 +12,8 @@ int encode_query(lucid_eQuery query, net_buffer& buffer)
     pckt.set_query(query);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::QUERY_STATE);
@@ -71,7 +72,8 @@ int encode_active_camera_id(uint8_t id, net_buffer& buffer)
     pckt.set_camera_id(id);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = 0; // static_cast<uint16_t>(ePacketType::ACTIVE_CAMERA_ID);
@@ -102,7 +104,8 @@ int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
     pckt.set_height(height);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::IMAGE_SIZE);
@@ -128,7 +131,8 @@ int encode_frame_rate(uint8_t fps, net_buffer& buffer)
     pckt.set_frames_per_second(fps);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::FRAME_RATE_HZ);
@@ -170,7 +174,8 @@ int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
     pckt.set_frames_per_second(fps);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::CURRENT_STATE);
@@ -214,7 +219,8 @@ int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
     pckt.set_max_camera_id(max_camera_id);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::CURRENT_STATE);

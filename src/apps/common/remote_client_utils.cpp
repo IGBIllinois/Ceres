@@ -22,7 +22,8 @@ int encode_experiment_type(const std::string& type, net_buffer& buffer)
     pckt.set_type(type);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_TYPE);
@@ -84,7 +85,8 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     pckt.set_file(doc);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_INFO);
@@ -122,7 +124,8 @@ int encode_exp_info_data(const std::string& title, const std::string& researcher
     pckt.set_file(doc);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_INFO);
@@ -153,7 +156,8 @@ int encode_experiment_title(const std::string& title, net_buffer& buffer)
     pckt.set_title(title);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_TITLE);
@@ -184,7 +188,8 @@ int encode_measurement_title(const std::string& title, net_buffer& buffer)
     pckt.set_title(title);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::MEASUREMENT_TITLE);
@@ -215,7 +220,8 @@ int encode_experiment_document(const std::string& doc, net_buffer& buffer)
     pckt.set_document(doc);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::EXPERIMENT_DOCUMENT);
@@ -246,7 +252,8 @@ int encode_species(const std::string& species, net_buffer& buffer)
     pckt.set_species(species);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SPECIES);
@@ -277,7 +284,8 @@ int encode_cultivar(const std::string& cultivar, net_buffer& buffer)
     pckt.set_cultivar(cultivar);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::CULTIVAR);
@@ -309,7 +317,8 @@ int encode_principal_investigator(const std::string& pi, net_buffer& buffer)
     pckt.set_pi(pi);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::PRINCIPAL_INVESTIGATOR);
@@ -376,7 +385,8 @@ int encode_researcher(const std::string& researcher, net_buffer& buffer)
     pckt.set_researcher(researcher);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::RESEARCHER);
@@ -407,7 +417,8 @@ int encode_construct_name(const std::string& name, net_buffer& buffer)
     pckt.set_construct_name(name);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::CONSTRUCT_NAME);
@@ -474,7 +485,8 @@ int encode_event_number(const std::string& number, net_buffer& buffer)
     pckt.set_event_number(number);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::EVENT_NUMBER);
@@ -505,7 +517,8 @@ int encode_field_design(const std::string& design, net_buffer& buffer)
     pckt.set_field_design(design);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::FIELD_DESIGN);
@@ -536,7 +549,8 @@ int encode_planting_date(std::time_t date, net_buffer& buffer)
     pckt.set_planting_date(static_cast<uint64_t>(date));
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::PLANTING_DATE);
@@ -567,7 +581,8 @@ int encode_harvest_date(std::time_t date, net_buffer& buffer)
     pckt.set_harvest_date(static_cast<uint64_t>(date));
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::HARVEST_DATE);
@@ -634,7 +649,8 @@ int encode_treatment(const std::string& treatment, net_buffer& buffer)
     pckt.set_treatment(treatment);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::TREATMENT);
@@ -701,7 +717,8 @@ int encode_comment(const std::string& comment, net_buffer& buffer)
     pckt.set_comment(comment);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::COMMENT);
@@ -732,7 +749,8 @@ int encode_permit_info(const std::string& permit, net_buffer& buffer)
     pckt.set_permit(permit);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::PERMIT_INFO);
@@ -769,7 +787,8 @@ int encode_permit_info(const std::string& authorization, const std::string& perm
     pckt.set_permit(permit);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::PERMIT_INFO);
@@ -873,7 +892,8 @@ int encode_open_data_file(const std::string& filename, net_buffer& buffer)
     pckt.set_filename(filename);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::OPEN_DATA_FILE);
@@ -922,7 +942,8 @@ int encode_file_open_state(bool open, net_buffer& buffer)
     pckt.set_isopen(open);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::DATA_FILE_STATE);
@@ -990,7 +1011,8 @@ int encode_status_message(const std::string& message, net_buffer& buffer)
     pckt.set_message(message);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::STATUS_MESSAGE);
@@ -1032,7 +1054,8 @@ int encode_log_message(uint8_t msg_type, const std::string& device, const std::s
     pckt.set_message(message);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::LOG_MESSAGE);
@@ -1061,7 +1084,8 @@ int encode_log_message(uint8_t msg_type, const std::string& device, const std::s
     pckt.set_message(message);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::LOG_MESSAGE);
@@ -1101,7 +1125,8 @@ int encode_sensor_status(const std::string& device, const std::string& message, 
     pckt.set_message(message);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_STATUS);
@@ -1129,7 +1154,8 @@ int encode_sensor_status(const std::string& device, const std::string& instance,
     pckt.set_instance(instance);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_STATUS);
@@ -1169,7 +1195,8 @@ int encode_sensor_name_change(const std::string& old_name, const std::string& ne
     pckt.set_new_name(new_name);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_NAME_CHANGE);
@@ -1197,7 +1224,8 @@ int encode_sensor_name_change(const std::string& old_name, const std::string& ne
     pckt.set_instance(instance);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_NAME_CHANGE);
@@ -1248,7 +1276,8 @@ int encode_sensor_property_connect_info(const std::string& sensor, const std::st
     pckt.set_port(port);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_PROPERTY_CONNECT_INFO);
@@ -1281,7 +1310,8 @@ int encode_sensor_property_connect_info(const std::string& sensor, const std::st
     pckt.set_instance(instance);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SENSOR_PROPERTY_CONNECT_INFO);
@@ -1306,28 +1336,32 @@ int encode_sensor_property_connect_info(const std::string& sensor, const std::st
 spidercam::sPosition_1_t to_spidercam_position_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     Spidercam_Position_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
 
-    spidercam::sPosition_1_t data;
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        spidercam::sPosition_1_t data;
 
-    data.X_mm = pckt.x_mm();
-    data.Y_mm = pckt.y_mm();
-    data.Z_mm = pckt.z_mm();
-    data.speed_mmps = pckt.speed_mmps();
-    data.pan_deg = pckt.pan_deg();
-    data.pitch_deg = pckt.pitch_deg();
-    data.roll_gimbal_deg = pckt.roll_deg();
-    data.timestamp = pckt.timestamp();
+        data.X_mm = pckt.x_mm();
+        data.Y_mm = pckt.y_mm();
+        data.Z_mm = pckt.z_mm();
+        data.speed_mmps = pckt.speed_mmps();
+        data.pan_deg = pckt.pan_deg();
+        data.pitch_deg = pckt.pitch_deg();
+        data.roll_gimbal_deg = pckt.roll_deg();
+        data.timestamp = pckt.timestamp();
 
-    data.focus = 0;
-    data.height_mm = data.Z_mm;
-    data.iris = 0;
-    data.pan_speed_dps = 0.0;
-    data.roll_deg = data.roll_gimbal_deg;
-    data.tilt_deg = 0;
-    data.tilt_speed_dps = 0;
+        data.focus = 0;
+        data.height_mm = data.Z_mm;
+        data.iris = 0;
+        data.pan_speed_dps = 0.0;
+        data.roll_deg = data.roll_gimbal_deg;
+        data.tilt_deg = 0;
+        data.tilt_speed_dps = 0;
 
-    return data;
+        return data;
+    }
+
+    return spidercam::sPosition_1_t();
 }
 
 int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer)
@@ -1345,7 +1379,8 @@ int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer
     pckt.set_timestamp(pos.timestamp);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SPIDER_CAM_DATA);
@@ -1367,28 +1402,31 @@ int encode_spidercam_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer
 spidercam::sPosition_1_t to_spidercam_start_position_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     Spidercam_Start_Position_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        spidercam::sPosition_1_t data;
 
-    spidercam::sPosition_1_t data;
+        data.X_mm = pckt.x_mm();
+        data.Y_mm = pckt.y_mm();
+        data.Z_mm = pckt.z_mm();
+        data.pan_deg = pckt.pan_deg();
+        data.pitch_deg = pckt.pitch_deg();
+        data.roll_gimbal_deg = pckt.roll_deg();
+        data.timestamp = pckt.timestamp();
 
-    data.X_mm = pckt.x_mm();
-    data.Y_mm = pckt.y_mm();
-    data.Z_mm = pckt.z_mm();
-    data.pan_deg = pckt.pan_deg();
-    data.pitch_deg = pckt.pitch_deg();
-    data.roll_gimbal_deg = pckt.roll_deg();
-    data.timestamp = pckt.timestamp();
+        data.speed_mmps = 0;
+        data.focus = 0;
+        data.height_mm = data.Z_mm;
+        data.iris = 0;
+        data.pan_speed_dps = 0.0;
+        data.roll_deg = data.roll_gimbal_deg;
+        data.tilt_deg = 0;
+        data.tilt_speed_dps = 0;
 
-    data.speed_mmps = 0;
-    data.focus = 0;
-    data.height_mm = data.Z_mm;
-    data.iris = 0;
-    data.pan_speed_dps = 0.0;
-    data.roll_deg = data.roll_gimbal_deg;
-    data.tilt_deg = 0;
-    data.tilt_speed_dps = 0;
+        return data;
+    }
 
-    return data;
+    return spidercam::sPosition_1_t();
 }
 
 int encode_spidercam_start_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer)
@@ -1405,7 +1443,8 @@ int encode_spidercam_start_pos(const spidercam::sPosition_1_t& pos, net_buffer& 
     pckt.set_timestamp(pos.timestamp);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SPIDER_CAM_START_POSITION);
@@ -1427,28 +1466,31 @@ int encode_spidercam_start_pos(const spidercam::sPosition_1_t& pos, net_buffer& 
 spidercam::sPosition_1_t to_spidercam_end_position_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     Spidercam_End_Position_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        spidercam::sPosition_1_t data;
 
-    spidercam::sPosition_1_t data;
+        data.X_mm = pckt.x_mm();
+        data.Y_mm = pckt.y_mm();
+        data.Z_mm = pckt.z_mm();
+        data.pan_deg = pckt.pan_deg();
+        data.pitch_deg = pckt.pitch_deg();
+        data.roll_gimbal_deg = pckt.roll_deg();
+        data.timestamp = pckt.timestamp();
 
-    data.X_mm = pckt.x_mm();
-    data.Y_mm = pckt.y_mm();
-    data.Z_mm = pckt.z_mm();
-    data.pan_deg = pckt.pan_deg();
-    data.pitch_deg = pckt.pitch_deg();
-    data.roll_gimbal_deg = pckt.roll_deg();
-    data.timestamp = pckt.timestamp();
+        data.speed_mmps = 0;
+        data.focus = 0;
+        data.height_mm = data.Z_mm;
+        data.iris = 0;
+        data.pan_speed_dps = 0.0;
+        data.roll_deg = data.roll_gimbal_deg;
+        data.tilt_deg = 0;
+        data.tilt_speed_dps = 0;
 
-    data.speed_mmps = 0;
-    data.focus = 0;
-    data.height_mm = data.Z_mm;
-    data.iris = 0;
-    data.pan_speed_dps = 0.0;
-    data.roll_deg = data.roll_gimbal_deg;
-    data.tilt_deg = 0;
-    data.tilt_speed_dps = 0;
+        return data;
+    }
 
-    return data;
+    return spidercam::sPosition_1_t();
 }
 
 int encode_spidercam_end_pos(const spidercam::sPosition_1_t& pos, net_buffer& buffer)
@@ -1465,7 +1507,8 @@ int encode_spidercam_end_pos(const spidercam::sPosition_1_t& pos, net_buffer& bu
     pckt.set_timestamp(pos.timestamp);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SPIDER_CAM_END_POSITION);
@@ -1491,15 +1534,18 @@ int encode_spidercam_end_pos(const spidercam::sPosition_1_t& pos, net_buffer& bu
 sWindData_t to_wind_data_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     WindData_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        sWindData_t data;
 
-    sWindData_t data;
+        data.dataValid = pckt.datavalid();
+        data.wind_speed_mps = pckt.wind_speed_mps();
+        data.wind_direction_deg = pckt.wind_direction_deg();
 
-    data.dataValid = pckt.datavalid();
-    data.wind_speed_mps = pckt.wind_speed_mps();
-    data.wind_direction_deg = pckt.wind_direction_deg();
+        return data;
+    }
 
-    return data;
+    return sWindData_t();
 }
 
 int encode_wind_data(bool valid, double wind_speed_mps, double wind_direction_deg, net_buffer& buffer)
@@ -1511,7 +1557,8 @@ int encode_wind_data(bool valid, double wind_speed_mps, double wind_direction_de
     pckt.set_wind_direction_deg(wind_direction_deg);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::WIND_DATA);
@@ -1534,8 +1581,9 @@ int encode_wind_data(bool valid, double wind_speed_mps, double wind_direction_de
 float to_temperature_data_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     TemperatureData_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
-    return pckt.temperature_c();
+    if (pckt.ParseFromArray(buffer.data(), length))
+        return pckt.temperature_c();
+    return -9999;
 }
 
 int encode_temperature_data(double temp_C, net_buffer& buffer)
@@ -1545,7 +1593,8 @@ int encode_temperature_data(double temp_C, net_buffer& buffer)
     pckt.set_temperature_c(temp_C);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::TEMPERATURE_DATA);
@@ -1567,8 +1616,9 @@ int encode_temperature_data(double temp_C, net_buffer& buffer)
 float to_relative_humidity_data_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     RelativeHumidityData_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
-    return pckt.rh_pct();
+    if (pckt.ParseFromArray(buffer.data(), length))
+        return pckt.rh_pct();
+    return -9999;
 }
 
 int encode_relative_humidity_data(double rh_pct, net_buffer& buffer)
@@ -1578,7 +1628,8 @@ int encode_relative_humidity_data(double rh_pct, net_buffer& buffer)
     pckt.set_rh_pct(rh_pct);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::RELATIVE_HUMIDITY_DATA);
@@ -1600,8 +1651,9 @@ int encode_relative_humidity_data(double rh_pct, net_buffer& buffer)
 float to_par_data_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     ParData_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
-    return pckt.par_umole();
+    if (pckt.ParseFromArray(buffer.data(), length))
+        return pckt.par_umole();
+    return -9999;
 }
 
 int encode_par_data(double par_umole, net_buffer& buffer)
@@ -1611,7 +1663,8 @@ int encode_par_data(double par_umole, net_buffer& buffer)
     pckt.set_par_umole(par_umole);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::PAR_DATA);
@@ -1633,18 +1686,21 @@ int encode_par_data(double par_umole, net_buffer& buffer)
 sWeatherData_t to_weather_data_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     WeatherData_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        sWeatherData_t data;
 
-    sWeatherData_t data;
+        data.wind_data_valid = pckt.wind_data_valid();
+        data.wind_speed_mps = pckt.wind_speed_mps();
+        data.wind_direction_deg = pckt.wind_direction_deg();
+        data.temp_C = pckt.temperature_c();
+        data.rh_pct = pckt.rh_pct();
+        data.par_umole = pckt.par_umole();
 
-    data.wind_data_valid = pckt.wind_data_valid();
-    data.wind_speed_mps = pckt.wind_speed_mps();
-    data.wind_direction_deg = pckt.wind_direction_deg();
-    data.temp_C = pckt.temperature_c();
-    data.rh_pct = pckt.rh_pct();
-    data.par_umole = pckt.par_umole();
+        return data;
+    }
 
-    return data;
+    return sWeatherData_t();
 }
 
 int encode_weather_data(bool wind_data_valid, double wind_speed_mps, double wind_direction_deg,
@@ -1660,7 +1716,8 @@ int encode_weather_data(bool wind_data_valid, double wind_speed_mps, double wind
     pckt.set_par_umole(par_umole);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::WEATHER_DATA);

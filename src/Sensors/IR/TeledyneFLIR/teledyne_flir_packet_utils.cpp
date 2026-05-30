@@ -13,7 +13,8 @@ int encode_query(teledyne_eQuery query, net_buffer& buffer)
     pckt.set_query(query);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::QUERY_STATE);
@@ -82,7 +83,8 @@ int flir::encode_camera_mode(uint8_t mode, net_buffer& buffer)
     pckt.set_mode(mode);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::CAMERA_MODE);
@@ -113,7 +115,8 @@ int flir::encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
     pckt.set_height(height);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::IMAGE_SIZE);
@@ -139,7 +142,8 @@ int flir::encode_frame_rate(double fps, net_buffer& buffer)
     pckt.set_frames_per_second(fps);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::FRAME_RATE_HZ);
@@ -165,7 +169,8 @@ int flir::encode_lapse_interval(uint32_t interval_ms, net_buffer& buffer)
     pckt.set_lapse_interval_ms(interval_ms);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::LAPSE_INTERVAL_MS);
@@ -196,7 +201,8 @@ int flir::encode_thermal_range(float min_value_K, float max_value_K, net_buffer&
     pckt.set_max_thermal_value_k(max_value_K);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::THERMAL_RANGE_K);
@@ -263,7 +269,8 @@ int flir::encode_current_state(bool valid, uint8_t mode, uint16_t width, uint16_
         pckt.set_max_thermal_value_k(max_K.value());
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::CURRENT_STATE);
@@ -289,7 +296,8 @@ int flir::encode_take_photo(bool update_view, net_buffer& buffer)
     pckt.set_update_view(update_view);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(flir::ePacketType::TAKE_PHOTO);
@@ -337,7 +345,8 @@ int encode_reply(flir::eReply reply, flir::ePacketType packet_type, net_buffer& 
     }
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(packet_type);

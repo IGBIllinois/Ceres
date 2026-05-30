@@ -8,8 +8,9 @@
 gps_eQuery gps::to_gps_query_enum_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     gps_QueryMessage_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
-    return pckt.query();
+    if (pckt.ParseFromArray(buffer.data(), length))
+        return pckt.query();
+    return gps_eQuery();
 }
 
 int gps::encode_gps_query(gps_eQuery query, net_buffer& buffer)
@@ -18,7 +19,8 @@ int gps::encode_gps_query(gps_eQuery query, net_buffer& buffer)
     pckt.set_query(query);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::GPS_QUERY);
@@ -35,8 +37,10 @@ int gps::encode_gps_query(gps_eQuery query, net_buffer& buffer)
 gps_eReferenceCommand gps::to_gps_reference_command_enum_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     gps_ReferenceCommand_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
-    return pckt.command();
+    if (pckt.ParseFromArray(buffer.data(), length))
+        return pckt.command();
+
+    return gps_eReferenceCommand();
 }
 
 int gps::encode_gps_reference_command(gps_eReferenceCommand command, net_buffer& buffer)
@@ -45,7 +49,8 @@ int gps::encode_gps_reference_command(gps_eReferenceCommand command, net_buffer&
     pckt.set_command(command);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::GPS_REFERENCE_COMMAND);
@@ -62,13 +67,16 @@ int gps::encode_gps_reference_command(gps_eReferenceCommand command, net_buffer&
 gps::sReferenceParameters_t gps::to_reference_parameters_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     gps_SetReferenceParameters_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        gps::sReferenceParameters_t data;
+        data.min_integration_time_sec = pckt.min_integration_time_sec();
+        data.max_integration_time_sec = pckt.max_integration_time_sec();
+        data.ref_error_threshold_mm = pckt.ref_error_threshold_mm();
+        return data;
+    }
 
-    gps::sReferenceParameters_t data;
-    data.min_integration_time_sec   = pckt.min_integration_time_sec();
-    data.max_integration_time_sec   = pckt.max_integration_time_sec();
-    data.ref_error_threshold_mm     = pckt.ref_error_threshold_mm();
-    return data;
+    return gps::sReferenceParameters_t();
 }
 
 int gps::encode_reference_parameters_set(std::uint16_t integration_time_sec,
@@ -80,7 +88,8 @@ int gps::encode_reference_parameters_set(std::uint16_t integration_time_sec,
     pckt.set_ref_error_threshold_mm(ref_error_threshold_mm);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::SET_REFERENCE_PARAMETERS);
@@ -103,7 +112,8 @@ int gps::encode_reference_parameters_reply(std::uint16_t min_integration_time_se
     pckt.set_ref_error_threshold_mm(ref_error_threshold_mm);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::REFERENCE_PARAMETERS);
@@ -120,18 +130,21 @@ int gps::encode_reference_parameters_reply(std::uint16_t min_integration_time_se
 gps::sReferenceData_t gps::to_reference_data_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     gps_ReferenceData_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        gps::sReferenceData_t data;
+        data.valid = pckt.valid();
+        data.avg_lat_rad = pckt.avg_lat_rad();
+        data.avg_lng_rad = pckt.avg_lng_rad();
+        data.avg_height_m = pckt.avg_height_m();
+        data.std_lat_rad = pckt.std_lat_rad();
+        data.std_lng_rad = pckt.std_lng_rad();
+        data.std_height_m = pckt.std_height_m();
+        data.height_valid = pckt.height_valid();
+        return data;
+    }
 
-    gps::sReferenceData_t data;
-    data.valid = pckt.valid();
-    data.avg_lat_rad = pckt.avg_lat_rad();
-    data.avg_lng_rad = pckt.avg_lng_rad();
-    data.avg_height_m = pckt.avg_height_m();
-    data.std_lat_rad = pckt.std_lat_rad();
-    data.std_lng_rad = pckt.std_lng_rad();
-    data.std_height_m = pckt.std_height_m();
-    data.height_valid = pckt.height_valid();
-    return data;
+    return gps::sReferenceData_t();
 }
 
 int gps::encode_reference_data(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
@@ -148,7 +161,8 @@ int gps::encode_reference_data(bool valid, double avg_lat_rad, double avg_lng_ra
     pckt.set_height_valid(height_valid);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::REFERENCE_DATA);
@@ -166,8 +180,10 @@ int gps::encode_reference_data(bool valid, double avg_lat_rad, double avg_lng_ra
 gps_eReferenceReply gps::to_reference_reply_1(std::uint16_t length, const net_buffer_view& buffer)
 {
     gps_RefCommandReply_1 pckt;
-    pckt.ParseFromArray(buffer.data(), length);
-    return pckt.reply();
+    if (pckt.ParseFromArray(buffer.data(), length))
+        return pckt.reply();
+
+    return gps_eReferenceReply();
 }
 
 int gps::encode_reference_reply(gps_eReferenceReply reply, net_buffer& buffer)
@@ -176,7 +192,8 @@ int gps::encode_reference_reply(gps_eReferenceReply reply, net_buffer& buffer)
     pckt.set_reply(reply);
 
     std::string str;
-    pckt.SerializeToString(&str);
+    if (!pckt.SerializeToString(&str))
+        return -1;
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::REFERENCE_REPLY);

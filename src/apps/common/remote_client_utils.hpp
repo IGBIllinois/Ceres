@@ -9,7 +9,7 @@
 #include "spidercam_data.pb.h"
 #include "weather_data.pb.h"
 
-#include <spidercam/spidercam_types.hpp>
+#include <spidercam_connect/spidercam_types.hpp>
 #include <cstdint>
 
 class net_buffer;

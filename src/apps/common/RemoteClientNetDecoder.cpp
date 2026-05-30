@@ -22,17 +22,21 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         case 1:
         {
             ExperimentInfo_1 packet;
-            packet.ParseFromArray(buffer.data(), hdr.length);
-            sExperimentInfo_t data = to_experiment_info_1(packet);
-            onExperimentInfo(data.title, data.researcher, data.cultivar, data.doc);
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                sExperimentInfo_t data = to_experiment_info_1(packet);
+                onExperimentInfo(data.title, data.researcher, data.cultivar, data.doc);
+            }
             break;
         }
         case 2:
         {
             ExperimentInfo_2 packet;
-            packet.ParseFromArray(buffer.data(), hdr.length);
-            sExperimentInfo_t data = to_experiment_info_2(packet);
-            onExperimentInfo(data.title, data.researcher, data.species, data.cultivar, data.doc);
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                sExperimentInfo_t data = to_experiment_info_2(packet);
+                onExperimentInfo(data.title, data.researcher, data.species, data.cultivar, data.doc);
+            }
             break;
         }
         }
@@ -42,15 +46,15 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     case ePacketType::EXPERIMENT_TITLE:
     {
         ExperimentTitle_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onExperimentTitle(to_experiment_title_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onExperimentTitle(to_experiment_title_1(packet));
         break;
     }
     case ePacketType::EXPERIMENT_DOCUMENT:
     {
         ExperimentDocument_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onExperimentDocument(to_experiment_document_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onExperimentDocument(to_experiment_document_1(packet));
         break;
     }
     case ePacketType::START_OF_TREATMENT_LIST:
@@ -62,15 +66,15 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     case ePacketType::TREATMENT:
     {
         ExperimentTreatment_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onTreatment(to_treatment_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onTreatment(to_treatment_1(packet));
         break;
     }
     case ePacketType::PRINCIPAL_INVESTIGATOR:
     {
         PrincipalInvestigator_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onPrincipalInvestigator(to_principal_investigator_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onPrincipalInvestigator(to_principal_investigator_1(packet));
         break;
     }
     case ePacketType::START_OF_RESEARCHER_LIST:
@@ -82,29 +86,29 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     case ePacketType::RESEARCHER:
     {
         Researcher_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onResearcher(to_researcher_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onResearcher(to_researcher_1(packet));
         break;
     }
     case ePacketType::SPECIES:
     {
         Species_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onSpecies(to_species_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onSpecies(to_species_1(packet));
         break;
     }
     case ePacketType::CULTIVAR:
     {
         Cultivar_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onCultivar(to_cultivar_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onCultivar(to_cultivar_1(packet));
         break;
     }
     case ePacketType::CONSTRUCT_NAME:
     {
         ConstructName_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onConstructName(to_construct_name_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onConstructName(to_construct_name_1(packet));
         break;
     }
     case ePacketType::START_OF_EVENT_NUMBER_LIST:
@@ -116,29 +120,29 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     case ePacketType::EVENT_NUMBER:
     {
         EventNumber_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onEventNumber(to_event_number_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onEventNumber(to_event_number_1(packet));
         break;
     }
     case ePacketType::FIELD_DESIGN:
     {
         FieldDesign_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onFieldDesign(to_field_design_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onFieldDesign(to_field_design_1(packet));
         break;
     }
     case ePacketType::PLANTING_DATE:
     {
         PlantingDate_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onPlantingDate(to_planting_date_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onPlantingDate(to_planting_date_1(packet));
         break;
     }
     case ePacketType::HARVEST_DATE:
     {
         HarvestDate_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onHarvestDate(to_harvest_date_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onHarvestDate(to_harvest_date_1(packet));
         break;
     }
     case ePacketType::START_OF_COMMENT_LIST:
@@ -150,8 +154,8 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     case ePacketType::COMMENT:
     {
         ExperimentComment_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onComment(to_comment_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onComment(to_comment_1(packet));
         break;
     }
     case ePacketType::PERMIT_INFO:
@@ -161,16 +165,18 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
         case 1:
         {
             ExperimentPermitInfo_1 packet;
-            packet.ParseFromArray(buffer.data(), hdr.length);
-            onPermitInfo(to_permit_info_1(packet));
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+                onPermitInfo(to_permit_info_1(packet));
             break;
         }
         case 2:
         {
             ExperimentPermitInfo_2 packet;
-            packet.ParseFromArray(buffer.data(), hdr.length);
-            auto permit_info = to_permit_info_2(packet);
-            onPermitInfo(permit_info.authorization, permit_info.permit);
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                auto permit_info = to_permit_info_2(packet);
+                onPermitInfo(permit_info.authorization, permit_info.permit);
+            }
             break;
         }
         }
@@ -184,8 +190,8 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     case ePacketType::OPEN_DATA_FILE:
     {
         OpenDataFile_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onOpenDataFile(to_filename_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onOpenDataFile(to_filename_1(packet));
         break;
     }
     case ePacketType::CLOSE_DATA_FILE:
@@ -265,8 +271,8 @@ void cCeresRemoteClientNetDecoder::processPacket(const sPacketHeader_t& hdr, con
     case ePacketType::MEASUREMENT_TITLE:
     {
         MeasurementTitle_1 packet;
-        packet.ParseFromArray(buffer.data(), hdr.length);
-        onMeasurementTitle(to_measurement_title_1(packet));
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+            onMeasurementTitle(to_measurement_title_1(packet));
         break;
     }
     case ePacketType::MARKER_REFERENCE_START:
