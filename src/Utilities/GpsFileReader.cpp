@@ -4,7 +4,7 @@
 
 #include "Constants.hpp"
 
-#include <csv2/reader.hpp>
+#include <rapidcsv.h>
 
 cGpsFileReader::cGpsFileReader()
 {
@@ -13,6 +13,11 @@ cGpsFileReader::cGpsFileReader()
 cGpsFileReader::cGpsFileReader(const std::string& filename)
 {
 	loadFromFile(filename);
+}
+
+bool cGpsFileReader::empty() const
+{
+	return mPoints.empty();
 }
 
 const std::optional<sSpiderCamPosition_t>& cGpsFileReader::GetRefPoint() const
@@ -25,25 +30,24 @@ const positions_t& cGpsFileReader::GetPoints() const
 	return mPoints;
 }
 
-void cGpsFileReader::loadFromFile(const std::string& filename)
+bool cGpsFileReader::loadFromFile(const std::string& filename)
 {
-	csv2::Reader reader;
+	rapidcsv::Document doc(filename, rapidcsv::LabelParams(0, -1));
 
-	if (!reader.mmap(filename))
+	if (doc.GetColumnCount() == 0)
 	{
-		return;
+		return false;
 	}
 
 	bool isIlStatePlane = true;
 
-	auto header = reader.header();
+	auto header = doc.GetColumnNames();
 
-	if (header.length() > 0)
+	if (header.size() > 0)
 	{
 		auto it = header.begin();
 
-		std::string type;
-		(*it).read_value<std::string>(type);
+		std::string type = *it;
 		++it;
 
 		if (type == "ILUC")
@@ -55,17 +59,17 @@ void cGpsFileReader::loadFromFile(const std::string& filename)
 			isIlStatePlane = false;
 
 			std::string val;
-			(*it).read_value<std::string>(val);
+			val = *it;
 			auto x_mm = std::stoi(val);
 			++it;
 			val.clear();
 
-			(*it).read_value<std::string>(val);
+			val = *it;
 			auto y_mm = std::stoi(val);
 			++it;
 			val.clear();
 
-			(*it).read_value<std::string>(val);
+			val = *it;
 			auto z_mm = std::stoi(val);
 			val.clear();
 	
@@ -79,33 +83,17 @@ void cGpsFileReader::loadFromFile(const std::string& filename)
 		}
 	}
 
-	auto c = reader.cols();
-	auto n = reader.rows();
+	auto c = doc.GetColumnCount();
+	auto n = doc.GetRowCount();
 
-	for (const auto& row : reader)
+	for (size_t i = 0; i < n; ++i)
 	{
-		if (row.length() == 0) break;
+		auto values = doc.GetRow<std::string>(i);
 
-		auto it = row.begin();
-
-		std::string label;
-		(*it).read_value<std::string>(label);
-		++it;
-
-		std::string val;
-		(*it).read_value<std::string>(val);
-		auto northing_ft = std::stod(val);
-		++it;
-		val.clear();
-
-		(*it).read_value<std::string>(val);
-		auto easting_ft = std::stod(val);
-		++it;
-		val.clear();
-
-		(*it).read_value<std::string>(val);
-		auto elevation_ft = std::stod(val);
-		val.clear();
+		auto label = values.at(0);
+		auto northing_ft = std::stod(values.at(1));
+		auto easting_ft = std::stod(values.at(2));
+		auto elevation_ft = std::stod(values.at(3));
 
 		rfm::rappPoint_t rapp_point;
 		if (isIlStatePlane)
@@ -125,5 +113,7 @@ void cGpsFileReader::loadFromFile(const std::string& filename)
 
 		mPoints.emplace_back(point);
 	}
+
+	return true;
 }
 
