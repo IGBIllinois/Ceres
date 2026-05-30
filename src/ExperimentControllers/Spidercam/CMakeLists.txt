@@ -95,7 +95,7 @@ target_link_libraries(SpidercamCtrl_static PRIVATE cbdf::info)
 target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Network)
 target_link_libraries(SpidercamCtrl_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(SpidercamCtrl_static PRIVATE spidercam::scConnect_static)
+target_link_libraries(SpidercamCtrl_static PRIVATE spidercam_connect::spidercam_connect_static)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

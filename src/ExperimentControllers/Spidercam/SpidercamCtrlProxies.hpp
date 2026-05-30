@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <spidercam/spidercam_com.hpp>
+#include <spidercam_connect/spidercam_com.hpp>
 
 #include <QObject>
 #include <QByteArray>
