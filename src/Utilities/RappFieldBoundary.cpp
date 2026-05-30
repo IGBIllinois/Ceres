@@ -43,17 +43,17 @@ namespace
 			static_cast<std::int32_t>((mUIUC_TowerLocations[3].elevation_ft - mUIUC_ReferenceElevation_ft) * nConstants::FT_TO_MM)) };
 
 	/*
-	* 40.0635686°, -88.2081615°
-	* 40.0618528°, -88.2081656°
-	* 40.0618504°, -88.2059322°
-	* 40.0635664°, -88.2059295°
+	* 40.0635686 deg, -88.2081615 deg
+	* 40.0618528 deg, -88.2081656 deg
+	* 40.0618504 deg, -88.2059322 deg
+	* 40.0635664 deg, -88.2059295 deg
 	* 
 	*/
 	/*
-	 * Tower 1 : lat = 40.0635686°, lng = -88.2081615°
-	 * Tower 2 : lat = 40.0618528°, lng = -88.2081656°
-	 * Tower 3 : lat = 40.0618504°, lng = -88.2059322°
-	 * Tower 4 : lat = 40.0635664°, lng = -88.2059295°
+	 * Tower 1 : lat = 40.0635686 deg, lng = -88.2081615 deg
+	 * Tower 2 : lat = 40.0618528 deg, lng = -88.2081656 deg
+	 * Tower 3 : lat = 40.0618504 deg, lng = -88.2059322 deg
+	 * Tower 4 : lat = 40.0635664 deg, lng = -88.2059295 deg
 	 */
 
 	struct sLatLon_WGS84_t
