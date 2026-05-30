@@ -4,7 +4,7 @@
 #include "DataModel.hpp"
 #include "PlannerDataThread.hpp"
 
-#include <spidercam/spidercam_types.hpp>
+#include <spidercam_connect/spidercam_types.hpp>
 
 #include <QObject>
 #include <QThread>

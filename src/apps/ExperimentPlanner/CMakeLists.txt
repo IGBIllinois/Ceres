@@ -9,7 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 
 
-include("SoftwareInformation/branding.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/SoftwareInformation/branding.cmake")
 
 
 set(ui_files
@@ -34,14 +34,19 @@ source_group("Resources" FILES
   ${platform_resource_files}
 )
 
-qt5_add_resources(UI_RESOURCES ceres_experiment_planner.qrc OPTIONS "--verbose")
+
+if (${Qt} STREQUAL "Qt6")
+	qt6_add_resources(UI_RESOURCES ceres_experiment_planner.qrc OPTIONS "--verbose")
+else()
+	qt5_add_resources(UI_RESOURCES ceres_experiment_planner.qrc OPTIONS "--verbose")
+endif()
 
 #
 # Main Ceres Experiment Planner Application
 #
 add_executable(CeresExperimentPlanner WIN32 MACOSX_BUNDLE)
 
-#set_target_properties(Ceres PROPERTIES LANGUAGE C CXX)
+set_target_properties(CeresExperimentPlanner PROPERTIES LANGUAGE CXX)
 
 target_compile_features(CeresExperimentPlanner PRIVATE cxx_std_20)
 
@@ -199,6 +204,7 @@ if(APPLE)
         )
 endif()
 
+#target_include_directories(CeresExperimentPlanner PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(CeresExperimentPlanner PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(CeresExperimentPlanner PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(CeresExperimentPlanner PRIVATE ${EXPERIMENT_CONTROLLERS_INCLUDE_DIR})
@@ -211,6 +217,8 @@ target_link_libraries(CeresExperimentPlanner PRIVATE Utilities)
 target_link_libraries(CeresExperimentPlanner PRIVATE ExperimentControllers)
 target_link_libraries(CeresExperimentPlanner PRIVATE ${VTK_LIBRARIES} )
 target_link_libraries(CeresExperimentPlanner PRIVATE common)
+target_link_libraries(CeresExperimentPlanner PRIVATE ${Protobuf_LIBRARIES})
+target_link_libraries(CeresExperimentPlanner PRIVATE utf8_range::utf8_range)
 
 vtk_module_autoinit(TARGETS CeresExperimentPlanner MODULES ${VTK_LIBRARIES})
 

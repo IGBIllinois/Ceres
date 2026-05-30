@@ -80,8 +80,11 @@ protected:
 	std::unique_ptr<cExperimentCtrlInfo> mCtrlInfo;
 	std::vector<std::shared_ptr<cExperimentSensorInfo>> mSensorInfo;
 
+//	positions_t mOriginalGpsPoints;
+
 	/* Title Info */
 	QLineEdit* mpTitle = nullptr;
+	QCheckBox* mpAutoAdvance = nullptr;
 
 	QPushButton* mpMetaInfo = nullptr;
 	QPushButton* mpCtrlInfo = nullptr;

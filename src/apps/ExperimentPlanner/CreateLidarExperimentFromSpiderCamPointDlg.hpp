@@ -3,7 +3,7 @@
 
 #include "CreateLidarExperimentDlg.hpp"
 
-#include <spidercam/spidercam_types.hpp>
+#include <spidercam_connect/spidercam_types.hpp>
 
 
 // Qt Forward Declaration

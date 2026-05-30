@@ -113,6 +113,25 @@ void cExperimentDesignMdiChild::saveAs()
 
     QString defaultDirectory = mDefaultPath;
 
+    switch (mMeasurementFile.getExperimentType())
+    {
+    case cExperimentFile::eExperimentType::HYPERSPECTRAL:
+        defaultDirectory += "/Hyperspectral";
+        break;
+    case cExperimentFile::eExperimentType::LIDAR:
+        defaultDirectory += "/LiDAR";
+        break;
+    case cExperimentFile::eExperimentType::THERMAL:
+        defaultDirectory += "/Thermal";
+        break;
+    case cExperimentFile::eExperimentType::TOF:
+        defaultDirectory += "/Time_of_Flight";
+        break;
+    default:
+    case cExperimentFile::eExperimentType::UNKNOWN:
+        break;
+    }
+
     if (getFileName().empty())
     {
         if (!mMeasurementFile.getMeasurementName().empty())

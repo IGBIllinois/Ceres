@@ -1,7 +1,8 @@
 
 #include "PlannerDataThread.hpp"
 #include "ExperimentCtrlModel.hpp"
-#include "SensorModel.hpp"
+//#include "SensorModel.hpp"
+//#include "../Sensors/SensorModel.hpp"
 
 cPlannerDataThread::cPlannerDataThread()
 :
@@ -23,10 +24,12 @@ bool cPlannerDataThread::startCommunications()
         return false;
     }
 
+/*
     for (auto& sensor : mActiveSensors)
     {
         QObject::connect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
     }
+*/
 
     emit connectedToController();
 
@@ -37,10 +40,12 @@ bool cPlannerDataThread::stopCommunications()
 {
     emit disconnectedFromController();
 
+/*
     for (auto& sensor : mActiveSensors)
     {
         QObject::disconnect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
     }
+*/
 
     // Shutdown the network communications that are tied to this thread
     cDataThread::stopCommunications();

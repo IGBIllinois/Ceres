@@ -43,14 +43,18 @@ private:
 	double mConversionFactor = 1.0;
 
 	uint32_t mStartIndex = 0;
-	uint32_t mEndIndex = 0;
+//BAF	uint32_t mEndIndex = 0;
 
 	QTableView* mpStartPosition = nullptr;
-	QTableView* mpEndPosition = nullptr;
+//BAF	QTableView* mpEndPosition = nullptr;
+
+	QRadioButton* mpPointAtStart = nullptr;
+	QRadioButton* mpPointAtCenter = nullptr;
+	QRadioButton* mpPointAtEnd = nullptr;
 
 	QAbstractItemModel* mpModel = nullptr;
 
-	QCheckBox* mpInverseDirection = nullptr;
+//BAF	QCheckBox* mpInverseDirection = nullptr;
 
 	QLabel* mpPlotLengthLabel = nullptr;
 	QLineEdit* mpPlotLength = nullptr;

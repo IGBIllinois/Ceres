@@ -52,6 +52,7 @@ private:
 	QTableView* mpEndPosition = nullptr;
 
 	QAbstractItemModel* mpModel = nullptr;
+	QAbstractItemModel* mpReverseModel = nullptr;
 
 	QCheckBox* mpInverseDirection = nullptr;
 };

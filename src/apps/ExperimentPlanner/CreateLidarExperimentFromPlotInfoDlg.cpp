@@ -28,6 +28,7 @@
 #include <QStandardItemModel>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QRadioButton>
 
 
 #include <algorithm>
@@ -41,6 +42,12 @@ namespace
 	const QString EAST_TO_WEST = "East to West";
 	const QString NORTH_TO_SOUTH = "North to South";
 	const QString SOUTH_TO_NORTH = "South to North";
+
+	constexpr int SCAN_NORTH_TO_SOUTH = 0;
+	constexpr int SCAN_SOUTH_TO_NORTH = 1;
+	constexpr int SCAN_EAST_TO_WEST = 2;
+	constexpr int SCAN_WEST_TO_EAST = 3;
+
 }
 
 cCreateLidarExperimentFromPlotInfoDlg::cCreateLidarExperimentFromPlotInfoDlg(const QString& filename, QWidget* parent)
@@ -97,22 +104,34 @@ void cCreateLidarExperimentFromPlotInfoDlg::createControls_PointSelection()
 	mpStartPosition->setSortingEnabled(false);
 	mpStartPosition->setFixedWidth(419);
 
-	mpEndPosition = new QTableView(this);
-	mpEndPosition->setModel(mpModel);
+	//mpEndPosition = new QTableView(this);
+	//mpEndPosition->setModel(mpModel);
 
-	mpEndPosition->verticalHeader()->hide();
+	//mpEndPosition->verticalHeader()->hide();
 
-	headerView = mpEndPosition->horizontalHeader();
-	headerView->setDefaultAlignment(Qt::AlignHCenter);
-	headerView->setStretchLastSection(false);
+	//headerView = mpEndPosition->horizontalHeader();
+	//headerView->setDefaultAlignment(Qt::AlignHCenter);
+	//headerView->setStretchLastSection(false);
 
-	mpEndPosition->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-	mpEndPosition->setSelectionBehavior(QAbstractItemView::SelectRows);
-	mpEndPosition->setSelectionMode(QAbstractItemView::SingleSelection);
-	mpEndPosition->setSortingEnabled(false);
-	mpEndPosition->setFixedWidth(419);
+	//mpEndPosition->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+	//mpEndPosition->setSelectionBehavior(QAbstractItemView::SelectRows);
+	//mpEndPosition->setSelectionMode(QAbstractItemView::SingleSelection);
+	//mpEndPosition->setSortingEnabled(false);
+	//mpEndPosition->setFixedWidth(419);
 
-	mpInverseDirection = new QCheckBox("Inverse Direction", this);
+	mpClearPath = new QPushButton("Clear Path", this);
+	connect(mpClearPath, &QPushButton::pressed, this, &cCreateLidarExperimentFromPlotInfoDlg::clearPaths);
+
+	mpShowPath = new QPushButton("Show Path", this);
+	connect(mpShowPath, &QPushButton::pressed, this, &cCreateLidarExperimentFromPlotInfoDlg::onShowPath);
+
+
+	mpPointAtStart  = new QRadioButton("Start of Scan", this);
+	mpPointAtCenter = new QRadioButton("Center of Scan", this);
+	mpPointAtEnd    = new QRadioButton("End of Scan", this);
+	mpPointAtStart->setChecked(true);
+
+//	mpInverseDirection = new QCheckBox("Inverse Direction", this);
 
 	mpPlotOrientation = new QComboBox(this);
 	mpPlotOrientation->setEditable(false);
@@ -120,6 +139,7 @@ void cCreateLidarExperimentFromPlotInfoDlg::createControls_PointSelection()
 	mpPlotOrientation->addItem(SOUTH_TO_NORTH);
 	mpPlotOrientation->addItem(EAST_TO_WEST);
 	mpPlotOrientation->addItem(WEST_TO_EAST);
+	mpPlotOrientation->setCurrentIndex(SCAN_WEST_TO_EAST);
 
 	mpUnits = new QComboBox(this);
 	mpUnits->setEditable(false);
@@ -150,8 +170,8 @@ void cCreateLidarExperimentFromPlotInfoDlg::createLayout_PointSelection(QVBoxLay
 	QHBoxLayout* pPosLayout = new QHBoxLayout();
 	pPosLayout->addStretch(1);
 	pPosLayout->addWidget(mpStartPosition);
-	pPosLayout->addSpacing(10);
-	pPosLayout->addWidget(mpEndPosition);
+	//pPosLayout->addSpacing(10);
+	//pPosLayout->addWidget(mpEndPosition);
 	pPosLayout->addSpacing(10);
 
 	QVBoxLayout* pVSubLayout = new QVBoxLayout();
@@ -164,7 +184,13 @@ void cCreateLidarExperimentFromPlotInfoDlg::createLayout_PointSelection(QVBoxLay
 
 	QHBoxLayout* pOptionsLayout = new QHBoxLayout();
 	pOptionsLayout->addStretch(1);
-	pOptionsLayout->addWidget(mpInverseDirection);
+	pOptionsLayout->addWidget(mpPointAtStart);
+	pOptionsLayout->addSpacing(10);
+	pOptionsLayout->addWidget(mpPointAtCenter);
+	pOptionsLayout->addSpacing(10);
+	pOptionsLayout->addWidget(mpPointAtEnd);
+//	pOptionsLayout->addSpacing(10);
+//	pOptionsLayout->addWidget(mpInverseDirection);
 	pOptionsLayout->addStretch(1);
 
 	pMainLayout->addLayout(pOptionsLayout);
@@ -241,22 +267,39 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 		return false;
 	}
 
+	bool auto_advance = mpAutoAdvance->isChecked();
+
+	if (mMeasurementTitle.empty())
+	{
+		mMeasurementTitle = title;
+	}
+	else if (mMeasurementTitle != title)
+	{
+		mMeasurementTitle = title;
+	}
+
 	if (mExperimentTitle.empty())
 	{
-		auto pos = title.find("_Pass");
+		auto pos = title.find("Pass");
 
 		if (pos == std::string::npos)
 			mExperimentTitle = title;
 		else
+		{
+			if (pos > 0)
+			{
+				if (std::isspace(title[pos - 1]) || (title[pos - 1] == '_'))
+					--pos;
+			}
 			mExperimentTitle = title.substr(0, pos);
+		}
 	}
 
 	QModelIndex startIndex = mpStartPosition->currentIndex();
-	QModelIndex endIndex = mpEndPosition->currentIndex();
 
-	if ((startIndex.row() < 0) || (endIndex.row() < 0))
+	if ((startIndex.row() < 0))
 	{
-		QString msg = "Please select start and end positions.";
+		QString msg = "Please select a start position.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
@@ -266,26 +309,12 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
 
-	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
-	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
-	auto h2 = mpModel->data(endIndex.siblingAtColumn(3)).toFloat();
-
-	if (mpInverseDirection->isChecked())
-	{
-		std::swap(x1, x2);
-		std::swap(y1, y2);
-		std::swap(h1, h2);
-	}
-
-	QString plot_orientation = mpPlotOrientation->currentText();
+	int plot_orientation = mpPlotOrientation->currentIndex();
 	int plot_length_mm = static_cast<int>(mpPlotLength->text().toDouble() * mConversionFactor);
 
 	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
 	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);
 	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
-	int x2_mm = static_cast<int>(x2 * nConstants::M_TO_MM);
-	int y2_mm = static_cast<int>(y2 * nConstants::M_TO_MM);
-	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
 
 	int travel_z_mm = static_cast<int>(mpTravelHeight_m->text().toDouble() * nConstants::M_TO_MM);
 	int scan_z_mm = static_cast<int>(mpMeasurementHeight_m->text().toDouble() * nConstants::M_TO_MM);
@@ -329,90 +358,95 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 		scan_z_mm += sensor_offset_mm;
 	}
 
-	int dx_mm = x2_mm - x1_mm;
-	int dy_mm = y2_mm - y1_mm;
+	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
+	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
 
-	double scan_direction_deg = atan2(dy_mm, dx_mm) * nConstants::RAD_TO_DEG;
+	int x2_mm = x1_mm;
+	int y2_mm = y1_mm;
+	int h2_mm = h1_mm;
 
-	if ((45.0 <= scan_direction_deg) && (scan_direction_deg < 135.0))
+	if (mpPointAtStart->isChecked())
 	{
-		// We are scanning east to west
-		if (plot_orientation == EAST_TO_WEST)
+		switch (plot_orientation)
 		{
-			y2_mm += plot_length_mm;
-		}
-		else if (plot_orientation == WEST_TO_EAST)
-		{
-			y1_mm -= plot_length_mm;
-		}
-		else if (plot_orientation == NORTH_TO_SOUTH)
-		{
-			x1_mm += (plot_length_mm / 2);
-			x2_mm += (plot_length_mm / 2);
-		}
-		else if (plot_orientation == SOUTH_TO_NORTH)
-		{
-			x1_mm -= (plot_length_mm / 2);
-			x2_mm -= (plot_length_mm / 2);
+		case SCAN_NORTH_TO_SOUTH:
+			x2_mm = x1_mm + plot_length_mm + end_offset_mm;
+			x1_mm -= start_offset_mm;
+			break;
+		case SCAN_SOUTH_TO_NORTH:
+			x2_mm = x1_mm - plot_length_mm - end_offset_mm;
+			x1_mm += start_offset_mm;
+			break;
+		case SCAN_EAST_TO_WEST:
+			y2_mm = y1_mm - plot_length_mm - end_offset_mm;
+			y1_mm += start_offset_mm;
+			break;
+		default:
+		case SCAN_WEST_TO_EAST:
+			y2_mm = y1_mm + plot_length_mm + end_offset_mm;
+			y1_mm -= start_offset_mm;
+			break;
 		}
 	}
-	else if ((135.0 <= scan_direction_deg) && (scan_direction_deg < 225.0))
+	else if (mpPointAtCenter->isChecked())
 	{
-		// We are scanning north to south
-		if (plot_orientation == NORTH_TO_SOUTH)
+		int half_plot_length_mm = plot_length_mm / 2;
+
+		switch (plot_orientation)
 		{
-			x2_mm += plot_length_mm;
-		}
-		else if (plot_orientation == SOUTH_TO_NORTH)
-		{
-			x1_mm -= plot_length_mm;
-		}
-		else if (plot_orientation == EAST_TO_WEST)
-		{
-			y1_mm += (plot_length_mm / 2);
-			y2_mm += (plot_length_mm / 2);
-		}
-		else if (plot_orientation == WEST_TO_EAST)
-		{
-			y1_mm -= (plot_length_mm / 2);
-			y2_mm -= (plot_length_mm / 2);
+		case SCAN_NORTH_TO_SOUTH:
+			x1_mm -= half_plot_length_mm;
+			x2_mm = x1_mm + plot_length_mm + end_offset_mm;
+			x1_mm -= start_offset_mm;
+			break;
+		case SCAN_SOUTH_TO_NORTH:
+			x1_mm += half_plot_length_mm;
+			x2_mm = x1_mm - plot_length_mm - end_offset_mm;
+			x1_mm += start_offset_mm;
+			break;
+		case SCAN_EAST_TO_WEST:
+			y1_mm += half_plot_length_mm;
+			y2_mm = y1_mm - plot_length_mm - end_offset_mm;
+			y1_mm += start_offset_mm;
+			break;
+		default:
+		case SCAN_WEST_TO_EAST:
+			y1_mm -= half_plot_length_mm;
+			y2_mm = y1_mm + plot_length_mm + end_offset_mm;
+			y1_mm -= start_offset_mm;
+			break;
 		}
 	}
-	else if ((225.0 <= scan_direction_deg) && (scan_direction_deg < 315.0))
+	else if (mpPointAtEnd->isChecked())
 	{
-		// We are scanning west to east
-		if (plot_orientation == WEST_TO_EAST)
+		switch (plot_orientation)
 		{
-			y2_mm -= plot_length_mm;
-		}
-		else if (plot_orientation == EAST_TO_WEST)
-		{
-			y1_mm += plot_length_mm;
-		}
-		else if (plot_orientation == NORTH_TO_SOUTH)
-		{
-			x1_mm += (plot_length_mm / 2);
-			x2_mm += (plot_length_mm / 2);
-		}
-		else if (plot_orientation == SOUTH_TO_NORTH)
-		{
-			x1_mm -= (plot_length_mm / 2);
-			x2_mm -= (plot_length_mm / 2);
+		case SCAN_NORTH_TO_SOUTH:
+			x1_mm = x2_mm - plot_length_mm - start_offset_mm;
+			x2_mm += end_offset_mm;
+			break;
+		case SCAN_SOUTH_TO_NORTH:
+			x1_mm = x2_mm + plot_length_mm + start_offset_mm;
+			x2_mm -= end_offset_mm;
+			break;
+		case SCAN_EAST_TO_WEST:
+			y1_mm = y2_mm + plot_length_mm + start_offset_mm;
+			y2_mm -= end_offset_mm;
+			break;
+		default:
+		case SCAN_WEST_TO_EAST:
+			y1_mm = y2_mm - plot_length_mm - start_offset_mm;
+			y2_mm += end_offset_mm;
+			break;
 		}
 	}
 	else
-	{
-		// We are scanning south to north
-
-	}
+		return false;
 
 	int vertical_speed_mmps = mpTravelVerticalSpeed_mmps->text().toInt();
 	int travel_speed_mmps = mpTravelSpeed_mmps->text().toInt();
 	int scan_speed_mmps = mpMeasurementSpeed_mmps->text().toInt();
 	int safe_vertical_speed_mmps = mpSafeVerticalSpeed_mmps->text().toInt();
-
-	int start_offset_mm = static_cast<int>(mpBeginningOffset_m->text().toDouble() * nConstants::M_TO_MM);
-	int end_offset_mm = static_cast<int>(mpEndingOffset_m->text().toDouble() * nConstants::M_TO_MM);
 
 	double minIntegrationTime_sec = mpMinIntegrationTime_sec->text().toDouble();
 	double maxIntegrationTime_sec = mpMaxIntegrationTime_sec->text().toDouble();
@@ -422,9 +456,19 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 
 	int errorThreshold_mm = mpErrorThreshold_mm->text().toInt();
 
+	/* Grab the info for multiple scans if selected */
+	int startNum = 0;
+	bool hasNumber = nStringUtils::endsWithInt(title, &startNum);
+
 	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
-	pInfo->setMeasurementName(title);
+	if (hasNumber && auto_advance)
+	{
+		nStringUtils::replaceIntAtEnd(title, ++startNum);
+		mpTitle->setText(QString::fromStdString(title));
+	}
+
+	pInfo->setMeasurementName(mMeasurementTitle);
 	pInfo->setExperimentName(mExperimentTitle);
 	pInfo->setExperimentType(cExperimentFile::eExperimentType::LIDAR);
 	pInfo->setMetaData(mMetaInfo);
@@ -438,7 +482,7 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 	step->setSpeed_mmps(vertical_speed_mmps);
 	pInfo->appendStep(std::move(step));
 
-	if ((dx_mm == 0) && (dy_mm == 0))
+	if (plot_length_mm == 0)
 	{
 		// Moving dolly to the beginning of the measurement scan...
 		step = std::make_unique<cMeasurementStep_Movement>();
@@ -495,32 +539,10 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 	}
 	else
 	{
-		int x_mm = 0;
-		int y_mm = 0;
-
-		if (std::abs(dx_mm) < 500)
-		{
-			x_mm = (x2_mm + x1_mm) / 2;
-
-			if (y1_mm > y2_mm)
-				y_mm = y1_mm + start_offset_mm;
-			else
-				y_mm = y1_mm - start_offset_mm;
-		}
-		else if (std::abs(dy_mm) < 500)
-		{
-			if (x1_mm > x2_mm)
-				x_mm = x1_mm + start_offset_mm;
-			else
-				x_mm = x1_mm - start_offset_mm;
-
-			y_mm = (y2_mm + y1_mm) / 2;
-		}
-
 		// Moving dolly to the beginning of the measurement scan...
 		step = std::make_unique<cMeasurementStep_Movement>();
-		step->setX_mm(x_mm);
-		step->setY_mm(y_mm);
+		step->setX_mm(x1_mm);
+		step->setY_mm(y1_mm);
 		step->setSpeed_mmps(travel_speed_mmps);
 		pInfo->appendStep(std::move(step));
 
@@ -558,25 +580,10 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 		reference->setErrorThreshold_mm(errorThreshold_mm);
 		pInfo->appendStep(std::move(reference));
 
-		if (std::abs(dx_mm) < 500)
-		{
-			if (y1_mm > y2_mm)
-				y_mm = y2_mm - end_offset_mm;
-			else
-				y_mm = y2_mm + end_offset_mm;
-		}
-		else if (std::abs(dy_mm) < 500)
-		{
-			if (x1_mm > x2_mm)
-				x_mm = x2_mm - end_offset_mm;
-			else
-				x_mm = x2_mm + end_offset_mm;
-		}
-
 		// Do measurement...
 		step = std::make_unique<cMeasurementStep_Movement>();
-		step->setX_mm(x_mm);
-		step->setY_mm(y_mm);
+		step->setX_mm(x2_mm);
+		step->setY_mm(y2_mm);
 
 		if ((mpHeightReference->currentIndex() == 1) &&
 			((scan_z_mm + h1_mm) != (scan_z_mm + h2_mm)))
@@ -618,15 +625,91 @@ void cCreateLidarExperimentFromPlotInfoDlg::onShowPath()
 	if (startIndex.row() < 0)
 		return;
 
-	QModelIndex endIndex   = mpEndPosition->currentIndex();
-	if (endIndex.row() < 0)
-		return;
-
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
+	auto x2 = 0.0f;
+	auto y2 = 0.0f;
 
-	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
-	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+	int plot_length_m = static_cast<int>(mpPlotLength->text().toDouble() * mConversionFactor * nConstants::MM_TO_M);
+	int plot_orientation = mpPlotOrientation->currentIndex();
+
+	if (mpPointAtStart->isChecked())
+	{
+		switch (plot_orientation)
+		{
+		case SCAN_NORTH_TO_SOUTH:
+			x2 = x1 + plot_length_m;
+			y2 = y1;
+			break;
+		case SCAN_SOUTH_TO_NORTH:
+			x2 = x1 - plot_length_m;
+			y2 = y1;
+			break;
+		case SCAN_EAST_TO_WEST:
+			x2 = x1;
+			y2 = y1 - plot_length_m;
+			break;
+		default:
+		case SCAN_WEST_TO_EAST:
+			x2 = x1;
+			y2 = y1 + plot_length_m;
+			break;
+		}
+	}
+	else if (mpPointAtCenter->isChecked())
+	{
+		int half_plot_length_m = plot_length_m / 2;
+
+		switch (plot_orientation)
+		{
+		case SCAN_NORTH_TO_SOUTH:
+			x1 -= half_plot_length_m;
+			x2 = x1 + plot_length_m;
+			y2 = y1;
+			break;
+		case SCAN_SOUTH_TO_NORTH:
+			x1 += half_plot_length_m;
+			x2 = x1 - plot_length_m;
+			y2 = y1;
+			break;
+		case SCAN_EAST_TO_WEST:
+			x2 = x1;
+			y1 += half_plot_length_m;
+			y2 = y1 - plot_length_m;
+			break;
+		default:
+		case SCAN_WEST_TO_EAST:
+			x2 = x1;
+			y1 -= half_plot_length_m;
+			y2 = y1 + plot_length_m;
+			break;
+		}
+	}
+	else if (mpPointAtEnd->isChecked())
+	{
+		switch (plot_orientation)
+		{
+		case SCAN_NORTH_TO_SOUTH:
+			x2 = x1 - plot_length_m;
+			y2 = y1;
+			break;
+		case SCAN_SOUTH_TO_NORTH:
+			x2 = x1 + plot_length_m;
+			y2 = y1;
+			break;
+		case SCAN_EAST_TO_WEST:
+			x2 = x1;
+			y2 = y1 + plot_length_m;
+			break;
+		default:
+		case SCAN_WEST_TO_EAST:
+			x2 = x1;
+			y2 = y1 - plot_length_m;
+			break;
+		}
+	}
+	else
+		return;
 
 	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
 	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);

@@ -53,7 +53,7 @@
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
-#include <QSound>
+#include <QSoundEffect>
 #include <QMdiArea>
 
 #include <cassert>
@@ -116,6 +116,11 @@ namespace
 
         return std::string();
     }
+
+    bool validGpsFile(std::string_view header)
+    {
+        return header.starts_with("ILUC") && header.ends_with("ILUC");
+    }
 }
 
 
@@ -132,7 +137,7 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     setUnifiedTitleAndToolBarOnMac(true);
 
-    auto cwd = std::filesystem::current_path();
+    auto cwd = std::filesystem::current_path().string();
 
     mMeasurementFilesPath = mSettings.value("Defaults/measurementDirectory", cwd.c_str()).toString();
     mFieldLayoutFile = mSettings.value("Defaults/fieldLayoutFile").toString();
@@ -141,13 +146,13 @@ cMainWindow::cMainWindow(QWidget* parent) :
     QString fileName = mSettings.value("Defaults/groundMeshFile").toString();
 
     if (!fileName.isEmpty())
-        LoadGpsData(fileName);
+        loadGpsData(fileName);
 
 
     fileName = mSettings.value("Defaults/aerialMeshFile").toString();
 
     if (!fileName.isEmpty())
-        LoadAerialData(fileName);
+        loadAerialData(fileName);
 
     mLimits.minX_mm = 10'000;
     mLimits.maxX_mm = 190'000;
@@ -432,13 +437,13 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_SpiderCam_Point);
     mpGenerateMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("LiDAR Scans From GPS data (Machine Planted)"), this);
+    pMenuItem = new QAction(tr("LiDAR Scans From GPS data (begin/end points)"), this);
     pMenuItem->setStatusTip(tr("Creates LiDAR scan measurement file(s) from GPS (begin/end) data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_GPS);
     mpGenerateMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("LiDAR Scans From GPS plot data (Hand Planted)"), this);
-    pMenuItem->setStatusTip(tr("Creates LiDAR scan measurement file(s) from GPS plot data"));
+    pMenuItem = new QAction(tr("LiDAR Scans From GPS plot data (single point)"), this);
+    pMenuItem->setStatusTip(tr("Creates LiDAR scan measurement file(s) from GPS point and plot data"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateLidarScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
 
@@ -1017,7 +1022,7 @@ void cMainWindow::onGenerateLidarScan_GPS()
     gps_file >> test;
     gps_file.close();
 
-    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    if (!validGpsFile(test))
     {
         QString msg = "Invalid GPS file: ";
         msg += fileName;
@@ -1074,7 +1079,7 @@ void cMainWindow::onGenerateLidarScan_PlotInfo()
     gps_file >> test;
     gps_file.close();
 
-    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    if (!validGpsFile(test))
     {
         QString msg = "Invalid GPS file: ";
         msg += fileName;
@@ -1184,7 +1189,7 @@ void cMainWindow::onGenerateHyperspectralScan_GPS()
     gps_file >> test;
     gps_file.close();
 
-    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    if (!validGpsFile(test))
     {
         QString msg = "Invalid GPS file: ";
         msg += fileName;
@@ -1241,7 +1246,7 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
     gps_file >> test;
     gps_file.close();
 
-    if (test != "ILUC,1249989.825,1015874.374,872.219,ILUC")
+    if (!validGpsFile(test))
     {
         QString msg = "Invalid GPS file: ";
         msg += fileName;
@@ -1337,17 +1342,12 @@ void cMainWindow::onPreferenceLoadGroundMesh()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Ground Data..."), savedFileName,
         "GPS CSV Files (*.csv)");
 
-    // Open file
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-
     // Return on Cancel
-    if (!file.exists())
+    if (fileName.isEmpty())
         return;
 
-    LoadGpsData(fileName);
-
-    mSettings.setValue("Defaults/groundMeshFile", fileName);
+    if (loadGpsData(fileName))
+        mSettings.setValue("Defaults/groundMeshFile", fileName);
 }
 
 void cMainWindow::onPreferenceLoadAerialMesh()
@@ -1357,17 +1357,12 @@ void cMainWindow::onPreferenceLoadAerialMesh()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Aerial Data..."), savedFileName,
         "Aerial CSV Files (*.csv)");
 
-    // Open file
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-
     // Return on Cancel
-    if (!file.exists())
+    if (fileName.isEmpty())
         return;
 
-    LoadAerialData(fileName);
-
-    mSettings.setValue("Defaults/aerialMeshFile", fileName);
+    if (loadAerialData(fileName))
+        mSettings.setValue("Defaults/aerialMeshFile", fileName);
 }
 
 void cMainWindow::onPreferenceDefaultFieldLayoutFile()
@@ -1943,18 +1938,30 @@ void cMainWindow::closeEvent(QCloseEvent* event)
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::LoadGpsData(QString fileName)
+bool cMainWindow::loadGpsData(QString fileName)
 {
-    // Open file
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
+    std::filesystem::path fpath = fileName.toStdString();
+    bool does_exist = std::filesystem::exists(fpath);
 
-    // Return on Cancel
-    if (!file.exists())
-        return;
+    if (!does_exist)
+    {
+        QString msg = "The GPS data file '";
+        msg += fileName;
+        msg += "' does not exist!";
+        QMessageBox::warning(this, "File Not Found", msg);
+        return false;
+    }
 
     cGpsFileReader gps;
-    gps.loadFromFile(fileName.toStdString());
+    if (!gps.loadFromFile(fileName.toStdString()))
+    {
+        QString msg = "The GPS data file '";
+        msg += fileName;
+        msg += "' failed to load!";
+        QMessageBox::warning(this, "File Failed", msg);
+
+        return false;
+    }
 
     auto points = gps.GetPoints();
 
@@ -1976,27 +1983,41 @@ void cMainWindow::LoadGpsData(QString fileName)
 
     mGroundData.clearGroundMesh();
     mGroundData.addMeshData(mesh);
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::LoadAerialData(QString fileName)
+bool cMainWindow::loadAerialData(QString fileName)
 {
-    // Open file
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
+    std::filesystem::path fpath = fileName.toStdString();
+    bool does_exist = std::filesystem::exists(fpath);
 
-    // Return on Cancel
-    if (!file.exists())
-        return;
-
-    cGpsFileReader gps;
-    gps.loadFromFile(fileName.toStdString());
-
-    auto points = gps.GetPoints();
-
-    if (gps.GetRefPoint().has_value())
+    if (!does_exist)
     {
-        auto ref_point = gps.GetRefPoint().value();
+        QString msg = "The Aerial data file '";
+        msg += fileName;
+        msg += "' does not exist!";
+        QMessageBox::warning(this, "File Not Found", msg);
+        return false;
+    }
+
+    cGpsFileReader aerial;
+    if (!aerial.loadFromFile(fileName.toStdString()))
+    {
+        QString msg = "The Aerial data file '";
+        msg += fileName;
+        msg += "' failed to load!";
+        QMessageBox::warning(this, "File Failed", msg);
+
+        return false;
+    }
+
+    auto points = aerial.GetPoints();
+
+    if (aerial.GetRefPoint().has_value())
+    {
+        auto ref_point = aerial.GetRefPoint().value();
         mReferenceHeight_mm = ref_point.z_m * nConstants::M_TO_MM;
     }
 
@@ -2018,6 +2039,8 @@ void cMainWindow::LoadAerialData(QString fileName)
 
     mAerialData.clearAerialMesh();
     mAerialData.addMeshData(mesh);
+
+    return true;
 }
 
 

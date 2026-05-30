@@ -12,6 +12,7 @@
 #include <QLineEdit>
 #include <QIntValidator>
 #include <QPlainTextEdit>
+#include <QRegularExpression>
 
 #include <algorithm>
 
@@ -155,6 +156,7 @@ void cExperimentMetaInfoDlg::createControls()
 	mpPlantingYear = new QComboBox(this);
 	mpPlantingYear->addItem("2025");
 	mpPlantingYear->addItem("2026");
+	mpPlantingYear->addItem("2027");
 
 
 	mpTargetHarvestDay = new QLineEdit(this);
@@ -179,6 +181,7 @@ void cExperimentMetaInfoDlg::createControls()
 	mpTargetHarvestYear = new QComboBox(this);
 	mpTargetHarvestYear->addItem("2025");
 	mpTargetHarvestYear->addItem("2026");
+	mpTargetHarvestYear->addItem("2027");
 
 	mpAuthorization = new QLineEdit(this);
 	if (!mInfo.getAuthorization().empty())
@@ -357,7 +360,8 @@ void cExperimentMetaInfoDlg::apply()
 	mInfo.setPrincipalInvestigator(str);
 
 	text = mpResearchers->toPlainText();
-	auto text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+//	auto text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+	auto text_list = text.split(QRegularExpression("[,\n]+"), Qt::SkipEmptyParts);
 
 	list.clear();
 	for (auto entry : text_list)
@@ -367,7 +371,8 @@ void cExperimentMetaInfoDlg::apply()
 	mInfo.setResearchers(list);
 
 	text = mpComments->toPlainText();
-	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+//	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+	text_list = text.split(QRegularExpression("[,\n]+"), Qt::SkipEmptyParts);
 
 	list.clear();
 	for (auto entry : text_list)
@@ -383,7 +388,8 @@ void cExperimentMetaInfoDlg::apply()
 	mInfo.setCultivar(str);
 
 	text = mpEvents->toPlainText();
-	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+//	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+	text_list = text.split(QRegularExpression("[,\n]+"), Qt::SkipEmptyParts);
 
 	list.clear();
 	for (auto entry : text_list)
@@ -396,7 +402,8 @@ void cExperimentMetaInfoDlg::apply()
 	mInfo.setConstructName(str);
 
 	text = mpTreatments->toPlainText();
-	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+//	text_list = text.split(QRegExp("[,\n]+"), Qt::SkipEmptyParts);
+	text_list = text.split(QRegularExpression("[,\n]+"), Qt::SkipEmptyParts);
 
 	list.clear();
 	for (auto entry : text_list)

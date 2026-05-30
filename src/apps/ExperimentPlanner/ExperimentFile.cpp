@@ -33,6 +33,7 @@ cExperimentFile& cExperimentFile::operator=(const cExperimentFile& rhs)
 	mDirty = rhs.mDirty;
 
 	mExperimentName = rhs.mExperimentName;
+	mExperimentType = rhs.mExperimentType;
 	mMeasurementName = rhs.mMeasurementName;
 
 	mMetaInfo = rhs.mMetaInfo;
@@ -345,6 +346,9 @@ void cExperimentFile::buildDocument(nlohmann::json& configDoc)
 			break;
 		case eExperimentType::TOF:
 			configDoc["experiment_type"] = "time-of-flight";
+			break;
+		case eExperimentType::THERMAL:
+			configDoc["experiment_type"] = "thermal";
 			break;
 		}
 	}

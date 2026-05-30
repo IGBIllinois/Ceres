@@ -82,6 +82,8 @@ void cCreateLidarExperimentDlg::createControls()
 void cCreateLidarExperimentDlg::createControls_TitleInfo()
 {
 	mpTitle = new QLineEdit(this);
+	mpAutoAdvance = new QCheckBox("Auto Advance", this);
+	mpAutoAdvance->setChecked(true);
 
 	mpMetaInfo = new QPushButton("Meta Info", this);
 	connect(mpMetaInfo, &QPushButton::pressed, this, &cCreateLidarExperimentDlg::onMetaInfoUpdate);
@@ -234,7 +236,6 @@ void cCreateLidarExperimentDlg::createControls_SubScanInfo()
 
 	mpScanInsideRows = new QRadioButton("Scan Inside Rows", this);
 	mpScanInsideRows->setEnabled(false);
-
 }
 
 void cCreateLidarExperimentDlg::createLayout()
@@ -273,6 +274,7 @@ void cCreateLidarExperimentDlg::createLayout_TitleInfo(QVBoxLayout* pMainLayout)
 	pText = new QLabel("Measurement Title");
 	pTitleLayout->addWidget(pText);
 	pTitleLayout->addWidget(mpTitle, 1);
+	pTitleLayout->addWidget(mpAutoAdvance);
 	pTitleLayout->addWidget(mpMetaInfo);
 	pTitleLayout->addWidget(mpCtrlInfo);
 	pTitleLayout->addWidget(mpSensorInfo);
@@ -481,12 +483,19 @@ void cCreateLidarExperimentDlg::onMetaInfoUpdate()
 
 	if (!title.empty() && mExperimentTitle.empty())
 	{
-		auto pos = title.find("_Pass");
+		auto pos = title.rfind("Pass");
 
 		if (pos == std::string::npos)
 			mExperimentTitle = title;
 		else
+		{
+			if (pos > 0)
+			{
+				if (std::isspace(title[pos - 1]) || (title[pos - 1] == '_'))
+					--pos;
+			}
 			mExperimentTitle = title.substr(0, pos);
+		}
 	}
 
 	dlg.setExperimentTitle(mExperimentTitle);
@@ -497,8 +506,9 @@ void cCreateLidarExperimentDlg::onMetaInfoUpdate()
 		return;
 
 	mExperimentTitle = dlg.getExperimentTitle();
+	mMeasurementTitle = dlg.getMeasurementTitle();
 
-	mpTitle->setText(QString::fromStdString(dlg.getMeasurementTitle()));
+	mpTitle->setText(QString::fromStdString(mMeasurementTitle));
 }
 
 void cCreateLidarExperimentDlg::onControllerUpdate()

@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include <spidercam/spidercam_com.hpp>
+#include <spidercam_connect/spidercam_com.hpp>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE

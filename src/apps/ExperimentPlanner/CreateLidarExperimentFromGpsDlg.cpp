@@ -61,10 +61,12 @@ cCreateLidarExperimentFromGpsDlg::cCreateLidarExperimentFromGpsDlg(const QString
 	mpModel->setHeaderData(2, Qt::Horizontal, tr("Y (m)"));
 	mpModel->setHeaderData(3, Qt::Horizontal, tr("Z (m)"));
 
+	positions_t points;
+
 	{
 		cGpsFileReader reader;
 		reader.loadFromFile(filename.toStdString());
-		auto points = reader.GetPoints();
+		points = reader.GetPoints();
 
 		auto n = points.size();
 
@@ -77,6 +79,31 @@ cCreateLidarExperimentFromGpsDlg::cCreateLidarExperimentFromGpsDlg(const QString
 			mpModel->setData(mpModel->index(i, 1, QModelIndex()), pos.x_m);
 			mpModel->setData(mpModel->index(i, 2, QModelIndex()), pos.y_m);
 			mpModel->setData(mpModel->index(i, 3, QModelIndex()), pos.z_m);
+		}
+	}
+
+	mpReverseModel = new QStandardItemModel(10, 4, this);
+	mpReverseModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
+	mpReverseModel->setHeaderData(1, Qt::Horizontal, tr("X (m)"));
+	mpReverseModel->setHeaderData(2, Qt::Horizontal, tr("Y (m)"));
+	mpReverseModel->setHeaderData(3, Qt::Horizontal, tr("Z (m)"));
+
+	{
+		auto n = points.size();
+
+		if (n > 0)
+		{
+			int j = n - 1;
+			for (int i = 0; i < n; ++i)
+			{
+				const auto& pos = points[j--];
+
+				mpReverseModel->insertRows(i, 1, QModelIndex());
+				mpReverseModel->setData(mpReverseModel->index(i, 0, QModelIndex()), QString::fromStdString(pos.label));
+				mpReverseModel->setData(mpReverseModel->index(i, 1, QModelIndex()), pos.x_m);
+				mpReverseModel->setData(mpReverseModel->index(i, 2, QModelIndex()), pos.y_m);
+				mpReverseModel->setData(mpReverseModel->index(i, 3, QModelIndex()), pos.z_m);
+			}
 		}
 	}
 
@@ -119,7 +146,8 @@ void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 	mpStartPosition->setFixedWidth(419);
 
 	mpEndPosition = new QTableView(this);
-	mpEndPosition->setModel(mpModel);
+//	mpEndPosition->setModel(mpModel);
+	mpEndPosition->setModel(mpReverseModel);
 
 	connect(mpEndPosition, &QTableView::activated, this, &cCreateLidarExperimentFromGpsDlg::onEndItem);
 	connect(mpEndPosition, &QTableView::pressed, this, &cCreateLidarExperimentFromGpsDlg::onEndItem);
@@ -135,7 +163,6 @@ void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 	mpEndPosition->setSelectionMode(QAbstractItemView::SingleSelection);
 	mpEndPosition->setSortingEnabled(false);
 	mpEndPosition->setFixedWidth(419);
-
 
 	mpClearPath = new QPushButton("Clear Path", this);
 	connect(mpClearPath, &QPushButton::pressed, this, &cCreateLidarExperimentFromGpsDlg::clearPaths);
@@ -224,8 +251,10 @@ void cCreateLidarExperimentFromGpsDlg::onStartItem(const QModelIndex& index)
 
 void cCreateLidarExperimentFromGpsDlg::onEndItem(const QModelIndex& index)
 {
-	auto x1 = mpModel->data(index.siblingAtColumn(1)).toFloat();
-	auto y1 = mpModel->data(index.siblingAtColumn(2)).toFloat();
+//BAF	auto x1 = mpModel->data(index.siblingAtColumn(1)).toFloat();
+//BAF	auto y1 = mpModel->data(index.siblingAtColumn(2)).toFloat();
+	auto x1 = mpReverseModel->data(index.siblingAtColumn(1)).toFloat();
+	auto y1 = mpReverseModel->data(index.siblingAtColumn(2)).toFloat();
 
 	mpEndX_mm->setText(QString::number(static_cast<int>(x1 * nConstants::M_TO_MM)));
 	mpEndY_mm->setText(QString::number(static_cast<int>(y1 * nConstants::M_TO_MM)));
@@ -246,23 +275,32 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 		return false;
 	}
 
+	bool auto_advance = mpAutoAdvance->isChecked();
+
 	if (mMeasurementTitle.empty())
 	{
 		mMeasurementTitle = title;
 	}
-	else if (mMeasurementTitle == title)
+	else if (mMeasurementTitle != title)
 	{
-
+		mMeasurementTitle = title;
 	}
 
 	if (mExperimentTitle.empty())
 	{
-		auto pos = title.find("_Pass");
+		auto pos = title.rfind("Pass");
 
 		if (pos == std::string::npos)
 			mExperimentTitle = title;
 		else
+		{
+			if (pos > 0)
+			{
+				if (std::isspace(title[pos - 1]) || (title[pos - 1] == '_'))
+					--pos;
+			}
 			mExperimentTitle = title.substr(0, pos);
+		}
 	}
 
 	QModelIndex startIndex = mpStartPosition->currentIndex();
@@ -290,11 +328,11 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 
 
 	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
-	auto h2 = mpModel->data(endIndex.siblingAtColumn(3)).toFloat();
-
+//BAF	auto h2 = mpModel->data(endIndex.siblingAtColumn(3)).toFloat();
+	auto h2 = mpReverseModel->data(endIndex.siblingAtColumn(3)).toFloat();
+	
 	int h1_mm = static_cast<int>(h1 * nConstants::M_TO_MM);
 	int h2_mm = static_cast<int>(h2 * nConstants::M_TO_MM);
-
 
 	if (mpInverseDirection->isChecked())
 	{
@@ -442,10 +480,13 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 	{
 		QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
-		if (hasNumber)
-			nStringUtils::replaceIntAtEnd(title, startNum++);
+		if (hasNumber && auto_advance)
+		{
+			nStringUtils::replaceIntAtEnd(title, ++startNum);
+			mpTitle->setText(QString::fromStdString(title));
+		}
 
-		pInfo->setMeasurementName(title);
+		pInfo->setMeasurementName(mMeasurementTitle);
 		pInfo->setExperimentName(mExperimentTitle);
 		pInfo->setExperimentType(cExperimentFile::eExperimentType::LIDAR);
 		pInfo->setMetaData(mMetaInfo);
@@ -723,8 +764,10 @@ void cCreateLidarExperimentFromGpsDlg::onShowPath()
 	auto x1 = mpModel->data(startIndex.siblingAtColumn(1)).toFloat();
 	auto y1 = mpModel->data(startIndex.siblingAtColumn(2)).toFloat();
 
-	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
-	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+//BAF	auto x2 = mpModel->data(endIndex.siblingAtColumn(1)).toFloat();
+//BAF	auto y2 = mpModel->data(endIndex.siblingAtColumn(2)).toFloat();
+	auto x2 = mpReverseModel->data(endIndex.siblingAtColumn(1)).toFloat();
+	auto y2 = mpReverseModel->data(endIndex.siblingAtColumn(2)).toFloat();
 
 	int x1_mm = static_cast<int>(x1 * nConstants::M_TO_MM);
 	int y1_mm = static_cast<int>(y1 * nConstants::M_TO_MM);

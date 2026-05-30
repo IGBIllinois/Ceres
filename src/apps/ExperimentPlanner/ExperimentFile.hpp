@@ -23,7 +23,7 @@ enum eMeasurementStep {delay, pause, movement, hyspex_command, reference_point};
 class cExperimentFile
 {
 public:
-	enum class eExperimentType { UNKNOWN, LIDAR, HYPERSPECTRAL, TOF, };
+	enum class eExperimentType { UNKNOWN, LIDAR, HYPERSPECTRAL, TOF, THERMAL };
 
 	typedef std::list<std::shared_ptr<cMeasurementStep>> Measurement_t;
 

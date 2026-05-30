@@ -6,7 +6,7 @@
 #include "RappGroundModel.hpp"
 #include "RappAerialModel.hpp"
 
-#include <spidercam/spidercam_types.hpp>
+#include <spidercam_connect/spidercam_types.hpp>
 
 #include <vector>
 #include <filesystem>
@@ -163,8 +163,8 @@ private:
     bool loadMeasurement(const std::filesystem::path& measurement);
 
 private:
-    void LoadGpsData(QString fileName);
-    void LoadAerialData(QString fileName);
+    bool loadGpsData(QString fileName);
+    bool loadAerialData(QString fileName);
 
 private:
     cRappGroundModel mGroundData;
