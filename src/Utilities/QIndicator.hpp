@@ -183,7 +183,6 @@ public:
     void setStateColor(eState state, QColor color);
     void setStatePattern(eState state, Qt::BrushStyle pattern);
 
-    //QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
 signals:

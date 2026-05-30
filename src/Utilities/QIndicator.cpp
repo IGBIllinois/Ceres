@@ -7,25 +7,6 @@
 #include <QStyleOption>
 
 
-/*
-extern bool qt_is_gui_used;
-
-Q_GUI_EXPORT int qt_defaultDpiX()
-{
-	if (QCoreApplication::instance()->testAttribute(Qt::AA_Use96Dpi))
-		return 96;
-
-	if (!qt_is_gui_used)
-		return 75;
-
-	if (const QScreen* screen = QGuiApplication::primaryScreen())
-		return qRound(screen->logicalDotsPerInchX());
-
-	//PI has not been initialised, or it is being initialised. Give a default dpi
-	return 100;
-}
-*/
-
 QT_BEGIN_NAMESPACE
 	
 Q_GUI_EXPORT int qt_defaultDpiX();
@@ -418,11 +399,6 @@ void QButtonIndicator::setStatePattern(eState state, Qt::BrushStyle pattern)
 	}
 }
 
-//QSize QButtonIndicator::minimumSizeHint() const
-//{
-//	return sizeHint();
-//}
-
 QSize QButtonIndicator::sizeHint() const
 {
 	if (mSizeHint.isValid())
@@ -448,8 +424,7 @@ QSize QButtonIndicator::sizeHint() const
 		h = qMax(h, sz.height());
 	opt.rect.setSize(QSize(w, h));
 
-	mSizeHint = (style()->sizeFromContents(QStyle::CT_PushButton, &opt, QSize(w, h), this).
-		expandedTo(QApplication::globalStrut()));
+	mSizeHint = style()->sizeFromContents(QStyle::CT_PushButton, &opt, QSize(w, h), this);
 
 	return mSizeHint;
 
