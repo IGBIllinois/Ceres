@@ -2,8 +2,8 @@
 #include "LucidVisionLabsRgbModel_Triton.hpp"
 #include "LucidVisionLabsRgbUtils.hpp"
 
-#include <LucidVisionLabsConnect/LucidTritonCamera.hpp>
-#include <LucidVisionLabsConnect/LucidVisionLabsData.hpp>
+#include <lucid_vision_labs_connect/LucidTritonCamera.hpp>
+#include <lucid_vision_labs_connect/LucidVisionLabsData.hpp>
 
 #include "TimestampProvider.hpp"
 #include "StringUtils.hpp"

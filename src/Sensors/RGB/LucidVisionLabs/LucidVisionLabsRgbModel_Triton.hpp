@@ -4,7 +4,7 @@
 #include "LucidVisionLabsRgbModel.hpp"
 #include "Timers.hpp"
 
-#include <LucidVisionLabsConnect/LucidVisionLabsTypes.hpp>
+#include <lucid_vision_labs_connect/LucidVisionLabsTypes.hpp>
 
 #include <Arena/ArenaApi.h>
 

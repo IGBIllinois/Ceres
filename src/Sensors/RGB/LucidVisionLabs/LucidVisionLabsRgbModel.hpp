@@ -4,8 +4,8 @@
 #include "../RgbTypes.hpp"
 #include "../RgbCameraModel.hpp"
 
-#include <LucidVisionLabsConnect/LucidVisionLabsData.hpp>
-#include <LucidVisionLabsConnect/LucidVisionLabsTypes.hpp>
+#include <lucid_vision_labs_connect/LucidVisionLabsData.hpp>
+#include <lucid_vision_labs_connect/LucidVisionLabsTypes.hpp>
 
 #include <cbdf/LucidTritonSerializer.hpp>
 

@@ -3,7 +3,7 @@
 
 #include "../RgbTypes.hpp"
 
-#include <LucidVisionLabsConnect/LucidVisionLabsTypes.hpp>
+#include <lucid_vision_labs_connect/LucidVisionLabsTypes.hpp>
 
 #include <cbdf/ImageBuffers.hpp>
 

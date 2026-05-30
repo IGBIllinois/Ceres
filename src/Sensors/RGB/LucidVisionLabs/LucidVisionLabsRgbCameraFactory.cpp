@@ -4,8 +4,8 @@
 #include "LucidVisionLabsRgbCameraFactory.hpp"
 #include "LucidVisionLabsIDs.hpp"
 
-#include <LucidVisionLabsConnect/LucidCameraFactory.hpp>
-#include <LucidVisionLabsConnect/LucidTritonCamera.hpp>
+#include <lucid_vision_labs_connect/LucidCameraFactory.hpp>
+#include <lucid_vision_labs_connect/LucidTritonCamera.hpp>
 
 #include "LucidVisionLabsRgbModel_Triton.hpp"
 #include "LucidVisionLabsRgbView_Triton.hpp"
