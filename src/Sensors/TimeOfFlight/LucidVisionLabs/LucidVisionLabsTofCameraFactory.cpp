@@ -4,8 +4,8 @@
 #include "LucidVisionLabsTofCameraFactory.hpp"
 #include "LucidVisionLabsIDs.hpp"
 
-#include <LucidVisionLabsConnect/LucidCameraFactory.hpp>
-#include <LucidVisionLabsConnect/LucidHeliosCamera.hpp>
+#include <lucid_vision_labs_connect/LucidCameraFactory.hpp>
+#include <lucid_vision_labs_connect/LucidHeliosCamera.hpp>
 
 
 #include "StringUtils.hpp"
