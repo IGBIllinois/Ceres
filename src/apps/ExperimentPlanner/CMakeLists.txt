@@ -79,6 +79,9 @@ PRIVATE
     DelayStepInfoDlg.hpp
     DelayStepInfoDlg.cpp
 
+    MarkerInfoDlg.hpp
+    MarkerInfoDlg.cpp
+
     MovementStepInfoDlg.hpp
     MovementStepInfoDlg.cpp
 

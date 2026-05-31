@@ -40,7 +40,7 @@ public:
 	cMeasurementStep_HySpex_Command() = delete;
 	cMeasurementStep_HySpex_Command(std::string_view camera_model, std::string_view command);
 
-	cBaseStep* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
 protected:
 	void load(const nlohmann::json& jdoc) override;

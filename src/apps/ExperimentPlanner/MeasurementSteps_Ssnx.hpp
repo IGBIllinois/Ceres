@@ -45,7 +45,7 @@ public:
 	void setMaxIntegrationTime_sec(double sec);
 	void setErrorThreshold_mm(int threshold_mm);
 
-	cBaseStep* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
 signals:
 	void onDescriptionChange(const QString& desc);

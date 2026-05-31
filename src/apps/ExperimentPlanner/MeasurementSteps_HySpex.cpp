@@ -72,9 +72,9 @@ cMeasurementStep_HySpex_Command::cMeasurementStep_HySpex_Command(std::string_vie
 	mCommand = command;
 }
 
-cBaseStep* cMeasurementStep_HySpex_Command::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_HySpex_Command::graphicsItem(const int id, eExperimentType exp_type) const
 {
-	auto step = new cProcessStep(id);
+	auto step = new cProcessStep(id, exp_type);
 
 	QString title = QString::fromStdString(mModel);
 

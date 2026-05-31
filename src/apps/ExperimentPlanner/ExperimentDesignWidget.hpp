@@ -18,6 +18,7 @@ QT_END_NAMESPACE
 
 // Forward Declaration
 class cExperimentFile;
+enum class eExperimentType;
 
 class cExperimentDesignWidget : public QGraphicsView
 {
@@ -56,4 +57,6 @@ private:
     QBrush  mBrush;
     bool    mAntialiased = false;
     bool    mTransformed = false;
+
+    eExperimentType mExperimentType;
 };

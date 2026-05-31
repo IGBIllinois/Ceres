@@ -306,7 +306,7 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 	QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
 	pInfo->setExperimentName(title);
-	pInfo->setExperimentType(cExperimentFile::eExperimentType::HYPERSPECTRAL);
+	pInfo->setExperimentType(eExperimentType::HYPERSPECTRAL);
 	pInfo->setController(copy(mCtrlInfo));
 	pInfo->setSensors(mSensorInfo);
 
@@ -407,7 +407,7 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
 
 		pInfo->setExperimentName(title);
-		pInfo->setExperimentType(cExperimentFile::eExperimentType::HYPERSPECTRAL);
+		pInfo->setExperimentType(eExperimentType::HYPERSPECTRAL);
 		pInfo->setController(copy(mCtrlInfo));
 		pInfo->setSensors(mSensorInfo);
 

@@ -17,6 +17,8 @@ class QCheckBox;
 class QLabel;
 QT_END_NAMESPACE
 
+// Forward Declaration
+enum class eExperimentType;
 
 class cConnectedItem : public QGraphicsItem
 {
@@ -50,7 +52,7 @@ class cFlowArrow : public QObject, public cConnectedItem
 	Q_OBJECT
 
 public:
-	explicit cFlowArrow(const int id, QGraphicsItem* parent = nullptr);
+	explicit cFlowArrow(const int id, eExperimentType exp_type, QGraphicsItem* parent = nullptr);
 
 	void setTopPoint(int x, int y);
 	void setTopPoint(QPoint p);
@@ -77,10 +79,14 @@ private slots:
 	void onInsertDelay();
 	void onInsertPause();
 	void onInsertMovement();
+	void onInsertMarker();
 	void onInsertHySpexCommand();
 	void onInsertReferencePoint();
 
 private:
+
+	eExperimentType mExperimentType;
+
 	float mScale = 1.0;
 	int mLineLength = 30;
 	int mArrowHeadSize = 10;
@@ -183,7 +189,7 @@ class cBaseStep : public QObject, public cConnectedItem
 	Q_OBJECT
 
 public:
-	explicit cBaseStep(const int id, QGraphicsItem* parent = nullptr);
+	explicit cBaseStep(const int id, eExperimentType exp_type, QGraphicsItem* parent = nullptr);
 
 signals:
 	void insertBefore(int id, int type);
@@ -207,6 +213,8 @@ protected:
 
 protected:
 	QFont mFont;
+
+	eExperimentType mExperimentType;
 
 	QString mTitle;
 	QString mSubHeading1;
@@ -235,8 +243,8 @@ class cProcessStep : public cBaseStep
 	Q_OBJECT
 
 public:
-	explicit cProcessStep(const int id, QGraphicsItem* parent = nullptr);
-	explicit cProcessStep(const int id, const QString& text, QGraphicsItem* parent = nullptr);
+	explicit cProcessStep(const int id, eExperimentType exp_type, QGraphicsItem* parent = nullptr);
+	explicit cProcessStep(const int id, eExperimentType exp_type, const QString& text, QGraphicsItem* parent = nullptr);
 
 	const QString& title() const;
 
@@ -259,12 +267,14 @@ private slots:
 	void onInsertBefore_Delay();
 	void onInsertBefore_Pause();
 	void onInsertBefore_Movement();
+	void onInsertBefore_Marker();
 	void onInsertBefore_HySpexCommand();
 	void onInsertBefore_ReferencePoint();
 
 	void onInsertAfter_Delay();
 	void onInsertAfter_Pause();
 	void onInsertAfter_Movement();
+	void onInsertAfter_Marker();
 	void onInsertAfter_HySpexCommand();
 	void onInsertAfter_ReferencePoint();
 
@@ -286,8 +296,8 @@ class cIoStep : public cBaseStep
 	Q_OBJECT
 
 public:
-	explicit cIoStep(const int id, QGraphicsItem* parent = nullptr);
-	explicit cIoStep(const int id, const QString& text, QGraphicsItem* parent = nullptr);
+	explicit cIoStep(const int id, eExperimentType exp_type, QGraphicsItem* parent = nullptr);
+	explicit cIoStep(const int id, eExperimentType exp_type, const QString& text, QGraphicsItem* parent = nullptr);
 
 	const QString& title() const;
 
@@ -324,10 +334,18 @@ protected:
 
 private slots:
 	void onInsertBefore_Delay();
+	void onInsertBefore_Pause();
 	void onInsertBefore_Movement();
+	void onInsertBefore_Marker();
+	void onInsertBefore_HySpexCommand();
+	void onInsertBefore_ReferencePoint();
 
 	void onInsertAfter_Delay();
+	void onInsertAfter_Pause();
 	void onInsertAfter_Movement();
+	void onInsertAfter_Marker();
+	void onInsertAfter_HySpexCommand();
+	void onInsertAfter_ReferencePoint();
 
 	void onDeleteStep();
 

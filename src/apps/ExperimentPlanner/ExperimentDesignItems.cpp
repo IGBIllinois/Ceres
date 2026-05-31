@@ -46,8 +46,10 @@ void cConnectedItem::setHighlighted(bool highlight)
  *
  ********************************************************************/
 
-cFlowArrow::cFlowArrow(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent)
-{}
+cFlowArrow::cFlowArrow(const int id, eExperimentType exp_type, QGraphicsItem* parent) : cConnectedItem(id, parent)
+{
+	mExperimentType = exp_type;
+}
 
 void cFlowArrow::setTopPoint(int x, int y)
 {
@@ -142,17 +144,24 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	connect(&movementStep, &QAction::triggered, this, &cFlowArrow::onInsertMovement);
 	contextMenu.addAction(&movementStep);
 
+	QAction markerStep("Insert Marker Step...");
+	connect(&markerStep, &QAction::triggered, this, &cFlowArrow::onInsertMarker);
+	contextMenu.addAction(&markerStep);
+
 	contextMenu.addSeparator();
 
 	QAction referenceStep("Insert Reference Point Step...");
 	connect(&referenceStep, &QAction::triggered, this, &cFlowArrow::onInsertReferencePoint);
 	contextMenu.addAction(&referenceStep);
 
-	contextMenu.addSeparator();
+	if ((mExperimentType == eExperimentType::UNKNOWN) || (mExperimentType == eExperimentType::HYPERSPECTRAL))
+	{
+		contextMenu.addSeparator();
 
-	QAction commandStep("Insert HySpex Command Step...");
-	connect(&commandStep, &QAction::triggered, this, &cFlowArrow::onInsertHySpexCommand);
-	contextMenu.addAction(&commandStep);
+		QAction commandStep("Insert HySpex Command Step...");
+		connect(&commandStep, &QAction::triggered, this, &cFlowArrow::onInsertHySpexCommand);
+		contextMenu.addAction(&commandStep);
+	}
 
 	contextMenu.exec(event->screenPos());
 };
@@ -170,6 +179,11 @@ void cFlowArrow::onInsertPause()
 void cFlowArrow::onInsertMovement()
 {
 	emit insertBefore(getID(), eMeasurementStep::movement);
+}
+
+void cFlowArrow::onInsertMarker()
+{
+	emit insertBefore(getID(), eMeasurementStep::marker);
 }
 
 void cFlowArrow::onInsertHySpexCommand()
@@ -387,8 +401,10 @@ void cEndTerminal::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
  ********************************************************************/
 
 
-cBaseStep::cBaseStep(const int id, QGraphicsItem* parent) : cConnectedItem(id, parent) 
-{}
+cBaseStep::cBaseStep(const int id, eExperimentType exp_type, QGraphicsItem* parent) : cConnectedItem(id, parent) 
+{
+	mExperimentType = exp_type;
+}
 
 void cBaseStep::setTitle(const QString& title)
 {
@@ -451,7 +467,7 @@ void cBaseStep::setHighlighted(bool highlight)
  *
  ********************************************************************/
 
-cProcessStep::cProcessStep(const int id, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
+cProcessStep::cProcessStep(const int id, eExperimentType exp_type, QGraphicsItem* parent) : cBaseStep(id, exp_type, parent) //cConnectedItem(id, parent)
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
@@ -467,7 +483,7 @@ cProcessStep::cProcessStep(const int id, QGraphicsItem* parent) : cBaseStep(id, 
 	mHighlightBrush.setStyle(mHightlightStyle);
 }
 
-cProcessStep::cProcessStep(const int id, const QString& text, QGraphicsItem* parent) : cProcessStep(id, parent) //cConnectedItem(id, parent)
+cProcessStep::cProcessStep(const int id, eExperimentType exp_type, const QString& text, QGraphicsItem* parent) : cProcessStep(id, exp_type, parent) //cConnectedItem(id, parent)
 {
 	mTitle = text;
 
@@ -661,9 +677,24 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	connect(&beforeMovement, &QAction::triggered, this, &cProcessStep::onInsertBefore_Movement);
 	beforeMenu->addAction(&beforeMovement);
 
-	QAction beforeCommand("HySpex Command");
-	connect(&beforeCommand, &QAction::triggered, this, &cProcessStep::onInsertBefore_HySpexCommand);
-	beforeMenu->addAction(&beforeCommand);
+	QAction beforeMarker("Marker");
+	connect(&beforeMarker, &QAction::triggered, this, &cProcessStep::onInsertBefore_Marker);
+	beforeMenu->addAction(&beforeMarker);
+
+	beforeMenu->addSeparator();
+
+	QAction beforeReference("Reference Point");
+	connect(&beforeReference, &QAction::triggered, this, &cProcessStep::onInsertBefore_ReferencePoint);
+	beforeMenu->addAction(&beforeReference);
+
+	if ((mExperimentType == eExperimentType::UNKNOWN) || (mExperimentType == eExperimentType::HYPERSPECTRAL))
+	{
+		beforeMenu->addSeparator();
+
+		QAction beforeCommand("HySpex Command");
+		connect(&beforeCommand, &QAction::triggered, this, &cProcessStep::onInsertBefore_HySpexCommand);
+		beforeMenu->addAction(&beforeCommand);
+	}
 
 	QMenu* afterMenu = contextMenu.addMenu(tr("Insert Step After..."));
 
@@ -679,9 +710,24 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	connect(&afterMovement, &QAction::triggered, this, &cProcessStep::onInsertAfter_Movement);
 	afterMenu->addAction(&afterMovement);
 
-	QAction afterCommand("HySpex Command");
-	connect(&afterCommand, &QAction::triggered, this, &cProcessStep::onInsertAfter_HySpexCommand);
-	afterMenu->addAction(&afterCommand);
+	QAction afterMarker("Marker");
+	connect(&afterMarker, &QAction::triggered, this, &cProcessStep::onInsertAfter_Marker);
+	afterMenu->addAction(&afterMarker);
+
+	afterMenu->addSeparator();
+
+	QAction afterReference("Reference Point");
+	connect(&afterReference, &QAction::triggered, this, &cProcessStep::onInsertAfter_ReferencePoint);
+	afterMenu->addAction(&afterReference);
+
+	if ((mExperimentType == eExperimentType::UNKNOWN) || (mExperimentType == eExperimentType::HYPERSPECTRAL))
+	{
+		afterMenu->addSeparator();
+
+		QAction afterCommand("HySpex Command");
+		connect(&afterCommand, &QAction::triggered, this, &cProcessStep::onInsertAfter_HySpexCommand);
+		afterMenu->addAction(&afterCommand);
+	}
 
 	contextMenu.addSeparator();
 
@@ -705,6 +751,11 @@ void cProcessStep::onInsertBefore_Pause()
 void cProcessStep::onInsertBefore_Movement()
 {
 	emit insertBefore(getID(), eMeasurementStep::movement);
+}
+
+void cProcessStep::onInsertBefore_Marker()
+{
+	emit insertBefore(getID(), eMeasurementStep::marker);
 }
 
 void cProcessStep::onInsertBefore_HySpexCommand()
@@ -732,6 +783,11 @@ void cProcessStep::onInsertAfter_Movement()
 	emit insertAfter(getID(), eMeasurementStep::movement);
 }
 
+void cProcessStep::onInsertAfter_Marker()
+{
+	emit insertAfter(getID(), eMeasurementStep::marker);
+}
+
 void cProcessStep::onInsertAfter_HySpexCommand()
 {
 	emit insertAfter(getID(), eMeasurementStep::hyspex_command);
@@ -754,7 +810,7 @@ void cProcessStep::onDeleteStep()
  *
  ********************************************************************/
 
-cIoStep::cIoStep(const int id, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
+cIoStep::cIoStep(const int id, eExperimentType exp_type, QGraphicsItem* parent) : cBaseStep(id, exp_type, parent) //cConnectedItem(id, parent)
 {
 	mTop.setY(-mScale * mBoxHeight / 2);
 	mBottom.setY(mScale * mBoxHeight / 2);
@@ -770,7 +826,7 @@ cIoStep::cIoStep(const int id, QGraphicsItem* parent) : cBaseStep(id, parent) //
 	mHighlightBrush.setStyle(mHightlightStyle);
 }
 
-cIoStep::cIoStep(const int id, const QString& text, QGraphicsItem* parent) : cBaseStep(id, parent) //cConnectedItem(id, parent)
+cIoStep::cIoStep(const int id, eExperimentType exp_type, const QString& text, QGraphicsItem* parent) : cBaseStep(id, exp_type, parent) //cConnectedItem(id, parent)
 {
 	setTitle(text);
 
@@ -1073,9 +1129,29 @@ void cIoStep::onInsertBefore_Delay()
 	emit insertBefore(getID(), eMeasurementStep::delay);
 }
 
+void cIoStep::onInsertBefore_Pause()
+{
+	emit insertBefore(getID(), eMeasurementStep::pause);
+}
+
 void cIoStep::onInsertBefore_Movement()
 {
 	emit insertBefore(getID(), eMeasurementStep::movement);
+}
+
+void cIoStep::onInsertBefore_Marker()
+{
+	emit insertBefore(getID(), eMeasurementStep::marker);
+}
+
+void cIoStep::onInsertBefore_HySpexCommand()
+{
+	emit insertBefore(getID(), eMeasurementStep::hyspex_command);
+}
+
+void cIoStep::onInsertBefore_ReferencePoint()
+{
+	emit insertBefore(getID(), eMeasurementStep::reference_point);
 }
 
 void cIoStep::onInsertAfter_Delay()
@@ -1083,9 +1159,29 @@ void cIoStep::onInsertAfter_Delay()
 	emit insertAfter(getID(), eMeasurementStep::delay);
 }
 
+void cIoStep::onInsertAfter_Pause()
+{
+	emit insertAfter(getID(), eMeasurementStep::pause);
+}
+
 void cIoStep::onInsertAfter_Movement()
 {
 	emit insertAfter(getID(), eMeasurementStep::movement);
+}
+
+void cIoStep::onInsertAfter_Marker()
+{
+	emit insertAfter(getID(), eMeasurementStep::marker);
+}
+
+void cIoStep::onInsertAfter_HySpexCommand()
+{
+	emit insertAfter(getID(), eMeasurementStep::hyspex_command);
+}
+
+void cIoStep::onInsertAfter_ReferencePoint()
+{
+	emit insertAfter(getID(), eMeasurementStep::reference_point);
 }
 
 void cIoStep::onDeleteStep()

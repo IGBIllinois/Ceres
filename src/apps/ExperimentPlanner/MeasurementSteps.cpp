@@ -4,6 +4,7 @@
 
 #include "DelayStepInfoDlg.hpp"
 #include "MovementStepInfoDlg.hpp"
+#include "MarkerInfoDlg.hpp"
 
 #include "Constants.hpp"
 
@@ -77,9 +78,9 @@ void cMeasurementStep_Include::setDefaultPath(const std::string& path)
 	mDefaultPath = path;
 }
 
-cBaseStep* cMeasurementStep_Include::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_Include::graphicsItem(const int id, eExperimentType exp_type) const
 {
-	auto step = new cProcessStep(id);
+	auto step = new cProcessStep(id, exp_type);
 	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_Include::onEdit);
 	connect(this, &cMeasurementStep_Include::onDescriptionChange, step, &cProcessStep::setSubHeading1);
 
@@ -171,9 +172,9 @@ void cMeasurementStep_Delay::setRecording(bool recording)
 }
 
 //cConnectedItem* cExperimentStep_Delay::graphicsItem(const int id) const
-cBaseStep* cMeasurementStep_Delay::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_Delay::graphicsItem(const int id, eExperimentType exp_type) const
 {
-	auto step = new cProcessStep(id);
+	auto step = new cProcessStep(id, exp_type);
 	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_Delay::onEdit);
 	connect(this, &cMeasurementStep_Delay::onDescriptionChange, step, &cProcessStep::setSubHeading1);
 	connect(this, &cMeasurementStep_Delay::onCommentChange, step, &cProcessStep::setSubHeading2);
@@ -354,9 +355,9 @@ QString cMeasurementStep_Delay::generateComment() const
  ********************************************************************/
 
 //cConnectedItem* cMeasurementStep_Pause::graphicsItem(const int id) const
-cBaseStep* cMeasurementStep_Pause::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_Pause::graphicsItem(const int id, eExperimentType exp_type) const
 {
-	auto step = new cIoStep(id);
+	auto step = new cIoStep(id, exp_type);
 	step->setReadOnly(true);
 	step->setTitle("Wait for User OK to Advance...");
 
@@ -447,9 +448,9 @@ void cMeasurementStep_Movement::setRecording(bool recording)
 }
 
 //cConnectedItem* cExperimentStep_Movement::graphicsItem(const int id) const
-cBaseStep* cMeasurementStep_Movement::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_Movement::graphicsItem(const int id, eExperimentType exp_type) const
 {
-	auto step = new cProcessStep(id);
+	auto step = new cProcessStep(id, exp_type);
 	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_Movement::onEdit);
 	connect(this, &cMeasurementStep_Movement::onMovementTextChange, step, &cProcessStep::setSubHeading1);
 	connect(this, &cMeasurementStep_Movement::onOrientationTextChange, step, &cProcessStep::setSubHeading2);
@@ -798,10 +799,41 @@ QString cMeasurementStep_Movement::generateComment() const
  *
  ********************************************************************/
 
-cBaseStep* cMeasurementStep_Marker::graphicsItem(const int id) const
+const cMeasurementStep_Marker::eMarkerType cMeasurementStep_Marker::getMarkerType() const
 {
-	auto step = new cProcessStep(id);
+	return mMarkerType;
+}
+
+const std::string cMeasurementStep_Marker::getMarkerLabel() const
+{
+	if (mMarkerType == eMarkerType::CUSTOM)
+		return mMarkerLabel;
+
+	return std::string();
+}
+
+void cMeasurementStep_Marker::setMarkerType(eMarkerType marker_type)
+{
+	mDirty |= mMarkerType != marker_type;
+	mMarkerType = marker_type;
+}
+
+void cMeasurementStep_Marker::setMarkerLabel(const std::string& marker_label)
+{
+	mDirty |= mMarkerLabel != marker_label;
+	mMarkerLabel = marker_label;
+}
+
+cBaseStep* cMeasurementStep_Marker::graphicsItem(const int id, eExperimentType exp_type) const
+{
+	auto step = new cProcessStep(id, exp_type);
+	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_Marker::onEdit);
+	connect(this, &cMeasurementStep_Marker::onMarkerTypeTextChange, step, &cProcessStep::setSubHeading1);
+
 	step->setTitle("Marker");
+
+	auto description = generateDescription();
+	step->setSubHeading1(description);
 
 	return step;
 }
@@ -811,20 +843,116 @@ void cMeasurementStep_Marker::load(const nlohmann::json& jdoc)
 	using namespace nlohmann;
 
 	if (jdoc.contains("marker type"))
+	{
 		std::string marker_type = jdoc["marker type"];
-
+		if (marker_type == "start position")
+			mMarkerType = eMarkerType::START_OF_MEASUREMENT;
+		else if (marker_type == "end position")
+			mMarkerType = eMarkerType::END_OF_MEASUREMENT;
+		else
+		{
+			mMarkerType = eMarkerType::CUSTOM;
+			mMarkerLabel = marker_type;
+		}
+	}
 }
 
 nlohmann::json cMeasurementStep_Marker::save()
 {
 	nlohmann::json entry;
 
+	if ((mMarkerType == eMarkerType::CUSTOM) && mMarkerLabel.empty())
+		return entry;
+
 	entry["type"] = "marker";
+
+	switch (mMarkerType)
+	{
+	case eMarkerType::START_OF_MEASUREMENT:
+		entry["marker type"] = "start position";
+		break;
+	case eMarkerType::END_OF_MEASUREMENT:
+		entry["marker type"] = "end position";
+		break;
+	case eMarkerType::CUSTOM:
+	default:
+		entry["marker type"] = mMarkerLabel;
+		break;
+	}
 
 	mDirty = false;
 
 	return entry;
 }
 
+bool cMeasurementStep_Marker::onEdit()
+{
+	cMarkerInfoDlg dlg;
+
+	switch (mMarkerType)
+	{
+	case eMarkerType::START_OF_MEASUREMENT:
+		dlg.setType(cMarkerInfoDlg::START_OF_MEASUREMENT);
+		break;
+	case eMarkerType::END_OF_MEASUREMENT:
+		dlg.setType(cMarkerInfoDlg::END_OF_MEASUREMENT);
+		break;
+	case eMarkerType::CUSTOM:
+	default:
+		dlg.setType(cMarkerInfoDlg::CUSTOM);
+		break;
+	}
+
+	dlg.setLabel(mMarkerLabel);
+
+	auto result = dlg.exec();
+
+	if (result == QDialog::Rejected)
+		return false;
+
+	switch (dlg.type())
+	{
+	case cMarkerInfoDlg::START_OF_MEASUREMENT:
+		setMarkerType(eMarkerType::START_OF_MEASUREMENT);
+		break;
+	case cMarkerInfoDlg::END_OF_MEASUREMENT:
+		setMarkerType(eMarkerType::END_OF_MEASUREMENT);
+		break;
+	case cMarkerInfoDlg::CUSTOM:
+	default:
+		setMarkerType(eMarkerType::CUSTOM);
+		setMarkerLabel(dlg.label());
+		break;
+	}
+
+	if (isDirty())
+	{
+		auto description = generateDescription();
+		emit onMarkerTypeTextChange(description);
+
+		emit redraw();
+	}
+
+	return true;
+}
+
+QString cMeasurementStep_Marker::generateDescription() const
+{
+	switch (mMarkerType)
+	{
+	case eMarkerType::START_OF_MEASUREMENT:
+		return "Start Position";
+		break;
+	case eMarkerType::END_OF_MEASUREMENT:
+		return "End Position";
+		break;
+	case eMarkerType::CUSTOM:
+	default:
+		return QString::fromStdString(mMarkerLabel);
+		break;
+	}
+
+	return QString();
+}
 
 

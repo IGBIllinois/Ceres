@@ -514,7 +514,7 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 			nStringUtils::replaceIntAtEnd(title, startNum++);
 
 		pInfo->setMeasurementName(title);
-		pInfo->setExperimentType(cExperimentFile::eExperimentType::HYPERSPECTRAL);
+		pInfo->setExperimentType(eExperimentType::HYPERSPECTRAL);
 		pInfo->setMetaData(mMetaInfo);
 		pInfo->setController(copy(mCtrlInfo));
 		pInfo->setSensors(mSensorInfo);

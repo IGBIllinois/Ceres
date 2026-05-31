@@ -115,20 +115,20 @@ void cExperimentDesignMdiChild::saveAs()
 
     switch (mMeasurementFile.getExperimentType())
     {
-    case cExperimentFile::eExperimentType::HYPERSPECTRAL:
+    case eExperimentType::HYPERSPECTRAL:
         defaultDirectory += "/Hyperspectral";
         break;
-    case cExperimentFile::eExperimentType::LIDAR:
+    case eExperimentType::LIDAR:
         defaultDirectory += "/LiDAR";
         break;
-    case cExperimentFile::eExperimentType::THERMAL:
+    case eExperimentType::THERMAL:
         defaultDirectory += "/Thermal";
         break;
-    case cExperimentFile::eExperimentType::TOF:
+    case eExperimentType::TOF:
         defaultDirectory += "/Time_of_Flight";
         break;
     default:
-    case cExperimentFile::eExperimentType::UNKNOWN:
+    case eExperimentType::UNKNOWN:
         break;
     }
 
@@ -593,6 +593,16 @@ void cExperimentDesignMdiChild::onInsertStepBefore(int id, int type)
     case eMeasurementStep::reference_point:
     {
         std::unique_ptr<cMeasurementStep_ReferencePoint> step = std::make_unique<cMeasurementStep_ReferencePoint>();
+        if (!step->onEdit())
+        {
+            return;
+        }
+        mMeasurementFile.insertBefore(id, std::move(step));
+        break;
+    }
+    case eMeasurementStep::marker:
+    {
+        std::unique_ptr<cMeasurementStep_Marker> step = std::make_unique<cMeasurementStep_Marker>();
         if (!step->onEdit())
         {
             return;

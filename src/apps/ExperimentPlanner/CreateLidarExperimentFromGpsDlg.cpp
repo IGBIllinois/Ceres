@@ -488,7 +488,7 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 
 		pInfo->setMeasurementName(mMeasurementTitle);
 		pInfo->setExperimentName(mExperimentTitle);
-		pInfo->setExperimentType(cExperimentFile::eExperimentType::LIDAR);
+		pInfo->setExperimentType(eExperimentType::LIDAR);
 		pInfo->setMetaData(mMetaInfo);
 		pInfo->setController(copy(mCtrlInfo));
 		pInfo->setSensors(mSensorInfo);
@@ -508,7 +508,6 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 			step->setY_mm(y1_mm);
 			step->setSpeed_mmps(travel_speed_mmps);
 			pInfo->appendStep(std::move(step));
-
 
 			// Move the dolly to measurement height...
 			step = std::make_unique<cMeasurementStep_Movement>();
@@ -681,6 +680,10 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 
 			}
 
+			auto marker = std::make_unique<cMeasurementStep_Marker>();
+			marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::START_OF_MEASUREMENT);
+			pInfo->appendStep(std::move(marker));
+
 			// Do measurement...
 			step = std::make_unique<cMeasurementStep_Movement>();
 			step->setX_mm(x_mm);
@@ -695,6 +698,10 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 			step->setSpeed_mmps(scan_speed_mmps);
 			step->setRecording(true);
 			pInfo->appendStep(std::move(step));
+
+			marker = std::make_unique<cMeasurementStep_Marker>();
+			marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::END_OF_MEASUREMENT);
+			pInfo->appendStep(std::move(marker));
 
 			delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 

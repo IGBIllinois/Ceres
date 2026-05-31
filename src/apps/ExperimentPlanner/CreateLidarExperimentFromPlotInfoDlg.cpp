@@ -470,7 +470,7 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 
 	pInfo->setMeasurementName(mMeasurementTitle);
 	pInfo->setExperimentName(mExperimentTitle);
-	pInfo->setExperimentType(cExperimentFile::eExperimentType::LIDAR);
+	pInfo->setExperimentType(eExperimentType::LIDAR);
 	pInfo->setMetaData(mMetaInfo);
 	pInfo->setController(copy(mCtrlInfo));
 	pInfo->setSensors(mSensorInfo);

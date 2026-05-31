@@ -21,6 +21,8 @@ cExperimentDesignWidget::cExperimentDesignWidget(QWidget *parent)
     mAntialiased = false;
     mTransformed = false;
 
+    mExperimentType = eExperimentType::UNKNOWN;
+
     setScene(&mScene);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -38,10 +40,12 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
 
     emit clearPaths();
 
+    mExperimentType = experiment.getExperimentType();
+
     cTerminal* start = new cStartTerminal();
     mScene.addItem(start);
 
-    cFlowArrow* arrow = new cFlowArrow(0);
+    cFlowArrow* arrow = new cFlowArrow(0, mExperimentType);
     connect(arrow, &cFlowArrow::insertBefore, this, &cExperimentDesignWidget::insertBefore);
     arrow->setTopPoint(start->getBottomPoint());
     mScene.addItem(arrow);
@@ -55,7 +59,7 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
     {
         connect(step.get(), &cMeasurementStep::redraw, this, &cExperimentDesignWidget::stepUpdated);
 
-        auto item = step->graphicsItem(id);
+        auto item = step->graphicsItem(id, mExperimentType);
         connect(item, &cBaseStep::insertBefore, this, &cExperimentDesignWidget::insertBefore);
         connect(item, &cBaseStep::insertAfter, this, &cExperimentDesignWidget::insertAfter);
         connect(item, &cBaseStep::deleteStep, this, &cExperimentDesignWidget::deleteStep);
@@ -87,7 +91,7 @@ void cExperimentDesignWidget::loadExperiment(const cExperimentFile& experiment)
         }
 
         ++id;
-        arrow = new cFlowArrow(id);
+        arrow = new cFlowArrow(id, mExperimentType);
         connect(arrow, &cFlowArrow::insertBefore, this, &cExperimentDesignWidget::insertBefore);
         arrow->setTopPoint(item->getBottomPoint());
         mScene.addItem(arrow);

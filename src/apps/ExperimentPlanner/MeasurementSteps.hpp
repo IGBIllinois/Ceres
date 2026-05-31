@@ -19,11 +19,13 @@ class cExperimentFile;
 class cConnectedItem;
 class cBaseStep;
 class cMeasurementStep;
+enum class eExperimentType;
 
 namespace basic
 {
 	std::shared_ptr<cMeasurementStep> create_step(const std::string& type);
 }
+
 
 class cMeasurementStep : public QObject
 {
@@ -35,7 +37,7 @@ public:
 
 	bool isDirty() const;
 
-	virtual cBaseStep* graphicsItem(const int id) const = 0;
+	virtual cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const = 0;
 //	virtual cConnectedItem* graphicsItem(const int id) const = 0;
 
 signals:
@@ -69,7 +71,7 @@ public:
 
 	void setDefaultPath(const std::string& path);
 
-	cBaseStep* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
 signals:
 	void onDescriptionChange(const QString& desc);
@@ -111,7 +113,7 @@ public:
 
 	void setRecording(bool recording);
 
-	cBaseStep* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
 signals:
 	void onDescriptionChange(const QString& desc);
@@ -145,7 +147,7 @@ class cMeasurementStep_Pause : public cMeasurementStep
 public:
 	cMeasurementStep_Pause() = default;
 
-	cBaseStep* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
@@ -186,7 +188,7 @@ public:
 
 	void setRecording(bool recording);
 
-	cBaseStep* graphicsItem(const int id) const override;
+	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
 signals:
 	void onMovementTextChange(const QString& desc);
@@ -230,13 +232,35 @@ class cMeasurementStep_Marker : public cMeasurementStep
 	Q_OBJECT
 
 public:
+	enum class eMarkerType {CUSTOM, START_OF_MEASUREMENT, END_OF_MEASUREMENT};
+
+public:
 	cMeasurementStep_Marker() = default;
 
-	cBaseStep* graphicsItem(const int id) const override;
+	const eMarkerType getMarkerType() const;
+	const std::string getMarkerLabel() const;
+
+	void setMarkerType(eMarkerType marker_type);
+	void setMarkerLabel(const std::string& marker_label);
+
+	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
+
+signals:
+	void onMarkerTypeTextChange(const QString& desc);
+
+public slots:
+	bool onEdit();
+
+private:
+	QString generateDescription() const;
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
 	nlohmann::json save() override;
+
+private:
+	eMarkerType mMarkerType = eMarkerType::CUSTOM;
+	std::string mMarkerLabel;
 };
 
 

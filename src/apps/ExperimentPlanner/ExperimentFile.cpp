@@ -84,7 +84,7 @@ void cExperimentFile::setMeasurementName(const std::string& name)
 	mMeasurementName = name;
 }
 
-const cExperimentFile::eExperimentType cExperimentFile::getExperimentType() const
+const eExperimentType cExperimentFile::getExperimentType() const
 {
 	return mExperimentType;
 }
@@ -217,6 +217,8 @@ void cExperimentFile::open(const std::string& file_name)
 			mExperimentType = eExperimentType::HYPERSPECTRAL;
 		else if (type == "time-of-flight")
 			mExperimentType = eExperimentType::TOF;
+		else if (type == "thermal")
+			mExperimentType = eExperimentType::THERMAL;
 		else
 			mExperimentType = eExperimentType::UNKNOWN;
 	}

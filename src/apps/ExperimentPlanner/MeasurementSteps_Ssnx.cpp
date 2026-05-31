@@ -64,9 +64,9 @@ void cMeasurementStep_ReferencePoint::setErrorThreshold_mm(int threshold_mm)
 	mErrorThreshold_mm = threshold_mm;
 }
 
-cBaseStep* cMeasurementStep_ReferencePoint::graphicsItem(const int id) const
+cBaseStep* cMeasurementStep_ReferencePoint::graphicsItem(const int id, eExperimentType exp_type) const
 {
-	auto step = new cProcessStep(id);
+	auto step = new cProcessStep(id, exp_type);
 	connect(step, &cProcessStep::editStep, this, &cMeasurementStep_ReferencePoint::onEdit);
 	connect(this, &cMeasurementStep_ReferencePoint::onDescriptionChange, step, &cProcessStep::setSubHeading1);
 	connect(this, &cMeasurementStep_ReferencePoint::onCommentChange, step, &cProcessStep::setSubHeading2);
