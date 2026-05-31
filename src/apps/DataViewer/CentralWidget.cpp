@@ -396,6 +396,10 @@ void cCentralWidget::onBeginCommentList() {}
 void cCentralWidget::onEndOfCommentList() {}
 void cCentralWidget::onComment(const std::string& comments) {}
 
+void cCentralWidget::onBeginCustomInfoList() {}
+void cCentralWidget::onEndOfCustomInfoList() {}
+void cCentralWidget::onCustomInfo(const std::string& tag, const std::string& info) {}
+
 void cCentralWidget::onFileDate(std::uint16_t year, std::uint8_t month, std::uint8_t day) {};
 void cCentralWidget::onFileTime(std::uint8_t hour, std::uint8_t minute, std::uint8_t seconds) {};
 void cCentralWidget::onDayOfYear(std::uint16_t day_of_year) {};
