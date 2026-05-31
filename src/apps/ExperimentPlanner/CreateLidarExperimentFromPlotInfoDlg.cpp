@@ -580,6 +580,11 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 		reference->setErrorThreshold_mm(errorThreshold_mm);
 		pInfo->appendStep(std::move(reference));
 
+		// Mark starting position
+		auto marker = std::make_unique<cMeasurementStep_Marker>();
+		marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::START_OF_MEASUREMENT);
+		pInfo->appendStep(std::move(marker));
+
 		// Do measurement...
 		step = std::make_unique<cMeasurementStep_Movement>();
 		step->setX_mm(x2_mm);
@@ -594,6 +599,11 @@ bool cCreateLidarExperimentFromPlotInfoDlg::generate()
 		step->setSpeed_mmps(scan_speed_mmps);
 		step->setRecording(true);
 		pInfo->appendStep(std::move(step));
+
+		// Mark ending position
+		marker = std::make_unique<cMeasurementStep_Marker>();
+		marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::END_OF_MEASUREMENT);
+		pInfo->appendStep(std::move(marker));
 
 		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 

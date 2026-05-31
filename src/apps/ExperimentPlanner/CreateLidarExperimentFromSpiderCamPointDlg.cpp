@@ -496,6 +496,10 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 					x_mm = x2_mm + end_offset_mm;
 			}
 
+			auto marker = std::make_unique<cMeasurementStep_Marker>();
+			marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::START_OF_MEASUREMENT);
+			pInfo->appendStep(std::move(marker));
+
 			// Do measurement...
 			step = std::make_unique<cMeasurementStep_Movement>();
 			step->setX_mm(x_mm);
@@ -510,6 +514,11 @@ bool cCreateLidarExperimentFromSpiderCamDlg::generate()
 			step->setSpeed_mmps(scan_speed_mmps);
 			step->setRecording(true);
 			pInfo->appendStep(std::move(step));
+
+
+			marker = std::make_unique<cMeasurementStep_Marker>();
+			marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::END_OF_MEASUREMENT);
+			pInfo->appendStep(std::move(marker));
 
 			delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
 

@@ -741,6 +741,11 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 						x_mm += scan_distance_mm;
 				}
 
+				// Mark starting position
+				auto marker = std::make_unique<cMeasurementStep_Marker>();
+				marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::START_OF_MEASUREMENT);
+				pInfo->appendStep(std::move(marker));
+
 				// Do measurement...
 				step = std::make_unique<cMeasurementStep_Movement>();
 				step->setX_mm(x_mm);
@@ -759,6 +764,11 @@ bool cCreateHyperspectralExperimentFromGpsDlg::generate()
 				step->setSpeed_mmps(scan_speed_mmps);
 				step->setRecording(true);
 				pInfo->appendStep(std::move(step));
+
+				// Mark ending position
+				marker = std::make_unique<cMeasurementStep_Marker>();
+				marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::END_OF_MEASUREMENT);
+				pInfo->appendStep(std::move(marker));
 
 				// Advance to the next measurement...
 				if (std::abs(dx_mm) < 500)

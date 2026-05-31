@@ -655,6 +655,11 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 			step->setRecording(false);
 			pInfo->appendStep(std::move(step));
 
+			// Mark starting position
+			auto marker = std::make_unique<cMeasurementStep_Marker>();
+			marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::START_OF_MEASUREMENT);
+			pInfo->appendStep(std::move(marker));
+
 			// Do measurement...
 			step = std::make_unique<cMeasurementStep_Movement>();
 			step->setX_mm(it->x2_mm);
@@ -677,6 +682,11 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 			step->setSpeed_mmps(scan_speed_mmps);
 			step->setRecording(true);
 			pInfo->appendStep(std::move(step));
+
+			// Mark ending position
+			auto marker = std::make_unique<cMeasurementStep_Marker>();
+			marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::END_OF_MEASUREMENT);
+			pInfo->appendStep(std::move(marker));
 		}
 
 		delay_sec = mpEndMeasurementDelay_sec->text().toFloat();
