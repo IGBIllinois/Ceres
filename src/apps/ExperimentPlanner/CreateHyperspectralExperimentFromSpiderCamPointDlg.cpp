@@ -684,7 +684,7 @@ bool cCreateHyperspectralExperimentFromSpiderCamDlg::generate()
 			pInfo->appendStep(std::move(step));
 
 			// Mark ending position
-			auto marker = std::make_unique<cMeasurementStep_Marker>();
+			marker = std::make_unique<cMeasurementStep_Marker>();
 			marker->setMarkerType(cMeasurementStep_Marker::eMarkerType::END_OF_MEASUREMENT);
 			pInfo->appendStep(std::move(marker));
 		}
