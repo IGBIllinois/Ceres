@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 
 class cExperimentMetaInfo
@@ -42,6 +43,9 @@ public:
 	const std::string& getAuthorization() const;
 	const std::string& getPermitInfo() const;
 
+	bool hasCustomInfo() const;
+	std::vector<std::string> customInfoTags() const;
+	std::string customInfo(const std::string& tag) const;
 
 	void setPrincipalInvestigator(const std::string& pi);
 	void setResearchers(const std::vector<std::string>& researchers);
@@ -65,6 +69,8 @@ public:
 
 	void setPermitInfo(const std::string& permit);
 	void setPermitInfo(const std::string& authorization, const std::string& permit);
+
+	void setCustomInfo(const std::string& tag, const std::string& info);
 
 	bool operator!=(const cExperimentMetaInfo& rhs) const;
 
@@ -97,6 +103,8 @@ private:
 
 	std::string mAuthorization;
 	std::string mPermit;
+
+	std::map<std::string, std::string> mCustomInfo;
 
 	friend class cExperimentFile;
 };

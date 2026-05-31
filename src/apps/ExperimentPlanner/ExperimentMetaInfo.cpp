@@ -52,6 +52,8 @@ void cExperimentMetaInfo::clear()
 
 	mAuthorization.clear();
     mPermit.clear();
+
+    mCustomInfo.clear();
 }
 
 bool cExperimentMetaInfo::isDirty() const
@@ -162,6 +164,39 @@ const std::string& cExperimentMetaInfo::getPermitInfo() const
 	return mPermit;
 }
 
+bool cExperimentMetaInfo::hasCustomInfo() const
+{
+    return !mCustomInfo.empty();
+}
+
+std::vector<std::string> cExperimentMetaInfo::customInfoTags() const
+{
+    if (mCustomInfo.empty())
+        return std::vector<std::string>();
+
+    std::vector<std::string> tags;
+
+    for (const auto& pair : mCustomInfo)
+    {
+        tags.push_back(pair.first);
+    }
+
+    return tags;
+}
+
+std::string cExperimentMetaInfo::customInfo(const std::string& tag) const
+{
+    if (mCustomInfo.empty())
+        return std::string();
+
+    auto it = mCustomInfo.find(tag);
+
+    if (it == mCustomInfo.end())
+        return std::string();
+
+    return it->second;
+}
+
 
 void cExperimentMetaInfo::setPrincipalInvestigator(const std::string& pi)
 {
@@ -267,6 +302,24 @@ void cExperimentMetaInfo::setPermitInfo(const std::string& authorization, const 
     mPermit = permit;
 }
 
+void cExperimentMetaInfo::setCustomInfo(const std::string& tag, const std::string& info)
+{
+    if (tag.empty() || info.empty())
+        return;
+
+    auto it = mCustomInfo.find(tag);
+
+    if (it == mCustomInfo.end())
+    {
+        mCustomInfo[tag] = info;
+        mDirty = true;
+        return;
+    }
+
+    mDirty |= it->second != info;
+    mCustomInfo[tag] = info;
+}
+
 bool cExperimentMetaInfo::operator!=(const cExperimentMetaInfo& rhs) const
 {
     return (mDirty != rhs.mDirty) ||
@@ -286,7 +339,8 @@ bool cExperimentMetaInfo::operator!=(const cExperimentMetaInfo& rhs) const
         (mTargetHarvestMonth != rhs.mTargetHarvestMonth) ||
         (mTargetHarvestYear != rhs.mTargetHarvestYear) ||
         (mAuthorization != rhs.mAuthorization) ||
-        (mPermit != rhs.mPermit);
+        (mPermit != rhs.mPermit) ||
+        (mCustomInfo != rhs.mCustomInfo);
 }
 
 
@@ -390,6 +444,18 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
         {
             for (auto it = comments.begin(); it != comments.end(); ++it)
                 mComments.push_back(*it);
+        }
+    }
+
+    if (jdoc.contains("custom_info"))
+    {
+        auto custom_info = jdoc["custom_info"];
+        if (custom_info.is_object())
+        {
+            for (auto it = custom_info.begin(); it != custom_info.end(); ++it)
+            {
+                mCustomInfo[it.key()] = it.value().get<std::string>();
+            }
         }
     }
 
@@ -524,6 +590,18 @@ void cExperimentMetaInfo::save(nlohmann::json& jdoc)
             comments.push_back(*it);
 
         jdoc["comments"] = comments;
+    }
+
+    if (mCustomInfo.size() > 0)
+    {
+        nlohmann::json custom_info;
+
+        for (const auto& pair : mCustomInfo)
+        {
+            custom_info[pair.first] = pair.second;
+        }
+
+        jdoc["custom_info"] = custom_info;
     }
 
     if ( !(mPlantingYear.empty() || mPlantingMonth.empty() || mPlantingDay.empty()))
