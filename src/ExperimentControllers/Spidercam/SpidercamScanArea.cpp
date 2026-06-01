@@ -122,8 +122,8 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mGreenway[1] = QPoint(88748, 94606);
 	mGreenway[2] = QPoint(0, 94606);
 	mGreenway[3] = QPoint(0, 102642);
-	mGreenway[4] = QPoint(200000, 102642);
-	mGreenway[5] = QPoint(200000, 94606);
+	mGreenway[4] = QPoint(190000, 102642);
+	mGreenway[5] = QPoint(190000, 94606);
 	mGreenway[6] = QPoint(98405, 94606);
 	mGreenway[7] = QPoint(98405, 0);
 	mGreenway[8] = mGreenway[0];
