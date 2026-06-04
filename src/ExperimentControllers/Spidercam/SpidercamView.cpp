@@ -2,6 +2,7 @@
 #include "SpidercamView.hpp"
 #include "../../Utilities/Constants.hpp"
 #include "ExperimentTypes.hpp"
+#include "../../Utilities/RappFieldBoundary.hpp"
 
 #include <QLayout>
 #include <QLineEdit>
@@ -83,6 +84,34 @@ void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 		mMaxY_mm = jsonCfg["max Y position (m)"] * M_TO_MM;
 		mMinHeight_mm = jsonCfg["min height (m)"] * M_TO_MM;
 		mMaxHeight_mm = jsonCfg["max height (m)"] * M_TO_MM;
+
+		if (jsonCfg.contains("markers"))
+		{
+			auto markers = jsonCfg["markers"];
+
+			for (const auto& marker : markers)
+			{
+				if (marker.contains("northing_ft") && marker.contains("easting_ft") && marker.contains("height_ft"))
+				{
+					std::string label = marker["label"];
+					double northing_ft = marker["northing_ft"];
+					double easting_ft = marker["easting_ft"];
+					double height_ft = marker["height_ft"];
+					rfm::rappPoint_t point = rfb::fromStatePlane(northing_ft, easting_ft, height_ft);
+					mpScanArea->addMarker(label, point.x_mm, point.y_mm, point.z_mm);
+				}
+				else if (marker.contains("lat_rad") && marker.contains("lng_rad") && marker.contains("height_m"))
+				{
+					std::string label = marker["label"];
+					double lat_rad = marker["lat_rad"];
+					double lng_rad = marker["lng_rad"];
+					double height_m = marker["height_m"];
+					rfm::rappPoint_t point = rfb::fromGPS(lat_rad, lng_rad, height_m);
+					mpScanArea->addMarker(label, point.x_mm, point.y_mm, point.z_mm);
+				}
+			}
+
+		}
 
 		if (jsonCfg.contains("layout"))
 		{

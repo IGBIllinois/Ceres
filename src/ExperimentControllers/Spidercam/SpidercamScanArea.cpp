@@ -128,6 +128,12 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mGreenway[7] = QPoint(98405, 0);
 	mGreenway[8] = mGreenway[0];
 
+	mRefColor.setRgb(59, 122, 87);	// Amazon Green
+	mRefPosition;
+	mRefPen;
+	mRefBrush;
+	mRefMarkerRadius;
+
 	mDollyMarkerRadius = 3;
 	mDollyColor.setRgb(0,0,255);
 	mDollyPen.setColor(mDollyColor);
@@ -257,6 +263,24 @@ void cSpidercamScanArea::updateBounds(double minX, double maxX, double minY, dou
 	mGreenway[6] = QPoint(98405, 94606);
 	mGreenway[7] = QPoint(98405, mMinY);
 	mGreenway[8] = mGreenway[0];
+}
+
+void cSpidercamScanArea::addMarker(std::string_view label, int x_mm, int y_mm, int z_mm)
+{
+	marker_t marker;
+
+	marker.id = mMarkers.size() + 1;
+	marker.label = QString::fromStdString(std::string(label));
+	marker.x_mm = x_mm;
+	marker.y_mm = y_mm;
+	marker.z_mm = z_mm;
+
+	mMarkers.push_back(marker);
+}
+
+void cSpidercamScanArea::removeMarkers()
+{
+	mMarkers.clear();
 }
 
 void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
@@ -630,6 +654,11 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		painter.drawText(QPoint(mX_Offset, mY_Offset - 3), QString("W4"));
 	}
 
+	for (auto& marker : mMarkers)
+	{
+		drawRefPoint(painter, window_height, marker);
+	}
+
 	for (auto& layout : mLayouts)
 	{
 		drawLayout(painter, window_height, layout);
@@ -647,14 +676,73 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 	drawPath(painter, window_height);
 }
 
+void cSpidercamScanArea::drawRefPoint(QPainter& painter, double height, const marker_t& marker)
+{
+	painter.save();
+
+	QString text = QString::number(marker.id);
+
+	int x = mX_Scale * (marker.x_mm - mMinX) + mX_Offset;
+	int y = mY_Scale * (marker.y_mm - mMinY) + mY_Offset;
+
+	QFont font = painter.font();
+	font.setPointSizeF(8);
+	painter.setFont(font);
+
+	QFontMetrics metrics(font);
+
+	QPoint textPoint = { 0,0 };
+
+	auto bounds = metrics.boundingRect("1");
+	auto textBounds = metrics.tightBoundingRect("1");
+	int halfWidth = textBounds.width() / 2;
+	int halfHeight = textBounds.height() / 2;
+	int deltaWidth = bounds.width() - textBounds.width();
+	int deltaHeigth = bounds.height() - textBounds.height();
+
+	int w = bounds.width();
+	int h = bounds.height();
+
+	y = height - y - h;
+
+	// Compute the text center point
+	QPoint textCenter = { 0,0 };
+
+	{
+		int cp = (w / 2);
+		int lp = halfWidth;
+		int x1 = x + (cp - lp);
+		textPoint.setX(x1);
+		textCenter.setX(x1 + bounds.width());
+	}
+
+	{
+		int cp = (h / 2);
+		int lp = 0;
+		int y1 = y + (cp - lp);
+		textPoint.setY(y1);
+		textCenter.setY(y1 - halfHeight);
+	}
+
+
+	painter.setPen(mRefPen);
+	painter.drawText(textPoint, text);
+
+	int r = 2 * std::min(textBounds.width(), textBounds.height());
+
+	painter.drawEllipse(textCenter, r, r);
+
+	painter.restore();
+}
+
 
 void cSpidercamScanArea::drawLayout(QPainter& painter, double height, experimentLayout_t& layout)
 {
 	painter.save();
 	painter.setPen(QPen(layout.color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-	int field_offset_x = layout.x_mm - mMinX;
-	int field_offset_y = layout.y_mm - mMinY;
+//	int field_offset_x = layout.x_mm - mMinX;
+//	int field_offset_y = layout.y_mm - mMinY;
 
 	int x = mX_Scale * (layout.x_mm - mMinX) + mX_Offset;
 	int y = mY_Scale * (layout.y_mm - mMinY) + mY_Offset;

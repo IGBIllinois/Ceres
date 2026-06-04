@@ -102,6 +102,9 @@ public:
 
     const std::vector<experimentLayout_t>& getLayouts() const;
 
+    void addMarker(std::string_view label, int x_mm, int y_mm, int z_mm);
+    void removeMarkers();
+
     std::tuple<int, int> toSpiderCamCoordinates(int window_x, int window_y);
 
 public slots:
@@ -143,6 +146,20 @@ private:
     path_t* mpActivePath;
 
 private:
+    struct marker_t
+    {
+        int id = 0;
+        QString  label;
+        uint32_t x_mm = 0;
+        uint32_t y_mm = 0;
+        uint32_t z_mm = 0;
+    };
+
+    std::vector<marker_t> mMarkers;
+
+    void drawRefPoint(QPainter& painter, double height, const marker_t& marker);
+
+private:
     std::vector<experimentLayout_t> mLayouts;
 
     void drawLayout(QPainter& painter, double height, experimentLayout_t& layout);
@@ -161,6 +178,13 @@ private:
     QColor mGreenwayColor;
     QBrush mGreenwayBrush;
     std::array<QPoint, 9> mGreenway;
+
+    // For drawing the reference position
+    QPoint mRefPosition;
+    QPen   mRefPen;
+    QBrush mRefBrush;
+    QColor mRefColor;
+    int    mRefMarkerRadius;
 
     // For drawing the dolly position
     bool   mShowDollyPosition = true;
