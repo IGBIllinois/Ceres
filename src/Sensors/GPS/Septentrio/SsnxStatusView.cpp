@@ -45,7 +45,7 @@ void cSsnxStatusView::createWidgets()
 
 	mpRtcmDatumValid = new QLedIndicator("RTCM Datum Valid", this);
 	mpWifiClientValid = new QLedIndicator("Wifi Client Valid", this);
-	mpNtripClientValid = new QLedIndicator("NTRIP Valid", this);
+	mpNtripClientValid = new QLedIndicator("NTRIP Client Info Valid", this);
 	mpReceiverStatusValid = new QLedIndicator("Receiver Status Valid", this);
 
 	mpRxErrorCongestion = new QLedIndicator("Congestion", this);
@@ -237,7 +237,7 @@ void cSsnxStatusView::doLayout()
 	statusLayout->addWidget(wifiBox);
 	statusLayout->addSpacing(5);
 
-	QGroupBox* ntripBox = new QGroupBox("NTRIP Information");
+	QGroupBox* ntripBox = new QGroupBox("NTRIP Client Information");
 
 	auto* ntripLayout = new QGridLayout();
 

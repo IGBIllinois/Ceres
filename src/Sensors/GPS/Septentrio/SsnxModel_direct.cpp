@@ -63,6 +63,20 @@ void cSsnxModel_direct::updateViews()
 
 bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
 {
+    if (jsonCfg.contains("antenna_offset"))
+    {
+        auto antenna_offset = jsonCfg["antenna_offset"];
+
+        if (antenna_offset.contains("x_mm (south is +)"))
+            mAntennaOffset.x_mm = antenna_offset["x_mm (south is +)"];
+
+        if (antenna_offset.contains("y_mm (east is +)"))
+            mAntennaOffset.y_mm = antenna_offset["y_mm (east is +)"];
+
+        if (antenna_offset.contains("z_mm (up is +)"))
+            mAntennaOffset.z_mm = antenna_offset["z_mm (up is +)"];
+    }
+
     emit statusMessage("Connecting to SSNX GPS receiver...");
 
     std::string portname;
@@ -103,7 +117,6 @@ bool cSsnxModel_direct::configure(const nlohmann::json& jsonCfg)
     }
 
     auto result = cSsnxModel::configure(jsonCfg);
-
 
     return result;
 }
@@ -377,9 +390,9 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     auto pos = rfb::fromGPS(mLatitude_rad, mLongitude_rad, height_m);
 
     // Adjust position here due to antenna offset on dolly
-    //pos.x_mm + or - ???;
-    //pos.y_mm + or - ???;
-    pos.z_mm -= 400;
+    pos.x_mm -= mAntennaOffset.x_mm;
+    pos.y_mm -= mAntennaOffset.y_mm;
+    pos.z_mm -= mAntennaOffset.z_mm;
 
     emit positionChanged(pos.x_mm, pos.y_mm, pos.z_mm);
 
