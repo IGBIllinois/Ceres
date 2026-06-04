@@ -22,25 +22,25 @@ namespace
 		rfm::planePoint_t(1236468.156, 1019912.027, 710.853),
 		rfm::planePoint_t(1237093.252, 1019911.889, 710.752) };
 
-	constexpr double mUIUC_ReferenceElevation_ft = 708.045;
-	constexpr double mUIUC_ReferenceElevation_m = mUIUC_ReferenceElevation_ft * nConstants::FT_TO_M;
+	constexpr double mUIUC_ReferenceHeight_ft = 708.045;
+	constexpr double mUIUC_ReferenceHeight_m = mUIUC_ReferenceHeight_ft * nConstants::FT_TO_M;
 
 	const std::array<rfm::rappPoint_t, 4> mRappTowerLocations = {
 		rfm::rappPoint_t(0, 
 			0, 
-			static_cast<std::int32_t>((mUIUC_TowerLocations[0].elevation_ft - mUIUC_ReferenceElevation_ft) * nConstants::FT_TO_MM)),
+			static_cast<std::int32_t>((mUIUC_TowerLocations[0].elevation_ft - mUIUC_ReferenceHeight_ft) * nConstants::FT_TO_MM)),
 
 		rfm::rappPoint_t(static_cast<std::int32_t>((mUIUC_TowerLocations[0].northing_ft - mUIUC_TowerLocations[1].northing_ft) * nConstants::FT_TO_MM),
 			static_cast<std::int32_t>((mUIUC_TowerLocations[1].easting_ft - mUIUC_TowerLocations[0].easting_ft) * nConstants::FT_TO_MM),
-			static_cast<std::int32_t>((mUIUC_TowerLocations[1].elevation_ft - mUIUC_ReferenceElevation_ft) * nConstants::FT_TO_MM)),
+			static_cast<std::int32_t>((mUIUC_TowerLocations[1].elevation_ft - mUIUC_ReferenceHeight_ft) * nConstants::FT_TO_MM)),
 
 		rfm::rappPoint_t(static_cast<std::int32_t>((mUIUC_TowerLocations[0].northing_ft - mUIUC_TowerLocations[2].northing_ft) * nConstants::FT_TO_MM),
 			static_cast<std::int32_t>((mUIUC_TowerLocations[2].easting_ft - mUIUC_TowerLocations[0].easting_ft) * nConstants::FT_TO_MM),
-			static_cast<std::int32_t>((mUIUC_TowerLocations[2].elevation_ft - mUIUC_ReferenceElevation_ft) * nConstants::FT_TO_MM)),
+			static_cast<std::int32_t>((mUIUC_TowerLocations[2].elevation_ft - mUIUC_ReferenceHeight_ft) * nConstants::FT_TO_MM)),
 
 		rfm::rappPoint_t(static_cast<std::int32_t>((mUIUC_TowerLocations[0].northing_ft - mUIUC_TowerLocations[3].northing_ft) * nConstants::FT_TO_MM),
 			static_cast<std::int32_t>((mUIUC_TowerLocations[3].easting_ft - mUIUC_TowerLocations[0].easting_ft) * nConstants::FT_TO_MM),
-			static_cast<std::int32_t>((mUIUC_TowerLocations[3].elevation_ft - mUIUC_ReferenceElevation_ft) * nConstants::FT_TO_MM)) };
+			static_cast<std::int32_t>((mUIUC_TowerLocations[3].elevation_ft - mUIUC_ReferenceHeight_ft) * nConstants::FT_TO_MM)) };
 
 	/*
 	* 40.0635686 deg, -88.2081615 deg
@@ -218,18 +218,18 @@ rfm::rappPoint_t rfb::toRappCoordinates(const rfm::planePoint_t& point)
 
 	result = { static_cast<std::int32_t>((mUIUC_TowerLocations[0].northing_ft - point.northing_ft) * nConstants::FT_TO_MM),
 		static_cast<std::int32_t>((point.easting_ft - mUIUC_TowerLocations[0].easting_ft) * nConstants::FT_TO_MM),
-		static_cast<std::int32_t>((point.elevation_ft - mUIUC_ReferenceElevation_ft) * nConstants::FT_TO_MM) };
+		static_cast<std::int32_t>((point.elevation_ft - mUIUC_ReferenceHeight_ft) * nConstants::FT_TO_MM) };
 
 	return result;
 }
 
-rfm::rappPoint_t rfb::fromStatePlane(const double northing_ft, const double easting_ft, const double elevation_ft)
+rfm::rappPoint_t rfb::fromStatePlane(const double northing_ft, const double easting_ft, const double height_ft)
 {
 	rfm::rappPoint_t result;
 
-	result = { static_cast<std::int32_t>((mUIUC_TowerLocations[0].northing_ft - northing_ft) * nConstants::FT_TO_MM),
-		static_cast<std::int32_t>((easting_ft - mUIUC_TowerLocations[0].easting_ft) * nConstants::FT_TO_MM),
-		static_cast<std::int32_t>((elevation_ft - mUIUC_ReferenceElevation_ft) * nConstants::FT_TO_MM) };
+	result.x_mm = static_cast<std::int32_t>((mUIUC_TowerLocations[0].northing_ft - northing_ft) * nConstants::FT_TO_MM);
+	result.y_mm = static_cast<std::int32_t>((easting_ft - mUIUC_TowerLocations[0].easting_ft) * nConstants::FT_TO_MM);
+	result.z_mm = static_cast<std::int32_t>((height_ft - mUIUC_ReferenceHeight_ft) * nConstants::FT_TO_MM);
 
 	return result;
 }
@@ -246,9 +246,9 @@ rfm::rappPoint_t rfb::fromGPS(const double lat_rad, const double lng_rad, const 
 
 	rfm::rappPoint_t result;
 
-	result = { static_cast<std::int32_t>(northing_m * nConstants::M_TO_MM),
-		static_cast<std::int32_t>(easting_m * nConstants::M_TO_MM),
-		static_cast<std::int32_t>((height_m - mUIUC_ReferenceElevation_m) * nConstants::M_TO_MM) };
+	result.x_mm = static_cast<std::int32_t>(northing_m * nConstants::M_TO_MM);
+	result.y_mm = static_cast<std::int32_t>(easting_m * nConstants::M_TO_MM);
+	result.z_mm = static_cast<std::int32_t>((height_m - mUIUC_ReferenceHeight_m) * nConstants::M_TO_MM);
 
 	return result;
 }
