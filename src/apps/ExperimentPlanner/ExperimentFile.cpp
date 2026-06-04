@@ -225,6 +225,41 @@ void cExperimentFile::open(const std::string& file_name)
 	else
 		mExperimentType = eExperimentType::UNKNOWN;
 
+	if (configDoc.contains("experiment_meta_info"))
+	{
+		std::string meta_file_name = configDoc["experiment_meta_info"];
+
+		if (!meta_file_name.empty())
+		{
+			fs::path meta_path = fn;
+			meta_path.replace_filename(meta_file_name);
+
+			std::ifstream in;
+			in.open(meta_path);
+			if (in.is_open())
+			{
+				nlohmann::json metaDoc;
+				try
+				{
+					in >> metaDoc;
+				}
+				catch (const nlohmann::json::parse_error& e)
+				{
+					metaDoc.clear();
+				}
+				catch (const std::exception& e)
+				{
+					metaDoc.clear();
+				}
+
+				if (!metaDoc.empty())
+				{
+					mMetaInfo.load(metaDoc);
+				}
+			}
+		}
+	}
+
 	mMetaInfo.load(configDoc);
 
 	std::string controller = configDoc["controller"];

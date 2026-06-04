@@ -353,14 +353,24 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
 
     if (jdoc.contains("researcher"))
     {
-        mResearchers.push_back(jdoc["researcher"]);
+        std::string name = jdoc["researcher"];
+        auto it = std::find(mResearchers.begin(), mResearchers.end(), name);
+
+        if (it == mResearchers.end())
+            mResearchers.push_back(name);
     }
 
     if (jdoc.contains("researchers"))
     {
         auto researchers = jdoc["researchers"];
         for (auto it = researchers.begin(); it != researchers.end(); ++it)
-            mResearchers.push_back(*it);
+        {
+            std::string name = *it;
+            auto find_it = std::find(mResearchers.begin(), mResearchers.end(), name);
+
+            if (find_it == mResearchers.end())
+                mResearchers.push_back(name);
+        }
     }
 
     if (jdoc.contains("species"))
@@ -394,14 +404,24 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
 
     if (jdoc.contains("event number"))
     {
-        mEvents.push_back(jdoc["event number"]);
+        std::string event = jdoc["event number"];
+        auto find_it = std::find(mEvents.begin(), mEvents.end(), event);
+
+        if (find_it == mEvents.end())
+            mEvents.push_back(event);
     }
 
     if (jdoc.contains("event numbers"))
     {
         auto event_numbers = jdoc["event numbers"];
         for (auto it = event_numbers.begin(); it != event_numbers.end(); ++it)
-            mEvents.push_back(*it);
+        {
+            std::string event = *it;
+            auto find_it = std::find(mEvents.begin(), mEvents.end(), event);
+
+            if (find_it == mEvents.end())
+                mEvents.push_back(event);
+        }
     }
 
     if (jdoc.contains("field design"))
@@ -411,7 +431,11 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
 
     if (jdoc.contains("treatment"))
     {
-        mTreatments.push_back(jdoc["treatment"]);
+        std::string treatment = jdoc["treatment"];
+        auto find_it = std::find(mTreatments.begin(), mTreatments.end(), treatment);
+
+        if (find_it == mTreatments.end())
+            mTreatments.push_back(treatment);
     }
 
     if (jdoc.contains("treatments"))
@@ -419,18 +443,32 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
         auto treatments = jdoc["treatments"];
         if (treatments.is_string())
         {
-            mTreatments.push_back(treatments);
+            std::string treatment = treatments;
+            auto find_it = std::find(mTreatments.begin(), mTreatments.end(), treatment);
+
+            if (find_it == mTreatments.end())
+                mTreatments.push_back(treatment);
         }
         else if (treatments.is_array())
         {
             for (auto it = treatments.begin(); it != treatments.end(); ++it)
-                mTreatments.push_back(*it);
+            {
+                std::string treatment = *it;
+                auto find_it = std::find(mTreatments.begin(), mTreatments.end(), treatment);
+
+                if (find_it == mTreatments.end())
+                    mTreatments.push_back(treatment);
+            }
         }
     }
 
     if (jdoc.contains("comment"))
     {
-        mComments.push_back(jdoc["comment"]);
+        std::string comment = jdoc["comment"];
+        auto find_it = std::find(mComments.begin(), mComments.end(), comment);
+
+        if (find_it == mComments.end())
+            mComments.push_back(comment);
     }
 
     if (jdoc.contains("comments"))
@@ -438,12 +476,22 @@ void cExperimentMetaInfo::load(const nlohmann::json& jdoc)
         auto comments = jdoc["comments"];
         if (comments.is_string())
         {
-            mComments.push_back(comments);
+            std::string comment = comments;
+            auto find_it = std::find(mComments.begin(), mComments.end(), comment);
+
+            if (find_it == mComments.end())
+                mComments.push_back(comment);
         }
         else if (comments.is_array())
         {
             for (auto it = comments.begin(); it != comments.end(); ++it)
-                mComments.push_back(*it);
+            {
+                std::string comment = *it;
+                auto find_it = std::find(mComments.begin(), mComments.end(), comment);
+
+                if (find_it == mComments.end())
+                    mComments.push_back(comment);
+            }
         }
     }
 
