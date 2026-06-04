@@ -237,6 +237,9 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
     mpSplashScreen = nullptr;
 
     QObject::connect(&mMainModel.getThread(), &cRemoteDataThread::updateLoopTime, mpLoopMeter, &cLoopTimeMeter::loopTimeUpdated);
+    QObject::connect(&mMainModel.getThread(), &cRemoteDataThread::updateLoopHeartbeat, mpLoopMeter, &cLoopTimeMeter::loopHeartbeatUpdated);
+    QObject::connect(&mMainModel.getThread(), &cRemoteDataThread::terminated, mpLoopMeter, &cLoopTimeMeter::loopTerminated);
+
     statusBar()->addPermanentWidget(mpLoopMeter);
 
     qInfo() << "Single shot timer to start data acquisition.";

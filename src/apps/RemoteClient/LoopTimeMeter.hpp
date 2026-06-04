@@ -8,6 +8,8 @@
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QLineEdit;
+class QPixmap;
+class QIcon;
 QT_END_NAMESPACE
 
 
@@ -20,9 +22,18 @@ public:
     ~cLoopTimeMeter();
 
 public slots:
+    void loopHeartbeatUpdated();
     void loopTimeUpdated(float avr_loop_time_ms);
+    void loopTerminated();
 
 protected:
     QLineEdit* mpAvgLoopTime_ms;
+    QLabel* mpHeartBeat;
+
+    QPixmap* mpRedHeart;
+    QPixmap* mpEmptyHeart;
+    QPixmap* mpBlackHeart;
+
+    bool mShowRedHeart = false;
 };
 

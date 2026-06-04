@@ -5,5 +5,8 @@
         <file alias="about.png">./Resources/Images/About.png</file>
         <file alias="splash.png">./Resources/Images/splash.png</file>
         <file alias="bottom_logo.png">./Resources/Images/bottom_logo.png</file>
+        <file alias="heart_red.png">./Resources/Images/heart_red.png</file>
+        <file alias="heart_empty.png">./Resources/Images/heart_empty.png</file>
+        <file alias="heart_black.png">./Resources/Images/heart_black.png</file>
     </qresource>
 </RCC>
