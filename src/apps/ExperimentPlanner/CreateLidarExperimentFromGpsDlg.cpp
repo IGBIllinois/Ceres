@@ -36,6 +36,8 @@
 
 namespace
 {
+	const QString PLOT_LENGTH_TEXT = "Plot Length (";
+
 	const QString SCAN_SEPARATION_TEXT = "Separation (";
 
 	const QString WEST_TO_EAST = "West to East";
@@ -145,6 +147,12 @@ void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 	mpStartPosition->setSortingEnabled(false);
 	mpStartPosition->setFixedWidth(419);
 
+	mpStartPointAtBegin = new QRadioButton("Start of Plot", this);
+	mpStartPointAtCenter = new QRadioButton("Center of Plot", this);
+	mpStartPointAtEnd = new QRadioButton("End of Plot", this);
+	mpStartPointAtBegin->setChecked(true);
+
+
 	mpEndPosition = new QTableView(this);
 //	mpEndPosition->setModel(mpModel);
 	mpEndPosition->setModel(mpReverseModel);
@@ -164,6 +172,11 @@ void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 	mpEndPosition->setSortingEnabled(false);
 	mpEndPosition->setFixedWidth(419);
 
+	mpEndPointAtBegin = new QRadioButton("Start of Plot", this);
+	mpEndPointAtCenter = new QRadioButton("Center of Plot", this);
+	mpEndPointAtEnd = new QRadioButton("End of Plot", this);
+	mpEndPointAtEnd->setChecked(true);
+
 	mpClearPath = new QPushButton("Clear Path", this);
 	connect(mpClearPath, &QPushButton::pressed, this, &cCreateLidarExperimentFromGpsDlg::clearPaths);
 
@@ -171,6 +184,20 @@ void cCreateLidarExperimentFromGpsDlg::createControls_PointSelection()
 	connect(mpShowPath, &QPushButton::pressed, this, &cCreateLidarExperimentFromGpsDlg::onShowPath);
 
 	mpInverseDirection = new QCheckBox("Inverse Direction", this);
+
+	mpUnits = new QComboBox(this);
+	mpUnits->setEditable(false);
+	mpUnits->addItem("Meters");
+	mpUnits->addItem("Millimeters");
+	mpUnits->addItem("Feet");
+	mpUnits->addItem("Inches");
+	connect(mpUnits, &QComboBox::currentTextChanged, this, &cCreateLidarExperimentFromGpsDlg::onUnitChange);
+	mConversionFactor = nConstants::M_TO_MM;
+
+	mpPlotLengthLabel = new QLabel(PLOT_LENGTH_TEXT + "m)", this);
+	mpPlotLength = new QLineEdit(this);
+	mpPlotLength->setValidator(new QDoubleValidator(0, 100.0, 3));
+	mpPlotLength->setText("1");
 }
 
 void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -178,6 +205,11 @@ void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* 
 	QLabel* pText = nullptr;
 	QGroupBox* pGroupBox = nullptr;
 	QGridLayout* pGridLayout = nullptr;
+
+
+	// Setup the "Start" Group Box
+	QGroupBox* pStartGroupBox = new QGroupBox(tr("Start of Scan"));
+	pStartGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	QHBoxLayout* pStartLayout = new QHBoxLayout();
 
@@ -194,7 +226,24 @@ void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* 
 	QVBoxLayout* pVStartLayout = new QVBoxLayout();
 	pVStartLayout->addLayout(pStartLayout);
 	pVStartLayout->addSpacing(10);
-	pVStartLayout->addWidget(mpStartPosition);
+	pVStartLayout->addWidget(mpStartPosition, 1);
+	pVStartLayout->addSpacing(10);
+
+	QHBoxLayout* pStartPlacementLayout = new QHBoxLayout();
+
+	pStartPlacementLayout->addStretch(1);
+	pStartPlacementLayout->addWidget(mpStartPointAtBegin);
+	pStartPlacementLayout->addWidget(mpStartPointAtCenter);
+	pStartPlacementLayout->addWidget(mpStartPointAtEnd);
+	pStartPlacementLayout->addStretch(1);
+	mpStartPointAtBegin->setChecked(true);
+
+	pVStartLayout->addLayout(pStartPlacementLayout);
+	pStartGroupBox->setLayout(pVStartLayout);
+
+	// Setup the "End" Group Box
+	QGroupBox* pEndGroupBox = new QGroupBox(tr("End of Scan"));
+	pEndGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	QHBoxLayout* pEndLayout = new QHBoxLayout();
 
@@ -212,14 +261,27 @@ void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* 
 	pVEndLayout->addLayout(pEndLayout);
 	pVEndLayout->addSpacing(10);
 	pVEndLayout->addWidget(mpEndPosition);
+	pVEndLayout->addSpacing(10);
+
+	QHBoxLayout* pEndPlacementLayout = new QHBoxLayout();
+
+	pEndPlacementLayout->addStretch(1);
+	pEndPlacementLayout->addWidget(mpEndPointAtBegin);
+	pEndPlacementLayout->addWidget(mpEndPointAtCenter);
+	pEndPlacementLayout->addWidget(mpEndPointAtEnd);
+	pEndPlacementLayout->addStretch(1);
+	mpEndPointAtEnd->setChecked(true);
+
+
+	pVEndLayout->addLayout(pEndPlacementLayout);
+	pEndGroupBox->setLayout(pVEndLayout);
+
 
 	QHBoxLayout* pPosLayout = new QHBoxLayout();
 	pPosLayout->addStretch(1);
-	pPosLayout->addLayout(pVStartLayout);
-//	pPosLayout->addWidget(mpStartPosition);
+	pPosLayout->addWidget(pStartGroupBox);
 	pPosLayout->addSpacing(10);
-	pPosLayout->addLayout(pVEndLayout);
-	//	pPosLayout->addWidget(mpEndPosition);
+	pPosLayout->addWidget(pEndGroupBox);
 	pPosLayout->addSpacing(10);
 
 	QVBoxLayout* pVSubLayout = new QVBoxLayout();
@@ -232,12 +294,50 @@ void cCreateLidarExperimentFromGpsDlg::createLayout_PointSelection(QVBoxLayout* 
 
 	QHBoxLayout* pOptionsLayout = new QHBoxLayout();
 	pOptionsLayout->addStretch(1);
+	pOptionsLayout->addWidget(mpPlotLengthLabel);
+	pOptionsLayout->addWidget(mpPlotLength);
+	pOptionsLayout->addSpacing(10);
+	pOptionsLayout->addWidget(mpUnits);
+	pOptionsLayout->addSpacing(30);
 	pOptionsLayout->addWidget(mpInverseDirection);
 	pOptionsLayout->addStretch(1);
 
 	pMainLayout->addLayout(pOptionsLayout);
 
 	pMainLayout->addSpacing(10);
+}
+
+void cCreateLidarExperimentFromGpsDlg::onUnitChange(const QString& text)
+{
+	double length = mpPlotLength->text().toDouble() * mConversionFactor;
+
+	switch (mpUnits->currentIndex())
+	{
+	case 0:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "m)");
+
+		mConversionFactor = nConstants::M_TO_MM;
+		break;
+	case 1:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "mm)");
+
+		mConversionFactor = 1.0;
+		break;
+	case 2:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "ft)");
+
+		mConversionFactor = nConstants::FT_TO_MM;
+		break;
+	case 3:
+		mpPlotLengthLabel->setText(PLOT_LENGTH_TEXT + "in)");
+
+		mConversionFactor = nConstants::IN_TO_MM;
+		break;
+	}
+
+	length /= mConversionFactor;
+
+	mpPlotLength->setText(QString::number(length));
 }
 
 void cCreateLidarExperimentFromGpsDlg::onStartItem(const QModelIndex& index)
@@ -325,6 +425,54 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 
 	int x2_mm = mpEndX_mm->text().toInt();
 	int y2_mm = mpEndY_mm->text().toInt();
+
+	double angle = atan2(static_cast<double>(y2_mm) - static_cast<double>(y1_mm), static_cast<double>(x2_mm) - static_cast<double>(x1_mm));
+
+	double plot_length_mm = mpPlotLength->text().toDouble() * mConversionFactor;
+
+	if (mpStartPointAtBegin->isChecked())
+	{
+		// Do nothing
+	}
+	else if (mpStartPointAtCenter->isChecked())
+	{
+		plot_length_mm /= 2.0;
+		double dx = plot_length_mm * cos(angle);
+		double dy = plot_length_mm * sin(angle);
+
+		x1_mm -= dx;
+		y1_mm -= dy;
+	}
+	else if (mpStartPointAtEnd->isChecked())
+	{
+		double dx = plot_length_mm * cos(angle);
+		double dy = plot_length_mm * sin(angle);
+
+		x1_mm -= dx;
+		y1_mm -= dy;
+	}
+
+	if (mpEndPointAtBegin->isChecked())
+	{
+		double dx = plot_length_mm * cos(angle);
+		double dy = plot_length_mm * sin(angle);
+
+		x2_mm += dx;
+		y2_mm += dy;
+	}
+	else if (mpEndPointAtCenter->isChecked())
+	{
+		plot_length_mm /= 2.0;
+		double dx = plot_length_mm * cos(angle);
+		double dy = plot_length_mm * sin(angle);
+
+		x2_mm += dx;
+		y2_mm += dy;
+	}
+	else if (mpEndPointAtEnd->isChecked())
+	{
+		// Do nothing
+	}
 
 
 	auto h1 = mpModel->data(startIndex.siblingAtColumn(3)).toFloat();
