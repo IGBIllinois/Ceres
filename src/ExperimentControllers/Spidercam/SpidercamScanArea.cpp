@@ -728,7 +728,7 @@ void cSpidercamScanArea::drawRefPoint(QPainter& painter, double height, const ma
 	painter.setPen(mRefPen);
 	painter.drawText(textPoint, text);
 
-	int r = 2 * std::min(textBounds.width(), textBounds.height());
+	int r = 2 * mDollyMarkerRadius;
 
 	painter.drawEllipse(textCenter, r, r);
 

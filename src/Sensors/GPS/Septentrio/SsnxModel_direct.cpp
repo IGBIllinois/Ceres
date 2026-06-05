@@ -342,7 +342,7 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
 
     if (!mPvtValid)
     {
-        emit positionChanged(-1, -1, -1);
+        emit positionChanged(-100000, -100000, -100000);
         return;
     }
 

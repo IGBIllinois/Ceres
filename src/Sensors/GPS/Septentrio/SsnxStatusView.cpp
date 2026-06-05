@@ -18,6 +18,7 @@
 
 #include <string>
 
+constexpr int MIN_VALUE = -20000;
 
 cSsnxStatusView::cSsnxStatusView(cSsnxModel* pModel, QWidget* parent)
 :
@@ -550,19 +551,19 @@ void cSsnxStatusView::onPositionChange(int x_mm, int y_mm, int z_mm)
 	if (!isActiveWindow())
 		return;
 
-	if (x_mm < 0)
+	if (x_mm < MIN_VALUE)
 		mpX_mm->setText("");
 	else
 		mpX_mm->setText(QString::number(x_mm));
 
-//	if (y_mm < 0)
-//		mpY_mm->setText("");
-//	else
+	if (y_mm < MIN_VALUE)
+		mpY_mm->setText("");
+	else
 		mpY_mm->setText(QString::number(y_mm));
 
-//	if (z_mm < 0)
-//		mpZ_mm->setText("");
-//	else
+	if (z_mm < MIN_VALUE)
+		mpZ_mm->setText("");
+	else
 		mpZ_mm->setText(QString::number(z_mm));
 }
 
@@ -571,19 +572,19 @@ void cSsnxStatusView::onReferenceChange(int x_mm, int y_mm, int z_mm, double err
 	if (!isActiveWindow())
 		return;
 
-	if (x_mm < 0)
+	if (x_mm < MIN_VALUE)
 		mpRef_X_mm->setText("");
 	else
 		mpRef_X_mm->setText(QString::number(x_mm));
 
-//	if (y_mm < 0)
-//		mpRef_Y_mm->setText("");
-//	else
+	if (y_mm < MIN_VALUE)
+		mpRef_Y_mm->setText("");
+	else
 		mpRef_Y_mm->setText(QString::number(y_mm));
 
-//	if (z_mm < 0)
-//		mpRef_Z_mm->setText("");
-//	else
+	if (z_mm < MIN_VALUE)
+		mpRef_Z_mm->setText("");
+	else
 		mpRef_Z_mm->setText(QString::number(z_mm));
 
 	if (error_mm < 0)
