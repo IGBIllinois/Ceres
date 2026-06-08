@@ -1,0 +1,173 @@
+{
+	"server":
+	{
+		"ip": "172.16.1.4",
+		"port":10213
+	},
+	"default data folder":
+	{
+		"windows": "d:/2025/"
+	},
+	"sensors" :[
+		{
+		 "type": "ssnx",
+		 "protocol": "direct"
+		}
+	],
+	"all sensors" :[
+		{
+		 "type": "ouster",
+		 "protocol": "net"
+		},
+		{
+		 "type": "axis_communications",
+		 "protocol": "net",
+		 "sensor": "F44"
+		},
+		{
+		 "type": "ssnx",
+		 "protocol": "direct"
+		},
+		{
+		 "type": "ssnx",
+		 "instance": "1",
+		 "protocol": "direct"
+		},
+		{
+		 "type": "ssnx",
+		 "instance": "2",
+		 "protocol": "direct"
+		},
+		{
+		 "type": "hyspex",
+		 "sensor": "VNIR-3000N",
+		 "protocol": "direct",
+		 "settings": "C://settings//"
+		},
+		{
+		 "type": "hyspex",
+		 "sensor": "SWIR-384",
+		 "protocol": "direct",
+		 "settings": "C://settings//"
+		}
+	],
+	"ouster":
+	{
+		"Manufacturer": "OUSTER",
+		"Model": "OS-0-128",
+		"Serial Number": "992037000167",
+		"azimuth window": [135.0, 225.0],
+		"mode": "1024x10"
+	},
+	"ssnx":
+	{
+		"Manufacturer": "Septentrio",
+		"Model": "Altus-NR3",
+		"Serial Number": "6106326",
+		"antenna_offset":
+		{
+            "x_mm (south is +)": -600.0,
+            "y_mm (east is +)": 0.0,
+            "z_mm (up is +)": -140.0
+		},
+		"serial_port":
+		{
+			"windows": "COM4",
+			"macOS": "/dev/ttyUSB0",
+			"linux": "/dev/ttyUSB0"
+		},
+		"initialization": [
+			"spm, Rover, StandAlone+RTK",
+			"sbtp, off",
+			"sgd, NAD83",
+			"slco, NETWORK", 
+			"lwa, all",
+			"sso, Stream1, <CD>, PVTGeodetic+PosProjected+Time, msec100",
+			"sso, Stream2, <CD>, RTCMDatum+WifiClientStatus+NTRIPClientStatus+ReceiverStatus, OnChange"
+		]
+	},
+	"ssnx:1":
+	{
+		"Manufacturer": "Septentrio",
+		"Model": "Altus-NR3",
+		"Serial Number": "6106326",
+		"serial_port":
+		{
+			"windows": "COM4",
+			"macOS": "/dev/ttyUSB0",
+			"linux": "/dev/ttyUSB0"
+		},
+		"initialization": [
+			"spm, Rover, StandAlone+RTK",
+			"sbtp, off",
+			"sgd, NAD83",
+			"slco, NETWORK", 
+			"lwa, all",
+			"sso, Stream1, <CD>, PVTGeodetic+PosProjected+Time, msec100",
+			"sso, Stream2, <CD>, RTCMDatum+WifiClientStatus+NTRIPClientStatus+ReceiverStatus, OnChange"
+		]
+	},
+	"ssnx:2":
+	{
+		"Manufacturer": "Septentrio",
+		"Model": "Altus-NR3",
+		"Serial Number": "6106327",
+		"serial_port":
+		{
+			"windows": "COM6",
+			"macOS": "/dev/ttyUSB0",
+			"linux": "/dev/ttyUSB0"
+		},
+		"initialization": [
+			"spm, Rover, StandAlone+RTK",
+			"sbtp, off",
+			"sgd, NAD83",
+			"slco, NETWORK", 
+			"lwa, all",
+			"sso, Stream1, <CD>, PVTGeodetic+PosProjected+Time, msec100",
+			"sso, Stream2, <CD>, RTCMDatum+WifiClientStatus+NTRIPClientStatus+ReceiverStatus, OnChange"
+		]
+	},
+	"axis_communications":
+	{
+		"F44":
+		{
+			"url": "http://172.16.2.141",
+			"Manufacturer": "Axis Communications",
+			"Model": "AXIS F44 DUAL AUDO INPUT",
+			"Serial Number": "B8A44F1E88FB",
+			"default camera id": 1,
+			"cameras":
+			[
+				{
+					"id": 1,
+					"resolution": "1920x1080",
+					"frames per second": 3
+				},
+				{
+					"id": 2,
+					"resolution": "1920x1080",
+					"frames per second": 3
+				}
+			]
+			
+		}
+	},
+	"hyspex":
+	{
+		"VNIR-3000N":
+		{
+			"Manufacturer": "HySpex",
+			"Model": "VNIR-3000N",
+			"Serial Number": "202184",
+			"lens": "3 m"
+		},
+		"SWIR-384":
+		{
+			"Manufacturer": "HySpex",
+			"Model": "SWIR-384",
+			"Serial Number": "200918",
+			"lens": "3 m"
+		}
+	}
+}

@@ -1,0 +1,83 @@
+{
+	"server":
+	{
+		"ip": "172.16.1.4",
+		"port":10213
+	},
+	"default data folder":
+	{
+		"windows": "d:/"
+	},
+	"sensors" :[
+		{
+		 "type": "ouster",
+		 "protocol": "net"
+		},
+		{
+		 "type": "axis_communications",
+		 "protocol": "net",
+		 "sensor": "F44"
+		},
+		{
+		 "type": "ssnx",
+		 "protocol": "direct"
+		}
+	],
+	"ouster":
+	{
+		"Manufacturer": "OUSTER",
+		"Model": "OS-0-128",
+		"Serial Number": "992037000167",
+		"azimuth window": [135.0, 225.0],
+		"mode": "1024x10"
+	},
+	"ssnx":
+	{
+		"Manufacturer": "Septentrio",
+		"Model": "Altus-NR3",
+		"Serial Number": "6106326",
+		"antenna_offset":
+		{
+            "x_mm (south is +)": -600.0,
+            "y_mm (east is +)": 0.0,
+            "z_mm (up is +)": -140.0
+		},
+		"serial_port":
+		{
+			"windows": "COM4",
+			"macOS": "/dev/ttyUSB0",
+			"linux": "/dev/ttyUSB0"
+		},
+		"initialization": [
+			"spm, Rover, StandAlone+RTK",
+			"sbtp, off",
+			"lwa, all",
+			"sso, Stream1, <CD>, PVTGeodetic+Time, OnChange"
+		]
+	},
+	"axis_communications":
+	{
+		"F44":
+		{
+			"url": "http://172.16.2.141",
+			"Manufacturer": "Axis Communications",
+			"Model": "AXIS F44 DUAL AUDO INPUT",
+			"Serial Number": "B8A44F1E88FB",
+			"default camera id": 1,
+			"cameras":
+			[
+				{
+					"id": 1,
+					"resolution": "640x480",
+					"frames per second": 1
+				},
+				{
+					"id": 1,
+					"resolution": "640x480",
+					"frames per second": 1
+				}
+			]
+			
+		}
+	}
+}
