@@ -4,6 +4,7 @@
 #include "../../Utilities/Utilities.hpp"
 
 #include <QWidget>
+#include <QPushButton>
 #include <QPen>
 #include <QPainter>
 #include <QPainterPath>
@@ -110,6 +111,9 @@ public:
 public slots:
     void updateSecondaryDollyPosition(bool valid, uint32_t x, uint32_t y);
 
+private slots:
+    void onMarkerInfo();
+
 protected:
 	void paintEvent(QPaintEvent* event) override;
 
@@ -180,11 +184,10 @@ private:
     std::array<QPoint, 9> mGreenway;
 
     // For drawing the reference position
-    QPoint mRefPosition;
-    QPen   mRefPen;
-    QBrush mRefBrush;
-    QColor mRefColor;
-    int    mRefMarkerRadius;
+    QPen   mMarkerPen;
+    QColor mMarkerColor;
+    int    mMarkerRadius;
+    QPushButton* mpShowMarkerInfo = nullptr;
 
     // For drawing the dolly position
     bool   mShowDollyPosition = true;

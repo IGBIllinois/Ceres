@@ -128,12 +128,6 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mGreenway[7] = QPoint(98405, 0);
 	mGreenway[8] = mGreenway[0];
 
-	mRefColor.setRgb(59, 122, 87);	// Amazon Green
-	mRefPosition;
-	mRefPen;
-	mRefBrush;
-	mRefMarkerRadius;
-
 	mDollyMarkerRadius = 3;
 	mDollyColor.setRgb(0,0,255);
 	mDollyPen.setColor(mDollyColor);
@@ -147,6 +141,13 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mSecondaryDollyPen.setWidth(1);
 	mSecondaryDollyBrush.setColor(color);
 	mSecondaryDollyBrush.setStyle(Qt::SolidPattern);
+
+	mMarkerColor.setRgb(59, 122, 87);	// Amazon Green
+	mMarkerPen.setWidth(1);;
+	mMarkerRadius = 2 * mDollyMarkerRadius;
+	mpShowMarkerInfo = new QPushButton("Marker Info", this);
+	mpShowMarkerInfo->setHidden(true);
+	connect(mpShowMarkerInfo, &QPushButton::pressed, this, &cSpidercamScanArea::onMarkerInfo);
 
 	mIsRecording = false;
 	mpActivePath = nullptr;
@@ -245,6 +246,11 @@ void cSpidercamScanArea::updateSecondaryDollyPosition(bool valid, uint32_t x, ui
 	mSecondaryDollyPosition.setY(y);
 }
 
+void cSpidercamScanArea::onMarkerInfo()
+{
+
+}
+
 void cSpidercamScanArea::updateBounds(double minX, double maxX, double minY, double maxY)
 {
 	mMinX = minX;
@@ -276,11 +282,14 @@ void cSpidercamScanArea::addMarker(std::string_view label, int x_mm, int y_mm, i
 	marker.z_mm = z_mm;
 
 	mMarkers.push_back(marker);
+
+//BAF	mpShowMarkerInfo->setHidden(false);
 }
 
 void cSpidercamScanArea::removeMarkers()
 {
 	mMarkers.clear();
+	mpShowMarkerInfo->setHidden(true);
 }
 
 void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
@@ -725,12 +734,10 @@ void cSpidercamScanArea::drawRefPoint(QPainter& painter, double height, const ma
 	}
 
 
-	painter.setPen(mRefPen);
+	painter.setPen(mMarkerPen);
 	painter.drawText(textPoint, text);
 
-	int r = 2 * mDollyMarkerRadius;
-
-	painter.drawEllipse(textCenter, r, r);
+	painter.drawEllipse(textCenter, mMarkerRadius, mMarkerRadius);
 
 	painter.restore();
 }
