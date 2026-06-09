@@ -37,7 +37,7 @@ public:
 	virtual void doLayout() = 0;
 
 public slots:
-	void onSensorStatusChange(QString name, QString instance, sensor::eStatus status);
+	virtual void onSensorStatusChange(QString name, QString instance, sensor::eStatus status);
 
 protected:
 	QGroupBox* getSensorStatusBox() const;
