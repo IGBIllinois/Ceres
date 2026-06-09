@@ -565,6 +565,13 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
             }
         }
 
+
+        if (widgets.pRemoteStatusView)
+        {
+            QString text = QString::fromStdString(widgets.pRemoteStatusView->descriptor());
+            mpCentralWindow->setTabToolTip(mpCentralWindow->count() - 1, text);
+        }
+
         widgets.pModel->updateViews();
 
         mMainModel.addSensor(widgets.pModel);

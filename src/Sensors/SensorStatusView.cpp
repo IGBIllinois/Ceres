@@ -12,7 +12,7 @@
 
 cSensorStatusView::cSensorStatusView(cSensorModel* pModel, QWidget* parent)
 :
-	QWidget(parent)
+	QWidget(parent), mpModel(pModel)
 {
 	auto title = pModel->name();
 
@@ -27,6 +27,16 @@ cSensorStatusView::cSensorStatusView(cSensorModel* pModel, QWidget* parent)
 
 cSensorStatusView::~cSensorStatusView()
 {
+}
+
+std::string cSensorStatusView::descriptor() const
+{
+	std::string description = mpModel->manufacturer();
+	description += " " + mpModel->model();
+	description += ", ";
+	description += mpModel->sensorClass();
+
+	return description;
 }
 
 void cSensorStatusView::createWidgets()

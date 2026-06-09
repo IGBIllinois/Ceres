@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include <memory>
+#include <string>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -30,6 +31,12 @@ public:
 
 public:
 	/*
+	 * Returns a string used as a descriptor of the sensor.
+	 */
+	virtual std::string descriptor() const;
+
+public:
+	/*
 	 * These methods are called by factory function to make sure the GUI elements are
 	 * created and displayed in the correct arrangment
 	 */
@@ -41,6 +48,9 @@ public slots:
 
 protected:
 	QGroupBox* getSensorStatusBox() const;
+
+private:
+	cSensorModel* mpModel = nullptr;
 
 private:
 	QLabel*	   mpSensorLabel = nullptr;
