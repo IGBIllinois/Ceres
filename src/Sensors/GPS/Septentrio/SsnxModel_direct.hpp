@@ -38,6 +38,9 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
+public slots:
+    void reconnectToGps();
+
 protected:
     void update() override;
 

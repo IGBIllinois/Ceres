@@ -156,6 +156,19 @@ void cSsnxModel_direct::update()
     runOnce();
 }
 
+void cSsnxModel_direct::reconnectToGps()
+{
+    forcePromptRequest();
+    //    sendPromptRequest();
+
+    if (mSerialPort.waitForBytesWritten(1000))
+        setStatus(sensor::eStatus::CONNECTING);
+    else
+        setStatus(sensor::eStatus::PENDING);
+
+    mLastReceived = std::chrono::high_resolution_clock::now();
+}
+
 void cSsnxModel_direct::writeDataHeader()
 {}
 

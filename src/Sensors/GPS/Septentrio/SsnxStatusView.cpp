@@ -11,6 +11,7 @@
 
 #include <QCheckBox>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QLabel>
 #include <QGroupBox>
 #include <QGridLayout>
@@ -165,6 +166,9 @@ void cSsnxStatusView::createWidgets()
 
 	mpRef_Count = new QLineEdit(this);
 	mpRef_Count->setReadOnly(true);
+
+	mpReconnect = new QPushButton("Restart", this);
+	mpReconnect->setEnabled(false);
 }
 
 void cSsnxStatusView::doLayout()
@@ -173,7 +177,13 @@ void cSsnxStatusView::doLayout()
 
 	auto* mainLayout = new QVBoxLayout(this);
 
-	mainLayout->addWidget(getSensorStatusBox());
+	auto* sensorLayout = new QHBoxLayout(this);
+
+	sensorLayout->addWidget(getSensorStatusBox(), 1);
+	sensorLayout->addSpacing(10);
+	sensorLayout->addWidget(mpReconnect);
+
+	mainLayout->addLayout(sensorLayout);
 
 	QGroupBox* packetBox = new QGroupBox("Received Packets");
 
@@ -418,6 +428,13 @@ void cSsnxStatusView::doLayout()
 	mainLayout->addStretch();
 
 	setLayout(mainLayout);
+}
+
+void cSsnxStatusView::onSensorStatusChange(QString name, QString instance, sensor::eStatus status)
+{
+	mpReconnect->setDisabled(status == sensor::eStatus::RUNNING);
+
+	cSensorStatusView::onSensorStatusChange(name, instance, status);
 }
 
 void cSsnxStatusView::onPvtCartesianStateChange(bool valid)

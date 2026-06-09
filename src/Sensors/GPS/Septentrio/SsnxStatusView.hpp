@@ -10,6 +10,7 @@
 QT_BEGIN_NAMESPACE
 class QCheckBox;
 class QLineEdit;
+class QPushButton;
 QT_END_NAMESPACE
 
 // Forward Declaration
@@ -29,6 +30,9 @@ public:
 
 	void createWidgets() override;
 	void doLayout() override;
+
+signals:
+	void tryGpsReconnection();
 
 public slots:
 	void onPvtCartesianStateChange(bool valid);
@@ -54,6 +58,9 @@ public slots:
 
 	void onUTC_Change(int hour, int min, int sec, int day, int month, int year);
 	void onReferenceChange(int x_mm, int y_mm, int z_mm, double error_mm, int count);
+
+public:
+	void onSensorStatusChange(QString name, QString instance, sensor::eStatus status) override;
 
 private:
 	QLedIndicator* mpPvtCartesianValid = nullptr;
@@ -113,4 +120,6 @@ private:
 	QLineEdit* mpRef_Z_mm = nullptr;
 	QLineEdit* mpRef_Error_mm = nullptr;
 	QLineEdit* mpRef_Count = nullptr;
+
+	QPushButton* mpReconnect = nullptr;
 };

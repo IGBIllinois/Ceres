@@ -62,6 +62,8 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
             QObject::connect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxStatusView::onUTC_Change);
             QObject::connect(pModel, &cSsnxModel::referenceChanged, pView, &cSsnxStatusView::onReferenceChange);
 
+            QObject::connect(pView, &cSsnxStatusView::tryGpsReconnection, static_cast<cSsnxModel_direct*>(pModel), &cSsnxModel_direct::reconnectToGps);
+
             widgets.pRemoteStatusView = pView;
         }
 
