@@ -1,6 +1,7 @@
 
 
 #include <QApplication>
+#include <QStyleFactory>
 
 #include "CeresSplashScreen.hpp"
 #include "MainWindow.hpp"
@@ -67,6 +68,7 @@ int main(int argc, char** argv)
     QCoreApplication::setOrganizationName("University of Illinois");
     QCoreApplication::setOrganizationDomain("rapp.ripe.illinois.edu");
     QCoreApplication::setApplicationName("Ceres");
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     QApplication app(argc, argv);
 

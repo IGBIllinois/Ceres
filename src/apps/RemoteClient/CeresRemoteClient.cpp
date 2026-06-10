@@ -1,6 +1,7 @@
 
 
 #include <QApplication>
+#include <QStyleFactory>
 
 #include "CeresSplashScreen.hpp"
 #include "RemoteClientWindow.hpp"
@@ -80,6 +81,8 @@ int main(int argc, char** argv)
     qInstallMessageHandler(myMessageOutput);
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
+
     QApplication app(argc, argv);
 
     cCeresSplashScreen* pSplash = new cCeresSplashScreen();
