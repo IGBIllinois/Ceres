@@ -65,34 +65,13 @@ if (MSVC)
     option(MSVC_STATIC_RUNTIME "Link static runtime libraries" OFF)
 endif()
 
-# Use integer versions instead of strings for easier handling if required
-SET(CERES_MAJOR 1)
-SET(CERES_MINOR 0)
-SET(CERES_PATCH 0)
-ADD_DEFINITIONS(
-     -DCERES_MAJOR=${CERES_MAJOR}
-     -DCERES_MINOR=${CERES_MINOR}
-     -DCERES_PATCH=${CERES_PATCH}
-)
-SET(VERSION "${CERES_MAJOR}.${CERES_MINOR}.${CERES_PATCH}")
-# Public version has format YY.V, where:
-# -- YY - two last digits of the year of release
-# -- V  - version of the release
-# Example: first release in year 2023 has version 1.23.0 and public version 23.1
-MATH(EXPR CERES "${CERES_PATCH} + 1" OUTPUT_FORMAT DECIMAL)
-SET(CERES_PUBLIC_VERSION "1.0")
-SET(PACKAGE ceres)
-STRING(TIMESTAMP CURRENTYEAR "%Y")
-SET(COPYRIGHT_YEARS "2000-${CURRENTYEAR}")
-
-
 
 #******************************************************************************
 # PROJECT LANGUAGE SUPPORT
 #******************************************************************************
 
 # We need a C and C++ compiler, so make sure project() test for it.
-project(ceres VERSION 0.1 LANGUAGES C CXX)
+project(CeresProject LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
