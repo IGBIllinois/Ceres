@@ -1,0 +1,32 @@
+#include "winver.h"
+
+IDI_ICON1               ICON    DISCARDABLE     "Icons/ripe.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION @CeresRemoteClient_VERSION_MAJOR@,@CeresRemoteClient_VERSION_MINOR@,@CeresRemoteClient_VERSION_PATCH@,@CeresRemoteClient_VERSION_TWEAK@
+ PRODUCTVERSION @CeresRemoteClient_VERSION_MAJOR@,@CeresRemoteClient_VERSION_MINOR@,@CeresRemoteClient_VERSION_PATCH@,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x00040004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "University of Illinois at Urbana-Champaign"
+            VALUE "FileDescription", "Ceres Remote Client Software"
+            VALUE "FileVersion", "@CeresRemoteClient_VERSION_MAJOR@.@CeresRemoteClient_VERSION_MINOR@.@CeresRemoteClient_VERSION_PATCH@.@CeresRemoteClient_VERSION_TWEAK@\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022..2026 UIUC"
+            VALUE "InternalName", "CeresRemoteClient"
+            VALUE "OriginalFilename", "CeresRemoteClient.exe"
+            VALUE "ProductName", "CeresRemoteClient"
+            VALUE "ProductVersion", "@CeresRemoteClient_VERSION_MAJOR@.@CeresRemoteClient_VERSION_MINOR@.@CeresRemoteClient_VERSION_PATCH@\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
