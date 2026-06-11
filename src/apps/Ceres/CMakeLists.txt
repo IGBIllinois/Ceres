@@ -1,4 +1,15 @@
 
+# We need a C and C++ compiler, so make sure project() test for it.
+project(Ceres VERSION 2.0.0.0 LANGUAGES C CXX)
+
+
+# Configure version resource file
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ceres.rc.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ceres.rc
+    @ONLY
+)
+
 
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.
@@ -63,6 +74,9 @@ PRIVATE
 #
 # General Application files
 #
+    AboutDialog.hpp
+    AboutDialog.cpp
+
     MeasurementManager.hpp
     MeasurementManager.cpp
     MeasurementTreeItem.hpp
@@ -100,6 +114,12 @@ PRIVATE
     MainWindow.cpp
 
     Ceres.cpp
+)
+
+get_source_file_property(defs AboutDialog.cpp COMPILE_DEFINITIONS)
+    list(APPEND defs "CERES_VERSION=\"${Ceres_VERSION}\"")
+    set_source_files_properties(AboutDialog.cpp PROPERTIES
+        COMPILE_DEFINITIONS "${defs}"
 )
 
 

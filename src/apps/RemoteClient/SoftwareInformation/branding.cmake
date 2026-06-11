@@ -1,4 +1,4 @@
-set(SOFTWARE_NAME "Ceres")
+set(SOFTWARE_NAME "Ceres Remote Client")
 set(VENDOR "University of Illinois at Urbana-Champaign")
 set(PROJECT_NAME "${SOFTWARE_NAME}")
 

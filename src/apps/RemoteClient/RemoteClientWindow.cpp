@@ -2,6 +2,8 @@
 #include "RemoteClientWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "AboutDialog.hpp"
+
 #include "CeresSplashScreen.hpp"
 #include "RemoteClientCentralWindow.hpp"
 #include "LoopTimeMeter.hpp"
@@ -416,6 +418,18 @@ void cRemoteClientWindow::onSensorLogMessage(uint8_t type, QString device, QStri
         mpCentralWindow->logMessage(type, device, instance, msg);
 }
 
+
+/**
+ * Slots for handling various menu signals
+ **/
+
+ //-----------------------------------------------------------------------------
+void cRemoteClientWindow::showAboutDialog()
+{
+    AboutDialog().exec();
+}
+
+
 //-----------------------------------------------------------------------------
 void cRemoteClientWindow::onSettingDefaultDataPath()
 {
@@ -456,9 +470,9 @@ void cRemoteClientWindow::createSubMenusAndActions()
     mpSettingMenu->addAction(pMenuItem);
 
     // Build the Help Menu
-//    pMenuItem = new QAction(tr("&About"), this);
-//    connect(pMenuItem, &QAction::triggered, this, &cRemoteClientWindow::helpAbout);
-//    mpHelpMenu->addAction(pMenuItem);
+    pMenuItem = new QAction(tr("&About"), this);
+    connect(pMenuItem, &QAction::triggered, this, &cRemoteClientWindow::showAboutDialog);
+    mpHelpMenu->addAction(pMenuItem);
 }
 
 //-----------------------------------------------------------------------------

@@ -55,6 +55,10 @@ public slots:
     void onLocalLogMessage(uint8_t type, QString device, QString msg);
     void onSensorLogMessage(uint8_t type, QString device, QString instance, QString msg);
 
+public slots:
+    //! Show the 'About this application' dialog
+    void showAboutDialog();
+
 private slots:
     void onSettingDefaultDataPath();
 

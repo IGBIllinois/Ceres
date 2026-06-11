@@ -1,4 +1,6 @@
 
+project(CeresExperimentPlanner VERSION 2.0.0.0)
+
 
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.

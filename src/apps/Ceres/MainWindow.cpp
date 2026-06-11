@@ -1,6 +1,7 @@
 
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
+#include "AboutDialog.hpp"
 #include "HobbsMeter.hpp"
 
 #include "CeresSplashScreen.hpp"
@@ -573,8 +574,9 @@ void cMainWindow::onSettingsReferenceHeight()
 }
 
 //-----------------------------------------------------------------------------
-void cMainWindow::helpAbout()
+void cMainWindow::showAboutDialog()
 {
+    AboutDialog().exec();
 }
 
 void cMainWindow::onStatusUpdate(QString msg)
@@ -762,7 +764,7 @@ void cMainWindow::createSubMenusAndActions()
 
     // Build the Help Menu
     pMenuItem = new QAction(tr("&About"), this);
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::helpAbout);
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::showAboutDialog);
     mpHelpMenu->addAction(pMenuItem);
 }
 

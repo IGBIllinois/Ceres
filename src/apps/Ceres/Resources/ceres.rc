@@ -3,10 +3,10 @@
 IDI_ICON1               ICON    DISCARDABLE     "Icons/ripe.ico"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
- FILEFLAGS 0x0L
+ FILEVERSION 2,0,0,0
+ PRODUCTVERSION 2,0,0,0
  FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
  FILEOS 0x00040004L
  FILETYPE 0x1L
  FILESUBTYPE 0x0L
@@ -16,13 +16,13 @@ BEGIN
         BLOCK "000004b0"
         BEGIN
             VALUE "CompanyName", "University of Illinois at Urbana-Champaign"
-            VALUE "FileDescription", "Spidercam Data Acquisition Software"
-            VALUE "FileVersion", "1.0.0.0"
-            VALUE "LegalCopyright", "Copyright (C) 2021 UIUC"
-            VALUE "InternalName", "ceres"
-            VALUE "OriginalFilename", "ceres.exe"
+            VALUE "FileDescription", "Ceres Data Acquisition Software"
+            VALUE "FileVersion", "2.0.0.0\0"
+            VALUE "LegalCopyright", "Copyright (C) 2021..2026 UIUC"
+            VALUE "InternalName", "Ceres"
+            VALUE "OriginalFilename", "Ceres.exe"
             VALUE "ProductName", "Ceres"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "ProductVersion", "2.0.0\0"
         END
     END
     BLOCK "VarFileInfo"

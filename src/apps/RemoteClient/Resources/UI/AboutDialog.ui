@@ -1,95 +1,158 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dcAboutDialog</class>
- <widget class="QDialog" name="dcAboutDialog">
+ <class>AboutDialog</class>
+ <widget class="QDialog" name="AboutDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1470</width>
-    <height>619</height>
+    <width>450</width>
+    <height>350</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
+  <property name="minimumSize">
+   <size>
+    <width>450</width>
+    <height>350</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>450</width>
+    <height>350</height>
+   </size>
   </property>
   <property name="windowTitle">
-   <string>About ...</string>
-  </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>../logo.ico</normaloff>../logo.ico</iconset>
+   <string>About</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
   <property name="modal">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="splashLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-       <horstretch>50</horstretch>
-       <verstretch>50</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="toolTip">
-      <string notr="true"/>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
-     </property>
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
+    <number>10</number>
+   </property>
+   <property name="topMargin">
+    <number>10</number>
+   </property>
+   <property name="rightMargin">
+    <number>10</number>
+   </property>
+   <property name="bottomMargin">
+    <number>10</number>
+   </property>
+   <item alignment="Qt::AlignHCenter">
+    <widget class="QLabel" name="lblLogo">
      <property name="text">
-      <string notr="true"/>
+      <string>logo</string>
      </property>
-     <property name="pixmap">
-      <pixmap resource="vvResources.qrc">:/vvResources/SoftwareInformation/About.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
+    </widget>
+   </item>
+   <item alignment="Qt::AlignHCenter">
+    <widget class="QLabel" name="lblProjectTitle">
+     <property name="text">
+      <string>project_title</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="copyrightLabel">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
+    <widget class="QWidget" name="wdtContent" native="true">
+     <layout class="QVBoxLayout" name="vBoxLytContent">
+      <property name="spacing">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <property name="bottomMargin">
+         <number>10</number>
+        </property>
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QLabel" name="lblVersion">
+          <property name="text">
+           <string>version</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QLabel" name="lblDescription">
+          <property name="text">
+           <string>description</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QLabel" name="lblDomain">
+          <property name="text">
+           <string>domain</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::RichText</enum>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::LinksAccessibleByMouse</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="lblCopying">
+        <property name="text">
+         <string>copying</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="detailsLabel">
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::RichText</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-     </property>
-     <property name="wordWrap">
+    <widget class="QTextBrowser" name="txtBws">
+     <property name="tabChangesFocus">
       <bool>true</bool>
-     </property>
-     <property name="margin">
-      <number>2</number>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
@@ -98,19 +161,73 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>5</number>
+     </property>
      <item>
-      <widget class="QPushButton" name="closeButton">
+      <widget class="QPushButton" name="btnCredits">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&amp;Close</string>
+        <string>Credits</string>
        </property>
-       <property name="default">
+       <property name="checkable">
         <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnLicense">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>License</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Close</string>
        </property>
       </widget>
      </item>
@@ -118,8 +235,58 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="dcResources.qrc"/>
- </resources>
- <connections/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnClose</sender>
+   <signal>clicked()</signal>
+   <receiver>AboutDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>438</x>
+     <y>338</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnCredits</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>AboutDialog</receiver>
+   <slot>onCreditsOrLicenceChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>50</x>
+     <y>326</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>224</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLicense</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>AboutDialog</receiver>
+   <slot>onCreditsOrLicenceChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>135</x>
+     <y>326</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>224</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onCreditsOrLicenceChecked(bool)</slot>
+ </slots>
 </ui>

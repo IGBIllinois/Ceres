@@ -1,6 +1,13 @@
 
-project(CeresRemoteClient VERSION 1.0.0.0)
 
+project(CeresRemoteClient VERSION 2.0.0.0)
+
+# Configure version resource file
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ceres_remote_client.rc.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ceres_remote_client.rc
+    @ONLY
+)
 
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.
@@ -64,6 +71,9 @@ PRIVATE
 #
 # General Application files
 #
+    AboutDialog.hpp
+    AboutDialog.cpp
+
     RemoteDataModel.hpp
     RemoteDataModel.cpp
     RemoteDataThread.hpp
@@ -77,6 +87,12 @@ PRIVATE
     RemoteClientCentralWindow.cpp
 
     CeresRemoteClient.cpp
+)
+
+get_source_file_property(defs AboutDialog.cpp COMPILE_DEFINITIONS)
+    list(APPEND defs "CERES_REMOTE_CLIENT_VERSION=\"${CeresRemoteClient_VERSION}\"")
+    set_source_files_properties(AboutDialog.cpp PROPERTIES
+        COMPILE_DEFINITIONS "${defs}"
 )
 
 #

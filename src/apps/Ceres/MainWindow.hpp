@@ -90,7 +90,8 @@ private slots:
     void onSettingsReferenceHeight();
 
 private slots:
-    void helpAbout();
+    //! Show the 'About this application' dialog
+    void showAboutDialog();
     void onSetExperimentActions(bool load, bool run, bool pause, bool stop);
 
 private:
