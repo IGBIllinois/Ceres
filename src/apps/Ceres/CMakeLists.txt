@@ -1,6 +1,13 @@
 
 # We need a C and C++ compiler, so make sure project() test for it.
-project(Ceres VERSION 2.0.0.0 LANGUAGES C CXX)
+project(Ceres VERSION 2.0.1.0 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Turn off any compiler extensions
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 # Configure version resource file
