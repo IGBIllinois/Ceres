@@ -5,6 +5,8 @@
 #include <nlohmann/json.hpp>
 
 #include <QPaintEvent>
+#include <QMenu>
+#include <QAction>
 
 #include <fstream>
 #include <algorithm>
@@ -65,6 +67,7 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	QWidget(parent)
 {
 	setBackgroundRole(QPalette::Base);
+	setContextMenuPolicy(Qt::DefaultContextMenu);
 
 	mMeasurementColor.setRgb(255, 0, 255);
 	mMeasurementPen.setColor(mMeasurementColor);
@@ -145,9 +148,6 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mMarkerColor.setRgb(59, 122, 87);	// Amazon Green
 	mMarkerPen.setWidth(1);;
 	mMarkerRadius = 2 * mDollyMarkerRadius;
-	mpShowMarkerInfo = new QPushButton("Marker Info", this);
-	mpShowMarkerInfo->setHidden(true);
-	connect(mpShowMarkerInfo, &QPushButton::pressed, this, &cSpidercamScanArea::onMarkerInfo);
 
 	mIsRecording = false;
 	mpActivePath = nullptr;
@@ -246,7 +246,7 @@ void cSpidercamScanArea::updateSecondaryDollyPosition(bool valid, uint32_t x, ui
 	mSecondaryDollyPosition.setY(y);
 }
 
-void cSpidercamScanArea::onMarkerInfo()
+void cSpidercamScanArea::showMarkerInfo()
 {
 
 }
@@ -282,14 +282,11 @@ void cSpidercamScanArea::addMarker(std::string_view label, int x_mm, int y_mm, i
 	marker.z_mm = z_mm;
 
 	mMarkers.push_back(marker);
-
-//BAF	mpShowMarkerInfo->setHidden(false);
 }
 
 void cSpidercamScanArea::removeMarkers()
 {
 	mMarkers.clear();
-	mpShowMarkerInfo->setHidden(true);
 }
 
 void cSpidercamScanArea::loadLayout(const std::string& layout_filename)
@@ -563,6 +560,27 @@ std::tuple<int, int> cSpidercamScanArea::toSpiderCamCoordinates(int window_x, in
 	int y = mMaxY - (window_y - mY_Offset) / mY_Scale;
 
 	return { x, y };
+}
+
+void cSpidercamScanArea::contextMenuEvent(QContextMenuEvent* event)
+{
+	if (mMarkers.empty())
+		return;
+
+	QMenu contextMenu(tr("Context Menu"), this);
+	
+	// Create and add actions
+	QAction showMarkerInfo(tr("Show Marker Info"), this);
+	contextMenu.addAction(&showMarkerInfo);
+
+	// Connect actions to slots (or use C++ lambdas)
+	connect(&showMarkerInfo, &QAction::triggered, this, &cSpidercamScanArea::showMarkerInfo);
+
+	// Display the menu at the cursor's global position. The event->globalPos() is crucial for correct placement!
+	contextMenu.exec(event->globalPos());
+
+	// Accept the event so it stops propagating (optional, but good practice)
+	event->accept();
 }
 
 void cSpidercamScanArea::paintEvent(QPaintEvent* event)

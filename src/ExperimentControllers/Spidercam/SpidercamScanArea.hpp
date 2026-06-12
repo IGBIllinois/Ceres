@@ -4,11 +4,12 @@
 #include "../../Utilities/Utilities.hpp"
 
 #include <QWidget>
-#include <QPushButton>
 #include <QPen>
 #include <QPainter>
 #include <QPainterPath>
 #include <Qpicture>
+#include <QContextMenuEvent>
+
 #include <vector>
 #include <string>
 #include <array>
@@ -112,10 +113,11 @@ public slots:
     void updateSecondaryDollyPosition(bool valid, uint32_t x, uint32_t y);
 
 private slots:
-    void onMarkerInfo();
+    void showMarkerInfo();
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     void drawDollyMarker(QPainter& painter, double height, 
@@ -187,7 +189,6 @@ private:
     QPen   mMarkerPen;
     QColor mMarkerColor;
     int    mMarkerRadius;
-    QPushButton* mpShowMarkerInfo = nullptr;
 
     // For drawing the dolly position
     bool   mShowDollyPosition = true;
