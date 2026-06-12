@@ -2,6 +2,8 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "AboutDialog.hpp"
+
 #include "PlannerDataModel.hpp"
 #include "PlannerDataModelLocal.hpp"
 
@@ -1703,6 +1705,7 @@ void cMainWindow::onSpidercamPauseRunMeasurement()
  *******************************************************************/
 void cMainWindow::onHelpAbout()
 {
+    AboutDialog().exec();
 }
 
 /********************************************************************

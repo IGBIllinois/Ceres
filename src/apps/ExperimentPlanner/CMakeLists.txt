@@ -1,6 +1,13 @@
 
 project(CeresExperimentPlanner VERSION 2.0.0.0)
 
+# Configure version resource file
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ceres_experiment_planner.rc.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ceres_experiment_planner.rc
+    @ONLY
+)
+
 
 #-------------------------------------------------------------------------------
 # This executable will use the Qt GUI framework.
@@ -187,12 +194,20 @@ PRIVATE
 	PlannerDataThread.hpp
 	PlannerDataThread.cpp
 	
+    AboutDialog.hpp
+    AboutDialog.cpp
+
     MainWindow.hpp
     MainWindow.cpp
 
     CeresExperimentPlanner.cpp
 )
 
+get_source_file_property(defs AboutDialog.cpp COMPILE_DEFINITIONS)
+    list(APPEND defs "CERES_EXPERIMENT_PLANNER_VERSION=\"${CeresExperimentPlanner_VERSION}\"")
+    set_source_files_properties(AboutDialog.cpp PROPERTIES
+        COMPILE_DEFINITIONS "${defs}"
+)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries
