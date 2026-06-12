@@ -1,0 +1,32 @@
+#include "winver.h"
+
+IDI_ICON1               ICON    DISCARDABLE     "Icons/ripe.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION @CeresExperimentPlanner_VERSION_MAJOR@,@CeresExperimentPlanner_VERSION_MINOR@,@CeresExperimentPlanner_VERSION_PATCH@,@CeresExperimentPlanner_VERSION_TWEAK@
+ PRODUCTVERSION @CeresExperimentPlanner_VERSION_MAJOR@,@CeresExperimentPlanner_VERSION_MINOR@,@CeresExperimentPlanner_VERSION_PATCH@,0
+ FILEFLAGS 0x0L
+ FILEFLAGSMASK 0x3fL
+ FILEOS 0x00040004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "University of Illinois at Urbana-Champaign"
+            VALUE "FileDescription", "Ceres Experiment Planner"
+            VALUE "FileVersion", "@CeresExperimentPlanner_VERSION_MAJOR@,@CeresExperimentPlanner_VERSION_MINOR@,@CeresExperimentPlanner_VERSION_PATCH@,@CeresExperimentPlanner_VERSION_TWEAK@\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 UIUC"
+            VALUE "InternalName", "CeresExperimentPlanner"
+            VALUE "OriginalFilename", "CeresExperimentPlanner.exe"
+            VALUE "ProductName", "CeresExperimentPlanner"
+            VALUE "ProductVersion", "@CeresExperimentPlanner_VERSION_MAJOR@,@CeresExperimentPlanner_VERSION_MINOR@,@CeresExperimentPlanner_VERSION_PATCH@\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END

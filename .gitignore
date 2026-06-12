@@ -37,3 +37,4 @@ build
 
 # OS files
 .DS_Store
+/src/apps/Ceres/Resources/ceres.rc
