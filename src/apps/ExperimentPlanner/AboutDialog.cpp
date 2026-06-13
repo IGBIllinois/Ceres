@@ -162,7 +162,13 @@ void AboutDialog::createWidgets()
 	QPalette palette = this->palette();
 	QRgb bgColor = palette.color(QPalette::Window).rgb();
 
-	lblDescription->setStyleSheet("background-color: rgb(240,240,240);"); 
+	uint8_t red   = static_cast<uint8_t>((bgColor & 0x00FF0000) >> 16);
+	uint8_t green = static_cast<uint8_t>((bgColor & 0x0000FF00) >> 8);
+	uint8_t blue  = static_cast<uint8_t>((bgColor & 0x000000FF));
+
+	QString style = QString("background-color: rgb(%1, %2, %3);").arg(red).arg(green).arg(blue);
+
+	lblDescription->setStyleSheet(style); 
 
 	lblDomain = new QLabel("domain", wdtContent);
 	lblDomain->setTextFormat(Qt::TextFormat::RichText);
