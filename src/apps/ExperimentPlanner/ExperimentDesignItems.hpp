@@ -80,8 +80,10 @@ private slots:
 	void onInsertPause();
 	void onInsertMovement();
 	void onInsertMarker();
-	void onInsertHySpexCommand();
 	void onInsertReferencePoint();
+	void onInsertHySpexCommand();
+	void onInsertFlirConfigure();
+	void onInsertFlirTakePhoto();
 
 private:
 
@@ -270,6 +272,8 @@ private slots:
 	void onInsertBefore_Marker();
 	void onInsertBefore_HySpexCommand();
 	void onInsertBefore_ReferencePoint();
+	void onInsertBefore_FlirConfigure();
+	void onInsertBefore_FlirTakePhoto();
 
 	void onInsertAfter_Delay();
 	void onInsertAfter_Pause();
@@ -277,6 +281,8 @@ private slots:
 	void onInsertAfter_Marker();
 	void onInsertAfter_HySpexCommand();
 	void onInsertAfter_ReferencePoint();
+	void onInsertAfter_FlirConfigure();
+	void onInsertAfter_FlirTakePhoto();
 
 	void onDeleteStep();
 
@@ -339,6 +345,8 @@ private slots:
 	void onInsertBefore_Marker();
 	void onInsertBefore_HySpexCommand();
 	void onInsertBefore_ReferencePoint();
+	void onInsertBefore_FlirConfigure();
+	void onInsertBefore_FlirTakePhoto();
 
 	void onInsertAfter_Delay();
 	void onInsertAfter_Pause();
@@ -346,6 +354,8 @@ private slots:
 	void onInsertAfter_Marker();
 	void onInsertAfter_HySpexCommand();
 	void onInsertAfter_ReferencePoint();
+	void onInsertAfter_FlirConfigure();
+	void onInsertAfter_FlirTakePhoto();
 
 	void onDeleteStep();
 

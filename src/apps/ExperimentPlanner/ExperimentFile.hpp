@@ -17,7 +17,7 @@
 class cMeasurementStep;
 
 
-enum eMeasurementStep {delay, pause, movement, hyspex_command, reference_point, marker};
+enum eMeasurementStep {delay, pause, movement, hyspex_command, reference_point, marker, flir_configure, flir_take_photo };
 
 enum class eExperimentType { UNKNOWN, LIDAR, HYPERSPECTRAL, TOF, THERMAL };
 

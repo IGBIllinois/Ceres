@@ -158,9 +158,22 @@ void cFlowArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	{
 		contextMenu.addSeparator();
 
-		QAction commandStep("Insert HySpex Command Step...");
-		connect(&commandStep, &QAction::triggered, this, &cFlowArrow::onInsertHySpexCommand);
-		contextMenu.addAction(&commandStep);
+		QAction* commandStep = new QAction("Insert HySpex Command Step...");
+		connect(commandStep, &QAction::triggered, this, &cFlowArrow::onInsertHySpexCommand);
+		contextMenu.addAction(commandStep);
+	}
+
+	if ((mExperimentType == eExperimentType::UNKNOWN) || (mExperimentType == eExperimentType::THERMAL))
+	{
+		contextMenu.addSeparator();
+
+		QAction* configureStep = new QAction("Insert FLIR Configuration Step...");
+		connect(configureStep, &QAction::triggered, this, &cFlowArrow::onInsertFlirConfigure);
+		contextMenu.addAction(configureStep);
+
+		QAction* takePhotoStep = new QAction("Insert FLIR Take Photo Step...");
+		connect(takePhotoStep, &QAction::triggered, this, &cFlowArrow::onInsertFlirTakePhoto);
+		contextMenu.addAction(takePhotoStep);
 	}
 
 	contextMenu.exec(event->screenPos());
@@ -194,6 +207,16 @@ void cFlowArrow::onInsertHySpexCommand()
 void cFlowArrow::onInsertReferencePoint()
 {
 	emit insertBefore(getID(), eMeasurementStep::reference_point);
+}
+
+void cFlowArrow::onInsertFlirConfigure()
+{
+	emit insertBefore(getID(), eMeasurementStep::flir_configure);
+}
+
+void cFlowArrow::onInsertFlirTakePhoto()
+{
+	emit insertBefore(getID(), eMeasurementStep::flir_take_photo);
 }
 
 
@@ -691,9 +714,22 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	{
 		beforeMenu->addSeparator();
 
-		QAction beforeCommand("HySpex Command");
-		connect(&beforeCommand, &QAction::triggered, this, &cProcessStep::onInsertBefore_HySpexCommand);
-		beforeMenu->addAction(&beforeCommand);
+		QAction* beforeCommand = new QAction("HySpex Command");
+		connect(beforeCommand, &QAction::triggered, this, &cProcessStep::onInsertBefore_HySpexCommand);
+		beforeMenu->addAction(beforeCommand);
+	}
+
+	if ((mExperimentType == eExperimentType::UNKNOWN) || (mExperimentType == eExperimentType::THERMAL))
+	{
+		beforeMenu->addSeparator();
+
+		QAction* beforeConfigure = new QAction("FLIR Configure");
+		connect(beforeConfigure, &QAction::triggered, this, &cProcessStep::onInsertBefore_FlirConfigure);
+		beforeMenu->addAction(beforeConfigure);
+
+		QAction* beforeTakePhoto = new QAction("FLIR Take Photo");
+		connect(beforeTakePhoto, &QAction::triggered, this, &cProcessStep::onInsertBefore_FlirTakePhoto);
+		beforeMenu->addAction(beforeTakePhoto);
 	}
 
 	QMenu* afterMenu = contextMenu.addMenu(tr("Insert Step After..."));
@@ -724,9 +760,22 @@ void cProcessStep::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	{
 		afterMenu->addSeparator();
 
-		QAction afterCommand("HySpex Command");
-		connect(&afterCommand, &QAction::triggered, this, &cProcessStep::onInsertAfter_HySpexCommand);
-		afterMenu->addAction(&afterCommand);
+		QAction* afterCommand = new QAction("HySpex Command");
+		connect(afterCommand, &QAction::triggered, this, &cProcessStep::onInsertAfter_HySpexCommand);
+		afterMenu->addAction(afterCommand);
+	}
+
+	if ((mExperimentType == eExperimentType::UNKNOWN) || (mExperimentType == eExperimentType::THERMAL))
+	{
+		afterMenu->addSeparator();
+
+		QAction* afterConfigure = new QAction("FLIR Configure");
+		connect(afterConfigure, &QAction::triggered, this, &cProcessStep::onInsertAfter_FlirConfigure);
+		afterMenu->addAction(afterConfigure);
+
+		QAction* afterTakePhoto = new QAction("FLIR Take Photo");
+		connect(afterTakePhoto, &QAction::triggered, this, &cProcessStep::onInsertAfter_FlirTakePhoto);
+		afterMenu->addAction(afterTakePhoto);
 	}
 
 	contextMenu.addSeparator();
@@ -768,6 +817,16 @@ void cProcessStep::onInsertBefore_ReferencePoint()
 	emit insertBefore(getID(), eMeasurementStep::reference_point);
 }
 
+void cProcessStep::onInsertBefore_FlirConfigure()
+{
+	emit insertBefore(getID(), eMeasurementStep::flir_configure);
+}
+
+void cProcessStep::onInsertBefore_FlirTakePhoto()
+{
+	emit insertBefore(getID(), eMeasurementStep::flir_take_photo);
+}
+
 void cProcessStep::onInsertAfter_Delay()
 {
 	emit insertAfter(getID(), eMeasurementStep::delay);
@@ -796,6 +855,16 @@ void cProcessStep::onInsertAfter_HySpexCommand()
 void cProcessStep::onInsertAfter_ReferencePoint()
 {
 	emit insertAfter(getID(), eMeasurementStep::reference_point);
+}
+
+void cProcessStep::onInsertAfter_FlirConfigure()
+{
+	emit insertAfter(getID(), eMeasurementStep::flir_configure);
+}
+
+void cProcessStep::onInsertAfter_FlirTakePhoto()
+{
+	emit insertAfter(getID(), eMeasurementStep::flir_take_photo);
 }
 
 void cProcessStep::onDeleteStep()
@@ -1154,6 +1223,16 @@ void cIoStep::onInsertBefore_ReferencePoint()
 	emit insertBefore(getID(), eMeasurementStep::reference_point);
 }
 
+void cIoStep::onInsertBefore_FlirConfigure()
+{
+	emit insertBefore(getID(), eMeasurementStep::flir_configure);
+}
+
+void cIoStep::onInsertBefore_FlirTakePhoto()
+{
+	emit insertBefore(getID(), eMeasurementStep::flir_take_photo);
+}
+
 void cIoStep::onInsertAfter_Delay()
 {
 	emit insertAfter(getID(), eMeasurementStep::delay);
@@ -1182,6 +1261,16 @@ void cIoStep::onInsertAfter_HySpexCommand()
 void cIoStep::onInsertAfter_ReferencePoint()
 {
 	emit insertAfter(getID(), eMeasurementStep::reference_point);
+}
+
+void cIoStep::onInsertAfter_FlirConfigure()
+{
+	emit insertAfter(getID(), eMeasurementStep::flir_configure);
+}
+
+void cIoStep::onInsertAfter_FlirTakePhoto()
+{
+	emit insertAfter(getID(), eMeasurementStep::flir_take_photo);
 }
 
 void cIoStep::onDeleteStep()

@@ -37,10 +37,12 @@ class cMeasurementStep_FLIR_Configure : public cMeasurementStep
 	Q_OBJECT
 
 public:
-	cMeasurementStep_FLIR_Configure() = delete;
-	cMeasurementStep_FLIR_Configure(std::string_view camera_model, std::string_view command);
+	cMeasurementStep_FLIR_Configure();
 
 	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
+
+public slots:
+	bool onEdit();
 
 protected:
 	void load(const nlohmann::json& jdoc) override;
@@ -50,8 +52,9 @@ private:
 	QString generateDescription() const;
 
 private:
-	std::string mModel;
-	std::string mCommand;
+	enum eMode { SINGLE, TIME_LAPSE, CONTINUOUS } mMode;
+	double mFrameRate_fps = 0.0;
+	int32_t mLapseInterval_ms = 0.0;
 };
 
 
@@ -64,8 +67,7 @@ class cMeasurementStep_FLIR_TakePhoto : public cMeasurementStep
 	Q_OBJECT
 
 public:
-	cMeasurementStep_FLIR_TakePhoto() = delete;
-	cMeasurementStep_FLIR_TakePhoto(std::string_view camera_model);
+	cMeasurementStep_FLIR_TakePhoto();
 
 	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
@@ -77,6 +79,5 @@ private:
 	QString generateDescription() const;
 
 private:
-	std::string mModel;
 };
 
