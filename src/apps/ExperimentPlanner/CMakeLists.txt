@@ -123,6 +123,8 @@ PRIVATE
     MeasurementSteps_HySpex.cpp
     MeasurementSteps_Ssnx.hpp
     MeasurementSteps_Ssnx.cpp
+    MeasurementSteps_FLIR.hpp
+    MeasurementSteps_FLIR.cpp
 
     CreateLidarExperimentDlg.hpp
     CreateLidarExperimentDlg.cpp
@@ -148,6 +150,11 @@ PRIVATE
     CreateHyperspectralReferenceExperimentFromSpiderCamPointDlg.cpp
     CreateHyperspectralReferenceExperimentFromGpsDlg.hpp
     CreateHyperspectralReferenceExperimentFromGpsDlg.cpp
+
+    CreateThermalExperimentDlg.hpp
+    CreateThermalExperimentDlg.cpp
+    CreateThermalExperimentFromSpiderCamPointDlg.hpp
+    CreateThermalExperimentFromSpiderCamPointDlg.cpp
 
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp

@@ -3,6 +3,7 @@
 #include "MeasurementSteps.hpp"
 #include "MeasurementSteps_HySpex.hpp"
 #include "MeasurementSteps_Ssnx.hpp"
+#include "MeasurementSteps_FLIR.hpp"
 
 #include <QLayout>
 #include <QPushButton>
@@ -321,6 +322,9 @@ void cExperimentFile::open(const std::string& file_name)
 
 			if (!step)
 				step = ssnx::create_step(type, entry);
+
+			if (!step)
+				step = flir::create_step(type, entry);
 
 			if (step)
 			{

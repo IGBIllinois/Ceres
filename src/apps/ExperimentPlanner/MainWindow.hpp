@@ -110,6 +110,8 @@ private slots:
     void onGenerateHyperspectralScan_GPS();
     void onGenerateHyperspectralScan_PlotInfo();
 
+    void onGenerateThermalScan_SpiderCam_Point();
+
     // Slots associated with "Compute" menu actions
 private slots:
     void onComputeGroundHeight();

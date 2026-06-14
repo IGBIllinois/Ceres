@@ -20,6 +20,8 @@
 #include "CreateHyperspectralExperimentFromGpsDlg.hpp"
 #include "CreateHyperspectralExperimentFromPlotInfoDlg.hpp"
 
+#include "CreateThermalExperimentFromSpiderCamPointDlg.hpp"
+
 #include "MeasurementManager.hpp"
 #include "MeasurementTreeItem.hpp"
 #include "FieldLayoutWidget.hpp"
@@ -476,6 +478,13 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem = new QAction(tr("Hyperspectral Scan From GPS plot data (Hand Planted)"), this);
     pMenuItem->setStatusTip(tr("Creates hyperspectral measurement file(s) from GPS plot point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateHyperspectralScan_PlotInfo);
+    mpGenerateMenu->addAction(pMenuItem);
+
+    mpGenerateMenu->addSeparator();
+
+    pMenuItem = new QAction(tr("Thermal Scan From SpiderCam Point"), this);
+    pMenuItem->setStatusTip(tr("Creates thermal measurement file(s) from single SpiderCam point"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateThermalScan_SpiderCam_Point);
     mpGenerateMenu->addAction(pMenuItem);
 
     //
@@ -1268,6 +1277,30 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
     connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
     connect(&dlg, &cCreateHyperspectralExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
+}
+
+void cMainWindow::onGenerateThermalScan_SpiderCam_Point()
+{
+    cCreateThermalExperimentFromSpiderCamDlg dlg;
+
+    connect(&dlg, &cCreateThermalExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateThermalExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateThermalExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
+
+    if (mpModel && mpModel->isConnected())
+    {
+        dlg.positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cCreateThermalExperimentFromSpiderCamDlg::positionUpdated);
+    }
 
     auto result = dlg.exec();
 
