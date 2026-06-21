@@ -158,6 +158,10 @@ void cSsnxModel_direct::update()
 
 void cSsnxModel_direct::reconnectToGps()
 {
+    logMessage(logINFO, "Trying to reconnect to the GPS!");
+    stopCommunications();
+    startCommunications();
+/*
     forcePromptRequest();
     //    sendPromptRequest();
 
@@ -167,6 +171,7 @@ void cSsnxModel_direct::reconnectToGps()
         setStatus(sensor::eStatus::PENDING);
 
     mLastReceived = std::chrono::high_resolution_clock::now();
+*/
 }
 
 void cSsnxModel_direct::writeDataHeader()

@@ -167,8 +167,9 @@ void cSsnxStatusView::createWidgets()
 	mpRef_Count = new QLineEdit(this);
 	mpRef_Count->setReadOnly(true);
 
-	mpReconnect = new QPushButton("Restart", this);
+	mpReconnect = new QPushButton("Reconnect", this);
 	mpReconnect->setEnabled(false);
+	connect(mpReconnect, &QPushButton::clicked, this, &cSsnxStatusView::tryGpsReconnection);
 }
 
 void cSsnxStatusView::doLayout()
