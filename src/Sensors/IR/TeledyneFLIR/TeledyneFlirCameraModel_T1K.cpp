@@ -175,13 +175,25 @@ void cTeledyneFlirCameraModel_T1K::writeDataHeader()
 
 bool cTeledyneFlirCameraModel_T1K::startCommunications()
 {
-    mCamera->start();
+    if (mCamera->start())
+    {
+        setStatus(sensor::eStatus::CONNECTING);
+    }
+    else
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+    }
 
-    setStatus(sensor::eStatus::CONNECTING);
-
-    mIsRunning = mCamera->isRunning();
-
-    setStatus(sensor::eStatus::RUNNING);
+    if (mIsRunning = mCamera->isRunning())
+    {
+        setStatus(sensor::eStatus::RUNNING);
+    }
+    else
+    {
+        setStatus(sensor::eStatus::FAILED);
+        return false;
+    }
 
     mTimeLapseTimer.start();
 
@@ -272,6 +284,8 @@ void cTeledyneFlirCameraModel_T1K::update()
         if (mImageRequested || mAutoEmitImages)
         {
             mColorizedImage = QImage(mCurrentImage.width(), mCurrentImage.height(), QImage::Format_RGB888);
+
+            mColorTable.setRange(mCurrentImage.minTemperature(), mCurrentImage.maxTemperature());
 
             // Access raw pixel data
             uchar* image_data = mColorizedImage.bits();

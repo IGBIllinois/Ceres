@@ -81,7 +81,7 @@ bool cTeledyneFlirCameraModel::configure(const nlohmann::json& jsonCfg)
 
         if (lapse_interval_ms < 0)
         {
-            throw std::logic_error("Missing \"interval (ms)\" entry!");
+            throw std::logic_error("Missing \"time-lapse interval (ms)\" entry!");
         }
     }
     else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))

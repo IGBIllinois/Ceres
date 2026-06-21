@@ -37,7 +37,11 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
 
     std::string protocol = sensorInfo["protocol"];
 
-    factory.discoverCameras(protocol);
+    long long timeout_sec = 5;
+    if (sensorInfo.contains("timeout (s)"))
+        timeout_sec = sensorInfo["timeout (s)"].get<long long>();
+
+    factory.discoverCameras(protocol, timeout_sec);
 
     if (factory.empty())
     {
