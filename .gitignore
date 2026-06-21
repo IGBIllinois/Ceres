@@ -39,3 +39,4 @@ build
 .DS_Store
 /src/apps/Ceres/Resources/ceres.rc
 /src/apps/RemoteClient/Resources/ceres_remote_client.rc
+/src/apps/ExperimentPlanner/Resources/ceres_experiment_planner.rc
