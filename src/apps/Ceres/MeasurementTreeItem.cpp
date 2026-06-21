@@ -27,6 +27,12 @@ cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidget* parent, const std::files
     {
         nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, true, true);
 
+        if (!jsonDoc.contains("experiment"))
+        {
+            in.close();
+            throw invalid_experiment_file();
+        }
+
         if (jsonDoc.contains("measurement name"))
             measurement_name = jsonDoc["measurement name"];
 
@@ -94,6 +100,12 @@ cMeasurementTreeItem::cMeasurementTreeItem(QTreeWidgetItem* parent, const std::f
     try
     {
         nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, true, true);
+
+        if (!jsonDoc.contains("experiment"))
+        {
+            in.close();
+            throw invalid_experiment_file();
+        }
 
         if (jsonDoc.contains("measurement name"))
             measurement_name = jsonDoc["measurement name"];

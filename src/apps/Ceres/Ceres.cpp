@@ -13,6 +13,7 @@
 #include <fstream>
 
 static std::ofstream g_logFile;
+static std::chrono::time_point<std::chrono::system_clock> g_startTime;
 
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -56,7 +57,28 @@ void shutdown_handler()
 
 int main(int argc, char** argv)
 {
-    g_logFile.open("ceres.log", std::ios::trunc);
+    {
+        std::string filename = "Ceres";
+
+        char timestamp[100] = { '\0' };
+        std::time_t t = std::time(nullptr);
+        std::strftime(timestamp, sizeof(timestamp), "%Y%m%d", std::localtime(&t));
+
+        filename += "_";
+        filename += timestamp;
+
+        filename += ".log";
+        g_logFile.open(filename, std::ios::app);
+
+        std::string title = "=========== Ceres Started ";
+        std::strftime(timestamp, sizeof(timestamp), "(%H:%M:%S)", std::localtime(&t));
+        title += timestamp;
+        title += " ===========";
+
+        g_logFile << title << std::endl;
+        g_startTime = std::chrono::system_clock::now();
+    }
+
 
     qInstallMessageHandler(myMessageOutput);
 

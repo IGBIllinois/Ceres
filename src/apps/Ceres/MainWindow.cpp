@@ -605,7 +605,7 @@ void cMainWindow::onWarningMessage(QString title, QString msg)
 
 void cMainWindow::onErrorMessage(QString title, QString msg)
 {
-    QMessageBox msg_box(QMessageBox::Critical, title, msg);
+    QMessageBox msg_box(QMessageBox::Critical, title, msg, QMessageBox::StandardButton::NoButton, this);
     msg_box.exec();
 }
 
