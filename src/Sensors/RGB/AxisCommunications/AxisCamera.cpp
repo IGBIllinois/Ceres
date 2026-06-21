@@ -11,6 +11,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <exception>
+
 
 cAxisCamera::cAxisCamera(int id, QObject* parent)
 :
@@ -18,6 +20,21 @@ cAxisCamera::cAxisCamera(int id, QObject* parent)
 {
     mpImageReader = new QImageReader();
     mpImageReader->setAutoDetectImageFormat(true);
+
+    bool found_jpeg = false;
+
+    auto formats = mpImageReader->supportedImageFormats();
+    for (const auto& format : formats)
+    {
+        QString str = format;
+        found_jpeg |= str.contains("jpeg");
+    }
+
+    if (!found_jpeg)
+    {
+        qCritical() << "Required JPEG decoder is missing.  Make sure the correct Qt plugin (plugins/imageformats/qjpeg.dll) is present.";
+        throw std::runtime_error("Missing JPEG decoder");
+    }
 
     mpCurrentImage = new QImage(640, 480, QImage::Format_RGB888);
     mpImageBuffer = new QBuffer(this);
