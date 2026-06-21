@@ -38,3 +38,4 @@ build
 # OS files
 .DS_Store
 /src/apps/Ceres/Resources/ceres.rc
+/src/apps/RemoteClient/Resources/ceres_remote_client.rc
