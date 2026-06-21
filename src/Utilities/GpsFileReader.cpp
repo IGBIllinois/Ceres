@@ -90,6 +90,11 @@ bool cGpsFileReader::loadFromFile(const std::string& filename)
 	{
 		auto values = doc.GetRow<std::string>(i);
 
+		if (values.size() != c)
+		{
+			break;
+		}
+
 		auto label = values.at(0);
 		auto northing_ft = std::stod(values.at(1));
 		auto easting_ft = std::stod(values.at(2));
