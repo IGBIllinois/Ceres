@@ -330,15 +330,6 @@ bool cCreateThermalExperimentFromSpiderCamDlg::generate()
 	int orientation = 0;
 	double separation_mm = 0.0;
 
-	if (mpHasSubScans->isChecked())
-	{
-		numOfScans = mpNumOfScans->text().toInt();
-		orientation = mpSubScanOrientation->currentIndex();
-		separation_mm = mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor;
-		mFastMode = mpFastMode->isChecked();
-	}
-
-
 	for (int scan = 0; scan < numOfScans; ++scan)
 	{
 		QSharedPointer<cExperimentFile> pInfo = QSharedPointer<cExperimentFile>(new cExperimentFile());
@@ -599,41 +590,6 @@ void cCreateThermalExperimentFromSpiderCamDlg::onShowPath()
 
 
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
-
-
-	if (mpHasSubScans->isChecked())
-	{
-		int separation_mm = static_cast<int>(mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor);
-
-		int numOfScans = mpNumOfScans->text().toInt();
-
-		int orientation = mpSubScanOrientation->currentIndex();
-
-		for (int i = 1; i < numOfScans; ++i)
-		{
-			switch (orientation)
-			{
-			case 0:
-				x1_mm += separation_mm;
-				x2_mm += separation_mm;
-				break;
-			case 1:
-				x1_mm -= separation_mm;
-				x2_mm -= separation_mm;
-				break;
-			case 2:
-				y1_mm -= separation_mm;
-				y2_mm -= separation_mm;
-				break;
-			case 3:
-				y1_mm += separation_mm;
-				y2_mm += separation_mm;
-				break;
-			}
-
-			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
-		}
-	}
 }
 
 void cCreateThermalExperimentFromSpiderCamDlg::recordXY()

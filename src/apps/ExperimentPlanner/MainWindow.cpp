@@ -329,10 +329,22 @@ void cMainWindow::createSubMenusAndActions()
     // Build the File Sub Menu
     //
 
-    pMenuItem = new QAction(tr("New Measurement File"), this);
-    pMenuItem->setStatusTip(tr("Creates a blank measurement file"));
-    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileNewMeasurement);
-    mpFileMenu->addAction(pMenuItem);
+    auto newMenu = mpFileMenu->addMenu("New Measurement File");
+
+    pMenuItem = new QAction(tr("LiDAR based Measurement File"), this);
+    pMenuItem->setStatusTip(tr("Measurement focused on collecting LiDAR data"));
+    connect(pMenuItem, &QAction::triggered, [this]() { onFileNewMeasurement(eExperimentType::LIDAR); });
+    newMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Hyperspectral based Measurement File"), this);
+    pMenuItem->setStatusTip(tr("Measurement focused on collecting Hyperspectral data"));
+    connect(pMenuItem, &QAction::triggered, [this]() { onFileNewMeasurement(eExperimentType::HYPERSPECTRAL); });
+    newMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Thermal based Measurement File"), this);
+    pMenuItem->setStatusTip(tr("Measurement focused on collecting FLIR data"));
+    connect(pMenuItem, &QAction::triggered, [this]() { onFileNewMeasurement(eExperimentType::THERMAL); });
+    newMenu->addAction(pMenuItem);
 
     pMenuItem = new QAction(tr("Open Measurement File..."), this);
     pMenuItem->setStatusTip(tr("Loads measurement file into memory"));
@@ -670,10 +682,10 @@ cExperimentDesignMdiChild* cMainWindow::createMdiChild()
 /********************************************************************
  * Slots associated with "File" menu actions
  *******************************************************************/
-void cMainWindow::onFileNewMeasurement()
+void cMainWindow::onFileNewMeasurement(eExperimentType exp_type)
 {
     auto* child = createMdiChild();
-    child->newFile();
+    child->newFile(exp_type);
     child->show();
 
     mpEditMenu->setDisabled(false);

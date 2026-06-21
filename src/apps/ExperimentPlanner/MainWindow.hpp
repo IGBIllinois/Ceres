@@ -77,7 +77,7 @@ public slots:
 
 // Slots associated with "File" menu actions
 private slots:
-    void onFileNewMeasurement();
+    void onFileNewMeasurement(eExperimentType exp_type);
     void onFileOpenMeasurement();
     void onFileSaveMeasurementFile();
     void onFileSaveAsMeasurementFile();

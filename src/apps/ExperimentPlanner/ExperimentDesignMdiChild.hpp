@@ -15,7 +15,7 @@ class cExperimentDesignMdiChild : public cExperimentDesignWidget
 public:
     cExperimentDesignMdiChild(QWidget *parent);
 
-    void newFile();
+    void newFile(eExperimentType exp_type);
     void newFile(const cExperimentFile& file);
     void loadFile(const QString &fileName);
     void save();

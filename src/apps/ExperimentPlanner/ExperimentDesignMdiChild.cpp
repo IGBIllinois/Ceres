@@ -155,11 +155,13 @@ void cExperimentDesignMdiChild::newWindowTitle()
     setWindowTitle(curFile + "[*]");
 }
 
-void cExperimentDesignMdiChild::newFile()
+void cExperimentDesignMdiChild::newFile(eExperimentType exp_type)
 {
     newWindowTitle();
 
     mMeasurementFile.clearSteps();
+
+    mMeasurementFile.setExperimentType(exp_type);
 
     loadExperiment(mMeasurementFile);
 }

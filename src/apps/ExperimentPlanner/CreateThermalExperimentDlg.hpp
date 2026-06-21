@@ -47,9 +47,6 @@ private slots:
 	void onMetaInfoUpdate();
 	void onControllerUpdate();
 	void onSensorUpdate();
-	void onSubScanUnitChange(const QString& text);
-	void onHasSubScans(int state);
-	void onNumSubScansChanged();
 
 protected:
 	void createControls();
@@ -59,7 +56,6 @@ protected:
 	virtual void createControls_Preamble();
 	virtual void createControls_Measurement();
 	virtual void createControls_Postamble();
-	virtual void createControls_SubScanInfo();
 
 	void createLayout();
 
@@ -68,7 +64,6 @@ protected:
 	virtual void createLayout_Preamble(QVBoxLayout* pMainLayout);
 	virtual void createLayout_Measurement(QVBoxLayout* pMainLayout);
 	virtual void createLayout_Postamble(QVBoxLayout* pMainLayout);
-	virtual void createLayout_SubScanInfo(QVBoxLayout* pMainLayout);
 
 protected:
 	double mSubScanConversionFactor = 1.0;
@@ -123,18 +118,5 @@ protected:
 	QLineEdit* mpSafeHeight_m = nullptr;
 	QLineEdit* mpSafeVerticalSpeed_mmps = nullptr;
 
-	/* Sub Scan Info */
-	QCheckBox* mpHasSubScans = nullptr;
-	QLineEdit* mpNumOfScans = nullptr;
-	QComboBox* mpSubScanOrientation = nullptr;
-	QComboBox* mpSubScanUnits = nullptr;
-
-	QLabel* mpSubScanSeparationLabel = nullptr;
-	QLineEdit* mpSubScanSeparation = nullptr;
-
-	QCheckBox* mpFastMode = nullptr;
-
-	QRadioButton* mpScanEveryRow = nullptr;
-	QRadioButton* mpScanCenterOnly = nullptr;
-	QRadioButton* mpScanInsideRows = nullptr;
+	QTableView* mpPhotoPositions = nullptr;
 };

@@ -76,7 +76,6 @@ void cCreateThermalExperimentDlg::createControls()
 	createControls_Preamble();
 	createControls_Measurement();
 	createControls_Postamble();
-	createControls_SubScanInfo();
 }
 
 void cCreateThermalExperimentDlg::createControls_TitleInfo()
@@ -181,63 +180,6 @@ void cCreateThermalExperimentDlg::createControls_Postamble()
 	mpSafeVerticalSpeed_mmps->setText("250");
 }
 
-void cCreateThermalExperimentDlg::createControls_SubScanInfo()
-{
-	mpHasSubScans = new QCheckBox("Has Adjacent Scans", this);
-	connect(mpHasSubScans, &QCheckBox::stateChanged, this, &cCreateThermalExperimentDlg::onHasSubScans);
-
-	mpNumOfScans = new QLineEdit(this);
-	mpNumOfScans->setValidator(new QIntValidator(1, 10));
-	mpNumOfScans->setEnabled(false);
-	mpNumOfScans->setText("1");
-	connect(mpNumOfScans, &QLineEdit::editingFinished, this, &cCreateThermalExperimentDlg::onNumSubScansChanged);
-
-	mpSubScanOrientation = new QComboBox(this);
-	mpSubScanOrientation->setEditable(false);
-	mpSubScanOrientation->addItem(NORTH_TO_SOUTH);
-	mpSubScanOrientation->addItem(SOUTH_TO_NORTH);
-	mpSubScanOrientation->addItem(EAST_TO_WEST);
-	mpSubScanOrientation->addItem(WEST_TO_EAST);
-	mpSubScanOrientation->setEnabled(false);
-//	connect(mpSubScanOrientation, &QComboBox::currentTextChanged, this, &cCreateExperimentFromGpsDlg::onSubOrientationChange);
-
-	 // default to inches
-	mpSubScanSeparationLabel = new QLabel(SCAN_SEPARATION_TEXT + "in)", this);
-	mpSubScanSeparation = new QLineEdit(this);
-	mpSubScanSeparation->setValidator(new QDoubleValidator(0, 100.0, 3));
-	mpSubScanSeparation->setText("0");
-	mpSubScanSeparation->setEnabled(false);
-
-	mpSubScanUnits = new QComboBox(this);
-	mpSubScanUnits->setEditable(false);
-	mpSubScanUnits->addItem("Meters");
-	mpSubScanUnits->addItem("Millimeters");
-	mpSubScanUnits->addItem("Feet");
-	mpSubScanUnits->addItem("Inches");
-	mpSubScanUnits->setEnabled(false);
-	mpSubScanUnits->setCurrentIndex(3);
-	mSubScanConversionFactor = nConstants::IN_TO_MM;
-	connect(mpSubScanUnits, &QComboBox::currentTextChanged, this, &cCreateThermalExperimentDlg::onSubScanUnitChange);
-
-	QString label = "Fast Mode (";
-	label += QChar(0x2191);
-	label += QChar(0x2193);
-	label += QChar(0x2191);
-	label += ")";
-
-	mpFastMode = new QCheckBox(label, this);
-
-	mpScanEveryRow = new QRadioButton("Scan Every Row", this);
-	mpScanEveryRow->setChecked(true);
-	mpScanEveryRow->setEnabled(false);
-
-	mpScanCenterOnly = new QRadioButton("Scan Center Only", this);
-	mpScanCenterOnly->setEnabled(false);
-
-	mpScanInsideRows = new QRadioButton("Scan Inside Rows", this);
-	mpScanInsideRows->setEnabled(false);
-}
-
 void cCreateThermalExperimentDlg::createLayout()
 {
 	QLabel* pText = nullptr;
@@ -250,7 +192,6 @@ void cCreateThermalExperimentDlg::createLayout()
 	createLayout_Preamble(pMainLayout);
 	createLayout_Measurement(pMainLayout);
 	createLayout_Postamble(pMainLayout);
-	createLayout_SubScanInfo(pMainLayout);
 
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
 		| QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
@@ -423,45 +364,6 @@ void cCreateThermalExperimentDlg::createLayout_Postamble(QVBoxLayout* pMainLayou
 	pMainLayout->addSpacing(10);
 }
 
-void cCreateThermalExperimentDlg::createLayout_SubScanInfo(QVBoxLayout* pMainLayout)
-{
-	QLabel* pText = nullptr;
-
-	QGroupBox* pGroupBox = new QGroupBox(tr("Sub Scan Information"));
-	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	QVBoxLayout* pVSubLayout = new QVBoxLayout();
-
-	QHBoxLayout* pHSubLayout = new QHBoxLayout();
-	pHSubLayout->addWidget(mpHasSubScans);
-	pText = new QLabel("Number of Scans: ");
-	pHSubLayout->addWidget(pText);
-	pHSubLayout->addWidget(mpNumOfScans);
-	pHSubLayout->addSpacing(10);
-	pHSubLayout->addWidget(mpSubScanOrientation);
-	pHSubLayout->addSpacing(10);
-	pHSubLayout->addWidget(mpFastMode);
-
-	pHSubLayout->addWidget(mpSubScanSeparationLabel);
-	pHSubLayout->addWidget(mpSubScanSeparation);
-	pHSubLayout->addSpacing(10);
-	pHSubLayout->addWidget(mpSubScanUnits);
-
-	pVSubLayout->addLayout(pHSubLayout);
-
-	pHSubLayout = new QHBoxLayout();
-	pHSubLayout->addWidget(mpScanEveryRow);
-	pHSubLayout->addWidget(mpScanCenterOnly);
-	pHSubLayout->addWidget(mpScanInsideRows);
-	pHSubLayout->addStretch(1);
-
-	pVSubLayout->addLayout(pHSubLayout);
-
-	pGroupBox->setLayout(pVSubLayout);
-
-	pMainLayout->addWidget(pGroupBox);
-}
-
 void cCreateThermalExperimentDlg::accept()
 {
 	if (mMeasurementTitle.empty())
@@ -534,87 +436,4 @@ void cCreateThermalExperimentDlg::onSensorUpdate()
 		mSensorInfo = dlg.getSensorInfo();
 	}
 }
-
-void cCreateThermalExperimentDlg::onSubScanUnitChange(const QString& text)
-{
-	double separation = mpSubScanSeparation->text().toDouble() * mSubScanConversionFactor;
-
-	switch (mpSubScanUnits->currentIndex())
-	{
-	case 0:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "m)");
-
-		mSubScanConversionFactor = nConstants::M_TO_MM;
-		break;
-	case 1:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "mm)");
-
-		mSubScanConversionFactor = 1.0;
-		break;
-	case 2:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "ft)");
-
-		mSubScanConversionFactor = nConstants::FT_TO_MM;
-		break;
-	case 3:
-		mpSubScanSeparationLabel->setText(SCAN_SEPARATION_TEXT + "in)");
-
-		mSubScanConversionFactor = nConstants::IN_TO_MM;
-		break;
-	}
-
-	separation /= mSubScanConversionFactor;
-
-	mpSubScanSeparation->setText(QString::number(separation));
-}
-
-
-void cCreateThermalExperimentDlg::onHasSubScans(int state)
-{
-	if (state == Qt::Checked)
-	{
-		mpNumOfScans->setEnabled(true);
-		mpSubScanOrientation->setEnabled(true);
-		mpSubScanUnits->setEnabled(true);
-		mpSubScanSeparation->setEnabled(true);
-		mpFastMode->setEnabled(true);
-		mpScanEveryRow->setEnabled(true);
-
-		int num = mpNumOfScans->text().toInt();
-		if (num > 1)
-			mpScanCenterOnly->setEnabled(true);
-		if (num > 2)
-			mpScanInsideRows->setEnabled(true);
-	}
-	else
-	{
-		mpNumOfScans->setEnabled(false);
-		mpSubScanOrientation->setEnabled(false);
-		mpSubScanUnits->setEnabled(false);
-		mpSubScanSeparation->setEnabled(false);
-		mpFastMode->setEnabled(false);
-		mpScanEveryRow->setEnabled(false);
-		mpScanCenterOnly->setEnabled(false);
-		mpScanInsideRows->setEnabled(false);
-	}
-}
-
-void cCreateThermalExperimentDlg::onNumSubScansChanged()
-{
-	if (!mpHasSubScans->isChecked())
-		return;
-
-	int num = mpNumOfScans->text().toInt();
-	if (num > 1)
-		mpScanCenterOnly->setEnabled(true);
-	else
-		mpScanCenterOnly->setEnabled(false);
-
-	if (num > 2)
-		mpScanInsideRows->setEnabled(true);
-	else
-		mpScanInsideRows->setEnabled(false);
-}
-
-
 

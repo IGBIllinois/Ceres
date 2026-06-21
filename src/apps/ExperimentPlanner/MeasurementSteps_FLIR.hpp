@@ -41,6 +41,10 @@ public:
 
 	cBaseStep* graphicsItem(const int id, eExperimentType exp_type) const override;
 
+signals:
+	void onDescriptionChange(const QString& desc);
+	void onCommentChange(const QString& comment);
+
 public slots:
 	bool onEdit();
 
@@ -50,11 +54,12 @@ protected:
 
 private:
 	QString generateDescription() const;
+	QString generateComment() const;
 
 private:
-	enum eMode { SINGLE, TIME_LAPSE, CONTINUOUS } mMode;
-	double mFrameRate_fps = 0.0;
-	int32_t mLapseInterval_ms = 0.0;
+	enum eMode { SINGLE = 0, TIME_LAPSE = 1, CONTINUOUS = 2 } mMode;
+	double mFrameRate_fps = 30.0;
+	int32_t mLapseInterval_ms = 1000.0;
 };
 
 

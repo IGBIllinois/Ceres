@@ -1,5 +1,5 @@
 
-project(CeresExperimentPlanner VERSION 2.0.0.0)
+project(CeresExperimentPlanner VERSION 2.1.0.0)
 
 # Configure version resource file
 configure_file(
@@ -105,6 +105,9 @@ PRIVATE
 
     ReferencePointDlg.hpp
     ReferencePointDlg.cpp
+
+    FlirConfigureDlg.hpp
+    FlirConfigureDlg.cpp
 
     ExperimentDesignItems.hpp
     ExperimentDesignItems.cpp

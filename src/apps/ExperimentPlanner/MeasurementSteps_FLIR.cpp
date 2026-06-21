@@ -2,8 +2,7 @@
 #include "MeasurementSteps_FLIR.hpp"
 #include "ExperimentDesignItems.hpp"
 
-#include "DelayStepInfoDlg.hpp"
-#include "MovementStepInfoDlg.hpp"
+#include "FlirConfigureDlg.hpp"
 
 #include "Constants.hpp"
 #include "StringUtils.hpp"
@@ -63,12 +62,38 @@ cBaseStep* cMeasurementStep_FLIR_Configure::graphicsItem(const int id, eExperime
 	auto description = generateDescription();
 	step->setSubHeading1(description);
 
+	auto comment = generateComment();
+	step->setSubHeading2(comment);
+
 	return step;
 }
 
 bool cMeasurementStep_FLIR_Configure::onEdit()
 {
-	return false;
+	cFlirConfigureDlg dlg;
+
+	dlg.setMode(mMode);
+	dlg.setLapseInterval_ms(mLapseInterval_ms);
+	dlg.setFrameRate_fps(mFrameRate_fps);
+
+	auto result = dlg.exec();
+
+	if (result == QDialog::Rejected)
+		return false;
+
+	mMode = static_cast<eMode>(dlg.mode());
+	mLapseInterval_ms = dlg.lapseInterval_ms();
+	mFrameRate_fps = dlg.frameRate_fps();
+
+	auto description = generateDescription();
+	emit onDescriptionChange(description);
+
+	auto comment = generateComment();
+	emit onCommentChange(comment);
+
+	emit redraw();
+
+	return true;
 }
 
 void cMeasurementStep_FLIR_Configure::load(const nlohmann::json& jdoc)
@@ -143,9 +168,46 @@ nlohmann::json cMeasurementStep_FLIR_Configure::save()
 
 QString cMeasurementStep_FLIR_Configure::generateDescription() const
 {
-	return "Configure";
+	QString description = "Mode: ";
 
-	return QString();
+	switch (mMode)
+	{
+	case eMode::SINGLE:
+		description += "Photo";
+		break;
+	case eMode::TIME_LAPSE:
+		description += "Time Lapse";
+		break;
+	case eMode::CONTINUOUS:
+		description += "Video";
+		break;
+	}
+
+	return description;
+}
+
+QString cMeasurementStep_FLIR_Configure::generateComment() const
+{
+	QString comment;
+
+	switch (mMode)
+	{
+	case eMode::TIME_LAPSE:
+		comment = "Time Lapse Interval: ";
+		comment += QString::number(mLapseInterval_ms);
+		comment += " ms";
+		break;
+	case eMode::CONTINUOUS:
+		comment = "Frame Rate: ";
+		comment += QString::number(mFrameRate_fps);
+		comment += " fps";
+		break;
+	case eMode::SINGLE:
+	default:
+		break;
+	}
+
+	return comment;
 }
 
 
@@ -197,7 +259,7 @@ nlohmann::json cMeasurementStep_FLIR_TakePhoto::save()
 
 QString cMeasurementStep_FLIR_TakePhoto::generateDescription() const
 {
-	return "Trigger taking a single FLIR image.";
+	return "Generate trigger to take a single FLIR image.";
 }
 
 
