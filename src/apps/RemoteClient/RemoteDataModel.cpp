@@ -33,6 +33,7 @@ namespace
     }
 }
 
+
 cRemoteDataModel::cRemoteDataModel(QObject* parent)
     :
     cDataModel(parent),
@@ -43,6 +44,7 @@ cRemoteDataModel::cRemoteDataModel(QObject* parent)
     mSerializer(8192), mSpidercamSerializer(1024), mWeatherSerializer(1024)
 
 {
+    setObjectName("RemoteDataModel");
     mWindDataValid = false;
     mWindSpeed_mps = 0.0;
     mWindDirection_deg = 0.0;
@@ -82,6 +84,10 @@ void cRemoteDataModel::setDefaultDataPath(const std::string& data_path)
     {
         create_directories(mDefaultDataPath);
     }
+
+    QString path = QString::fromStdString(mDefaultDataPath.string());
+    emit onDefaultDataPathChange(path);
+
 }
 
 bool cRemoteDataModel::startTcpServer(const std::string& ip, uint16_t port)

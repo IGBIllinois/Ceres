@@ -23,6 +23,8 @@ cSensorStatusView::cSensorStatusView(cSensorModel* pModel, QWidget* parent)
 	}
 
 	setWindowTitle(title.c_str());
+
+	setObjectName(title.c_str());
 }
 
 cSensorStatusView::~cSensorStatusView()

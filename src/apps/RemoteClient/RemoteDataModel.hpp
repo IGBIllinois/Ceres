@@ -20,6 +20,7 @@
 #include <QtNetwork/QTcpServer>
 
 
+
 /*****************************************************************************
  * 
  * The cRemoteDataModel class is the base class for data acquisition.
@@ -57,6 +58,7 @@ public:
     const cRemoteDataThread& getThread() const { return mThread; }
 
 signals:
+    void onDefaultDataPathChange(QString path);
     void requestDataRecordingState(bool record);
     void logMessage(quint8 type, QString device, QString instance, QString msg);
 
