@@ -8,6 +8,7 @@
 QT_BEGIN_NAMESPACE
 class QCamera;
 class QToolButton;
+class QPushButton;
 QT_END_NAMESPACE
 
 class cAxisCommunicationsModel_F44;
@@ -31,12 +32,21 @@ public slots:
 	void cameraSelected_2();
 	void cameraSelected_3();
 	void cameraSelected_4();
+	void saveImage();
+
+protected:
+	void imageUpdated(const QImage& image) override;
 
 private:
 	QToolButton* mpCamera1;
 	QToolButton* mpCamera2;
 	QToolButton* mpCamera3;
 	QToolButton* mpCamera4;
+
+	QPushButton* mpSaveImage = nullptr;
+
+	bool mSaveImage = false;
+	int mImageNum = 1;
 
 protected:
 	const cAxisCommunicationsModel* mpModel;

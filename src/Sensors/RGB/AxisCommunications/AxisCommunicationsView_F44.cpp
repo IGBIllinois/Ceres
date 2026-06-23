@@ -5,8 +5,11 @@
 
 #include <QToolBar>
 #include <QToolButton>
+#include <QPushButton>
 #include <QCamera>
 #include <QLayout>
+#include <QImage>
+#include <QImageWriter>
 
 #include <string>
 
@@ -59,6 +62,12 @@ void cAxisCommunicationsView_F44::initialize()
 
     toolbar->addWidget(mpCamera4);
 
+    toolbar->addSeparator();
+
+    mpSaveImage = new QPushButton("Save", toolbar);
+    mpSaveImage->setEnabled(false);
+    connect(mpSaveImage, &QPushButton::pressed, this, &cAxisCommunicationsView_F44::saveImage);
+
     auto* mainLayout = new QVBoxLayout();
 
     mainLayout->addWidget(toolbar);
@@ -109,4 +118,24 @@ void cAxisCommunicationsView_F44::cameraSelected_4()
     emit activateCamera(4);
 }
 
+void cAxisCommunicationsView_F44::saveImage()
+{
+    mSaveImage = true;
+}
+
+void cAxisCommunicationsView_F44::imageUpdated(const QImage& image)
+{
+    cAxisCommunicationsView::imageUpdated(image);
+
+    if (mSaveImage)
+    {
+        QString fileName = "Image_";
+        fileName += QString::number(mImageNum++);
+        fileName += ".jpg";
+        QImageWriter writer(fileName);
+        writer.setFormat("JPEG");
+        writer.write(mpImage->getImage());
+        mSaveImage = false;
+    }
+}
 

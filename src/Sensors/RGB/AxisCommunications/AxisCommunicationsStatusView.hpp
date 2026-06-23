@@ -36,6 +36,13 @@ public slots:
 
 	void resizeEvent(QResizeEvent*) override;
 
+protected slots:
+	void saveImage();
+
+private:
+	bool mSaveImage = false;
+	int mImageNum = 1;
+
 private:
 	QLabel* mpCameraIdLabel = nullptr;
 	QLineEdit* mpCameraId = nullptr;
@@ -47,6 +54,7 @@ private:
 	QLineEdit* mpFrameRate_fps = nullptr;
 
 	QPushButton* mpGrabImage = nullptr;
+	QPushButton* mpSaveImage = nullptr;
 
 	cRgbImageWidget* mpImage = nullptr;
 };
