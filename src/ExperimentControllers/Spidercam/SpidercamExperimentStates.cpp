@@ -318,7 +318,7 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 					variables->add("sensor_offset_mm", sensor_offset_mm);
 
 				if (!variables->set("reference_height_mm", reference_height_mm))
-					variables->set("reference_height_mm", reference_height_mm);
+					variables->add("reference_height_mm", reference_height_mm);
 
 				pDlg->deleteLater();
 			}
