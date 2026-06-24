@@ -32,6 +32,7 @@ signals:
     void requestImage();
     void requestImages(bool update_view);
     void requestPhoto(bool update_view);
+    void requestPhoto(bool update_view, bool auto_save);
 
 protected:
     void createWidgets() override;

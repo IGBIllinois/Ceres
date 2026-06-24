@@ -196,6 +196,11 @@ void cTeledyneFlirController_T1K::onTakePhoto(bool update_view)
     emit requestPhoto(update_view);
 }
 
+void cTeledyneFlirController_T1K::onTakePhoto(bool updateView, bool autoSave)
+{
+    emit requestPhoto(updateView, autoSave);
+}
+
 void cTeledyneFlirController_T1K::setThermalRange_K(float min_value_K, float max_value_K)
 {
     float minValue_K = mpModel->minThermalValue_K().value_or(-1.0f);

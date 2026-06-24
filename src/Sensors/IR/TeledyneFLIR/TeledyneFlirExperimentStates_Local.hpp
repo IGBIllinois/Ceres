@@ -96,6 +96,7 @@ public:
 signals:
 	void updateView();
 	void takePhoto(bool update_view);
+	void takePhoto(bool update_view, bool auto_save);
 
 public slots:
 	void onPhotoTaken();

@@ -34,6 +34,7 @@ signals:
     void requestImage();
     void requestImages(bool update_view);
     void requestPhoto(bool update_view);
+    void requestPhoto(bool update_view, bool auto_save);
 
 public slots:
     void photoTaken();
@@ -94,6 +95,7 @@ protected:
     void onQueryThermalRange() override;
     void onGrabImage() override;
     void onTakePhoto(bool updateView) override;
+    void onTakePhoto(bool updateView, bool autoSave) override;
 
     void setThermalRange_K(float min_value_K, float max_value_K) override;
 

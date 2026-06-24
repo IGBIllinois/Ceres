@@ -34,6 +34,7 @@ public:
     void sendSetLapseInterval_ms(uint32_t interval_ms);
     void sendGrabImage();
     void sendTakePhoto(bool update_view);
+    void sendTakePhoto(bool update_view, bool save_image);
 };
 
 

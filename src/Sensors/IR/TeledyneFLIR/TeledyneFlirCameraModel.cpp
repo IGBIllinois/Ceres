@@ -206,6 +206,17 @@ void cTeledyneFlirCameraModel::takePhoto(bool update_view)
     }
 }
 
+void cTeledyneFlirCameraModel::takePhoto(bool update_view, bool auto_save)
+{
+    if (mMode == eMode::SINGLE)
+    {
+        mPhotoRequested = true;
+        mImageRequested = update_view;
+        mAutoEmitImages = false;
+    }
+}
+
+
 const QImage& cTeledyneFlirCameraModel::getCurrentImage() const
 {
     return mColorizedImage;

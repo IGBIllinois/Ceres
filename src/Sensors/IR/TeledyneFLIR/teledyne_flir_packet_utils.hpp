@@ -104,6 +104,14 @@ namespace flir
 	bool to_take_photo_t(const teledyne_TakePhoto_1& pckt);
 	int encode_take_photo(bool update_view, net_buffer& buffer);
 
+	struct sTakePhoto
+	{
+		bool update_view;
+		bool auto_save;
+	};
+	sTakePhoto to_take_photo_t(const teledyne_TakePhoto_2& pckt);
+	int encode_take_photo(bool update_view, bool auto_save, net_buffer& buffer);
+
 
 	enum eReply { GOOD, FAILED, ABORTED, PENDING };
 	eReply to_reply_t(const teledyne_Reply_1& pckt);

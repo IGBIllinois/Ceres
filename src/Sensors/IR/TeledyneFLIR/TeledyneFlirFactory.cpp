@@ -19,6 +19,7 @@
 #include <QDockWidget>
 #include <QMetaType>
 #include <QDebug>
+#include <QOverload>
 
 
 // Example of how to declare a metatype in Qt
@@ -89,7 +90,9 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         QObject::connect(pController, &cTeledyneFlirController::requestLapseInterval_ms, pModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
         QObject::connect(pController, &cTeledyneFlirController::requestImage,            pModel, &cTeledyneFlirCameraModel::requestImage);
         QObject::connect(pController, &cTeledyneFlirController::requestImages,           pModel, &cTeledyneFlirCameraModel::requestImages);
-        QObject::connect(pController, &cTeledyneFlirController::requestPhoto,            pModel, &cTeledyneFlirCameraModel::takePhoto);
+
+        QObject::connect(pController, qOverload<bool>(&cTeledyneFlirController::requestPhoto),       pModel, qOverload<bool>(&cTeledyneFlirCameraModel::takePhoto));
+        QObject::connect(pController, qOverload<bool, bool>(&cTeledyneFlirController::requestPhoto), pModel, qOverload<bool, bool>(&cTeledyneFlirCameraModel::takePhoto));
 
         return sSensorWidgets(pModel, pController, pView);
     }
@@ -124,7 +127,9 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
     QObject::connect(page, &cTeledyneFlirPropertyPage_T1K_Local::requestLapseInterval_ms, pModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
     QObject::connect(page, &cTeledyneFlirPropertyPage_T1K_Local::requestImage,            pModel, &cTeledyneFlirCameraModel::requestImage);
     QObject::connect(page, &cTeledyneFlirPropertyPage_T1K_Local::requestImages,           pModel, &cTeledyneFlirCameraModel::requestImages);
-    QObject::connect(page, &cTeledyneFlirPropertyPage_T1K_Local::requestPhoto,            pModel, &cTeledyneFlirCameraModel::takePhoto);
+
+    QObject::connect(page, qOverload<bool>(&cTeledyneFlirPropertyPage_T1K_Local::requestPhoto),       pModel, qOverload<bool>(&cTeledyneFlirCameraModel::takePhoto));
+    QObject::connect(page, qOverload<bool, bool>(&cTeledyneFlirPropertyPage_T1K_Local::requestPhoto), pModel, qOverload<bool, bool>(&cTeledyneFlirCameraModel::takePhoto));
 
     return sSensorWidgets(pModel, dockWidget, page);
 }

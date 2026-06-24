@@ -305,7 +305,7 @@ void cTeledyneFlirCamera_TakePhoto_Remote::onMode(uint8_t mode)
 {
 	if (mode == cTeledyneFlirCameraModel::eMode::SINGLE)
 	{
-		sendTakePhoto(mUpdateView);
+		sendTakePhoto(mUpdateView, true);
 	}
 	else
 	{

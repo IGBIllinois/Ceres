@@ -31,6 +31,7 @@ protected:
     virtual void onQueryThermalRange() = 0;
     virtual void onGrabImage() = 0;
     virtual void onTakePhoto(bool updateView) = 0;
+    virtual void onTakePhoto(bool updateView, bool autoSave) = 0;
 
     virtual void setMode(uint8_t mode) = 0;
     virtual void setImageSize(uint16_t width, uint16_t height) = 0;

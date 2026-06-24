@@ -94,15 +94,27 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         break;
     case ePacketType::TAKE_PHOTO:
     {
-        teledyne_TakePhoto_1 packet;
-        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        if (hdr.revision == 1)
         {
-            auto update_view = to_take_photo_t(packet);
-            onTakePhoto(update_view);
+            teledyne_TakePhoto_1 packet;
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                auto update_view = to_take_photo_t(packet);
+                onTakePhoto(update_view);
+            }
+        }
+        else if (hdr.revision == 2)
+        {
+            teledyne_TakePhoto_2 packet;
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                auto result = to_take_photo_t(packet);
+                onTakePhoto(result.update_view, result.auto_save);
+            }
         }
         break;
     }
-}
+    }
 }
 
 

@@ -311,6 +311,39 @@ int flir::encode_take_photo(bool update_view, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+flir::sTakePhoto flir::to_take_photo_t(const teledyne_TakePhoto_2& pckt)
+{
+    sTakePhoto state;
+
+    state.update_view = pckt.update_view();
+    state.auto_save   = pckt.auto_save();
+
+    return state;
+}
+
+int flir::encode_take_photo(bool update_view, bool auto_save, net_buffer& buffer)
+{
+    teledyne_TakePhoto_2 pckt;
+
+    pckt.set_update_view(update_view);
+    pckt.set_auto_save(auto_save);
+
+    std::string str;
+    if (!pckt.SerializeToString(&str))
+        return -1;
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::TAKE_PHOTO);
+    hdr.revision = 2;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
 flir::eReply flir::to_reply_t(const teledyne_Reply_1& pckt)
 {
     switch (pckt.reply())

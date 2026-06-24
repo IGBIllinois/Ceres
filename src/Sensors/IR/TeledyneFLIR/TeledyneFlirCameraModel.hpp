@@ -89,6 +89,7 @@ public slots:
     void requestImages(bool update_view);
 
     void takePhoto(bool update_view = false);
+    void takePhoto(bool update_view, bool auto_save);
 
 protected:
     cTeledyneFlirCameraModel(const std::string& name, QObject* parent = nullptr);

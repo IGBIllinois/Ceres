@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QDialogButtonBox>
+#include <QOverload>
 
 
 cTeledyneFlirPropertyPage_Local::cTeledyneFlirPropertyPage_Local(cTeledyneFlirCameraModel* pModel, QWidget* parent)
@@ -53,7 +54,8 @@ cExperimentState* cTeledyneFlirPropertyPage_Local::createState(const std::string
 		{
 			auto* pState = new cTeledyneFlirCamera_TakePhoto_Local(mpModel, parent);
 
-			QObject::connect(pState, &cTeledyneFlirCamera_TakePhoto_Local::takePhoto, mpModel, &cTeledyneFlirCameraModel::takePhoto);
+			QObject::connect(pState, qOverload<bool>(&cTeledyneFlirCamera_TakePhoto_Local::takePhoto), mpModel, qOverload<bool>(&cTeledyneFlirCameraModel::takePhoto));
+			QObject::connect(pState, qOverload<bool, bool>(&cTeledyneFlirCamera_TakePhoto_Local::takePhoto), mpModel, qOverload<bool, bool>(&cTeledyneFlirCameraModel::takePhoto));
 			QObject::connect(pState, &cTeledyneFlirCamera_TakePhoto_Local::updateView, mpModel, &cTeledyneFlirCameraModel::requestImage);
 			QObject::connect(mpModel, &cTeledyneFlirCameraModel::photoTaken, pState, &cTeledyneFlirCamera_TakePhoto_Local::onPhotoTaken);
 

@@ -72,9 +72,15 @@ message teledyne_ThermalRangeMessage_1
  * Property Page -> Sensor Controller
  *****************************************************************************/
 
- message teledyne_TakePhoto_1 
+message teledyne_TakePhoto_1 
 {
 	bool update_view = 1;
+}
+
+message teledyne_TakePhoto_2 
+{
+	bool update_view = 1;
+	bool auto_save   = 2;
 }
 
 
