@@ -13,12 +13,21 @@ cSensorModel::cSensorModel(const std::string& name, QObject* parent)
     qRegisterMetaType<sensor::eStatus>();
 
     mIsRecording = false;
+
+    setObjectName(name.c_str());
 }
 
 cSensorModel::cSensorModel(const std::string& name, const std::string& instance, QObject* parent)
     : cSensorModel(name, parent)
 {
     mSensorInstance = instance;
+
+    QString title = QString::fromStdString(name);
+
+    title += ":";
+    title += QString::fromStdString(instance);
+
+    setObjectName(title);
 }
 
 bool cSensorModel::configure(const nlohmann::json& jsonCfg)
