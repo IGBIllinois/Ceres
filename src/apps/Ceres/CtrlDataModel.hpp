@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <ctime>
+#include <memory>
 
 #include <nlohmann/json.hpp>
 
@@ -24,6 +25,7 @@ QT_END_NAMESPACE
 class cExperimentControlModel;
 class cSensorModel;
 class cSensorPropertyPage;
+class cExperimentVariableTable;
 
 namespace experiment
 {
@@ -67,7 +69,8 @@ public:
     bool isInBatchMode() const;
     void setBatchMode(bool mode);
 
-    void clearVariableTable();
+    std::weak_ptr<cExperimentVariableTable> getGlobalVariableTable() const;
+    void clearGlobalVariableTable();
 
     bool isExperimentRunning();
     bool isExperimentPaused();

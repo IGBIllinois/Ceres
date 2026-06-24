@@ -3,7 +3,9 @@
 #include "SensorModel.hpp"
 #include "SensorPropertyPage.hpp"
 #include "ExperimentCtrlModel.hpp"
+#include "ExperimentVariableTable.hpp"
 #include "ExperimentTypes.hpp"
+#include "RappFieldModel.hpp"
 
 #include <QMessageBox>
 
@@ -178,12 +180,20 @@ void cCtrlDataModel::setBatchMode(bool mode)
     mThread.mpController->setBatchMode(mode);
 }
 
-void cCtrlDataModel::clearVariableTable()
+std::weak_ptr<cExperimentVariableTable> cCtrlDataModel::getGlobalVariableTable() const
+{
+    if (!mThread.mpController)
+        return std::weak_ptr<cExperimentVariableTable>();
+
+    return mThread.mpController->getGlobalVariableTable();
+}
+
+void cCtrlDataModel::clearGlobalVariableTable()
 {
     if (!mThread.mpController)
         return;
 
-    mThread.mpController->clearVariableTable();
+    mThread.mpController->clearGlobalVariableTable();
 }
 
 bool cCtrlDataModel::isExperimentRunning()
@@ -257,6 +267,21 @@ bool cCtrlDataModel::loadExperiment(const std::string& exp_path, const std::stri
             }
         }
 */
+        if (nRFM::has_reference_height_mm())
+        {
+            auto table = mThread.mpController->getGlobalVariableTable();
+
+            if (table.expired())
+            {
+                mThread.mpController->createGlobalVariableTable();
+                table = mThread.mpController->getGlobalVariableTable();
+            }
+
+            auto variables = table.lock();
+
+            if (!variables->set("reference_height_mm", nRFM::reference_height_mm()))
+                variables->add("reference_height_mm", nRFM::reference_height_mm());
+        }
 
         if (mThread.mpController->loadExperiment(exp_path, exp_name, expDoc["experiment"]))
         {
