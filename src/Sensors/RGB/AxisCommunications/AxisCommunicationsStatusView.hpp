@@ -27,6 +27,7 @@ public:
 
 signals:
 	void requestImage();
+	void saveImage();
 
 public slots:
 	void onCameraIdChange(int id);
@@ -35,13 +36,6 @@ public slots:
 	void imageUpdated(const QImage& image);
 
 	void resizeEvent(QResizeEvent*) override;
-
-protected slots:
-	void saveImage();
-
-private:
-	bool mSaveImage = false;
-	int mImageNum = 1;
 
 private:
 	QLabel* mpCameraIdLabel = nullptr;

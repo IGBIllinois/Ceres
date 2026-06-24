@@ -7,6 +7,7 @@
 #include <QEventLoop>
 #include <QByteArray>
 #include <QUrlQuery>
+#include <QImageWriter>
 
 #include <nlohmann/json.hpp>
 
@@ -141,10 +142,26 @@ void cAxisCommunicationsModel::stopCommunications()
     delete mpHttpManager; mpHttpManager = nullptr;
 }
 
+void cAxisCommunicationsModel::onDefaultDataPathChange(QString path)
+{
+
+}
+
 void cAxisCommunicationsModel::requestImage()
 {
     emit onNewImage(mCurrentImage);
 }
+
+void cAxisCommunicationsModel::requestSaveImage()
+{
+    QString fileName = "Image_";
+    fileName += QString::number(1);
+    fileName += ".jpg";
+    QImageWriter writer(fileName);
+    writer.setFormat("JPEG");
+    writer.write(mCurrentImage);
+}
+
 
 void cAxisCommunicationsModel::requestReceived(QNetworkReply* pReply)
 {

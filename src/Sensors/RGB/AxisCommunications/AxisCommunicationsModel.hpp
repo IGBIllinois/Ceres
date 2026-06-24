@@ -79,6 +79,9 @@ public:
     void update() override;
 
 signals:
+    void defaultDataPathChanged(QString path);
+
+signals:
     void onNewImage(const QImage& image);
     void cameraIdChanged(int id);
     void frameRateChanged(int rate_fps);
@@ -86,6 +89,8 @@ signals:
 
 public slots:
     void requestImage();
+    void requestSaveImage();
+    void onDefaultDataPathChange(QString path);
 
 protected slots:
     void requestReceived(QNetworkReply* pReply);

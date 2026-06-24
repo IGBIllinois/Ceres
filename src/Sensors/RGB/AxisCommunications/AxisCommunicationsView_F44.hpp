@@ -25,6 +25,7 @@ public:
 
 signals:
 	void activateCamera(int id);
+	void saveImage();
 
 public slots:
 	void enableCamera(int id);
@@ -32,7 +33,6 @@ public slots:
 	void cameraSelected_2();
 	void cameraSelected_3();
 	void cameraSelected_4();
-	void saveImage();
 
 protected:
 	void imageUpdated(const QImage& image) override;
@@ -44,9 +44,6 @@ private:
 	QToolButton* mpCamera4;
 
 	QPushButton* mpSaveImage = nullptr;
-
-	bool mSaveImage = false;
-	int mImageNum = 1;
 
 protected:
 	const cAxisCommunicationsModel* mpModel;

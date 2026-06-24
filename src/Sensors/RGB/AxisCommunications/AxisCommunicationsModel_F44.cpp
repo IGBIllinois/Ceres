@@ -3,9 +3,14 @@
 #include "AxisCommunicationsFactory.hpp"
 #include "AxisCommunicationsUtils.hpp"
 
+#include <cbdf/BlockDataFile.hpp>
+
 #include <QDebug>
 #include <QNetworkAccessManager>
 #include <QMessageBox>
+
+#include <filesystem>
+
 
 const std::size_t MAX_CAMERAS = 4;
 
@@ -162,6 +167,13 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 
 void cAxisCommunicationsModel_F44::enableDataRecording(cBlockDataFileWriter& file)
 {
+    std::filesystem::path filename = file.filename();
+    std::filesystem::path path = filename.parent_path();
+
+    QString qPath = QString::fromStdString(path.string());
+
+    emit defaultDataPathChanged(qPath);
+
     mSerializer.attach(&file);
 }
 

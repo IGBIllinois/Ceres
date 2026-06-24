@@ -9,7 +9,6 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include <QResizeEvent>
-#include <QImageWriter>
 
 #include <string>
 
@@ -110,27 +109,10 @@ void cAxisCommunicationsStatusView::imageUpdated(const QImage& image)
 
 	if (!isHidden())
 		mpImage->repaint();
-
-	if (mSaveImage)
-	{
-		QString fileName = "Image_";
-		fileName += QString::number(mImageNum++);
-		fileName += ".jpg";
-		QImageWriter writer(fileName);
-		writer.setFormat("JPEG");
-		writer.write(mpImage->getImage());
-		mSaveImage = false;
-	}
 }
 
 void cAxisCommunicationsStatusView::resizeEvent(QResizeEvent* e)
 {
 	cSensorStatusView::resizeEvent(e);
 	mpImage->resizeImage(e->size().width(), e->size().height());
-}
-
-void cAxisCommunicationsStatusView::saveImage()
-{
-	mSaveImage = true;
-	emit requestImage();
 }
