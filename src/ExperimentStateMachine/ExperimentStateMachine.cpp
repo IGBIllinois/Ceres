@@ -166,12 +166,25 @@ void cExperimentStateMachine::clearExperiment()
         mVariableTable->clear();
 }
 
-void cExperimentStateMachine::clearVariableTable()
+void cExperimentStateMachine::createGlobalVariableTable()
 {
     if (mRunning) return;
 
-    if (mVariableTable)
-        mVariableTable->clear();
+    if (!mGlobalVariableTable)
+        mGlobalVariableTable = std::make_shared<cExperimentVariableTable>();
+}
+
+void cExperimentStateMachine::clearGlobalVariableTable()
+{
+    if (mRunning) return;
+
+    if (mGlobalVariableTable)
+        mGlobalVariableTable->clear();
+}
+
+std::weak_ptr<cExperimentVariableTable> cExperimentStateMachine::getGlobalVariableTable() const
+{
+    return mGlobalVariableTable;
 }
 
 cExperimentState* cExperimentStateMachine::createState(const std::string& type, const nlohmann::json& expDoc)
@@ -200,6 +213,9 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
 
     if (!mVariableTable)
         mVariableTable = std::make_shared<cExperimentVariableTable>();
+
+    if (mGlobalVariableTable)
+        mVariableTable = mGlobalVariableTable;
 
     mExperimentStates.push_back(new cExperimentState_Dummy());
 

@@ -58,7 +58,7 @@ public:
     const cRemoteDataThread& getThread() const { return mThread; }
 
 signals:
-    void onDefaultDataPathChange(QString path);
+    void defaultDataPathChanged(QString path);
     void requestDataRecordingState(bool record);
     void logMessage(quint8 type, QString device, QString instance, QString msg);
 

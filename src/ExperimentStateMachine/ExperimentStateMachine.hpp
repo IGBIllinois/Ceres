@@ -78,11 +78,19 @@ public:
     bool isRecording();
 
     /*
-     * Clear the experiment variable table
+     * Create the global experiment variable table
      */
-    void clearVariableTable();
+    void createGlobalVariableTable();
 
+    /*
+     * Clear the global experiment variable table
+     */
+    void clearGlobalVariableTable();
 
+    /*
+     * Returns the global experiment variable table that affects all experiments
+     */
+    std::weak_ptr<cExperimentVariableTable> getGlobalVariableTable() const;
 
 signals:
     void experimentStatus(QString msg);
@@ -142,5 +150,6 @@ private:
     std::mutex mPendingDeleteMutex;
     std::vector<cExperimentState*> mPendingDelete;
 
+    std::shared_ptr<cExperimentVariableTable> mGlobalVariableTable;
     std::shared_ptr<cExperimentVariableTable> mVariableTable;
 };

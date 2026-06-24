@@ -149,7 +149,13 @@ namespace
 
 }	// End of namespace
 
+cExperimentVariableTable::cExperimentVariableTable()
+{}
 
+cExperimentVariableTable::~cExperimentVariableTable()
+{
+	mNamedVariables.clear();
+}
 
 void cExperimentVariableTable::clear()
 {

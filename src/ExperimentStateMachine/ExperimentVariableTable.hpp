@@ -10,7 +10,8 @@
 class cExperimentVariableTable
 {
 public:
-	cExperimentVariableTable() = default;
+	cExperimentVariableTable();
+	~cExperimentVariableTable();
 
 	void clear();
 

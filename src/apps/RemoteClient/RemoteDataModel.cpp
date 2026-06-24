@@ -86,7 +86,7 @@ void cRemoteDataModel::setDefaultDataPath(const std::string& data_path)
     }
 
     QString path = QString::fromStdString(mDefaultDataPath.string());
-    emit onDefaultDataPathChange(path);
+    emit defaultDataPathChanged(path);
 
 }
 
