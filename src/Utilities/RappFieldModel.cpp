@@ -174,6 +174,11 @@ bool nRFM::load_aerial_data(const std::string& fileName)
     return true;
 }
 
+bool nRFM::has_reference_height_mm()
+{
+    return gReferenceHeight_mm != rfm::INVALID_HEIGHT;
+}
+
 int nRFM::reference_height_mm()
 {
     return gReferenceHeight_mm;
