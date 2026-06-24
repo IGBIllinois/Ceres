@@ -57,7 +57,7 @@ cCreateThermalExperimentDlg::cCreateThermalExperimentDlg(QWidget* parent)
 	setWindowTitle("Create Thermal Measurement");
 
 	mCtrlInfo = std::make_unique<cExperimentCtrlInfo_SpiderCam>();
-	mSensorInfo.push_back(std::make_shared<cExperimentSensorInfo_Ouster>());
+	mSensorInfo.push_back(std::make_shared<cExperimentSensorInfo_FLIR>());
 }
 
 cCreateThermalExperimentDlg::~cCreateThermalExperimentDlg()

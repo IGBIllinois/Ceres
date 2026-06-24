@@ -887,6 +887,7 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::onShowPath()
 	emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 
 
+/*
 	if (mpHasSubScans->isChecked())
 	{
 		int separation_mm = getSubScanSeparation_mm();
@@ -920,4 +921,5 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::onShowPath()
 			emit drawPath(x1_mm, y1_mm, x2_mm, y2_mm);
 		}
 	}
+*/
 }

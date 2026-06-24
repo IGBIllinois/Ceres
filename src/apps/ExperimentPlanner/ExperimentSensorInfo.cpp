@@ -6,6 +6,7 @@
 #include "Lidar/Ouster/OusterIDs.hpp"
 #include "RGB/AxisCommunications/AxisCommunicationsIDs.hpp"
 #include "Hyperspectral/HySpex/HySpexIDs.hpp"
+#include "IR/TeledyneFLIR/TeledyneFlirIDs.hpp"
 
 #include <QLabel>
 #include <QLayout>
@@ -26,6 +27,7 @@ std::shared_ptr<cExperimentSensorInfo> createSensor(std::string type)
 	if (type == cExperimentSensorInfo_AxisCommunications::type())	return std::make_shared<cExperimentSensorInfo_AxisCommunications>();
 	if (type == cExperimentSensorInfo_VNIR3000N::type())			return std::make_shared<cExperimentSensorInfo_VNIR3000N>();
 	if (type == cExperimentSensorInfo_SWIR384::type())				return std::make_shared<cExperimentSensorInfo_SWIR384>();
+	if (type == cExperimentSensorInfo_FLIR::type())					return std::make_shared<cExperimentSensorInfo_FLIR>();
 
 	return std::shared_ptr<cExperimentSensorInfo>();
 }
@@ -96,6 +98,9 @@ void cExperimentSensorInfo_Dummy::save(nlohmann::json& jdoc)
 {}
 
 
+//*****************************************************************************
+//**	OUSTER OS-0-128 LiDAR
+//*****************************************************************************
 
 cExperimentSensorInfo_Ouster::cExperimentSensorInfo_Ouster()
 {
@@ -229,6 +234,9 @@ void cExperimentSensorInfo_Ouster::save(nlohmann::json& jdoc)
 }
 
 
+//*****************************************************************************
+//**	Septentrio Altus-NR3 GPS
+//*****************************************************************************
 
 cExperimentSensorInfo_Septentrio::cExperimentSensorInfo_Septentrio()
 {
@@ -325,6 +333,9 @@ void cExperimentSensorInfo_Septentrio::save(nlohmann::json& jdoc)
 }
 
 
+//*****************************************************************************
+//**	Axis Communications F44 Webcams
+//*****************************************************************************
 
 cExperimentSensorInfo_AxisCommunications::cExperimentSensorInfo_AxisCommunications()
 {
@@ -537,6 +548,9 @@ void cExperimentSensorInfo_AxisCommunications::save(nlohmann::json& jdoc)
 }
 
 
+//*****************************************************************************
+//**	HySpex VNIR-3000N Camera
+//*****************************************************************************
 
 cExperimentSensorInfo_VNIR3000N::cExperimentSensorInfo_VNIR3000N()
 {
@@ -633,6 +647,9 @@ void cExperimentSensorInfo_VNIR3000N::save(nlohmann::json& jdoc)
 }
 
 
+//*****************************************************************************
+//**	HySpex SWIR-384 Camera
+//*****************************************************************************
 
 cExperimentSensorInfo_SWIR384::cExperimentSensorInfo_SWIR384()
 {
@@ -728,5 +745,103 @@ void cExperimentSensorInfo_SWIR384::save(nlohmann::json& jdoc)
 	mDirty = false;
 }
 
+
+//*****************************************************************************
+//**	Teledyne FLIR Camera
+//*****************************************************************************
+
+cExperimentSensorInfo_FLIR::cExperimentSensorInfo_FLIR()
+{
+	mName = "Teledyne FLIR Camera";
+	mManufacturer = "Teledyne";
+	mModel = "T1030sc";
+	mSerialNumber = "72500779";
+}
+
+cExperimentSensorInfo_FLIR::~cExperimentSensorInfo_FLIR()
+{}
+
+const char* cExperimentSensorInfo_FLIR::type() { return teledyne_flir_id; }
+std::string cExperimentSensorInfo_FLIR::getType() const { return type(); }
+const std::string& cExperimentSensorInfo_FLIR::getManufacturer() const { return mManufacturer; }
+const std::string& cExperimentSensorInfo_FLIR::getModel() const { return mModel; }
+const std::string& cExperimentSensorInfo_FLIR::getSerialNumber() const { return mSerialNumber; }
+
+class cSensorWidget_FLIR : public cSensorWidget
+{
+public:
+	cSensorWidget_FLIR(cExperimentSensorInfo_FLIR* parent) : mpParent(parent)
+	{
+		QLabel* pText = nullptr;
+
+		QVBoxLayout* pMainLayout = new QVBoxLayout();
+
+		QGridLayout* pGridLayout = new QGridLayout();
+
+		pText = new QLabel("Name");
+		pGridLayout->addWidget(pText, 0, 0);
+		mpName = new QLineEdit(mpParent->getName());
+		pGridLayout->addWidget(mpName, 0, 1);
+
+		pText = new QLabel("Manufacturer");
+		pGridLayout->addWidget(pText, 1, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getManufacturer()));
+		pGridLayout->addWidget(pText, 1, 1);
+
+		pText = new QLabel("Model");
+		pGridLayout->addWidget(pText, 2, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getModel()));
+		pGridLayout->addWidget(pText, 2, 1);
+
+		pText = new QLabel("Serial Number");
+		pGridLayout->addWidget(pText, 3, 0);
+		pText = new QLabel(QString::fromStdString(mpParent->getSerialNumber()));
+		pGridLayout->addWidget(pText, 3, 1);
+
+		pMainLayout->addLayout(pGridLayout, 0);
+
+		setLayout(pMainLayout);
+	}
+
+	void accept() override
+	{
+		std::string name = mpName->text().toStdString();
+		mpParent->setName(name);
+	}
+
+	void reset() override
+	{
+		mpName->setText(mpParent->getName());
+	}
+
+private:
+	QLineEdit* mpName = nullptr;
+
+	cExperimentSensorInfo_FLIR* const mpParent;
+};
+
+cSensorWidget* cExperimentSensorInfo_FLIR::widget()
+{
+	return new cSensorWidget_FLIR(this);
+}
+
+void cExperimentSensorInfo_FLIR::load(const nlohmann::json& jdoc)
+{
+	if (jdoc.contains("Name"))
+		mName = jdoc["Name"];
+}
+
+void cExperimentSensorInfo_FLIR::save(nlohmann::json& jdoc)
+{
+	nlohmann::json swir;
+	swir["Name"] = mName;
+	swir["Manufacturer"] = mManufacturer;
+	swir["Model"] = mModel;
+	swir["Serial Number"] = mSerialNumber;
+
+	jdoc[type()] = swir;
+
+	mDirty = false;
+}
 
 

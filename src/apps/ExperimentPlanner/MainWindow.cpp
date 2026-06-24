@@ -21,6 +21,7 @@
 #include "CreateHyperspectralExperimentFromPlotInfoDlg.hpp"
 
 #include "CreateThermalExperimentFromSpiderCamPointDlg.hpp"
+#include "CreateThermalExperimentFromPlotInfoDlg.hpp"
 
 #include "MeasurementManager.hpp"
 #include "MeasurementTreeItem.hpp"
@@ -497,6 +498,11 @@ void cMainWindow::createSubMenusAndActions()
     pMenuItem = new QAction(tr("Thermal Scan From SpiderCam Point"), this);
     pMenuItem->setStatusTip(tr("Creates thermal measurement file(s) from single SpiderCam point"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateThermalScan_SpiderCam_Point);
+    mpGenerateMenu->addAction(pMenuItem);
+
+    pMenuItem = new QAction(tr("Thermal Scan From GPS points"), this);
+    pMenuItem->setStatusTip(tr("Creates thermal measurement file(s) from GPS points"));
+    connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onGenerateThermalScan_PlotInfo);
     mpGenerateMenu->addAction(pMenuItem);
 
     //
@@ -1313,6 +1319,63 @@ void cMainWindow::onGenerateThermalScan_SpiderCam_Point()
         dlg.positionUpdated(mpModel->getPosition());
         connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cCreateThermalExperimentFromSpiderCamDlg::positionUpdated);
     }
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Rejected)
+    {
+        return;
+    }
+
+    mpEditMenu->setDisabled(false);
+}
+
+void cMainWindow::onGenerateThermalScan_PlotInfo()
+{
+    QString defaultDirectory = mSettings.value("Defaults/gpsFiles").toString();
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open GPS File"), defaultDirectory,
+        "GPS Files (*.csv)");
+
+    if (fileName.isEmpty())
+        return;
+
+    std::ifstream gps_file;
+    gps_file.open(fileName.toStdString());
+
+    if (!gps_file.is_open())
+    {
+        QString msg = "Could not open file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "File Error", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::string test;
+    gps_file >> test;
+    gps_file.close();
+
+    if (!validGpsFile(test))
+    {
+        QString msg = "Invalid GPS file: ";
+        msg += fileName;
+        QMessageBox msg_box(QMessageBox::Critical, "Invalid File", msg);
+        msg_box.exec();
+        return;
+    }
+
+    std::filesystem::path file_name = fileName.toStdString();
+
+    std::filesystem::path directory = file_name.parent_path();
+
+    mSettings.setValue("Defaults/gpsFiles", QString::fromStdString(directory.string()));
+
+    cCreateThermalExperimentFromPlotInfoDlg dlg(fileName, this);
+
+    connect(&dlg, &cCreateThermalExperimentFromPlotInfoDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(&dlg, &cCreateThermalExperimentFromPlotInfoDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(&dlg, &cCreateThermalExperimentFromPlotInfoDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     auto result = dlg.exec();
 

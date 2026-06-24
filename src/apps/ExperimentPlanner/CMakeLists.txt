@@ -158,6 +158,8 @@ PRIVATE
     CreateThermalExperimentDlg.cpp
     CreateThermalExperimentFromSpiderCamPointDlg.hpp
     CreateThermalExperimentFromSpiderCamPointDlg.cpp
+    CreateThermalExperimentFromPlotInfoDlg.hpp
+    CreateThermalExperimentFromPlotInfoDlg.cpp
 
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp

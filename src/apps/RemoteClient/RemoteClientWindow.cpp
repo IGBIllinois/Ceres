@@ -244,6 +244,8 @@ void cRemoteClientWindow::initialize(cCeresSplashScreen* pSplashScreen)
 
     statusBar()->addPermanentWidget(mpLoopMeter);
 
+    emit mMainModel.defaultDataPathChanged(QString::fromStdString(mMainModel.defaultDataPath()));
+
     qInfo() << "Single shot timer to start data acquisition.";
     QTimer::singleShot(1000, this, &cRemoteClientWindow::startDataAcquisitionSystem);
 }

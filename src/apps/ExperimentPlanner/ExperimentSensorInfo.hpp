@@ -231,4 +231,31 @@ private:
 };
 
 
+class cExperimentSensorInfo_FLIR : public cExperimentSensorInfo
+{
+public:
+	cExperimentSensorInfo_FLIR();
+	virtual ~cExperimentSensorInfo_FLIR();
+
+	static const char* type();
+
+	std::string getType() const override;
+
+	const std::string& getManufacturer() const;
+	const std::string& getModel() const;
+	const std::string& getSerialNumber() const;
+
+	cSensorWidget* widget() override;
+
+protected:
+	void load(const nlohmann::json& jdoc) override;
+	void save(nlohmann::json& jdoc) override;
+
+private:
+	std::string mManufacturer;
+	std::string mModel;
+	std::string mSerialNumber;
+};
+
+
 

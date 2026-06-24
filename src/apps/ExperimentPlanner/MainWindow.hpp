@@ -111,6 +111,7 @@ private slots:
     void onGenerateHyperspectralScan_PlotInfo();
 
     void onGenerateThermalScan_SpiderCam_Point();
+    void onGenerateThermalScan_PlotInfo();
 
     // Slots associated with "Compute" menu actions
 private slots:

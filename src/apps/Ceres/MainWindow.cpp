@@ -31,6 +31,7 @@
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
+#include <QDialog>
 
 
 #include <cassert>
@@ -571,6 +572,11 @@ void cMainWindow::onSettingsReferenceHeight()
     }
 
     auto result = dlg.exec();
+
+    if (result == QDialog::Accepted)
+    {
+
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -632,7 +638,7 @@ void cMainWindow::onExperimentTerminated()
     mBatchProcess.clear();
 
     mpModel->setBatchMode(false);
-    mpModel->clearVariableTable();
+    mpModel->clearGlobalVariableTable();
 
     emit setExperimentActions(true, true, false, false);
 
@@ -663,7 +669,7 @@ void cMainWindow::onExperimentCompleted()
     }
 
     mpModel->setBatchMode(false);
-    mpModel->clearVariableTable();
+    mpModel->clearGlobalVariableTable();
 
     emit setExperimentActions(true, true, false, false);
 
