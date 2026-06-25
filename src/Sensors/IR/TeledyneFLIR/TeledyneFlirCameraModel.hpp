@@ -100,6 +100,7 @@ protected:
 protected:
     eMode mMode = eMode::SINGLE;
     bool mPhotoRequested = false;
+    bool mSavePhoto = false;
 
     double mFrameRate_fps = 0;
     std::optional<double> mMinFrameRate_fps;

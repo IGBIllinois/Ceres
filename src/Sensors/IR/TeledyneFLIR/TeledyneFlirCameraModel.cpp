@@ -203,6 +203,7 @@ void cTeledyneFlirCameraModel::takePhoto(bool update_view)
         mPhotoRequested = true;
         mImageRequested = update_view;
         mAutoEmitImages = false;
+        mSavePhoto      = false;
     }
 }
 
@@ -213,6 +214,7 @@ void cTeledyneFlirCameraModel::takePhoto(bool update_view, bool auto_save)
         mPhotoRequested = true;
         mImageRequested = update_view;
         mAutoEmitImages = false;
+        mSavePhoto      = auto_save;
     }
 }
 

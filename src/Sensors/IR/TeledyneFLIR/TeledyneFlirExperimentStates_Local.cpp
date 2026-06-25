@@ -252,7 +252,7 @@ void cTeledyneFlirCamera_TakePhoto_Local::run()
 	{
 		if (mpModel->mode() == cTeledyneFlirCameraModel::eMode::SINGLE)
 		{
-			emit takePhoto(mUpdateView);
+			emit takePhoto(mUpdateView, true);
 		}
 		else
 		{

@@ -76,7 +76,7 @@ bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)
 
     size_t buffer_size = mImageHeight * mImageWidth * sizeof(double);
 
-    mSerializer.setBufferCapacity(buffer_size + 1024);
+    mSerializer.setBufferCapacity(buffer_size + 2048);
 
     if (result)
         setStatus(sensor::eStatus::CONFIGURED);
@@ -276,9 +276,19 @@ void cTeledyneFlirCameraModel_T1K::update()
 
     if (newData)
     {
-        if (mIsRecording && static_cast<bool>(mSerializer))
+        if (static_cast<bool>(mSerializer))
         {
-            mSerializer.writeThermalImage(mInstanceID, mCurrentImage);
+            if (mIsRecording || mSavePhoto)
+            {
+                mSerializer.writeThermalImage(mInstanceID, mCurrentImage);
+            }
+
+            mSavePhoto = false;
+        }
+        else if (mSavePhoto)
+        {
+            //BAF Save thermal image here!!!
+            mSavePhoto = false;
         }
 
         if (mImageRequested || mAutoEmitImages)

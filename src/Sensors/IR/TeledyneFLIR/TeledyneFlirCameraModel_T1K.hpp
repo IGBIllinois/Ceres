@@ -94,8 +94,6 @@ private:
 
     bool mIsRunning = false;
 
-    cTeledyneFlirSerializer mSerializer;
-
 private:
     const uint8_t mInstanceID;
 };
