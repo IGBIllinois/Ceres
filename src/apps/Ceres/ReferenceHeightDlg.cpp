@@ -134,6 +134,8 @@ void cReferenceHeightDlg::createLayout()
 
 void cReferenceHeightDlg::accept()
 {
+	compute();
+
 	if (!mpReferenceHeight_mm->text().isEmpty())
 	{
 		int32_t reference_height_mm = mpReferenceHeight_mm->text().toInt();
