@@ -2,6 +2,7 @@
 #include "SpidercamExperimentStates.hpp"
 #include "SpidercamCtrlProxies.hpp"
 #include "AerialCompensationDlg.hpp"
+#include "../../ExperimentStateMachine/ExperimentVariableNames.hpp"
 #include "../../ExperimentStateMachine/ExperimentVariableTable.hpp"
 #include "../../Utilities/Constants.hpp"
 #include "../../Utilities/RappFieldBoundary.hpp"
@@ -151,6 +152,7 @@ cSpidercamExperimentState_Movement::cSpidercamExperimentState_Movement(const spi
 bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
+	using namespace nExperimentVariables;
 
 	try
 	{
@@ -210,14 +212,14 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 
 			auto variables = mVariables.lock();
 
-			if (variables->contains("canopy_height_mm"))
-				variables->get("canopy_height_mm", canopy_height_mm);
+			if (variables->contains(CANOPY_HEIGHT_mm))
+				variables->get(CANOPY_HEIGHT_mm, canopy_height_mm);
 
-			if (variables->contains("sensor_offset_mm"))
-				variables->get("sensor_offset_mm", sensor_offset_mm);
+			if (variables->contains(SENSOR_OFFSET_mm))
+				variables->get(SENSOR_OFFSET_mm, sensor_offset_mm);
 
-			if (variables->contains("reference_height_mm"))
-				variables->get("reference_height_mm", mReferenceHeight_mm);
+			if (variables->contains(REFERENCE_HEIGHT_mm))
+				variables->get(REFERENCE_HEIGHT_mm, mReferenceHeight_mm);
 
 			if ((sensor_offset_mm == -10000) || (canopy_height_mm == -10000))
 			{
@@ -241,14 +243,14 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 				sensor_offset_mm = pDlg->getSensorOffset_mm();
 				mReferenceHeight_mm = pDlg->getReferenceHeight_mm();
 
-				if (!variables->set("canopy_height_mm", canopy_height_mm))
-					variables->add("canopy_height_mm", canopy_height_mm);
+				if (!variables->set(CANOPY_HEIGHT_mm, canopy_height_mm))
+					variables->add(CANOPY_HEIGHT_mm, canopy_height_mm);
 
-				if (!variables->set("sensor_offset_mm", sensor_offset_mm))
-					variables->add("sensor_offset_mm", sensor_offset_mm);
+				if (!variables->set(SENSOR_OFFSET_mm, sensor_offset_mm))
+					variables->add(SENSOR_OFFSET_mm, sensor_offset_mm);
 
-				if (!variables->set("reference_height_mm", mReferenceHeight_mm))
-					variables->add("reference_height_mm", mReferenceHeight_mm);
+				if (!variables->set(REFERENCE_HEIGHT_mm, mReferenceHeight_mm))
+					variables->add(REFERENCE_HEIGHT_mm, mReferenceHeight_mm);
 
 				pDlg->deleteLater();
 			}
@@ -289,11 +291,11 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 
 			auto variables = mVariables.lock();
 
-			if (variables->contains("sensor_offset_mm"))
-				variables->get("sensor_offset_mm", sensor_offset_mm);
+			if (variables->contains(SENSOR_OFFSET_mm))
+				variables->get(SENSOR_OFFSET_mm, sensor_offset_mm);
 
-			if (variables->contains("reference_height_mm"))
-				variables->get("reference_height_mm", reference_height_mm);
+			if (variables->contains(REFERENCE_HEIGHT_mm))
+				variables->get(REFERENCE_HEIGHT_mm, reference_height_mm);
 
 			if (sensor_offset_mm == -10000)
 			{
@@ -314,11 +316,11 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 				sensor_offset_mm = pDlg->getSensorOffset_mm();
 				reference_height_mm = pDlg->getReferenceHeight_mm();
 
-				if (!variables->set("sensor_offset_mm", sensor_offset_mm))
-					variables->add("sensor_offset_mm", sensor_offset_mm);
+				if (!variables->set(SENSOR_OFFSET_mm, sensor_offset_mm))
+					variables->add(SENSOR_OFFSET_mm, sensor_offset_mm);
 
-				if (!variables->set("reference_height_mm", reference_height_mm))
-					variables->add("reference_height_mm", reference_height_mm);
+				if (!variables->set(REFERENCE_HEIGHT_mm, reference_height_mm))
+					variables->add(REFERENCE_HEIGHT_mm, reference_height_mm);
 
 				pDlg->deleteLater();
 			}
