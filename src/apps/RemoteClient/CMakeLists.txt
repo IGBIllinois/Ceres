@@ -1,6 +1,6 @@
 
 
-project(CeresRemoteClient VERSION 2.0.1.0)
+project(CeresRemoteClient VERSION 2.0.2.0)
 
 # Configure version resource file
 configure_file(
