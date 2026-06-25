@@ -215,7 +215,7 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
         mVariableTable = std::make_shared<cExperimentVariableTable>();
 
     if (mGlobalVariableTable)
-        mVariableTable = mGlobalVariableTable;
+        *mVariableTable = *mGlobalVariableTable;
 
     mExperimentStates.push_back(new cExperimentState_Dummy());
 

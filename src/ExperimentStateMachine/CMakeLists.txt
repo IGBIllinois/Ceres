@@ -35,6 +35,7 @@ PRIVATE
 # A variable table for passing values to difference experiment states
 # within the state machine
 #
+    ExperimentVariableNames.hpp
     ExperimentVariableTable.hpp
     ExperimentVariableTable.cpp
 

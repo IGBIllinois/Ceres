@@ -163,128 +163,128 @@ void cExperimentVariableTable::clear()
 }
 
 
-void cExperimentVariableTable::add(const std::string& name, bool value)
+void cExperimentVariableTable::add(std::string_view name, bool value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, int16_t value)
+void cExperimentVariableTable::add(std::string_view name, int16_t value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, uint16_t value)
+void cExperimentVariableTable::add(std::string_view name, uint16_t value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, int32_t value)
+void cExperimentVariableTable::add(std::string_view name, int32_t value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, uint32_t value)
+void cExperimentVariableTable::add(std::string_view name, uint32_t value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, int64_t value)
+void cExperimentVariableTable::add(std::string_view name, int64_t value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, uint64_t value)
+void cExperimentVariableTable::add(std::string_view name, uint64_t value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, float value)
+void cExperimentVariableTable::add(std::string_view name, float value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
-void cExperimentVariableTable::add(const std::string& name, double value)
+void cExperimentVariableTable::add(std::string_view name, double value)
 {
-	mNamedVariables[name] = std::any(value);
+	mNamedVariables[std::string(name)] = std::any(value);
 }
 
 
 
-bool cExperimentVariableTable::set(const std::string& name, bool value)
+bool cExperimentVariableTable::set(std::string_view name, bool value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, int16_t value)
+bool cExperimentVariableTable::set(std::string_view name, int16_t value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, uint16_t value)
+bool cExperimentVariableTable::set(std::string_view name, uint16_t value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, int32_t value)
+bool cExperimentVariableTable::set(std::string_view name, int32_t value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, uint32_t value)
+bool cExperimentVariableTable::set(std::string_view name, uint32_t value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, int64_t value)
+bool cExperimentVariableTable::set(std::string_view name, int64_t value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, uint64_t value)
+bool cExperimentVariableTable::set(std::string_view name, uint64_t value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, float value)
+bool cExperimentVariableTable::set(std::string_view name, float value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return set_value(value, it->second);
 }
 
-bool cExperimentVariableTable::set(const std::string& name, double value)
+bool cExperimentVariableTable::set(std::string_view name, double value)
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
@@ -293,88 +293,88 @@ bool cExperimentVariableTable::set(const std::string& name, double value)
 
 
 
-bool cExperimentVariableTable::contains(const std::string& name) const
+bool cExperimentVariableTable::contains(std::string_view name) const
 {
-	return mNamedVariables.contains(name);
+	return mNamedVariables.contains(std::string(name));
 }
 
 
 
-bool cExperimentVariableTable::get(const std::string& name, bool& value) const
+bool cExperimentVariableTable::get(std::string_view name, bool& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, int16_t& value) const
+bool cExperimentVariableTable::get(std::string_view name, int16_t& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, uint16_t& value) const
+bool cExperimentVariableTable::get(std::string_view name, uint16_t& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, int32_t& value) const
+bool cExperimentVariableTable::get(std::string_view name, int32_t& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, uint32_t& value) const
+bool cExperimentVariableTable::get(std::string_view name, uint32_t& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, int64_t& value) const
+bool cExperimentVariableTable::get(std::string_view name, int64_t& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, uint64_t& value) const
+bool cExperimentVariableTable::get(std::string_view name, uint64_t& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, float& value) const
+bool cExperimentVariableTable::get(std::string_view name, float& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
 	return to_value(it->second, value);
 }
 
-bool cExperimentVariableTable::get(const std::string& name, double& value) const
+bool cExperimentVariableTable::get(std::string_view name, double& value) const
 {
-	auto it = mNamedVariables.find(name);
+	auto it = mNamedVariables.find(std::string(name));
 	if (it == mNamedVariables.end())
 		return false;
 
