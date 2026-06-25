@@ -72,6 +72,7 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mMeasurementColor.setRgb(255, 0, 255);
 	mMeasurementPen.setColor(mMeasurementColor);
 	mMeasurementPen.setWidth(2);
+	mMeasurementMarkerRadius = 1;
 
 	mBorderColor.setRgb(0, 0, 255);
 	mBorderPen.setColor(mBorderColor);
@@ -189,6 +190,19 @@ void cSpidercamScanArea::setRecording(bool recording)
 
 	if (mIsRecording)
 	{
+		if (mIsRecording.IsRising())
+		{
+			mMeasurementPaths.push_back(path_t());
+			mpActivePath = &(mMeasurementPaths.back());
+
+			uint32_t x = mDollyPosition.x();
+			uint32_t y = mDollyPosition.y();
+
+			mpActivePath->push_back({ x,y });
+
+			mIsRecording.reset();
+		}
+
 		mDollyPen.setColor(mMeasurementColor);
 		mDollyBrush.setColor(mMeasurementColor);
 	}
@@ -219,13 +233,6 @@ void cSpidercamScanArea::updateDollyPosition(uint32_t x, uint32_t y)
 
 	if (mIsRecording)
 	{
-		if (mIsRecording.IsRising())
-		{
-			mMeasurementPaths.push_back(path_t());
-			mpActivePath = &(mMeasurementPaths.back());
-			mIsRecording.reset();
-		}
-
 		if (mpActivePath)
 			mpActivePath->push_back({x,y});
 	}
@@ -943,6 +950,14 @@ void cSpidercamScanArea::drawPath(QPainter& painter, double height)
 		int x = mX_Scale * (point.x_mm - mMinX) + mX_Offset;
 		int y = mY_Scale * (point.y_mm - mMinY) + mY_Offset;
 		y = height - y;
+
+		if (measurementPath.size() == 1)
+		{
+			QPoint center(x, y);
+			painter.drawEllipse(center, mMeasurementMarkerRadius, mMeasurementMarkerRadius);
+			continue;
+		}
+
 		path.moveTo(x, y);
 
 		for (int i = 0; i < measurementPath.size(); ++i)

@@ -86,7 +86,6 @@ public:
 
     bool isRecording() const;
     void setRecording(bool recording);
-    void clearRecordedPath();
     void setMeasurementColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
 
     void updateBounds(double minX, double maxX, double minY, double maxY);
@@ -110,6 +109,7 @@ public:
     std::tuple<int, int> toSpiderCamCoordinates(int window_x, int window_y);
 
 public slots:
+    void clearRecordedPath();
     void updateSecondaryDollyPosition(bool valid, uint32_t x, uint32_t y);
 
 private slots:
@@ -173,6 +173,7 @@ private:
 private:
     QPen   mMeasurementPen;
     QColor mMeasurementColor;
+    int    mMeasurementMarkerRadius = 2;
 
     // For drawing the Spidercam border area
     QPen   mBorderPen;
