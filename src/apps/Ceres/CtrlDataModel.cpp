@@ -3,6 +3,7 @@
 #include "SensorModel.hpp"
 #include "SensorPropertyPage.hpp"
 #include "ExperimentCtrlModel.hpp"
+#include "ExperimentVariableNames.hpp"
 #include "ExperimentVariableTable.hpp"
 #include "ExperimentTypes.hpp"
 #include "RappFieldModel.hpp"
@@ -231,6 +232,7 @@ bool cCtrlDataModel::experimentRequiresDataFile() const
 bool cCtrlDataModel::loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc)
 {
     using namespace nlohmann;
+    using namespace nExperimentVariables;
 
     if (isExperimentRunning())
     {
@@ -252,21 +254,31 @@ bool cCtrlDataModel::loadExperiment(const std::string& exp_path, const std::stri
 
         auto required_sensors = expDoc["sensors"];
 
-/*
         for (auto required_sensor : required_sensors)
         {
-            bool found = false;
+            int num_required_sensors = 0;
 
             for (auto& sensor : mThread.mActiveSensors)
             {
                 if (required_sensor == sensor->descriptor())
                 {
-                    found = true;
-                    break;
+                    ++num_required_sensors;
                 }
             }
+
+            if (num_required_sensors != required_sensors.size())
+            {
+                QString msg = "Not all of the required sensors are active!\n";
+
+                QMessageBox::StandardButtons buttons = QMessageBox::Ignore | QMessageBox::Cancel;
+                QMessageBox mb(QMessageBox::Critical, QString::fromStdString(exp_name), msg, buttons);
+                auto result = mb.exec();
+
+                if (result == QMessageBox::Rejected)
+                    return false;
+            }
         }
-*/
+
         if (nRFM::has_reference_height_mm())
         {
             auto table = mThread.mpController->getGlobalVariableTable();
@@ -279,8 +291,8 @@ bool cCtrlDataModel::loadExperiment(const std::string& exp_path, const std::stri
 
             auto variables = table.lock();
 
-            if (!variables->set("reference_height_mm", nRFM::reference_height_mm()))
-                variables->add("reference_height_mm", nRFM::reference_height_mm());
+            if (!variables->set(REFERENCE_HEIGHT_mm, nRFM::reference_height_mm()))
+                variables->add(REFERENCE_HEIGHT_mm, nRFM::reference_height_mm());
         }
 
         if (mThread.mpController->loadExperiment(exp_path, exp_name, expDoc["experiment"]))
