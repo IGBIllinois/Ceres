@@ -12,7 +12,7 @@ cRemoteClientCentalWindow::cRemoteClientCentalWindow(QWidget* parent) :
 {
     mpLogWindow = new QLogWidget();
 
-    setTabShape(QTabWidget::Triangular);
+    setTabShape(QTabWidget::Rounded);   // Triangular);
 
     addTab(mpLogWindow, "Log");
     setTabToolTip(0, "Log of commands and sensor status");
