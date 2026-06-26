@@ -104,6 +104,8 @@ int cMissingSensorsDlg::exec()
 		}
 		table += "</table>";
 		mpSensorTable->setHtml(table);
+
+		setMinimumWidth(600);
 	}
 
 	return QDialog::exec();

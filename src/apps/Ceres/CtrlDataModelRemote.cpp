@@ -467,8 +467,8 @@ bool cCtrlDataModelRemote::hasRequiredSensors(const std::string& exp_name, const
                     if (sensor_info.contains("Name"))
                         sensor_name = sensor_info["Name"];
 
-                    auto remote_it = std::find_if(remote_sensors.begin(), remote_sensors.end(), [name, sensor_name](const cRemoteClientView::sRemoteSensorStatus_t& sensor) 
-                        { return (name == sensor.sensor_name) || (sensor_name == sensor.sensor_name); });
+                    auto remote_it = std::find_if(remote_sensors.begin(), remote_sensors.end(), [name, sensor_name, sensor_model](const cRemoteClientView::sRemoteSensorStatus_t& sensor)
+                        { return (name == sensor.sensor_name) || (sensor_name == sensor.sensor_name) || (sensor_model == sensor.sensor_name); });
 
                     if (remote_it == remote_sensors.end())
                         dlg.addMissingSensor(name, sensor_manufacturer, sensor_model, sensor_name);
