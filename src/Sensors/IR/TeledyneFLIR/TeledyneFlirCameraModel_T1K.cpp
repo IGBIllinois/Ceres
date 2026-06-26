@@ -72,11 +72,11 @@ bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)
 {
     updateName(mCamera->modelName());
 
-    bool result = cTeledyneFlirCameraModel::configure(jsonCfg);
-
     size_t buffer_size = mImageHeight * mImageWidth * sizeof(double);
 
     mSerializer.setBufferCapacity(buffer_size + 2048);
+
+    bool result = cTeledyneFlirCameraModel::configure(jsonCfg);
 
     if (result)
         setStatus(sensor::eStatus::CONFIGURED);
