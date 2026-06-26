@@ -87,6 +87,9 @@ public:
     void terminateExperiment();
 
 signals:
+    void statusMessage(QString msg);
+
+signals:
     void connectToSensorMenu(QAction* pAction);
     void disconnectFromSensorMenu(QAction* pAction);
 

@@ -896,6 +896,7 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         mpModel = pModel;
     }
 
+    QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
 
     QObject::connect(mpModel, &cCtrlDataModel::connectToSensorMenu, this, &cMainWindow::addSensorPropertyPage);
     QObject::connect(mpModel, &cCtrlDataModel::disconnectFromSensorMenu, this, &cMainWindow::removeSensorPropertyPage);
