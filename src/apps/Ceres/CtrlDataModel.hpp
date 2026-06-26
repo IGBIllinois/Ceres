@@ -107,6 +107,7 @@ private slots:
     void onDataThreadTermination();
 
 protected:
+    virtual bool hasRequiredSensors(const std::string& exp_name, const nlohmann::json& expDoc) = 0;
     virtual void endDataRecording() = 0;
 
 protected:

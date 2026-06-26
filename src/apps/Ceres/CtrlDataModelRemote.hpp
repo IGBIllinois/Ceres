@@ -70,6 +70,7 @@ protected:
     cExperimentState* createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent) override;
 
 protected:
+    bool hasRequiredSensors(const std::string& exp_name, const nlohmann::json& expDoc) override;
     void dataRecordingStateChange(bool record) override;
     void endDataRecording() override;
 

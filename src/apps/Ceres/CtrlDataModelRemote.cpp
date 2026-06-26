@@ -10,11 +10,13 @@
 #include "SensorPropertyPage.hpp"
 #include "ExperimentStateCreator.hpp"
 #include "MarkerExperimentStates.hpp"
+#include "MissingSensorsDlg.hpp"
 
 #include <QDockWidget>
 #include <QTime>
 #include <QCoreApplication>
 #include <QAbstractEventDispatcher>
+#include <QMessageBox>
 
 
 //Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
@@ -384,6 +386,122 @@ void cCtrlDataModelRemote::dataRecordingStateChange(bool record)
     {
         sendStopDataRecording();
     }
+}
+
+bool cCtrlDataModelRemote::hasRequiredSensors(const std::string& exp_name, const nlohmann::json& expDoc)
+{
+    auto remote_sensors = mpView->getSensorStatus();
+
+    auto required_sensors = expDoc["sensors"];
+    std::vector<std::string> missing_sensors;
+
+    for (const auto& required_sensor : required_sensors)
+    {
+        std::string sensor_model;
+        std::string sensor_name;
+
+        if (expDoc.contains(required_sensor))
+        {
+            auto sensor_info = expDoc[required_sensor];
+
+            if (sensor_info.contains("Model"))
+                sensor_model = sensor_info["Model"];
+
+            if (sensor_info.contains("Name"))
+                sensor_name = sensor_info["Name"];
+        }
+
+        missing_sensors.push_back(required_sensor.get<std::string>());
+
+        for (const auto& sensor : mThread.mActiveSensors)
+        {
+            if (required_sensor == sensor->descriptor())
+            {
+                if (sensor->getStatus() == sensor::eStatus::RUNNING)
+                {
+                    auto it = std::remove(missing_sensors.begin(), missing_sensors.end(), required_sensor.get<std::string>());
+                    missing_sensors.erase(it, missing_sensors.end());
+                }
+            }
+        }
+
+        for (const auto& sensor : remote_sensors)
+        {
+            if ((required_sensor == sensor.sensor_name) || (sensor_name == sensor.sensor_name) || (sensor_model == sensor.sensor_name))
+            {
+                if (sensor.sensor_status == "RUNNING")
+                {
+                    auto it = std::remove(missing_sensors.begin(), missing_sensors.end(), required_sensor.get<std::string>());
+                    missing_sensors.erase(it, missing_sensors.end());
+                }
+            }
+        }
+    }
+
+    if (missing_sensors.size() > 0)
+    {
+        QString title = "Measurement: ";
+        title += QString::fromStdString(exp_name);
+        cMissingSensorsDlg dlg(title);
+
+        for (const auto& name : missing_sensors)
+        {
+            auto it = std::find_if(mThread.mActiveSensors.begin(), mThread.mActiveSensors.end(), [name](const cSensorModel* sensor) { return name == sensor->descriptor(); });
+
+            if (it == mThread.mActiveSensors.end())
+            {
+                if (expDoc.contains(name))
+                {
+                    std::string sensor_manufacturer;
+                    std::string sensor_model;
+                    std::string sensor_name;
+
+                    auto sensor_info = expDoc[name];
+
+                    if (sensor_info.contains("Manufacturer"))
+                        sensor_manufacturer = sensor_info["Manufacturer"];
+
+                    if (sensor_info.contains("Model"))
+                        sensor_model = sensor_info["Model"];
+
+                    if (sensor_info.contains("Name"))
+                        sensor_name = sensor_info["Name"];
+
+                    auto remote_it = std::find_if(remote_sensors.begin(), remote_sensors.end(), [name, sensor_name](const cRemoteClientView::sRemoteSensorStatus_t& sensor) 
+                        { return (name == sensor.sensor_name) || (sensor_name == sensor.sensor_name); });
+
+                    if (remote_it == remote_sensors.end())
+                        dlg.addMissingSensor(name, sensor_manufacturer, sensor_model, sensor_name);
+                    else
+                        dlg.addSensor(name, sensor_manufacturer, sensor_model, sensor_name, remote_it->sensor_status);
+                }
+                else
+                    dlg.addMissingSensor(name);
+            }
+            else
+            {
+                const cSensorModel* sensor = *it;
+
+                std::string manufacturer = sensor->manufacturer();
+                std::string model = sensor->model();
+                std::string sensor_name = sensor->name();
+                std::string status = sensor::to_string(sensor->getStatus());
+
+                dlg.addSensor(name, manufacturer, model, sensor_name, status);
+            }
+        }
+
+        auto result = dlg.exec();
+
+        if (result == QDialog::Rejected)
+        {
+            emit statusMessage("Measurement terminated.");
+            return false;
+        }
+    }
+
+
+    return true;
 }
 
 bool cCtrlDataModelRemote::loadExperiment(const std::string& exp_path, const std::string& exp_name, const nlohmann::json& expDoc)

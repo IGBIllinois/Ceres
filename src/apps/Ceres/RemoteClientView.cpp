@@ -174,6 +174,23 @@ void cRemoteClientView::updateLogMsg(int msg_type, const QString& device, const 
 	mpLogMessage->setText(msg);
 }
 
+std::vector<cRemoteClientView::sRemoteSensorStatus_t> cRemoteClientView::getSensorStatus()
+{
+	std::vector<sRemoteSensorStatus_t> result;
+
+	for (const auto& entry : mSensorStatus)
+	{
+		sRemoteSensorStatus_t status;
+		status.sensor_name = entry.mpSensorLabel->text().toStdString();
+		status.sensor_status = entry.mpSensorStatus->text().toStdString();
+
+		result.push_back(status);
+	}
+
+	return result;
+}
+
+
 void cRemoteClientView::clearRequiredSensors()
 {
 	mRequiredSensors.clear();

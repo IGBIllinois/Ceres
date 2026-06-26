@@ -20,6 +20,13 @@ QT_END_NAMESPACE
 class cRemoteClientView : public QAbstractScrollArea
 {
 public:
+    struct sRemoteSensorStatus_t
+    {
+        std::string sensor_name;
+        std::string sensor_status;
+    };
+
+public:
     cRemoteClientView(cCtrlDataModelRemote* pModel, QWidget* parent = nullptr);
 	virtual ~cRemoteClientView();
 
@@ -40,6 +47,8 @@ public:
     void clearRequiredSensors();
     bool addRequiredSensor(const QString& sensor);
     bool addRequiredSensors(const std::vector<QString>& sensors);
+
+    std::vector<sRemoteSensorStatus_t> getSensorStatus();
 
 signals:
     void sensorFaultDetected();

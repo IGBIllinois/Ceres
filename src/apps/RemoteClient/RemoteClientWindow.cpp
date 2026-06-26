@@ -577,8 +577,18 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
             }
             catch (const std::exception& e)
             {
+                QString msg = "Failed configuration!\n";
+                msg += e.what();
+                QMessageBox md(QMessageBox::Warning, QString::fromStdString(entry), msg);
+                md.exec();
+
                 validSensor = false;
             }
+        }
+        else
+        {
+            QMessageBox md(QMessageBox::Warning, QString::fromStdString(entry), "Has no configuration!");
+            md.exec();
         }
 
 

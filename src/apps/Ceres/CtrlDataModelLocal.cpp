@@ -4,6 +4,7 @@
 #include "ExperimentCtrlModel.hpp"
 #include "ExperimentTypes.hpp"
 #include "TimestampProvider.hpp"
+#include "MissingSensorsDlg.hpp"
 
 #include <QtWidgets>
 
@@ -189,6 +190,89 @@ void cCtrlDataModelLocal::closeDataFile()
 
     mPlantingDate = 0;
     mHarvestDate = 0;
+}
+
+bool cCtrlDataModelLocal::hasRequiredSensors(const std::string& exp_name, const nlohmann::json& expDoc)
+{
+
+    auto required_sensors = expDoc["sensors"];
+    std::vector<std::string> missing_sensors;
+
+    for (const auto& required_sensor : required_sensors)
+    {
+        missing_sensors.push_back(required_sensor.get<std::string>());
+
+        for (const auto& sensor : mThread.mActiveSensors)
+        {
+            if (required_sensor == sensor->descriptor())
+            {
+                if (sensor->getStatus() == sensor::eStatus::RUNNING)
+                {
+                    auto it = std::remove(missing_sensors.begin(), missing_sensors.end(), required_sensor.get<std::string>());
+                    missing_sensors.erase(it, missing_sensors.end());
+                }
+            }
+        }
+    }
+
+    if (missing_sensors.size() > 0)
+    {
+        QString title = "Measurement: ";
+        title += QString::fromStdString(exp_name);
+        cMissingSensorsDlg dlg(title);
+
+        for (const auto& name : missing_sensors)
+        {
+            auto it = std::find_if(mThread.mActiveSensors.begin(), mThread.mActiveSensors.end(), [name](const cSensorModel* sensor) { return name == sensor->descriptor(); });
+
+            if (it == mThread.mActiveSensors.end())
+            {
+                if (expDoc.contains(name))
+                {
+                    std::string manufacturer;
+                    std::string model;
+                    std::string sensor_name;
+
+                    auto sensor_info = expDoc[name];
+
+                    if (sensor_info.contains("Manufacturer"))
+                        manufacturer = sensor_info["Manufacturer"];
+
+                    if (sensor_info.contains("Model"))
+                        model = sensor_info["Model"];
+
+                    if (sensor_info.contains("Name"))
+                        sensor_name = sensor_info["Name"];
+
+                    dlg.addMissingSensor(name, manufacturer, model, sensor_name);
+                }
+                else
+                    dlg.addMissingSensor(name);
+            }
+            else
+            {
+                const cSensorModel* sensor = *it;
+
+                std::string manufacturer = sensor->manufacturer();
+                std::string model = sensor->model();
+                std::string sensor_name = sensor->name();
+                std::string status = sensor::to_string(sensor->getStatus());
+
+                dlg.addSensor(name, manufacturer, model, sensor_name, status);
+            }
+        }
+
+        auto result = dlg.exec();
+
+        if ((result == QMessageBox::Rejected) || (result == QMessageBox::Cancel))
+        {
+            emit statusMessage("Measurement terminated.");
+            return false;
+        }
+    }
+
+
+    return true;
 }
 
 void cCtrlDataModelLocal::endDataRecording()
