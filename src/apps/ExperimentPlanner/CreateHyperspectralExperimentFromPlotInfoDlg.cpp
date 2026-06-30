@@ -37,6 +37,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <fstream>
 
 namespace
 {
@@ -84,6 +85,8 @@ cCreateHyperspectralExperimentFromPlotInfoDlg::cCreateHyperspectralExperimentFro
 			mpModel->setData(mpModel->index(i, 2, QModelIndex()), pos.y_m);
 			mpModel->setData(mpModel->index(i, 3, QModelIndex()), pos.z_m);
 		}
+
+		gps_filename = filename.toStdString();
 	}
 
 	initialize();
@@ -129,6 +132,10 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::createControls_PointSelectio
 
 	mpShowPath = new QPushButton("Show Path", this);
 	connect(mpShowPath, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromPlotInfoDlg::onShowPath);
+
+	mpExportGPS = new QPushButton("Export Data", this);;
+	connect(mpExportGPS, &QPushButton::pressed, this, &cCreateHyperspectralExperimentFromPlotInfoDlg::onExportGPS);
+
 
 	mpInverseDirection = new QCheckBox("Inverse Direction", this);
 
@@ -202,6 +209,7 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::createLayout_PointSelection(
 	QVBoxLayout* pVSubLayout = new QVBoxLayout();
 	pVSubLayout->addWidget(mpClearPath);
 	pVSubLayout->addWidget(mpShowPath);
+	pVSubLayout->addWidget(mpExportGPS);
 	pPosLayout->addLayout(pVSubLayout);
 	pPosLayout->addStretch(1);
 
@@ -922,4 +930,28 @@ void cCreateHyperspectralExperimentFromPlotInfoDlg::onShowPath()
 		}
 	}
 */
+}
+
+void cCreateHyperspectralExperimentFromPlotInfoDlg::onExportGPS()
+{
+	std::filesystem::path output_path = gps_filename;
+	output_path.replace_extension("spidercam.csv");
+
+	std::ofstream output;
+	output.open(output_path);
+
+	cGpsFileReader reader;
+	reader.loadFromFile(gps_filename);
+	auto points = reader.GetPoints();
+
+	auto n = points.size();
+
+	for (int i = 0; i < n; ++i)
+	{
+		const auto& pos = points[i];
+
+		output << pos.label << ", " << static_cast<int>(pos.x_m * nConstants::M_TO_MM) << ", " << static_cast<int>(pos.y_m * nConstants::M_TO_MM) << ", " << static_cast<int>(pos.z_m * nConstants::M_TO_MM) << std::endl;
+	}
+
+
 }

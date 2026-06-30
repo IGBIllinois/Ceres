@@ -31,6 +31,7 @@ public:
 private slots:
 	bool generate() override;
 	void onShowPath() override;
+	void onExportGPS();
 	void onPlotUnitChange(const QString& text);
 	void onOffsetUnitChange(const QString& text);
 
@@ -64,6 +65,10 @@ private:
 	QRadioButton* mpStart = nullptr;
 	QRadioButton* mpCenter = nullptr;
 	QRadioButton* mpEnd = nullptr;
+
+	QPushButton* mpExportGPS = nullptr;
+
+	std::string gps_filename;
 
 	double mOffsetConversionFactor = 1.0;
 
