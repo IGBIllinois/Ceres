@@ -19,6 +19,7 @@ public:
 	uint32_t interval_ms() const;
 	void interval_ms(uint32_t interval_ms);
 
+	void start();
 	void stop();
 
 	void reset();
