@@ -136,8 +136,8 @@ void cCreateHyperspectralExperimentDlg::createControls_TitleInfo()
 	mpCtrlInfo = new QPushButton("Controller", this);
 	connect(mpCtrlInfo, &QPushButton::pressed, this, &cCreateHyperspectralExperimentDlg::onControllerUpdate);
 
-	mpSensorInfo = new QPushButton("Sensors", this);
-	connect(mpSensorInfo, &QPushButton::pressed, this, &cCreateHyperspectralExperimentDlg::onSensorUpdate);
+	mpRequiredSensorInfo = new QPushButton("Required Sensors", this);
+	connect(mpRequiredSensorInfo, &QPushButton::pressed, this, &cCreateHyperspectralExperimentDlg::onSensorUpdate);
 }
 
 void cCreateHyperspectralExperimentDlg::createControls_Preamble()
@@ -334,7 +334,7 @@ void cCreateHyperspectralExperimentDlg::createLayout_TitleInfo(QVBoxLayout* pMai
 	pTitleLayout->addWidget(mpTitle, 1);
 	pTitleLayout->addWidget(mpMetaInfo);
 	pTitleLayout->addWidget(mpCtrlInfo);
-	pTitleLayout->addWidget(mpSensorInfo);
+	pTitleLayout->addWidget(mpRequiredSensorInfo);
 
 	pMainLayout->addLayout(pTitleLayout);
 
