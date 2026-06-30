@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../GpsModel.hpp"
+#include "Timers.hpp"
 
 #include <cbdf/SsnxSerializer.hpp>
 
@@ -71,6 +72,9 @@ signals:
 protected:
     int mNumBases = 0;
     int mNumSV = 0;
+
+    cIntervalTimer mPvtUpdateInterval;
+    cIntervalTimer mUtcUpdateInterval;
 
     cSsnxSerializer mSerializer;
 

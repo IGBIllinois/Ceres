@@ -142,6 +142,9 @@ bool cSsnxModel_direct::startCommunications()
 
     mLastReceived = std::chrono::high_resolution_clock::now();
 
+    mPvtUpdateInterval.start();
+    mUtcUpdateInterval.start();
+
     return true;
 }
 
@@ -400,11 +403,6 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
         mTrack.emplace_back(point);
     }
 
-    emit updateGeodeticPVT(mPvtTimestamp_s,
-        mLatitude_rad, mLongitude_rad, height_m,
-        mVn_mps, mVe_mps, mVu_mps,
-        mGroundTrack_deg, ::gps::to_int(mDatum), mNumSV, mNumBases);
-
     auto pos = rfb::fromGPS(mLatitude_rad, mLongitude_rad, height_m);
 
     // Adjust position here due to antenna offset on dolly
@@ -412,7 +410,15 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     pos.y_mm -= mAntennaOffset.y_mm;
     pos.z_mm -= mAntennaOffset.z_mm;
 
-    emit positionChanged(pos.x_mm, pos.y_mm, pos.z_mm);
+    if (mPvtUpdateInterval.elapsed())
+    {
+        emit updateGeodeticPVT(mPvtTimestamp_s,
+            mLatitude_rad, mLongitude_rad, height_m,
+            mVn_mps, mVe_mps, mVu_mps,
+            mGroundTrack_deg, ::gps::to_int(mDatum), mNumSV, mNumBases);
+
+        emit positionChanged(pos.x_mm, pos.y_mm, pos.z_mm);
+    }
 
     if (getStatus() != sensor::eStatus::RUNNING)
         setStatus(sensor::eStatus::RUNNING);
@@ -493,7 +499,10 @@ void cSsnxModel_direct::receiverTime(const ssnx::gps::ReceiverTime_1_t& pvt)
         mSerializer.write(device_id(), pvt);
     }
 
-    emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
+    if (mUtcUpdateInterval.elapsed())
+    {
+        emit updateUTC(mUtcHour, mUtcMinute, mUtcSecond, mUtcDay, mUtcMonth, mUtcYear);
+    }
 }
 
 void cSsnxModel_direct::diffCorrIn(const ssnx::gps::DiffCorrIn_1_t& diff_corr)

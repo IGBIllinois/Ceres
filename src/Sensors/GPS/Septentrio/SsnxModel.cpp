@@ -43,6 +43,9 @@ bool cSsnxModel::configure(const nlohmann::json& jsonCfg)
     if (!mModel.empty())
         updateName(mModel);
 
+    mPvtUpdateInterval.interval_sec(1);
+    mUtcUpdateInterval.interval_sec(1);
+
     return result;
 }
 
