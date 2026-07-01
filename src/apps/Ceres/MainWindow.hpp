@@ -22,6 +22,7 @@ class QMenu;
 class QTextEdit;
 class QLineEdit;
 class QToolBar;
+class QPixmap;
 QT_END_NAMESPACE
 
 
@@ -71,6 +72,10 @@ public slots:
 //    void onRunControllerAction(QString msg);
     void onExperimentTerminated();
     void onExperimentCompleted();
+
+protected slots:
+    void loopHeartbeatUpdated();
+    void loopTerminated();
 
 private slots:
     //! File Menu Actions
@@ -135,6 +140,14 @@ private:
     QMenu* mpHelpMenu = nullptr;
 
     QToolBar* mpFileBar = nullptr;
+
+    QLabel* mpHeartBeat;
+
+    QPixmap* mpRedHeart;
+    QPixmap* mpEmptyHeart;
+    QPixmap* mpBlackHeart;
+
+    bool mShowRedHeart = false;
 
     cHobbsMeter* mpHobbsMeter = nullptr;
 

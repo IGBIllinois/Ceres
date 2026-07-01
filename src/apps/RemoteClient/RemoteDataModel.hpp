@@ -75,6 +75,8 @@ signals:
  */
 private slots:
     void onHeartbeat();
+    void loopHeartbeatUpdated();
+    void loopTerminated();
 
 /*
  * Signals handlers from the sensors

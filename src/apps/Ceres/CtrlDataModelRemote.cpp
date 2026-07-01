@@ -11,9 +11,11 @@
 #include "ExperimentStateCreator.hpp"
 #include "MarkerExperimentStates.hpp"
 #include "MissingSensorsDlg.hpp"
+#include "../common/remote_client_utils.hpp"
 
 #include <QDockWidget>
 #include <QTime>
+#include <QTimer>
 #include <QCoreApplication>
 #include <QAbstractEventDispatcher>
 #include <QMessageBox>
@@ -52,10 +54,20 @@ cCtrlDataModelRemote::cCtrlDataModelRemote(QObject* parent)
     mTemperature_C = 0.0;
     mRH_pct = 0.0;
     mPAR_umole = 0.0;
+
+
+    mpSystemCheckTimer = new QTimer(this);
+    connect(mpSystemCheckTimer, &QTimer::timeout, this, &cCtrlDataModelRemote::onSystemCheck);
+
+    mpSystemCheckTimer->start(5000);    // Check on the system every five seconds
+
+    mWatchDogTimer.interval_sec(15);
 }
 
 cCtrlDataModelRemote::~cCtrlDataModelRemote()
 {
+    mpSystemCheckTimer->stop();
+
     mpView->deleteLater();
     mpView = nullptr;
         
@@ -161,7 +173,6 @@ void cCtrlDataModelRemote::addSensor(cSensorModel* pSensor)
 
 bool cCtrlDataModelRemote::systemReady() const
 {
- 
     if (!isConnected())
     {
         QString str = "Not connected to the remote computer!\n";
@@ -660,6 +671,19 @@ void cCtrlDataModelRemote::recordEndReference()
     sendMarkerReferenceEnd();
 }
 
+void cCtrlDataModelRemote::onSystemCheck()
+{
+    if (!mConnected) return;
+
+    if (mWatchDogTimer.elapsed())
+    {
+        QString msg = "Connection to the C4 has been lost or the data collection thread has stopped!";
+        emit errorMessage("Connection Unstable", msg);
+
+        mWatchDogTimer.stop();
+    }
+}
+
 /**********************************************************
  * TCP Socket Methods
  *********************************************************/
@@ -702,6 +726,8 @@ void cCtrlDataModelRemote::disconnected()
 
     mDataFileIsOpen = false;
     mConnected = false;
+
+    emit loopTerminated();
 }
 
 void cCtrlDataModelRemote::errorOccurred(QAbstractSocket::SocketError socketError)
@@ -902,4 +928,22 @@ void cCtrlDataModelRemote::onUnknownID(uint16_t id)
     QString msg("Received unknown packet id from remote computer: ");
     msg += QString::number(id);
     emit statusMessage(msg);
+}
+
+void cCtrlDataModelRemote::onRemoteThreadStatus(eRemoteThread_STATUS status)
+{
+    mWatchDogTimer.reset();
+
+    switch (status)
+    {
+    case eRemoteThread_STATUS::THREAD_HEARTBEAT:
+        emit updateLoopHeartbeat();
+        break;
+    case eRemoteThread_STATUS::THREAD_TERMINATED:
+        emit loopTerminated();
+        break;
+    case eRemoteThread_STATUS::UNSPECIFIED:
+    default:
+        break;
+    }
 }

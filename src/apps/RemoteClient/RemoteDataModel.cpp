@@ -2,6 +2,8 @@
 #include "RemoteDataModel.hpp"
 #include "SensorModel.hpp"
 
+#include "../common/remote_client_utils.hpp"
+
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QString>
@@ -145,6 +147,9 @@ void cRemoteDataModel::addSensorController(cSensorController* pController)
 
 void cRemoteDataModel::startDataThread()
 {
+    QObject::connect(&mThread, &cRemoteDataThread::updateLoopHeartbeat, this, &cRemoteDataModel::loopHeartbeatUpdated);
+    QObject::connect(&mThread, &cRemoteDataThread::terminated, this, &cRemoteDataModel::loopTerminated);
+
     mThread.start();
 }
 
@@ -924,6 +929,23 @@ void cRemoteDataModel::onHeartbeat()
         mSerializer.heartbeatTimestamp(timestamp_ns());
     }
 }
+
+void cRemoteDataModel::loopHeartbeatUpdated()
+{
+    if (mpClient)
+    {
+        sendRemoteThreadStatus(eRemoteThread_STATUS::THREAD_HEARTBEAT);
+    }
+}
+
+void cRemoteDataModel::loopTerminated()
+{
+    if (mpClient)
+    {
+        sendRemoteThreadStatus(eRemoteThread_STATUS::THREAD_TERMINATED);
+    }
+}
+
 
 /***   Signals handlers from the sensors   ****/
 void cRemoteDataModel::updateSensorStatus(QString name, QString instance, sensor::eStatus status)

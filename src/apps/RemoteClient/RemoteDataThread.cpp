@@ -8,9 +8,6 @@ cRemoteDataThread::cRemoteDataThread(cRemoteDataModel* pController)
     :
     mpController(pController)
 {
-    mHeartBeatTimer.interval_sec(3);
-    mHeartBeatTimer.reset();
-
 }
 
 cRemoteDataThread::~cRemoteDataThread()
@@ -77,10 +74,5 @@ void cRemoteDataThread::updateAll()
         mLoopCount = 0;
         mStartTime = endTime;
         emit updateLoopTime(mAvgLoopTime_ms);
-    }
-
-    if (mHeartBeatTimer.elapsed())
-    {
-        emit updateLoopHeartbeat();
     }
 }

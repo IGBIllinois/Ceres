@@ -28,6 +28,8 @@ public:
 
     void startExperiment() override;
 
+    const cCtrlDataThread& getThread() const { return mThread; }
+
 protected:
     cExperimentState* createState(const std::string& type, const nlohmann::json& stateDoc, QObject* parent) override;
 

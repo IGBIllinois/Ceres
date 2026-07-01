@@ -682,6 +682,27 @@ void cMainWindow::onExperimentCompleted()
 }
 
 //-----------------------------------------------------------------------------
+void cMainWindow::loopHeartbeatUpdated()
+{
+    if (mShowRedHeart)
+    {
+        mpHeartBeat->setPixmap(*mpRedHeart);
+        mShowRedHeart = false;
+    }
+    else
+    {
+        mpHeartBeat->setPixmap(*mpEmptyHeart);
+        mShowRedHeart = true;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::loopTerminated()
+{
+    mpHeartBeat->setPixmap(*mpBlackHeart);
+}
+
+//-----------------------------------------------------------------------------
 void cMainWindow::createMainMenu()
 {
     mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
@@ -805,6 +826,37 @@ void cMainWindow::createStatusBar()
 
     connect(this, &cMainWindow::showMessage, statusBar(), &QStatusBar::showMessage);
 
+    QFontMetrics fm(font());
+    int pixelsHeight = fm.boundingRect(" XXX.XXX ").height();
+
+    QPixmap pixmap;
+    if (pixmap.load(":/ripe.illinois.edu/heart_red.png"))
+    {
+        mpRedHeart = new QPixmap(pixmap.scaledToHeight(pixelsHeight));
+    }
+    else
+        mpRedHeart = new QPixmap(":/ripe.illinois.edu/heart_red.png");
+
+    if (pixmap.load(":/ripe.illinois.edu/heart_empty.png"))
+    {
+        mpEmptyHeart = new QPixmap(pixmap.scaledToHeight(pixelsHeight));
+    }
+    else
+        mpEmptyHeart = new QPixmap(":/ripe.illinois.edu/heart_empty.png");
+
+    if (pixmap.load(":/ripe.illinois.edu/heart_black.png"))
+    {
+        mpBlackHeart = new QPixmap(pixmap.scaledToHeight(pixelsHeight));
+    }
+    else
+        mpBlackHeart = new QPixmap(":/ripe.illinois.edu/heart_black.png");
+
+    mpHeartBeat = new QLabel(this);
+    mpHeartBeat->setPixmap(*mpBlackHeart);
+    mShowRedHeart = true;
+
+    statusBar()->addPermanentWidget(mpHeartBeat);
+
     mpHobbsMeter = new cHobbsMeter(statusBar());
 }
 
@@ -843,7 +895,14 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         std::string type = data_model.get<std::string>();
 
         if (type == "local")
-            mpModel = new cCtrlDataModelLocal(this);
+        {
+            auto* pModel = new cCtrlDataModelLocal(this);
+
+            QObject::connect(&(pModel->getThread()), &cCtrlDataThread::updateLoopHeartbeat, this, &cMainWindow::loopHeartbeatUpdated);
+            QObject::connect(&(pModel->getThread()), &cCtrlDataThread::terminated, this, &cMainWindow::loopTerminated);
+
+            mpModel = pModel;
+        }
         else
         {
             QString msg = "Unknown data model: ";
@@ -871,6 +930,9 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 
         cCtrlDataModelRemote* pModel = new cCtrlDataModelRemote(this);
 
+        QObject::connect(pModel, &cCtrlDataModelRemote::updateLoopHeartbeat, this, &cMainWindow::loopHeartbeatUpdated);
+        QObject::connect(pModel, &cCtrlDataModelRemote::loopTerminated, this, &cMainWindow::loopTerminated);
+
         QObject::connect(pModel, &cDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
         QObject::connect(pModel, &cDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
         QObject::connect(pModel, &cDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
@@ -896,7 +958,7 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
         mpModel = pModel;
     }
 
-    QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+//    QObject::connect(mpModel, &cCtrlDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
 
     QObject::connect(mpModel, &cCtrlDataModel::connectToSensorMenu, this, &cMainWindow::addSensorPropertyPage);
     QObject::connect(mpModel, &cCtrlDataModel::disconnectFromSensorMenu, this, &cMainWindow::removeSensorPropertyPage);

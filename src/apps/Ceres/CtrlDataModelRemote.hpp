@@ -7,6 +7,8 @@
 #include "ExperimentStateCreator.hpp"
 #include "MarkerInterfaces.hpp"
 
+#include "../../Utilities/Timers.hpp"
+
 #include <spidercam_connect/spidercam_types.hpp>
 
 #include <QByteArray>
@@ -74,6 +76,10 @@ protected:
     void dataRecordingStateChange(bool record) override;
     void endDataRecording() override;
 
+signals:
+    void updateLoopHeartbeat();
+    void loopTerminated();
+
 public slots:
     void updatePosition(spidercam::sPosition_1_t pos);
     void updateWindData(bool valid_wind_speed, double wind_speed_mps, double wind_dir_deg);
@@ -85,6 +91,7 @@ public slots:
  * Signals handlers from the TCP socket
  */
 private slots:
+    void onSystemCheck();
     void connected();
     void disconnected();
     void errorOccurred(QAbstractSocket::SocketError socketError);
@@ -131,6 +138,8 @@ private:
 
     void onUnknownID(uint16_t id) override;
 
+    void onRemoteThreadStatus(eRemoteThread_STATUS status) override;
+
 /*
  *
  */
@@ -150,7 +159,11 @@ private:
     bool mExperimentTypeConfirmed = false;
     bool mExperimentInfoConfirmed = false;
 
+    cIntervalTimer mWatchDogTimer;
+
     cRemoteClientView* mpView = nullptr;
+
+    QTimer* mpSystemCheckTimer = nullptr;
 
     QString  mHostName;
     uint16_t mPort = 0;
