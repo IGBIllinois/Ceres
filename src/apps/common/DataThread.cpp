@@ -7,6 +7,7 @@
 
 cDataThread::cDataThread()
 {
+    mHeartBeatTimer.interval_sec(3);
 }
 
 cDataThread::~cDataThread()
@@ -80,6 +81,8 @@ void cDataThread::run()
 {
     try
     {
+        mHeartBeatTimer.start();
+
         if (!startCommunications())
         {
             QString msg("Data collection thread: Communications failed during startup.");
@@ -120,6 +123,11 @@ void cDataThread::run()
                 return;
 
             updateAll();
+
+            if (mHeartBeatTimer.elapsed())
+            {
+                emit updateLoopHeartbeat();
+            }
         }
     }
     catch (const std::exception& e)

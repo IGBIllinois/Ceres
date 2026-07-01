@@ -181,3 +181,16 @@ message SensorPropertyConnectInfo_1
 	uint32 port = 6;
 	optional string instance = 7;
 }
+
+
+enum remoteThread_eSTATUS 
+{
+    eSTATUS_UNSPECIFIED = 0;
+    eSTATUS_THREAD_TERMINATED = 1;
+    eSTATUS_THREAD_HEARTBEAT = 2;
+}
+
+message RemoteThreadStatus_1 
+{
+	remoteThread_eSTATUS status = 1;
+}

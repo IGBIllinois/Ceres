@@ -4,6 +4,9 @@
 #include "net_packet_encoder.hpp"
 #include <cstddef>
 
+// Forward Declarations
+enum class eRemoteThread_STATUS;
+
 
 class cCeresRemoteClientNetEncoder : public cNetworkEncoder
 {
@@ -29,6 +32,8 @@ public:
         const std::string& name, const std::string& instance,
         const std::string& ip_address, uint16_t port);
 
+    void encodeRemoteThreadStatus(const eRemoteThread_STATUS status);
+
     /* Automatically encodes and calls sendData to send the packet information */
     void sendExperimentInfoReply();
     void sendDataFileState(bool is_open);
@@ -48,6 +53,8 @@ public:
     void sendSensorPropertyConnectInfo(const std::string& sensor, const std::string& model,
         uint32_t version, const std::string& name, const std::string& instance,
         const std::string& ip_address, uint16_t port );
+
+    void sendRemoteThreadStatus(const eRemoteThread_STATUS status);
 };
 
 

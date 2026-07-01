@@ -1,13 +1,11 @@
 /*
-   GNSS Receiver Communication SDK for C++ and Asio
-   For connecting to and communicating with a Septentrio GNSS receiver, using C++/Asio
 */
 
 #pragma once
 
-#include "ceres_remote_client.pb.h"
-#include "spidercam_data.pb.h"
-#include "weather_data.pb.h"
+#include "C:\igb\Ceres\build\src\apps\common\ceres_remote_client.pb.h"
+#include "C:\igb\Ceres\build\src\apps\common\spidercam_data.pb.h"
+#include "C:\igb\Ceres\build\src\apps\common\weather_data.pb.h"
 
 #include <spidercam_connect/spidercam_types.hpp>
 #include <cstdint>
@@ -67,6 +65,7 @@ enum class ePacketType : uint16_t
 	EXPERIMENT_TYPE,
 	EXPERIMENT_TYPE_REPLY,
 	MEASUREMENT_TITLE,
+	REMOTE_THREAD_STATUS,
 
 	SPIDER_CAM_DATA = 1000,
 	SPIDER_CAM_START_POSITION,
@@ -242,6 +241,12 @@ int encode_sensor_property_connect_info(const std::string& sensor,
 	const std::string& model, uint32_t version,
 	const std::string& name, const std::string& instance, 
 	const std::string& ip_address, uint16_t port, net_buffer& buffer);
+
+
+enum class eRemoteThread_STATUS { UNSPECIFIED, THREAD_TERMINATED, THREAD_HEARTBEAT };
+
+eRemoteThread_STATUS to_remote_thread_status_1(const RemoteThreadStatus_1& pckt);
+int encode_remote_thread_status(const eRemoteThread_STATUS status, net_buffer& buffer);
 
 
 /**********************************************************

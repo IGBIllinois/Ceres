@@ -10,6 +10,10 @@
 
 #include <string>
 
+// Forward Declarations
+enum class eRemoteThread_STATUS;
+
+
 class cCeresNetDecoder : public cNetworkDecoder
 {
 public:
@@ -45,6 +49,8 @@ protected:
         const std::string& name, const std::string& instance, const std::string& ip_address, uint16_t port) = 0;
 
     virtual void onUnknownID(uint16_t id) = 0;
+
+    virtual void onRemoteThreadStatus(eRemoteThread_STATUS id) = 0;
 
 private:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;

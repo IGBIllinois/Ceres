@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "../../Utilities/Timers.hpp"
+
 #include <QThread>
 #include <vector>
 
@@ -23,6 +25,7 @@ public:
 signals:
     void statusMessage(QString msg);
     void errorMessage(QString title, QString msg);
+    void updateLoopHeartbeat();
     void terminated();
 
 protected:
@@ -35,6 +38,9 @@ protected:
 public:
     std::vector<cSensorModel*> mSensors;
     std::vector<cSensorModel*> mActiveSensors;
+
+private:
+    cIntervalTimer mHeartBeatTimer;
 
 private:
     bool mStop  = false;

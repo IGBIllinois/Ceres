@@ -112,5 +112,15 @@ void cCeresNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffe
         }
         break;
     }
+    case ePacketType::REMOTE_THREAD_STATUS:
+    {
+        RemoteThreadStatus_1 packet;
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto status = to_remote_thread_status_1(packet);
+            onRemoteThreadStatus(status);
+        }
+        break;
+    }
     }
 }

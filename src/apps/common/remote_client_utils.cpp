@@ -1330,6 +1330,39 @@ int encode_sensor_property_connect_info(const std::string& sensor, const std::st
     return pckt_size;
 }
 
+
+eRemoteThread_STATUS to_remote_thread_status_1(const RemoteThreadStatus_1& pckt)
+{
+    return static_cast<eRemoteThread_STATUS>(pckt.status());
+}
+
+int encode_remote_thread_status(const eRemoteThread_STATUS status, net_buffer& buffer)
+{
+    RemoteThreadStatus_1 pckt;
+
+    pckt.set_status(static_cast<remoteThread_eSTATUS>(status));
+
+    std::string str;
+    if (!pckt.SerializeToString(&str))
+        return -1;
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::REMOTE_THREAD_STATUS);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    int pckt_size = sizeof(sPacketHeader_t) + hdr.length;
+
+    if (buffer.write_size() < pckt_size)
+        return -pckt_size;
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return pckt_size;
+}
+
 /*
  * Spidercam Packets
  */

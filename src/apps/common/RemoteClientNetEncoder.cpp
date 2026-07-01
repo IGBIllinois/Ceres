@@ -49,6 +49,16 @@ void cCeresRemoteClientNetEncoder::encodeSensorPropertyConnectInfo(const std::st
     }
 }
 
+void cCeresRemoteClientNetEncoder::encodeRemoteThreadStatus(const eRemoteThread_STATUS status)
+{
+    if (encode_remote_thread_status(status, mBuffer) < 0)
+    {
+        sendData();
+        encode_remote_thread_status(status, mBuffer);
+    }
+}
+
+
 void cCeresRemoteClientNetEncoder::sendExperimentInfoReply()
 {
     encode_experiment_info_reply(mBuffer);
@@ -123,3 +133,8 @@ void cCeresRemoteClientNetEncoder::sendSensorPropertyConnectInfo(const std::stri
     sendData();
 }
 
+void cCeresRemoteClientNetEncoder::sendRemoteThreadStatus(const eRemoteThread_STATUS status)
+{
+    encode_remote_thread_status(status, mBuffer);
+    sendData();
+}
