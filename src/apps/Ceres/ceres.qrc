@@ -13,6 +13,9 @@
         <file alias="two_button.png">./Resources/Images/button_two.png</file>
         <file alias="three_button.png">./Resources/Images/button_three.png</file>
         <file alias="four_button.png">./Resources/Images/button_four.png</file>
+        <file alias="heart_red.png">./Resources/Images/heart_red.png</file>
+        <file alias="heart_empty.png">./Resources/Images/heart_empty.png</file>
+        <file alias="heart_black.png">./Resources/Images/heart_black.png</file>
         <file alias="end_experiment.wav">./Resources/Sounds/end_experiment.wav</file>
     </qresource>
 </RCC>
