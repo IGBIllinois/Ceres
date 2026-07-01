@@ -215,7 +215,15 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
         mVariableTable = std::make_shared<cExperimentVariableTable>();
 
     if (mGlobalVariableTable)
-        *mVariableTable = *mGlobalVariableTable;
+    {
+        for (const auto& entry : *mGlobalVariableTable)
+        {
+            if (mVariableTable->contains(entry.first))
+                continue;
+
+            mVariableTable->insert(entry);
+        }
+    }
 
     mExperimentStates.push_back(new cExperimentState_Dummy());
 
