@@ -380,3 +380,8 @@ bool cExperimentVariableTable::get(std::string_view name, double& value) const
 
 	return to_value(it->second, value);
 }
+
+bool cExperimentVariableTable::insert(const value_type& value)
+{
+	return mNamedVariables.insert(value).second;
+}
