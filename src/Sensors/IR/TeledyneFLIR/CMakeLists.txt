@@ -73,6 +73,8 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 	TeledyneFlirCameraModel_T1K.cpp
 	TeledyneFlirUtils.hpp
 	TeledyneFlirUtils.cpp
+	TeledyneDiscoverCameras.hpp
+	TeledyneDiscoverCameras.cpp
 	TeledyneFlirFactory.cpp
 )
 
