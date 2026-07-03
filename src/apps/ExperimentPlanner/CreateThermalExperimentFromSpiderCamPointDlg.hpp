@@ -20,6 +20,10 @@ class QTableView;
 QT_END_NAMESPACE
 
 
+// Forward Declaration
+class cScanPointsWidget;
+
+
 class cCreateThermalExperimentFromSpiderCamDlg : public cCreateThermalExperimentDlg
 {
 	Q_OBJECT
@@ -56,6 +60,8 @@ private:
 	QComboBox* mpScanUnits = nullptr;
 
 	QPushButton* mpSampleXY = nullptr;
+
+	cScanPointsWidget* mpPath = nullptr;
 
 	uint32_t mSpidercamX_mm = 0;
 	uint32_t mSpidercamY_mm = 0;

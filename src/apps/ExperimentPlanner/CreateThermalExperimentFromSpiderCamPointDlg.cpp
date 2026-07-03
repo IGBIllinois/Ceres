@@ -12,6 +12,8 @@
 #include "RappGroundModel.hpp"
 #include "RappFieldBoundary.hpp"
 
+#include "ScanPointsWidget.hpp"
+
 #include "StringUtils.hpp"
 
 #include <QLabel>
@@ -71,6 +73,8 @@ void cCreateThermalExperimentFromSpiderCamDlg::createControls_PointSelection()
 	mpStartY_mm = new QLineEdit(this);
 	mpStartY_mm->setValidator(new QIntValidator(10000, 190000));
 
+	mpPath = new cScanPointsWidget(this);
+
 	// default to feet
 	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
 	mpScanDistance = new QLineEdit(this);
@@ -108,6 +112,8 @@ void cCreateThermalExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBox
 
 	pPosLayout->addStretch(1);
 
+	pGroupBox = new QGroupBox();
+
 	pGridLayout = new QGridLayout();
 	pGridLayout->setColumnMinimumWidth(2, 10);
 
@@ -121,7 +127,19 @@ void cCreateThermalExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBox
 	pGridLayout->addWidget(mpScanDistance, 2, 1);
 	pGridLayout->addWidget(mpScanOrientation, 2, 3);
 	pGridLayout->addWidget(mpScanUnits, 2, 4);
-	pPosLayout->addLayout(pGridLayout);
+
+	pGroupBox->setLayout(pGridLayout);
+	pPosLayout->addWidget(pGroupBox);
+
+//	pPosLayout->addLayout(pGridLayout);
+
+	pGroupBox = new QGroupBox("Measurement Path");
+	QVBoxLayout* pPathLayout = new QVBoxLayout();
+
+	pPathLayout->addWidget(mpPath);
+
+	pGroupBox->setLayout(pPathLayout);
+	pPosLayout->addWidget(pGroupBox);
 
 	pPosLayout->addSpacing(10);
 	pPosLayout->addWidget(mpSampleXY);

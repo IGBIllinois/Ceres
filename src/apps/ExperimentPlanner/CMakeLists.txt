@@ -160,6 +160,9 @@ PRIVATE
     CreateThermalExperimentFromSpiderCamPointDlg.cpp
     CreateThermalExperimentFromPlotInfoDlg.hpp
     CreateThermalExperimentFromPlotInfoDlg.cpp
+    
+    ScanPointsWidget.hpp
+    ScanPointsWidget.cpp
 
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp
