@@ -73,7 +73,7 @@ protected:
 	QLineEdit* mpTitle = nullptr;
 
 	QPushButton* mpCtrlInfo = nullptr;
-	QPushButton* mpSensorInfo = nullptr;
+	QPushButton* mpRequiredSensorInfo = nullptr;
 
 	/* Measurement Preamble */
 	QLineEdit* mpTravelHeight_m = nullptr;

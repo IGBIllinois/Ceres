@@ -50,6 +50,7 @@ private:
 	QRadioButton* mpStartPointAtEnd = nullptr;
 
 	QLineEdit* mpEndX_mm = nullptr;
+
 	QLineEdit* mpEndY_mm = nullptr;
 
 	QRadioButton* mpEndPointAtBegin = nullptr;

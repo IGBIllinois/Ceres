@@ -91,8 +91,8 @@ void cCreateLidarExperimentDlg::createControls_TitleInfo()
 	mpCtrlInfo = new QPushButton("Controller", this);
 	connect(mpCtrlInfo, &QPushButton::pressed, this, &cCreateLidarExperimentDlg::onControllerUpdate);
 
-	mpSensorInfo = new QPushButton("Sensors", this);
-	connect(mpSensorInfo, &QPushButton::pressed, this, &cCreateLidarExperimentDlg::onSensorUpdate);
+	mpRequiredSensorInfo = new QPushButton("Required Sensors", this);
+	connect(mpRequiredSensorInfo, &QPushButton::pressed, this, &cCreateLidarExperimentDlg::onSensorUpdate);
 }
 
 void cCreateLidarExperimentDlg::createControls_Preamble()
@@ -277,7 +277,7 @@ void cCreateLidarExperimentDlg::createLayout_TitleInfo(QVBoxLayout* pMainLayout)
 	pTitleLayout->addWidget(mpAutoAdvance);
 	pTitleLayout->addWidget(mpMetaInfo);
 	pTitleLayout->addWidget(mpCtrlInfo);
-	pTitleLayout->addWidget(mpSensorInfo);
+	pTitleLayout->addWidget(mpRequiredSensorInfo);
 
 	pMainLayout->addLayout(pTitleLayout);
 

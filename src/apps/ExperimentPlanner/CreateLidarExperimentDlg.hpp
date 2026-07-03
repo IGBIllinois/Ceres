@@ -88,7 +88,7 @@ protected:
 
 	QPushButton* mpMetaInfo = nullptr;
 	QPushButton* mpCtrlInfo = nullptr;
-	QPushButton* mpSensorInfo = nullptr;
+	QPushButton* mpRequiredSensorInfo = nullptr;
 
 	QPushButton* mpClearPath = nullptr;
 	QPushButton* mpShowPath = nullptr;

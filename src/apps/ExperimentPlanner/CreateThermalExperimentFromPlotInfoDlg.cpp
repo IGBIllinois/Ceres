@@ -10,6 +10,8 @@
 #include "ExperimentCtrlInfoDlg.hpp"
 #include "ExperimentSensorInfoDlg.hpp"
 
+#include "ScanPointsWidget.hpp"
+
 #include "StringUtils.hpp"
 
 #include <QLabel>

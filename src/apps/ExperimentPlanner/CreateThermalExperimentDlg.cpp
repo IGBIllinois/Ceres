@@ -90,8 +90,8 @@ void cCreateThermalExperimentDlg::createControls_TitleInfo()
 	mpCtrlInfo = new QPushButton("Controller", this);
 	connect(mpCtrlInfo, &QPushButton::pressed, this, &cCreateThermalExperimentDlg::onControllerUpdate);
 
-	mpSensorInfo = new QPushButton("Sensors", this);
-	connect(mpSensorInfo, &QPushButton::pressed, this, &cCreateThermalExperimentDlg::onSensorUpdate);
+	mpRequiredSensorInfo = new QPushButton("Required Sensors", this);
+	connect(mpRequiredSensorInfo, &QPushButton::pressed, this, &cCreateThermalExperimentDlg::onSensorUpdate);
 }
 
 void cCreateThermalExperimentDlg::createControls_Preamble()
@@ -218,7 +218,7 @@ void cCreateThermalExperimentDlg::createLayout_TitleInfo(QVBoxLayout* pMainLayou
 	pTitleLayout->addWidget(mpAutoAdvance);
 	pTitleLayout->addWidget(mpMetaInfo);
 	pTitleLayout->addWidget(mpCtrlInfo);
-	pTitleLayout->addWidget(mpSensorInfo);
+	pTitleLayout->addWidget(mpRequiredSensorInfo);
 
 	pMainLayout->addLayout(pTitleLayout);
 
