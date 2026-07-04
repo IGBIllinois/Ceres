@@ -3,9 +3,15 @@
 
 #pragma once
 
+#if 0
 #include "C:\igb\Ceres\build\src\apps\common\ceres_remote_client.pb.h"
 #include "C:\igb\Ceres\build\src\apps\common\spidercam_data.pb.h"
 #include "C:\igb\Ceres\build\src\apps\common\weather_data.pb.h"
+#else
+#include "D:\code\igb\Ceres\build\src\apps\common\ceres_remote_client.pb.h"
+#include "D:\code\igb\Ceres\build\src\apps\common\spidercam_data.pb.h"
+#include "D:\code\igb\Ceres\build\src\apps\common\weather_data.pb.h"
+#endif
 
 #include <spidercam_connect/spidercam_types.hpp>
 #include <cstdint>
