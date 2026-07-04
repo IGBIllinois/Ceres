@@ -177,7 +177,7 @@ target_link_libraries(hyspex_static PUBLIC ${Qt}::Network)
 target_link_libraries(hyspex_static PUBLIC ${Qt}::PrintSupport)
 #target_link_libraries(qcustomplot_shared PUBLIC ${Qt}::Core ${Qt}::Widgets ${Qt}::OpenGL ${Qt}::OpenGLWidgets ${Qt}::PrintSupport)
 
-target_link_libraries(hyspex_static PUBLIC qcustomplot::qcustomplot_static)
+target_link_libraries(hyspex_static PUBLIC QCustomPlot::qcustomplot_static)
 target_link_libraries(hyspex_static PRIVATE ExperimentStateMachine)
 target_link_libraries(hyspex_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(hyspex_static PRIVATE ${Protobuf_LIBRARIES})
