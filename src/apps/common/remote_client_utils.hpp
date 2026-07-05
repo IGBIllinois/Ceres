@@ -3,10 +3,10 @@
 
 #pragma once
 
-#if 0
-#include "C:\igb\Ceres\build\src\apps\common\ceres_remote_client.pb.h"
-#include "C:\igb\Ceres\build\src\apps\common\spidercam_data.pb.h"
-#include "C:\igb\Ceres\build\src\apps\common\weather_data.pb.h"
+#if 1
+#include "../../../build/src/apps/common/ceres_remote_client.pb.h"
+#include "../../../build/src/apps/common/spidercam_data.pb.h"
+#include "../../../build/src/apps/common/weather_data.pb.h"
 #else
 #include "D:\code\igb\Ceres\build\src\apps\common\ceres_remote_client.pb.h"
 #include "D:\code\igb\Ceres\build\src\apps\common\spidercam_data.pb.h"
