@@ -128,8 +128,13 @@ void cCreateThermalExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBox
 	pGridLayout->addWidget(mpScanOrientation, 2, 3);
 	pGridLayout->addWidget(mpScanUnits, 2, 4);
 
+	pGridLayout->addWidget(mpSampleXY, 4, 0);
+
 	pGroupBox->setLayout(pGridLayout);
 	pPosLayout->addWidget(pGroupBox);
+
+//	pPosLayout->addSpacing(10);
+//	pPosLayout->addWidget(mpSampleXY);
 
 //	pPosLayout->addLayout(pGridLayout);
 
@@ -140,9 +145,6 @@ void cCreateThermalExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBox
 
 	pGroupBox->setLayout(pPathLayout);
 	pPosLayout->addWidget(pGroupBox);
-
-	pPosLayout->addSpacing(10);
-	pPosLayout->addWidget(mpSampleXY);
 
 	pPosLayout->addStretch(1);
 

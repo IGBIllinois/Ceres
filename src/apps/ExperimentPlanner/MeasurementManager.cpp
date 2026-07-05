@@ -161,7 +161,7 @@ void cMeasurementManager::loadMeasurements()
                 // Check for acceptable file extensions
                 auto extension = entry.path().extension().string();
 
-                if (extension == "json")
+                if (extension == ".json")
                     auto* pItem = new cMeasurementTreeItem(this, entry.path());
             }
             catch (const invalid_experiment_file&)
@@ -172,8 +172,6 @@ void cMeasurementManager::loadMeasurements()
             }
         }
     }
-
-//    addTopLevelItem(mpExperimentItems);
 }
 
 void cMeasurementManager::loadMeasurements(cMeasurementTreeItem& root, const std::filesystem::path& path)
@@ -194,7 +192,7 @@ void cMeasurementManager::loadMeasurements(cMeasurementTreeItem& root, const std
                 // Check for acceptable file extensions
                 auto extension = entry.path().extension().string();
 
-                if (extension == "json")
+                if (extension == ".json")
                     auto* pItem = new cMeasurementTreeItem(&root, entry.path());
             }
             catch (const invalid_experiment_file&)

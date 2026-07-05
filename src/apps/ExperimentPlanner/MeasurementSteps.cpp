@@ -391,6 +391,9 @@ const std::optional<int>& cMeasurementStep_Movement::getX_mm() const { return mX
 const std::optional<int>& cMeasurementStep_Movement::getY_mm() const { return mY_mm; }
 const std::optional<int>& cMeasurementStep_Movement::getZ_mm() const { return mZ_mm; }
 
+const std::optional<int>& cMeasurementStep_Movement::getHeightAGL_mm() const { return mHeightAGL_mm; }
+const std::optional<int>& cMeasurementStep_Movement::getHeightACL_mm() const { return mHeightACL_mm; }
+
 int cMeasurementStep_Movement::getSpeed_mmps() const { return mSpeed_mmps; }
 
 const std::optional<double>& cMeasurementStep_Movement::getPan_deg() const { return mPan_deg; }
@@ -415,6 +418,27 @@ void cMeasurementStep_Movement::setZ_mm(const std::optional<int>& z_mm)
 {
 	mDirty |= mZ_mm != z_mm;
 	mZ_mm = z_mm;
+
+	mHeightAGL_mm.reset();
+	mHeightACL_mm.reset();
+}
+
+void cMeasurementStep_Movement::setHeightAGL_mm(const std::optional<int>& height_agl_mm)
+{
+	mDirty |= mHeightAGL_mm != height_agl_mm;
+	mHeightAGL_mm = height_agl_mm;
+
+	mZ_mm.reset();
+	mHeightACL_mm.reset();
+}
+
+void cMeasurementStep_Movement::setHeightACL_mm(const std::optional<int>& height_acl_mm)
+{
+	mDirty |= mHeightACL_mm != height_acl_mm;
+	mHeightACL_mm = height_acl_mm;
+
+	mZ_mm.reset();
+	mHeightAGL_mm.reset();
 }
 
 void cMeasurementStep_Movement::setSpeed_mmps(int speed_mmps)
@@ -503,6 +527,15 @@ void cMeasurementStep_Movement::load(const nlohmann::json& jdoc)
 		mZ_mm = static_cast<uint32_t>(pos["z (m)"].get<double>() * nConstants::M_TO_MM);
 		mUsingMeters = true;
 	}
+	else if (pos.contains("height agl (mm)"))
+	{
+		mHeightAGL_mm = static_cast<uint32_t>(pos["height agl (mm)"].get<int>());
+	}
+	else if (pos.contains("height acl (mm)"))
+	{
+		mHeightACL_mm = static_cast<uint32_t>(pos["height acl (mm)"].get<int>());
+	}
+
 
 	if (jdoc.contains("speed (mm/s)"))
 	{
@@ -574,6 +607,14 @@ nlohmann::json cMeasurementStep_Movement::save()
 			pos["z (m)"] = mZ_mm.value() * nConstants::MM_TO_M;
 		else
 			pos["z (mm)"] = mZ_mm.value();
+	}
+	else if (mHeightAGL_mm.has_value())
+	{
+		pos["height agl (mm)"] = mHeightAGL_mm.value();
+	}
+	else if (mHeightACL_mm.has_value())
+	{
+		 pos["height acl (mm)"] = mHeightACL_mm.value();
 	}
 
 	entry["position"] = pos;
@@ -732,6 +773,22 @@ QString cMeasurementStep_Movement::generateMovementDescription() const
 		description = "Moving vertically to ";
 		description += QString::number(mZ_mm.value());
 		description += " mm @ ";
+		description += QString::number(mSpeed_mmps);
+		description += " mm/sec";
+	}
+	else if (mHeightAGL_mm.has_value())
+	{
+		description = "Moving vertically to ";
+		description += QString::number(mHeightAGL_mm.value());
+		description += " AGL mm @ ";
+		description += QString::number(mSpeed_mmps);
+		description += " mm/sec";
+	}
+	else if (mHeightACL_mm.has_value())
+	{
+		description = "Moving vertically to ";
+		description += QString::number(mHeightACL_mm.value());
+		description += " ACL mm @ ";
 		description += QString::number(mSpeed_mmps);
 		description += " mm/sec";
 	}

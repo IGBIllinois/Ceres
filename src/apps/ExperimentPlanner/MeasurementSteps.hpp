@@ -168,6 +168,9 @@ public:
 	const std::optional<int>& getY_mm() const;
 	const std::optional<int>& getZ_mm() const;
 
+	const std::optional<int>& getHeightAGL_mm() const;
+	const std::optional<int>& getHeightACL_mm() const;
+
 	int getSpeed_mmps() const;
 
 	const std::optional<double>& getPan_deg() const;
@@ -179,6 +182,9 @@ public:
 	void setX_mm(const std::optional<int>& x_mm);
 	void setY_mm(const std::optional<int>& y_mm);
 	void setZ_mm(const std::optional<int>& z_mm);
+
+	void setHeightAGL_mm(const std::optional<int>& height_agl_mm);
+	void setHeightACL_mm(const std::optional<int>& height_acl_mm);
 
 	void setSpeed_mmps(int speed_mmps);
 
@@ -213,6 +219,9 @@ private:
 	std::optional<int> mX_mm;
 	std::optional<int> mY_mm;
 	std::optional<int> mZ_mm;
+
+	std::optional<int> mHeightAGL_mm;
+	std::optional<int> mHeightACL_mm;
 
 	int mSpeed_mmps = 0;
 

@@ -35,8 +35,18 @@ void cMovementStepInfoDlg::createControls()
 	mpY_mm = new QLineEdit(this);
 	mpY_mm->setValidator(new QIntValidator(0, 190000));
 
+	mpHeightLabel = new QLabel(this);
+
 	mpZ_mm = new QLineEdit(this);
 	mpZ_mm->setValidator(new QIntValidator(-5000, 10000));
+
+	mpHeightAGL_mm = new QLineEdit(this);
+	mpHeightAGL_mm->setValidator(new QIntValidator(0, 9000));
+	mpHeightAGL_mm->setHidden(true);
+
+	mpHeightACL_mm = new QLineEdit(this);
+	mpHeightACL_mm->setValidator(new QIntValidator(0, 9000));
+	mpHeightACL_mm->setHidden(true);
 
 
 	mpSpeed_mmps = new QLineEdit(this);
@@ -85,8 +95,8 @@ void cMovementStepInfoDlg::createLayout()
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpY_mm, 0, 4);
 
-	pText = new QLabel("Z (mm)");
-	pGridLayout->addWidget(pText, 0, 6);
+	mpHeightLabel->setText("Z (mm)");
+	pGridLayout->addWidget(mpHeightLabel, 0, 6);
 	pGridLayout->addWidget(mpZ_mm, 0, 7);
 
 	pText = new QLabel("Speed (mm/s)");
@@ -179,6 +189,26 @@ int  cMovementStepInfoDlg::z_mm() const
 	return mpZ_mm->text().toInt();
 }
 
+bool cMovementStepInfoDlg::hasHeightAGL() const
+{
+	return !mpHeightAGL_mm->text().isEmpty();
+}
+
+int  cMovementStepInfoDlg::height_agl_mm() const
+{
+	return mpHeightAGL_mm->text().toInt();
+}
+
+bool cMovementStepInfoDlg::hasHeightACL() const
+{
+	return !mpHeightACL_mm->text().isEmpty();
+}
+
+int  cMovementStepInfoDlg::height_acl_mm() const
+{
+	return mpHeightACL_mm->text().toInt();
+}
+
 int  cMovementStepInfoDlg::speed_mmps() const
 {
 	return mpSpeed_mmps->text().toInt();
@@ -232,6 +262,16 @@ void cMovementStepInfoDlg::setY_mm(int y_mm)
 void cMovementStepInfoDlg::setZ_mm(int z_mm)
 {
 	mpZ_mm->setText(QString::number(z_mm));
+}
+
+void cMovementStepInfoDlg::setHeightAGL_mm(int height_agl_mm)
+{
+	mpHeightAGL_mm->setText(QString::number(height_agl_mm));
+}
+
+void cMovementStepInfoDlg::setHeightACL_mm(int height_acl_mm)
+{
+	mpHeightACL_mm->setText(QString::number(height_acl_mm));
 }
 
 void cMovementStepInfoDlg::setSpeed_mmps(int speed_mmps)

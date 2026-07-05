@@ -21,6 +21,7 @@ class QLabel;
 class QPlainTextEdit;
 class QComboBox;
 class QAbstractItemModel;
+class QPointItemModel;
 class QTableWidget;
 class QTableView;
 class QVBoxLayout;
@@ -41,19 +42,19 @@ private:
     void createLayout_PointSelection();
 
 private:
-    QTableWidget* mpStartPosition = nullptr;
+//    QTableWidget* mpStartPosition = nullptr;
 
-    QLabel*     mpStartLabel = nullptr;
+    QLineEdit*  mpStartLabel = nullptr;
     QLineEdit*  mpStartX_mm = nullptr;
     QLineEdit*  mpStartY_mm = nullptr;
     QComboBox*  mpStartType = nullptr;
 
     QTableView* mpMeasurementPoints = nullptr;
-    QAbstractItemModel* mpModel = nullptr;
+    QPointItemModel* mpModel = nullptr;
 
-    QTableWidget* mpEndPosition = nullptr;
+//    QTableWidget* mpEndPosition = nullptr;
 
-    QLabel*    mpEndLabel = nullptr;
+    QLineEdit* mpEndLabel = nullptr;
     QLineEdit* mpEndX_mm = nullptr;
     QLineEdit* mpEndY_mm = nullptr;
     QComboBox* mpEndType = nullptr;

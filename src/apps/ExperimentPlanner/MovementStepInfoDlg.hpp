@@ -11,6 +11,7 @@ class QAbstractButton;
 class QPushButton;
 class QLineEdit;
 class QCheckBox;
+class QComboBox;
 class QLabel;
 QT_END_NAMESPACE
 
@@ -32,6 +33,12 @@ public:
 	bool hasZ() const;
 	int  z_mm() const;
 
+	bool hasHeightAGL() const;
+	int  height_agl_mm() const;
+
+	bool hasHeightACL() const;
+	int  height_acl_mm() const;
+
 	int speed_mmps() const;
 
 	bool   hasPan() const;
@@ -48,6 +55,9 @@ public:
 	void setX_mm(int x_mm);
 	void setY_mm(int y_mm);
 	void setZ_mm(int z_mm);
+
+	void setHeightAGL_mm(int height_agl_mm);
+	void setHeightACL_mm(int height_acl_mm);
 
 	void setSpeed_mmps(int speed_mmps);
 
@@ -71,7 +81,13 @@ private slots:
 private:
 	QLineEdit* mpX_mm = nullptr;
 	QLineEdit* mpY_mm = nullptr;
+
+	QLabel* mpHeightLabel = nullptr;
+	QComboBox* mpHeightType = nullptr;
+
 	QLineEdit* mpZ_mm = nullptr;
+	QLineEdit* mpHeightAGL_mm = nullptr;
+	QLineEdit* mpHeightACL_mm = nullptr;
 
 	QLineEdit* mpSpeed_mmps = nullptr;
 
