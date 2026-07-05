@@ -110,7 +110,10 @@ namespace
         cfgPath = QApplication::applicationDirPath();
         cfgPath += "/ceres.json";
         if (QFile::exists(cfgPath))
-            return cfgPath.toStdString();
+        {
+            std::string cfg_path = cfgPath.toStdString();
+            return cfg_path;
+        }
 
         QString msg = "The default configuration file \"";
         msg += cfgPath;
@@ -205,6 +208,23 @@ void cMainWindow::initialize()
         try
         {
             configDoc = nlohmann::json::parse(in, nullptr, true, true);
+
+/*
+            if (configDoc.contains("experiment file folder"))
+            {
+                auto expCfg = configDoc["experiment file folder"];
+#ifdef _WIN32
+                if (expCfg.contains("windows"))
+                    mMeasurementFilesPath = expCfg["windows"];
+#elif __linux__
+                if (expCfg.contains("linux"))
+                    mMeasurementFilesPath = expCfg["linux"];
+#else
+                if (expCfg.contains("macos"))
+                    mMeasurementFilesPath = expCfg["macos"];
+#endif
+            }
+*/
         }
         catch (const nlohmann::json::parse_error& e)
         {
