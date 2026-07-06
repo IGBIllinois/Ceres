@@ -17,7 +17,11 @@ class QPlainTextEdit;
 class QComboBox;
 class QAbstractItemModel;
 class QTableView;
+class QGroupBox;
 QT_END_NAMESPACE
+
+// Forward Declaration
+class cScanPointsWidget;
 
 
 class cCreateHyperspectralReferenceExperimentFromSpiderCamDlg : public cCreateHyperspectralReferenceExperimentDlg
@@ -58,4 +62,7 @@ private:
 
 	uint32_t mSpidercamX_mm = 0;
 	uint32_t mSpidercamY_mm = 0;
+
+	cScanPointsWidget* mpPath = nullptr;
+
 };

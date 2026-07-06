@@ -616,8 +616,7 @@ void cCreateThermalExperimentFromSpiderCamDlg::recordXY()
 {
 	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
 	{
-		mpStartX_mm->setText(QString::number(mSpidercamX_mm));
-		mpStartY_mm->setText(QString::number(mSpidercamY_mm));
+		mpPath->addPoint("", mSpidercamX_mm, mSpidercamY_mm);
 	}
 }
 
@@ -625,6 +624,16 @@ void cCreateThermalExperimentFromSpiderCamDlg::positionUpdated(spidercam::sPosit
 {
 	mSpidercamX_mm = pos.X_mm;
 	mSpidercamY_mm = pos.Y_mm;
+
+	if ((mSpidercamX_mm > 0) && (mSpidercamX_mm < 190000))
+	{
+		mpStartX_mm->setText(QString::number(mSpidercamX_mm));
+	}
+
+	if ((mSpidercamY_mm > 0) && (mSpidercamY_mm < 190000))
+	{
+		mpStartY_mm->setText(QString::number(mSpidercamY_mm));
+	}
 
 	mpSampleXY->setEnabled(true);
 }

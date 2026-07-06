@@ -15,6 +15,8 @@
 #include "RappGroundModel.hpp"
 #include "RappFieldBoundary.hpp"
 
+#include "ScanPointsWidget.hpp"
+
 #include "StringUtils.hpp"
 
 #include <QLabel>
@@ -70,9 +72,13 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createControls_Poi
 {
 	mpRefPosX_mm = new QLineEdit(this);
 	mpRefPosX_mm->setValidator(new QIntValidator(10000, 190000));
+	mpRefPosX_mm->setEnabled(false);
+	mpRefPosX_mm->setReadOnly(true);
 
 	mpRefPosY_mm = new QLineEdit(this);
 	mpRefPosY_mm->setValidator(new QIntValidator(10000, 190000));
+	mpRefPosY_mm->setEnabled(false);
+	mpRefPosY_mm->setReadOnly(true);
 
 	// default to feet
 	mpScanDistanceLabel = new QLabel(SCAN_DISTANCE_TEXT + "ft)", this);
@@ -99,6 +105,9 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createControls_Poi
 	mpSampleXY = new QPushButton("Record X, Y", this);
 	mpSampleXY->setEnabled(false);
 	connect(mpSampleXY, &QPushButton::pressed, this, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::recordXY);
+
+	mpPath = new cScanPointsWidget(this);
+	mpPath->hideMeasurementPoints();
 }
 
 void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_PointSelection(QVBoxLayout* pMainLayout)
@@ -107,9 +116,13 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_Point
 	QGroupBox* pGroupBox = nullptr;
 	QGridLayout* pGridLayout = nullptr;
 
+	pGroupBox = new QGroupBox("Spidercam Info");
+
 	QHBoxLayout* pPosLayout = new QHBoxLayout();
 
 	pPosLayout->addStretch(1);
+
+	QVBoxLayout* pInfoLayout = new QVBoxLayout();
 
 	pGridLayout = new QGridLayout();
 	pGridLayout->setColumnMinimumWidth(2, 10);
@@ -120,14 +133,35 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::createLayout_Point
 	pText = new QLabel("Y position (mm)");
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpRefPosY_mm, 0, 4);
+	pGridLayout->addWidget(mpSampleXY, 2, 4);
+
+	pGroupBox->setLayout(pGridLayout);
+
+	pInfoLayout->addWidget(pGroupBox);
+
+	pInfoLayout->addSpacing(10);
+
+	pGridLayout = new QGridLayout();
+	pGridLayout->setColumnMinimumWidth(2, 10);
+
 	pGridLayout->addWidget(mpScanDistanceLabel, 2, 0);
 	pGridLayout->addWidget(mpScanDistance, 2, 1);
 	pGridLayout->addWidget(mpScanOrientation, 2, 3);
 	pGridLayout->addWidget(mpScanUnits, 2, 4);
-	pPosLayout->addLayout(pGridLayout);
+
+	pInfoLayout->addLayout(pGridLayout);
+
+	pPosLayout->addLayout(pInfoLayout);
 
 	pPosLayout->addSpacing(10);
-	pPosLayout->addWidget(mpSampleXY);
+
+	pGroupBox = new QGroupBox("Measurement Path");
+	QVBoxLayout* pPathLayout = new QVBoxLayout();
+
+	pPathLayout->addWidget(mpPath);
+
+	pGroupBox->setLayout(pPathLayout);
+	pPosLayout->addWidget(pGroupBox);
 
 	pPosLayout->addStretch(1);
 
@@ -487,5 +521,17 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::positionUpdated(sp
 	mSpidercamX_mm = pos.X_mm;
 	mSpidercamY_mm = pos.Y_mm;
 
+	if ((mSpidercamX_mm > 0) && (mSpidercamX_mm < 190000))
+	{
+		mpRefPosX_mm->setText(QString::number(mSpidercamX_mm));
+	}
+
+	if ((mSpidercamY_mm > 0) && (mSpidercamY_mm < 190000))
+	{
+		mpRefPosY_mm->setText(QString::number(mSpidercamY_mm));
+	}
+
+	mpRefPosX_mm->setEnabled(true);
+	mpRefPosY_mm->setEnabled(true);
 	mpSampleXY->setEnabled(true);
 }

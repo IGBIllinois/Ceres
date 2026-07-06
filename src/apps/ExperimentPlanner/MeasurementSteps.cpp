@@ -653,6 +653,10 @@ bool cMeasurementStep_Movement::onEdit()
 
 	if (mZ_mm.has_value())
 		dlg.setZ_mm(mZ_mm.value());
+	else if (mHeightAGL_mm.has_value())
+		dlg.setHeightAGL_mm(mHeightAGL_mm.value());
+	else if (mHeightACL_mm.has_value())
+		dlg.setHeightACL_mm(mHeightACL_mm.value());
 
 	dlg.setSpeed_mmps(mSpeed_mmps);
 
@@ -697,6 +701,22 @@ bool cMeasurementStep_Movement::onEdit()
 			z_mm = dlg.z_mm();
 	}
 	setZ_mm(z_mm);
+
+	std::optional<int> height_agl_mm;
+	if (dlg.hasHeightAGL())
+	{
+		if (dlg.height_agl_mm() > 0)
+			height_agl_mm = dlg.height_agl_mm();
+	}
+	setHeightAGL_mm(height_agl_mm);
+
+	std::optional<int> height_acl_mm;
+	if (dlg.hasHeightACL())
+	{
+		if (dlg.height_acl_mm() > 0)
+			height_acl_mm = dlg.height_acl_mm();
+	}
+	setHeightACL_mm(height_acl_mm);
 
 	int speed_mmps = dlg.speed_mmps();
 	setSpeed_mmps(speed_mmps);

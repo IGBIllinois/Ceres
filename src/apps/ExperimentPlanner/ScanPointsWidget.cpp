@@ -9,9 +9,11 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
+#include <QPushButton>
 #include <QIntValidator>
 #include <QHeaderView>
 #include <QAbstractItemModel>
+#include <QMessageBox>
 
 
 class QPointItemModel : public QAbstractItemModel
@@ -33,6 +35,109 @@ cScanPointsWidget::cScanPointsWidget(QWidget* parent)
 
 cScanPointsWidget::~cScanPointsWidget()
 {
+}
+
+void cScanPointsWidget::hideMeasurementPoints(bool hide)
+{
+	mpMeasurementPoints->setVisible(!hide);
+}
+
+void cScanPointsWidget::showMeasurementPoints(bool show)
+{
+	mpMeasurementPoints->setVisible(show);
+}
+
+void cScanPointsWidget::addPoint(int x_mm, int y_mm)
+{
+	addPoint("", x_mm, y_mm);
+}
+
+void cScanPointsWidget::addPoint(const std::string& id, int x_mm, int y_mm)
+{
+	if (mpStartX_mm->text().isEmpty())
+	{
+		if (!id.empty())
+			mpStartLabel->setText(QString::fromStdString(id));
+
+		mpStartX_mm->setText(QString::number(x_mm));
+		mpStartY_mm->setText(QString::number(y_mm));
+
+		return;
+	}
+
+	if (mpEndX_mm->text().isEmpty())
+	{
+		if (!id.empty())
+			mpEndLabel->setText(QString::fromStdString(id));
+
+		mpEndX_mm->setText(QString::number(x_mm));
+		mpEndY_mm->setText(QString::number(y_mm));
+
+		return;
+	}
+}
+
+std::vector<sMeasurementPoint> cScanPointsWidget::path()
+{
+	std::vector<sMeasurementPoint> result;
+
+	if (mpStartX_mm->text().isEmpty())
+	{
+		sMeasurementPoint point;
+
+		point.x_mm = mpStartX_mm->text().toInt();
+		point.y_mm = mpStartY_mm->text().toInt();
+		point.scan = static_cast<ePointRepresentsScan>(mpStartType->currentIndex());
+
+		result.push_back(point);
+	}
+
+//	mpMeasurementPoints->rowCount();
+
+	if (mpEndX_mm->text().isEmpty())
+	{
+		sMeasurementPoint point;
+
+		point.x_mm = mpEndX_mm->text().toInt();
+		point.y_mm = mpEndY_mm->text().toInt();
+		point.scan = static_cast<ePointRepresentsScan>(mpEndType->currentIndex());
+
+		result.push_back(point);
+	}
+
+	return result;
+}
+
+
+void cScanPointsWidget::onShowPath()
+{
+	emit showPath();
+}
+
+void cScanPointsWidget::onClearPath()
+{
+	QMessageBox msgBox(this);
+
+	emit clearPath();
+
+	msgBox.setText("Clear Measurement Path");
+	msgBox.setInformativeText("Do you wish clear path data?");
+	msgBox.setStandardButtons(QMessageBox::Discard | QMessageBox::Cancel);
+	msgBox.setDefaultButton(QMessageBox::Cancel);
+	int ret = msgBox.exec();
+
+	if (ret == QMessageBox::Cancel)
+		return;
+
+	mpStartLabel->setText("Start");
+	mpStartX_mm->setText("");
+	mpStartY_mm->setText("");
+	mpStartType->setCurrentIndex(0);
+
+	mpEndLabel->setText("End");
+	mpEndX_mm->setText("");
+	mpEndY_mm->setText("");
+	mpEndType->setCurrentIndex(1);
 }
 
 void cScanPointsWidget::createControls_PointSelection()
@@ -99,6 +204,13 @@ void cScanPointsWidget::createControls_PointSelection()
 //	mpEndPosition->setCellWidget(0, 3, mpEndType);
 
 //	mpEndPosition->setMaximumHeight(30);
+
+	mpClearPath = new QPushButton("Clear", this);
+	connect(mpClearPath, &QPushButton::pressed, this, &cScanPointsWidget::onClearPath);
+
+	mpShowPath = new QPushButton("Show", this);
+	connect(mpShowPath, &QPushButton::pressed, this, &cScanPointsWidget::onShowPath);
+
 }
 
 void cScanPointsWidget::createLayout_PointSelection()
@@ -151,6 +263,18 @@ void cScanPointsWidget::createLayout_PointSelection()
 */
 
 	pMainLayout->addLayout(pGridLayout, 0);
+
+	pMainLayout->addSpacing(10);
+
+	QHBoxLayout* pButtonLayout = new QHBoxLayout();
+
+	pButtonLayout->addStretch(1);
+	pButtonLayout->addWidget(mpShowPath);
+	pButtonLayout->addStretch(1);
+	pButtonLayout->addWidget(mpClearPath);
+	pButtonLayout->addStretch(1);
+
+	pMainLayout->addLayout(pButtonLayout, 0);
 
 	setLayout(pMainLayout);
 }

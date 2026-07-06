@@ -75,6 +75,7 @@ private:
 	void createLayout();
 
 private slots:
+	void onHeightTypeChange(int index);
 	void recordXY();
 	void recordXYZ();
 
@@ -85,9 +86,7 @@ private:
 	QLabel* mpHeightLabel = nullptr;
 	QComboBox* mpHeightType = nullptr;
 
-	QLineEdit* mpZ_mm = nullptr;
-	QLineEdit* mpHeightAGL_mm = nullptr;
-	QLineEdit* mpHeightACL_mm = nullptr;
+	QLineEdit* mpHeight_mm = nullptr;
 
 	QLineEdit* mpSpeed_mmps = nullptr;
 

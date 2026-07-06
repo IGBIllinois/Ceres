@@ -19,7 +19,6 @@ class QAbstractItemModel;
 class QTableView;
 QT_END_NAMESPACE
 
-
 // Forward Declaration
 class cScanPointsWidget;
 

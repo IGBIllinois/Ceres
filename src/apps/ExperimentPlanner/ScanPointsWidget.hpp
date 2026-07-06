@@ -27,6 +27,14 @@ class QTableView;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
+enum ePointRepresentsScan { START, END, CENTER, POINT };
+
+struct sMeasurementPoint
+{
+    int x_mm = 0;
+    int y_mm = 0;
+    ePointRepresentsScan scan = START;
+};
 
 class cScanPointsWidget : public QWidget
 {
@@ -35,6 +43,22 @@ class cScanPointsWidget : public QWidget
 public:
     explicit cScanPointsWidget(QWidget* parent = nullptr);
 	~cScanPointsWidget();
+
+    void hideMeasurementPoints(bool hide = true);
+    void showMeasurementPoints(bool show = true);
+
+    void addPoint(int x_mm, int y_mm);
+    void addPoint(const std::string& id, int x_mm, int y_mm);
+
+    std::vector<sMeasurementPoint> path();
+
+signals:
+    void showPath();
+    void clearPath();
+
+private slots:
+    void onShowPath();
+    void onClearPath();
 
 private:
     void createControls_PointSelection();
@@ -58,5 +82,8 @@ private:
     QLineEdit* mpEndX_mm = nullptr;
     QLineEdit* mpEndY_mm = nullptr;
     QComboBox* mpEndType = nullptr;
+
+    QPushButton* mpClearPath = nullptr;
+    QPushButton* mpShowPath = nullptr;
 };
 

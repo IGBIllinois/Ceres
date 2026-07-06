@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QPushButton>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -37,17 +38,14 @@ void cMovementStepInfoDlg::createControls()
 
 	mpHeightLabel = new QLabel(this);
 
-	mpZ_mm = new QLineEdit(this);
-	mpZ_mm->setValidator(new QIntValidator(-5000, 10000));
+	mpHeight_mm = new QLineEdit(this);
+	mpHeight_mm->setValidator(new QIntValidator(-5000, 10000));
 
-	mpHeightAGL_mm = new QLineEdit(this);
-	mpHeightAGL_mm->setValidator(new QIntValidator(0, 9000));
-	mpHeightAGL_mm->setHidden(true);
-
-	mpHeightACL_mm = new QLineEdit(this);
-	mpHeightACL_mm->setValidator(new QIntValidator(0, 9000));
-	mpHeightACL_mm->setHidden(true);
-
+	mpHeightType = new QComboBox(this);
+	mpHeightType->addItem("Spidercam");
+	mpHeightType->addItem("Above Ground Level");
+	mpHeightType->addItem("Above Canopy Level");
+	connect(mpHeightType, &QComboBox::currentIndexChanged, this, &cMovementStepInfoDlg::onHeightTypeChange);
 
 	mpSpeed_mmps = new QLineEdit(this);
 	mpSpeed_mmps->setValidator(new QIntValidator(10, 2000));
@@ -86,6 +84,8 @@ void cMovementStepInfoDlg::createLayout()
 
 	QGridLayout* pGridLayout = new QGridLayout();
 	pGridLayout->setColumnMinimumWidth(2, 10);
+	pGridLayout->setColumnMinimumWidth(5, 10);
+	pGridLayout->setColumnMinimumWidth(9, 10);
 
 	pText = new QLabel("X (mm)");
 	pGridLayout->addWidget(pText, 0, 0);
@@ -97,11 +97,12 @@ void cMovementStepInfoDlg::createLayout()
 
 	mpHeightLabel->setText("Z (mm)");
 	pGridLayout->addWidget(mpHeightLabel, 0, 6);
-	pGridLayout->addWidget(mpZ_mm, 0, 7);
+	pGridLayout->addWidget(mpHeight_mm, 0, 7);
+	pGridLayout->addWidget(mpHeightType, 0, 8);
 
 	pText = new QLabel("Speed (mm/s)");
-	pGridLayout->addWidget(pText, 0, 9);
-	pGridLayout->addWidget(mpSpeed_mmps, 0, 10);
+	pGridLayout->addWidget(pText, 0, 10);
+	pGridLayout->addWidget(mpSpeed_mmps, 0, 11);
 
 	pGroupBox->setLayout(pGridLayout);
 	pMainLayout->addWidget(pGroupBox);
@@ -181,32 +182,32 @@ int  cMovementStepInfoDlg::y_mm() const
 
 bool cMovementStepInfoDlg::hasZ() const
 {
-	return !mpZ_mm->text().isEmpty();
+	return (mpHeightType->currentIndex() == 0) && !mpHeight_mm->text().isEmpty();
 }
 
 int  cMovementStepInfoDlg::z_mm() const
 {
-	return mpZ_mm->text().toInt();
+	return mpHeight_mm->text().toInt();
 }
 
 bool cMovementStepInfoDlg::hasHeightAGL() const
 {
-	return !mpHeightAGL_mm->text().isEmpty();
+	return (mpHeightType->currentIndex() == 1) && !mpHeight_mm->text().isEmpty();
 }
 
 int  cMovementStepInfoDlg::height_agl_mm() const
 {
-	return mpHeightAGL_mm->text().toInt();
+	return mpHeight_mm->text().toInt();
 }
 
 bool cMovementStepInfoDlg::hasHeightACL() const
 {
-	return !mpHeightACL_mm->text().isEmpty();
+	return (mpHeightType->currentIndex() == 2) && !mpHeight_mm->text().isEmpty();
 }
 
 int  cMovementStepInfoDlg::height_acl_mm() const
 {
-	return mpHeightACL_mm->text().toInt();
+	return mpHeight_mm->text().toInt();
 }
 
 int  cMovementStepInfoDlg::speed_mmps() const
@@ -261,17 +262,26 @@ void cMovementStepInfoDlg::setY_mm(int y_mm)
 
 void cMovementStepInfoDlg::setZ_mm(int z_mm)
 {
-	mpZ_mm->setText(QString::number(z_mm));
+	mpHeightLabel->setText("Z (mm)");
+	mpHeightType->setCurrentIndex(0);
+	mpHeight_mm->setValidator(new QIntValidator(-5000, 10000));
+	mpHeight_mm->setText(QString::number(z_mm));
 }
 
 void cMovementStepInfoDlg::setHeightAGL_mm(int height_agl_mm)
 {
-	mpHeightAGL_mm->setText(QString::number(height_agl_mm));
+	mpHeightLabel->setText("Height (mm)");
+	mpHeightType->setCurrentIndex(1);
+	mpHeight_mm->setValidator(new QIntValidator(0, 9000));
+	mpHeight_mm->setText(QString::number(height_agl_mm));
 }
 
 void cMovementStepInfoDlg::setHeightACL_mm(int height_acl_mm)
 {
-	mpHeightACL_mm->setText(QString::number(height_acl_mm));
+	mpHeightLabel->setText("Height (mm)");
+	mpHeightType->setCurrentIndex(2);
+	mpHeight_mm->setValidator(new QIntValidator(0, 9000));
+	mpHeight_mm->setText(QString::number(height_acl_mm));
 }
 
 void cMovementStepInfoDlg::setSpeed_mmps(int speed_mmps)
@@ -299,6 +309,25 @@ void cMovementStepInfoDlg::setRecording(bool recording)
 	mpRecord->setChecked(recording);
 }
 
+void cMovementStepInfoDlg::onHeightTypeChange(int index)
+{
+	switch (index)
+	{
+	case 0:
+		mpHeightLabel->setText("Z (mm)");
+		mpHeight_mm->setValidator(new QIntValidator(-5000, 10000));
+		break;
+	case 1:
+		mpHeightLabel->setText("Height (mm)");
+		mpHeight_mm->setValidator(new QIntValidator(0, 9000));
+		break;
+	case 2:
+		mpHeightLabel->setText("Height (mm)");
+		mpHeight_mm->setValidator(new QIntValidator(0, 9000));
+		break;
+	}
+}
+
 void cMovementStepInfoDlg::recordXY()
 {
 	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
@@ -312,8 +341,12 @@ void cMovementStepInfoDlg::recordXYZ()
 {
 	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
 	{
+		mpHeightLabel->setText("Z (mm)");
+		mpHeightType->setCurrentIndex(0);
+
 		mpX_mm->setText(QString::number(mSpidercamX_mm));
 		mpY_mm->setText(QString::number(mSpidercamY_mm));
-		mpZ_mm->setText(QString::number(mSpidercamZ_mm));
+		mpHeight_mm->setValidator(new QIntValidator(-5000, 10000));
+		mpHeight_mm->setText(QString::number(mSpidercamZ_mm));
 	}
 }

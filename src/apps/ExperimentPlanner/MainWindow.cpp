@@ -422,8 +422,8 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMeasurementCtrlInfo);
     mpEditMenu->addAction(pMenuItem);
 
-    pMenuItem = new QAction(tr("Edit Measurement Sensor Information..."), this);
-    pMenuItem->setStatusTip(tr("Edit the measurement sensor information..."));
+    pMenuItem = new QAction(tr("Edit Measurement Required Sensor Information..."), this);
+    pMenuItem->setStatusTip(tr("Edit the measurement required sensor information..."));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onEditMeasurementSernsorInfo);
     mpEditMenu->addAction(pMenuItem);
 
@@ -669,10 +669,11 @@ void cMainWindow::createDockWindows()
     connect(this, &cMainWindow::disconnectedFromController, mpFieldLayout, &cFieldLayoutWidget::onDisconnectFromSpidercam);
     connect(this, &cMainWindow::measurementRunning, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
     
-    auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 0).toInt();
-    auto maxX_mm = mSettings.value("Defaults/fieldBounds/maxX_mm", 190000).toInt();
-    auto minY_mm = mSettings.value("Defaults/fieldBounds/minY_mm", 0).toInt();
-    auto maxY_mm = mSettings.value("Defaults/fieldBounds/maxY_mm", 190000).toInt();
+    // Our spidercam field dimensions are 0 to 190000mm.  However, the dolly can't get closer then 10000mm to a tower.
+    auto minX_mm = mSettings.value("Defaults/fieldBounds/minX_mm", 10000).toInt();
+    auto maxX_mm = mSettings.value("Defaults/fieldBounds/maxX_mm", 180000).toInt();
+    auto minY_mm = mSettings.value("Defaults/fieldBounds/minY_mm", 10000).toInt();
+    auto maxY_mm = mSettings.value("Defaults/fieldBounds/maxY_mm", 180000).toInt();
 
     mpFieldLayout->setBounds(minX_mm, maxX_mm, minY_mm, maxY_mm);
 
