@@ -91,7 +91,15 @@ void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 
 			for (const auto& marker : markers)
 			{
-				if (marker.contains("northing_ft") && marker.contains("easting_ft") && marker.contains("height_ft"))
+				if (marker.contains("x_mm") && marker.contains("y_mm") && marker.contains("z_mm"))
+				{
+					std::string label = marker["label"];
+					int32_t x_mm = marker["x_mm"];
+					int32_t y_mm = marker["y_mm"];
+					int32_t z_mm = marker["z_mm"];
+					mpScanArea->addMarker(label, x_mm, y_mm, z_mm);
+				}
+				else if (marker.contains("northing_ft") && marker.contains("easting_ft") && marker.contains("height_ft"))
 				{
 					std::string label = marker["label"];
 					double northing_ft = marker["northing_ft"];
