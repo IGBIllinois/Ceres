@@ -47,6 +47,9 @@ protected:
 	void updateObstacleDistance();
 
 private:
+	bool mConnected = false;
+
+private:
     cSpidercamController mController;
 	std::unique_ptr<cSpidercamCtrlProxy<cSpidercamController>> mpProxy;
 };

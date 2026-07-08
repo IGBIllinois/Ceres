@@ -4,6 +4,8 @@
 #include "ExperimentTypes.hpp"
 #include "AerialCompensationStates.hpp"
 
+#include <QMessageBox>
+
 
 cSpidercamModel_net::cSpidercamModel_net(QObject* parent)
 :
@@ -23,6 +25,8 @@ cSpidercamModel_net::~cSpidercamModel_net()
 
 bool cSpidercamModel_net::startCommunications()
 {
+    mConnected = false;
+
     if (!mController.hasRemoteEndpoint())
     {
         QString msg("Cannot establishing connection to Spidercam.");
@@ -72,6 +76,8 @@ bool cSpidercamModel_net::startCommunications()
         emit updateControllerConnection(true);
 
         mTimer.reset();
+
+        mConnected = true;
     }
 
     return result;
@@ -82,6 +88,8 @@ void cSpidercamModel_net::stopCommunications()
     emit updateControllerConnection(false);
     mController.stopCommunications();
     mTimer.stop();
+
+    mConnected = false;
 }
 
 cExperimentState* cSpidercamModel_net::createState(const std::string& type, const nlohmann::json& expDoc)
@@ -169,6 +177,33 @@ bool cSpidercamModel_net::systemReady() const
 
 void cSpidercamModel_net::onConnectionStateChange(bool connected)
 {
+    if (!connected && mConnected)
+    {
+        QString msg = "";
+        emit errorMessage("", msg);
+
+        QMessageBox msgBox;
+
+        msgBox.setText("Connection Lost");
+        msgBox.setInformativeText("Connection to the C2 has been lost!\nDo you wish try and reconnect to C2?");
+        msgBox.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Retry);
+        int ret = msgBox.exec();
+
+        if (ret == QMessageBox::Retry)
+        {
+            // Stop the communication
+            mController.stopCommunications();
+            mTimer.stop();
+
+            mConnected = false;
+
+            // Try to re-start the communication
+            if (startCommunications())
+                return;
+        }
+    }
+
     emit updateControllerConnection(connected);
 }
 
