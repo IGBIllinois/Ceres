@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../../Utilities/Utilities.hpp"
+#include "MeasurementPointItemModel.hpp"
 
 #include <QWidget>
 
@@ -27,6 +28,7 @@ class QTableView;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
+/*
 enum ePointRepresentsScan { START, END, CENTER, POINT };
 
 struct sMeasurementPoint
@@ -35,6 +37,7 @@ struct sMeasurementPoint
     int y_mm = 0;
     ePointRepresentsScan scan = START;
 };
+*/
 
 class cScanPointsWidget : public QWidget
 {

@@ -1,6 +1,7 @@
 
 #include "ScanPointsWidget.hpp"
 #include "../../Utilities/Constants.hpp"
+#include "MeasurementPointItemModel.hpp"
 
 #include <QTableWidget>
 #include <QVBoxLayout>
@@ -13,13 +14,8 @@
 #include <QIntValidator>
 #include <QHeaderView>
 #include <QAbstractItemModel>
+#include <QStandardItemModel>
 #include <QMessageBox>
-
-
-class QPointItemModel : public QAbstractItemModel
-{
-public:
-};
 
 
 cScanPointsWidget::cScanPointsWidget(QWidget* parent)
@@ -29,7 +25,6 @@ cScanPointsWidget::cScanPointsWidget(QWidget* parent)
 	createControls_PointSelection();
 	createLayout_PointSelection();
 
-//	setMinimumWidth(420);
 	setMinimumWidth(435);
 }
 
@@ -174,9 +169,12 @@ void cScanPointsWidget::createControls_PointSelection()
 //	mpStartPosition->setMaximumHeight(50);
 
 
-	mpMeasurementPoints = new QTableWidget(8, 4, this);
+	mpMeasurementPoints = new QTableView(this);
 	mpMeasurementPoints->horizontalHeader()->hide();
 	mpMeasurementPoints->verticalHeader()->hide();
+
+	mpModel = new QPointItemModel(4, mpMeasurementPoints);
+	mpMeasurementPoints->setModel(mpModel);
 
 
 //	mpEndPosition = new QTableWidget(1, 4, this);

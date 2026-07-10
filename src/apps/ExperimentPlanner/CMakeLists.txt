@@ -163,6 +163,8 @@ PRIVATE
     
     ScanPointsWidget.hpp
     ScanPointsWidget.cpp
+    MeasurementPointItemModel.hpp
+    MeasurementPointItemModel.cpp
 
     ExperimentFieldLayoutDlg.hpp
     ExperimentFieldLayoutDlg.cpp

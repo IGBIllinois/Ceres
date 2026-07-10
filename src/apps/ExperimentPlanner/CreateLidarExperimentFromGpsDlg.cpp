@@ -661,7 +661,7 @@ bool cCreateLidarExperimentFromGpsDlg::generate()
 			step = std::make_unique<cMeasurementStep_Movement>();
 
 			if (mpHeightReference->currentIndex() == 1)
-				step->setZ_mm(scan_z_mm + h1_mm);
+				step->setHeightAGL_mm(scan_z_mm);
 			else
 				step->setZ_mm(scan_z_mm);
 
