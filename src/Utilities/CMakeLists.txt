@@ -66,6 +66,8 @@ target_include_directories(Utilities PRIVATE ${CMAKE_INSTALL_PREFIX}/include)
 
 target_link_libraries(Utilities PRIVATE ${Qt}::Widgets)
 target_link_libraries(Utilities PRIVATE ${VTK_LIBRARIES} )
+target_link_libraries(Utilities PRIVATE ${VTK_LIBRARIES} )
+target_link_libraries(Utilities PRIVATE PROJ::proj )
 
 vtk_module_autoinit(TARGETS Utilities MODULES ${VTK_LIBRARIES})
 

@@ -89,6 +89,8 @@ void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 		{
 			auto markers = jsonCfg["markers"];
 
+			rfm::rappPoint_t point = rfb::fromGPS(40.0635686 * nConstants::DEG_TO_RAD, -88.2081615 * nConstants::DEG_TO_RAD, 250);
+
 			for (const auto& marker : markers)
 			{
 				if (marker.contains("x_mm") && marker.contains("y_mm") && marker.contains("z_mm"))
