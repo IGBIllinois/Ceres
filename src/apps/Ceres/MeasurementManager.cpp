@@ -73,7 +73,11 @@ void cMeasurementManager::loadMeasurements()
         {
             try
             {
-                auto* pItem = new cMeasurementTreeItem(this, entry.path());
+                // Check for acceptable file extensions
+                auto extension = entry.path().extension().string();
+
+                if (extension == ".json")
+                    auto* pItem = new cMeasurementTreeItem(this, entry.path());
             }
             catch (const invalid_experiment_file& e)
             {
@@ -100,7 +104,11 @@ void cMeasurementManager::loadMeasurements(cMeasurementTreeItem& root, const std
         {
             try
             {
-                auto* pItem = new cMeasurementTreeItem(&root, entry.path());
+                // Check for acceptable file extensions
+                auto extension = entry.path().extension().string();
+
+                if (extension == ".json")
+                    auto* pItem = new cMeasurementTreeItem(&root, entry.path());
             }
             catch (const invalid_experiment_file&)
             {
