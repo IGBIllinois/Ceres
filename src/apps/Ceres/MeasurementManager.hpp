@@ -3,6 +3,8 @@
 
 #include <QtWidgets>
 #include <QDialog>
+
+#include <vector>
 #include <filesystem>
 
 // Qt Forward Declaration
@@ -23,7 +25,7 @@ public:
 	const cMeasurementTreeItem* measurements() const;
 
 signals:
-	void runExperiment();
+	void runExperiments();
 
 public slots:
 	void refresh();

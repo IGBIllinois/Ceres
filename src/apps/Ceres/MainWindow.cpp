@@ -265,11 +265,40 @@ void cMainWindow::onFileRefresh()
 //-----------------------------------------------------------------------------
 void cMainWindow::onExperimentLoad()
 {
-    mBatchFileName.clear();
-
     if (mpModel->isExperimentRunning())
     {
-        //TODO: Something here!
+        QString msg = "A measurement is currently running.  Please wait for the measurement to finish or stop the current measurement.";
+        QMessageBox mb(QMessageBox::Critical, "Measurement In Progress", msg);
+        mb.exec();
+
+        return;
+    }
+
+    mBatchFileName.clear();
+
+    auto experiment_list = mpMeasurements->selectedItems();
+
+    if (experiment_list.size() > 1)
+    {
+        for (const auto& entry : experiment_list)
+        {
+            auto* pMeasurement = static_cast<cMeasurementTreeItem*>(entry);
+
+            if (pMeasurement->hasMeasurementDocument())
+                mBatchProcess.push_back(pMeasurement->getMeasurementFile());
+        }
+
+        if (mBatchProcess.empty())
+            return;
+
+        auto measurementFile = mBatchProcess.front();
+        mBatchProcess.erase(mBatchProcess.begin());
+
+        mpModel->setBatchMode(mBatchProcess.size() > 0);
+
+        loadMeasurement(measurementFile);
+
+        return;
     }
 
     auto* pMeasurement = static_cast<cMeasurementTreeItem*>(mpMeasurements->currentItem());
@@ -877,7 +906,7 @@ void cMainWindow::createDockWindows(const nlohmann::json& configDoc)
     QDockWidget* dock = new QDockWidget(tr("Measurements"), this);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     mpMeasurements = new cMeasurementManager(mExperimentFilesPath, dock);
-    connect(mpMeasurements, &cMeasurementManager::runExperiment, this, &cMainWindow::onExperimentRun);
+    connect(mpMeasurements, &cMeasurementManager::runExperiments, this, &cMainWindow::onExperimentRun);
 
 
     dock->setWidget(mpMeasurements);

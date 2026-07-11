@@ -39,6 +39,8 @@ private:
 
 	std::vector<std::filesystem::path> getSelectedMeasurements(cMeasurementTreeItem* pRoot);
 
+	void updateItemState(QTreeWidgetItem* item, int column, Qt::CheckState checked_state);
+
 private:
 	QTreeWidget* mpMeasurements;
 };

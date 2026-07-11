@@ -25,7 +25,13 @@ cMeasurementManager::cMeasurementManager(const QString& path, QWidget* parent)
     setHeaderLabel("Loaded Measurements");
     setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     setSelectionBehavior(QAbstractItemView::SelectItems);
-    setSelectionMode(QAbstractItemView::SingleSelection);
+
+    //    SingleSelection,
+    //    MultiSelection,
+    //    ExtendedSelection,
+    //    ContiguousSelection
+
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (!fs::exists(mMeasurementPath))
     {
@@ -46,7 +52,7 @@ void cMeasurementManager::contextMenuEvent(QContextMenuEvent* event)
     QMenu contextMenu(this);
 
     QAction run("Run...", this);
-    connect(&run, &QAction::triggered, this, &cMeasurementManager::runExperiment);
+    connect(&run, &QAction::triggered, this, &cMeasurementManager::runExperiments);
     contextMenu.addAction(&run);
 
     contextMenu.exec(event->globalPos());
@@ -161,7 +167,14 @@ void cMeasurementSelectDlg::initialize(const cMeasurementManager& mgr)
     mpMeasurements->setHeaderLabel("Loaded Measurements");
     mpMeasurements->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     mpMeasurements->setSelectionBehavior(QAbstractItemView::SelectItems);
-    mpMeasurements->setSelectionMode(QAbstractItemView::SingleSelection);
+
+//    SingleSelection,
+//    MultiSelection,
+//    ExtendedSelection,
+//    ContiguousSelection
+
+    mpMeasurements->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
     auto* active = mgr.measurements();
     auto n = active->childCount();
 

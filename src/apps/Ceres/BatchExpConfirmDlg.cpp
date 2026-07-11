@@ -32,6 +32,14 @@ void cBatchExpConfirmDlg::initialize(const cMeasurementTreeItem* pRoot)
     mpMeasurements->setColumnCount(0);
     mpMeasurements->setHeaderLabel("Measurements to run...");
     mpMeasurements->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+    mpMeasurements->setSelectionBehavior(QAbstractItemView::SelectItems);
+
+    //    SingleSelection,
+    //    MultiSelection,
+    //    ExtendedSelection,
+    //    ContiguousSelection
+
+    mpMeasurements->setSelectionMode(QAbstractItemView::ExtendedSelection);
     mpMeasurements->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     auto n = pRoot->childCount();
@@ -159,6 +167,23 @@ void cBatchExpConfirmDlg::reject()
 
 void cBatchExpConfirmDlg::itemChanged(QTreeWidgetItem* item, int column)
 {
+    auto check_state = item->checkState(column);
+
+    auto select_list = mpMeasurements->selectedItems();
+
+    if (select_list.empty())
+        return;
+
+    for (auto& entry : select_list)
+    {
+        updateItemState(entry, column, check_state);
+    }
+}
+
+void cBatchExpConfirmDlg::updateItemState(QTreeWidgetItem* item, int column, Qt::CheckState checked_state)
+{
+    item->setCheckState(column, checked_state);
+
     auto* pExp = static_cast<cMeasurementTreeItem*>(item);
 
     if (pExp->hasMeasurementDocument())
@@ -170,8 +195,7 @@ void cBatchExpConfirmDlg::itemChanged(QTreeWidgetItem* item, int column)
     for (int i = 0; i < n; ++i)
     {
         auto* child = item->child(i);
-        child->setCheckState(column, item->checkState(column));
+        child->setCheckState(column, checked_state);
     }
 }
-
 
