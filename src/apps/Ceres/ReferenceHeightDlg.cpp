@@ -130,6 +130,8 @@ void cReferenceHeightDlg::createLayout()
 	pMainLayout->addWidget(buttonBox);
 
 	setLayout(pMainLayout);
+
+	mpGeometricHeight_mm->setFocus();
 }
 
 void cReferenceHeightDlg::accept()
