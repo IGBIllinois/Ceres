@@ -202,6 +202,8 @@ private:
 
     QToolBar* mpFileBar = nullptr;
 
+    QDockWidget* mpVideoView = nullptr;
+
     Ui::MainWindow* mpUI = nullptr;
     QString mCurrentFile;
 

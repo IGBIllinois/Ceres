@@ -303,6 +303,8 @@ void cMainWindow::initialize()
                 {
                     addDockWidget(Qt::NoDockWidgetArea, result.pDockableView);
                     mpViewMenu->addAction(result.pDockableView->toggleViewAction());
+
+                    mpVideoView = result.pDockableView;
                 }
 
                 result.pModel->startCommunications();
@@ -2071,6 +2073,12 @@ void cMainWindow::onMeasurementRun(const QString& filename)
 //-----------------------------------------------------------------------------
 void cMainWindow::closeEvent(QCloseEvent* event)
 {
+    if (mpVideoView)
+    {
+        mpVideoView->hide();
+        mpVideoView->deleteLater();
+    }
+
     mpMdiArea->closeAllSubWindows();
     if (mpMdiArea->currentSubWindow()) 
     {
