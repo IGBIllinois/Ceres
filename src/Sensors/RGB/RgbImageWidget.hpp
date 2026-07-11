@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QImage>
+#include <QPen>
+#include <QColor>
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -19,14 +21,25 @@ public:
 	const QImage& getImage() const;
 	void setImage(const QImage& image);
 
-	void resizeImage(int width, int height);
+public slots:
+	void showCrossHairs(bool enable);
+
+public slots:
+	void resizeEvent(QResizeEvent*) override;
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
 
 private:
-	QImage mCurrentImage;
+	bool mShowCrossHairs = false;
+
 	int mWindowHeight = -1;
 	int mWindowWidth = -1;
 	double mAspectRatio = 1.0;
+
+	QPen   mPen;
+	QColor mColor;
+
+	QImage mCurrentImage;
+	QImage mResizedImage;
 };

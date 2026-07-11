@@ -43,6 +43,8 @@ private:
 	QToolButton* mpCamera3;
 	QToolButton* mpCamera4;
 
+	QPushButton* mpShowCrossHairs = nullptr;
+
 	QPushButton* mpSaveImage = nullptr;
 
 protected:

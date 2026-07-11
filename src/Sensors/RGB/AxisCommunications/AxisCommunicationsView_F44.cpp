@@ -63,13 +63,23 @@ void cAxisCommunicationsView_F44::initialize()
 
     toolbar->addSeparator();
 
+    mpShowCrossHairs = new QPushButton("Show Crosshairs", toolbar);
+    mpShowCrossHairs->setCheckable(true);
+    QObject::connect(mpShowCrossHairs, &QPushButton::clicked, this, &cAxisCommunicationsView_F44::enableCrosshairs);
+
+    toolbar->addWidget(mpShowCrossHairs);
+
+    toolbar->addSeparator();
+
     mpSaveImage = new QPushButton("Save", toolbar);
     mpSaveImage->setEnabled(false);
     connect(mpSaveImage, &QPushButton::pressed, this, &cAxisCommunicationsView_F44::saveImage);
 
+    toolbar->addWidget(mpSaveImage);
+
     auto* mainLayout = new QVBoxLayout();
 
-    mainLayout->addWidget(toolbar);
+    mainLayout->addWidget(toolbar, 1);
     mainLayout->addWidget(mpImage);
 
     setLayout(mainLayout);

@@ -18,6 +18,9 @@ public:
 	virtual ~cRgbCameraView();
 
 public slots:
+	void enableCrosshairs(bool enable);
+
+public slots:
 	void dockLocationChanged(Qt::DockWidgetArea area);
 	void topLevelChanged(bool topLevel);
 	void resizeEvent(QResizeEvent*) override;

@@ -16,6 +16,11 @@ cRgbCameraView::~cRgbCameraView()
 {
 }
 
+void cRgbCameraView::enableCrosshairs(bool enable)
+{
+    mpImage->showCrossHairs(enable);
+}
+
 void cRgbCameraView::setFloatingSize()
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -57,5 +62,5 @@ void cRgbCameraView::topLevelChanged(bool topLevel)
 void cRgbCameraView::resizeEvent(QResizeEvent* e)
 {
     QAbstractScrollArea::resizeEvent(e);
-    mpImage->resizeImage(e->size().width(), e->size().height());
+//    mpImage->resizeImage(e->size().width(), e->size().height());
 }

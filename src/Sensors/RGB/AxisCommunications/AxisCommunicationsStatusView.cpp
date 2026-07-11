@@ -114,5 +114,5 @@ void cAxisCommunicationsStatusView::imageUpdated(const QImage& image)
 void cAxisCommunicationsStatusView::resizeEvent(QResizeEvent* e)
 {
 	cSensorStatusView::resizeEvent(e);
-	mpImage->resizeImage(e->size().width(), e->size().height());
+//	mpImage->resizeImage(e->size().width(), e->size().height());
 }
