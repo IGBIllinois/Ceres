@@ -463,6 +463,9 @@ void cExperimentStateMachine::terminateExperiment()
     mPaused = false;
     mExperimentName.clear();
 
+    if (mVariableTable)
+        mVariableTable->clear();
+
     emit experimentStateChanged(eState::TERMINATED);
 }
 
