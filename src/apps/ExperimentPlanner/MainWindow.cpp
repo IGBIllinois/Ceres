@@ -55,6 +55,9 @@
 #include "GpsFileReader.hpp"
 #include "FieldUtils.hpp"
 
+#include "../../Sensors/SensorModel.hpp"
+#include "../../Sensors/RGB/RgbCameraFactory.hpp"
+
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QToolBar>
@@ -209,22 +212,20 @@ void cMainWindow::initialize()
         {
             configDoc = nlohmann::json::parse(in, nullptr, true, true);
 
-/*
             if (configDoc.contains("experiment file folder"))
             {
-                auto expCfg = configDoc["experiment file folder"];
+                const auto& expCfg = configDoc["experiment file folder"];
 #ifdef _WIN32
                 if (expCfg.contains("windows"))
-                    mMeasurementFilesPath = expCfg["windows"];
+                    mMeasurementFilesPath = QString::fromStdString(expCfg["windows"]);
 #elif __linux__
                 if (expCfg.contains("linux"))
-                    mMeasurementFilesPath = expCfg["linux"];
+                    mMeasurementFilesPath = QString::fromStdString(expCfg["linux"]);
 #else
                 if (expCfg.contains("macos"))
-                    mMeasurementFilesPath = expCfg["macos"];
+                    mMeasurementFilesPath = QString::fromStdString(expCfg["macos"]);
 #endif
             }
-*/
         }
         catch (const nlohmann::json::parse_error& e)
         {
@@ -264,6 +265,9 @@ void cMainWindow::initialize()
             mLimits.minHeight_mm = static_cast<uint32_t>(jsonCfg["min height (m)"] * nConstants::M_TO_MM);
             mLimits.maxHeight_mm = static_cast<uint32_t>(jsonCfg["max height (m)"] * nConstants::M_TO_MM);
             auto maxSpeed_mmps = static_cast<uint32_t>(jsonCfg["max speed (m/s)"] * nConstants::M_TO_MM);
+
+            if (jsonCfg.contains("layout"))
+                mFieldLayoutFile = QString::fromStdString(jsonCfg["layout"]);
         }
     }
     catch (const std::exception& e)
@@ -278,6 +282,37 @@ void cMainWindow::initialize()
     createDockWindows();
 
     createStatusBar();
+
+    try
+    {
+        if (configDoc.contains("axis_communications"))
+        {
+            nlohmann::json sensorInfo;
+            sensorInfo["type"] = "axis_communications";
+            sensorInfo["protocol"] = "net";
+            sensorInfo["sensor"] = "F44";
+
+            auto result = rgb::create_sensor("axis_communications", sensorInfo);
+
+            if (result.pModel)
+            {
+                auto jsonCfg = configDoc["axis_communications"];
+                result.pModel->configure(jsonCfg);
+
+                if (result.pDockableView)
+                {
+                    addDockWidget(Qt::NoDockWidgetArea, result.pDockableView);
+                    mpViewMenu->addAction(result.pDockableView->toggleViewAction());
+                }
+
+                result.pModel->startCommunications();
+            }
+
+        }
+    }
+    catch (const std::exception& e)
+    {
+    }
 
     mpMdiArea = new QMdiArea(this);
     mpMdiArea->setViewMode(QMdiArea::TabbedView);

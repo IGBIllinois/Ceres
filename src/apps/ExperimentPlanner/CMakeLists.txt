@@ -252,10 +252,48 @@ target_link_libraries(CeresExperimentPlanner PRIVATE ${Qt}::Multimedia)
 target_link_libraries(CeresExperimentPlanner PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(CeresExperimentPlanner PRIVATE Utilities)
 target_link_libraries(CeresExperimentPlanner PRIVATE ExperimentControllers)
+target_link_libraries(CeresExperimentPlanner PRIVATE Sensors)
 target_link_libraries(CeresExperimentPlanner PRIVATE ${VTK_LIBRARIES} )
 target_link_libraries(CeresExperimentPlanner PRIVATE common)
 target_link_libraries(CeresExperimentPlanner PRIVATE ${Protobuf_LIBRARIES})
 target_link_libraries(CeresExperimentPlanner PRIVATE utf8_range::utf8_range)
+target_link_libraries(CeresExperimentPlanner PUBLIC
+    absl::absl_check
+    absl::absl_log
+    absl::algorithm
+    absl::base
+    absl::bind_front
+    absl::bits
+    absl::btree
+    absl::cleanup
+    absl::cord
+    absl::core_headers
+    absl::debugging
+    absl::die_if_null
+    absl::dynamic_annotations
+    absl::flags
+    absl::flat_hash_map
+    absl::flat_hash_set
+    absl::function_ref
+    absl::hash
+    absl::layout
+    absl::log_initialize
+    absl::log_globals
+    absl::log_severity
+    absl::memory
+    absl::node_hash_map
+    absl::node_hash_set
+    absl::optional
+    absl::random_distributions
+    absl::random_random
+    absl::span
+    absl::status
+    absl::statusor
+    absl::strings
+    absl::synchronization
+    absl::time
+    absl::utility
+)
 
 vtk_module_autoinit(TARGETS CeresExperimentPlanner MODULES ${VTK_LIBRARIES})
 
