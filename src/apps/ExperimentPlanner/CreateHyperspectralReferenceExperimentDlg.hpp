@@ -21,6 +21,9 @@ class QTableView;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
+// Forward Declaration
+class cScanPointsWidget;
+
 
 class cCreateHyperspectralReferenceExperimentDlg : public QDialog
 {
@@ -81,6 +84,7 @@ protected:
 	QLineEdit* mpTravelSpeed_mmps = nullptr;
 
 	/* Measurement */
+	QLineEdit* mpBeginningOffset_m = nullptr;
 	QLineEdit* mpStartMeasurementDelay_sec = nullptr;
 
 	QLineEdit* mpMinIntegrationTime_sec = nullptr;
@@ -89,7 +93,10 @@ protected:
 
 	QLineEdit* mpReferenceHeight_m = nullptr;
 	QComboBox* mpLensFocalDistance = nullptr;
+	QLineEdit* mpMeasurementSpeed_mmps = nullptr;
 	QLineEdit* mpMeasurementTime_sec = nullptr;
+
+	QLineEdit* mpEndMeasurementDelay_sec = nullptr;
 
 	/* Gimble Orientation */
 	QLineEdit* mpGimbleTilt_deg = nullptr;

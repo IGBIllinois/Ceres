@@ -224,9 +224,13 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 		return false;
 	}
 
-	if (mpRefPosX_mm->text().isEmpty() || mpRefPosY_mm->text().isEmpty())
+	auto path = mpPath->path();
+
+	bool missing_start_point = mpRefPosX_mm->text().isEmpty() || mpRefPosY_mm->text().isEmpty();
+
+	if (missing_start_point && path.empty())
 	{
-		QString msg = "The SpiderCam position can not be blank.";
+		QString msg = "The measurement path can not be blank.";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
@@ -234,12 +238,25 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 
 	auto* pGroundModel = cRappGroundModel::get();
 
-	int x1_mm = mpRefPosX_mm->text().toInt();
-	int y1_mm = mpRefPosY_mm->text().toInt();
+	int x1_mm = 0;
+	int y1_mm = 0;
+
+	if (missing_start_point)
+	{
+		auto point = path.front();
+
+		x1_mm = point.x_mm;
+		y1_mm = point.y_mm;
+	}
+	else
+	{
+		x1_mm = mpRefPosX_mm->text().toInt();
+		y1_mm = mpRefPosY_mm->text().toInt();
+	}
 
 	if (!rfb::withinBoundary(x1_mm, y1_mm))
 	{
-		QString msg = "The SpiderCam position must be a valid field position (10,000mm to 190,000mm).";
+		QString msg = "The SpiderCam position must be a valid field position (10,000mm to 180,000mm).";
 		QMessageBox msg_box(QMessageBox::Critical, "Invalid Parameter", msg);
 		msg_box.exec();
 		return false;
@@ -255,26 +272,65 @@ bool cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::generate()
 			h1_mm = 0;
 	}
 
-	int distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+	int distance_mm = 0;
 
 	int x2_mm = x1_mm;
 	int y2_mm = y1_mm;
 	int h2_mm = h1_mm;
 
-	switch (mpScanOrientation->currentIndex())
+	if (path.size() == 2)
 	{
-	case SCAN_WEST_TO_EAST:
-		y2_mm += distance_mm;
-		break;
-	case SCAN_EAST_TO_WEST:
-		y2_mm -= distance_mm;
-		break;
-	case SCAN_NORTH_TO_SOUTH:
-		x2_mm += distance_mm;
-		break;
-	case SCAN_SOUTH_TO_NORTH:
-		x2_mm -= distance_mm;
-		break;
+		auto p1 = path.front();
+		auto p2 = path.back();
+
+		if ((p1.scan == START) && (p2.scan == END))
+		{
+			auto dx = p2.x_mm - p1.x_mm;
+			auto dy = p2.y_mm - p1.y_mm;
+
+			distance_mm = sqrt(dx*dx + dy*dy);
+
+			x2_mm = p2.x_mm;
+			y2_mm = p2.y_mm;
+		}
+		else if((p1.scan == END) && (p2.scan == START))
+		{
+			auto dx = p2.x_mm - p1.x_mm;
+			auto dy = p2.y_mm - p1.y_mm;
+
+			distance_mm = sqrt(dx * dx + dy * dy);
+
+			x2_mm = p2.x_mm;
+			y2_mm = p2.y_mm;
+
+			std::swap(x1_mm, x2_mm);
+			std::swap(y1_mm, y2_mm);
+		}
+
+	}
+	if (mpScanDistance->text().isEmpty())
+	{
+
+	}
+	else
+	{
+		distance_mm = static_cast<int>(mpScanDistance->text().toDouble() * mScanConversionFactor);
+
+		switch (mpScanOrientation->currentIndex())
+		{
+		case SCAN_WEST_TO_EAST:
+			y2_mm += distance_mm;
+			break;
+		case SCAN_EAST_TO_WEST:
+			y2_mm -= distance_mm;
+			break;
+		case SCAN_NORTH_TO_SOUTH:
+			x2_mm += distance_mm;
+			break;
+		case SCAN_SOUTH_TO_NORTH:
+			x2_mm -= distance_mm;
+			break;
+		}
 	}
 
 	if (pGroundModel)
@@ -511,8 +567,7 @@ void cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::recordXY()
 {
 	if ((mSpidercamX_mm > 0) && (mSpidercamY_mm > 0))
 	{
-		mpRefPosX_mm->setText(QString::number(mSpidercamX_mm));
-		mpRefPosY_mm->setText(QString::number(mSpidercamY_mm));
+		mpPath->addPoint(mSpidercamX_mm, mSpidercamY_mm);
 	}
 }
 
