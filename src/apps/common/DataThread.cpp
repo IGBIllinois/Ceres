@@ -151,6 +151,8 @@ cleanup:
         qCritical() << e.what();
     }
 
+    mActiveSensors.clear();
+
     QString msg("Data collection thread terminated.");
 
     emit statusMessage(msg);
