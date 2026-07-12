@@ -24,13 +24,6 @@ bool cPlannerDataThread::startCommunications()
         return false;
     }
 
-/*
-    for (auto& sensor : mActiveSensors)
-    {
-        QObject::connect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
-    }
-*/
-
     emit connectedToController();
 
     return true;
@@ -39,13 +32,6 @@ bool cPlannerDataThread::startCommunications()
 bool cPlannerDataThread::stopCommunications()
 {
     emit disconnectedFromController();
-
-/*
-    for (auto& sensor : mActiveSensors)
-    {
-        QObject::disconnect(mpController, &cExperimentControlModel::requestDataRecordingState, sensor, &cSensorModel::dataRecordingStateChange);
-    }
-*/
 
     // Shutdown the network communications that are tied to this thread
     cDataThread::stopCommunications();

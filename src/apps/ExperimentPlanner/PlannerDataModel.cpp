@@ -80,7 +80,17 @@ std::size_t cPlannerDataModel::sensorCount() const
 
 void cPlannerDataModel::addSensor(cSensorModel* pSensor)
 {
-    pSensor;
+    if (pSensor)
+    {
+        if (!pSensor->initialize())
+        {
+            emit statusMessage("Sensor failed initialization!");
+            return;
+        }
+
+        pSensor->moveToThread(&mThread);
+        mThread.mSensors.push_back(pSensor);
+    }
 }
 
 void cPlannerDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)

@@ -283,39 +283,6 @@ void cMainWindow::initialize()
 
     createStatusBar();
 
-    try
-    {
-        if (configDoc.contains("axis_communications"))
-        {
-            nlohmann::json sensorInfo;
-            sensorInfo["type"] = "axis_communications";
-            sensorInfo["protocol"] = "net";
-            sensorInfo["sensor"] = "F44";
-
-            auto result = rgb::create_sensor("axis_communications", sensorInfo);
-
-            if (result.pModel)
-            {
-                auto jsonCfg = configDoc["axis_communications"];
-                result.pModel->configure(jsonCfg);
-
-                if (result.pDockableView)
-                {
-                    addDockWidget(Qt::NoDockWidgetArea, result.pDockableView);
-                    mpViewMenu->addAction(result.pDockableView->toggleViewAction());
-
-                    mpVideoView = result.pDockableView;
-                }
-
-                result.pModel->startCommunications();
-            }
-
-        }
-    }
-    catch (const std::exception& e)
-    {
-    }
-
     mpMdiArea = new QMdiArea(this);
     mpMdiArea->setViewMode(QMdiArea::TabbedView);
     mpMdiArea->setTabsClosable(true);
@@ -1717,6 +1684,50 @@ void cMainWindow::onConnectToSpidercam()
         pCtrlModel->configure(configDoc[name]);
     }
 
+    if (mpVideoView == nullptr)
+    {
+        try
+        {
+            if (configDoc.contains("axis_communications"))
+            {
+                nlohmann::json sensorInfo;
+                sensorInfo["type"] = "axis_communications";
+                sensorInfo["protocol"] = "net";
+                sensorInfo["sensor"] = "F44";
+
+                auto widgets = rgb::create_sensor("axis_communications", sensorInfo);
+
+                if (widgets.pModel)
+                {
+                    QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+                    QObject::connect(widgets.pModel, &cSensorModel::elogMessage, this, &cMainWindow::onLogMessage);
+
+                    auto jsonCfg = configDoc["axis_communications"];
+                    widgets.pModel->configure(jsonCfg);
+
+                    if (widgets.pDockableView)
+                    {
+                        addDockWidget(Qt::NoDockWidgetArea, widgets.pDockableView);
+                        mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
+                        mpVideoView = widgets.pDockableView;
+                    }
+
+                    widgets.pModel->updateViews();
+
+                    mpModel->addSensor(widgets.pModel);
+                }
+
+            }
+        }
+        catch (const std::exception& e)
+        {
+        }
+    }
+    else
+    {
+        mpViewMenu->addAction(mpVideoView->toggleViewAction());
+    }
+
     mpModel->startDataThread();
 
     mpSpidercamConnect->setText(tr("Disconnect"));
@@ -1742,6 +1753,11 @@ void cMainWindow::onDisconnectFromSpidercam()
     mpPauseRunMeasurement->setEnabled(false);
 
     mpModel->stopDataThread();
+
+    if (mpVideoView)
+    {
+        mpViewMenu->removeAction(mpVideoView->toggleViewAction());
+    }
 
     cExperimentControlModel* pCtrlModel = mpModel->removeExperimentControlModel();
 
