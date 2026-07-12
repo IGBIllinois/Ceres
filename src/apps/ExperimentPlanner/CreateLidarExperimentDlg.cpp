@@ -330,7 +330,7 @@ void cCreateLidarExperimentDlg::createLayout_Measurement(QVBoxLayout* pMainLayou
 	pGridLayout->addWidget(pText, 0, 3);
 	pGridLayout->addWidget(mpStartMeasurementDelay_sec, 0, 4);
 
-	pText = new QLabel("Integration Time (sec)");
+	pText = new QLabel("GPS Integration Time (sec)");
 	pGridLayout->addWidget(pText, 2, 0);
 
 	QHBoxLayout* pIntegrationLayout = new QHBoxLayout();
