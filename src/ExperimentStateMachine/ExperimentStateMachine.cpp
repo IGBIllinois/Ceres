@@ -7,6 +7,7 @@
 
 #include <QThread>
 #include <QString>
+#include <QMessageBox>
 
 #include <algorithm>
 #include <filesystem>
@@ -18,10 +19,19 @@ Q_DECLARE_METATYPE(experiment::eState)
 
 namespace
 {
-    class invalid_include_file : public std::exception
+    class include_file_not_found : public std::runtime_error
     {
     public:
-        invalid_include_file() = default;
+        include_file_not_found(const std::string& what_arg) : std::runtime_error(what_arg) {}
+        include_file_not_found(const char* what_arg) : std::runtime_error(what_arg) {}
+        ~include_file_not_found() = default;
+    };
+
+    class invalid_include_file : public std::runtime_error
+    {
+    public:
+        invalid_include_file(const std::string& what_arg) : std::runtime_error(what_arg) {}
+        invalid_include_file(const char* what_arg) : std::runtime_error(what_arg) {}
         ~invalid_include_file() = default;
     };
 
@@ -294,50 +304,84 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
             }
         }
     }
-    catch (const invalid_include_file&)
+    catch (const include_file_not_found& e)
     {
         emit experimentStateChanged(eState::EXP_ERROR);
 
         delete_states(mExperimentStates);
+
+        QString msg = "The include file \"";
+        msg += QString::fromStdString(e.what());
+        msg += "\" was not found.";
+
+        QMessageBox msgBox;
+
+        msgBox.setWindowTitle("Include File Not Found");
+        msgBox.setText(msg);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setMinimumWidth(400);
+        msgBox.exec();
+
+        emitStatusMessage(msg);
+
+        return false;
+    }
+    catch (const invalid_include_file& e)
+    {
+        emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
+        QString msg = QString::fromStdString(e.what());
+
+        QMessageBox msgBox;
+
+        msgBox.setWindowTitle("Invalid Include File");
+        msgBox.setText(msg);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setMinimumWidth(400);
+        msgBox.exec();
+
+        emitStatusMessage(msg);
 
         return false;
     }
     catch (const detail::parse_error& e)
     {
+        emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
         QString msg = "Experiment \"";
         msg += QString::fromStdString(expName);
         msg += "\" failed to load due to parse error.";
         emitStatusMessage(msg);
 
-        emit experimentStateChanged(eState::EXP_ERROR);
-
-        delete_states(mExperimentStates);
-
         return false;
     }
     catch (const detail::type_error& e)
     {
+        emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
         QString msg = "Experiment \"";
         msg += QString::fromStdString(expName);
         msg += "\" failed to load due to type error.";
         emitStatusMessage(msg);
 
-        emit experimentStateChanged(eState::EXP_ERROR);
-
-        delete_states(mExperimentStates);
-
         return false;
     }
     catch (const detail::exception& e)
     {
+        emit experimentStateChanged(eState::EXP_ERROR);
+
+        delete_states(mExperimentStates);
+
         QString msg = "Experiment \"";
         msg += QString::fromStdString(expName);
         msg += "\" failed to load due to unknown error.";
         emitStatusMessage(msg);
-
-        emit experimentStateChanged(eState::EXP_ERROR);
-
-        delete_states(mExperimentStates);
 
         return false;
     }
@@ -589,22 +633,26 @@ std::vector<cExperimentState*> cExperimentStateMachine::loadMeasurementStates(co
 
     if (!in.is_open())
     {
-        throw invalid_include_file();
+        throw include_file_not_found(includeFile.string());
     }
-
-    nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, false, true);
-
-    if (!jsonDoc.contains("experiment"))
-    {
-        return std::vector<cExperimentState*>();
-    }
-
-    nlohmann::json expDoc = jsonDoc["experiment"];
 
     std::vector<cExperimentState*> states;
 
     try
     {
+        nlohmann::json jsonDoc = nlohmann::json::parse(in, nullptr, true, true);
+
+        if (!jsonDoc.contains("experiment"))
+        {
+            std::string msg = "Experiment include file \"";
+            msg += includeFile.string();
+            msg += "\" does not contain an \"experiment\" section.";
+
+            throw invalid_include_file(msg);
+        }
+
+        nlohmann::json expDoc = jsonDoc["experiment"];
+
         for (auto entry : expDoc)
         {
             if (entry.contains("variables"))
@@ -667,36 +715,36 @@ std::vector<cExperimentState*> cExperimentStateMachine::loadMeasurementStates(co
     }
     catch (const detail::parse_error& e)
     {
-        QString msg = "Experiment include file \"";
-        msg += QString::fromStdString(include_filename);
-        msg += "\" failed to load due to parse error.";
-        emitStatusMessage(msg);
+        std::string msg = "Experiment include file \"";
+        msg += include_filename;
+        msg += "\" failed to load due to parse error.\n\n";
+        msg += e.what();
 
         delete_states(states);
 
-        throw invalid_include_file();
+        throw invalid_include_file(msg);
     }
     catch (const detail::type_error& e)
     {
-        QString msg = "Experiment include file \"";
-        msg += QString::fromStdString(include_filename);
-        msg += "\" failed to load due to type error.";
-        emitStatusMessage(msg);
+        std::string msg = "Experiment include file \"";
+        msg += include_filename;
+        msg += "\" failed to load due to type error.\n\n";
+        msg += e.what();
 
         delete_states(states);
 
-        throw invalid_include_file();
+        throw invalid_include_file(msg);
     }
     catch (const detail::exception& e)
     {
-        QString msg = "Experiment include file \"";
-        msg += QString::fromStdString(include_filename);
-        msg += "\" failed to load due to unknown error.";
-        emitStatusMessage(msg);
+        std::string msg = "Experiment include file \"";
+        msg += include_filename;
+        msg += "\" failed to load due to unknown error.\n\n";
+        msg += e.what();
 
         delete_states(states);
 
-        throw invalid_include_file();
+        throw invalid_include_file(msg);
     }
 
 
