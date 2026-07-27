@@ -53,6 +53,12 @@ void cRappAerialModel::addAerialPoint(const rfm::planePoint_t& gps_point)
 
     auto point = rfb::toRappCoordinates(gps_point);
 
+    if (point.x_mm < mMinX_mm) mMinX_mm = point.x_mm;
+    if (point.x_mm > mMaxX_mm) mMaxX_mm = point.x_mm;
+
+    if (point.y_mm < mMinY_mm) mMinY_mm = point.y_mm;
+    if (point.y_mm > mMaxY_mm) mMaxY_mm = point.y_mm;
+
     mAerialPoints.push_back(point);
 }
 
@@ -60,6 +66,12 @@ void cRappAerialModel::addAerialPoint(const rfm::rappPoint_t& rapp_point)
 {
     if (!rfb::withinBoundary(rapp_point))
         return;
+
+    if (rapp_point.x_mm < mMinX_mm) mMinX_mm = rapp_point.x_mm;
+    if (rapp_point.x_mm > mMaxX_mm) mMaxX_mm = rapp_point.x_mm;
+
+    if (rapp_point.y_mm < mMinY_mm) mMinY_mm = rapp_point.y_mm;
+    if (rapp_point.y_mm > mMaxY_mm) mMaxY_mm = rapp_point.y_mm;
 
     mAerialPoints.push_back(rapp_point);
 }
@@ -127,6 +139,71 @@ double cRappAerialModel::getMeshHeight_mm(std::int32_t x_mm, std::int32_t y_mm) 
 
             return triangle.height(x_mm, y_mm);
         }
+    }
+
+    if ((mMinX_mm <= x_mm) && (x_mm <= mMaxX_mm))
+    {
+        auto points = mAerialPoints;
+
+        std::sort(points.begin(), points.end(), [](const auto& point1, const auto& point2) { return point1.x_mm < point2.x_mm; });
+
+        auto i = points.size() / 2;
+
+        if (points[i].x_mm < x_mm)
+        {
+
+        }
+        else
+        {
+            double distance = 1'000'000'000;
+            auto index = i;
+
+            for (; i < points.size(); ++i)
+            {
+                double x = (points[i].x_mm - x_mm);
+                double y = (points[i].y_mm - y_mm);
+
+                double d = sqrt(x*x + y*y);
+
+                if (d < distance)
+                {
+                    distance = d;
+                    index = i;
+                }
+            }
+        }
+     }
+    else if ((mMinY_mm <= y_mm) && (y_mm <= mMaxY_mm))
+    {
+        auto points = mAerialPoints;
+
+        std::sort(points.begin(), points.end(), [](const auto& point1, const auto& point2) { return point1.y_mm < point2.y_mm; });
+
+
+    }
+    else if ((x_mm > mMaxX_mm) && (y_mm < mMinY_mm))
+    {
+
+    }
+    else if ((x_mm > mMaxX_mm) && (y_mm > mMaxY_mm))
+    {
+
+    }
+    else if (x_mm < mMinX_mm)
+    {
+
+    }
+    else if (x_mm > mMaxX_mm)
+    {
+
+    }
+    else if (y_mm < mMinY_mm)
+    {
+
+    }
+    else if (y_mm > mMaxY_mm)
+    {
+
     }
 
     return rfm::INVALID_HEIGHT;
