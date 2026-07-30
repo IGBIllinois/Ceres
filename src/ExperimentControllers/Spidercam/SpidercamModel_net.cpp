@@ -17,6 +17,8 @@ cSpidercamModel_net::cSpidercamModel_net(QObject* parent)
 
     QObject::connect(&mController, &cSpidercamController::connectionStateChange,
                 this, &cSpidercamModel_net::onConnectionStateChange);
+
+    mWatchDogTimer.interval_sec(10);
 }
 
 cSpidercamModel_net::~cSpidercamModel_net()
@@ -77,6 +79,8 @@ bool cSpidercamModel_net::startCommunications()
 
         mTimer.reset();
 
+        mWatchDogTimer.start();
+
         mConnected = true;
     }
 
@@ -88,6 +92,7 @@ void cSpidercamModel_net::stopCommunications()
     emit updateControllerConnection(false);
     mController.stopCommunications();
     mTimer.stop();
+    mWatchDogTimer.stop();
 
     mConnected = false;
 }
@@ -179,8 +184,13 @@ void cSpidercamModel_net::onConnectionStateChange(bool connected)
 {
     if (!connected && mConnected)
     {
-        QString msg = "";
-        emit errorMessage("", msg);
+        mTimer.stop();
+        mWatchDogTimer.stop();
+
+        mConnected = false;
+        
+//        QString msg = "";
+//        emit errorMessage("", msg);
 
         QMessageBox msgBox;
 
@@ -194,9 +204,6 @@ void cSpidercamModel_net::onConnectionStateChange(bool connected)
         {
             // Stop the communication
             mController.stopCommunications();
-            mTimer.stop();
-
-            mConnected = false;
 
             // Try to re-start the communication
             if (startCommunications())
@@ -213,7 +220,8 @@ void cSpidercamModel_net::update()
 
     if (mController.checkForReply() || true)
     {
-        mController.readReply();
+        if (mController.readReply())
+            mWatchDogTimer.reset();
 
         mLastReplyWasError = mController.lastReplyWasError();
 

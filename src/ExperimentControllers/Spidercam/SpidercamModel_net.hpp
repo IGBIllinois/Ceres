@@ -8,6 +8,8 @@
 
 #include "SpidercamExperimentStates.hpp"
 
+#include "../../Utilities/Timers.hpp"
+
 #include <memory>
 
 class cSpidercamModel_net : public cSpidercamModel
@@ -48,6 +50,8 @@ protected:
 
 private:
 	bool mConnected = false;
+
+	cIntervalTimer mWatchDogTimer;
 
 private:
     cSpidercamController mController;
