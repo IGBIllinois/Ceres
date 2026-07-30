@@ -74,6 +74,7 @@ public slots:
     void onExperimentCompleted();
 
 protected slots:
+    void updateControllerConnection(bool connected);
     void loopHeartbeatUpdated();
     void loopTerminated();
 
@@ -156,6 +157,7 @@ private:
 
     cCtrlDataModel* mpModel = nullptr;
 
+    bool mControllerConnected = false;
     cExperimentControlView* mpController = nullptr;
 
     cSound mExperimentErrorSound;

@@ -711,6 +711,17 @@ void cMainWindow::onExperimentCompleted()
 }
 
 //-----------------------------------------------------------------------------
+void cMainWindow::updateControllerConnection(bool connected)
+{
+    if (mControllerConnected && !connected)
+    {
+        onStatusUpdate("Connection to experiment controller has been lost!");
+    }
+
+    mControllerConnected = connected;
+}
+
+//-----------------------------------------------------------------------------
 void cMainWindow::loopHeartbeatUpdated()
 {
     if (mShowRedHeart)
@@ -1057,6 +1068,9 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
 
         exit(EXIT_FAILURE);
     }
+
+    QObject::connect(pModel, &cExperimentControlModel::updateControllerConnection,
+            this, &cMainWindow::updateControllerConnection);
 
     QObject::connect(pModel, &cExperimentControlModel::updateControllerConnection,
         mpHobbsMeter, &cHobbsMeter::updateControllerConnection);

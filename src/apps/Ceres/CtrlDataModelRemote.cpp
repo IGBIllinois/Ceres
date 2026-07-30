@@ -696,6 +696,9 @@ void cCtrlDataModelRemote::connected()
     mSocket.setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
 
     mConnected = true;
+
+    mWatchDogTimer.reset();
+
 }
 
 void cCtrlDataModelRemote::disconnected()
@@ -711,6 +714,8 @@ void cCtrlDataModelRemote::disconnected()
         emit errorMessage("Connection Lost", msg);
         mpView->enableReconnectButton(true);
         mpView->removeAllSensors();
+
+        mWatchDogTimer.stop();
     }
 
     mThread.mpController->clearStateCreators();
@@ -802,42 +807,50 @@ int cCtrlDataModelRemote::sendOutgoingData(const char* data, std::size_t len)
 void cCtrlDataModelRemote::onExperimentTypeReply()
 {
     mExperimentTypeConfirmed = true;
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onExperimentInfoReply()
 {
     mExperimentInfoConfirmed = true;
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onDataFileState(bool is_open)
 {
     mDataFileIsOpen = is_open;
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onStatusMessage(const std::string& msg)
 {
     mpView->updateStatusMsg(QString::fromStdString(msg));
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onLogMessage(uint8_t msg_type, const std::string& device, const std::string& msg)
 {
     mpView->updateLogMsg(msg_type, QString::fromStdString(device), QString::fromStdString(msg));
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onLogMessage(uint8_t msg_type, const std::string& device, const std::string& instance, const std::string& msg)
 {
     std::string name = device + ":" + instance;
     mpView->updateLogMsg(msg_type, QString::fromStdString(name), QString::fromStdString(msg));
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onSensorStatus(const std::string& sensor, const std::string& status)
 {
     mpView->updateSensorStatus(QString::fromStdString(sensor), QString::fromStdString(status));
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onSensorStatus(const std::string& sensor, const std::string& instance, const std::string& status)
 {
     mpView->updateSensorStatus(QString::fromStdString(sensor), QString::fromStdString(instance), QString::fromStdString(status));
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const std::string& new_name)
@@ -853,6 +866,7 @@ void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const
             break;
         }
     }
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const std::string& new_name, const std::string& instance)
@@ -875,6 +889,8 @@ void cCtrlDataModelRemote::onSensorNameChange(const std::string& old_name, const
             break;
         }
     }
+
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor, 
@@ -894,6 +910,8 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     mPropertyPages.push_back(page);
 
     addSensorPropertyPage(page);
+
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor,
@@ -921,6 +939,8 @@ void cCtrlDataModelRemote::onSensorPropertyConnectInfo(const std::string& sensor
     mPropertyPages.push_back(page);
 
     addSensorPropertyPage(page);
+
+    mWatchDogTimer.reset();
 }
 
 void cCtrlDataModelRemote::onUnknownID(uint16_t id)
