@@ -148,8 +148,8 @@ bool cAxisCamera::sendRequest()
     mpRequest->setUrl(mCurrentUrl);
 
     mpReply = mpDownloadManager->get(*mpRequest);
-    connect(mpReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(downloadError(QNetworkReply::NetworkError)));
-    connect(mpReply, SIGNAL(readyRead()), this, SLOT(replyDataAvailable()));
+    connect(mpReply, &QNetworkReply::errorOccurred, this, &cAxisCamera::downloadError);
+    connect(mpReply, &QNetworkReply::readyRead, this, &cAxisCamera::replyDataAvailable);
 
     mCurrentImageSize = 0;
     mpImageBuffer->seek(0);
@@ -261,9 +261,11 @@ void cAxisCamera::bufferToImage()
     }
     else
     {
+/*
         mErrorStr = "Image read fail: ";
         mErrorStr += mpImageReader->errorString();
         qWarning() << mErrorStr;
+*/
     }
 }
 
