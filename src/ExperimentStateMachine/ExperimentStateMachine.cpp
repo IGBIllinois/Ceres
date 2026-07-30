@@ -178,7 +178,7 @@ void cExperimentStateMachine::clearExperiment()
 
 void cExperimentStateMachine::createGlobalVariableTable()
 {
-    if (mRunning) return;
+//    if (mRunning) return;
 
     if (!mGlobalVariableTable)
         mGlobalVariableTable = std::make_shared<cExperimentVariableTable>();
@@ -186,7 +186,7 @@ void cExperimentStateMachine::createGlobalVariableTable()
 
 void cExperimentStateMachine::clearGlobalVariableTable()
 {
-    if (mRunning) return;
+//    if (mRunning) return;
 
     if (mGlobalVariableTable)
         mGlobalVariableTable->clear();
