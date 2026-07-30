@@ -38,6 +38,11 @@ namespace rfm
 		std::int32_t x_mm = 0;
 		std::int32_t y_mm = 0;
 		std::int32_t z_mm = 0;
+
+		bool operator==(const rappPoint_t& rhs) const
+		{
+			return (x_mm == rhs.x_mm) && (y_mm == rhs.y_mm) && (z_mm == rhs.z_mm);
+		}
 	};
 
 	struct sCentroid_t

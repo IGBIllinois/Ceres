@@ -37,11 +37,6 @@ public:
 	double getDollyOffset_mm(std::int32_t x_mm, std::int32_t y_mm, std::int32_t ref_height_mm);
 
 private:
-	std::int32_t mMinX_mm = 1'000'000;
-	std::int32_t mMaxX_mm = 0;
-	std::int32_t mMinY_mm = 1'000'000;
-	std::int32_t mMaxY_mm = 0;
-
 	std::vector<rfm::rappPoint_t> mAerialPoints;
 	std::vector<cRappTriangle>	  mAerialMesh;
 	std::unique_ptr<cQuadTree>	  mQuadTree;

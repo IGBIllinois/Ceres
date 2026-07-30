@@ -4,6 +4,8 @@
 
 #include <QString>
 
+#include <algorithm>
+
 
 namespace
 {
@@ -53,13 +55,8 @@ void cRappAerialModel::addAerialPoint(const rfm::planePoint_t& gps_point)
 
     auto point = rfb::toRappCoordinates(gps_point);
 
-    if (point.x_mm < mMinX_mm) mMinX_mm = point.x_mm;
-    if (point.x_mm > mMaxX_mm) mMaxX_mm = point.x_mm;
-
-    if (point.y_mm < mMinY_mm) mMinY_mm = point.y_mm;
-    if (point.y_mm > mMaxY_mm) mMaxY_mm = point.y_mm;
-
-    mAerialPoints.push_back(point);
+    if (std::find(mAerialPoints.begin(), mAerialPoints.end(), point) == mAerialPoints.end())
+        mAerialPoints.push_back(point);
 }
 
 void cRappAerialModel::addAerialPoint(const rfm::rappPoint_t& rapp_point)
@@ -67,13 +64,8 @@ void cRappAerialModel::addAerialPoint(const rfm::rappPoint_t& rapp_point)
     if (!rfb::withinBoundary(rapp_point))
         return;
 
-    if (rapp_point.x_mm < mMinX_mm) mMinX_mm = rapp_point.x_mm;
-    if (rapp_point.x_mm > mMaxX_mm) mMaxX_mm = rapp_point.x_mm;
-
-    if (rapp_point.y_mm < mMinY_mm) mMinY_mm = rapp_point.y_mm;
-    if (rapp_point.y_mm > mMaxY_mm) mMaxY_mm = rapp_point.y_mm;
-
-    mAerialPoints.push_back(rapp_point);
+    if (std::find(mAerialPoints.begin(), mAerialPoints.end(), rapp_point) == mAerialPoints.end())
+        mAerialPoints.push_back(rapp_point);
 }
 
 void cRappAerialModel::addAerialPoints(const std::vector<rfm::planePoint_t>& gps_points)
