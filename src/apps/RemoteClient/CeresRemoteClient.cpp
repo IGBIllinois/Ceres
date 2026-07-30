@@ -9,6 +9,9 @@
 #include <fstream>
 #include <string>
 #include <chrono>
+#include <exception>
+#include <stdexcept>
+
 
 static std::ofstream g_logFile;
 static std::chrono::time_point<std::chrono::system_clock> g_startTime;
@@ -52,9 +55,30 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QS
     g_logFile << std::endl;
 }
 
+void on_terminate()
+{
+    try 
+    {
+        auto ex = std::current_exception();
+        if (ex) 
+            std::rethrow_exception(ex);
+    }
+    catch (const std::exception& e) 
+    {
+        g_logFile << "Unhandled exception: " << e.what() << "\n";
+    }
+    catch (...) 
+    {
+        g_logFile << "Unhandled unknown exception\n";
+    }
+
+    std::abort();
+}
 
 int main(int argc, char** argv)
 {
+    auto termination_handler = std::set_terminate(on_terminate);
+
     {
         std::string filename = "CeresRemoteClient";
 
@@ -105,5 +129,7 @@ int main(int argc, char** argv)
     {
         g_logFile << "Fatal Exception: " << e.what() << std::endl;
     }
+
+    std::set_terminate(termination_handler);
 }
 
