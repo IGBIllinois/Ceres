@@ -72,6 +72,8 @@ void on_terminate()
         g_logFile << "Unhandled unknown exception\n";
     }
 
+    g_logFile.flush();
+
     std::abort();
 }
 
@@ -128,6 +130,7 @@ int main(int argc, char** argv)
     catch (const std::exception& e)
     {
         g_logFile << "Fatal Exception: " << e.what() << std::endl;
+        g_logFile.flush();
     }
 
     std::set_terminate(termination_handler);
