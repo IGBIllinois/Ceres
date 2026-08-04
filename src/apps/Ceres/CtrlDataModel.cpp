@@ -197,6 +197,16 @@ void cCtrlDataModel::clearGlobalVariableTable()
     mThread.mpController->clearGlobalVariableTable();
 }
 
+void cCtrlDataModel::clearVariableTables()
+{
+    if (!mThread.mpController)
+        return;
+
+    mThread.mpController->clearGlobalVariableTable();
+    mThread.mpController->clearVariableTable();
+}
+
+
 bool cCtrlDataModel::isExperimentRunning()
 {
     if (!mThread.mpController)

@@ -667,7 +667,7 @@ void cMainWindow::onExperimentTerminated()
     mBatchProcess.clear();
 
     mpModel->setBatchMode(false);
-    mpModel->clearGlobalVariableTable();
+    mpModel->clearVariableTables();
 
     emit setExperimentActions(true, true, false, false);
 
@@ -698,7 +698,7 @@ void cMainWindow::onExperimentCompleted()
     }
 
     mpModel->setBatchMode(false);
-    mpModel->clearGlobalVariableTable();
+    mpModel->clearVariableTables();
 
     emit setExperimentActions(true, true, false, false);
 

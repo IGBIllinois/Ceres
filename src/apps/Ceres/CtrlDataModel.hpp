@@ -72,6 +72,8 @@ public:
     std::weak_ptr<cExperimentVariableTable> getGlobalVariableTable() const;
     void clearGlobalVariableTable();
 
+    void clearVariableTables();
+
     bool isExperimentRunning();
     bool isExperimentPaused();
 
