@@ -23,7 +23,7 @@ namespace
     static int gReferenceHeight_mm = rfm::INVALID_HEIGHT;
     static int gAerialMeasurementHeight_mm = rfm::INVALID_HEIGHT;
 
-    std::vector<cRappTriangle> compute_mesh(const std::vector<rfm::rappPoint_t>& points, int32_t max_separation_mm = 10000)
+    std::vector<cRappTriangle> compute_delaunay_2d_mesh(const std::vector<rfm::rappPoint_t>& points, int32_t max_separation_mm = 1'000'000)
     {
         vtkDoubleArray* x = vtkDoubleArray::New();
         vtkDoubleArray* y = vtkDoubleArray::New();
@@ -128,7 +128,7 @@ bool nRFM::load_ground_data(const std::string& fileName)
     gGroundModel.addGroundPoints(rapp_points);
 
     auto data = gGroundModel.getGroundPoints();
-    auto mesh = compute_mesh(data);
+    auto mesh = compute_delaunay_2d_mesh(data);
 
     gGroundModel.clearGroundMesh();
     gGroundModel.addMeshData(mesh);
@@ -167,7 +167,7 @@ bool nRFM::load_aerial_data(const std::string& fileName)
     gAerialModel.addAerialPoints(rapp_points);
 
     auto data = gAerialModel.getAerialPoints();
-    auto mesh = compute_mesh(data, 15000);
+    auto mesh = compute_delaunay_2d_mesh(data, 100000);
 
     gAerialModel.clearAerialMesh();
     gAerialModel.addMeshData(mesh);

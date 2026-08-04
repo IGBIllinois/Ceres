@@ -197,6 +197,13 @@ std::weak_ptr<cExperimentVariableTable> cExperimentStateMachine::getGlobalVariab
     return mGlobalVariableTable;
 }
 
+void cExperimentStateMachine::clearVariableTable()
+{
+    if (mVariableTable)
+        mVariableTable->clear();
+}
+
+
 cExperimentState* cExperimentStateMachine::createState(const std::string& type, const nlohmann::json& expDoc)
 {
     if (type == "delay")

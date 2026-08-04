@@ -92,6 +92,11 @@ public:
      */
     std::weak_ptr<cExperimentVariableTable> getGlobalVariableTable() const;
 
+    /*
+     * Clear the experiment variable table
+     */
+    void clearVariableTable();
+
 signals:
     void experimentStatus(QString msg);
     void experimentStateChanged(experiment::eState state);
