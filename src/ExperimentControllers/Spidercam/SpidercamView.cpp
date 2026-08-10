@@ -35,6 +35,12 @@ cSpidercamView::cSpidercamView()
 	mpZ_m = new QLineEdit();
 	mpZ_m->setReadOnly(true);
 
+	QLabel* pSpeed_Label = new QLabel();
+	pSpeed_Label->setText("Speed (m/s)");
+
+	mpSpeed_mps = new QLineEdit();
+	mpSpeed_mps->setReadOnly(true);
+
 	mpExperimentStatus = new QStatusBar();
 	mpExperimentStatus->setHidden(true);
 	mpExperimentStatus->setSizeGripEnabled(false);
@@ -53,6 +59,8 @@ cSpidercamView::cSpidercamView()
 	statuslayout->addWidget(mpY_m);
 	statuslayout->addWidget(pZ_Label);
 	statuslayout->addWidget(mpZ_m);
+	statuslayout->addWidget(pSpeed_Label);
+	statuslayout->addWidget(mpSpeed_mps);
 
 	mainlayout->addLayout(statuslayout);
 
@@ -89,8 +97,6 @@ void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 		{
 			auto markers = jsonCfg["markers"];
 
-			rfm::rappPoint_t point = rfb::fromGPS(40.0635686 * nConstants::DEG_TO_RAD, -88.2081615 * nConstants::DEG_TO_RAD, 250);
-
 			for (const auto& marker : markers)
 			{
 				if (marker.contains("x_mm") && marker.contains("y_mm") && marker.contains("z_mm"))
@@ -110,11 +116,29 @@ void cSpidercamView::configure(const nlohmann::json& jsonCfg)
 					rfm::rappPoint_t point = rfb::fromStatePlane(northing_ft, easting_ft, height_ft);
 					mpScanArea->addMarker(label, point.x_mm, point.y_mm, point.z_mm);
 				}
+				else if (marker.contains("northing_m") && marker.contains("easting_m") && marker.contains("height_m"))
+				{
+					std::string label = marker["label"];
+					double northing_ft = marker["northing_m"] * nConstants::M_TO_FT;
+					double easting_ft = marker["easting_m"] * nConstants::M_TO_FT;
+					double height_ft = marker["height_m"] * nConstants::M_TO_FT;
+					rfm::rappPoint_t point = rfb::fromStatePlane(northing_ft, easting_ft, height_ft);
+					mpScanArea->addMarker(label, point.x_mm, point.y_mm, point.z_mm);
+				}
 				else if (marker.contains("lat_rad") && marker.contains("lng_rad") && marker.contains("height_m"))
 				{
 					std::string label = marker["label"];
 					double lat_rad = marker["lat_rad"];
 					double lng_rad = marker["lng_rad"];
+					double height_m = marker["height_m"];
+					rfm::rappPoint_t point = rfb::fromGPS(lat_rad, lng_rad, height_m);
+					mpScanArea->addMarker(label, point.x_mm, point.y_mm, point.z_mm);
+				}
+				else if (marker.contains("lat_deg") && marker.contains("lng_deg") && marker.contains("height_m"))
+				{
+					std::string label = marker["label"];
+					double lat_rad = marker["lat_deg"] * nConstants::DEG_TO_RAD;
+					double lng_rad = marker["lng_deg"] * nConstants::DEG_TO_RAD;
 					double height_m = marker["height_m"];
 					rfm::rappPoint_t point = rfb::fromGPS(lat_rad, lng_rad, height_m);
 					mpScanArea->addMarker(label, point.x_mm, point.y_mm, point.z_mm);
@@ -160,6 +184,7 @@ void cSpidercamView::updatePosition(spidercam::sPosition_1_t pos)
 	mpX_m->setText(QString::number(pos.X_mm * nConstants::MM_TO_M, 'f', 3));
 	mpY_m->setText(QString::number(pos.Y_mm * nConstants::MM_TO_M, 'f', 3));
 	mpZ_m->setText(QString::number(pos.height_mm * nConstants::MM_TO_M, 'f', 3));
+	mpSpeed_mps->setText(QString::number(pos.speed_mmps * nConstants::MM_TO_M, 'f', 3));
 }
 
 void cSpidercamView::updateRecordingState(bool recording)

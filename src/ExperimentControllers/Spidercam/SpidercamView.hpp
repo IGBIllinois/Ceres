@@ -60,6 +60,8 @@ private:
     QLineEdit* mpY_m = nullptr;
     QLineEdit* mpZ_m = nullptr;
 
+    QLineEdit* mpSpeed_mps = nullptr;
+
     QStatusBar* mpExperimentStatus = nullptr;
 };
 
