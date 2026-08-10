@@ -51,6 +51,7 @@ protected:
 private:
 	bool mConnected = false;
 
+	cIntervalTimer mErrorTimer;
 	cIntervalTimer mWatchDogTimer;
 
 private:

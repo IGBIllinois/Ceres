@@ -18,6 +18,7 @@ cSpidercamModel_net::cSpidercamModel_net(QObject* parent)
     QObject::connect(&mController, &cSpidercamController::connectionStateChange,
                 this, &cSpidercamModel_net::onConnectionStateChange);
 
+    mErrorTimer.interval_sec(10);
     mWatchDogTimer.interval_sec(10);
 }
 
@@ -80,6 +81,7 @@ bool cSpidercamModel_net::startCommunications()
         mTimer.reset();
 
         mWatchDogTimer.start();
+        mErrorTimer.stop();
 
         mConnected = true;
     }
@@ -93,6 +95,7 @@ void cSpidercamModel_net::stopCommunications()
     mController.stopCommunications();
     mTimer.stop();
     mWatchDogTimer.stop();
+    mErrorTimer.stop();
 
     mConnected = false;
 }
@@ -186,6 +189,7 @@ void cSpidercamModel_net::onConnectionStateChange(bool connected)
     {
         mTimer.stop();
         mWatchDogTimer.stop();
+        mErrorTimer.stop();
 
         mConnected = false;
         
@@ -227,6 +231,8 @@ void cSpidercamModel_net::update()
 
         if (mLastReplyWasError.IsRising())
         {
+            mErrorTimer.reset();
+
             const auto& error = mController.getLastReportedError();
 
             QString msg = "SpiderCam Error Response: Group ID = ";
@@ -313,39 +319,51 @@ void cSpidercamModel_net::update()
 
         if (mLastReplyWasError.IsFalling())
         {
+            mErrorTimer.stop();
             emit statusMessage("");
         }
     }
 
-    const auto& pos = mController.getLastKnownPosition();
-
-    if (spidercam::hasPosSpeedChanged(pos, mCurrentPosition, mPositionTolerance_mm))
+    if (mErrorTimer.elapsed())
     {
-        mCurrentPosition = pos;
-        emit positionChanged(mCurrentPosition);
+        mInScriptMode = false;
+        mInError = true;
 
-        if (mRecording && mSerializer)
-        {
-            mSerializer.write(mCurrentPosition);
-        }
+        if (mInScriptMode.HasChanged())
+            emit inScriptMode(mInScriptMode);
     }
+    else
+    {
+        const auto& pos = mController.getLastKnownPosition();
 
-    updateState();
+        if (spidercam::hasPosSpeedChanged(pos, mCurrentPosition, mPositionTolerance_mm))
+        {
+            mCurrentPosition = pos;
+            emit positionChanged(mCurrentPosition);
 
-    if (mBusy.HasChanged())
-        emit busyChanged(mBusy);
+            if (mRecording && mSerializer)
+            {
+                mSerializer.write(mCurrentPosition);
+            }
+        }
 
-    if (mMoving.HasChanged())
-        emit movingChanged(mMoving);
+        updateState();
 
-    if (mInPosition.HasChanged())
-        emit inPositionStateChanged(mInPosition);
+        if (mBusy.HasChanged())
+            emit busyChanged(mBusy);
 
-    if (mBatteryLevel_pct.HasChanged())
-        emit batteryLevelChanged(mBatteryLevel_pct);
+        if (mMoving.HasChanged())
+            emit movingChanged(mMoving);
 
-    if (mInScriptMode.HasChanged())
-        emit inScriptMode(mInScriptMode);
+        if (mInPosition.HasChanged())
+            emit inPositionStateChanged(mInPosition);
+
+        if (mBatteryLevel_pct.HasChanged())
+            emit batteryLevelChanged(mBatteryLevel_pct);
+
+        if (mInScriptMode.HasChanged())
+            emit inScriptMode(mInScriptMode);
+    }
 
     updateObstacleDistance();
 
