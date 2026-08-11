@@ -7,7 +7,7 @@
 
 #include "LucidVisionLabsRgbPropertyPage.hpp"
 
- // Forward Declaration
+// Forward Declaration
 class cLucidVisionLabsRgbModel;
 class cLucidVisionLabsRgbModel_Triton;
 
