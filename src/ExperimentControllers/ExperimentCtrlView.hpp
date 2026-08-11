@@ -30,6 +30,7 @@ public slots:
     virtual void refresh() {};
     virtual void experimentStateChanging(experiment::eState state);
     virtual void experimentStatusUpdating(QString msg);
+    virtual void experimentNameUpdating(QString name);
 
 protected:
 	cExperimentControlView() = default;

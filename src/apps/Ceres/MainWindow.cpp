@@ -1090,6 +1090,9 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
 
     QObject::connect(this, &cMainWindow::refreshDisplay, mpController, &cExperimentControlView::refresh);
 
+    QObject::connect(pModel, &cExperimentControlModel::measurementName,
+        mpController, &cExperimentControlView::experimentNameUpdating);
+
     QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
         mpController, &cExperimentControlView::experimentStatusUpdating);
 

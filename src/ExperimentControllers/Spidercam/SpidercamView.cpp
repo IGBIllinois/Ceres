@@ -216,6 +216,7 @@ void cSpidercamView::experimentStateChanging(experiment::eState state)
 		break;
 	case eState::COMPLETED:
 	case eState::TERMINATED:
+		mMeasurementName.clear();
 		mpExperimentStatus->clearMessage();
 		mpExperimentStatus->setHidden(true);
 		break;
@@ -227,5 +228,17 @@ void cSpidercamView::experimentStateChanging(experiment::eState state)
 
 void cSpidercamView::experimentStatusUpdating(QString msg)
 {
-	mpExperimentStatus->showMessage(msg);
+	if (mMeasurementName.isEmpty())
+		mpExperimentStatus->showMessage(msg);
+	else
+	{
+		QString txt = mMeasurementName;
+		txt += "  =>>  " + msg;
+		mpExperimentStatus->showMessage(txt);
+	}
+}
+
+void cSpidercamView::experimentNameUpdating(QString name)
+{
+	mMeasurementName = name;
 }

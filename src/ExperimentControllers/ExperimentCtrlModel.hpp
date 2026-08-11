@@ -73,6 +73,8 @@ signals:
     void warningMessage(QString title, QString msg) const;
     void errorMessage(QString title, QString msg) const;
 
+    void measurementName(QString name) const;
+
 public:
     virtual void update() = 0;
 
@@ -80,4 +82,5 @@ protected:
     cExperimentControlModel(QObject* parent = nullptr);
 
     void emitStatusMessage(const QString& msg) override;
+    void emitMeasurementName(const QString& name) override;
 };

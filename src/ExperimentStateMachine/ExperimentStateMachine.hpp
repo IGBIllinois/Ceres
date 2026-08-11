@@ -124,6 +124,7 @@ protected:
     void recordingStateChanged(bool recording);
 
     virtual void emitStatusMessage(const QString& msg) = 0;
+    virtual void emitMeasurementName(const QString& name) = 0;
 
 private:
     void addVariables(const nlohmann::json& variables);

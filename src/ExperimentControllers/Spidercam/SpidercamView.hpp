@@ -39,6 +39,7 @@ protected:
     void refresh() override;
     void experimentStateChanging(experiment::eState state) override;
     void experimentStatusUpdating(QString msg) override;
+    void experimentNameUpdating(QString name) override;
 
 private:
     double mMinX_mm = 0;
@@ -61,6 +62,8 @@ private:
     QLineEdit* mpZ_m = nullptr;
 
     QLineEdit* mpSpeed_mps = nullptr;
+
+    QString mMeasurementName;
 
     QStatusBar* mpExperimentStatus = nullptr;
 };

@@ -481,6 +481,8 @@ void cExperimentStateMachine::startExperiment()
     msg += QString::fromStdString(mExperimentName);
     emitStatusMessage(msg);
 
+    emitMeasurementName(QString::fromStdString(mExperimentName));
+
     // Everything is setup so it is ok to update the state maching.
     // We need to be careful as updating the state machine is in 
     // another thread!

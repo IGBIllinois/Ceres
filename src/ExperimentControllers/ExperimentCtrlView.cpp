@@ -13,3 +13,7 @@ void cExperimentControlView::experimentStatusUpdating(QString msg)
 {
 	emit statusMessage(msg);
 }
+
+void cExperimentControlView::experimentNameUpdating(QString name)
+{
+}
