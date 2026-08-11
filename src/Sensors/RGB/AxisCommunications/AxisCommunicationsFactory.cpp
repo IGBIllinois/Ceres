@@ -7,8 +7,8 @@
 #include "AxisCommunicationsView_F44.hpp"
 #include "AxisCommunicationsStatusView.hpp"
 #include "AxisCommunicationsController.hpp"
-#include "AxisCommunicationsPropertyPage.hpp"
 #include "AxisCommunicationsPropertyPage_Remote.hpp"
+#include "AxisCommunicationsPropertyPage_Local.hpp"
 
 #include <QWidget>
 #include <QString>
@@ -73,7 +73,10 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
 
     QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
 
-    return sSensorWidgets(pModel, dockWidget);
+
+    auto pPage = new cAxisCommunicationsPropertyPage_Local(pModel);
+
+    return sSensorWidgets(pModel, dockWidget, pPage);
 }
 
 sSensorWidgets axis_communications::create_sensor(const nlohmann::json& sensorInfo,

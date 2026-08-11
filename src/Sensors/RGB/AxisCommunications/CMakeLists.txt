@@ -27,6 +27,8 @@ set(AXIS_COMM_SOURCE_FILES
 	AxisPropertiesNetDecoder.cpp
 	AxisPropertiesNetEncoder.hpp
 	AxisPropertiesNetEncoder.cpp
+	AxisCommunicationsPropertyPage_Local.hpp
+	AxisCommunicationsPropertyPage_Local.cpp
 	AxisCommunicationsPropertyPage_Remote.hpp
 	AxisCommunicationsPropertyPage_Remote.cpp
 	AxisCommunicationsPropertyPage.hpp
