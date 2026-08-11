@@ -66,6 +66,54 @@ void cRgbImageWidget::paintEvent(QPaintEvent* event)
 
         painter.drawLine(0, h2, mWindowWidth, h2);
         painter.drawLine(w2, 0, w2, mWindowHeight);
+
+        int w_1 = static_cast<int>(mWindowWidth * 0.1);
+        int h_1 = static_cast<int>(mWindowHeight * 0.1);
+
+        int w_9 = static_cast<int>(mWindowWidth * 0.9);
+        int h_9 = static_cast<int>(mWindowHeight * 0.9);
+
+        painter.drawLine(w_1, h_1, w_1 + 50, h_1);
+        painter.drawLine(w_1, h_1, w_1, h_1 + 50);
+
+        painter.drawLine(w_9 - 50, h_1, w_9, h_1);
+        painter.drawLine(w_9, h_1, w_9, h_1 + 50);
+
+        painter.drawLine(w_1, h_9, w_1 + 50, h_9);
+        painter.drawLine(w_1, h_9 - 50, w_1, h_9);
+
+        painter.drawLine(w_9 - 50, h_9, w_9, h_9);
+        painter.drawLine(w_9, h_9 - 50, w_9, h_9);
+
+        painter.drawLine(w_1, h2 - 25, w_1, h2 + 25);
+        painter.drawLine(w_9, h2 - 25, w_9, h2 + 25);
+
+        painter.drawLine(w2 - 25, h_1, w2 + 25, h_1);
+        painter.drawLine(w2 - 25, h_9, w2 + 25, h_9);
+
+        int w_3 = static_cast<int>(mWindowWidth * 0.3);
+        int h_3 = static_cast<int>(mWindowHeight * 0.3);
+
+        int w_7 = static_cast<int>(mWindowWidth * 0.7);
+        int h_7 = static_cast<int>(mWindowHeight * 0.7);
+
+        painter.drawLine(w_3, h_3, w_3 + 50, h_3);
+        painter.drawLine(w_3, h_3, w_3, h_3 + 50);
+
+        painter.drawLine(w_7 - 50, h_3, w_7, h_3);
+        painter.drawLine(w_7, h_3, w_7, h_3 + 50);
+
+        painter.drawLine(w_3, h_7, w_3 + 50, h_7);
+        painter.drawLine(w_3, h_7 - 50, w_3, h_7);
+
+        painter.drawLine(w_7 - 50, h_7, w_7, h_7);
+        painter.drawLine(w_7, h_7 - 50, w_7, h_7);
+
+        painter.drawLine(w_3, h2 - 25, w_3, h2 + 25);
+        painter.drawLine(w_7, h2 - 25, w_7, h2 + 25);
+
+        painter.drawLine(w2 - 25, h_3, w2 + 25, h_3);
+        painter.drawLine(w2 - 25, h_7, w2 + 25, h_7);
     }
 }
 
