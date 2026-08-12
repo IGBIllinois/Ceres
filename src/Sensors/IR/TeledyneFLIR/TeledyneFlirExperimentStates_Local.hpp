@@ -32,6 +32,10 @@ protected:
 };
 
 
+/*******************************************************************/
+/**    Teledyne FLIR Experiment States to Configure Camera        **/
+/*******************************************************************/
+
 class cTeledyneFlirCamera_Configure_Local : public cTeledyneFlirCameraExperimentState_Local
 {
 	Q_OBJECT
@@ -73,6 +77,10 @@ private:
 	bool mWaitingForInterval = false;
 };
 
+
+/*******************************************************************/
+/**       Teledyne FLIR Experiment States to Take Photo           **/
+/*******************************************************************/
 
 class cTeledyneFlirCamera_TakePhoto_Local : public cTeledyneFlirCameraExperimentState_Local
 {

@@ -78,7 +78,18 @@ void cTeledyneFlirPropertyPage_Local::createWidgets()
 
 void cTeledyneFlirPropertyPage_Local::doLayout()
 {
-	setTitle(QString::fromStdString(mpModel->name()));
+	QString title = QString::fromStdString(mpModel->name());
+
+	auto instance = mpModel->instance();
+
+	if (!instance.empty())
+	{
+		title += ":";
+		title += QString::fromStdString(instance);
+	}
+
+	setTitle(title);
+
 	cTeledyneFlirPropertyPage::doLayout();
 }
 

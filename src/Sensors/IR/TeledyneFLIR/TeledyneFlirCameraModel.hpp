@@ -75,11 +75,12 @@ public:
 
 signals:
     void onNewImage(const QImage& image);
-    void photoTaken();
     void modeChanged(int mode);
     void lapseIntervalChanged(int interval_ms);
     void frameRateChanged(double rate_fps);
     void imageSizeChanged(int width, int height);
+
+    void photoTaken();
 
 public slots:
     void requestMode(int mode);
