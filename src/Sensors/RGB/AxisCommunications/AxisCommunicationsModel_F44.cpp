@@ -71,6 +71,8 @@ void cAxisCommunicationsModel_F44::updateViews()
 
     auto s = getActiveImageSize();
     emit imageSizeChanged(s.width, s.height);
+
+    cAxisCommunicationsModel::updateViews();
 }
 
 bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
@@ -376,6 +378,17 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
     }
 
     emit frameRateChanged(fps);
+}
+
+bool cAxisCommunicationsModel_F44::updateLapseInterval(uint32_t interval_ms)
+{
+    return true;
+}
+
+bool cAxisCommunicationsModel_F44::updateFrameRate(double frame_rate_fps)
+{
+    setActiveFramesRate_fps(static_cast<int>(frame_rate_fps));
+    return true;
 }
 
 void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)

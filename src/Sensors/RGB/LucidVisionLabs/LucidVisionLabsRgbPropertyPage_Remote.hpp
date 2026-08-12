@@ -19,6 +19,9 @@ public:
     ~cLucidVisionLabsRgbPropertyPage_Remote() = default;
 
 public:
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
+
+public:
     void onCameraId(uint8_t id) override;
     void onImageSize(uint16_t width, uint16_t height) override;
     void onFrameRate(uint8_t fps) override;

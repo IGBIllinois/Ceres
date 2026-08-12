@@ -24,13 +24,27 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
             {
             case eQUERY_STATE:
                 return onQueryState();
+            case eQUERY_MODE:
+                return onQueryMode();
             case eQUERY_ACTIVE_CAMERA_ID:
                 return onQueryCameraId();
             case eQUERY_IMAGE_SIZE:
                 return onQueryImageSize();
             case eQUERY_FRAME_RATE:
                 return onQueryFrameRate();
+            case eQUERY_LAPSE_INTERVAL:
+                return onQueryLapseInterval();
             }
+        }
+        break;
+    }
+    case ePacketType::CAMERA_MODE:
+    {
+        axis_CameraModeMessage_1 packet;
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto mode = to_camera_mode_t(packet);
+            setMode(mode);
         }
         break;
     }
@@ -64,9 +78,41 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         }
         break;
     }
+    case ePacketType::LAPSE_INTERVAL_MS:
+    {
+        axis_LapseIntervalMessage_1 packet;
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto interval_ms = to_lapse_interval_t(packet);
+            setLapseInterval_ms(interval_ms);
+        }
+        break;
+    }
     case ePacketType::GRAB_IMAGE:
         onGrabImage();
         break;
+    case ePacketType::TAKE_PHOTO:
+    {
+        if (hdr.revision == 1)
+        {
+            axis_TakePhoto_1 packet;
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                auto update_view = to_take_photo_t(packet);
+                onTakePhoto(update_view);
+            }
+        }
+        else if (hdr.revision == 2)
+        {
+            axis_TakePhoto_2 packet;
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                auto result = to_take_photo_t(packet);
+                onTakePhoto(result.update_view, result.auto_save);
+            }
+        }
+        break;
+    }
     }
 }
 

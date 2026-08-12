@@ -92,6 +92,9 @@ protected:
     void setFrameRate_Hz(double frame_rate_hz) override {};
     void setLapseInterval_ms(uint32_t interval_ms)  override {};
 
+    bool updateLapseInterval(uint32_t interval_ms) override;
+    bool updateFrameRate(double frame_rate_fps) override;
+
 private:
     QByteArray mImageData;
     QBuffer mImageBuffer;

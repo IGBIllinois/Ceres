@@ -20,6 +20,9 @@ public:
     cLucidVisionLabsRgbPropertyPage_Local(cLucidVisionLabsRgbModel* pModel, QWidget* parent = nullptr);
     ~cLucidVisionLabsRgbPropertyPage_Local() = default;
 
+public:
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
+
 signals:
     void requestPhoto(bool update_view);
 

@@ -32,6 +32,10 @@ protected:
 };
 
 
+/***********************************************************************/
+/**    Lucid Vision Labs Experiment States to Configure Camera        **/
+/***********************************************************************/
+
 class cLucidVisionLabsRgbCamera_Configure_Local : public cLucidVisionLabsRgbCameraExperimentState_Local
 {
 	Q_OBJECT
@@ -73,6 +77,10 @@ private:
 	bool mWaitingForInterval = false;
 };
 
+
+/***********************************************************************/
+/**       Lucid Vision Labs Experiment States to Take Photo           **/
+/***********************************************************************/
 
 class cLucidVisionLabsRgbCamera_TakePhoto_Local : public cLucidVisionLabsRgbCameraExperimentState_Local
 {

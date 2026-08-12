@@ -24,6 +24,11 @@ cLucidVisionLabsRgbPropertyPage_Remote::cLucidVisionLabsRgbPropertyPage_Remote(Q
 		cLucidRgbPropertiesNetEncoder(255)
 {}
 
+cExperimentState* cLucidVisionLabsRgbPropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
+{
+	return nullptr;
+}
+
 void cLucidVisionLabsRgbPropertyPage_Remote::createWidgets()
 {
 	cLucidVisionLabsRgbPropertyPage::createWidgets();

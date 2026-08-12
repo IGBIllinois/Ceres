@@ -43,6 +43,11 @@ void cLucidVisionLabsRgbPropertyPage_Local::doLayout()
 	cLucidVisionLabsRgbPropertyPage::doLayout();
 }
 
+cExperimentState* cLucidVisionLabsRgbPropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
+{
+	return nullptr;
+}
+
 void cLucidVisionLabsRgbPropertyPage_Local::onGrabImagePressed()
 {
 	mpGrabImage->setEnabled(false);

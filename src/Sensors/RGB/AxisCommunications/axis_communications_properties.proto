@@ -8,7 +8,7 @@ syntax = "proto3";
 
 
 /******************************************************************************
- * Property Page <-> Sensor Controller
+ * Enums used in various messages
  *****************************************************************************/
 
 enum axis_eQuery 
@@ -18,7 +18,22 @@ enum axis_eQuery
   eQUERY_ACTIVE_CAMERA_ID = 2;
   eQUERY_IMAGE_SIZE = 3;
   eQUERY_FRAME_RATE = 4;
+  eQUERY_MODE = 5;
+  eQUERY_LAPSE_INTERVAL = 6;
 }
+
+ enum axis_eReply
+{
+    eReply_GOOD = 0;
+    eReply_FAILED = 1;
+    eReply_ABORTED = 2;
+    eReply_PENDING = 3;
+}
+
+
+/******************************************************************************
+ * Property Page <-> Sensor Controller
+ *****************************************************************************/
 
 message axis_QueryMessage_1 
 {
@@ -28,6 +43,11 @@ message axis_QueryMessage_1
 message axis_ActiveCameraIdMessage_1
 {
     uint32 camera_id = 1;
+}
+
+message axis_CameraModeMessage_1
+{
+    uint32 mode = 1;
 }
 
 message axis_ImageSizeMessage_1 
@@ -40,6 +60,31 @@ message axis_FrameRateMessage_1
 {
 	uint32 frames_per_second = 1;
 }
+
+message axis_LapseIntervalMessage_1 
+{
+	uint32 lapse_interval_ms = 1;
+}
+
+
+/******************************************************************************
+ * Property Page -> Sensor Controller
+ *****************************************************************************/
+
+message axis_TakePhoto_1 
+{
+	bool update_view = 1;
+}
+
+message axis_TakePhoto_2 
+{
+	bool update_view = 1;
+	bool auto_save   = 2;
+}
+
+/******************************************************************************
+ * Sensor Controller -> Property Page
+ *****************************************************************************/
 
 message axis_StateMessage_1 
 {
@@ -59,5 +104,25 @@ message axis_StateMessage_2
     uint32 frames_per_second = 5;
 	uint32 min_camera_id = 6;
 	uint32 max_camera_id = 7;
+}
+
+message axis_StateMessage_3
+{
+	bool   valid = 1;
+	uint32 active_camera_id = 2;
+	uint32 width = 3;
+	uint32 height = 4;
+    uint32 frames_per_second = 5;
+	uint32 min_camera_id = 6;
+	uint32 max_camera_id = 7;
+	uint32 mode = 8;
+    uint32 lapse_interval_ms = 9;
+    optional double min_frames_per_second = 10;
+    optional double max_frames_per_second = 11;
+}
+
+message axis_Reply_1 
+{
+	axis_eReply reply = 1;
 }
 

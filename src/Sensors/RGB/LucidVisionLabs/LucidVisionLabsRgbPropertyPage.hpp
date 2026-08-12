@@ -35,9 +35,6 @@ public:
     
     void doLayout() override;
 
-public:
-    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
-
 protected slots:
     void modeTextChanged(const QString& text);
     virtual void exposureTimeSelectorChanged(const QString&) = 0;

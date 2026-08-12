@@ -47,6 +47,65 @@ uint16_t cAxisCommunicationsModel::data_class_id() const
     return mSerializer.classID();
 }
 
+void cAxisCommunicationsModel::updateViews()
+{
+    emit modeChanged(static_cast<int>(mMode));
+    emit lapseIntervalChanged(mLapseInterval_ms);
+}
+
+void cAxisCommunicationsModel::setMode(eMode mode)
+{
+    bool changing = mode != mMode;
+
+    mMode = mode;
+
+    if (changing)
+        emit modeChanged(static_cast<int>(mMode));
+}
+
+void cAxisCommunicationsModel::setFrameRate_Hz(double frame_rate_hz)
+{
+    if (mMinFrameRate_fps.has_value())
+    {
+        if (frame_rate_hz < mMinFrameRate_fps.value())
+            frame_rate_hz = mMinFrameRate_fps.value();
+    }
+    else if (frame_rate_hz < 0)
+        frame_rate_hz = 0;
+
+    if (mMaxFrameRate_fps.has_value())
+    {
+        if (frame_rate_hz > mMaxFrameRate_fps.value())
+            frame_rate_hz = mMaxFrameRate_fps.value();
+    }
+
+    bool changing = frame_rate_hz != mFrameRate_fps;
+
+    if (updateFrameRate(frame_rate_hz))
+    {
+        mFrameRate_fps = frame_rate_hz;
+
+        if (changing)
+            emit frameRateChanged(mFrameRate_fps);
+    }
+}
+
+void cAxisCommunicationsModel::setLapseInterval_ms(uint32_t interval_ms)
+{
+    if (interval_ms < 100)
+        interval_ms = 100;
+
+    bool changing = interval_ms != mLapseInterval_ms;
+
+    if (updateLapseInterval(interval_ms))
+    {
+        mLapseInterval_ms = interval_ms;
+
+        if (changing)
+            emit lapseIntervalChanged(mLapseInterval_ms);
+    }
+}
+
 bool cAxisCommunicationsModel::autoEmitImages() const { return mAutoEmitImages; }
 void cAxisCommunicationsModel::autoEmitImages(bool auto_emit_images) { mAutoEmitImages = auto_emit_images; }
 
@@ -107,18 +166,6 @@ bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
     if (!querySupportedResolutions()) return false;
     if (!querySupportedImageFormats()) return false;
 
-/*
-	try
-	{
-		nlohmann::json jsonDoc = nlohmann::json::parse(replyText.toStdString());
-	}
-	catch (const std::exception& e)
-	{
-		emit errorMessage("Axis Communication Error", e.what());
-
-		return false;
-	}
-*/
     mConnected = true;
 
     return cRgbCameraModel::configure(jsonCfg);
@@ -142,15 +189,37 @@ void cAxisCommunicationsModel::stopCommunications()
     delete mpHttpManager; mpHttpManager = nullptr;
 }
 
-void cAxisCommunicationsModel::onDefaultDataPathChange(QString path)
+void cAxisCommunicationsModel::requestMode(int mode)
+{
+    if ((mode >= eMode::SINGLE) && (mode <= eMode::CONTINUOUS))
+        setMode(static_cast<eMode>(mode));
+}
+
+void cAxisCommunicationsModel::requestImageSize(int width, int height)
 {
 
 }
+
+void cAxisCommunicationsModel::requestFrameRate_Hz(double frame_rate_hz)
+{
+    setFrameRate_Hz(frame_rate_hz);
+}
+
+void cAxisCommunicationsModel::requestLapseInterval_ms(uint32_t interval_ms)
+{
+    setLapseInterval_ms(interval_ms);
+}
+
+void cAxisCommunicationsModel::onDefaultDataPathChange(QString path)
+{}
 
 void cAxisCommunicationsModel::requestImage()
 {
     emit onNewImage(mCurrentImage);
 }
+
+void cAxisCommunicationsModel::requestImages(bool update_view)
+{}
 
 void cAxisCommunicationsModel::requestSaveImage()
 {
@@ -160,6 +229,28 @@ void cAxisCommunicationsModel::requestSaveImage()
     QImageWriter writer(fileName);
     writer.setFormat("JPEG");
     writer.write(mCurrentImage);
+}
+
+void cAxisCommunicationsModel::takePhoto(bool update_view)
+{
+    if (mMode == eMode::SINGLE)
+    {
+        mPhotoRequested = true;
+        mImageRequested = update_view;
+        mAutoEmitImages = false;
+        mSavePhoto = false;
+    }
+}
+
+void cAxisCommunicationsModel::takePhoto(bool update_view, bool auto_save)
+{
+    if (mMode == eMode::SINGLE)
+    {
+        mPhotoRequested = true;
+        mImageRequested = update_view;
+        mAutoEmitImages = false;
+        mSavePhoto = auto_save;
+    }
 }
 
 

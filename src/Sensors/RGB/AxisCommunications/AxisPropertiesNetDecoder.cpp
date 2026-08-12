@@ -14,6 +14,16 @@ void cAxisPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
     {
         break;
     }
+    case ePacketType::CAMERA_MODE:
+    {
+        axis_CameraModeMessage_1 packet;
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto id = to_camera_mode_t(packet);
+            onMode(id);
+        }
+        break;
+    }
     case ePacketType::ACTIVE_CAMERA_ID:
     {
         axis_ActiveCameraIdMessage_1 packet;
@@ -44,6 +54,16 @@ void cAxisPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         }
         break;
     }
+    case ePacketType::LAPSE_INTERVAL_MS:
+    {
+        axis_LapseIntervalMessage_1 packet;
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto interval_ms = to_lapse_interval_t(packet);
+            onLapseInterval(interval_ms);
+        }
+        break;
+    }
     case ePacketType::CURRENT_STATE:
     {
         switch (hdr.revision)
@@ -68,8 +88,29 @@ void cAxisPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
             }
             break;
         }
+        case 3:
+        {
+            axis_StateMessage_3 packet;
+            if (packet.ParseFromArray(buffer.data(), hdr.length))
+            {
+                auto state = to_current_state_t(packet);
+                onCurrentState(state.valid, state.mode, state.active_camera_id, state.width, state.height, 
+                    state.frames_per_second, state.lapse_interval_ms, state.min_camera_id, state.max_camera_id, state.min_frames_per_second, state.max_frames_per_second);
+            }
+            break;
+        }
         }
 
+        break;
+    }
+    case ePacketType::TAKE_PHOTO_REPLY:
+    {
+        axis_Reply_1 packet;
+        if (packet.ParseFromArray(buffer.data(), hdr.length))
+        {
+            auto reply = to_reply_t(packet);
+            onTakePhotoReply(reply != eReply::GOOD);
+        }
         break;
     }
     }

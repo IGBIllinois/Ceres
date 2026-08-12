@@ -23,6 +23,23 @@ void cAxisControllerNetEncoder::sendCurrentState(bool valid, uint8_t active_came
     sendData();
 }
 
+void cAxisControllerNetEncoder::sendCurrentState(bool valid, uint8_t mode, uint8_t active_camera_id,
+    uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
+    uint8_t min_camera_id, uint8_t max_camera_id,
+    std::optional<double> min_fps, std::optional<double> max_fps)
+{
+    encode_current_state(valid, mode, active_camera_id, width, height, fps, interval_ms, 
+        min_camera_id, max_camera_id, min_fps, max_fps, mBuffer);
+
+    sendData();
+}
+
+void cAxisControllerNetEncoder::sendCameraMode(uint8_t mode)
+{
+    encode_camera_mode(mode, mBuffer);
+    sendData();
+}
+
 void cAxisControllerNetEncoder::sendActiveCameraId(uint8_t camera_id)
 {
     encode_active_camera_id(camera_id, mBuffer);
@@ -41,12 +58,14 @@ void cAxisControllerNetEncoder::sendFrameRate(uint8_t fps)
     sendData();
 }
 
-/*
-void cOusterControllerNetEncoder::sendCurrentState(bool valid,
-    ouster::eLIDAR_MODE mode, double min_deg, double max_deg)
+void cAxisControllerNetEncoder::sendLapseInterval_ms(uint32_t interval_ms)
 {
-    std::string lidar_mode(to_string(mode));
-    encode_current_state(valid, lidar_mode, min_deg, max_deg, mBuffer);
+    encode_lapse_interval(interval_ms, mBuffer);
     sendData();
 }
-*/
+
+void cAxisControllerNetEncoder::sendTakePhotoReply()
+{
+    encode_take_photo_reply(eReply::GOOD, mBuffer);
+    sendData();
+}

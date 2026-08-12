@@ -218,11 +218,6 @@ void cLucidVisionLabsRgbPropertyPage::enableControls(bool enable)
     mpGrabImage->setEnabled(enable);
 }
 
-cExperimentState* cLucidVisionLabsRgbPropertyPage::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
-{
-	return nullptr;
-}
-
 void cLucidVisionLabsRgbPropertyPage::modeTextChanged(const QString& text)
 {
     if (text == "Photo")

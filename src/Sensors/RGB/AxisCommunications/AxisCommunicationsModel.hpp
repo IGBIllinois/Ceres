@@ -47,12 +47,28 @@ public:
      */
     uint16_t data_class_id() const override;
 
+    /*
+     * Update views by emitting all state signals
+     */
+    void updateViews() override;
+
+
     bool isConnected() const { return mConnected; }
+
+    /*
+     * General accessors and control of basic camera functions
+     */
+
+    void setMode(eMode mode) override;
+
+    // Set the frame rate when the mode is set to continuous
+    void setFrameRate_Hz(double frame_rate_hz) override;
+
+    // Get/Set the lapse interval (the time between images) when the mode is set to time-lapse
+    void setLapseInterval_ms(uint32_t interval_ms)  override;
 
     bool autoEmitImages() const;
     void autoEmitImages(bool auto_emit_images);
-
-    const QImage& getCurrentImage() const;
 
     QUrl url() const { return mUrl; }
 
@@ -60,10 +76,15 @@ public:
     const std::vector<rgb::sImageSize_t>& getImageSizes() const;
     const std::vector<rgb::eIMAGE_FORMAT>& getImageFormats() const;
 
-
     virtual int getActiveCameraID() const;
+
     virtual int getActiveFramesRate_fps() const;
+
     virtual rgb::sImageSize_t getActiveImageSize() const;
+    uint16_t activeImageWidth() const;
+    uint16_t activeImageHeight() const;
+
+    const QImage& getCurrentImage() const;
 
 
     bool configure(const nlohmann::json& jsonCfg) override;
@@ -83,14 +104,27 @@ signals:
 
 signals:
     void onNewImage(const QImage& image);
+    void modeChanged(int mode);
     void cameraIdChanged(int id);
     void frameRateChanged(int rate_fps);
     void imageSizeChanged(int width, int height);
+    void lapseIntervalChanged(int interval_ms);
+
+    void photoTaken();
 
 public slots:
+    void requestMode(int mode);
+    void requestImageSize(int width, int height);
+    void requestFrameRate_Hz(double frame_rate_hz);
+    void requestLapseInterval_ms(uint32_t interval_ms);
     void requestImage();
+    void requestImages(bool update_view);
     void requestSaveImage();
     void onDefaultDataPathChange(QString path);
+
+    void takePhoto(bool update_view = false);
+    void takePhoto(bool update_view, bool auto_save);
+
 
 protected slots:
     void requestReceived(QNetworkReply* pReply);
@@ -98,6 +132,9 @@ protected slots:
 protected:
     cAxisCommunicationsModel(const std::string& name, QObject* parent = nullptr);
     virtual ~cAxisCommunicationsModel();
+
+    virtual bool updateLapseInterval(uint32_t interval_ms) = 0;
+    virtual bool updateFrameRate(double frame_rate_fps) = 0;
 
     bool queryVapixSupport();
     bool querySupportedResolutions();
@@ -121,7 +158,12 @@ protected:
     std::vector<rgb::sImageSize_t>  mSupportedImageSizes;
     std::vector<rgb::eIMAGE_FORMAT> mSupportedImageFormats;
 
+    bool mPhotoRequested = false;
+    bool mSavePhoto = false;
+
+    bool mImageRequested = false;
     bool mAutoEmitImages = true;
+
     QImage mCurrentImage;
 
     cBitmapBuffer    mBitmapBuffer;

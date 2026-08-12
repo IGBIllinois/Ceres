@@ -38,9 +38,13 @@ public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 protected slots:
-    virtual void requestImage();
+    void modeTextChanged(const QString& text);
+    virtual void onGrabImagePressed() = 0;
 
 protected:
+    QLabel* mpModeLabel = nullptr;
+    QComboBox* mpMode = nullptr;
+
     QLabel* mpCameraIdLabel = nullptr;
     QLineEdit* mpCameraId = nullptr;
 
@@ -50,9 +54,18 @@ protected:
     QLabel* mpFrameRateLabel = nullptr;
     QLineEdit* mpFrameRate_fps = nullptr;
 
+    QLabel* mpLapseIntervalLabel = nullptr;
+    QLineEdit* mpLapseInterval_s = nullptr;
+
+    int mDefaultMode = -1;
+
     int mDefaultCameraId = -1;
-    QString mDefaultImageSize;
+
     int  mDefaultFrameRate_fps = -1;
+    int  mDefaultLapseInterval_ms = -1;
+
+    int mDefaultImageWidth = -1;
+    int mDefaultImageHeight = -1;
 
     QPushButton* mpGrabImage = nullptr;
 };

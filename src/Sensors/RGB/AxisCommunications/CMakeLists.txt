@@ -45,6 +45,15 @@ set(AXIS_COMM_SOURCE_FILES
     AxisCommunicationsController.cpp
 
 #
+# Axis Communications Experiment State Files
+#
+    AxisCommunicationsExperimentStates_Local.hpp
+	AxisCommunicationsExperimentStates_Local.cpp
+	AxisCommunicationsExperimentStates_Remote.hpp
+	AxisCommunicationsExperimentStates_Remote.cpp
+
+
+#
 # Axis Communications Video Cameras
 #
 	AxisCommunicationsView_F44.hpp

@@ -76,17 +76,42 @@ public:
     const std::string& instance() const override;
     bool has_instance() const override;
 
+signals:
+    void requestMode(int mode);
+    void requestCameraID(int id);
+    void requestImageSize(uint16_t width, uint16_t height);
+    void requestFrameRate_Hz(int frame_rate_hz);
+    void requestLapseInterval_ms(uint32_t interval_ms);
+    void requestImage();
+    void requestImages(bool update_view);
+    void requestPhoto(bool update_view);
+    void requestPhoto(bool update_view, bool auto_save);
+
+public slots:
+    void photoTaken();
+    void modeChanged(int mode);
+    void cameraIdChanged(int id);
+    void lapseIntervalChanged(int interval_ms);
+    void frameRateChanged(int rate_fps);
+    void imageSizeChanged(int width, int height);
+
 protected:
+    void onQueryMode() override;
     void onQueryState() override;
     void onQueryCameraId() override;
     void onQueryImageSize() override;
     void onQueryFrameRate() override;
-    void onGrabImage() override;
+    void onQueryLapseInterval() override;
 
+    void onGrabImage() override;
+    void onTakePhoto(bool updateView) override;
+    void onTakePhoto(bool updateView, bool autoSave) override;
+
+    void setMode(uint8_t mode) override;
     void setCameraId(uint8_t id) override;
     void setImageSize(uint16_t width, uint16_t height) override;
     void setFrameRate(uint8_t fps) override;
-
+    void setLapseInterval_ms(uint32_t interval_ms) override;
 
 protected:
     /**

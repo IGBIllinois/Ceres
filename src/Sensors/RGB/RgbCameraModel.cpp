@@ -18,6 +18,16 @@ double cRgbCameraModel::frameRate_Hz() const
 	return mFrameRate_fps;
 }
 
+std::optional<double> cRgbCameraModel::minFrameRate_fps() const
+{
+	return mMinFrameRate_fps;
+}
+
+std::optional<double> cRgbCameraModel::maxFrameRate_fps() const
+{
+	return mMaxFrameRate_fps;
+}
+
 uint32_t cRgbCameraModel::lapseInterval_ms() const
 {
 	return mLapseInterval_ms;

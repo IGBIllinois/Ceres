@@ -64,6 +64,10 @@ protected:
 	uint16_t   mPort = 0;
 };
 
+/***************************************************************************/
+/**    Lucid Vision Labs RGB Experiment States to Configure Camera        **/
+/***************************************************************************/
+
 class cLucidVisionLabsRgbCamera_Configure_Remote : public cLucidVisionLabsRgbCameraExperimentState_Remote
 {
 	Q_OBJECT
@@ -103,6 +107,10 @@ private:
 	bool mWaitingForInterval = false;
 };
 
+
+/****************************************************************************/
+/**        Lucid Vision Labs RGB Experiment States to Take Photo           **/
+/****************************************************************************/
 
 class cLucidVisionLabsRgbCamera_TakePhoto_Remote : public cLucidVisionLabsRgbCameraExperimentState_Remote
 {
