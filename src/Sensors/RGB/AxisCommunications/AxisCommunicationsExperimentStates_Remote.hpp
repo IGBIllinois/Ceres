@@ -66,6 +66,69 @@ protected:
 	uint16_t   mPort = 0;
 };
 
+
+/***********************************************************************/
+/** Axis Communications Experiment State to Save Current Camera State **/
+/***********************************************************************/
+
+class cAxisCommunications_SaveState_Remote : public cAxisCommunicationsExperimentState_Remote
+{
+	Q_OBJECT
+
+public:
+	cAxisCommunications_SaveState_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
+
+	QString getStatusStr() override;
+
+	bool configure(const nlohmann::json& stateDoc) override { return true; };
+	bool recording() override { return false; };
+
+	void run() override;
+	void pause() override;
+	void stop() override;
+
+	eRESULT finished() override;
+
+private:
+	void onConnect() override;
+
+private:
+	eRESULT mResult = cExperimentState::eRESULT::WAITING;
+};
+
+
+/***********************************************************************/
+/**   Axis Communications Experiment State to Restore Camera State    **/
+/***********************************************************************/
+
+class cAxisCommunications_RestoreState_Remote : public cAxisCommunicationsExperimentState_Remote
+{
+	Q_OBJECT
+
+public:
+	cAxisCommunications_RestoreState_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
+
+	QString getStatusStr() override;
+
+	bool configure(const nlohmann::json& stateDoc) override { return true; };
+	bool recording() override { return false; };
+
+	void run() override;
+	void pause() override;
+	void stop() override;
+
+	eRESULT finished() override;
+
+private:
+	void onConnect() override;
+
+private:
+	eRESULT mResult = cExperimentState::eRESULT::WAITING;
+};
+
+
 /***************************************************************************/
 /**     Axis Communications Experiment States to Configure Camera         **/
 /***************************************************************************/

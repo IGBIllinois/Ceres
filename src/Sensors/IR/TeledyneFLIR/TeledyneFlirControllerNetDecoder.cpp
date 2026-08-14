@@ -114,6 +114,12 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         }
         break;
     }
+    case ePacketType::SAVE_STATE:
+        onSaveState();
+        break;
+    case ePacketType::RESTORE_STATE:
+        onRestoreState();
+        break;
     }
 }
 

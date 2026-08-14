@@ -36,6 +36,9 @@ signals:
     void requestPhoto(bool update_view);
     void requestPhoto(bool update_view, bool auto_save);
 
+    void requestSaveState();
+    void requestRestoreState();
+
 public slots:
     void photoTaken();
     void modeChanged(int mode);
@@ -53,6 +56,9 @@ protected:
     void setImageSize(uint16_t width, uint16_t height) override;
     void setFrameRate_Hz(double fps) override;
     void setLapseInterval_ms(uint32_t interval_ms) override;
+
+    void onSaveState() override;
+    void onRestoreState() override;
 
 protected:
     /**

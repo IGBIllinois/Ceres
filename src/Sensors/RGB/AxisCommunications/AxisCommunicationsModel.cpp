@@ -2,6 +2,8 @@
 #include "AxisCommunicationsModel.hpp"
 #include "AxisCommunicationsIDs.hpp"
 
+#include "StringUtils.hpp"
+
 #include <QNetworkAccessManager>
 #include <QMessageBox>
 #include <QEventLoop>
@@ -55,12 +57,9 @@ void cAxisCommunicationsModel::updateViews()
 
 void cAxisCommunicationsModel::setMode(eMode mode)
 {
-    bool changing = mode != mMode;
-
     mMode = mode;
 
-    if (changing)
-        emit modeChanged(static_cast<int>(mMode));
+    emit modeChanged(static_cast<int>(mMode));
 }
 
 void cAxisCommunicationsModel::setFrameRate_Hz(double frame_rate_hz)
@@ -84,10 +83,9 @@ void cAxisCommunicationsModel::setFrameRate_Hz(double frame_rate_hz)
     if (updateFrameRate(frame_rate_hz))
     {
         mFrameRate_fps = frame_rate_hz;
-
-        if (changing)
-            emit frameRateChanged(mFrameRate_fps);
     }
+
+    emit frameRateChanged(mFrameRate_fps);
 }
 
 void cAxisCommunicationsModel::setLapseInterval_ms(uint32_t interval_ms)
@@ -100,10 +98,9 @@ void cAxisCommunicationsModel::setLapseInterval_ms(uint32_t interval_ms)
     if (updateLapseInterval(interval_ms))
     {
         mLapseInterval_ms = interval_ms;
-
-        if (changing)
-            emit lapseIntervalChanged(mLapseInterval_ms);
     }
+
+    emit lapseIntervalChanged(mLapseInterval_ms);
 }
 
 bool cAxisCommunicationsModel::autoEmitImages() const { return mAutoEmitImages; }
@@ -129,27 +126,55 @@ const std::vector<rgb::eIMAGE_FORMAT>& cAxisCommunicationsModel::getImageFormats
     return mSupportedImageFormats;
 }
 
-int cAxisCommunicationsModel::getActiveCameraID() const
-{
-    return -1;
-}
-
-int cAxisCommunicationsModel::getActiveFramesRate_fps() const
-{
-    return -1;
-}
-
-rgb::sImageSize_t cAxisCommunicationsModel::getActiveImageSize() const
-{
-    return rgb::sImageSize_t{0,0};
-}
-
 bool cAxisCommunicationsModel::configure(const nlohmann::json& jsonCfg)
 {
     try
     {
         std::string url = jsonCfg["url"];
         mUrl = QUrl(QString(url.c_str()));
+
+        std::string mode = "video";
+
+        if (jsonCfg.contains("mode"))
+            mode = jsonCfg["mode"];
+
+        int32_t lapse_interval_ms = -1;
+
+        if (jsonCfg.contains("time-lapse interval (s)"))
+            lapse_interval_ms = static_cast<int32_t>(jsonCfg["time-lapse interval (s)"].get<float>() * 1000.0);
+        else if (jsonCfg.contains("time-lapse interval (ms)"))
+            lapse_interval_ms = jsonCfg["time-lapse interval (ms)"].get<int32_t>();
+        else if (jsonCfg.contains("lapse interval (s)"))
+            lapse_interval_ms = static_cast<int32_t>(jsonCfg["lapse interval (s)"].get<float>() * 1000.0);
+        else if (jsonCfg.contains("lapse interval (ms)"))
+            lapse_interval_ms = jsonCfg["lapse interval (ms)"].get<int32_t>();
+        else if (jsonCfg.contains("interval (s)"))
+            lapse_interval_ms = static_cast<int32_t>(jsonCfg["interval (s)"].get<float>() * 1000.0);
+        else if (jsonCfg.contains("interval (ms)"))
+            lapse_interval_ms = jsonCfg["interval (ms)"].get<int32_t>();
+
+        if (nStringUtils::iequal(mode, "photo"))
+        {
+            setMode(eMode::SINGLE);
+        }
+        else if (nStringUtils::iequal(mode, "time lapse") || nStringUtils::iequal(mode, "time-lapse"))
+        {
+            setMode(eMode::TIME_LAPSE);
+
+            if (lapse_interval_ms < 0)
+            {
+                throw std::logic_error("Missing \"time-lapse interval (ms)\" entry!");
+            }
+        }
+        else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))
+        {
+            setMode(eMode::CONTINUOUS);
+        }
+        else
+            throw std::logic_error("Unknown \"mode\" entry!  Values can be \"photo\", \"time lapse\", or \"video\".");
+
+        if (lapse_interval_ms > 0)
+            setLapseInterval_ms(lapse_interval_ms);
     }
     catch (const std::exception& e)
     {
@@ -197,7 +222,7 @@ void cAxisCommunicationsModel::requestMode(int mode)
 
 void cAxisCommunicationsModel::requestImageSize(int width, int height)
 {
-
+    updateImageSize(width, height);
 }
 
 void cAxisCommunicationsModel::requestFrameRate_Hz(double frame_rate_hz)
@@ -215,11 +240,15 @@ void cAxisCommunicationsModel::onDefaultDataPathChange(QString path)
 
 void cAxisCommunicationsModel::requestImage()
 {
-    emit onNewImage(mCurrentImage);
+    mImageRequested = true;
+
+//    emit onNewImage(mCurrentImage);
 }
 
-void cAxisCommunicationsModel::requestImages(bool update_view)
-{}
+void cAxisCommunicationsModel::requestImages(bool auto_emit)
+{
+    mAutoEmitImages = auto_emit;
+}
 
 void cAxisCommunicationsModel::requestSaveImage()
 {

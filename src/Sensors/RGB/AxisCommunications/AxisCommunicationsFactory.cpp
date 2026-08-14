@@ -44,11 +44,13 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
 
             pModel->autoEmitImages(false);
 
-            QObject::connect(pModel, &cSensorModel::sensorStatusChanging,         pView, &cSensorStatusView::onSensorStatusChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::cameraIdChanged,  pView, &cAxisCommunicationsStatusView::onCameraIdChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged, pView, &cAxisCommunicationsStatusView::onFrameRateChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged, pView, &cAxisCommunicationsStatusView::onImageSizeChange);
-            QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage,       pView, &cAxisCommunicationsStatusView::imageUpdated);
+            QObject::connect(pModel, &cSensorModel::sensorStatusChanging,               pView, &cSensorStatusView::onSensorStatusChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::cameraIdChanged,        pView, &cAxisCommunicationsStatusView::onCameraIdChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged,       pView, &cAxisCommunicationsStatusView::onImageSizeChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::modeChanged,            pView, &cAxisCommunicationsStatusView::onModeChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged,       pView, &cAxisCommunicationsStatusView::onFrameRateChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::lapseIntervalChanged,   pView, &cAxisCommunicationsStatusView::onLapseIntervalChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage,             pView, &cAxisCommunicationsStatusView::imageUpdated);
 
             QObject::connect(pView, &cAxisCommunicationsStatusView::requestImage, pModel, &cAxisCommunicationsModel::requestImage);
 
@@ -65,6 +67,9 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
             QObject::connect(pController, &cAxisCommunicationsController_F44::requestLapseInterval_ms,  pModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
             QObject::connect(pController, &cAxisCommunicationsController_F44::requestImage,             pModel, &cAxisCommunicationsModel::requestImage);
             QObject::connect(pController, &cAxisCommunicationsController_F44::requestImages,            pModel, &cAxisCommunicationsModel::requestImages);
+
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestSaveState,    pModel, &cAxisCommunicationsModel_F44::onSaveState);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestRestoreState, pModel, &cAxisCommunicationsModel_F44::onRestoreState);
 
             QObject::connect(pController, qOverload<bool>(&cAxisCommunicationsController_F44::requestPhoto), pModel, qOverload<bool>(&cAxisCommunicationsModel::takePhoto));
             QObject::connect(pController, qOverload<bool, bool>(&cAxisCommunicationsController_F44::requestPhoto), pModel, qOverload<bool, bool>(&cAxisCommunicationsModel::takePhoto));
@@ -87,6 +92,12 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
     QObject::connect(pModel, &cAxisCommunicationsModel_F44::enableCamera, pView, &cAxisCommunicationsView_F44::enableCamera);
     QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage, pView, &cAxisCommunicationsView::imageUpdated);
 
+    QObject::connect(pModel, &cAxisCommunicationsModel::modeChanged,          pView, &cAxisCommunicationsView::onModeChange);
+    QObject::connect(pModel, &cAxisCommunicationsModel::lapseIntervalChanged, pView, &cAxisCommunicationsView::onLapseIntervalChange);
+    QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged,     pView, &cAxisCommunicationsView::onFrameRateChange);
+    QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged,     pView, &cAxisCommunicationsView::onImageSizeChange);
+    QObject::connect(pModel, &cAxisCommunicationsModel::cameraIdChanged,      pView, &cAxisCommunicationsView_F44::onCameraIdChange);
+
     QObject::connect(pView, &cAxisCommunicationsView_F44::activateCamera, pModel, &cAxisCommunicationsModel_F44::setActiveCamera);
 
 
@@ -101,6 +112,7 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
     QObject::connect(pPage, &cAxisCommunicationsPropertyPage_Local_F44::requestMode,             pModel, &cAxisCommunicationsModel::requestMode);
     QObject::connect(pPage, &cAxisCommunicationsPropertyPage_Local_F44::requestFrameRate_Hz,     pModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
     QObject::connect(pPage, &cAxisCommunicationsPropertyPage_Local_F44::requestLapseInterval_ms, pModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
+    QObject::connect(pPage, &cAxisCommunicationsPropertyPage_Local_F44::requestImageSize,        pModel, &cAxisCommunicationsModel::requestImageSize);
     QObject::connect(pPage, &cAxisCommunicationsPropertyPage_Local_F44::requestImage,            pModel, &cAxisCommunicationsModel::requestImage);
     QObject::connect(pPage, &cAxisCommunicationsPropertyPage_Local_F44::requestImages,           pModel, &cAxisCommunicationsModel::requestImages);
 
@@ -166,7 +178,7 @@ cSensorPropertyPage* axis_communications::create_sensor_property_page(
     const std::string& model, uint32_t version,
     const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
-    cAxisCommunicationsPropertyPage_Remote* page = new cAxisCommunicationsPropertyPage_Remote();
+    cAxisCommunicationsPropertyPage_Remote* page = new cAxisCommunicationsPropertyPage_Remote_F44();
     page->initialize(remote_ip_address, port, false, local_ip_address);
 
     return page;

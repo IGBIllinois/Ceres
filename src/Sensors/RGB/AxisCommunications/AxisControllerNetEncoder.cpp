@@ -3,6 +3,7 @@
 #include "AxisControllerNetEncoder.hpp"
 #include "axis_communications_packet_utils.hpp"
 
+using namespace axis;
 
 cAxisControllerNetEncoder::cAxisControllerNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)

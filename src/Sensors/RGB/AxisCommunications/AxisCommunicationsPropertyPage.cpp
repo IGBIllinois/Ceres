@@ -23,9 +23,6 @@ void cAxisCommunicationsPropertyPage::createWidgets()
 	mpMode->addItem("Video");
 	connect(mpMode, &QComboBox::currentTextChanged, this, &cAxisCommunicationsPropertyPage::modeTextChanged);
 
-	mpCameraIdLabel = new QLabel("Camera ID:", this);
-	mpCameraId = new QLineEdit(this);
-
 	mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
 	mpImageSizes = new QComboBox(this);
 	mpImageSizes->addItem("1920x1080");
@@ -48,7 +45,6 @@ void cAxisCommunicationsPropertyPage::createWidgets()
 void cAxisCommunicationsPropertyPage::enableControls(bool enable)
 {
 	mpMode->setEnabled(enable);
-	mpCameraId->setEnabled(enable);
 	mpImageSizes->setEnabled(enable);
 	mpFrameRate_fps->setEnabled(enable);
 	mpLapseInterval_s->setEnabled(enable);
@@ -59,10 +55,14 @@ void cAxisCommunicationsPropertyPage::doLayout()
 {
 	QVBoxLayout* pMainLayout = new QVBoxLayout();
 
-	auto* idLayout = new QHBoxLayout();
-	idLayout->addWidget(mpCameraIdLabel);
-	idLayout->addWidget(mpCameraId);
-	pMainLayout->addLayout(idLayout);
+	doLayout(pMainLayout);
+
+	setLayout(pMainLayout);
+}
+
+void cAxisCommunicationsPropertyPage::doLayout(QVBoxLayout* pMainLayout)
+{
+	assert(pMainLayout);
 
 	auto* sizeLayout = new QHBoxLayout();
 	sizeLayout->addWidget(mpImageSizeLabel);
@@ -82,9 +82,8 @@ void cAxisCommunicationsPropertyPage::doLayout()
 	pMainLayout->addSpacing(10);
 
 	pMainLayout->addWidget(mpButtons);
-
-	setLayout(pMainLayout);
 }
+
 
 cExperimentState* cAxisCommunicationsPropertyPage::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {

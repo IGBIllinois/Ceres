@@ -276,4 +276,14 @@ void cAxisCommunicationsController_F44::setLapseInterval_ms(uint32_t interval_ms
     emit requestLapseInterval_ms(interval_ms);
 }
 
+void cAxisCommunicationsController_F44::onSaveState()
+{
+    emit requestSaveState();
+}
+
+void cAxisCommunicationsController_F44::onRestoreState()
+{
+    emit requestRestoreState();
+}
+
 

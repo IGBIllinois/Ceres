@@ -92,6 +92,9 @@ public slots:
     void takePhoto(bool update_view = false);
     void takePhoto(bool update_view, bool auto_save);
 
+    virtual void onSaveState();
+    virtual void onRestoreState();
+
 protected:
     cTeledyneFlirCameraModel(const std::string& name, QObject* parent = nullptr);
 

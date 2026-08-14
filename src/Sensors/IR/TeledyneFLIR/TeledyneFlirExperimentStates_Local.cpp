@@ -29,6 +29,61 @@ bool cTeledyneFlirCameraExperimentState_Local::initialize()
 void cTeledyneFlirCameraExperimentState_Local::cleanup()
 {}
 
+
+/**************************************************************************/
+/**    Teledyne FLIR Experiment State to Save the State of the Camera    **/
+/**************************************************************************/
+
+cTeledyneFlirCamera_SaveState_Local::cTeledyneFlirCamera_SaveState_Local(QObject* parent)
+	: cTeledyneFlirCameraExperimentState_Local(nullptr, parent)
+{}
+
+QString cTeledyneFlirCamera_SaveState_Local::getStatusStr()
+{
+	return "Saving current camera state...";
+}
+
+void cTeledyneFlirCamera_SaveState_Local::run()
+{
+	if (mResult == cExperimentState::eRESULT::WAITING)
+		emit requestSaveState();
+
+	mResult = cExperimentState::eRESULT::DONE;
+}
+
+void cTeledyneFlirCamera_SaveState_Local::pause() {}
+void cTeledyneFlirCamera_SaveState_Local::stop() {}
+
+cExperimentState::eRESULT cTeledyneFlirCamera_SaveState_Local::finished() { return mResult; }
+
+
+/*****************************************************************************/
+/**    Teledyne FLIR Experiment State to Restore the State of the Camera    **/
+/*****************************************************************************/
+
+cTeledyneFlirCamera_RestoreState_Local::cTeledyneFlirCamera_RestoreState_Local(QObject* parent)
+	: cTeledyneFlirCameraExperimentState_Local(nullptr, parent)
+{}
+
+QString cTeledyneFlirCamera_RestoreState_Local::getStatusStr()
+{
+	return "Restoring camera state...";
+}
+
+void cTeledyneFlirCamera_RestoreState_Local::run()
+{
+	if (mResult == cExperimentState::eRESULT::WAITING)
+		emit requestRestoreState();
+
+	mResult = cExperimentState::eRESULT::DONE;
+}
+
+void cTeledyneFlirCamera_RestoreState_Local::pause() {}
+void cTeledyneFlirCamera_RestoreState_Local::stop() {}
+
+cExperimentState::eRESULT cTeledyneFlirCamera_RestoreState_Local::finished() { return mResult; }
+
+
 /*******************************************************************/
 /**    Teledyne FLIR Experiment States to Configure Camera        **/
 /*******************************************************************/

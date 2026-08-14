@@ -3,6 +3,13 @@
 #include "Constants.hpp"
 #include "AxisCommunicationsModel_F44.hpp"
 
+#include <QLabel>
+#include <QLineEdit>
+#include <QGroupBox>
+#include <QGridLayout>
+#include <QFormLayout>
+#include <QResizeEvent>
+#include <QComboBox>
 #include <QToolBar>
 #include <QToolButton>
 #include <QPushButton>
@@ -28,6 +35,74 @@ cAxisCommunicationsView_F44::~cAxisCommunicationsView_F44()
 
 void cAxisCommunicationsView_F44::initialize()
 {
+    mpCameraIdLabel = new QLabel("Camera ID:", this);
+    mpCameraId = new QLineEdit(this);
+    mpCameraId->setReadOnly(true);
+
+    mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
+    mpImageSize = new QLineEdit(this);
+    mpImageSize->setReadOnly(true);
+
+    mpModeLabel = new QLabel("Mode:", this);
+    mpMode = new QComboBox(this);
+    mpMode->addItem("Photo");
+    mpMode->addItem("Time Lapse");
+    mpMode->addItem("Continuous");
+    mpMode->setCurrentIndex(2);
+    mpMode->setEnabled(false);
+
+    mpFrameRateLabel = new QLabel("Frames per Second:", this);
+    mpFrameRate_fps = new QLineEdit(this);
+    mpFrameRate_fps->setReadOnly(true);
+
+    mpLapseIntervalLabel = new QLabel("Lapse time (sec):", this);
+    mpLapseInterval_s = new QLineEdit(this);
+    mpLapseInterval_s->setReadOnly(true);
+
+    mpShowCrossHairs = new QPushButton("Show Crosshairs", this);
+    mpShowCrossHairs->setCheckable(true);
+    mpShowCrossHairs->setHidden(true);
+    QObject::connect(mpShowCrossHairs, &QPushButton::clicked, this, &cAxisCommunicationsView_F44::enableCrosshairs);
+
+    auto* viewport = new QWidget(this);
+
+    auto* statusLayout = new QHBoxLayout();
+
+    statusLayout->addWidget(mpCameraIdLabel);
+    statusLayout->addWidget(mpCameraId);
+    statusLayout->addSpacing(10);
+
+    statusLayout->addWidget(mpModeLabel);
+    statusLayout->addWidget(mpMode);
+    statusLayout->addSpacing(10);
+
+    statusLayout->addWidget(mpImageSizeLabel);
+    statusLayout->addWidget(mpImageSize);
+    statusLayout->addSpacing(10);
+
+    statusLayout->addWidget(mpFrameRateLabel);
+    statusLayout->addWidget(mpFrameRate_fps);
+    statusLayout->addSpacing(10);
+
+    statusLayout->addWidget(mpLapseIntervalLabel);
+    statusLayout->addWidget(mpLapseInterval_s);
+
+    statusLayout->addStretch(1);
+
+    statusLayout->addWidget(mpShowCrossHairs);
+
+    auto* mainLayout = new QVBoxLayout();
+
+    mainLayout->addLayout(statusLayout);
+
+    mainLayout->addWidget(mpImage, 1);
+
+    viewport->setLayout(mainLayout);
+
+    setViewport(viewport);
+
+
+/*
     auto* toolbar = new QToolBar(this);
     toolbar->setFloatable(false);
     toolbar->setMovable(false);
@@ -83,10 +158,26 @@ void cAxisCommunicationsView_F44::initialize()
     mainLayout->addWidget(mpImage);
 
     setLayout(mainLayout);
+*/
+}
+
+void cAxisCommunicationsView_F44::showCrossHairButton(bool show)
+{
+    mpShowCrossHairs->setHidden(!show);
+}
+
+void cAxisCommunicationsView_F44::onCameraIdChange(int id)
+{
+    if (mpCameraId)
+        mpCameraId->setText(QString::number(id));
 }
 
 void cAxisCommunicationsView_F44::enableCamera(int id)
 {
+    if (mpCameraId)
+        mpCameraId->setText(QString::number(id));
+
+/*
     switch (id)
     {
     case 1:
@@ -105,6 +196,7 @@ void cAxisCommunicationsView_F44::enableCamera(int id)
         mpCamera4->setEnabled(true);
         break;
     }
+*/
 }
 
 void cAxisCommunicationsView_F44::cameraSelected_1()

@@ -38,6 +38,10 @@ namespace flir
 		// Controller -> Property Page
 		CURRENT_STATE = 2000,
 		TAKE_PHOTO_REPLY,
+
+		// Experiment State -> Controller
+		SAVE_STATE = 3000,
+		RESTORE_STATE,
 	};
 
 
@@ -121,4 +125,11 @@ namespace flir
 //	int encode_frame_interval_reply(eReply reply, net_buffer& buffer);
 //	int encode_thermal_range_reply(eReply reply, net_buffer& buffer);
 	int encode_take_photo_reply(eReply reply, net_buffer& buffer);
+
+
+	/**********************************************************
+	 * Experiment State -> Controller packets utilities
+	 **********************************************************/
+	int encode_save_state(net_buffer& buffer);
+	int encode_restore_state(net_buffer& buffer);
 }

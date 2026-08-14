@@ -87,3 +87,15 @@ void cTeledyneFlirPropertiesNetEncoder::sendTakePhoto(bool update_view, bool aut
     sendData();
 }
 
+void cTeledyneFlirPropertiesNetEncoder::sendSaveState()
+{
+    encode_save_state(mBuffer);
+    sendData();
+}
+
+void cTeledyneFlirPropertiesNetEncoder::sendRestoreState()
+{
+    encode_restore_state(mBuffer);
+    sendData();
+}
+

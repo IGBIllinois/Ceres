@@ -8,6 +8,7 @@
 
 #include <QString>
 #include <QLineEdit>
+#include <QLabel>
 #include <QComboBox>
 #include <QTimer>
 #include <QTime>
@@ -15,6 +16,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QDialogButtonBox>
+#include <QHBoxLayout>
 
 namespace
 {
@@ -37,6 +39,26 @@ cExperimentState* cAxisCommunicationsPropertyPage_Remote::createState(const std:
 		auto use_IpV6 = usingIpV6();
 
 		std::string cmd = entry["command"];
+
+		if ((cmd == "save_state") || (cmd == "save state"))
+		{
+			auto* pState = new cAxisCommunications_SaveState_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if ((cmd == "restore_state") || (cmd == "restore state"))
+		{
+			auto* pState = new cAxisCommunications_RestoreState_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
 
 		if (cmd == "configure")
 		{
@@ -151,15 +173,6 @@ void cAxisCommunicationsPropertyPage_Remote::onMode(uint8_t mode)
 	mpMode->setCurrentIndex(mode);
 }
 
-void cAxisCommunicationsPropertyPage_Remote::onCameraId(uint8_t id)
-{
-	if ((id == 0) || (id > 4))
-		return;
-
-	mpCameraId->setText(QString::number(id));
-	mDefaultCameraId = id;
-}
-
 void cAxisCommunicationsPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
 {
 	mDefaultImageWidth = width;
@@ -194,46 +207,6 @@ void cAxisCommunicationsPropertyPage_Remote::onLapseInterval(uint32_t interval_m
 {
 	mDefaultLapseInterval_ms = interval_ms;
 	mpLapseInterval_s->setText(QString::number(interval_ms * 0.001f));
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t id,
-	uint16_t width, uint16_t height, uint8_t fps)
-{
-	if (!valid) return;
-
-	onCameraId(id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t active_id,
-	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
-{
-	if (!valid) return;
-
-	onCameraId(active_id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-
-	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode, uint8_t active_id,
-	uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms, uint8_t min_id, uint8_t max_id, 
-	std::optional<double> min_fps, std::optional<double> max_fps)
-{
-	if (!valid) return;
-
-	onMode(mode);
-	onCameraId(active_id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-	onLapseInterval(interval_ms);
-
-	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
-
-	if (min_fps.has_value() && max_fps.has_value())
-		mpFrameRate_fps->setValidator(new QDoubleValidator(min_fps.value(), max_fps.value(), 2));
 }
 
 void cAxisCommunicationsPropertyPage_Remote::onTakePhotoReply(bool error)
@@ -271,11 +244,13 @@ void cAxisCommunicationsPropertyPage_Remote::doApply()
 	if (!mConnected)
 		return;
 
+/*
 	uint8_t id = mpCameraId->text().toInt();
 	if (mDefaultCameraId != id)
 	{
 		sendSetCameraId(id);
 	}
+*/
 
 	auto image_size = mpImageSizes->currentText();
 	auto is = axis::to_image_size(image_size.toStdString());
@@ -306,3 +281,100 @@ int cAxisCommunicationsPropertyPage_Remote::sendOutgoingData(const char* data, s
 	return cSensorPropertyPageRemoteInterface::sendOutgoingData(data, len);
 }
 
+
+
+cAxisCommunicationsPropertyPage_Remote_F44::cAxisCommunicationsPropertyPage_Remote_F44(QWidget* parent)
+{}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::createWidgets()
+{
+	cAxisCommunicationsPropertyPage_Remote::createWidgets();
+
+	mpCameraIdLabel = new QLabel("Camera ID:", this);
+	mpCameraId = new QComboBox(this);
+
+//	mMinCameraId = mpModel->getMinCameraID();
+//	mMaxCameraId = mpModel->getMaxCameraID();
+
+//	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
+//	{
+//		mpCameraId->addItem(QString::number(i));
+//	}
+
+//	mpCameraId->setCurrentIndex(mpModel->getActiveCameraID() - mMinCameraId);
+
+//	connect(mpCameraId, &QComboBox::currentTextChanged, this, &cAxisCommunicationsPropertyPage_Remote_F44::cameraIdTextChanged);
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::doLayout(QVBoxLayout* pMainLayout)
+{
+	assert(pMainLayout);
+
+	auto* idLayout = new QHBoxLayout();
+	idLayout->addWidget(mpCameraIdLabel);
+	idLayout->addWidget(mpCameraId);
+	pMainLayout->addLayout(idLayout);
+
+	cAxisCommunicationsPropertyPage_Remote::doLayout(pMainLayout);
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCameraId(uint8_t id)
+{
+	if ((id < mMinCameraId) || (id > mMaxCameraId))
+		return;
+
+	mpCameraId->setCurrentIndex(id - mMinCameraId);
+	mDefaultCameraId = id;
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentState(bool valid, uint8_t id,
+	uint16_t width, uint16_t height, uint8_t fps)
+{
+	if (!valid) return;
+
+	onCameraId(id);
+	onImageSize(width, height);
+	onFrameRate(fps);
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentState(bool valid, uint8_t active_id,
+	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
+{
+	if (!valid) return;
+
+	onCameraId(active_id);
+	onImageSize(width, height);
+	onFrameRate(fps);
+
+	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentState(bool valid, uint8_t mode, uint8_t active_id,
+	uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms, uint8_t min_id, uint8_t max_id,
+	std::optional<double> min_fps, std::optional<double> max_fps)
+{
+	if (!valid) return;
+
+	onMode(mode);
+	onCameraId(active_id);
+	onImageSize(width, height);
+	onFrameRate(fps);
+	onLapseInterval(interval_ms);
+
+	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
+
+	if (min_fps.has_value() && max_fps.has_value())
+		mpFrameRate_fps->setValidator(new QDoubleValidator(min_fps.value(), max_fps.value(), 2));
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::cameraIdTextChanged(const QString& text)
+{
+	auto id = text.toInt();
+
+	if ((id < mMinCameraId) || (id > mMaxCameraId)) return;
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::doApply()
+{
+	cAxisCommunicationsPropertyPage_Remote::doApply();
+}

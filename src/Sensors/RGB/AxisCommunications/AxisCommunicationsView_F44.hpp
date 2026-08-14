@@ -7,6 +7,8 @@
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QCamera;
+class QLabel;
+class QLineEdit;
 class QToolButton;
 class QPushButton;
 QT_END_NAMESPACE
@@ -21,13 +23,16 @@ public:
 	cAxisCommunicationsView_F44(cAxisCommunicationsModel_F44* pModel, QWidget* parent = nullptr);
 	virtual ~cAxisCommunicationsView_F44();
 
-	void initialize();
+	void initialize() override;
+
+	void showCrossHairButton(bool show);
 
 signals:
 	void activateCamera(int id);
 	void saveImage();
 
 public slots:
+	void onCameraIdChange(int id);
 	void enableCamera(int id);
 	void cameraSelected_1();
 	void cameraSelected_2();
@@ -38,10 +43,13 @@ protected:
 	void imageUpdated(const QImage& image) override;
 
 private:
-	QToolButton* mpCamera1;
-	QToolButton* mpCamera2;
-	QToolButton* mpCamera3;
-	QToolButton* mpCamera4;
+	QToolButton* mpCamera1 = nullptr;
+	QToolButton* mpCamera2 = nullptr;
+	QToolButton* mpCamera3 = nullptr;
+	QToolButton* mpCamera4 = nullptr;
+
+	QLabel* mpCameraIdLabel = nullptr;
+	QLineEdit* mpCameraId = nullptr;
 
 	QPushButton* mpShowCrossHairs = nullptr;
 

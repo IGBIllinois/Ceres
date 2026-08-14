@@ -425,3 +425,34 @@ int flir::encode_take_photo_reply(eReply reply, net_buffer& buffer)
     return encode_reply(reply, flir::ePacketType::TAKE_PHOTO_REPLY, buffer);
 }
 
+
+/**********************************************************
+ * Experiment State -> Controller packets utilities
+ **********************************************************/
+
+int flir::encode_save_state(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::SAVE_STATE);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+int flir::encode_restore_state(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(flir::ePacketType::RESTORE_STATE);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+

@@ -39,6 +39,9 @@ protected:
     virtual void setFrameRate(uint8_t fps) = 0;
     virtual void setLapseInterval_ms(uint32_t interval_ms) = 0;
 
+    virtual void onSaveState() = 0;
+    virtual void onRestoreState() = 0;
+
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;
 };

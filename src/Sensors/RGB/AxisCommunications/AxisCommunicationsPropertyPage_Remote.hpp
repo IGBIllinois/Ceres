@@ -16,7 +16,6 @@ class cAxisCommunicationsPropertyPage_Remote : public cAxisCommunicationsPropert
     public cSensorPropertyPageRemoteInterface, 
     private cAxisPropertiesNetDecoder, private cAxisPropertiesNetEncoder
 {
-
 public:
     cAxisCommunicationsPropertyPage_Remote(QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Remote() = default;
@@ -26,17 +25,9 @@ public:
 
 public:
     void onMode(uint8_t mode) override;
-    void onCameraId(uint8_t id) override;
     void onImageSize(uint16_t width, uint16_t height) override;
     void onFrameRate(uint8_t fps) override;
     void onLapseInterval(uint32_t interval_ms) override;
-    void onCurrentState(bool valid, uint8_t id,
-        uint16_t width, uint16_t height, uint8_t fps) override;
-    void onCurrentState(bool valid, uint8_t active_id,
-        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
-    void onCurrentState(bool valid, uint8_t mode, uint8_t active_id,
-        uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
-        uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps) override;
 
     void onTakePhotoReply(bool error)  override;
 
@@ -70,3 +61,38 @@ private:
 };
 
 
+class cAxisCommunicationsPropertyPage_Remote_F44 : public cAxisCommunicationsPropertyPage_Remote
+{
+public:
+    cAxisCommunicationsPropertyPage_Remote_F44(QWidget* parent = nullptr);
+    ~cAxisCommunicationsPropertyPage_Remote_F44() = default;
+
+public:
+    void onCameraId(uint8_t id) override;
+    void onCurrentState(bool valid, uint8_t id,
+        uint16_t width, uint16_t height, uint8_t fps) override;
+    void onCurrentState(bool valid, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
+    void onCurrentState(bool valid, uint8_t mode, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
+        uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps) override;
+
+protected slots:
+    void cameraIdTextChanged(const QString& text);
+
+protected:
+    void createWidgets() override;
+    void doLayout(QVBoxLayout* pMainLayout) override;
+
+    void doApply() override;
+
+private:
+    QLabel* mpCameraIdLabel = nullptr;
+    QComboBox* mpCameraId = nullptr;
+
+    int mDefaultCameraId = -1;
+
+    int mMinCameraId = 0;
+    int mMaxCameraId = 0;
+
+};

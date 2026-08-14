@@ -17,6 +17,7 @@ class QLineEdit;
 class QComboBox;
 class QGroupBox;
 class QPushButton;
+class QVBoxLayout;
 QT_END_NAMESPACE
 
 
@@ -42,11 +43,11 @@ protected slots:
     virtual void onGrabImagePressed() = 0;
 
 protected:
+    virtual void doLayout(QVBoxLayout* pMainLayout);
+
+protected:
     QLabel* mpModeLabel = nullptr;
     QComboBox* mpMode = nullptr;
-
-    QLabel* mpCameraIdLabel = nullptr;
-    QLineEdit* mpCameraId = nullptr;
 
     QLabel* mpImageSizeLabel = nullptr;
     QComboBox* mpImageSizes = nullptr;
@@ -58,8 +59,6 @@ protected:
     QLineEdit* mpLapseInterval_s = nullptr;
 
     int mDefaultMode = -1;
-
-    int mDefaultCameraId = -1;
 
     int  mDefaultFrameRate_fps = -1;
     int  mDefaultLapseInterval_ms = -1;

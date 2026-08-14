@@ -3,6 +3,7 @@
 #include "AxisPropertiesNetEncoder.hpp"
 #include "axis_communications_packet_utils.hpp"
 
+using namespace axis;
 
 cAxisPropertiesNetEncoder::cAxisPropertiesNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
@@ -84,6 +85,18 @@ void cAxisPropertiesNetEncoder::sendTakePhoto(bool update_view)
 void cAxisPropertiesNetEncoder::sendTakePhoto(bool update_view, bool auto_save)
 {
     encode_take_photo(update_view, auto_save, mBuffer);
+    sendData();
+}
+
+void cAxisPropertiesNetEncoder::sendSaveState()
+{
+    encode_save_state(mBuffer);
+    sendData();
+}
+
+void cAxisPropertiesNetEncoder::sendRestoreState()
+{
+    encode_restore_state(mBuffer);
     sendData();
 }
 

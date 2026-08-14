@@ -20,9 +20,6 @@ public:
     cAxisCommunicationsPropertyPage_Local(cAxisCommunicationsModel* pModel, QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Local() = default;
 
-public:
-    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
-
 signals:
     void requestMode(int mode);
     void requestImageSize(int width, int height);
@@ -43,6 +40,7 @@ public slots:
 protected:
     void createWidgets() override;
     void doLayout() override;
+    void doLayout(QVBoxLayout* pMainLayout) override;
 
     void enableControls(bool enable) override;
 
@@ -69,16 +67,29 @@ public:
     cAxisCommunicationsPropertyPage_Local_F44(cAxisCommunicationsModel_F44* pModel, QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Local_F44() = default;
 
+public:
+    cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
+
 signals:
     void requestCameraID(int id);
 
 public slots:
     void onCameraIdChange(int id);
 
+protected slots:
+    void cameraIdTextChanged(const QString& text);
+
 protected:
-    void doApply() override;
+    void createWidgets() override;
+    void doLayout(QVBoxLayout* pMainLayout) override;
 
 private:
+    QLabel* mpCameraIdLabel = nullptr;
+    QComboBox* mpCameraId = nullptr;
+
+    int mMinCameraId = 0;
+    int mMaxCameraId = 0;
+
     cAxisCommunicationsModel_F44* mpModel;
 };
 

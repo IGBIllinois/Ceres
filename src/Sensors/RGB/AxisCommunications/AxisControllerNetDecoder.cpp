@@ -8,6 +8,8 @@
 
 void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
+    using namespace axis;
+
     switch (static_cast<ePacketType>(hdr.id))
     {
     case ePacketType::UNKNOWN:
@@ -113,6 +115,12 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         }
         break;
     }
+    case ePacketType::SAVE_STATE:
+        onSaveState();
+        break;
+    case ePacketType::RESTORE_STATE:
+        onRestoreState();
+        break;
     }
 }
 

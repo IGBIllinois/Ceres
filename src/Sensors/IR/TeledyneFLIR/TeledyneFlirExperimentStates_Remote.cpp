@@ -59,6 +59,70 @@ int cTeledyneFlirCameraExperimentState_Remote::sendOutgoingData(const char* data
 }
 
 
+/***********************************************************************/
+/**    Teledyne FLIR Experiment State to Save Current Camera State    **/
+/***********************************************************************/
+
+cTeledyneFlirCamera_SaveState_Remote::cTeledyneFlirCamera_SaveState_Remote(const std::string& hostname, uint16_t port,
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
+	:
+	cTeledyneFlirCameraExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent)
+{}
+
+QString cTeledyneFlirCamera_SaveState_Remote::getStatusStr()
+{
+	return "Saving current camera state...";
+}
+
+void cTeledyneFlirCamera_SaveState_Remote::run() {}
+void cTeledyneFlirCamera_SaveState_Remote::pause() {}
+void cTeledyneFlirCamera_SaveState_Remote::stop() {}
+
+cExperimentState::eRESULT cTeledyneFlirCamera_SaveState_Remote::finished() { return mResult; }
+
+void cTeledyneFlirCamera_SaveState_Remote::onConnect()
+{
+	sendSaveState();
+
+	// Sleep for 250 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
+	eRESULT mResult = cExperimentState::eRESULT::DONE;
+};
+
+
+/***********************************************************************/
+/**      Teledyne FLIR Experiment State to Restore Camera State       **/
+/***********************************************************************/
+
+cTeledyneFlirCamera_RestoreState_Remote::cTeledyneFlirCamera_RestoreState_Remote(const std::string& hostname, uint16_t port,
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
+	:
+	cTeledyneFlirCameraExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent)
+{}
+
+QString cTeledyneFlirCamera_RestoreState_Remote::getStatusStr()
+{
+	return "Restoring camera state...";
+}
+
+void cTeledyneFlirCamera_RestoreState_Remote::run() {}
+void cTeledyneFlirCamera_RestoreState_Remote::pause() {}
+void cTeledyneFlirCamera_RestoreState_Remote::stop() {}
+
+cExperimentState::eRESULT cTeledyneFlirCamera_RestoreState_Remote::finished() { return mResult; }
+
+void cTeledyneFlirCamera_RestoreState_Remote::onConnect()
+{
+	sendRestoreState();
+
+	// Sleep for 250 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
+	eRESULT mResult = cExperimentState::eRESULT::DONE;
+};
+
+
 /*******************************************************************/
 /**    Teledyne FLIR Experiment States to Configure Camera        **/
 /*******************************************************************/

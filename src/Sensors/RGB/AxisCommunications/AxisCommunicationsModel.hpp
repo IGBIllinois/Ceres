@@ -76,16 +76,16 @@ public:
     const std::vector<rgb::sImageSize_t>& getImageSizes() const;
     const std::vector<rgb::eIMAGE_FORMAT>& getImageFormats() const;
 
-    virtual int getActiveCameraID() const;
+    virtual int getActiveCameraID() const = 0;
 
-    virtual int getActiveFramesRate_fps() const;
+    virtual int getActiveFramesRate_fps() const = 0;
 
-    virtual rgb::sImageSize_t getActiveImageSize() const;
+    virtual rgb::sImageSize_t getActiveImageSize() const = 0;
+
     uint16_t activeImageWidth() const;
     uint16_t activeImageHeight() const;
 
     const QImage& getCurrentImage() const;
-
 
     bool configure(const nlohmann::json& jsonCfg) override;
 
@@ -122,9 +122,8 @@ public slots:
     void requestSaveImage();
     void onDefaultDataPathChange(QString path);
 
-    void takePhoto(bool update_view = false);
-    void takePhoto(bool update_view, bool auto_save);
-
+    virtual void takePhoto(bool update_view = false);
+    virtual void takePhoto(bool update_view, bool auto_save);
 
 protected slots:
     void requestReceived(QNetworkReply* pReply);
@@ -135,6 +134,7 @@ protected:
 
     virtual bool updateLapseInterval(uint32_t interval_ms) = 0;
     virtual bool updateFrameRate(double frame_rate_fps) = 0;
+    virtual bool updateImageSize(int width, int height) = 0;
 
     bool queryVapixSupport();
     bool querySupportedResolutions();

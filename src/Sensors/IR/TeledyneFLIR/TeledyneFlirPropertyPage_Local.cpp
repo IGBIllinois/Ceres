@@ -32,6 +32,30 @@ cExperimentState* cTeledyneFlirPropertyPage_Local::createState(const std::string
 	{
 		std::string cmd = entry["command"];
 
+		if ((cmd == "save_state") || (cmd == "save state"))
+		{
+			auto* pState = new cTeledyneFlirCamera_SaveState_Local(parent);
+
+			QObject::connect(pState, &cTeledyneFlirCamera_SaveState_Local::requestSaveState, mpModel, &cTeledyneFlirCameraModel::onSaveState);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if ((cmd == "restore_state") || (cmd == "restore state"))
+		{
+			auto* pState = new cTeledyneFlirCamera_RestoreState_Local(parent);
+
+			QObject::connect(pState, &cTeledyneFlirCamera_RestoreState_Local::requestRestoreState, mpModel, &cTeledyneFlirCameraModel::onRestoreState);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
 		if (cmd == "configure")
 		{
 			auto* pState = new cTeledyneFlirCamera_Configure_Local(mpModel, parent);

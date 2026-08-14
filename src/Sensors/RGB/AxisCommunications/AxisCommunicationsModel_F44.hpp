@@ -75,6 +75,9 @@ public slots:
     void setActiveImageSize(rgb::sImageSize_t image_size);
     void setActiveFramesRate_fps(int fps);
 
+    void onSaveState();
+    void onRestoreState();
+
 protected slots:
     void frameGrabbed(int id, QImage* img);
     void imageGrabbed(int id, QImage* img);
@@ -86,14 +89,9 @@ protected slots:
     virtual void processReply(const std::string& reply) {};
 
 protected:
-    // Unlike most other RGB cameras, the Axis Communication F44 system does not support
-    // the various modes
-    void setMode(eMode mode)  override {};
-    void setFrameRate_Hz(double frame_rate_hz) override {};
-    void setLapseInterval_ms(uint32_t interval_ms)  override {};
-
     bool updateLapseInterval(uint32_t interval_ms) override;
     bool updateFrameRate(double frame_rate_fps) override;
+    bool updateImageSize(int width, int height) override;
 
 private:
     QByteArray mImageData;
@@ -105,6 +103,17 @@ private:
     int mMaxCameraID = -1;
 
     std::vector<cAxisCamera*> mCameras;
+
+    struct sState
+    {
+        eMode mode;
+        double frame_rate_fps;
+        uint32_t lapse_interval_ms;
+        int cameraId;
+        rgb::sImageSize_t resolution;
+    };
+
+    std::vector<sState> mStateStack;
 
 private:
     const uint8_t mDeviceID;

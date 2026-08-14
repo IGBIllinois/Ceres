@@ -17,7 +17,7 @@ int encode_query(axis_eQuery query, net_buffer& buffer)
         return -1;
 
     sPacketHeader_t hdr;
-    hdr.id = static_cast<uint16_t>(ePacketType::QUERY_STATE);
+    hdr.id = static_cast<uint16_t>(axis::ePacketType::QUERY_STATE);
     hdr.revision = 1;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
@@ -28,37 +28,37 @@ int encode_query(axis_eQuery query, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-int encode_query_current_state(net_buffer& buffer)
+int axis::encode_query_current_state(net_buffer& buffer)
 {
     return encode_query(eQUERY_STATE, buffer);
 }
 
-int encode_query_camera_mode(net_buffer& buffer)
+int axis::encode_query_camera_mode(net_buffer& buffer)
 {
     return encode_query(eQUERY_MODE, buffer);
 }
 
-int encode_query_active_camera_id(net_buffer& buffer)
+int axis::encode_query_active_camera_id(net_buffer& buffer)
 {
     return encode_query(eQUERY_ACTIVE_CAMERA_ID, buffer);
 }
 
-int encode_query_image_size(net_buffer& buffer)
+int axis::encode_query_image_size(net_buffer& buffer)
 {
     return encode_query(eQUERY_IMAGE_SIZE, buffer);
 }
 
-int encode_query_frame_rate(net_buffer& buffer)
+int axis::encode_query_frame_rate(net_buffer& buffer)
 {
     return encode_query(eQUERY_FRAME_RATE, buffer);
 }
 
-int encode_query_lapse_interval(net_buffer& buffer)
+int axis::encode_query_lapse_interval(net_buffer& buffer)
 {
     return encode_query(eQUERY_LAPSE_INTERVAL, buffer);
 }
 
-int encode_grab_image(net_buffer& buffer)
+int axis::encode_grab_image(net_buffer& buffer)
 {
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::GRAB_IMAGE);
@@ -72,12 +72,12 @@ int encode_grab_image(net_buffer& buffer)
 }
 
 
-uint8_t to_camera_mode_t(const axis_CameraModeMessage_1& pckt)
+uint8_t axis::to_camera_mode_t(const axis_CameraModeMessage_1& pckt)
 {
     return static_cast<uint8_t>(pckt.mode());
 }
 
-int encode_camera_mode(uint8_t mode, net_buffer& buffer)
+int axis::encode_camera_mode(uint8_t mode, net_buffer& buffer)
 {
     axis_CameraModeMessage_1 pckt;
 
@@ -100,12 +100,12 @@ int encode_camera_mode(uint8_t mode, net_buffer& buffer)
 }
 
 
-uint8_t to_active_camera_id_t(const axis_ActiveCameraIdMessage_1& pckt)
+uint8_t axis::to_active_camera_id_t(const axis_ActiveCameraIdMessage_1& pckt)
 {
     return static_cast<uint8_t>(pckt.camera_id());
 }
 
-int encode_active_camera_id(uint8_t id, net_buffer& buffer)
+int axis::encode_active_camera_id(uint8_t id, net_buffer& buffer)
 {
     axis_ActiveCameraIdMessage_1 pckt;
 
@@ -128,7 +128,7 @@ int encode_active_camera_id(uint8_t id, net_buffer& buffer)
 }
 
 
-sImageSize to_image_size_t(const axis_ImageSizeMessage_1& pckt)
+axis::sImageSize axis::to_image_size_t(const axis_ImageSizeMessage_1& pckt)
 {
     sImageSize image_size;
     image_size.width = pckt.width();
@@ -136,7 +136,7 @@ sImageSize to_image_size_t(const axis_ImageSizeMessage_1& pckt)
     return image_size;
 }
 
-int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
+int axis::encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
 {
     axis_ImageSizeMessage_1 pckt;
 
@@ -160,12 +160,12 @@ int encode_image_size(uint16_t width, uint16_t height, net_buffer& buffer)
 }
 
 
-uint8_t to_frame_rate_t(const axis_FrameRateMessage_1& pckt)
+uint8_t axis::to_frame_rate_t(const axis_FrameRateMessage_1& pckt)
 {
     return static_cast<uint8_t>(pckt.frames_per_second());
 }
 
-int encode_frame_rate(uint8_t fps, net_buffer& buffer)
+int axis::encode_frame_rate(uint8_t fps, net_buffer& buffer)
 {
     axis_FrameRateMessage_1 pckt;
 
@@ -188,12 +188,12 @@ int encode_frame_rate(uint8_t fps, net_buffer& buffer)
 }
 
 
-uint32_t to_lapse_interval_t(const axis_LapseIntervalMessage_1& pckt)
+uint32_t axis::to_lapse_interval_t(const axis_LapseIntervalMessage_1& pckt)
 {
     return pckt.lapse_interval_ms();
 }
 
-int encode_lapse_interval(uint32_t interval_ms, net_buffer& buffer)
+int axis::encode_lapse_interval(uint32_t interval_ms, net_buffer& buffer)
 {
     axis_LapseIntervalMessage_1 pckt;
 
@@ -216,7 +216,7 @@ int encode_lapse_interval(uint32_t interval_ms, net_buffer& buffer)
 }
 
 
-sCurrentState to_current_state_t(const axis_StateMessage_1& pckt)
+axis::sCurrentState axis::to_current_state_t(const axis_StateMessage_1& pckt)
 {
     sCurrentState state;
 
@@ -233,7 +233,7 @@ sCurrentState to_current_state_t(const axis_StateMessage_1& pckt)
     return state;
 }
 
-int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
+int axis::encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
     uint16_t height, uint8_t fps, net_buffer& buffer)
 {
     axis_StateMessage_1 pckt;
@@ -261,7 +261,7 @@ int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
 }
 
 
-sCurrentState to_current_state_t(const axis_StateMessage_2& pckt)
+axis::sCurrentState axis::to_current_state_t(const axis_StateMessage_2& pckt)
 {
     sCurrentState state;
 
@@ -278,7 +278,7 @@ sCurrentState to_current_state_t(const axis_StateMessage_2& pckt)
     return state;
 }
 
-int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
+int axis::encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
     uint16_t height, uint8_t fps, uint8_t min_camera_id, uint8_t max_camera_id, net_buffer& buffer)
 {
     axis_StateMessage_2 pckt;
@@ -307,7 +307,7 @@ int encode_current_state(bool valid, uint8_t camera_id, uint16_t width,
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-sCurrentState to_current_state_t(const axis_StateMessage_3& pckt)
+axis::sCurrentState axis::to_current_state_t(const axis_StateMessage_3& pckt)
 {
     sCurrentState state;
 
@@ -330,7 +330,7 @@ sCurrentState to_current_state_t(const axis_StateMessage_3& pckt)
     return state;
 }
 
-int encode_current_state(bool valid, uint8_t mode, uint8_t camera_id, uint16_t width,
+int axis::encode_current_state(bool valid, uint8_t mode, uint8_t camera_id, uint16_t width,
     uint16_t height, uint8_t fps, uint32_t interval_ms, uint8_t min_camera_id, uint8_t max_camera_id,
     std::optional<double> min_fps, std::optional<double> max_fps, net_buffer& buffer)
 {
@@ -369,12 +369,12 @@ int encode_current_state(bool valid, uint8_t mode, uint8_t camera_id, uint16_t w
 }
 
 
-bool to_take_photo_t(const axis_TakePhoto_1& pckt)
+bool axis::to_take_photo_t(const axis_TakePhoto_1& pckt)
 {
     return pckt.update_view();
 }
 
-int encode_take_photo(bool update_view, net_buffer& buffer)
+int axis::encode_take_photo(bool update_view, net_buffer& buffer)
 {
     axis_TakePhoto_1 pckt;
 
@@ -396,7 +396,7 @@ int encode_take_photo(bool update_view, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-sTakePhoto to_take_photo_t(const axis_TakePhoto_2& pckt)
+axis::sTakePhoto axis::to_take_photo_t(const axis_TakePhoto_2& pckt)
 {
     sTakePhoto state;
 
@@ -406,7 +406,7 @@ sTakePhoto to_take_photo_t(const axis_TakePhoto_2& pckt)
     return state;
 }
 
-int encode_take_photo(bool update_view, bool auto_save, net_buffer& buffer)
+int axis::encode_take_photo(bool update_view, bool auto_save, net_buffer& buffer)
 {
     axis_TakePhoto_2 pckt;
 
@@ -429,7 +429,7 @@ int encode_take_photo(bool update_view, bool auto_save, net_buffer& buffer)
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
-eReply to_reply_t(const axis_Reply_1& pckt)
+axis::eReply axis::to_reply_t(const axis_Reply_1& pckt)
 {
     switch (pckt.reply())
     {
@@ -441,23 +441,23 @@ eReply to_reply_t(const axis_Reply_1& pckt)
     return eReply::GOOD;
 }
 
-int encode_reply(eReply reply, ePacketType packet_type, net_buffer& buffer)
+int encode_reply(axis::eReply reply, axis::ePacketType packet_type, net_buffer& buffer)
 {
     axis_Reply_1 pckt;
 
     switch (reply)
     {
     default:
-    case eReply::GOOD:
+    case axis::eReply::GOOD:
         pckt.set_reply(eReply_GOOD);
         break;
-    case eReply::FAILED:
+    case axis::eReply::FAILED:
         pckt.set_reply(eReply_FAILED);
         break;
-    case eReply::ABORTED:
+    case axis::eReply::ABORTED:
         pckt.set_reply(eReply_ABORTED);
         break;
-    case eReply::PENDING:
+    case axis::eReply::PENDING:
         pckt.set_reply(eReply_PENDING);
         break;
     }
@@ -505,9 +505,38 @@ int flir::encode_thermal_range_reply(eReply reply, net_buffer& buffer)
 }
 */
 
-int encode_take_photo_reply(eReply reply, net_buffer& buffer)
+int axis::encode_take_photo_reply(eReply reply, net_buffer& buffer)
 {
     return encode_reply(reply, ePacketType::TAKE_PHOTO_REPLY, buffer);
 }
 
 
+/**********************************************************
+ * Experiment State -> Controller packets utilities
+ **********************************************************/
+
+int axis::encode_save_state(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(axis::ePacketType::SAVE_STATE);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
+int axis::encode_restore_state(net_buffer& buffer)
+{
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(axis::ePacketType::RESTORE_STATE);
+    hdr.revision = 1;
+    hdr.length = 0;
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}

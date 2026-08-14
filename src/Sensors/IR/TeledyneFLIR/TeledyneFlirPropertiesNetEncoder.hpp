@@ -35,6 +35,9 @@ public:
     void sendGrabImage();
     void sendTakePhoto(bool update_view);
     void sendTakePhoto(bool update_view, bool save_image);
+
+    void sendSaveState();
+    void sendRestoreState();
 };
 
 

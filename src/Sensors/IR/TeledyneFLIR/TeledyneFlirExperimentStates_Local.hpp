@@ -32,6 +32,66 @@ protected:
 };
 
 
+/***********************************************************************/
+/**    Teledyne FLIR Experiment State to Save Current Camera State    **/
+/***********************************************************************/
+
+class cTeledyneFlirCamera_SaveState_Local : public cTeledyneFlirCameraExperimentState_Local
+{
+	Q_OBJECT
+
+public:
+	cTeledyneFlirCamera_SaveState_Local(QObject* parent = nullptr);
+
+	QString getStatusStr() override;
+
+	bool configure(const nlohmann::json& stateDoc) override { return true; };
+	bool recording() override { return false; };
+
+	void run() override;
+	void pause() override;
+	void stop() override;
+
+	eRESULT finished() override;
+
+signals:
+	void requestSaveState();
+
+private:
+	eRESULT mResult = cExperimentState::eRESULT::WAITING;
+};
+
+
+/***********************************************************************/
+/**      Teledyne FLIR Experiment State to Restore Camera State       **/
+/***********************************************************************/
+
+class cTeledyneFlirCamera_RestoreState_Local : public cTeledyneFlirCameraExperimentState_Local
+{
+	Q_OBJECT
+
+public:
+	cTeledyneFlirCamera_RestoreState_Local(QObject* parent = nullptr);
+
+	QString getStatusStr() override;
+
+	bool configure(const nlohmann::json& stateDoc) override { return true; };
+	bool recording() override { return false; };
+
+	void run() override;
+	void pause() override;
+	void stop() override;
+
+	eRESULT finished() override;
+
+signals:
+	void requestRestoreState();
+
+private:
+	eRESULT mResult = cExperimentState::eRESULT::WAITING;
+};
+
+
 /*******************************************************************/
 /**    Teledyne FLIR Experiment States to Configure Camera        **/
 /*******************************************************************/

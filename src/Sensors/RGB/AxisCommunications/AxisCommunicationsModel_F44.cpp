@@ -10,6 +10,7 @@
 #include <QMessageBox>
 
 #include <filesystem>
+#include <algorithm>
 
 
 const std::size_t MAX_CAMERAS = 4;
@@ -42,6 +43,10 @@ cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
     mModel = "AXIS F44 DUAL AUDO INPUT";
 
     mImageBuffer.open(QIODevice::ReadWrite);
+
+    mMinFrameRate_fps = 1;
+    mMaxFrameRate_fps = 50;
+
 
 //    mCameras = {nullptr, nullptr, nullptr, nullptr};
 }
@@ -193,7 +198,6 @@ void cAxisCommunicationsModel_F44::writeDataHeader()
     auto size = mpActiveCamera->getImageSize();
     mSerializer.writeImageSize(mDeviceID, size.width, size.height);
     mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
-
 }
 
 bool cAxisCommunicationsModel_F44::startCommunications()
@@ -372,6 +376,8 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
     emit statusMessage(msg);
 #endif
 
+    mFrameRate_fps = mpActiveCamera->getFramesPerSeconds();
+
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
@@ -380,14 +386,65 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
     emit frameRateChanged(fps);
 }
 
+void cAxisCommunicationsModel_F44::onSaveState()
+{
+    sState state;
+
+    state.mode = mode();
+    state.frame_rate_fps = getActiveFramesRate_fps();
+    state.lapse_interval_ms = lapseInterval_ms();
+    state.cameraId = getActiveCameraID();
+    state.resolution = getActiveImageSize();
+
+    mStateStack.push_back(state);
+}
+
+void cAxisCommunicationsModel_F44::onRestoreState()
+{
+    if (mStateStack.empty()) return;
+
+    auto state = mStateStack.back();
+    mStateStack.pop_back();
+
+    setActiveCamera(state.cameraId);
+    setActiveImageSize(state.resolution);
+    setActiveFramesRate_fps(state.frame_rate_fps);
+
+    requestMode(state.mode);
+    requestLapseInterval_ms(state.lapse_interval_ms);
+}
+
+
 bool cAxisCommunicationsModel_F44::updateLapseInterval(uint32_t interval_ms)
 {
+    mLapseInterval_ms = interval_ms;
+
     return true;
 }
 
 bool cAxisCommunicationsModel_F44::updateFrameRate(double frame_rate_fps)
 {
+    if (frame_rate_fps == mFrameRate_fps)
+        return true;
+
     setActiveFramesRate_fps(static_cast<int>(frame_rate_fps));
+
+    return true;
+}
+
+bool cAxisCommunicationsModel_F44::updateImageSize(int width, int height)
+{
+    rgb::sImageSize_t image_size = {static_cast<uint16_t>(width), static_cast<uint16_t>(height)};
+
+    // Find element with minimum absolute difference from target
+    auto closest_it = std::min_element(mSupportedImageSizes.begin(), mSupportedImageSizes.end(),
+            [image_size](auto a, auto b) {
+                return std::abs((a.width - image_size.width) + (a.height - image_size.height)) < 
+                    std::abs((b.width - image_size.width) + (b.height - image_size.height));
+            });
+
+    setActiveImageSize(*closest_it);
+    
     return true;
 }
 
@@ -399,19 +456,49 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
         emit onNewImage(mCurrentImage);
     }
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    bool newData = false;
+
+    switch (mMode)
     {
-        try
+    case eMode::SINGLE:
+        if (mPhotoRequested)
         {
-            axis::to_buffer(mCurrentImage, mMpegFrameBuffer);
-            mSerializer.write(mDeviceID, mMpegFrameBuffer);
+//            mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
+            newData = true;
+            mPhotoRequested = false;
+            emit photoTaken();
         }
-        catch (const std::exception& e)
+        break;
+    case eMode::TIME_LAPSE:
+        if (mTimeLapseTimer.elapsed())
         {
-            QString msg = "Error in writing MPEG frame: ";
-            msg += e.what();
-            logMessage(logERROR, msg);
-            qCritical() << msg;
+//            mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
+            newData = true;
+            mTimeLapseTimer.start();
+        }
+        break;
+    case eMode::CONTINUOUS:
+//        mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
+        newData = true;
+        break;
+    }
+
+    if (newData)
+    {
+        if (mIsRecording && static_cast<bool>(mSerializer))
+        {
+            try
+            {
+                axis::to_buffer(mCurrentImage, mMpegFrameBuffer);
+                mSerializer.write(mDeviceID, mMpegFrameBuffer);
+            }
+            catch (const std::exception& e)
+            {
+                QString msg = "Error in writing MPEG frame: ";
+                msg += e.what();
+                logMessage(logERROR, msg);
+                qCritical() << msg;
+            }
         }
     }
 }

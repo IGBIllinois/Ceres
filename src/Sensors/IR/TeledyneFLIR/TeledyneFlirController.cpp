@@ -142,6 +142,16 @@ void cTeledyneFlirController::setLapseInterval_ms(uint32_t interval_ms)
     emit requestLapseInterval_ms(interval_ms);
 }
 
+void cTeledyneFlirController::onSaveState()
+{
+    emit requestSaveState();
+}
+
+void cTeledyneFlirController::onRestoreState()
+{
+    emit requestRestoreState();
+}
+
 
 /******************************************************************************
  * Teledyne FLIR Controller T1K

@@ -8,14 +8,14 @@
 #include "StringUtils.hpp"
 
 #include <QString>
+#include <QLabel>
 #include <QLineEdit>
 #include <QComboBox>
-#include <QTimer>
-#include <QTime>
-#include <QCoreApplication>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QDialogButtonBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 
 //
@@ -25,52 +25,6 @@
 cAxisCommunicationsPropertyPage_Local::cAxisCommunicationsPropertyPage_Local(cAxisCommunicationsModel* pModel, QWidget* parent)
 	: cAxisCommunicationsPropertyPage(parent), mpModel(pModel)
 {}
-
-cExperimentState* cAxisCommunicationsPropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
-{
-/*
-	if (nStringUtils::iequal(type, axis_communications_id))
-	{
-		std::string cmd = entry["command"];
-
-		if (cmd == "configure")
-		{
-			auto* pState = new cAxisCommunications_Configure_Local(mpModel, parent);
-
-			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestMode,				mpModel, &cAxisCommunicationsModel::requestMode);
-			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestFrameRate_Hz,		mpModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
-			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestLapseInterval_ms,	mpModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
-
-			QObject::connect(mpModel, &cAxisCommunicationsModel::modeChanged,			pState, &cAxisCommunications_Configure_Local::modeChanged);
-			QObject::connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged,	pState, &cAxisCommunications_Configure_Local::lapseIntervalChanged);
-			QObject::connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,		pState, &cAxisCommunications_Configure_Local::frameRateChanged);
-
-			if (parent)
-				pState->moveToThread(parent->thread());
-
-			return pState;
-		}
-
-		if (cmd == "take photo")
-		{
-			auto* pState = new cAxisCommunications_TakePhoto_Local(mpModel, parent);
-
-			QObject::connect(pState, qOverload<bool>(&cAxisCommunications_TakePhoto_Local::takePhoto),			mpModel, qOverload<bool>(&cAxisCommunicationsModel::takePhoto));
-			QObject::connect(pState, qOverload<bool, bool>(&cAxisCommunications_TakePhoto_Local::takePhoto),	mpModel, qOverload<bool, bool>(&cAxisCommunicationsModel::takePhoto));
-			QObject::connect(pState, &cAxisCommunications_TakePhoto_Local::updateView,							mpModel, &cAxisCommunicationsModel::requestImage);
-
-			QObject::connect(mpModel, &cAxisCommunicationsModel::photoTaken, pState, &cAxisCommunications_TakePhoto_Local::onPhotoTaken);
-
-			if (parent)
-				pState->moveToThread(parent->thread());
-
-			return pState;
-		}
-	}
-*/
-
-	return nullptr;
-}
 
 void cAxisCommunicationsPropertyPage_Local::createWidgets()
 {
@@ -94,6 +48,11 @@ void cAxisCommunicationsPropertyPage_Local::doLayout()
 	setTitle(title);
 
 	cAxisCommunicationsPropertyPage::doLayout();
+}
+
+void cAxisCommunicationsPropertyPage_Local::doLayout(QVBoxLayout* pMainLayout)
+{
+	cAxisCommunicationsPropertyPage::doLayout(pMainLayout);
 }
 
 void cAxisCommunicationsPropertyPage_Local::enableControls(bool enable)
@@ -197,6 +156,13 @@ void cAxisCommunicationsPropertyPage_Local::doCancel()
 
 void cAxisCommunicationsPropertyPage_Local::doApply()
 {
+	auto mode = mpMode->currentIndex();
+
+	if (mDefaultMode != mode)
+	{
+		emit requestMode(mode);
+	}
+
 	auto image_size = mpImageSizes->currentText();
 	auto is = axis::to_image_size(image_size.toStdString());
 
@@ -232,18 +198,136 @@ cAxisCommunicationsPropertyPage_Local_F44::cAxisCommunicationsPropertyPage_Local
 	: cAxisCommunicationsPropertyPage_Local(pModel, parent), mpModel(pModel)
 {}
 
+cExperimentState* cAxisCommunicationsPropertyPage_Local_F44::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
+{
+	if (nStringUtils::iequal(type, axis_communications_id))
+	{
+		std::string cmd = entry["command"];
+
+		if ((cmd == "save_state") || (cmd == "save state"))
+		{
+			auto* pState = new cAxisCommunications_SaveState_Local(parent);
+
+			QObject::connect(pState, &cAxisCommunications_SaveState_Local::requestSaveState, mpModel, &cAxisCommunicationsModel_F44::onSaveState);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if ((cmd == "restore_state") || (cmd == "restore state"))
+		{
+			auto* pState = new cAxisCommunications_RestoreState_Local(parent);
+
+			QObject::connect(pState, &cAxisCommunications_RestoreState_Local::requestRestoreState, mpModel, &cAxisCommunicationsModel_F44::onRestoreState);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if (cmd == "configure")
+		{
+			auto* pState = new cAxisCommunications_Configure_Local(mpModel, parent);
+
+			QObject::connect(mpModel, &cAxisCommunicationsModel::modeChanged,			pState, &cAxisCommunications_Configure_Local::onModeChange);
+			QObject::connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged,	pState, &cAxisCommunications_Configure_Local::onLapseIntervalChange);
+			QObject::connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,		pState, &cAxisCommunications_Configure_Local::onFrameRateChange);
+			QObject::connect(mpModel, &cAxisCommunicationsModel::imageSizeChanged,		pState, &cAxisCommunications_Configure_Local::onImageSizeChange);
+			QObject::connect(mpModel, &cAxisCommunicationsModel::cameraIdChanged,		pState, &cAxisCommunications_Configure_Local::onCameraIdChange);
+
+			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestCameraID, mpModel, &cAxisCommunicationsModel_F44::setActiveCamera);
+
+			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestMode,				mpModel, &cAxisCommunicationsModel::requestMode);
+			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestFrameRate_Hz,		mpModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
+			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestLapseInterval_ms, mpModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
+			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestImageSize,		mpModel, &cAxisCommunicationsModel::requestImageSize);
+
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if ((cmd == "take_photo") || (cmd == "take photo"))
+		{
+			auto* pState = new cAxisCommunications_TakePhoto_Local(mpModel, parent);
+
+			QObject::connect(pState, qOverload<bool>(&cAxisCommunications_TakePhoto_Local::takePhoto),			mpModel, qOverload<bool>(&cAxisCommunicationsModel::takePhoto));
+			QObject::connect(pState, qOverload<bool, bool>(&cAxisCommunications_TakePhoto_Local::takePhoto),	mpModel, qOverload<bool, bool>(&cAxisCommunicationsModel::takePhoto));
+			QObject::connect(pState, &cAxisCommunications_TakePhoto_Local::updateView,							mpModel, &cAxisCommunicationsModel::requestImage);
+
+			QObject::connect(mpModel, &cAxisCommunicationsModel::photoTaken, pState, &cAxisCommunications_TakePhoto_Local::onPhotoTaken);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+	}
+
+	return nullptr;
+}
+
+void cAxisCommunicationsPropertyPage_Local_F44::createWidgets()
+{
+	cAxisCommunicationsPropertyPage_Local::createWidgets();
+
+	mpCameraIdLabel = new QLabel("Camera ID:", this);
+	mpCameraId = new QComboBox(this);
+
+	mMinCameraId = mpModel->getMinCameraID();
+	mMaxCameraId = mpModel->getMaxCameraID();
+
+	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
+	{
+		mpCameraId->addItem(QString::number(i));
+	}
+
+	mpCameraId->setCurrentIndex(mpModel->getActiveCameraID() - mMinCameraId);
+
+	connect(mpCameraId, &QComboBox::currentTextChanged, this, &cAxisCommunicationsPropertyPage_Local_F44::cameraIdTextChanged);
+}
+
+void cAxisCommunicationsPropertyPage_Local_F44::doLayout(QVBoxLayout* pMainLayout)
+{
+	assert(pMainLayout);
+
+	auto* idLayout = new QHBoxLayout();
+	idLayout->addWidget(mpCameraIdLabel);
+	idLayout->addWidget(mpCameraId);
+	pMainLayout->addLayout(idLayout);
+
+	cAxisCommunicationsPropertyPage_Local::doLayout(pMainLayout);
+}
+
 void cAxisCommunicationsPropertyPage_Local_F44::onCameraIdChange(int id)
 {
-	mDefaultCameraId = id;
+	if ((id < mMinCameraId) || (id > mMaxCameraId)) return;
+
+//	mDefaultCameraId = id;
 
 	if (!mpCameraId) return;
 
-	mpCameraId->setText(QString::number(id));
+	mpCameraId->setCurrentIndex(id - mMinCameraId);
 }
 
+void cAxisCommunicationsPropertyPage_Local_F44::cameraIdTextChanged(const QString& text)
+{
+	auto id = text.toInt();
+
+	if ((id < mMinCameraId) || (id > mMaxCameraId)) return;
+
+	emit requestCameraID(id);
+}
+
+/*
 void cAxisCommunicationsPropertyPage_Local_F44::doApply()
 {
-	uint8_t id = mpCameraId->text().toInt();
+	uint8_t id = mpCameraId->currentIndex() + mMinCameraId;
 	if (mDefaultCameraId != id)
 	{
 		emit requestCameraID(id);
@@ -251,3 +335,4 @@ void cAxisCommunicationsPropertyPage_Local_F44::doApply()
 
 	cAxisCommunicationsPropertyPage_Local::doApply();
 }
+*/

@@ -59,6 +59,70 @@ int cAxisCommunicationsExperimentState_Remote::sendOutgoingData(const char* data
 }
 
 
+/***********************************************************************/
+/** Axis Communications Experiment State to Save Current Camera State **/
+/***********************************************************************/
+
+cAxisCommunications_SaveState_Remote::cAxisCommunications_SaveState_Remote(const std::string& hostname, uint16_t port,
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
+	:
+	cAxisCommunicationsExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent)
+{}
+
+QString cAxisCommunications_SaveState_Remote::getStatusStr()
+{
+	return "Saving current camera state...";
+}
+
+void cAxisCommunications_SaveState_Remote::run() {}
+void cAxisCommunications_SaveState_Remote::pause() {}
+void cAxisCommunications_SaveState_Remote::stop() {}
+
+cExperimentState::eRESULT cAxisCommunications_SaveState_Remote::finished() { return mResult; }
+
+void cAxisCommunications_SaveState_Remote::onConnect()
+{
+	sendSaveState();
+
+	// Sleep for 250 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
+	eRESULT mResult = cExperimentState::eRESULT::DONE;
+};
+
+
+/***********************************************************************/
+/**   Axis Communications Experiment State to Restore Camera State    **/
+/***********************************************************************/
+
+cAxisCommunications_RestoreState_Remote::cAxisCommunications_RestoreState_Remote(const std::string& hostname, uint16_t port,
+	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
+	:
+	cAxisCommunicationsExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent)
+{}
+
+QString cAxisCommunications_RestoreState_Remote::getStatusStr()
+{
+	return "Restoring camera state...";
+}
+
+void cAxisCommunications_RestoreState_Remote::run() {}
+void cAxisCommunications_RestoreState_Remote::pause() {}
+void cAxisCommunications_RestoreState_Remote::stop() {}
+
+cExperimentState::eRESULT cAxisCommunications_RestoreState_Remote::finished() { return mResult; }
+
+void cAxisCommunications_RestoreState_Remote::onConnect()
+{
+	sendRestoreState();
+
+	// Sleep for 250 milliseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
+	eRESULT mResult = cExperimentState::eRESULT::DONE;
+};
+
+
 /***************************************************************************/
 /**     Axis Communications Experiment States to Configure Camera         **/
 /***************************************************************************/

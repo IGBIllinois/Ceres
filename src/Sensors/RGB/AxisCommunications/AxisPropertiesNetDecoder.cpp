@@ -7,9 +7,11 @@
 
 void cAxisPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
+    using namespace axis;
+
     switch (static_cast<ePacketType>(hdr.id))
     {
-    case ePacketType::UNKNOWN:
+    case axis::ePacketType::UNKNOWN:
     default:
     {
         break;

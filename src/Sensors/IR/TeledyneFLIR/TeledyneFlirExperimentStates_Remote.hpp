@@ -65,6 +65,73 @@ protected:
 	uint16_t   mPort = 0;
 };
 
+
+/***********************************************************************/
+/**    Teledyne FLIR Experiment State to Save Current Camera State    **/
+/***********************************************************************/
+
+class cTeledyneFlirCamera_SaveState_Remote : public cTeledyneFlirCameraExperimentState_Remote
+{
+	Q_OBJECT
+
+public:
+	cTeledyneFlirCamera_SaveState_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
+
+	QString getStatusStr() override;
+
+	bool configure(const nlohmann::json& stateDoc) override { return true; };
+	bool recording() override { return false; };
+
+	void run() override;
+	void pause() override;
+	void stop() override;
+
+	eRESULT finished() override;
+
+private:
+	void onConnect() override;
+
+private:
+	eRESULT mResult = cExperimentState::eRESULT::WAITING;
+};
+
+
+/***********************************************************************/
+/**      Teledyne FLIR Experiment State to Restore Camera State       **/
+/***********************************************************************/
+
+class cTeledyneFlirCamera_RestoreState_Remote : public cTeledyneFlirCameraExperimentState_Remote
+{
+	Q_OBJECT
+
+public:
+	cTeledyneFlirCamera_RestoreState_Remote(const std::string& hostname, uint16_t port,
+		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
+
+	QString getStatusStr() override;
+
+	bool configure(const nlohmann::json& stateDoc) override { return true; };
+	bool recording() override { return false; };
+
+	void run() override;
+	void pause() override;
+	void stop() override;
+
+	eRESULT finished() override;
+
+private:
+	void onConnect() override;
+
+private:
+	eRESULT mResult = cExperimentState::eRESULT::WAITING;
+};
+
+
+/*******************************************************************/
+/**     Teledyne FLIR Experiment State to Configure Camera        **/
+/*******************************************************************/
+
 class cTeledyneFlirCamera_Configure_Remote : public cTeledyneFlirCameraExperimentState_Remote
 {
 	Q_OBJECT
@@ -104,6 +171,10 @@ private:
 	bool mWaitingForInterval = false;
 };
 
+
+/*******************************************************************/
+/**        Teledyne FLIR Experiment State to Take Photo           **/
+/*******************************************************************/
 
 class cTeledyneFlirCamera_TakePhoto_Remote : public cTeledyneFlirCameraExperimentState_Remote
 {

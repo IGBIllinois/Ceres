@@ -218,6 +218,11 @@ void cTeledyneFlirCameraModel::takePhoto(bool update_view, bool auto_save)
     }
 }
 
+void cTeledyneFlirCameraModel::onSaveState()
+{}
+
+void cTeledyneFlirCameraModel::onRestoreState()
+{}
 
 const QImage& cTeledyneFlirCameraModel::getCurrentImage() const
 {

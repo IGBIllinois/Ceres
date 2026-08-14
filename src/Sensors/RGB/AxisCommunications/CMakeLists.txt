@@ -47,6 +47,8 @@ set(AXIS_COMM_SOURCE_FILES
 #
 # Axis Communications Experiment State Files
 #
+    AxisCommunicationsExperimentStatesHelpers.hpp
+	AxisCommunicationsExperimentStatesHelpers.cpp
     AxisCommunicationsExperimentStates_Local.hpp
 	AxisCommunicationsExperimentStates_Local.cpp
 	AxisCommunicationsExperimentStates_Remote.hpp

@@ -4,6 +4,7 @@
 
 #include <QLineEdit>
 #include <QLabel>
+#include <QComboBox>
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QFormLayout>
@@ -34,15 +35,30 @@ void cAxisCommunicationsStatusView::createWidgets()
 	mpImageSizes = new QLineEdit(this);
 	mpImageSizes->setReadOnly(true);
 
+	mpModeLabel = new QLabel("Mode:", this);
+	mpMode = new QComboBox(this);
+	mpMode->addItem("Photo");
+	mpMode->addItem("Time Lapse");
+	mpMode->addItem("Continuous");
+	mpMode->setCurrentIndex(2);
+	mpMode->setEnabled(false);
+
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
 	mpFrameRate_fps->setReadOnly(true);
 
+	mpLapseIntervalLabel = new QLabel("Lapse time (sec):", this);
+	mpLapseInterval_s = new QLineEdit(this);
+	mpLapseInterval_s->setReadOnly(true);
+
+
 	mpGrabImage = new QPushButton("Grab Image", this);
 	connect(mpGrabImage, &QPushButton::pressed, this, &cAxisCommunicationsStatusView::requestImage);
 
+/*
 	mpSaveImage = new QPushButton("Save Image", this);
 	connect(mpSaveImage, &QPushButton::pressed, this, &cAxisCommunicationsStatusView::saveImage);
+*/
 
 	mpImage = new cRgbImageWidget(this);
 }
@@ -63,23 +79,30 @@ void cAxisCommunicationsStatusView::doLayout()
 	cameraInfoLayout->addWidget(mpImageSizeLabel);
 	cameraInfoLayout->addWidget(mpImageSizes);
 
+	cameraInfoLayout->addWidget(mpModeLabel);
+	cameraInfoLayout->addWidget(mpMode);
+
 	cameraInfoLayout->addWidget(mpFrameRateLabel);
 	cameraInfoLayout->addWidget(mpFrameRate_fps);
+
+	cameraInfoLayout->addWidget(mpLapseIntervalLabel);
+	cameraInfoLayout->addWidget(mpLapseInterval_s);
 
 	cameraInfoLayout->addStretch(1);
 
 	cameraInfoLayout->addWidget(mpGrabImage);
 
+/*
 	cameraInfoLayout->addSpacing(20);
 
 	cameraInfoLayout->addWidget(mpSaveImage);
+*/
 
 	infoBox->setLayout(cameraInfoLayout);
 
 	mainLayout->addWidget(infoBox);
 
 	mainLayout->addWidget(mpImage, 1);
-//	mainLayout->addStretch();
 
 	setLayout(mainLayout);
 }
@@ -89,11 +112,6 @@ void cAxisCommunicationsStatusView::onCameraIdChange(int id)
 	mpCameraId->setText(QString::number(id));
 }
 
-void cAxisCommunicationsStatusView::onFrameRateChange(int rate_fps)
-{
-	mpFrameRate_fps->setText(QString::number(rate_fps));
-}
-
 void cAxisCommunicationsStatusView::onImageSizeChange(int width, int height)
 {
 	QString str = QString::number(width);
@@ -101,6 +119,40 @@ void cAxisCommunicationsStatusView::onImageSizeChange(int width, int height)
 	str += QString::number(height);
 
 	mpImageSizes->setText(str);
+}
+
+void cAxisCommunicationsStatusView::onModeChange(int mode)
+{
+	if ((mode < 0) || (mode > 2))
+		return;
+
+	mpMode->setCurrentIndex(mode);
+
+	switch (mode)
+	{
+	case 0:
+		mpFrameRate_fps->setEnabled(false);
+		mpLapseInterval_s->setEnabled(false);
+		break;
+	case 1:
+		mpFrameRate_fps->setEnabled(false);
+		mpLapseInterval_s->setEnabled(true);
+		break;
+	case 2:
+		mpFrameRate_fps->setEnabled(true);
+		mpLapseInterval_s->setEnabled(false);
+		break;
+	}
+}
+
+void cAxisCommunicationsStatusView::onFrameRateChange(int rate_fps)
+{
+	mpFrameRate_fps->setText(QString::number(rate_fps));
+}
+
+void cAxisCommunicationsStatusView::onLapseIntervalChange(int interval_ms)
+{
+	mpLapseInterval_s->setText(QString::number(interval_ms * 0.001, (char) 103, 3));
 }
 
 void cAxisCommunicationsStatusView::imageUpdated(const QImage& image)
