@@ -63,6 +63,28 @@ private:
 };
 
 
+class cExperimentState_Recording : public cExperimentState
+{
+public:
+	cExperimentState_Recording();
+
+	QString getStatusStr() override;
+
+	bool configure(const nlohmann::json& stateDoc) override;
+
+	bool recording() override;
+
+	bool initialize() override;
+	void run() override;
+	void pause() override;
+	void stop() override;
+	eRESULT finished() override;
+
+private:
+	bool mRecording;
+};
+
+
 class cPauseExperimentStateDlg;
 
 class cExperimentState_Pause : public QObject, public cExperimentState

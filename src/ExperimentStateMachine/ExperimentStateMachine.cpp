@@ -212,6 +212,9 @@ cExperimentState* cExperimentStateMachine::createState(const std::string& type, 
     if (type == "pause")
         return new cExperimentState_Pause();
 
+    if (type == "record_state")
+        return new cExperimentState_Recording();
+
     return nullptr;
 }
 

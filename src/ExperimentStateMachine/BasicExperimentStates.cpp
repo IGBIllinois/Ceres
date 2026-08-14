@@ -14,7 +14,6 @@ cExperimentState_Delay::cExperimentState_Delay()
 {
 }
 
-
 bool cExperimentState_Delay::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
@@ -89,6 +88,74 @@ void cExperimentState_Delay::stop()
 cExperimentState::eRESULT cExperimentState_Delay::finished()
 {
 	return mElapsedTime_sec >= mWaitTime_sec ? eRESULT::DONE : eRESULT::WAITING;
+}
+
+
+/********************************************************************
+ * Recording Step
+ *******************************************************************/
+cExperimentState_Recording::cExperimentState_Recording()
+	: mRecording(false)
+{}
+
+bool cExperimentState_Recording::configure(const nlohmann::json& stateDoc)
+{
+	using namespace nlohmann;
+
+	try
+	{
+		mRecording = stateDoc["record"];
+	}
+	catch (const detail::parse_error& e)
+	{
+		return false;
+	}
+	catch (const detail::type_error& e)
+	{
+		return false;
+	}
+	catch (const detail::exception& e)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+QString cExperimentState_Recording::getStatusStr()
+{
+	QString msg = "Set recording state: ";
+
+	if (mRecording)
+		msg += " ON";
+	else
+		msg += " OFF";
+
+	return msg;
+}
+
+bool cExperimentState_Recording::recording()
+{
+	return mRecording;
+}
+
+bool cExperimentState_Recording::initialize()
+{
+	return true;
+}
+
+void cExperimentState_Recording::run()
+{}
+
+void cExperimentState_Recording::pause()
+{}
+
+void cExperimentState_Recording::stop()
+{}
+
+cExperimentState::eRESULT cExperimentState_Recording::finished()
+{
+	return eRESULT::DONE;
 }
 
 
