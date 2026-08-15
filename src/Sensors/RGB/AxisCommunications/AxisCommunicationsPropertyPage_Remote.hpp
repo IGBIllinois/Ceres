@@ -14,7 +14,7 @@
 
 class cAxisCommunicationsPropertyPage_Remote : public cAxisCommunicationsPropertyPage,
     public cSensorPropertyPageRemoteInterface, 
-    private cAxisPropertiesNetDecoder, private cAxisPropertiesNetEncoder
+    protected cAxisPropertiesNetDecoder, protected cAxisPropertiesNetEncoder
 {
 public:
     cAxisCommunicationsPropertyPage_Remote(QWidget* parent = nullptr);

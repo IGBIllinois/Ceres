@@ -69,6 +69,7 @@ public:
 
 signals:
     void enableCamera(int id);
+    void cameraRangeUpdated(int min_id, int max_id);
 
 public slots:
     void setActiveCamera(int id);

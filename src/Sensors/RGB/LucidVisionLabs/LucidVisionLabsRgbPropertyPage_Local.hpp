@@ -25,6 +25,7 @@ public:
 
 signals:
     void requestPhoto(bool update_view);
+//    void requestPhoto(bool update_view, bool auto_save);
 
 signals:
     void pushStreamState();

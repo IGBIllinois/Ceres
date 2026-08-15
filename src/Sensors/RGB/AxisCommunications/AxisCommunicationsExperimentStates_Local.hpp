@@ -97,7 +97,7 @@ private:
 /**   Axis Communications Experiment State to Configure Camera       **/
 /***********************************************************************/
 
-class cAxisCommunications_Configure_Local : public cAxisCommunicationsExperimentState_Local, protected cAxisCommunicationsExperimentState_Configure
+class cAxisCommunications_Configure_Local : public cAxisCommunicationsExperimentState_Local, protected cAxisCommunicationsExperimentHelper_Configure
 {
 	Q_OBJECT
 
@@ -139,7 +139,7 @@ private:
 /**   Axis Communications Experiment State to Take Photo Camera       **/
 /***********************************************************************/
 
-class cAxisCommunications_TakePhoto_Local : public cAxisCommunicationsExperimentState_Local, protected cAxisCommunicationsExperimentState_TakePhoto
+class cAxisCommunications_TakePhoto_Local : public cAxisCommunicationsExperimentState_Local, protected cAxisCommunicationsExperimentHelper_TakePhoto
 {
 	Q_OBJECT
 

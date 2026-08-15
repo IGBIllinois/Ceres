@@ -100,7 +100,7 @@ QString cAxisCommunications_Configure_Local::getStatusStr()
 
 bool cAxisCommunications_Configure_Local::configure(const nlohmann::json& stateDoc)
 {
-	return cAxisCommunicationsExperimentState_Configure::configure(stateDoc);
+	return cAxisCommunicationsExperimentHelper_Configure::configure(stateDoc);
 }
 
 void cAxisCommunications_Configure_Local::run()
@@ -182,7 +182,7 @@ QString cAxisCommunications_TakePhoto_Local::getStatusStr()
 
 bool cAxisCommunications_TakePhoto_Local::configure(const nlohmann::json& stateDoc)
 {
-	return cAxisCommunicationsExperimentState_TakePhoto::configure(stateDoc);
+	return cAxisCommunicationsExperimentHelper_TakePhoto::configure(stateDoc);
 }
 
 void cAxisCommunications_TakePhoto_Local::run()

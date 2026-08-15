@@ -8,7 +8,7 @@ syntax = "proto3";
 
 
 /******************************************************************************
- * Property Page <-> Sensor Controller
+ * Enums used in various messages
  *****************************************************************************/
 
 enum lucid_eQuery 
@@ -21,14 +21,27 @@ enum lucid_eQuery
   eQUERY_LAPSE_INTERVAL = 5;
 }
 
+enum lucid_eReply
+{
+    eReply_GOOD = 0;
+    eReply_FAILED = 1;
+    eReply_ABORTED = 2;
+    eReply_PENDING = 3;
+}
+
+
+/******************************************************************************
+ * Property Page <-> Sensor Controller
+ *****************************************************************************/
+
 message lucid_QueryMessage_1 
 {
 	lucid_eQuery query = 1;
 }
 
-message lucid_ActiveCameraIdMessage_1
+message lucid_CameraModeMessage_1
 {
-    uint32 camera_id = 1;
+    uint32 mode = 1;
 }
 
 message lucid_ImageSizeMessage_1 
@@ -41,6 +54,32 @@ message lucid_FrameRateMessage_1
 {
 	uint32 frames_per_second = 1;
 }
+
+message lucid_LapseIntervalMessage_1 
+{
+	uint32 lapse_interval_ms = 1;
+}
+
+
+/******************************************************************************
+ * Property Page -> Sensor Controller
+ *****************************************************************************/
+ 
+message lucid_TakePhoto_1 
+{
+	bool update_view = 1;
+}
+
+message lucid_TakePhoto_2 
+{
+	bool update_view = 1;
+	bool auto_save   = 2;
+}
+
+
+/******************************************************************************
+ * Sensor Controller -> Property Page
+ *****************************************************************************/
 
 message lucid_StateMessage_1 
 {
@@ -61,4 +100,10 @@ message lucid_StateMessage_2
 	uint32 min_camera_id = 6;
 	uint32 max_camera_id = 7;
 }
+
+message lucid_Reply_1 
+{
+	lucid_eReply reply = 1;
+}
+
 

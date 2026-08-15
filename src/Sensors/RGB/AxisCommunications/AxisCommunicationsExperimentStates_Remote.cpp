@@ -87,7 +87,7 @@ void cAxisCommunications_SaveState_Remote::onConnect()
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
-	eRESULT mResult = cExperimentState::eRESULT::DONE;
+	mResult = cExperimentState::eRESULT::DONE;
 };
 
 
@@ -119,7 +119,7 @@ void cAxisCommunications_RestoreState_Remote::onConnect()
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
-	eRESULT mResult = cExperimentState::eRESULT::DONE;
+	mResult = cExperimentState::eRESULT::DONE;
 };
 
 
@@ -141,84 +141,22 @@ QString cAxisCommunications_Configure_Remote::getStatusStr()
 
 bool cAxisCommunications_Configure_Remote::configure(const nlohmann::json& stateDoc)
 {
-	using namespace nlohmann;
+	auto result = cAxisCommunicationsExperimentHelper_Configure::configure(stateDoc);
 
-	try
-	{
-		if (stateDoc.contains("mode"))
-		{
-			auto mode = stateDoc["mode"];
-			if (nStringUtils::iequal(mode, "photo"))
-			{
-				mMode = static_cast<int>(cAxisCommunicationsModel::eMode::SINGLE);
-			}
-			else if (nStringUtils::iequal(mode, "time lapse") || nStringUtils::iequal(mode, "time-lapse"))
-			{
-				mMode = static_cast<int>(cAxisCommunicationsModel::eMode::TIME_LAPSE);
-			}
-			else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))
-			{
-				mMode = static_cast<int>(cAxisCommunicationsModel::eMode::CONTINUOUS);
-			}
-		}
+	mWaitingForMode = false;
+	mWaitingForCameraID = false;
+	mWaitingForResolution = false;
+	mWaitingForFrameRate = false;
+	mWaitingForInterval = false;
 
-		if (stateDoc.contains("frame rate (hz)"))
-		{
-			mFrameRate_fps = stateDoc["frame rate (hz)"];
-		}
+	return result;
+}
 
-		int32_t lapse_interval_ms = -1;
+void cAxisCommunications_Configure_Remote::run()
+{
+	if (!mConnected) return;
 
-		if (stateDoc.contains("time-lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("time-lapse interval (ms)"))
-			lapse_interval_ms = stateDoc["time-lapse interval (ms)"].get<int32_t>();
-		else if (stateDoc.contains("lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("lapse interval (ms)"))
-			lapse_interval_ms = stateDoc["lapse interval (ms)"].get<int32_t>();
-		else if (stateDoc.contains("interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("interval (ms)"))
-			lapse_interval_ms = stateDoc["interval (ms)"].get<int32_t>();
-
-		if (lapse_interval_ms > 0)
-		{
-			mLapseInterval_ms = lapse_interval_ms;
-		}
-	}
-	catch (const detail::parse_error& e)
-	{
-		QString msg = "Parse Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Axis Communications Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::type_error& e)
-	{
-		QString msg = "Type Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Axis Communications Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::exception& e)
-	{
-		QString msg = "Unknown Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Axis Communications Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-
-	return true;
+	if (mWaitingForConfiguration) return;
 }
 
 cExperimentState::eRESULT cAxisCommunications_Configure_Remote::finished()
@@ -226,44 +164,67 @@ cExperimentState::eRESULT cAxisCommunications_Configure_Remote::finished()
 	if (mWaitingForConfiguration)
 		return cExperimentState::eRESULT::WAITING;
 
-	if (mWaitingForMode || mWaitingForFrameRate || mWaitingForInterval)
+	if (mWaitingForMode || mWaitingForCameraID || mWaitingForResolution || mWaitingForFrameRate || mWaitingForInterval)
 		return cExperimentState::eRESULT::WAITING;
 
 	return cExperimentState::eRESULT::DONE;
 }
 
-/*
-void cLucidVisionLabsRgbCamera_Configure_Remote::onMode(uint8_t id)
+void cAxisCommunications_Configure_Remote::onMode(uint8_t mode)
 {
 	mWaitingForMode = false;
 }
 
-void cLucidVisionLabsRgbCamera_Configure_Remote::onFrameRate(double fps)
+void cAxisCommunications_Configure_Remote::onCameraId(uint8_t id)
+{
+	mWaitingForCameraID = false;
+}
+
+void cAxisCommunications_Configure_Remote::onImageSize(uint16_t width, uint16_t height)
+{
+	mWaitingForResolution = false;
+}
+
+void cAxisCommunications_Configure_Remote::onFrameRate(uint8_t fps)
 {
 	mWaitingForFrameRate = false;
 }
 
-void cLucidVisionLabsRgbCamera_Configure_Remote::onLapseInterval(uint32_t interval_ms)
+void cAxisCommunications_Configure_Remote::onLapseInterval(uint32_t interval_ms)
 {
 	mWaitingForInterval = false;
 }
 
-void cLucidVisionLabsRgbCamera_Configure_Remote::onCurrentState(bool valid, uint8_t mode,
-	uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
-	std::optional<double> min_fps, std::optional<double> max_fps,
-	std::optional<float> min_K, std::optional<float> max_K)
+void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t id, uint16_t width, uint16_t height, uint8_t fps)
 {
+	if (mCameraID >= 0)
+		mWaitingForCameraID = id != mCameraID;
+
 	if (mMode >= 0)
-		mWaitingForMode = mode != mMode;
+		mWaitingForMode = true;
 
 	if (mFrameRate_fps > 0)
 		mWaitingForFrameRate = mFrameRate_fps != fps;
 
 	if (mLapseInterval_ms > 0)
-		mWaitingForInterval = mLapseInterval_ms != interval_ms;
+		mWaitingForInterval = true;
+
+	if (mImageWidth < 0)
+		mImageWidth = width;
+
+	if (mImageHeight < 0)
+		mImageHeight = height;
+
+	mWaitingForResolution = (mImageWidth != width) || (mImageHeight != height);
 
 	if (mWaitingForMode)
 		sendSetMode(static_cast<uint8_t>(mMode));
+
+	if (mWaitingForResolution)
+		sendSetImageSize(mImageWidth, mImageHeight);
+
+	if (mWaitingForCameraID)
+		sendSetCameraId(mCameraID);
 
 	if (mWaitingForFrameRate)
 		sendSetFrameRate_fps(mFrameRate_fps);
@@ -273,7 +234,87 @@ void cLucidVisionLabsRgbCamera_Configure_Remote::onCurrentState(bool valid, uint
 
 	mWaitingForConfiguration = false;
 }
-*/
+
+void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
+{
+	if (mCameraID >= 0)
+		mWaitingForCameraID = active_id != mCameraID;
+
+	if (mMode >= 0)
+		mWaitingForMode = true;
+
+	if (mFrameRate_fps > 0)
+		mWaitingForFrameRate = mFrameRate_fps != fps;
+
+	if (mLapseInterval_ms > 0)
+		mWaitingForInterval = true;
+
+	if (mImageWidth < 0)
+		mImageWidth = width;
+
+	if (mImageHeight < 0)
+		mImageHeight = height;
+
+	mWaitingForResolution = (mImageWidth != width) || (mImageHeight != height);
+
+	if (mWaitingForMode)
+		sendSetMode(static_cast<uint8_t>(mMode));
+
+	if (mWaitingForResolution)
+		sendSetImageSize(mImageWidth, mImageHeight);
+
+	if (mWaitingForCameraID)
+		sendSetCameraId(mCameraID);
+
+	if (mWaitingForFrameRate)
+		sendSetFrameRate_fps(mFrameRate_fps);
+
+	if (mWaitingForInterval)
+		sendSetLapseInterval_ms(mLapseInterval_ms);
+
+	mWaitingForConfiguration = false;
+}
+
+void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t mode, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
+	uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps)
+{
+	if (mCameraID >= 0)
+		mWaitingForCameraID = active_id != mCameraID;
+
+	if (mMode >= 0)
+		mWaitingForMode = mode != mMode;
+
+	if (mFrameRate_fps > 0)
+		mWaitingForFrameRate = mFrameRate_fps != fps;
+
+	if (mLapseInterval_ms > 0)
+		mWaitingForInterval = mLapseInterval_ms != interval_ms;
+
+	if (mImageWidth < 0)
+		mImageWidth = width;
+
+	if (mImageHeight < 0)
+		mImageHeight = height;
+
+	mWaitingForResolution = (mImageWidth != width) || (mImageHeight != height);
+
+	if (mWaitingForMode)
+		sendSetMode(static_cast<uint8_t>(mMode));
+
+	if (mWaitingForResolution)
+		sendSetImageSize(mImageWidth, mImageHeight);
+
+	if (mWaitingForCameraID)
+		sendSetCameraId(mCameraID);
+
+	if (mWaitingForFrameRate)
+		sendSetFrameRate_fps(mFrameRate_fps);
+
+	if (mWaitingForInterval)
+		sendSetLapseInterval_ms(mLapseInterval_ms);
+
+	mWaitingForConfiguration = false;
+}
 
 void cAxisCommunications_Configure_Remote::onConnect()
 {
@@ -281,6 +322,8 @@ void cAxisCommunications_Configure_Remote::onConnect()
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+
+	mConnected = true;
 }
 
 
@@ -305,49 +348,7 @@ QString cAxisCommunications_TakePhoto_Remote::getStatusStr()
 
 bool cAxisCommunications_TakePhoto_Remote::configure(const nlohmann::json& stateDoc)
 {
-	using namespace nlohmann;
-
-	mUpdateView = false;
-
-	try
-	{
-		if (stateDoc.contains("update view"))
-		{
-			mUpdateView = stateDoc["update view"];
-		}
-	}
-	catch (const detail::parse_error& e)
-	{
-		QString msg = "Parse Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Axis Communications Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::type_error& e)
-	{
-		QString msg = "Type Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Axis Communications Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::exception& e)
-	{
-		QString msg = "Unknown Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Axis Communications Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-
-	return true;
+	return cAxisCommunicationsExperimentHelper_TakePhoto::configure(stateDoc);
 }
 
 cExperimentState::eRESULT cAxisCommunications_TakePhoto_Remote::finished()
@@ -355,31 +356,14 @@ cExperimentState::eRESULT cAxisCommunications_TakePhoto_Remote::finished()
 	return mResult;
 }
 
-/*
-void cLucidVisionLabsRgbCamera_TakePhoto_Remote::onTakePhotoReply(bool error)
+void cAxisCommunications_TakePhoto_Remote::onTakePhotoReply(bool error)
 {
 	mResult = cExperimentState::eRESULT::DONE;
 };
 
-void cLucidVisionLabsRgbCamera_TakePhoto_Remote::onMode(uint8_t mode)
-{
-	if (mode == cLucidVisionLabsRgbModel::eMode::SINGLE)
-	{
-		sendTakePhoto(mUpdateView);
-	}
-	else
-	{
-		if (mUpdateView)
-			sendGrabImage();
-
-		mResult = cExperimentState::eRESULT::DONE;
-	}
-}
-*/
-
 void cAxisCommunications_TakePhoto_Remote::onConnect()
 {
-//	sendQueryMode();
+	sendTakePhoto(mUpdateView);
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));

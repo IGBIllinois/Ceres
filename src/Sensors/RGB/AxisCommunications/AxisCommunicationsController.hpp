@@ -29,8 +29,6 @@ public:
 
 protected:
     void onQueryState() override;
-//    void onSetAzimuthWindow(double min_deg, double max_deg) override;
-//    void onSetMode(ouster::eLIDAR_MODE mode) override;
 
 protected:
     /**

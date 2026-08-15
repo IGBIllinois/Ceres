@@ -49,7 +49,7 @@ private:
 	QLineEdit* mpImageSizes = nullptr;
 
 	QLabel* mpModeLabel = nullptr;
-	QComboBox* mpMode = nullptr;
+	QLineEdit* mpMode = nullptr;
 
 	QLabel* mpFrameRateLabel = nullptr;
 	QLineEdit* mpFrameRate_fps = nullptr;

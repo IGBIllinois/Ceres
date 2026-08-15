@@ -59,6 +59,11 @@ void cAxisCommunicationsModel::setMode(eMode mode)
 {
     mMode = mode;
 
+    if (mMode == eMode::TIME_LAPSE)
+        mTimeLapseTimer.start();
+    else
+        mTimeLapseTimer.stop();
+
     emit modeChanged(static_cast<int>(mMode));
 }
 
@@ -98,6 +103,7 @@ void cAxisCommunicationsModel::setLapseInterval_ms(uint32_t interval_ms)
     if (updateLapseInterval(interval_ms))
     {
         mLapseInterval_ms = interval_ms;
+        mTimeLapseTimer.time_ms(mLapseInterval_ms);
     }
 
     emit lapseIntervalChanged(mLapseInterval_ms);
@@ -241,8 +247,6 @@ void cAxisCommunicationsModel::onDefaultDataPathChange(QString path)
 void cAxisCommunicationsModel::requestImage()
 {
     mImageRequested = true;
-
-//    emit onNewImage(mCurrentImage);
 }
 
 void cAxisCommunicationsModel::requestImages(bool auto_emit)

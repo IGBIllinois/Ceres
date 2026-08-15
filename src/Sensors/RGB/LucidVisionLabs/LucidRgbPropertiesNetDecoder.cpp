@@ -7,6 +7,8 @@
 
 void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
+    using namespace lucid;
+
     switch (static_cast<ePacketType>(hdr.id))
     {
     case ePacketType::UNKNOWN:

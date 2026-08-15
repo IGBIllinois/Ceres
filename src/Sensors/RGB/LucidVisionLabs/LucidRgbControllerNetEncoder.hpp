@@ -23,9 +23,13 @@ public:
         uint16_t width, uint16_t height, uint8_t fps,
         uint8_t min_camera_id, uint8_t max_camera_id);
 
-    void sendActiveCameraId(uint8_t camera_id);
+    void sendCameraMode(uint8_t mode);
     void sendImageSize(uint16_t width, uint16_t height);
+
     void sendFrameRate(uint8_t fps);
+    void sendLapseInterval_ms(uint32_t interval_ms);
+
+    void sendTakePhotoReply();
 };
 
 

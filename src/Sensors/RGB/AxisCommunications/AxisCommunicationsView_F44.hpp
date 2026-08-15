@@ -23,38 +23,34 @@ public:
 	cAxisCommunicationsView_F44(cAxisCommunicationsModel_F44* pModel, QWidget* parent = nullptr);
 	virtual ~cAxisCommunicationsView_F44();
 
-	void initialize() override;
-
-	void showCrossHairButton(bool show);
+signals:
+	void saveImage();
 
 signals:
-	void activateCamera(int id);
-	void saveImage();
+	void requestCameraID(int id);
 
 public slots:
 	void onCameraIdChange(int id);
-	void enableCamera(int id);
-	void cameraSelected_1();
-	void cameraSelected_2();
-	void cameraSelected_3();
-	void cameraSelected_4();
+	void onCameraRangeChange(int min_id, int max_id);
+
+protected slots:
+	void cameraIdIndexChanged(int id);
 
 protected:
-	void imageUpdated(const QImage& image) override;
+	void createWidgets() override;
+	void doControlLayout(QHBoxLayout* pControlLayout) override;
 
 private:
-	QToolButton* mpCamera1 = nullptr;
-	QToolButton* mpCamera2 = nullptr;
-	QToolButton* mpCamera3 = nullptr;
-	QToolButton* mpCamera4 = nullptr;
-
 	QLabel* mpCameraIdLabel = nullptr;
-	QLineEdit* mpCameraId = nullptr;
+	QComboBox* mpCameraId = nullptr;
+
+	int mMinCameraId = 0;
+	int mMaxCameraId = 0;
 
 	QPushButton* mpShowCrossHairs = nullptr;
 
-	QPushButton* mpSaveImage = nullptr;
+//	QPushButton* mpSaveImage = nullptr;
 
 protected:
-	const cAxisCommunicationsModel* mpModel;
+	const cAxisCommunicationsModel_F44* mpModel;
 };

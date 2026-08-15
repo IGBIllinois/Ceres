@@ -22,13 +22,17 @@ protected:
     /*
      * Controller ----> Property Page
      */
-    virtual void onCameraId(uint8_t id) = 0;
+    virtual void onMode(uint8_t id) = 0;
     virtual void onImageSize(uint16_t width, uint16_t height) = 0;
     virtual void onFrameRate(uint8_t fps) = 0;
+    virtual void onLapseInterval(uint32_t interval_ms) = 0;
+
     virtual void onCurrentState(bool valid, uint8_t id,
         uint16_t width, uint16_t height, uint8_t fps) = 0;
     virtual void onCurrentState(bool valid, uint8_t active_id,
         uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) = 0;
+
+    virtual void onTakePhotoReply(bool error) = 0;
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;

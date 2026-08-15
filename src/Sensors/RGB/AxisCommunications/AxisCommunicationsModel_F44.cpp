@@ -46,9 +46,6 @@ cAxisCommunicationsModel_F44::cAxisCommunicationsModel_F44(QObject* parent)
 
     mMinFrameRate_fps = 1;
     mMaxFrameRate_fps = 50;
-
-
-//    mCameras = {nullptr, nullptr, nullptr, nullptr};
 }
 
 cAxisCommunicationsModel_F44::~cAxisCommunicationsModel_F44()
@@ -150,6 +147,8 @@ bool cAxisCommunicationsModel_F44::configure(const nlohmann::json& jsonCfg)
 
             emit enableCamera(id);
         }
+
+        emit cameraRangeUpdated(mMinCameraID, mMaxCameraID);
 
         int default_id = section["default camera id"];
         setActiveCamera(default_id);
@@ -451,9 +450,11 @@ bool cAxisCommunicationsModel_F44::updateImageSize(int width, int height)
 void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
 {
     mCurrentImage = *img;
-    if (mAutoEmitImages)
+    if (mAutoEmitImages || mImageRequested)
     {
         emit onNewImage(mCurrentImage);
+
+        mImageRequested = false;
     }
 
     bool newData = false;

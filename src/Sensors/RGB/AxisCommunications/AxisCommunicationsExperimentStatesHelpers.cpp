@@ -12,10 +12,10 @@
 /** Axis Communications Experiment State Helper to Configure Camera   **/
 /***********************************************************************/
 
-cAxisCommunicationsExperimentState_Configure::cAxisCommunicationsExperimentState_Configure()
+cAxisCommunicationsExperimentHelper_Configure::cAxisCommunicationsExperimentHelper_Configure()
 {}
 
-bool cAxisCommunicationsExperimentState_Configure::configure(const nlohmann::json& stateDoc)
+bool cAxisCommunicationsExperimentHelper_Configure::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
 
@@ -129,11 +129,11 @@ bool cAxisCommunicationsExperimentState_Configure::configure(const nlohmann::jso
 /**   Axis Communications Experiment State Helper to Take Photo       **/
 /***********************************************************************/
 
-cAxisCommunicationsExperimentState_TakePhoto::cAxisCommunicationsExperimentState_TakePhoto()
+cAxisCommunicationsExperimentHelper_TakePhoto::cAxisCommunicationsExperimentHelper_TakePhoto()
 {
 }
 
-bool cAxisCommunicationsExperimentState_TakePhoto::configure(const nlohmann::json& stateDoc)
+bool cAxisCommunicationsExperimentHelper_TakePhoto::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
 

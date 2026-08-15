@@ -9,10 +9,10 @@
 /***********************************************************************/
 
 
-class cAxisCommunicationsExperimentState_Configure
+class cAxisCommunicationsExperimentHelper_Configure
 {
 public:
-	cAxisCommunicationsExperimentState_Configure();
+	cAxisCommunicationsExperimentHelper_Configure();
 
 	bool configure(const nlohmann::json& stateDoc);
 
@@ -36,10 +36,10 @@ protected:
 /**   Axis Communications Experiment State Helper to Take Photo       **/
 /***********************************************************************/
 
-class cAxisCommunicationsExperimentState_TakePhoto
+class cAxisCommunicationsExperimentHelper_TakePhoto
 {
 public:
-	cAxisCommunicationsExperimentState_TakePhoto();
+	cAxisCommunicationsExperimentHelper_TakePhoto();
 
 	bool configure(const nlohmann::json& stateDoc);
 

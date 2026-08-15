@@ -14,6 +14,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QToolBar>
+#include <QDoubleValidator>
 
 #include <string>
 
@@ -32,16 +33,32 @@ cAxisCommunicationsView::~cAxisCommunicationsView()
 
 void cAxisCommunicationsView::initialize()
 {
+	createWidgets();
+
 	auto* viewport = new QWidget(this);
 
-	auto* statusLayout = new QHBoxLayout();
+	auto* controlLayout = new QHBoxLayout();
 
+	doControlLayout(controlLayout);
+
+	auto* mainLayout = new QVBoxLayout();
+
+	mainLayout->addLayout(controlLayout);
+
+	mainLayout->addWidget(mpImage);
+
+	viewport->setLayout(mainLayout);
+
+	setViewport(viewport);
+}
+
+void cAxisCommunicationsView::createWidgets()
+{
 	mpModeLabel = new QLabel("Mode:", this);
 	mpMode = new QComboBox(this);
 	mpMode->addItem("Photo");
 	mpMode->addItem("Time Lapse");
 	mpMode->addItem("Continuous");
-	mpMode->setEnabled(false);
 
 	switch (mpModel->mode())
 	{
@@ -55,54 +72,116 @@ void cAxisCommunicationsView::initialize()
 		mpMode->setCurrentIndex(2);
 		break;
 	}
-
-	statusLayout->addWidget(mpModeLabel);
-	statusLayout->addWidget(mpMode);
-	statusLayout->addSpacing(10);
+	connect(mpMode, &QComboBox::currentTextChanged, this, &cAxisCommunicationsView::modeTextChanged);
 
 	mpImageSizeLabel = new QLabel("Image Size (w x h):", this);
-	mpImageSize = new QLineEdit(this);
-	mpImageSize->setReadOnly(true);
-
-	statusLayout->addWidget(mpImageSizeLabel);
-	statusLayout->addWidget(mpImageSize);
-	statusLayout->addSpacing(10);
+	mpImageSizes = new QComboBox(this);
+	mpImageSizes->addItem("1920x1080");
+	mpImageSizes->addItem("1280x720");
+	mpImageSizes->addItem("1024x768");
+	mpImageSizes->addItem("1024x640");
+	mpImageSizes->addItem("800x600");
+	mpImageSizes->addItem("640x480");
+	connect(mpImageSizes, &QComboBox::currentTextChanged, this, &cAxisCommunicationsView::imageSizesTextChanged);
 
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
-	mpFrameRate_fps->setReadOnly(true);
 
-	statusLayout->addWidget(mpFrameRateLabel);
-	statusLayout->addWidget(mpFrameRate_fps);
-	statusLayout->addSpacing(10);
+	auto minRate_fps = mpModel->minFrameRate_fps();
+	auto maxRate_fps = mpModel->maxFrameRate_fps();
+
+	if (minRate_fps.has_value() && maxRate_fps.has_value())
+	{
+		mpFrameRate_fps->setValidator(new QDoubleValidator(minRate_fps.value(), maxRate_fps.value(), 0));
+	}
+	else
+	{
+		mpFrameRate_fps->setValidator(new QDoubleValidator(1.0, 50.0, 0));
+	}
+	connect(mpFrameRate_fps, &QLineEdit::editingFinished, this, &cAxisCommunicationsView::frameRateChanged);
 
 	mpLapseIntervalLabel = new QLabel("Lapse time (sec):", this);
 	mpLapseInterval_s = new QLineEdit(this);
-	mpLapseInterval_s->setReadOnly(true);
+	mpLapseInterval_s->setValidator(new QDoubleValidator(0.1, 300.0, 3));
+	connect(mpLapseInterval_s, &QLineEdit::editingFinished, this, &cAxisCommunicationsView::lapseIntervalChanged);
+}
 
-	statusLayout->addWidget(mpLapseIntervalLabel);
-	statusLayout->addWidget(mpLapseInterval_s);
+void cAxisCommunicationsView::doControlLayout(QHBoxLayout* pControlLayout)
+{
+	pControlLayout->addWidget(mpModeLabel);
+	pControlLayout->addWidget(mpMode);
+	pControlLayout->addSpacing(10);
 
-	statusLayout->addStretch(1);
+	pControlLayout->addWidget(mpImageSizeLabel);
+	pControlLayout->addWidget(mpImageSizes);
+	pControlLayout->addSpacing(10);
 
-	auto* mainLayout = new QVBoxLayout();
+	pControlLayout->addWidget(mpFrameRateLabel);
+	pControlLayout->addWidget(mpFrameRate_fps);
+	pControlLayout->addSpacing(10);
 
-	mainLayout->addLayout(statusLayout);
+	pControlLayout->addWidget(mpLapseIntervalLabel);
+	pControlLayout->addWidget(mpLapseInterval_s);
 
-	viewport->setLayout(mainLayout);
+	pControlLayout->addStretch(1);
+}
 
-	setViewport(viewport);
+
+void cAxisCommunicationsView::modeTextChanged(const QString& text)
+{
+	if (text == "Photo")
+	{
+		emit requestMode(cRgbCameraModel::SINGLE);
+	}
+	else if (text == "Time Lapse")
+	{
+		emit requestMode(cRgbCameraModel::TIME_LAPSE);
+	}
+	else if (text == "Continuous")
+	{
+		emit requestMode(cRgbCameraModel::CONTINUOUS);
+	}
+}
+
+void cAxisCommunicationsView::imageSizesTextChanged(const QString& text)
+{
+	rgb::sImageSize_t image_size = axis::to_image_size(text.toStdString());
+
+	emit requestImageSize(image_size.width, image_size.height);
+}
+
+void cAxisCommunicationsView::frameRateChanged()
+{
+	double frame_rate_hz = mpFrameRate_fps->text().toDouble();
+
+	emit requestFrameRate_Hz(frame_rate_hz);
+}
+
+void cAxisCommunicationsView::lapseIntervalChanged()
+{
+	uint32_t interval_ms = static_cast<uint32_t>(mpLapseInterval_s->text().toDouble() * 1000.0);
+
+	emit requestLapseInterval_ms(interval_ms);
 }
 
 void cAxisCommunicationsView::onImageSizeChange(int width, int height)
 {
-	QString str = QString::number(width);
-	str += " x ";
-	str += QString::number(height);
+	if (!mpImageSizes) return;
 
-	if (mpImageSize)
-		mpImageSize->setText(str);
+	if ((width == 1920) && (height == 1080))
+		mpImageSizes->setCurrentIndex(0);
+	else if ((width == 1280) && (height == 720))
+		mpImageSizes->setCurrentIndex(1);
+	else if ((width == 1024) && (height == 768))
+		mpImageSizes->setCurrentIndex(2);
+	else if ((width == 1024) && (height == 640))
+		mpImageSizes->setCurrentIndex(3);
+	else if ((width == 800) && (height == 600))
+		mpImageSizes->setCurrentIndex(4);
+	else if ((width == 640) && (height == 480))
+		mpImageSizes->setCurrentIndex(5);
 }
+
 
 void cAxisCommunicationsView::onModeChange(int mode)
 {
@@ -114,6 +193,7 @@ void cAxisCommunicationsView::onModeChange(int mode)
 
 	mpMode->setCurrentIndex(mode);
 
+/*
 	switch (mode)
 	{
 	case 0:
@@ -129,6 +209,7 @@ void cAxisCommunicationsView::onModeChange(int mode)
 		mpLapseInterval_s->setEnabled(false);
 		break;
 	}
+*/
 }
 
 void cAxisCommunicationsView::onFrameRateChange(int rate_fps)

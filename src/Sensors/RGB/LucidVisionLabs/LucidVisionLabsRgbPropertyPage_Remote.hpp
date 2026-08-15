@@ -22,13 +22,18 @@ public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 public:
-    void onCameraId(uint8_t id) override;
+    void onMode(uint8_t mode) override;
     void onImageSize(uint16_t width, uint16_t height) override;
     void onFrameRate(uint8_t fps) override;
+
+    void onLapseInterval(uint32_t interval_ms) override;
+
     void onCurrentState(bool valid, uint8_t id,
         uint16_t width, uint16_t height, uint8_t fps) override;
     void onCurrentState(bool valid, uint8_t active_id,
         uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
+
+    void onTakePhotoReply(bool error)  override;
 
 protected:
     void onConnect() override;

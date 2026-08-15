@@ -36,12 +36,9 @@ void cAxisCommunicationsStatusView::createWidgets()
 	mpImageSizes->setReadOnly(true);
 
 	mpModeLabel = new QLabel("Mode:", this);
-	mpMode = new QComboBox(this);
-	mpMode->addItem("Photo");
-	mpMode->addItem("Time Lapse");
-	mpMode->addItem("Continuous");
-	mpMode->setCurrentIndex(2);
-	mpMode->setEnabled(false);
+	mpMode = new QLineEdit(this);
+	mpMode->setText("Continuous");
+	mpMode->setReadOnly(true);
 
 	mpFrameRateLabel = new QLabel("Frames per Second:", this);
 	mpFrameRate_fps = new QLineEdit(this);
@@ -126,6 +123,20 @@ void cAxisCommunicationsStatusView::onModeChange(int mode)
 	if ((mode < 0) || (mode > 2))
 		return;
 
+	switch (mode)
+	{
+	case 0:
+		mpMode->setText("Photo");
+		break;
+	case 1:
+		mpMode->setText("Time Lapse");
+		break;
+	case 2:
+		mpMode->setText("Continuous");
+		break;
+	}
+
+/*
 	mpMode->setCurrentIndex(mode);
 
 	switch (mode)
@@ -143,6 +154,7 @@ void cAxisCommunicationsStatusView::onModeChange(int mode)
 		mpLapseInterval_s->setEnabled(false);
 		break;
 	}
+*/
 }
 
 void cAxisCommunicationsStatusView::onFrameRateChange(int rate_fps)

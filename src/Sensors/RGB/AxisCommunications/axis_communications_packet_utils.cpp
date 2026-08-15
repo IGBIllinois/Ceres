@@ -358,7 +358,7 @@ int axis::encode_current_state(bool valid, uint8_t mode, uint8_t camera_id, uint
 
     sPacketHeader_t hdr;
     hdr.id = static_cast<uint16_t>(ePacketType::CURRENT_STATE);
-    hdr.revision = 2;
+    hdr.revision = 3;
     hdr.length = str.length();
     set_timestamp(&hdr.timestamp);
 
@@ -497,11 +497,6 @@ int flir::encode_frame_rate_reply(eReply reply, net_buffer& buffer)
 int flir::encode_frame_interval_reply(eReply reply, net_buffer& buffer)
 {
     return encode_reply(reply, flir::ePacketType::FRAME_INTERVAL_REPLY, buffer);
-}
-
-int flir::encode_thermal_range_reply(eReply reply, net_buffer& buffer)
-{
-    return encode_reply(reply, flir::ePacketType::THERMAL_RANGE_REPLY, buffer);
 }
 */
 

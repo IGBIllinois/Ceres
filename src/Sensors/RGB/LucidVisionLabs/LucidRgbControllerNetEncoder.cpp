@@ -3,6 +3,8 @@
 #include "LucidRgbControllerNetEncoder.hpp"
 #include "lucid_vision_labs_rgb_packet_utils.hpp"
 
+using namespace lucid;
+
 
 cLucidRgbControllerNetEncoder::cLucidRgbControllerNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
@@ -23,9 +25,9 @@ void cLucidRgbControllerNetEncoder::sendCurrentState(bool valid, uint8_t active_
     sendData();
 }
 
-void cLucidRgbControllerNetEncoder::sendActiveCameraId(uint8_t camera_id)
+void cLucidRgbControllerNetEncoder::sendCameraMode(uint8_t mode)
 {
-    encode_active_camera_id(camera_id, mBuffer);
+    encode_camera_mode(mode, mBuffer);
     sendData();
 }
 
@@ -38,6 +40,18 @@ void cLucidRgbControllerNetEncoder::sendImageSize(uint16_t width, uint16_t heigh
 void cLucidRgbControllerNetEncoder::sendFrameRate(uint8_t fps)
 {
     encode_frame_rate(fps, mBuffer);
+    sendData();
+}
+
+void cLucidRgbControllerNetEncoder::sendLapseInterval_ms(uint32_t interval_ms)
+{
+    encode_lapse_interval(interval_ms, mBuffer);
+    sendData();
+}
+
+void cLucidRgbControllerNetEncoder::sendTakePhotoReply()
+{
+    encode_take_photo_reply(eReply::GOOD, mBuffer);
     sendData();
 }
 

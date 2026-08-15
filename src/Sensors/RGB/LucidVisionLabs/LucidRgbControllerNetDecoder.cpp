@@ -5,6 +5,8 @@
 #include "lucid_vision_labs_rgb_packet_utils.hpp"
 #include "net_buffer.hpp"
 
+using namespace lucid;
+
 
 void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer)
 {
@@ -54,6 +56,12 @@ void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, co
     }
     case ePacketType::GRAB_IMAGE:
         onGrabImage();
+        break;
+    case ePacketType::SAVE_STATE:
+        onSaveState();
+        break;
+    case ePacketType::RESTORE_STATE:
+        onRestoreState();
         break;
     }
 }

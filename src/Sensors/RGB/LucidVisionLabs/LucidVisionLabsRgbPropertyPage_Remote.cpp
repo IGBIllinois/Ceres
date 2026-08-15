@@ -128,10 +128,10 @@ void cLucidVisionLabsRgbPropertyPage_Remote::balanceWhiteAutoModeChanged(const Q
 
 }
 
-void cLucidVisionLabsRgbPropertyPage_Remote::onCameraId(uint8_t id)
+void cLucidVisionLabsRgbPropertyPage_Remote::onMode(uint8_t id)
 {
-	if ((id == 0) || (id > 4))
-		return;
+//	if ((id == 0) || (id > 4))
+//		return;
 
 //	mpCameraId->setText(QString::number(id));
 //	mDefaultCameraId = id;
@@ -172,7 +172,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t 
 {
 	if (!valid) return;
 
-	onCameraId(id);
+//	onCameraId(id);
 	onImageSize(width, height);
 	onFrameRate(fps);
 }
@@ -182,7 +182,7 @@ void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t 
 {
 	if (!valid) return;
 
-	onCameraId(active_id);
+//	onCameraId(active_id);
 	onImageSize(width, height);
 	onFrameRate(fps);
 

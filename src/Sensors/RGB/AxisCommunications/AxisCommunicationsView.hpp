@@ -9,6 +9,7 @@ class QPaintEvent;
 class QLabel;
 class QLineEdit;
 class QComboBox;
+class QHBoxLayout;
 QT_END_NAMESPACE
 
 class cAxisCommunicationsModel;
@@ -23,18 +24,33 @@ public:
 
 	virtual void initialize();
 
-public slots:
-	void onImageSizeChange(int width, int height);
+signals:
+	void requestMode(int mode);
+	void requestImageSize(int width, int height);
+	void requestFrameRate_Hz(double frame_rate_hz);
+	void requestLapseInterval_ms(uint32_t interval_ms);
 
+public slots:
 	void onModeChange(int mode);
+	void onImageSizeChange(int width, int height);
 	void onFrameRateChange(int rate_fps);
 	void onLapseIntervalChange(int interval_ms);
 
 	virtual void imageUpdated(const QImage& image);
 
+protected slots:
+	void modeTextChanged(const QString& text);
+	void imageSizesTextChanged(const QString& text);
+	void frameRateChanged();
+	void lapseIntervalChanged();
+
+protected:
+	virtual void createWidgets();
+	virtual void doControlLayout(QHBoxLayout* pControlLayout);
+
 protected:
     QLabel* mpImageSizeLabel = nullptr;
-    QLineEdit* mpImageSize = nullptr;
+	QComboBox* mpImageSizes = nullptr;
 
 	QLabel* mpModeLabel = nullptr;
 	QComboBox* mpMode = nullptr;

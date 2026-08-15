@@ -177,7 +177,7 @@ void cLucidVisionLabsRgbController_Triton::onQueryState()
 */
 }
 
-void cLucidVisionLabsRgbController_Triton::onQueryCameraId()
+void cLucidVisionLabsRgbController_Triton::onQueryMode()
 {
 //    sendActiveCameraId(mpModel->getActiveCameraID());
 }
@@ -195,12 +195,23 @@ void cLucidVisionLabsRgbController_Triton::onQueryFrameRate()
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
 
+void cLucidVisionLabsRgbController_Triton::onQueryLapseInterval()
+{
+    //    sendFrameRate(mpModel->getActiveFramesRate_fps());
+}
+
 void cLucidVisionLabsRgbController_Triton::onGrabImage()
 {
     mpModel->requestImage();
 }
 
-void cLucidVisionLabsRgbController_Triton::setCameraId(uint8_t id)
+void cLucidVisionLabsRgbController_Triton::onTakePhoto(bool updateView)
+{}
+
+void cLucidVisionLabsRgbController_Triton::onTakePhoto(bool updateView, bool autoSave)
+{}
+
+void cLucidVisionLabsRgbController_Triton::setMode(uint8_t mode)
 {
 //    mpModel->setActiveCamera(id);
 //    sendActiveCameraId(mpModel->getActiveCameraID());
@@ -219,5 +230,17 @@ void cLucidVisionLabsRgbController_Triton::setFrameRate(uint8_t fps)
 //    mpModel->setActiveFramesRate_fps(fps);
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
+
+void cLucidVisionLabsRgbController_Triton::setLapseInterval_ms(uint32_t interval_ms)
+{
+    //    mpModel->setActiveFramesRate_fps(fps);
+    //    sendFrameRate(mpModel->getActiveFramesRate_fps());
+}
+
+void cLucidVisionLabsRgbController_Triton::onSaveState()
+{}
+
+void cLucidVisionLabsRgbController_Triton::onRestoreState()
+{}
 
 

@@ -6,6 +6,7 @@ cRgbCameraModel::cRgbCameraModel(const std::string& name, QObject* parent)
 :
 	cSensorModel(name, parent)
 {
+	mLapseInterval_ms = 1000;
 }
 
 cRgbCameraModel::eMode cRgbCameraModel::mode() const

@@ -78,14 +78,21 @@ public:
 
 protected:
     void onQueryState() override;
-    void onQueryCameraId() override;
+    void onQueryMode() override;
     void onQueryImageSize() override;
     void onQueryFrameRate() override;
+    void onQueryLapseInterval() override;
     void onGrabImage() override;
+    void onTakePhoto(bool updateView) override;
+    void onTakePhoto(bool updateView, bool autoSave) override;
 
-    void setCameraId(uint8_t id) override;
+    void setMode(uint8_t mode) override;
     void setImageSize(uint16_t width, uint16_t height) override;
     void setFrameRate(uint8_t fps) override;
+    void setLapseInterval_ms(uint32_t interval_ms) override;
+
+    void onSaveState() override;
+    void onRestoreState() override;
 
 
 protected:
