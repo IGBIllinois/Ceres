@@ -71,6 +71,7 @@
 
 #include <nlohmann/json.hpp>
 
+bool g_AppIsClosing = false;
 
 namespace
 {
@@ -1684,6 +1685,84 @@ void cMainWindow::onConnectToSpidercam()
         pCtrlModel->configure(configDoc[name]);
     }
 
+    auto sensors = configDoc["planner sensors"];
+
+    for (auto sensor : sensors)
+    {
+        std::string type = sensor["type"];
+        auto widgets = create_sensor(type, sensor);
+
+        if (widgets.pModel == nullptr)
+        {
+            std::string msg = "Unknown sensor type or sensor not found: type is \"";
+            msg += type;
+            msg += "\"";
+
+            if (sensor.contains("sensor"))
+            {
+                msg += ", sensor name: ";
+                msg += sensor["sensor"];
+            }
+            else
+                msg += ".";
+
+            QMessageBox mb(QMessageBox::Critical, "Configuration Error", QString(msg.c_str()));
+            mb.exec();
+            continue;
+        }
+
+        QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
+        QObject::connect(widgets.pModel, &cSensorModel::elogMessage, this, &cMainWindow::onLogMessage);
+
+        if (!configDoc.contains(type))
+        {
+            QString msg = "The follow object is missing from the configuration file: ";
+            msg += QString::fromStdString(type);
+            onErrorMessage("Configuration Error", msg);
+            continue;
+        }
+
+        bool validSensor = false;
+        try
+        {
+            std::string entry = type;
+            if (sensor.contains("instance"))
+            {
+                entry += ":";
+                entry += sensor["instance"];
+            }
+
+            validSensor = widgets.pModel->configure(configDoc[entry]);
+        }
+        catch (const std::exception& e)
+        {
+            QString msg = "Sensor: ";
+            msg += QString::fromStdString(type);
+            msg += "\n";
+            msg += e.what();
+            onErrorMessage("Configuration Error", msg);
+            validSensor = false;
+        }
+
+        if (!validSensor)
+        {
+            remove_sensor(type, widgets);
+            continue;
+        }
+
+        mpModel->addSensor(widgets.pModel);
+
+        if (widgets.pDockableView)
+        {
+            addDockWidget(Qt::NoDockWidgetArea, widgets.pDockableView);
+            mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
+            widgets.pDockableView->show();
+
+            mpVideoView = widgets.pDockableView;
+        }
+    }
+
+#if 0
     if (mpVideoView == nullptr)
     {
         try
@@ -1710,6 +1789,7 @@ void cMainWindow::onConnectToSpidercam()
                         addDockWidget(Qt::NoDockWidgetArea, widgets.pDockableView);
                         mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
                         mpVideoView = widgets.pDockableView;
+                        mpVideoView->show();
                     }
 
                     widgets.pModel->updateViews();
@@ -1726,7 +1806,9 @@ void cMainWindow::onConnectToSpidercam()
     else
     {
         mpViewMenu->addAction(mpVideoView->toggleViewAction());
+        mpVideoView->show();
     }
+#endif
 
     mpModel->startDataThread();
 
@@ -1754,6 +1836,8 @@ void cMainWindow::onDisconnectFromSpidercam()
 
     mpModel->stopDataThread();
 
+    auto sensors = mpModel->getSensors();
+
     if (mpVideoView)
     {
         mpViewMenu->removeAction(mpVideoView->toggleViewAction());
@@ -1780,7 +1864,8 @@ void cMainWindow::onDisconnectFromSpidercam()
     QObject::disconnect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onMeasurementTerminated);
     QObject::disconnect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onMeasurementCompleted);
 
-    delete mpModel;
+    mpModel->deleteLater();
+//    delete mpModel;
     mpModel = nullptr;
 
     delete pCtrlModel;
@@ -2124,6 +2209,8 @@ void cMainWindow::closeEvent(QCloseEvent* event)
 
     mSettings.setValue("mainWindow/geometry", saveGeometry());
     mSettings.setValue("mainWindow/windowState", saveState());
+
+    ::g_AppIsClosing = true;
 
     QMainWindow::closeEvent(event);
 }

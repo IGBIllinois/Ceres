@@ -407,6 +407,7 @@ void cCreateHyperspectralReferenceExperimentDlg::onSensorUpdate()
 	}
 }
 
+#if 0
 bool cCreateHyperspectralReferenceExperimentDlg::generate()
 {
 	std::string str;
@@ -423,6 +424,7 @@ bool cCreateHyperspectralReferenceExperimentDlg::generate()
 	}
 
 	auto path = mpPath->path();
+
 	if (path.empty())
 	{
 		QString msg = "The measurement path can not be blank.";
@@ -679,7 +681,7 @@ bool cCreateHyperspectralReferenceExperimentDlg::generate()
 
 	return true;
 }
-
+#endif
 
 
 

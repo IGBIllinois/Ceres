@@ -40,6 +40,8 @@
 
 #include <nlohmann/json.hpp>
 
+bool g_AppIsClosing = false;
+
 namespace
 {
     std::string getCfgFilePath()
@@ -1242,3 +1244,14 @@ void cMainWindow::removeSensorPropertyPage(QAction* pAction)
 {
     mpSensorMenu->removeAction(pAction);
 }
+
+//-----------------------------------------------------------------------------
+void cMainWindow::closeEvent(QCloseEvent* event)
+{
+    ::g_AppIsClosing = true;
+
+    mpModel->stopDataThread();
+
+    QMainWindow::closeEvent(event);
+}
+

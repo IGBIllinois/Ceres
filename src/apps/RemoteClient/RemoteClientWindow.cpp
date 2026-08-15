@@ -25,6 +25,8 @@
 
 #include <nlohmann/json.hpp>
 
+bool g_AppIsClosing = false;
+
 namespace
 {
     std::string getCfgFilePath()

@@ -5,6 +5,8 @@
 #include <QAbstractEventDispatcher>
 #include <QDebug>
 
+extern bool g_AppIsClosing;
+
 cDataThread::cDataThread()
 {
     mHeartBeatTimer.interval_sec(3);
@@ -142,19 +144,25 @@ void cDataThread::run()
 
 cleanup:
 
+    mHeartBeatTimer.stop();
+
     try
     {
         stopCommunications();
     }
     catch (const std::exception& e)
     {
-        qCritical() << e.what();
+        if (!g_AppIsClosing)
+            qCritical() << e.what();
     }
 
     mActiveSensors.clear();
 
-    QString msg("Data collection thread terminated.");
+    if (!g_AppIsClosing)
+    {
+        QString msg("Data collection thread terminated.");
 
-    emit statusMessage(msg);
-    emit terminated();
+        emit statusMessage(msg);
+        emit terminated();
+    }
 }

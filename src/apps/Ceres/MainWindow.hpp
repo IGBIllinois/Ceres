@@ -118,6 +118,9 @@ private:
     void startDataModel(const nlohmann::json& configDoc);
 
 private:
+    void closeEvent(QCloseEvent* event) override;
+
+private:
     QSettings mSettings;
 
     cCeresSplashScreen* mpSplashScreen = nullptr;

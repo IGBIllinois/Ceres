@@ -21,6 +21,9 @@
 #include <QMessageBox>
 
 
+extern bool g_AppIsClosing;
+
+
 //Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
 //Q_DECLARE_METATYPE(QAbstractSocket::SocketState)
 
@@ -732,7 +735,8 @@ void cCtrlDataModelRemote::disconnected()
     mDataFileIsOpen = false;
     mConnected = false;
 
-    emit loopTerminated();
+    if (!g_AppIsClosing)
+        emit loopTerminated();
 }
 
 void cCtrlDataModelRemote::errorOccurred(QAbstractSocket::SocketError socketError)

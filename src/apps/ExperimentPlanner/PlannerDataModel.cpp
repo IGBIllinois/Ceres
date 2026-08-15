@@ -93,6 +93,16 @@ void cPlannerDataModel::addSensor(cSensorModel* pSensor)
     }
 }
 
+std::vector<cSensorModel*> cPlannerDataModel::getSensors()
+{
+    return mThread.mSensors;
+}
+
+void cPlannerDataModel::removeAllSensors()
+{
+    mThread.mSensors.clear();
+}
+
 void cPlannerDataModel::addExperimentControlModel(cExperimentControlModel* pControlModel)
 {
     if (pControlModel)

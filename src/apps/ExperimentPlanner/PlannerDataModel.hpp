@@ -44,6 +44,8 @@ public:
 
     std::size_t sensorCount() const override;
     void addSensor(cSensorModel* pSensor) override;
+    std::vector<cSensorModel*> getSensors();
+    void removeAllSensors();
 
     virtual void addExperimentControlModel(cExperimentControlModel* pModel);
     virtual cExperimentControlModel* removeExperimentControlModel();
