@@ -55,60 +55,6 @@ void cAxisCommunicationsModel::updateViews()
     emit lapseIntervalChanged(mLapseInterval_ms);
 }
 
-void cAxisCommunicationsModel::setMode(eMode mode)
-{
-    mMode = mode;
-
-    if (mMode == eMode::TIME_LAPSE)
-        mTimeLapseTimer.start();
-    else
-        mTimeLapseTimer.stop();
-
-    emit modeChanged(static_cast<int>(mMode));
-}
-
-void cAxisCommunicationsModel::setFrameRate_Hz(double frame_rate_hz)
-{
-    if (mMinFrameRate_fps.has_value())
-    {
-        if (frame_rate_hz < mMinFrameRate_fps.value())
-            frame_rate_hz = mMinFrameRate_fps.value();
-    }
-    else if (frame_rate_hz < 0)
-        frame_rate_hz = 0;
-
-    if (mMaxFrameRate_fps.has_value())
-    {
-        if (frame_rate_hz > mMaxFrameRate_fps.value())
-            frame_rate_hz = mMaxFrameRate_fps.value();
-    }
-
-    bool changing = frame_rate_hz != mFrameRate_fps;
-
-    if (updateFrameRate(frame_rate_hz))
-    {
-        mFrameRate_fps = frame_rate_hz;
-    }
-
-    emit frameRateChanged(mFrameRate_fps);
-}
-
-void cAxisCommunicationsModel::setLapseInterval_ms(uint32_t interval_ms)
-{
-    if (interval_ms < 100)
-        interval_ms = 100;
-
-    bool changing = interval_ms != mLapseInterval_ms;
-
-    if (updateLapseInterval(interval_ms))
-    {
-        mLapseInterval_ms = interval_ms;
-        mTimeLapseTimer.time_ms(mLapseInterval_ms);
-    }
-
-    emit lapseIntervalChanged(mLapseInterval_ms);
-}
-
 bool cAxisCommunicationsModel::autoEmitImages() const { return mAutoEmitImages; }
 void cAxisCommunicationsModel::autoEmitImages(bool auto_emit_images) { mAutoEmitImages = auto_emit_images; }
 

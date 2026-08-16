@@ -60,6 +60,20 @@ public:
     bool startCommunications() override;
     void stopCommunications() override;
 
+    /*
+     * General accessors and control of basic camera functions
+     */
+
+    // Set the acquisition mode: photo, time lapsed, continuous
+    void setMode(eMode mode) override;
+
+    // Set the frame rate when the mode is set to continuous
+    void setFrameRate_Hz(double frame_rate_hz) override;
+
+    // Get/Set the lapse interval (the time between images) when the mode is set to time-lapse
+    void setLapseInterval_ms(uint32_t interval_ms)  override;
+
+
     int getActiveCameraID() const override;
     int getActiveFramesRate_fps() const override;
     rgb::sImageSize_t getActiveImageSize() const override;

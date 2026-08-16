@@ -3,6 +3,8 @@
 #include "AxisCommunicationsFactory.hpp"
 #include "AxisCommunicationsUtils.hpp"
 
+#include "TimestampProvider.hpp"
+
 #include <cbdf/BlockDataFile.hpp>
 
 #include <QDebug>
@@ -193,9 +195,16 @@ void cAxisCommunicationsModel_F44::writeDataHeader()
 {
     if (!mpActiveCamera) return;
 
+    mSerializer.writeMode(mDeviceID, static_cast<uint8_t>(mMode));
+
+    if (mMode == eMode::TIME_LAPSE)
+        mSerializer.writeLapseTime(mDeviceID, mLapseInterval_ms);
+
     mSerializer.writeActiveCameraId(mDeviceID, mpActiveCamera->cameraID());
+
     auto size = mpActiveCamera->getImageSize();
     mSerializer.writeImageSize(mDeviceID, size.width, size.height);
+
     mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
 }
 
@@ -247,6 +256,78 @@ void cAxisCommunicationsModel_F44::requestReceived(QNetworkReply* pReply)
     }
 }
 
+void cAxisCommunicationsModel_F44::setMode(eMode mode)
+{
+    mMode = mode;
+
+    if (mMode == eMode::TIME_LAPSE)
+        mTimeLapseTimer.start();
+    else
+        mTimeLapseTimer.stop();
+
+    if (static_cast<bool>(mSerializer))
+    {
+        mSerializer.writeMode(mDeviceID, static_cast<uint8_t>(mMode));
+
+        if (mMode == eMode::TIME_LAPSE)
+            mSerializer.writeLapseTime(mDeviceID, mLapseInterval_ms);
+    }
+
+    emit modeChanged(static_cast<int>(mMode));
+}
+
+void cAxisCommunicationsModel_F44::setFrameRate_Hz(double frame_rate_hz)
+{
+    if (mMinFrameRate_fps.has_value())
+    {
+        if (frame_rate_hz < mMinFrameRate_fps.value())
+            frame_rate_hz = mMinFrameRate_fps.value();
+    }
+    else if (frame_rate_hz < 0)
+        frame_rate_hz = 0;
+
+    if (mMaxFrameRate_fps.has_value())
+    {
+        if (frame_rate_hz > mMaxFrameRate_fps.value())
+            frame_rate_hz = mMaxFrameRate_fps.value();
+    }
+
+    bool changing = frame_rate_hz != mFrameRate_fps;
+
+    if (updateFrameRate(frame_rate_hz))
+    {
+        mFrameRate_fps = frame_rate_hz;
+
+        if (static_cast<bool>(mSerializer))
+        {
+            mSerializer.writeFramesPerSecond(mDeviceID, mFrameRate_fps);
+        }
+    }
+
+    emit frameRateChanged(mFrameRate_fps);
+}
+
+void cAxisCommunicationsModel_F44::setLapseInterval_ms(uint32_t interval_ms)
+{
+    if (interval_ms < 100)
+        interval_ms = 100;
+
+    bool changing = interval_ms != mLapseInterval_ms;
+
+    if (updateLapseInterval(interval_ms))
+    {
+        mLapseInterval_ms = interval_ms;
+        mTimeLapseTimer.time_ms(mLapseInterval_ms);
+
+        if (static_cast<bool>(mSerializer))
+        {
+            mSerializer.writeLapseTime(mDeviceID, mLapseInterval_ms);
+        }
+    }
+
+    emit lapseIntervalChanged(mLapseInterval_ms);
+}
+
 int cAxisCommunicationsModel_F44::getActiveCameraID() const
 {
     if (mpActiveCamera)
@@ -290,7 +371,7 @@ void cAxisCommunicationsModel_F44::setActiveCamera(int id)
 
     mpActiveCamera = pCamera;
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    if (static_cast<bool>(mSerializer))
     {
         mSerializer.writeActiveCameraId(mDeviceID, mpActiveCamera->cameraID());
         mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
@@ -337,7 +418,7 @@ void cAxisCommunicationsModel_F44::setActiveImageSize(rgb::sImageSize_t image_si
     emit statusMessage(msg);
 #endif
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    if (static_cast<bool>(mSerializer))
     {
         auto size = mpActiveCamera->getImageSize();
         mSerializer.writeImageSize(mDeviceID, size.width, size.height);
@@ -377,7 +458,7 @@ void cAxisCommunicationsModel_F44::setActiveFramesRate_fps(int fps)
 
     mFrameRate_fps = mpActiveCamera->getFramesPerSeconds();
 
-    if (mIsRecording && static_cast<bool>(mSerializer))
+    if (static_cast<bool>(mSerializer))
     {
         mSerializer.writeFramesPerSecond(mDeviceID, mpActiveCamera->getFramesPerSeconds());
     }
@@ -464,7 +545,6 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
     case eMode::SINGLE:
         if (mPhotoRequested)
         {
-//            mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
             newData = true;
             mPhotoRequested = false;
             emit photoTaken();
@@ -473,13 +553,11 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
     case eMode::TIME_LAPSE:
         if (mTimeLapseTimer.elapsed())
         {
-//            mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
             newData = true;
             mTimeLapseTimer.start();
         }
         break;
     case eMode::CONTINUOUS:
-//        mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
         newData = true;
         break;
     }
@@ -490,8 +568,16 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
         {
             try
             {
+/*
+#ifdef USE_LOG_MESSAGE
+                logMessage(logSTATUS, "Saving MPEG Frame Buffer");
+#else
+                emit statusMessage("Saving MPEG Frame Buffer");
+#endif
+*/
+
                 axis::to_buffer(mCurrentImage, mMpegFrameBuffer);
-                mSerializer.write(mDeviceID, mMpegFrameBuffer);
+                mSerializer.write(mDeviceID, cTimestampProvider::timestamp_ns(), mMpegFrameBuffer);
             }
             catch (const std::exception& e)
             {
@@ -508,17 +594,27 @@ void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
 {
     mCurrentImage = *img;
 
-    if (mAutoEmitImages)
+    if (mAutoEmitImages || mImageRequested)
     {
         emit onNewImage(mCurrentImage);
+
+        mImageRequested = false;
     }
 
     if (mIsRecording && static_cast<bool>(mSerializer))
     {
         try
         {
+/*
+#ifdef USE_LOG_MESSAGE
+            logMessage(logSTATUS, "Saving JPEG Frame Buffer");
+#else
+            emit statusMessage("Saving JPEG Frame Buffer");
+#endif
+*/
+
             axis::to_buffer(mCurrentImage, mJpegBuffer);
-            mSerializer.write(mDeviceID, mJpegBuffer);
+            mSerializer.write(mDeviceID, cTimestampProvider::timestamp_ns(), mJpegBuffer);
         }
         catch (const std::exception& e)
         {

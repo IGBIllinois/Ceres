@@ -1,6 +1,14 @@
 
 #pragma once
 
+
+/******************************************************************************
+ * Axis Communications Controller
+ * 
+ * 
+ ******************************************************************************/
+
+
 #include "../../SensorController.hpp"
 #include "AxisControllerNetDecoder.hpp"
 #include "AxisControllerNetEncoder.hpp"
@@ -26,9 +34,6 @@ public:
     const std::string& name() const override;
     const std::string& instance() const override;
     bool has_instance() const override;
-
-protected:
-    void onQueryState() override;
 
 protected:
     /**

@@ -70,29 +70,6 @@ void cAxisCommunicationsController::processStream(const void* pBuffer, std::size
     }
 }
 
-void cAxisCommunicationsController::onQueryState()
-{
-//    auto window = mpModel->getAzimuthWindow();
-//    auto mode = mpModel->getLidarMode();
-
-//    sendCurrentState(true, mode, window.min_deg, window.max_deg);
-}
-
-/*
-void cAxisCommunicationsController::onSetAzimuthWindow(double min_deg, double max_deg)
-{
-    if (max_deg < min_deg)
-        std::swap(min_deg, max_deg);
-
-    mpModel->setAzimuthWindow(min_deg, max_deg);
-}
-
-void cAxisCommunicationsController::onSetMode(ouster::eLIDAR_MODE mode)
-{
-    mpModel->setLidarMode(mode);
-}
-*/
-
 /******************************************************************************
  * Axis Communications Controller F44
  ******************************************************************************/

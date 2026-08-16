@@ -58,15 +58,6 @@ public:
     /*
      * General accessors and control of basic camera functions
      */
-
-    void setMode(eMode mode) override;
-
-    // Set the frame rate when the mode is set to continuous
-    void setFrameRate_Hz(double frame_rate_hz) override;
-
-    // Get/Set the lapse interval (the time between images) when the mode is set to time-lapse
-    void setLapseInterval_ms(uint32_t interval_ms)  override;
-
     bool autoEmitImages() const;
     void autoEmitImages(bool auto_emit_images);
 
