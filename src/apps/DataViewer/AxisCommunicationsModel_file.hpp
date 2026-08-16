@@ -23,16 +23,20 @@ signals:
 	void onNewImage(const QImage& image);
 
 protected:
+	void onTimestamp(uint8_t device_id, uint64_t timestamp_ns) override;
+	void onMode(uint8_t device_id, int mode) override;
 	void onActiveCameraId(uint8_t device_id, int id) override;
 	void onFramesPerSecond(uint8_t device_id, int frames_per_sec) override;
 	void onImageSize(uint8_t device_id, int width, int height) override;
+	void onLapseTime(uint8_t device_id, int lapse_time_ms) override;
 
 	void onBitmap(uint8_t device_id, const cBitmapBuffer& buffer) override;
 	void onJPEG(uint8_t device_id, const cJpegBuffer& buffer) override;
 	void onMpegFrame(uint8_t device_id, const cMpegFrameBuffer& buffer) override;
-//	void onBitmap(const QBitmap& in) override;
-//	void onJPEG(const QImage& in) override;
-//	void onMpegFrame(const QImage& image) override;
+
+	void onBitmap(uint8_t device_id, uint64_t timestamp_ns, const cBitmapBuffer& buffer) override;
+	void onJPEG(uint8_t device_id, uint64_t timestamp_ns, const cJpegBuffer& buffer) override;
+	void onMpegFrame(uint8_t device_id, uint64_t timestamp_ns, const cMpegFrameBuffer& buffer) override;
 
 private:
 	QImage mImage;
