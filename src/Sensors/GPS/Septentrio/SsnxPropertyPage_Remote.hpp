@@ -32,6 +32,8 @@ public:
     void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
         double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) override;
 
+    void onReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count) override;
+
     void onReferenceCommandReply(eReferenceReply reply) override;
 
 
@@ -40,6 +42,7 @@ protected:
     void onDisconnect() override;
 
 protected:
+    void connectToModel() {};
     void showPage() override;
 
     void doCalcReference() override;

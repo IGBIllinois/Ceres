@@ -33,6 +33,7 @@ namespace gps
 		REFERENCE_PARAMETERS = 1000,
 		REFERENCE_DATA = 1001,
 		REFERENCE_REPLY = 1002,
+		REFERENCE_POSITION,
 	};
 
 
@@ -61,7 +62,7 @@ namespace gps
 	int encode_reference_parameters_reply(std::uint16_t min_integration_time_sec,
 		std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm, net_buffer& buffer);
 
-	/*** send/receive  the reference position message ***/
+	/*** send/receive  the reference data message ***/
 	struct sReferenceData_t
 	{
 		bool valid = false;
@@ -76,6 +77,18 @@ namespace gps
 	sReferenceData_t to_reference_data_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_reference_data(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
 		double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid, net_buffer& buffer);
+
+	/*** send/receive  the reference position message ***/
+	struct sReferencePosition_t
+	{
+		int x_mm = 0;
+		int y_mm = 0;
+		int z_mm = 0;
+		double error_mm = 0;
+		int count;
+	};
+	sReferencePosition_t to_reference_position_1(std::uint16_t length, const net_buffer_view& buffer);
+	int encode_reference_position(int x_mm, int y_mm, int z_mm, double error_mm, int count, net_buffer& buffer);
 
 	/*** send/receive the reference command reply message ***/
 	gps_eReferenceReply to_reference_reply_1(std::uint16_t length, const net_buffer_view& buffer);

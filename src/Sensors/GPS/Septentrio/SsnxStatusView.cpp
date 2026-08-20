@@ -23,8 +23,9 @@ constexpr int MIN_VALUE = -20000;
 
 cSsnxStatusView::cSsnxStatusView(cSsnxModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(pModel, parent)
+	cSensorStatusView(pModel, parent), mpModel(pModel)
 {
+	assert(mpModel);
 }
 
 cSsnxStatusView::~cSsnxStatusView()
@@ -431,6 +432,32 @@ void cSsnxStatusView::doLayout()
 	setLayout(mainLayout);
 }
 
+void cSsnxStatusView::connectToModel()
+{
+	connect(mpModel, &cSsnxModel::pvtCartesianDataValid, this, &cSsnxStatusView::onPvtCartesianStateChange);
+	connect(mpModel, &cSsnxModel::pvtGeodeticDataValid, this, &cSsnxStatusView::onPvtGeodeticStateChange);
+	connect(mpModel, &cSsnxModel::posCovGeodeticDataValid, this, &cSsnxStatusView::onPosCovGeodeticStateChange);
+	connect(mpModel, &cSsnxModel::velCovGeodeticDataValid, this, &cSsnxStatusView::onVelCovGeodeticStateChange);
+	connect(mpModel, &cSsnxModel::posProjectedDataValid, this, &cSsnxStatusView::onPosProjectedStateChange);
+	connect(mpModel, &cSsnxModel::receiverTimeDataValid, this, &cSsnxStatusView::onReceiverTimeStateChange);
+	connect(mpModel, &cSsnxModel::rtcmDatumDataValid, this, &cSsnxStatusView::onRtcmDatumStateChange);
+	connect(mpModel, &cSsnxModel::receiverStatusDataValid, this, &cSsnxStatusView::onReceiverStatusStateChange);
+	connect(mpModel, &cSsnxModel::wifiClientDataValid, this, &cSsnxStatusView::onWifiClientStateChange);
+	connect(mpModel, &cSsnxModel::ntripClientDataValid, this, &cSsnxStatusView::onNtripStateChange);
+
+	connect(mpModel, &cSsnxModel::receiverStatusChanged, this, &cSsnxStatusView::onReceiverStateChange);
+	connect(mpModel, &cSsnxModel::ntripClientStatusChanged, this, &cSsnxStatusView::onNtripClientChange);
+	connect(mpModel, &cSsnxModel::wifiClientConnectionChanged, this, &cSsnxStatusView::onWifiConnectionChange);
+
+	connect(mpModel, &cSsnxModel::solutionTypeChanged, this, &cSsnxStatusView::onSolutionTypeChange);
+	connect(mpModel, &cSsnxModel::positionChanged, this, &cSsnxStatusView::onPositionChange);
+	connect(mpModel, &cSsnxModel::updateGeodeticPVT, this, &cSsnxStatusView::onGeodeticPVT_Change);
+	connect(mpModel, &cSsnxModel::updateUTC, this, &cSsnxStatusView::onUTC_Change);
+	connect(mpModel, &cSsnxModel::referencePositionChanged, this, &cSsnxStatusView::onReferencePositionChange);
+
+	cSensorStatusView::connectToModel();
+}
+
 void cSsnxStatusView::onSensorStatusChange(QString name, QString instance, sensor::eStatus status)
 {
 	mpReconnect->setDisabled(status == sensor::eStatus::RUNNING);
@@ -585,7 +612,7 @@ void cSsnxStatusView::onPositionChange(int x_mm, int y_mm, int z_mm)
 		mpZ_mm->setText(QString::number(z_mm));
 }
 
-void cSsnxStatusView::onReferenceChange(int x_mm, int y_mm, int z_mm, double error_mm, int count)
+void cSsnxStatusView::onReferencePositionChange(int x_mm, int y_mm, int z_mm, double error_mm, int count)
 {
 	if (!isActiveWindow())
 		return;

@@ -32,6 +32,14 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
 
         break;
     }
+    case ePacketType::REFERENCE_POSITION:
+    {
+        sReferencePosition_t data = to_reference_position_1(hdr.length, buffer);
+
+        onReferencePosition(data.x_mm, data.y_mm, data.z_mm, data.error_mm, data.count);
+
+        break;
+    }
     case ePacketType::REFERENCE_REPLY:
     {
         auto reply = to_reference_reply_1(hdr.length, buffer);
@@ -48,6 +56,9 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
             break;
         case gps_eReferenceReply::eReferenceReply_PENDING:
             onReferenceCommandReply(eReferenceReply::PENDING);
+            break;
+        case gps_eReferenceReply::eReferenceReply_IDLE:
+            onReferenceCommandReply(eReferenceReply::IDLE);
             break;
         }
         break;

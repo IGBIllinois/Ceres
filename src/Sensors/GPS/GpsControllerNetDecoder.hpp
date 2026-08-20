@@ -39,7 +39,7 @@ protected:
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override;
-    virtual void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) {};
+    virtual void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) = 0;
 };
 
 

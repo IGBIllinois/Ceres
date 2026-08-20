@@ -1,6 +1,7 @@
 
 #include "SsnxView.hpp"
 #include "Constants.hpp"
+#include "SsnxModel.hpp"
 
 #include "../GpsUtils.hpp"
 
@@ -20,9 +21,7 @@ cSsnxView::cSsnxView(QWidget* parent)
 }
 
 cSsnxView::~cSsnxView()
-{
-
-}
+{}
 
 void cSsnxView::updateSolutionType(int solution_type)
 {

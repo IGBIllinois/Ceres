@@ -178,7 +178,9 @@ void cSsnxModel_direct::reconnectToGps()
 }
 
 void cSsnxModel_direct::writeDataHeader()
-{}
+{
+    cSsnxModel::writeDataHeader();
+}
 
 void cSsnxModel_direct::closeConnection()
 {

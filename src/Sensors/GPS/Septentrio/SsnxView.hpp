@@ -8,6 +8,8 @@
 QT_BEGIN_NAMESPACE
 QT_END_NAMESPACE
 
+class cSsnxModel;
+
 
 class cSsnxView : public cGpsView
 {

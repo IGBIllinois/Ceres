@@ -6,6 +6,8 @@
 
 #include "Timers.hpp"
 
+#include <QMetaType>
+
 #include <deque>
 #include <vector>
 
@@ -38,22 +40,36 @@ public:
     int getRefMaxIntegrationTime_sec() const;
     int getRefErrorThreshold_mm() const;
 
-    void setReferenceIntegrationTimes(int integration_time_sec,
+    void setReferenceIntegrationTimes(int min_integration_time_sec,
         int max_integration_time_sec, int ref_error_threshold_mm);
 
     ::gps::sReferencePosition getReferencePosition() const;
 
-    void startReferenceComputation();
-    void abortReferenceCompute();
+    void writeDataHeader() override;
 
 signals:
     void referenceComplete();
-    void referenceChanged(int x_mm, int y_mm, int z_mm, double error_mm, int count);
+    void referenceStateChanged(::gps::eReferenceState state);
+    void referenceParametersChanged(int min_integration_time_sec, int max_integration_time_sec, int ref_error_threshold_mm);
+    void referenceDataChanged(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+        double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid);
+
+    void referencePositionChanged(int x_mm, int y_mm, int z_mm, double error_mm, int count);
+
+public slots:
+    void referenceStateQueried();
+    void referenceParametersQueried();
+    void referenceDataQueried();
+
+    void updateReferenceParameters(int min_integration_time_sec, int max_integration_time_sec, int error_threshold_mm);
+
+    void startReferenceComputation();
+    void abortReferenceCompute();
 
 protected:
     cGpsModel(const std::string& name, QObject* parent = nullptr);
     cGpsModel(const std::string& name, const std::string& instance, QObject* parent = nullptr);
-    virtual ~cGpsModel() = default;
+    virtual ~cGpsModel();
 
 protected:
     void calcReferencePosition();

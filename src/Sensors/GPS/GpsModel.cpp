@@ -22,6 +22,10 @@ cGpsModel::cGpsModel(const std::string& name, const std::string& instance, QObje
     mRefMaxIntegrationTimer.time_sec(mRefMaxIntegrationTime_sec);
 }
 
+cGpsModel::~cGpsModel()
+{}
+
+
 bool cGpsModel::isPositionValid() const
 {
     return mPvtValid;
@@ -95,6 +99,8 @@ void cGpsModel::setReferenceIntegrationTimes(int min_integration_time_sec,
 
     mRefMinIntegrationTimer.time_sec(mRefMinIntegrationTime_sec);
     mRefMaxIntegrationTimer.time_sec(mRefMaxIntegrationTime_sec);
+
+    emit referenceParametersChanged(mRefMinIntegrationTime_sec, mRefMaxIntegrationTime_sec, mRefErrorThreshold_mm);
 }
 
 gps::sReferencePosition cGpsModel::getReferencePosition() const
@@ -102,15 +108,66 @@ gps::sReferencePosition cGpsModel::getReferencePosition() const
     return mReferencePosition;
 }
 
+void cGpsModel::writeDataHeader()
+{
+    // Write Data Header is call at the beginning of each measurement run.
+    // Here we invalidate the reference position so we don't store an old copy.
+    mRefLatitudes.clear();
+    mRefLongitudes.clear();
+    mRefHeights.clear();
+
+    mRefMinIntegrationTimer.stop();
+    mRefMaxIntegrationTimer.stop();
+
+    mReferenceState = gps::eReferenceState::WAITING;
+
+    mReferencePosition.valid = false;
+    mReferencePosition.heightValid = false;
+}
+
+
+/******************************************************************************
+* S L O T S   H A N D L E R S
+*******************************************************************************/
+
+void cGpsModel::referenceStateQueried()
+{
+    emit referenceStateChanged(mReferenceState);
+}
+
+void cGpsModel::referenceParametersQueried()
+{
+    emit referenceParametersChanged(mRefMinIntegrationTime_sec, mRefMaxIntegrationTime_sec, mRefErrorThreshold_mm);
+}
+
+void cGpsModel::referenceDataQueried()
+{
+    emit referenceDataChanged(mReferencePosition.valid, mReferencePosition.avgLatitude_rad, mReferencePosition.avgLongitude_rad, mReferencePosition.avgHeight_m,
+        mReferencePosition.stdLatitude_rad, mReferencePosition.stdLongitude_rad, mReferencePosition.stdHeight_m, mReferencePosition.heightValid);
+}
+
+void  cGpsModel::updateReferenceParameters(int min_integration_time_sec, int max_integration_time_sec, int error_threshold_mm)
+{
+    setReferenceIntegrationTimes(min_integration_time_sec, max_integration_time_sec, error_threshold_mm);
+}
+
 void cGpsModel::startReferenceComputation()
 {
     logMessage(logSTATUS, "Reference computation start requested.");
+
+    if (getStatus() != sensor::eStatus::RUNNING)
+    {
+        emit referenceStateChanged(gps::eReferenceState::ABORT);
+        return;
+    }
 
     if ((mReferenceState == gps::eReferenceState::START)
         || (mReferenceState == gps::eReferenceState::PENDING))
         return;
 
     mReferenceState = gps::eReferenceState::START;
+
+    emit referenceStateChanged(mReferenceState);
 }
 
 void cGpsModel::abortReferenceCompute()
@@ -118,7 +175,14 @@ void cGpsModel::abortReferenceCompute()
     logMessage(logSTATUS, "Reference computation abort requested.");
     
     mReferenceState = gps::eReferenceState::ABORT;
+
+    emit referenceStateChanged(mReferenceState);
 }
+
+
+/******************************************************************************
+* HELPER METHODS
+*******************************************************************************/
 
 void cGpsModel::calcReferencePosition()
 {
@@ -137,11 +201,14 @@ void cGpsModel::calcReferencePosition()
         mRefLongitudes.clear();
         mRefHeights.clear();
 
+        mRefMinIntegrationTimer.stop();
+        mRefMaxIntegrationTimer.stop();
+
         mReferenceState = gps::eReferenceState::WAITING;
 
         emit referenceComplete();
 
-        emit referenceChanged(-1, -1, -1, -1.0, -1);
+        emit referencePositionChanged(-1, -1, -1, -1.0, -1);
 
         logMessage(logSTATUS, "Reference computation aborted!");
         return;
@@ -161,7 +228,7 @@ void cGpsModel::calcReferencePosition()
             mReferencePosition.valid = false;
 
             emit referenceComplete();
-            emit referenceChanged(-1, -1, -1, -1.0, count);
+            emit referencePositionChanged(-1, -1, -1, -1.0, count);
             logMessage(logSTATUS, "Reference computation failed!");
 
             return;
@@ -226,7 +293,7 @@ void cGpsModel::calcReferencePosition()
 
         double error = sqrt(dx * dx + dy * dy + dz * dz);
 
-        emit referenceChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
+        emit referencePositionChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
 
         logMessage(logSTATUS, "Reference computation hit max integration time!");
 
@@ -316,7 +383,7 @@ void cGpsModel::calcReferencePosition()
 
         auto p = rfb::fromGPS(avgLat_rad, avgLng_rad, avgHeight_m);
 
-        emit referenceChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
+        emit referencePositionChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
         logMessage(logSTATUS, "Reference computation complete");
     }
 }

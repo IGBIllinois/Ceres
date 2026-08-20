@@ -31,6 +31,8 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
+	void connectToModel() override;
+
 signals:
 	void tryGpsReconnection();
 
@@ -57,7 +59,7 @@ public slots:
 		double groundTrack_deg, int datum, int num_sv, int num_bases);
 
 	void onUTC_Change(int hour, int min, int sec, int day, int month, int year);
-	void onReferenceChange(int x_mm, int y_mm, int z_mm, double error_mm, int count);
+	void onReferencePositionChange(int x_mm, int y_mm, int z_mm, double error_mm, int count);
 
 public:
 	void onSensorStatusChange(QString name, QString instance, sensor::eStatus status) override;
@@ -122,4 +124,7 @@ private:
 	QLineEdit* mpRef_Count = nullptr;
 
 	QPushButton* mpReconnect = nullptr;
+
+private:
+	cSsnxModel* mpModel = nullptr;
 };

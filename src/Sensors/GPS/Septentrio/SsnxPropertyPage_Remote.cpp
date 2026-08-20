@@ -2,7 +2,7 @@
 
 #include "SsnxPropertyPage_Remote.hpp"
 #include "SsnxIDs.hpp"
-#include "../GpsExperimentStates.hpp"
+#include "../GpsExperimentStates_Remote.hpp"
 
 #include "RappFieldBoundary.hpp"
 
@@ -134,6 +134,25 @@ void cSsnxPropertyPage_Remote::onReferenceData(bool valid, double avg_lat_rad, d
 		mpRef_Z_mm->setText("");
 
 	mpRef_Error_mm->setText(QString::number(error));
+}
+
+
+void cSsnxPropertyPage_Remote::onReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count)
+{
+	if ((x_mm == -1) && (y_mm == -1) && (z_mm == -1) && (error_mm < 0.0))
+	{
+		mpRef_X_mm->setText("");
+		mpRef_Y_mm->setText("");
+		mpRef_Z_mm->setText("");
+		mpRef_Error_mm->setText("");
+		return;
+	}
+
+	mpRef_X_mm->setText(QString::number(x_mm));
+	mpRef_Y_mm->setText(QString::number(y_mm));
+	mpRef_Z_mm->setText(QString::number(z_mm));
+
+	mpRef_Error_mm->setText(QString::number(error_mm));
 }
 
 void cSsnxPropertyPage_Remote::onReferenceCommandReply(eReferenceReply reply)

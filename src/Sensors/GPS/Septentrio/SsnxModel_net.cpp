@@ -111,6 +111,7 @@ void cSsnxModel_net::writeDataHeader()
         mReferenceState = ::gps::eReferenceState::WAITING;
     }
 */
+    cSsnxModel::writeDataHeader();
 }
 
 void cSsnxModel_net::pvtCartesian(const ssnx::gps::PVT_Cartesian_2_t pvt)

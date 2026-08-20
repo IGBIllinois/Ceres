@@ -55,8 +55,10 @@ set(GPS_SOURCE_FILES
 #
 # Gps Experiment State Files
 #
-    GpsExperimentStates.hpp
-    GpsExperimentStates.cpp
+    GpsExperimentStates_Local.hpp
+    GpsExperimentStates_Local.cpp
+    GpsExperimentStates_Remote.hpp
+    GpsExperimentStates_Remote.cpp
 )
 
 

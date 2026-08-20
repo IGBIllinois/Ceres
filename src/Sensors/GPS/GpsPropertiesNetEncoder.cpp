@@ -21,6 +21,15 @@ void cGpsPropertiesNetEncoder::encodeQueryReferenceData()
     }
 }
 
+void cGpsPropertiesNetEncoder::encodeQueryReferenceState()
+{
+    if (encode_gps_query(gps_eQuery::eQUERY_REFERENCE_STATE, mBuffer) < 0)
+    {
+        sendData();
+        encode_gps_query(gps_eQuery::eQUERY_REFERENCE_STATE, mBuffer);
+    }
+}
+
 void cGpsPropertiesNetEncoder::encodeQueryReferenceParameters()
 {
     if (encode_gps_query(gps_eQuery::eQUERY_REFERENCE_PARAMETERS, mBuffer) < 0)
@@ -62,6 +71,12 @@ void cGpsPropertiesNetEncoder::encodeStopReference()
 void cGpsPropertiesNetEncoder::sendQueryReferenceData()
 {
     encode_gps_query(gps_eQuery::eQUERY_REFERENCE_DATA, mBuffer);
+    sendData();
+}
+
+void cGpsPropertiesNetEncoder::sendQueryReferenceState()
+{
+    encode_gps_query(gps_eQuery::eQUERY_REFERENCE_STATE, mBuffer);
     sendData();
 }
 

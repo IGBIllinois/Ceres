@@ -39,37 +39,17 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
             pView->createWidgets();
             pView->doLayout();
 
-            QObject::connect(pModel, &cSsnxModel::sensorStatusChanging, pView, &cSsnxStatusView::onSensorStatusChange);
+            pView->connectToModel();
 
-            QObject::connect(pModel, &cSsnxModel::pvtCartesianDataValid, pView, &cSsnxStatusView::onPvtCartesianStateChange);
-            QObject::connect(pModel, &cSsnxModel::pvtGeodeticDataValid, pView, &cSsnxStatusView::onPvtGeodeticStateChange);
-            QObject::connect(pModel, &cSsnxModel::posCovGeodeticDataValid, pView, &cSsnxStatusView::onPosCovGeodeticStateChange);
-            QObject::connect(pModel, &cSsnxModel::velCovGeodeticDataValid, pView, &cSsnxStatusView::onVelCovGeodeticStateChange);
-            QObject::connect(pModel, &cSsnxModel::posProjectedDataValid, pView, &cSsnxStatusView::onPosProjectedStateChange);
-            QObject::connect(pModel, &cSsnxModel::receiverTimeDataValid, pView, &cSsnxStatusView::onReceiverTimeStateChange);
-            QObject::connect(pModel, &cSsnxModel::rtcmDatumDataValid, pView, &cSsnxStatusView::onRtcmDatumStateChange);
-            QObject::connect(pModel, &cSsnxModel::receiverStatusDataValid, pView, &cSsnxStatusView::onReceiverStatusStateChange);
-            QObject::connect(pModel, &cSsnxModel::wifiClientDataValid, pView, &cSsnxStatusView::onWifiClientStateChange);
-            QObject::connect(pModel, &cSsnxModel::ntripClientDataValid, pView, &cSsnxStatusView::onNtripStateChange);
-
-            QObject::connect(pModel, &cSsnxModel::receiverStatusChanged, pView, &cSsnxStatusView::onReceiverStateChange);
-            QObject::connect(pModel, &cSsnxModel::ntripClientStatusChanged, pView, &cSsnxStatusView::onNtripClientChange);
-            QObject::connect(pModel, &cSsnxModel::wifiClientConnectionChanged, pView, &cSsnxStatusView::onWifiConnectionChange);
-
-            QObject::connect(pModel, &cSsnxModel::solutionTypeChanged, pView, &cSsnxStatusView::onSolutionTypeChange);
-            QObject::connect(pModel, &cSsnxModel::positionChanged, pView, &cSsnxStatusView::onPositionChange);
-            QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxStatusView::onGeodeticPVT_Change);
-            QObject::connect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxStatusView::onUTC_Change);
-            QObject::connect(pModel, &cSsnxModel::referenceChanged, pView, &cSsnxStatusView::onReferenceChange);
-
-            QObject::connect(pView, &cSsnxStatusView::tryGpsReconnection, static_cast<cSsnxModel_direct*>(pModel), &cSsnxModel_direct::reconnectToGps);
+            if (protocol == "direct")
+                QObject::connect(pView, &cSsnxStatusView::tryGpsReconnection, static_cast<cSsnxModel_direct*>(pModel), &cSsnxModel_direct::reconnectToGps);
 
             widgets.pRemoteStatusView = pView;
         }
 
         auto* pController = new cSsnxController(pModel);
 
-        QObject::connect(pModel, &cSsnxModel::referenceComplete, pController, &cGpsController::onReferenceComplete);
+        pController->connectToModel();
 
         widgets.pController = pController;
 
@@ -79,13 +59,16 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
     auto* dockWidget = new QDockWidget();
     auto* pView = new cSsnxView(dockWidget);
 
+    // Connect the model signals to the view's slots
+    QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxView::updatePVT);
+    QObject::connect(pModel, &cSsnxModel::updateUTC,         pView, &cSsnxView::updateUTC);
+
+
     dockWidget->setWindowTitle(pView->windowTitle());
     dockWidget->setWidget(pView);
+
     QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cGpsView::dockLocationChanged);
     QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cGpsView::topLevelChanged);
-
-    QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxView::updatePVT);
-    QObject::connect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxView::updateUTC);
 
     return sSensorWidgets(pModel, dockWidget);
 }
@@ -93,19 +76,15 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
 
 void ssnx::remove_sensor(sSensorWidgets widgets)
 {
-    // SSNX model and view...
-    auto* pModel = static_cast<cSsnxModel*>(widgets.pModel);
+    auto* pModel = widgets.pModel;
     auto* dockWidget = widgets.pDockableView;
-    auto* pView = static_cast<cSsnxView*>(dockWidget->widget());
+    auto* pView = dockWidget->widget();
 
-    QObject::disconnect(pModel, &cSsnxModel::updateGeodeticPVT, pView, &cSsnxView::updatePVT);
-    QObject::disconnect(pModel, &cSsnxModel::updateUTC, pView, &cSsnxView::updateUTC);
+    pModel->disconnect();
+    pView->disconnect();
 
-    QObject::disconnect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cGpsView::dockLocationChanged);
-    QObject::disconnect(dockWidget, &QDockWidget::topLevelChanged, pView, &cGpsView::topLevelChanged);
-
-    delete pModel;
-    delete dockWidget;
+    pModel->deleteLater();
+    dockWidget->deleteLater();
 }
 
 

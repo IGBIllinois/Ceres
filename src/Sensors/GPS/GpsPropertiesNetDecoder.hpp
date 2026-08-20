@@ -34,7 +34,9 @@ protected:
     virtual void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
                                     double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) = 0;
 
-    enum class eReferenceReply { GOOD, FAILED, ABORTED, PENDING };
+    virtual void onReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count) = 0;
+
+    enum class eReferenceReply { GOOD, FAILED, ABORTED, PENDING, IDLE };
     virtual void onReferenceCommandReply(eReferenceReply reply) = 0;
 
 protected:

@@ -80,6 +80,15 @@ message gps_ReferenceData_1
 	bool   height_valid = 8;
 }
 
+message gps_ReferencePosition_1 
+{
+	int32 x_mm = 1;
+    int32 y_mm = 2;
+    int32 z_mm = 3;
+    double error_mm = 4;
+    int32 count = 5;
+}
+
 message gps_RefCommandReply_1 
 {
 	gps_eReferenceReply reply = 1;

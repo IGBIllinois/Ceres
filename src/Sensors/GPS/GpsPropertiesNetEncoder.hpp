@@ -27,6 +27,7 @@ public:
       * You need to call sendData to make sure the data is sent out!
       */
     void encodeQueryReferenceData();
+    void encodeQueryReferenceState();
     void encodeQueryReferenceParameters();
     void encodeReferenceParameters(std::uint16_t min_integration_time_sec, std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm);
     void encodeCalcReference();
@@ -37,6 +38,7 @@ public:
      * send the data.
      */
     void sendQueryReferenceData();
+    void sendQueryReferenceState();
     void sendQueryReferenceParameters();
     void sendReferenceParameters(std::uint16_t min_integration_time_sec, std::uint16_t max_integration_time_sec, std::uint16_t ref_error_threshold_mm);
     void sendCalcReference();

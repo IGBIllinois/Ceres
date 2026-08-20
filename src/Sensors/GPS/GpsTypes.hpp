@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <QMetaType>
+
 namespace  gps
 {
     enum class eDatum
@@ -92,6 +94,6 @@ namespace  gps
     {
         WAITING, START, PENDING, COMPLETE_GOOD, COMPLETE_FAILED, ABORT
     };
-
 };
 
+Q_DECLARE_METATYPE(gps::eReferenceState)

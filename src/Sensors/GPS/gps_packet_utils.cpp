@@ -176,6 +176,48 @@ int gps::encode_reference_data(bool valid, double avg_lat_rad, double avg_lng_ra
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+gps::sReferencePosition_t gps::to_reference_position_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    gps_ReferencePosition_1 pckt;
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        gps::sReferencePosition_t data;
+        data.x_mm = pckt.x_mm();
+        data.y_mm = pckt.y_mm();
+        data.z_mm = pckt.z_mm();
+        data.error_mm = pckt.error_mm();
+        data.count = pckt.count();
+        return data;
+    }
+
+    return gps::sReferencePosition_t();
+}
+
+int gps::encode_reference_position(int x_mm, int y_mm, int z_mm, double error_mm, int count, net_buffer& buffer)
+{
+    gps_ReferencePosition_1 pckt;
+    pckt.set_x_mm(x_mm);
+    pckt.set_y_mm(y_mm);
+    pckt.set_z_mm(z_mm);
+    pckt.set_error_mm(error_mm);
+    pckt.set_count(count);
+
+    std::string str;
+    if (!pckt.SerializeToString(&str))
+        return -1;
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::REFERENCE_POSITION);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
+
 /*** send/receive the command reply message ***/
 gps_eReferenceReply gps::to_reference_reply_1(std::uint16_t length, const net_buffer_view& buffer)
 {
