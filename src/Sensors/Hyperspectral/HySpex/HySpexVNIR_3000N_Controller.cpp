@@ -13,6 +13,11 @@ cHySpexVNIR_3000N_Controller::cHySpexVNIR_3000N_Controller(cHySpexVNIR_3000N_Mod
     assert(mpModel);
 }
 
+void cHySpexVNIR_3000N_Controller::connectToModel()
+{
+    connect(mpModel, &cHySpexVNIR_3000N_Model::backgroundComplete, this, &cHySpexVNIR_3000N_Controller::onBackgroundComplete);
+}
+
 void cHySpexVNIR_3000N_Controller::processStream(const void* pBuffer, std::size_t buf_length)
 {
     if (!pBuffer)

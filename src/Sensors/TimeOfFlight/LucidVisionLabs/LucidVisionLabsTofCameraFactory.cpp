@@ -41,6 +41,7 @@ sSensorWidgets create_helios_sensor(const nlohmann::json& sensorInfo, bool no_vi
         if (protocol == "net")
         {
             auto* pView = new cAxisCommunicationsStatusView(pModel);
+
             pView->createWidgets();
             pView->doLayout();
 

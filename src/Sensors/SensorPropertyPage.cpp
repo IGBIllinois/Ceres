@@ -30,6 +30,9 @@ cSensorPropertyPage::~cSensorPropertyPage()
 {
 }
 
+void cSensorPropertyPage::connectToModel()
+{}
+
 const std::string cSensorPropertyPage::instance() const
 {
     return mInstance;

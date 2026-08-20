@@ -12,6 +12,11 @@ cHySpexSWIR_384_Controller::cHySpexSWIR_384_Controller(cHySpexSWIR_384_Model* mo
     assert(mpModel);
 }
 
+void cHySpexSWIR_384_Controller::connectToModel()
+{
+    connect(mpModel, &cHySpexSWIR_384_Model::backgroundComplete, this, &cHySpexSWIR_384_Controller::onBackgroundComplete);
+}
+
 void cHySpexSWIR_384_Controller::processStream(const void* pBuffer, std::size_t buf_length)
 {
     if (!pBuffer)

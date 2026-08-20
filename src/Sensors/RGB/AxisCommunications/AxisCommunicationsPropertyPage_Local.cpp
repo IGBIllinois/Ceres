@@ -26,6 +26,25 @@ cAxisCommunicationsPropertyPage_Local::cAxisCommunicationsPropertyPage_Local(cAx
 	: cAxisCommunicationsPropertyPage(parent), mpModel(pModel)
 {}
 
+void cAxisCommunicationsPropertyPage_Local::connectToModel()
+{
+
+	QObject::connect(mpModel, &cAxisCommunicationsModel::modeChanged,          this, &cAxisCommunicationsPropertyPage_Local::onModeChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged, this, &cAxisCommunicationsPropertyPage_Local::onLapseIntervalChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,     this, &cAxisCommunicationsPropertyPage_Local::onFrameRateChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel::imageSizeChanged,     this, &cAxisCommunicationsPropertyPage_Local::onImageSizeChange);
+
+	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local::requestMode,             mpModel, &cAxisCommunicationsModel::requestMode);
+	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local::requestFrameRate_Hz,     mpModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
+	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local::requestLapseInterval_ms, mpModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
+	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local::requestImageSize,        mpModel, &cAxisCommunicationsModel::requestImageSize);
+	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local::requestImage,            mpModel, &cAxisCommunicationsModel::requestImage);
+	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local::requestImages,           mpModel, &cAxisCommunicationsModel::requestImages);
+
+	QObject::connect(this, qOverload<bool>(&cAxisCommunicationsPropertyPage_Local::requestPhoto),       mpModel, qOverload<bool>(&cAxisCommunicationsModel::takePhoto));
+	QObject::connect(this, qOverload<bool, bool>(&cAxisCommunicationsPropertyPage_Local::requestPhoto), mpModel, qOverload<bool, bool>(&cAxisCommunicationsModel::takePhoto));
+}
+
 void cAxisCommunicationsPropertyPage_Local::createWidgets()
 {
 	cAxisCommunicationsPropertyPage::createWidgets();
@@ -197,6 +216,15 @@ void cAxisCommunicationsPropertyPage_Local::reject()
 cAxisCommunicationsPropertyPage_Local_F44::cAxisCommunicationsPropertyPage_Local_F44(cAxisCommunicationsModel_F44* pModel, QWidget* parent)
 	: cAxisCommunicationsPropertyPage_Local(pModel, parent), mpModel(pModel)
 {}
+
+void cAxisCommunicationsPropertyPage_Local_F44::connectToModel()
+{
+	QObject::connect(mpModel, &cAxisCommunicationsModel::cameraIdChanged, this, &cAxisCommunicationsPropertyPage_Local_F44::onCameraIdChange);
+
+	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local_F44::requestCameraID, mpModel, &cAxisCommunicationsModel_F44::setActiveCamera);
+
+	cAxisCommunicationsPropertyPage_Local::connectToModel();
+}
 
 cExperimentState* cAxisCommunicationsPropertyPage_Local_F44::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {

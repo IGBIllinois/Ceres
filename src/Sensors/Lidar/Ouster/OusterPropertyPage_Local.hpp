@@ -16,10 +16,11 @@ public:
     cOusterPropertyPage_Local(cOusterModel* model, QWidget* parent = nullptr);
     ~cOusterPropertyPage_Local() = default;
 
+    void connectToModel() override;
+    void doLayout() override;
+
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
-
-    void doLayout() override;
 
 signals:
     void requestNewAzimuthWindow(double min_deg, double max_deg);

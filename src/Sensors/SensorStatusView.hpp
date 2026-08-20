@@ -37,14 +37,22 @@ public:
 
 public:
 	/*
+	 * This method is called by factory function to make sure the signals/slots
+	 * between the model and status view are established
+	 */
+	virtual void connectToModel();
+
+	/*
 	 * These methods are called by factory function to make sure the GUI elements are
 	 * created and displayed in the correct arrangment
 	 */
 	virtual void createWidgets();
 	virtual void doLayout() = 0;
 
+
 public slots:
 	virtual void onSensorStatusChange(QString name, QString instance, sensor::eStatus status);
+	virtual void onSensorNameChanging(QString old_name, QString new_name, QString instance);
 
 protected:
 	QGroupBox* getSensorStatusBox() const;

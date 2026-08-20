@@ -25,6 +25,8 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
+	void connectToModel() override;
+
 public slots:
 	void onSensorInfoUpdated();
 	void onTimeInfoUpdated();

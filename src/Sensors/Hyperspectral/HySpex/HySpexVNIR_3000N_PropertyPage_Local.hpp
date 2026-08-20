@@ -13,6 +13,8 @@ public:
     cHySpexVNIR_3000N_PropertyPage_Local(QWidget* parent = nullptr);
     ~cHySpexVNIR_3000N_PropertyPage_Local() = default;
 
+    void connectToModel() override;
+
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 

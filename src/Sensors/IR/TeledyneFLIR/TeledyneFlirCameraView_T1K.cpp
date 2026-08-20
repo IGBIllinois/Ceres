@@ -30,3 +30,8 @@ void cTeledyneFlirCameraView_T1K::initialize()
 
 	mpImageSize->setText(image_size);
 }
+
+void cTeledyneFlirCameraView_T1K::connectToModel()
+{
+	cTeledyneFlirCameraView::connectToModel();
+}

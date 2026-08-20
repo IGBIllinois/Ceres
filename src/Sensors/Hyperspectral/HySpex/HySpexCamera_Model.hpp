@@ -11,6 +11,7 @@
 #include <hyspex_connect/HySpexData.hpp>
 
 #include <QObject>
+#include <QImage>
 
 #include <vector>
 #include <mutex>
@@ -262,5 +263,8 @@ protected:
     std::size_t mSpectralDistributionSpatialChannel = 0;
     HySpexConnect::cSpectralData<float> mSpectralDistWorkingData;
     HySpexConnect::cSpectralData<float> mSpectralDistributionData;
+
+//    mpCurrentImage = new QImage(640, 480, QImage::Format_RGB888);
+
 };
 

@@ -28,6 +28,13 @@ public:
     virtual bool has_instance() const = 0;
 
 public:
+    /*
+     * This method is called by factory function to make sure the signals/slots
+     * between the model and status view are established
+     */
+    virtual void connectToModel() = 0;
+
+public:
     bool startTcpServer(const std::string& ip);
 
     std::string serverIpAddress() const;
@@ -70,6 +77,4 @@ private slots:
 protected:
 	QTcpServer* mpTcpServer = nullptr;
 	QTcpSocket* mpClient = nullptr;
-
-private:
 };

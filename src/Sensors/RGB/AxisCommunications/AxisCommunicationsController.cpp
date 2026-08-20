@@ -81,6 +81,28 @@ cAxisCommunicationsController_F44::cAxisCommunicationsController_F44(cAxisCommun
     assert(mpModel);
 }
 
+void cAxisCommunicationsController_F44::connectToModel()
+{
+    connect(mpModel, &cAxisCommunicationsModel::modeChanged,          this, &cAxisCommunicationsController_F44::modeChanged);
+    connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged, this, &cAxisCommunicationsController_F44::lapseIntervalChanged);
+    connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,     this, &cAxisCommunicationsController_F44::frameRateChanged);
+    connect(mpModel, &cAxisCommunicationsModel::imageSizeChanged,     this, &cAxisCommunicationsController_F44::imageSizeChanged);
+    connect(mpModel, &cAxisCommunicationsModel::photoTaken,           this, &cAxisCommunicationsController_F44::photoTaken);
+
+    connect(this, &cAxisCommunicationsController_F44::requestImageSize,        mpModel, &cAxisCommunicationsModel::requestImageSize);
+    connect(this, &cAxisCommunicationsController_F44::requestMode,             mpModel, &cAxisCommunicationsModel::requestMode);
+    connect(this, &cAxisCommunicationsController_F44::requestFrameRate_Hz,     mpModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
+    connect(this, &cAxisCommunicationsController_F44::requestLapseInterval_ms, mpModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
+    connect(this, &cAxisCommunicationsController_F44::requestImage,            mpModel, &cAxisCommunicationsModel::requestImage);
+    connect(this, &cAxisCommunicationsController_F44::requestImages,           mpModel, &cAxisCommunicationsModel::requestImages);
+
+    connect(this, &cAxisCommunicationsController_F44::requestSaveState,    mpModel, &cAxisCommunicationsModel_F44::onSaveState);
+    connect(this, &cAxisCommunicationsController_F44::requestRestoreState, mpModel, &cAxisCommunicationsModel_F44::onRestoreState);
+
+    connect(this, qOverload<bool>(&cAxisCommunicationsController_F44::requestPhoto),       mpModel, qOverload<bool>(&cAxisCommunicationsModel::takePhoto));
+    connect(this, qOverload<bool, bool>(&cAxisCommunicationsController_F44::requestPhoto), mpModel, qOverload<bool, bool>(&cAxisCommunicationsModel::takePhoto));
+}
+
 const char* cAxisCommunicationsController_F44::descriptor() const
 {
     return mpModel->descriptor();

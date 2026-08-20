@@ -42,6 +42,7 @@ protected:
     void onDisconnect() override;
 
 protected:
+    void connectToModel() override {}
     void createWidgets() override;
     void enableControls(bool enable) override;
     void buttonClicked(QAbstractButton* button) override;

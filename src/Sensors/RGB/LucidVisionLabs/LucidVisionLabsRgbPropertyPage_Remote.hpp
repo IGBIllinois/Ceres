@@ -46,6 +46,8 @@ protected:
 
 protected:
     void createWidgets() override;
+    void connectToModel() override {}
+
     void enableControls(bool enable) override;
     void buttonClicked(QAbstractButton* button) override;
 

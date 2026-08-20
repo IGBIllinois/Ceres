@@ -21,6 +21,7 @@ public:
 	virtual ~cLucidVisionLabsRgbView_Triton();
 
 	void initialize() override;
+	void connectToModel() override;
 
 protected:
 	const cLucidVisionLabsRgbModel_Triton* mpModel;

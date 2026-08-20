@@ -28,8 +28,7 @@ cSensorStatusView::cSensorStatusView(cSensorModel* pModel, QWidget* parent)
 }
 
 cSensorStatusView::~cSensorStatusView()
-{
-}
+{}
 
 std::string cSensorStatusView::descriptor() const
 {
@@ -39,6 +38,12 @@ std::string cSensorStatusView::descriptor() const
 	description += mpModel->sensorClass();
 
 	return description;
+}
+
+void cSensorStatusView::connectToModel()
+{
+	connect(mpModel, &cSensorModel::sensorStatusChanging, this, &cSensorStatusView::onSensorStatusChange);
+	connect(mpModel, &cSensorModel::sensorNameChanging,   this, &cSensorStatusView::onSensorNameChanging);
 }
 
 void cSensorStatusView::createWidgets()
@@ -62,6 +67,14 @@ void cSensorStatusView::onSensorStatusChange(QString name, QString instance, sen
 {
 	QString str = QString::fromStdString(sensor::to_string(status));
 	mpSensorStatus->setText(str);
+}
+
+void cSensorStatusView::onSensorNameChanging(QString old_name, QString new_name, QString instance)
+{
+	if (new_name.isEmpty())
+		return;
+
+	setWindowTitle(new_name);
 }
 
 QGroupBox* cSensorStatusView::getSensorStatusBox() const

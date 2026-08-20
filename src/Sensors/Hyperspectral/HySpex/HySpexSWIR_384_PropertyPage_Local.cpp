@@ -21,6 +21,11 @@ cHySpexSWIR_384_PropertyPage_Local::cHySpexSWIR_384_PropertyPage_Local(QWidget* 
 {
 }
 
+void cHySpexSWIR_384_PropertyPage_Local::connectToModel()
+{
+
+}
+
 cExperimentState* cHySpexSWIR_384_PropertyPage_Local::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 /*

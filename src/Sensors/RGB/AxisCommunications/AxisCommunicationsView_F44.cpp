@@ -33,6 +33,16 @@ cAxisCommunicationsView_F44::~cAxisCommunicationsView_F44()
 {
 }
 
+void cAxisCommunicationsView_F44::connectToModel()
+{
+    QObject::connect(mpModel, &cAxisCommunicationsModel_F44::cameraIdChanged,    this, &cAxisCommunicationsView_F44::onCameraIdChange);
+    QObject::connect(mpModel, &cAxisCommunicationsModel_F44::cameraRangeUpdated, this, &cAxisCommunicationsView_F44::onCameraRangeChange);
+
+    QObject::connect(this, &cAxisCommunicationsView_F44::requestCameraID, mpModel, &cAxisCommunicationsModel_F44::setActiveCamera);
+
+    cAxisCommunicationsView::connectToModel();
+}
+
 void cAxisCommunicationsView_F44::createWidgets()
 {
     cAxisCommunicationsView::createWidgets();

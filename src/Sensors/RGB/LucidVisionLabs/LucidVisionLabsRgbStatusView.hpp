@@ -25,6 +25,8 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
+	void connectToModel() override;
+
 signals:
 	void requestImage();
 
@@ -49,4 +51,7 @@ private:
 	QPushButton* mpGrabImage = nullptr;
 
 	cRgbImageWidget* mpImage = nullptr;
+
+private:
+	cLucidVisionLabsRgbModel* mpModel = nullptr;
 };

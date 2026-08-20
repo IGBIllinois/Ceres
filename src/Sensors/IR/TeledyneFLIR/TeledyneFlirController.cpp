@@ -13,6 +13,27 @@ cTeledyneFlirController::cTeledyneFlirController(cTeledyneFlirCameraModel* model
     assert(mpModel);
 }
 
+void cTeledyneFlirController::connectToModel()
+{
+    connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,          this, &cTeledyneFlirController::modeChanged);
+    connect(mpModel, &cTeledyneFlirCameraModel::lapseIntervalChanged, this, &cTeledyneFlirController::lapseIntervalChanged);
+    connect(mpModel, &cTeledyneFlirCameraModel::frameRateChanged,     this, &cTeledyneFlirController::frameRateChanged);
+    connect(mpModel, &cTeledyneFlirCameraModel::imageSizeChanged,     this, &cTeledyneFlirController::imageSizeChanged);
+    connect(mpModel, &cTeledyneFlirCameraModel::photoTaken,           this, &cTeledyneFlirController::photoTaken);
+
+    connect(this, &cTeledyneFlirController::requestMode,             mpModel, &cTeledyneFlirCameraModel::requestMode);
+    connect(this, &cTeledyneFlirController::requestFrameRate_Hz,     mpModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
+    connect(this, &cTeledyneFlirController::requestLapseInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
+    connect(this, &cTeledyneFlirController::requestImage,            mpModel, &cTeledyneFlirCameraModel::requestImage);
+    connect(this, &cTeledyneFlirController::requestImages,           mpModel, &cTeledyneFlirCameraModel::requestImages);
+
+    connect(this, &cTeledyneFlirController::requestSaveState,    mpModel, &cTeledyneFlirCameraModel::onSaveState);
+    connect(this, &cTeledyneFlirController::requestRestoreState, mpModel, &cTeledyneFlirCameraModel::onRestoreState);
+
+    connect(this, qOverload<bool>(&cTeledyneFlirController::requestPhoto),       mpModel, qOverload<bool>(&cTeledyneFlirCameraModel::takePhoto));
+    connect(this, qOverload<bool, bool>(&cTeledyneFlirController::requestPhoto), mpModel, qOverload<bool, bool>(&cTeledyneFlirCameraModel::takePhoto));
+}
+
 const char* cTeledyneFlirController::descriptor() const
 {
     return mpModel->descriptor();
@@ -162,6 +183,11 @@ cTeledyneFlirController_T1K::cTeledyneFlirController_T1K(cTeledyneFlirCameraMode
     cTeledyneFlirController(model, parent), mpModel(model)
 {
     assert(mpModel);
+}
+
+void cTeledyneFlirController_T1K::connectToModel()
+{
+    cTeledyneFlirController::connectToModel();
 }
 
 void cTeledyneFlirController_T1K::onPhotoTaken()

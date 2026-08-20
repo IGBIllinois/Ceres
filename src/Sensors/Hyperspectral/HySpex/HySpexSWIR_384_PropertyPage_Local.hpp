@@ -15,6 +15,8 @@ public:
     cHySpexSWIR_384_PropertyPage_Local(QWidget* parent = nullptr);
     ~cHySpexSWIR_384_PropertyPage_Local() = default;
 
+    void connectToModel() override;
+
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 

@@ -14,11 +14,10 @@ class cHySpexVNIR_3000N_View : public cHyperspectralView
 	Q_OBJECT
 
 public:
-	cHySpexVNIR_3000N_View(QWidget* parent = nullptr);
+	cHySpexVNIR_3000N_View(cHySpexVNIR_3000N_Model* pModel, QWidget* parent = nullptr);
 	virtual ~cHySpexVNIR_3000N_View();
 
-public slots:
-
+	void connectToModel() override;
 
 protected:
 	const cHySpexVNIR_3000N_Model* mpModel;

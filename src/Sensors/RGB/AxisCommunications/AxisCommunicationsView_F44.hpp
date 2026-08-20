@@ -23,6 +23,8 @@ public:
 	cAxisCommunicationsView_F44(cAxisCommunicationsModel_F44* pModel, QWidget* parent = nullptr);
 	virtual ~cAxisCommunicationsView_F44();
 
+	void connectToModel() override;
+
 signals:
 	void saveImage();
 

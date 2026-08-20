@@ -52,6 +52,21 @@ void cAxisCommunicationsView::initialize()
 	setViewport(viewport);
 }
 
+void cAxisCommunicationsView::connectToModel()
+{
+	QObject::connect(mpModel, &cAxisCommunicationsModel::modeChanged,          this, &cAxisCommunicationsView::onModeChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged, this, &cAxisCommunicationsView::onLapseIntervalChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,     this, &cAxisCommunicationsView::onFrameRateChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel::imageSizeChanged,     this, &cAxisCommunicationsView::onImageSizeChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel::onNewImage,           this, &cAxisCommunicationsView::imageUpdated);
+
+	QObject::connect(this, &cAxisCommunicationsView::requestMode,             mpModel, &cAxisCommunicationsModel::requestMode);
+	QObject::connect(this, &cAxisCommunicationsView::requestFrameRate_Hz,     mpModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
+	QObject::connect(this, &cAxisCommunicationsView::requestLapseInterval_ms, mpModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
+	QObject::connect(this, &cAxisCommunicationsView::requestImageSize,        mpModel, &cAxisCommunicationsModel::requestImageSize);
+}
+
+
 void cAxisCommunicationsView::createWidgets()
 {
 	mpModeLabel = new QLabel("Mode:", this);

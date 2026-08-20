@@ -23,6 +23,7 @@ public:
 	virtual ~cLucidVisionLabsRgbView();
 
 	virtual void initialize();
+	void connectToModel() override;
 
 signals:
 	void requestPhoto();

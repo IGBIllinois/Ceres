@@ -86,6 +86,9 @@ protected:
 
     void update() override;
 
+    void onSaveState() override;
+    void onRestoreState() override;
+
 protected:
     cColorTable mColorTable;
 
@@ -93,6 +96,17 @@ private:
     std::unique_ptr<cTeledyneFlirCamera> mCamera;
 
     bool mIsRunning = false;
+
+    struct sState
+    {
+        eMode mode;
+        double frameRate_fps;
+        uint32_t lapseInterval_ms;
+        uint16_t imageWidth;
+        uint16_t imageHeight;
+    };
+
+    std::vector<sState> mStateStack;
 
 private:
     const uint8_t mInstanceID;

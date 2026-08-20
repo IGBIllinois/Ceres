@@ -21,6 +21,7 @@ public:
 	virtual ~cAxisCommunicationsView_file();
 
 	void initialize();
+	void connectToModel();
 
 public slots:
 	void activeCameraIdUpdated(int id);

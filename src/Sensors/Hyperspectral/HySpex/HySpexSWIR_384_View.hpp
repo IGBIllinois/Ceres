@@ -10,16 +10,16 @@ QT_END_NAMESPACE
 
 class cHySpexSWIR_384_Model;
 
+
 class cHySpexSWIR_384_View : public cHyperspectralView
 {
 	Q_OBJECT
 
 public:
-	cHySpexSWIR_384_View(QWidget* parent = nullptr);
+	cHySpexSWIR_384_View(cHySpexSWIR_384_Model* pModel, QWidget* parent = nullptr);
 	virtual ~cHySpexSWIR_384_View();
 
-public slots:
-
+	void connectToModel() override;
 
 protected:
 	const cHySpexSWIR_384_Model* mpModel;

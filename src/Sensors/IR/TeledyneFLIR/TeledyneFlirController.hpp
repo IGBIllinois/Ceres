@@ -17,6 +17,8 @@ class cTeledyneFlirController : public cSensorController,
 public:
     cTeledyneFlirController(cTeledyneFlirCameraModel* model, QObject* parent = nullptr);
 
+    void connectToModel() override;
+
 public:
     const char* descriptor() const override;
     uint32_t version() const override { return 1; };
@@ -92,6 +94,8 @@ class cTeledyneFlirController_T1K : public cTeledyneFlirController
 
 public:
     cTeledyneFlirController_T1K(cTeledyneFlirCameraModel_T1K* model, QObject* parent = nullptr);
+
+    void connectToModel() override;
 
 public slots:
     void onPhotoTaken();

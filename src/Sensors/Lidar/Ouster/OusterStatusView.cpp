@@ -120,6 +120,21 @@ void cOusterStatusView::doLayout()
 	setLayout(mainLayout);
 }
 
+void cOusterStatusView::connectToModel()
+{
+	connect(mpModel, &cOusterModel::updateSensorInfo,      this, &cOusterStatusView::onSensorInfoUpdated);
+	connect(mpModel, &cOusterModel::updateTimeInfo,        this, &cOusterStatusView::onTimeInfoUpdated);
+	connect(mpModel, &cOusterModel::updateLidarMode,       this, &cOusterStatusView::onLidarModeUpdated);
+	connect(mpModel, &cOusterModel::updateBeamIntrinsics,  this, &cOusterStatusView::onBeamIntrinsicsUpdated);
+	connect(mpModel, &cOusterModel::updateImuIntrinsics,   this, &cOusterStatusView::onImuIntrinsicsUpdated);
+	connect(mpModel, &cOusterModel::updateLidarIntrinsics, this, &cOusterStatusView::onLidarIntrinsicsUpdated);
+	connect(mpModel, &cOusterModel::updateDataFormat,      this, &cOusterStatusView::onDataFormatUpdated);
+	connect(mpModel, &cOusterModel::updateAzimuthWindow,   this, &cOusterStatusView::onAzimuthWindowUpdated);
+	connect(mpModel, &cOusterModel::updateRangeData,       this, &cOusterStatusView::onRangeUpdated);
+
+	cSensorStatusView::connectToModel();
+}
+
 void cOusterStatusView::onSensorInfoUpdated()
 {
 	mpSensorInfoValid->setState(true);

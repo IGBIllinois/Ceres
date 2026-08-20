@@ -69,6 +69,8 @@ class cAxisCommunicationsController_F44 : public cSensorController,
 public:
     cAxisCommunicationsController_F44(cAxisCommunicationsModel_F44* model, QObject* parent = nullptr);
 
+    void connectToModel() override;
+
 public:
     const char* descriptor() const override;
     uint32_t version() const override { return 1; };

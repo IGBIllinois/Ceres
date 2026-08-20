@@ -40,6 +40,7 @@ public:
 
 	virtual void createWidgets() = 0;
 	virtual void doLayout() = 0;
+	virtual void connectToModel() = 0;
 
 	virtual void doOK();
 	virtual void doCancel();

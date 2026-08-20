@@ -20,6 +20,8 @@ public:
     cAxisCommunicationsPropertyPage_Remote(QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Remote() = default;
 
+    void connectToModel() override {};
+
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 

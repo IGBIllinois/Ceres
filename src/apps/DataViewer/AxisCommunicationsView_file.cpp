@@ -57,6 +57,11 @@ void cAxisCommunicationsView_file::initialize()
     setFixedSize(600, 500);
 }
 
+void cAxisCommunicationsView_file::connectToModel()
+{
+
+}
+
 void cAxisCommunicationsView_file::activeCameraIdUpdated(int id)
 {
     mFrameNumber = 0;

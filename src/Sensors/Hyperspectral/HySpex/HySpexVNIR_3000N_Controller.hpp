@@ -17,6 +17,9 @@ class cHySpexVNIR_3000N_Controller : public cHySpexCamera_Controller,
 public:
     cHySpexVNIR_3000N_Controller(cHySpexVNIR_3000N_Model* model, QObject* parent = nullptr);
 
+public:
+    void connectToModel() override;
+
 /*** Qt slot handler */
 public:
     void onBackgroundComplete() override;

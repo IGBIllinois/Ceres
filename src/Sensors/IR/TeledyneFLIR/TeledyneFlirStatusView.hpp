@@ -26,6 +26,8 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
+	void connectToModel() override;
+
 signals:
 	void requestMode(int mode);
 	void requestFrameRate_Hz(double frame_rate_hz);
@@ -35,7 +37,6 @@ signals:
 	void requestImages(bool update_view);
 
 public slots:
-	void onSensorNameChanging(QString old_name, QString new_name, QString instance);
 	void onModeChange(int mode);
 	void onLapseIntervalChange(int interval_ms);
 	void onFrameRateChange(double rate_fps);
@@ -65,4 +66,7 @@ private:
 	QPushButton* mpGrabImage = nullptr;
 
 	cThermalImageWidget* mpThermalImage = nullptr;
+
+private:
+	cTeledyneFlirCameraModel* mpModel = nullptr;
 };

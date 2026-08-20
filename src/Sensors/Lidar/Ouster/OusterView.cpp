@@ -41,6 +41,20 @@ cOusterView::~cOusterView()
 {
 }
 
+void cOusterView::connectToModel()
+{
+
+    connect(mpModel, &cOusterModel::updateBeamIntrinsics,  this, &cOusterView::beamIntrinsicsChanged);
+    connect(mpModel, &cOusterModel::updateImuIntrinsics,   this, &cOusterView::imuIntrinsicsChanged);
+    connect(mpModel, &cOusterModel::updateLidarIntrinsics, this, &cOusterView::lidarIntrinsicsChanged);
+    connect(mpModel, &cOusterModel::updateDataFormat,      this, &cOusterView::dataFormatChanged);
+    connect(mpModel, &cOusterModel::updateAzimuthWindow,   this, &cOusterView::azimuthWindowChanged);
+    connect(mpModel, &cOusterModel::updateImuData,         this, &cOusterView::imuDataChanged, Qt::QueuedConnection);
+    connect(mpModel, &cOusterModel::updateLidarData,       this, &cOusterView::displayData, Qt::QueuedConnection);
+
+    //    QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged);
+    //    QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData);
+}
 
 void cOusterView::setFloatingSize()
 {

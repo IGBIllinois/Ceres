@@ -28,6 +28,8 @@ public:
 
 	virtual void initialize();
 
+	void connectToModel() override;
+
 signals:
 	void requestImage();
 	void requestImages(bool update_view);

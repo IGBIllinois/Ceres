@@ -25,6 +25,9 @@ public:
     const std::string& instance() const override;
     bool has_instance() const override;
 
+public:
+    void connectToModel() override;
+
 protected:
     void onQueryState() override;
     void onQueryLidarMode() override;

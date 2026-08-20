@@ -30,6 +30,7 @@ protected:
     void onConnect() override;
 
 protected:
+    void connectToModel() override {}
     void showPage() override;
     void doOK() override;
     void doCancel() override;

@@ -875,6 +875,11 @@ void cHySpexCamera_StatusView::onSpectralDistributionUpdated()
 	mpPlot->replot();
 }
 
+void cHySpexCamera_StatusView::updateImage(QImage image)
+{
+
+}
+
 void cHySpexCamera_StatusView::backgroundPressed()
 {
 	unclickAllButtons(nullptr);

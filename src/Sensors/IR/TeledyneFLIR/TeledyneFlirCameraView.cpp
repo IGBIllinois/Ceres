@@ -115,6 +115,17 @@ void cTeledyneFlirCameraView::initialize()
 	setViewport(viewport);
 }
 
+void cTeledyneFlirCameraView::connectToModel()
+{
+	QObject::connect(mpModel, &cTeledyneFlirCameraModel::sensorNameChanging, this, &cTeledyneFlirCameraView::onSensorNameChanging);
+	QObject::connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,        this, &cTeledyneFlirCameraView::onModeChange);
+	QObject::connect(mpModel, &cTeledyneFlirCameraModel::imageSizeChanged,   this, &cTeledyneFlirCameraView::onImageSizeChange);
+	QObject::connect(mpModel, &cTeledyneFlirCameraModel::onNewImage,         this, &cTeledyneFlirCameraView::imageUpdated);
+
+	QObject::connect(this, &cTeledyneFlirCameraView::requestImage,  mpModel, &cTeledyneFlirCameraModel::requestImage);
+	QObject::connect(this, &cTeledyneFlirCameraView::requestImages, mpModel, &cTeledyneFlirCameraModel::requestImages);
+}
+
 void cTeledyneFlirCameraView::onSensorNameChanging(QString old_name, QString new_name, QString instance)
 {
 	if (new_name.isEmpty())

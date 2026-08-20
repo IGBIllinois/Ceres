@@ -17,6 +17,13 @@ public:
 	cRgbCameraView(QWidget* parent = nullptr);
 	virtual ~cRgbCameraView();
 
+public:
+	/*
+	 * This method is called by factory function to make sure the signals/slots
+	 * between the model and status view are established
+	 */
+	virtual void connectToModel() = 0;
+
 public slots:
 	void enableCrosshairs(bool enable);
 

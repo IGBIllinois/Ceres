@@ -92,6 +92,17 @@ void cLucidVisionLabsRgbView::initialize()
 	setViewport(viewport);
 }
 
+void cLucidVisionLabsRgbView::connectToModel()
+{
+	connect(mpModel, &cLucidVisionLabsRgbModel::sensorNameChanging, this, &cLucidVisionLabsRgbView::onSensorNameChanging);
+	connect(mpModel, &cLucidVisionLabsRgbModel::modeChanged,        this, &cLucidVisionLabsRgbView::onModeChange);
+	connect(mpModel, &cLucidVisionLabsRgbModel::imageSizeChanged,   this, &cLucidVisionLabsRgbView::onImageSizeChange);
+	connect(mpModel, &cLucidVisionLabsRgbModel::onNewImage,         this, &cLucidVisionLabsRgbView::imageUpdated);
+
+	connect(this, &cLucidVisionLabsRgbView::requestImage,  mpModel, &cLucidVisionLabsRgbModel::requestImage);
+	connect(this, &cLucidVisionLabsRgbView::requestImages, mpModel, &cLucidVisionLabsRgbModel::requestImages);
+}
+
 void cLucidVisionLabsRgbView::onSensorNameChanging(QString old_name, QString new_name, QString instance)
 {
     if (new_name.isEmpty())

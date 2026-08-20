@@ -16,8 +16,9 @@
 
 cTeledyneFlirStatusView::cTeledyneFlirStatusView(cTeledyneFlirCameraModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(pModel, parent)
+	cSensorStatusView(pModel, parent), mpModel(pModel)
 {
+	assert(mpModel);
 }
 
 cTeledyneFlirStatusView::~cTeledyneFlirStatusView()
@@ -89,13 +90,18 @@ void cTeledyneFlirStatusView::doLayout()
 	setLayout(mainLayout);
 }
 
-
-void cTeledyneFlirStatusView::onSensorNameChanging(QString old_name, QString new_name, QString instance)
+void cTeledyneFlirStatusView::connectToModel()
 {
-	if (new_name.isEmpty())
-		return;
+	connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,          this, &cTeledyneFlirStatusView::onModeChange);
+	connect(mpModel, &cTeledyneFlirCameraModel::lapseIntervalChanged, this, &cTeledyneFlirStatusView::onLapseIntervalChange);
+	connect(mpModel, &cTeledyneFlirCameraModel::frameRateChanged,     this, &cTeledyneFlirStatusView::onFrameRateChange);
+	connect(mpModel, &cTeledyneFlirCameraModel::imageSizeChanged,     this, &cTeledyneFlirStatusView::onImageSizeChange);
+	connect(mpModel, &cTeledyneFlirCameraModel::onNewImage,           this, &cTeledyneFlirStatusView::imageUpdated);
 
-	setWindowTitle(new_name);
+	connect(this, &cTeledyneFlirStatusView::requestMode,             mpModel, &cTeledyneFlirCameraModel::requestMode);
+	connect(this, &cTeledyneFlirStatusView::requestFrameRate_Hz,     mpModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
+	connect(this, &cTeledyneFlirStatusView::requestLapseInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
+	connect(this, &cTeledyneFlirStatusView::requestImage,            mpModel, &cTeledyneFlirCameraModel::requestImage);
 }
 
 void cTeledyneFlirStatusView::onModeChange(int mode)

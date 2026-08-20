@@ -16,8 +16,9 @@
 
 cAxisCommunicationsStatusView::cAxisCommunicationsStatusView(cAxisCommunicationsModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(pModel, parent)
+	cSensorStatusView(pModel, parent), mpModel(pModel)
 {
+	assert(mpModel);
 }
 
 cAxisCommunicationsStatusView::~cAxisCommunicationsStatusView()
@@ -102,6 +103,20 @@ void cAxisCommunicationsStatusView::doLayout()
 	mainLayout->addWidget(mpImage, 1);
 
 	setLayout(mainLayout);
+}
+
+void cAxisCommunicationsStatusView::connectToModel()
+{
+	connect(mpModel, &cAxisCommunicationsModel::cameraIdChanged,      this, &cAxisCommunicationsStatusView::onCameraIdChange);
+	connect(mpModel, &cAxisCommunicationsModel::imageSizeChanged,     this, &cAxisCommunicationsStatusView::onImageSizeChange);
+	connect(mpModel, &cAxisCommunicationsModel::modeChanged,          this, &cAxisCommunicationsStatusView::onModeChange);
+	connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,     this, &cAxisCommunicationsStatusView::onFrameRateChange);
+	connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged, this, &cAxisCommunicationsStatusView::onLapseIntervalChange);
+	connect(mpModel, &cAxisCommunicationsModel::onNewImage,           this, &cAxisCommunicationsStatusView::imageUpdated);
+
+	connect(this, &cAxisCommunicationsStatusView::requestImage, mpModel, &cAxisCommunicationsModel::requestImage);
+
+	cSensorStatusView::connectToModel();
 }
 
 void cAxisCommunicationsStatusView::onCameraIdChange(int id)

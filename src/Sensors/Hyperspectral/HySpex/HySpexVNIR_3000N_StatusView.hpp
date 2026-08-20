@@ -27,4 +27,9 @@ public:
 	 */
 	void createWidgets() override;
 	void doLayout() override;
+
+	void connectToModel() override;
+
+private:
+	cHySpexVNIR_3000N_Model* mpModel = nullptr;
 };

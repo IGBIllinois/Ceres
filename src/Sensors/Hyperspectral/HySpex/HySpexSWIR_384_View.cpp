@@ -5,17 +5,21 @@
 #include <string>
 
 
-cHySpexSWIR_384_View::cHySpexSWIR_384_View(QWidget* parent)
+cHySpexSWIR_384_View::cHySpexSWIR_384_View(cHySpexSWIR_384_Model* pModel, QWidget* parent)
 	:
-    cHyperspectralView(parent),
-    mpModel(nullptr)
+    cHyperspectralView(parent), mpModel(pModel)
 {
+    assert(mpModel);
+
     setWindowTitle("HySpex SWIR-384");
 }
 
 cHySpexSWIR_384_View::~cHySpexSWIR_384_View()
 {
 }
+
+void cHySpexSWIR_384_View::connectToModel()
+{}
 
 
 

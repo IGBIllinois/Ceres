@@ -22,6 +22,8 @@ public:
     cTeledyneFlirPropertyPage_Local(cTeledyneFlirCameraModel* pModel, QWidget* parent = nullptr);
     ~cTeledyneFlirPropertyPage_Local() = default;
 
+    void connectToModel() override;
+
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
@@ -60,6 +62,8 @@ class cTeledyneFlirPropertyPage_T1K_Local : public cTeledyneFlirPropertyPage_Loc
 public:
     cTeledyneFlirPropertyPage_T1K_Local(cTeledyneFlirCameraModel_T1K* pModel, QWidget* parent = nullptr);
     ~cTeledyneFlirPropertyPage_T1K_Local() = default;
+
+    void connectToModel() override;
 
 protected:
     void showPage() override;

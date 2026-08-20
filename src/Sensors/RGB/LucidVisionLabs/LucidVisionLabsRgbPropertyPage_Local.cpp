@@ -134,6 +134,14 @@ void cLucidVisionLabsRgbPropertyPage_Local::buttonClicked(QAbstractButton* butto
 	cLucidVisionLabsRgbPropertyPage::buttonClicked(button);
 }
 
+void cLucidVisionLabsRgbPropertyPage_Local::connectToModel()
+{
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changeMode,             mpModel, &cLucidVisionLabsRgbModel::requestMode);
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changeFrameRate_Hz,     mpModel, &cLucidVisionLabsRgbModel::requestFrameRate_Hz);
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changeLapseInterval_ms, mpModel, &cLucidVisionLabsRgbModel::requestLapseInterval_ms);
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::requestPhoto,           mpModel, &cLucidVisionLabsRgbModel::takePhoto);
+}
+
 void cLucidVisionLabsRgbPropertyPage_Local::showPage()
 {
 	switch (mpModel->mode())
@@ -210,6 +218,23 @@ void cLucidVisionLabsRgbPropertyPage_Local::reject()
 cLucidVisionLabsRgbPropertyPage_Local_Triton::cLucidVisionLabsRgbPropertyPage_Local_Triton(cLucidVisionLabsRgbModel_Triton* pModel, QWidget* parent)
 	: cLucidVisionLabsRgbPropertyPage_Local(pModel, parent), mpModel(pModel)
 {
+}
+
+void cLucidVisionLabsRgbPropertyPage_Local_Triton::connectToModel()
+{
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changePixelFormat,      mpModel, &cLucidVisionLabsRgbModel_Triton::requestPixelFormat);
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changeExposure,         mpModel, &cLucidVisionLabsRgbModel_Triton::requestExposure);
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changeGain,             mpModel, &cLucidVisionLabsRgbModel_Triton::requestGain);
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changeBalanceWhiteAuto, mpModel, &cLucidVisionLabsRgbModel_Triton::requestBalanceWhiteAuto);
+	connect(this, &cLucidVisionLabsRgbPropertyPage_Local::changeGamma,            mpModel, &cLucidVisionLabsRgbModel_Triton::requestGamma);
+
+	connect(mpModel, &cLucidVisionLabsRgbModel_Triton::pixelFormatChanged,       this, &cLucidVisionLabsRgbPropertyPage_Local::pixelFormatUpdated);
+	connect(mpModel, &cLucidVisionLabsRgbModel_Triton::exposureChanged,          this, &cLucidVisionLabsRgbPropertyPage_Local::exposureUpdated);
+	connect(mpModel, &cLucidVisionLabsRgbModel_Triton::gainChanged,              this, &cLucidVisionLabsRgbPropertyPage_Local::gainUpdated);
+	connect(mpModel, &cLucidVisionLabsRgbModel_Triton::balanceWhiteAutoChanged,  this, &cLucidVisionLabsRgbPropertyPage_Local::balanceWhiteAutoUpdated);
+	connect(mpModel, &cLucidVisionLabsRgbModel_Triton::gammaChanged,             this, &cLucidVisionLabsRgbPropertyPage_Local::gammaUpdated);
+
+	cLucidVisionLabsRgbPropertyPage_Local::connectToModel();
 }
 
 void cLucidVisionLabsRgbPropertyPage_Local_Triton::showPage()

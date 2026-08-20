@@ -117,6 +117,24 @@ void cTeledyneFlirPropertyPage_Local::doLayout()
 	cTeledyneFlirPropertyPage::doLayout();
 }
 
+void cTeledyneFlirPropertyPage_Local::connectToModel()
+{
+	//    QObject::connect(pModel, &cTeledyneFlirCameraModel::modeChanged, pController, &cTeledyneFlirController::modeChanged);
+	//    QObject::connect(pModel, &cTeledyneFlirCameraModel::lapseIntervalChanged, pController, &cTeledyneFlirController::frameIntervalChanged);
+	//    QObject::connect(pModel, &cTeledyneFlirCameraModel::frameRateChanged, pController, &cTeledyneFlirController::frameRateChanged);
+	//    QObject::connect(pModel, &cTeledyneFlirCameraModel::imageSizeChanged, pController, &cTeledyneFlirController::imageSizeChanged);
+	//    QObject::connect(pModel, &cTeledyneFlirCameraModel::photoTaken, pController, &cTeledyneFlirController::photoTaken);
+
+	QObject::connect(this, &cTeledyneFlirPropertyPage_Local::requestMode,             mpModel, &cTeledyneFlirCameraModel::requestMode);
+	QObject::connect(this, &cTeledyneFlirPropertyPage_Local::requestFrameRate_Hz,     mpModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
+	QObject::connect(this, &cTeledyneFlirPropertyPage_Local::requestLapseInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
+	QObject::connect(this, &cTeledyneFlirPropertyPage_Local::requestImage,            mpModel, &cTeledyneFlirCameraModel::requestImage);
+	QObject::connect(this, &cTeledyneFlirPropertyPage_Local::requestImages,           mpModel, &cTeledyneFlirCameraModel::requestImages);
+
+	QObject::connect(this, qOverload<bool>(&cTeledyneFlirPropertyPage_Local::requestPhoto),       mpModel, qOverload<bool>(&cTeledyneFlirCameraModel::takePhoto));
+	QObject::connect(this, qOverload<bool, bool>(&cTeledyneFlirPropertyPage_Local::requestPhoto), mpModel, qOverload<bool, bool>(&cTeledyneFlirCameraModel::takePhoto));
+}
+
 void cTeledyneFlirPropertyPage_Local::enableControls(bool enable)
 {
 	cTeledyneFlirPropertyPage::enableControls(enable);
@@ -218,6 +236,11 @@ void cTeledyneFlirPropertyPage_Local::reject()
 cTeledyneFlirPropertyPage_T1K_Local::cTeledyneFlirPropertyPage_T1K_Local(cTeledyneFlirCameraModel_T1K* pModel, QWidget* parent)
 	: cTeledyneFlirPropertyPage_Local(pModel, parent), mpModel(pModel)
 {}
+
+void cTeledyneFlirPropertyPage_T1K_Local::connectToModel()
+{
+	cTeledyneFlirPropertyPage_Local::connectToModel();
+}
 
 void cTeledyneFlirPropertyPage_T1K_Local::showPage()
 {

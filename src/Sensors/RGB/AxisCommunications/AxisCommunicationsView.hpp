@@ -23,6 +23,7 @@ public:
 	virtual ~cAxisCommunicationsView();
 
 	virtual void initialize();
+	void connectToModel() override;
 
 signals:
 	void requestMode(int mode);

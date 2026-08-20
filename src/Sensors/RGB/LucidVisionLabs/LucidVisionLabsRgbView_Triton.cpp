@@ -24,3 +24,8 @@ void cLucidVisionLabsRgbView_Triton::initialize()
 {
     cLucidVisionLabsRgbView::initialize();
 }
+
+void cLucidVisionLabsRgbView_Triton::connectToModel()
+{
+    cLucidVisionLabsRgbView::connectToModel();
+}

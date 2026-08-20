@@ -20,6 +20,8 @@ public:
 
 	void initialize() override;
 
+	void connectToModel() override;
+
 private:
 	cTeledyneFlirCameraModel_T1K* mpModel = nullptr;
 };

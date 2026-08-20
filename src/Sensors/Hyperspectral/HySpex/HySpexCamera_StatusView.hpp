@@ -13,7 +13,8 @@ QT_BEGIN_NAMESPACE
 	class QLabel;
 	class QLineEdit;
 	class QPushButton;
-	QT_END_NAMESPACE
+	class QImage;
+QT_END_NAMESPACE
 
 // Forward Declaration
 class cHySpexCameraModel;
@@ -61,6 +62,8 @@ public slots:
 	void onFocusDataUpdated(double focus_number);
 	void onSpatialDistributionUpdated();
 	void onSpectralDistributionUpdated();
+
+	void updateImage(QImage image);
 
 protected:
 	void doStatusLayout(QBoxLayout* pMainLayout);

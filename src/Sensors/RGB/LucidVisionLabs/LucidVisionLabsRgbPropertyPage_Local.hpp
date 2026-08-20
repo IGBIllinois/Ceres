@@ -23,6 +23,8 @@ public:
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
+    void connectToModel() override;
+
 signals:
     void requestPhoto(bool update_view);
 //    void requestPhoto(bool update_view, bool auto_save);
@@ -85,6 +87,8 @@ class cLucidVisionLabsRgbPropertyPage_Local_Triton : public cLucidVisionLabsRgbP
 public:
     cLucidVisionLabsRgbPropertyPage_Local_Triton(cLucidVisionLabsRgbModel_Triton* pModel, QWidget* parent = nullptr);
     ~cLucidVisionLabsRgbPropertyPage_Local_Triton() = default;
+
+    void connectToModel() override;
 
 protected:
     void showPage() override;

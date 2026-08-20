@@ -15,12 +15,18 @@
 
 cLucidVisionLabsRgbStatusView::cLucidVisionLabsRgbStatusView(cLucidVisionLabsRgbModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(pModel, parent)
+	cSensorStatusView(pModel, parent), mpModel(pModel)
 {
+	assert(mpModel);
 }
 
 cLucidVisionLabsRgbStatusView::~cLucidVisionLabsRgbStatusView()
 {}
+
+void cLucidVisionLabsRgbStatusView::connectToModel()
+{
+	cSensorStatusView::connectToModel();
+}
 
 void cLucidVisionLabsRgbStatusView::createWidgets()
 {

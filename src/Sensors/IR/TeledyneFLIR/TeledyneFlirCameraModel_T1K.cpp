@@ -211,6 +211,31 @@ void cTeledyneFlirCameraModel_T1K::stopCommunications()
     mIsRunning = false;
 }
 
+void cTeledyneFlirCameraModel_T1K::onSaveState()
+{
+    sState state;
+
+    state.mode = mode();
+    state.frameRate_fps = frameRate_Hz();
+    state.lapseInterval_ms = lapseInterval_ms();
+    state.imageWidth = imageWidth();
+    state.imageHeight = imageHeight();
+
+    mStateStack.push_back(state);
+}
+
+void cTeledyneFlirCameraModel_T1K::onRestoreState()
+{
+    if (mStateStack.empty()) return;
+
+    auto state = mStateStack.back();
+    mStateStack.pop_back();
+
+    requestMode(state.mode);
+    requestFrameRate_Hz(state.frameRate_fps);
+    requestLapseInterval_ms(state.lapseInterval_ms);
+}
+
 bool cTeledyneFlirCameraModel_T1K::updateLapseInterval(uint32_t interval_ms)
 {
     mTimeLapseTimer.time_ms(interval_ms);

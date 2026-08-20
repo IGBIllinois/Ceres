@@ -20,6 +20,11 @@ cSensorController::~cSensorController()
     mpTcpServer->close();
 }
 
+void cSensorController::connectToModel()
+{
+
+}
+
 bool cSensorController::startTcpServer(const std::string& ip)
 {
     QHostAddress local_endpoint(ip.c_str());

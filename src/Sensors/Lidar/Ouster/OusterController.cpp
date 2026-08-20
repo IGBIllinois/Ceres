@@ -49,6 +49,16 @@ bool cOusterController::has_instance() const
     return mpModel->has_instance();
 }
 
+void cOusterController::connectToModel()
+{
+    connect(this, &cOusterController::requestNewLidarMode,     mpModel, &cOusterModel::changeLidarMode);
+    connect(this, &cOusterController::requestNewAzimuthWindow, mpModel, &cOusterModel::changeAzimuthWindow);
+
+    connect(mpModel, &cOusterModel::updateDataFormat,     this, &cOusterController::dataFormatChanged);
+    connect(mpModel, &cOusterModel::updateAzimuthWindow,  this, &cOusterController::azimuthWindowChanged);
+}
+
+
 void cOusterController::processStream(const void* pBuffer, std::size_t buf_length)
 {
     if (!pBuffer)

@@ -45,83 +45,48 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
     if (no_visualization)
     {
         auto* pView = new cOusterStatusView(pModel);
+
         pView->createWidgets();
         pView->doLayout();
 
-        QObject::connect(pModel, &cOusterModel::sensorStatusChanging, pView, &cOusterStatusView::onSensorStatusChange);
-        QObject::connect(pModel, &cOusterModel::updateSensorInfo, pView, &cOusterStatusView::onSensorInfoUpdated);
-        QObject::connect(pModel, &cOusterModel::updateTimeInfo, pView, &cOusterStatusView::onTimeInfoUpdated);
-        QObject::connect(pModel, &cOusterModel::updateLidarMode, pView, &cOusterStatusView::onLidarModeUpdated);
-        QObject::connect(pModel, &cOusterModel::updateBeamIntrinsics, pView, &cOusterStatusView::onBeamIntrinsicsUpdated);
-        QObject::connect(pModel, &cOusterModel::updateImuIntrinsics, pView, &cOusterStatusView::onImuIntrinsicsUpdated);
-        QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterStatusView::onLidarIntrinsicsUpdated);
-        QObject::connect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterStatusView::onDataFormatUpdated);
-        QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterStatusView::onAzimuthWindowUpdated);
-        QObject::connect(pModel, &cOusterModel::updateRangeData, pView, &cOusterStatusView::onRangeUpdated);
 
         auto* pController = new cOusterController(pModel);
 
-        QObject::connect(pController, &cOusterController::requestNewLidarMode,
-            pModel, &cOusterModel::changeLidarMode);
-
-        QObject::connect(pModel, &cOusterModel::updateDataFormat,
-            pController, &cOusterController::dataFormatChanged);
-
-        QObject::connect(pController, &cOusterController::requestNewAzimuthWindow,
-            pModel, &cOusterModel::changeAzimuthWindow);
-
-        QObject::connect(pModel, &cOusterModel::updateAzimuthWindow,
-            pController, &cOusterController::azimuthWindowChanged);
+        pController->connectToModel();
 
         return sSensorWidgets(pModel, pController, pView);
     }
 
     auto* dockWidget = new QDockWidget();
     auto* pView = new cOusterView(pModel, dockWidget);
-    
+
+    pView->connectToModel();
+
     dockWidget->setWindowTitle(pView->windowTitle());
     dockWidget->setWidget(pView);
+
     QObject::connect(dockWidget, &QDockWidget::dockLocationChanged, pView, &cOusterView::dockLocationChanged);
-    QObject::connect(dockWidget, &QDockWidget::topLevelChanged, pView, &cOusterView::topLevelChanged);
+    QObject::connect(dockWidget, &QDockWidget::topLevelChanged,     pView, &cOusterView::topLevelChanged);
 
-    QObject::connect(pModel, &cOusterModel::updateBeamIntrinsics, pView, &cOusterView::beamIntrinsicsChanged);
-    QObject::connect(pModel, &cOusterModel::updateImuIntrinsics, pView, &cOusterView::imuIntrinsicsChanged);
-    QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterView::lidarIntrinsicsChanged);
-    QObject::connect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterView::dataFormatChanged);
-    QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterView::azimuthWindowChanged);
-//    QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged);
-//    QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData);
-    QObject::connect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged, Qt::QueuedConnection);
-    QObject::connect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData, Qt::QueuedConnection);
+    auto* pPage = new cOusterPropertyPage_Local(pModel);
 
-    auto* page = new cOusterPropertyPage_Local(pModel);
+    pPage->connectToModel();
 
-    QObject::connect(page, &cOusterPropertyPage_Local::requestNewLidarMode, pModel, &cOusterModel::changeLidarMode);
-    QObject::connect(pModel, &cOusterModel::updateDataFormat, page, &cOusterPropertyPage_Local::dataFormatChanged);
-    QObject::connect(page, &cOusterPropertyPage_Local::requestNewAzimuthWindow, pModel, &cOusterModel::changeAzimuthWindow);
-    QObject::connect(pModel, &cOusterModel::updateAzimuthWindow, page, &cOusterPropertyPage_Local::azimuthWindowChanged);
-
-
-    return sSensorWidgets(pModel, dockWidget, page);
+    return sSensorWidgets(pModel, dockWidget, pPage);
 }
 
 void ouster::remove_sensor(sSensorWidgets widgets)
 {
-    // Ouster model and view...
-    auto* pModel = static_cast<cOusterModel*>(widgets.pModel);
+    auto* pModel = widgets.pModel;
+
     auto* dockWidget = widgets.pDockableView;
-    auto* pView = static_cast<cOusterView*>(dockWidget->widget());
+    auto* pView = dockWidget->widget();
 
-    QObject::disconnect(pModel, &cOusterModel::updateBeamIntrinsics, pView, &cOusterView::beamIntrinsicsChanged);
-    QObject::disconnect(pModel, &cOusterModel::updateImuIntrinsics, pView, &cOusterView::imuIntrinsicsChanged);
-    QObject::disconnect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterView::lidarIntrinsicsChanged);
-    QObject::disconnect(pModel, &cOusterModel::updateDataFormat, pView, &cOusterView::dataFormatChanged);
-    QObject::disconnect(pModel, &cOusterModel::updateAzimuthWindow, pView, &cOusterView::azimuthWindowChanged);
-    QObject::disconnect(pModel, &cOusterModel::updateImuData, pView, &cOusterView::imuDataChanged);
-    QObject::disconnect(pModel, &cOusterModel::updateLidarData, pView, &cOusterView::displayData);
+    pView->disconnect();
+    pModel->disconnect();
 
-    delete pModel;
-    delete dockWidget;
+    pModel->deleteLater();
+    dockWidget->deleteLater();
 }
 
 cSensorPropertyPage* ouster::create_sensor_property_page(uint32_t version,

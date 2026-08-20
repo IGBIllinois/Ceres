@@ -17,6 +17,9 @@ class cHySpexSWIR_384_Controller : public cHySpexCamera_Controller,
 public:
     cHySpexSWIR_384_Controller(cHySpexSWIR_384_Model* model, QObject* parent = nullptr);
 
+public:
+    void connectToModel() override;
+
     /*** Qt slot handler */
 public:
     void onBackgroundComplete() override;

@@ -20,6 +20,8 @@ public:
     cAxisCommunicationsPropertyPage_Local(cAxisCommunicationsModel* pModel, QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Local() = default;
 
+    void connectToModel() override;
+
 signals:
     void requestMode(int mode);
     void requestImageSize(int width, int height);
@@ -66,6 +68,8 @@ class cAxisCommunicationsPropertyPage_Local_F44 : public cAxisCommunicationsProp
 public:
     cAxisCommunicationsPropertyPage_Local_F44(cAxisCommunicationsModel_F44* pModel, QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Local_F44() = default;
+
+    void connectToModel() override;
 
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
