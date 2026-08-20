@@ -1,5 +1,5 @@
 
-#include "GpsExperimentStates.hpp"
+#include "GpsExperimentStates_Local.hpp"
 
 #include <QMessageBox>
 #include <QThread>
@@ -10,54 +10,37 @@
 const long long NETWORK_DELAY_MS = 500;
 
 /*******************************************************************/
-/**       Base Class for Remote GPS Experiment States          **/
+/**       Base Class for Local GPS Experiment States          **/
 /*******************************************************************/
-cGpsExperimentState_Remote::cGpsExperimentState_Remote
-	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6, QObject* parent)
-	: cExperimentStateRemoteInterface(parent)
+cGpsExperimentState_Local::cGpsExperimentState_Local(cGpsModel* pModel, QObject* parent)
+	: QObject(parent), mpModel(pModel)
 {
-	mHostname = hostname;
-	mPort = port;
-	mLocalIpAddress = localIpAddress;
-	mUse_IpV6 = use_IpV6;
 }
 
-cGpsExperimentState_Remote::~cGpsExperimentState_Remote()
+cGpsExperimentState_Local::~cGpsExperimentState_Local()
 {}
 
-bool cGpsExperimentState_Remote::initialize()
+bool cGpsExperimentState_Local::initialize()
 {
-	if (!cExperimentStateRemoteInterface::initialize(mHostname, mPort, mUse_IpV6, mLocalIpAddress))
-		return false;
-
-	return openConnection();
+	return true;
 }
 
-void cGpsExperimentState_Remote::cleanup()
-{
-	closeConnection();
-	destroy();
-}
-
-bool cGpsExperimentState_Remote::recording()
-{
-	return false;
-}
+void cGpsExperimentState_Local::cleanup()
+{}
 
 
 /*******************************************************************/
 /**   GPS Experiment States to Control Reference Acquisition      **/
 /*******************************************************************/
-cGpsReferenceAcquisition_Remote::cGpsReferenceAcquisition_Remote(const std::string& hostname, uint16_t port,
-	const std::string& localIpAddress, bool use_IpV6, QObject* parent)
+cGpsReferenceAcquisition_Local::cGpsReferenceAcquisition_Local(cGpsModel* pModel, QObject* parent)
 	: 
-	cGpsExperimentState_Remote(hostname, port, localIpAddress, use_IpV6, parent), cGpsPropertiesNetEncoder(255)
+	cGpsExperimentState_Local(pModel, parent)
 {}
 
-cGpsReferenceAcquisition_Remote::~cGpsReferenceAcquisition_Remote()
+cGpsReferenceAcquisition_Local::~cGpsReferenceAcquisition_Local()
 {}
 
-bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
+bool cGpsReferenceAcquisition_Local::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
 
@@ -135,11 +118,11 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 	return true;
 }
 
-void cGpsReferenceAcquisition_Remote::run() {}
-void cGpsReferenceAcquisition_Remote::pause() {}
-void cGpsReferenceAcquisition_Remote::stop() {}
+void cGpsReferenceAcquisition_Local::run() {}
+void cGpsReferenceAcquisition_Local::pause() {}
+void cGpsReferenceAcquisition_Local::stop() {}
 
-cExperimentState::eRESULT cGpsReferenceAcquisition_Remote::finished()
+cExperimentState::eRESULT cGpsReferenceAcquisition_Local::finished()
 {
 	if (mState == eSTATE::ERROR)
 		return eRESULT::ABORT;
@@ -150,7 +133,7 @@ cExperimentState::eRESULT cGpsReferenceAcquisition_Remote::finished()
 	return eRESULT::WAITING;
 }
 
-QString cGpsReferenceAcquisition_Remote::getStatusStr()
+QString cGpsReferenceAcquisition_Local::getStatusStr()
 {
 	QString msg;
 	if (mHasReferenceParameters)
@@ -164,7 +147,23 @@ QString cGpsReferenceAcquisition_Remote::getStatusStr()
 	return msg;
 }
 
-void cGpsReferenceAcquisition_Remote::onReferenceParameters(bool valid, uint16_t min_integration_time_sec,
+void onReferenceComplete();
+void referenceStateUpdated(::gps::eReferenceState state);
+
+void referenceParametersUpdated(int min_integration_time_sec, int max_integration_time_sec, int ref_error_threshold_mm);
+
+void cGpsReferenceAcquisition_Local::onReferenceComplete()
+{}
+
+void cGpsReferenceAcquisition_Local::referenceStateUpdated(::gps::eReferenceState state)
+{}
+
+void cGpsReferenceAcquisition_Local::referenceParametersUpdated(int min_integration_time_sec, int max_integration_time_sec, int ref_error_threshold_mm)
+{}
+
+
+/*
+void cGpsReferenceAcquisition_Local::onReferenceParameters(bool valid, uint16_t min_integration_time_sec,
 	uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
 	mCurrentMinIntegrationTime_sec = min_integration_time_sec;
@@ -196,12 +195,12 @@ void cGpsReferenceAcquisition_Remote::onReferenceParameters(bool valid, uint16_t
 	sendCalcReference();;
 }
 
-void cGpsReferenceAcquisition_Remote::onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+void cGpsReferenceAcquisition_Local::onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
 	double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
 {
 }
 
-void cGpsReferenceAcquisition_Remote::onReferenceCommandReply(eReferenceReply reply)
+void cGpsReferenceAcquisition_Local::onReferenceCommandReply(eReferenceReply reply)
 {
 	switch (reply)
 	{
@@ -216,7 +215,7 @@ void cGpsReferenceAcquisition_Remote::onReferenceCommandReply(eReferenceReply re
 }
 
 
-void cGpsReferenceAcquisition_Remote::onConnect()
+void cGpsReferenceAcquisition_Local::onConnect()
 {
 	mState = eSTATE::WAIT_FOR_STATE;
 	sendQueryReferenceParameters();
@@ -225,16 +224,16 @@ void cGpsReferenceAcquisition_Remote::onConnect()
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 }
 
-void cGpsReferenceAcquisition_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
+void cGpsReferenceAcquisition_Local::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
 {
 	cGpsPropertiesNetDecoder::decode(pBuffer, buf_length);
 }
 
-int cGpsReferenceAcquisition_Remote::sendOutgoingData(const char* data, std::size_t len)
+int cGpsReferenceAcquisition_Local::sendOutgoingData(const char* data, std::size_t len)
 {
 	return cExperimentStateRemoteInterface::sendOutgoingData(data, len);
 }
-
+*/
 
 
 

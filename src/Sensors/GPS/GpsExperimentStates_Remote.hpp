@@ -6,18 +6,20 @@
 #include "GpsPropertiesNetDecoder.hpp"
 #include "GpsPropertiesNetEncoder.hpp"
 
-
-// Forward Declarations
-
+#include <Timers.hpp>
 
 #include <optional>
+
+
+// Forward Declarations
 
 
 /*******************************************************************/
 /**           Base Class for GPS Experiment States             **/
 /*******************************************************************/
 
-class cGpsExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState
+class cGpsExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState,
+	protected cGpsPropertiesNetDecoder, protected cGpsPropertiesNetEncoder
 {
 	Q_OBJECT
 
@@ -31,6 +33,10 @@ public:
 	bool recording() override;
 	bool initialize() override;
 
+private:
+	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
+	int sendOutgoingData(const char* data, std::size_t len) override;
+
 protected:
 	std::string mHostname;
 	std::string mLocalIpAddress;
@@ -42,8 +48,7 @@ protected:
 /**   GPS Experiment States to Control Reference Acquisition      **/
 /*******************************************************************/
 
-class cGpsReferenceAcquisition_Remote : public cGpsExperimentState_Remote,
-	protected cGpsPropertiesNetDecoder, private cGpsPropertiesNetEncoder
+class cGpsReferenceAcquisition_Remote : public cGpsExperimentState_Remote
 {
 	Q_OBJECT
 
@@ -70,11 +75,11 @@ protected:
 	void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
 		double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) override;
 
+	void onReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count) override;
+
 	void onReferenceCommandReply(eReferenceReply reply) override;
 
 	void onConnect() override;
-	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
-	int sendOutgoingData(const char* data, std::size_t len) override;
 
 protected:
 	std::optional<std::uint16_t> mDesiredMinIntegrationTime_sec;
@@ -86,6 +91,8 @@ protected:
 	std::uint16_t mCurrentRefErrorThreshold_mm = 0;
 
 	bool mHasReferenceParameters = false;
+
+	cIntervalTimer mPollStateTimer;
 
 	enum class eSTATE { WAIT_FOR_CONNECT, WAIT_FOR_STATE, WAIT_FOR_STATE_UPDATE, WAIT_FOR_REFERENCE, COMPLETE, ERROR };
 	eSTATE mState = eSTATE::WAIT_FOR_CONNECT;
