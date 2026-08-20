@@ -591,9 +591,16 @@ void cMainWindow::onSettingsLoadAerialMesh()
 
 void cMainWindow::onSettingsReferenceHeight()
 {
+    int32_t reference_height_mm = nRFM::reference_height_mm();
+    
+    QVariant value = mSettings.value("Defaults/ReferenceHeight");
+
+    if (value.canConvert<int32_t>())
+        reference_height_mm = value.toInt();
+
     cReferenceHeightDlg dlg(this);
 
-    dlg.setReferenceHeight_mm(nRFM::reference_height_mm());
+    dlg.setReferenceHeight_mm(reference_height_mm);
 
     cSpidercamView* pView = dynamic_cast<cSpidercamView*>(mpController);
 
@@ -606,7 +613,13 @@ void cMainWindow::onSettingsReferenceHeight()
 
     if (result == QDialog::Accepted)
     {
+        reference_height_mm = dlg.getReferenceHeight_mm();
 
+        if (reference_height_mm > rfm::INVALID_HEIGHT)
+        {
+            nRFM::set_reference_height_mm(reference_height_mm);
+            mSettings.setValue("Defaults/ReferenceHeight", reference_height_mm);
+        }
     }
 }
 
