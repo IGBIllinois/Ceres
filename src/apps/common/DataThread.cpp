@@ -29,6 +29,8 @@ void cDataThread::start()
 
 void cDataThread::stop()
 {
+    disconnect();
+
     mStop = true;
 
     wait();
