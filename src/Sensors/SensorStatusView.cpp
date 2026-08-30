@@ -40,12 +40,6 @@ std::string cSensorStatusView::descriptor() const
 	return description;
 }
 
-void cSensorStatusView::connectToModel()
-{
-	connect(mpModel, &cSensorModel::sensorStatusChanging, this, &cSensorStatusView::onSensorStatusChange);
-	connect(mpModel, &cSensorModel::sensorNameChanging,   this, &cSensorStatusView::onSensorNameChanging);
-}
-
 void cSensorStatusView::createWidgets()
 {
 	mpSensorLabel = new QLabel();

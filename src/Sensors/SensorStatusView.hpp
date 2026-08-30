@@ -37,12 +37,6 @@ public:
 
 public:
 	/*
-	 * This method is called by factory function to make sure the signals/slots
-	 * between the model and status view are established
-	 */
-	virtual void connectToModel();
-
-	/*
 	 * These methods are called by factory function to make sure the GUI elements are
 	 * created and displayed in the correct arrangment
 	 */
