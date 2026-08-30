@@ -95,6 +95,8 @@ private:
     cIntervalTimer mTemperatureUpdateTimer;
 
     enum class eBgStates {NONE, SH_CLOSE, STARTED, SH_OPEN, ABORT };
+    Q_ENUM(eBgStates)
+
     eBgStates mBgCurrentState = eBgStates::NONE;
 
     std::unique_ptr<hyspex::cSWIR384> mCamera;

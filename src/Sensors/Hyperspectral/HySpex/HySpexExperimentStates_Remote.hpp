@@ -66,17 +66,17 @@ public:
 
 protected:
 
-	void onCurrentState(bool valid, std::uint16_t average_frames,
+	void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
 		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
 		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 		std::uint32_t num_backgrounds, const std::string& lens_name) override {};
 
-	void onLensNames(const std::vector<std::string>& names) override {};
+	void onLensNamesMessage(const std::vector<std::string>& names) override {};
 
-	void onCommandReply(eCommandReply reply) override {};
-	void onBackgroundReply(eBackgroundReply reply) override {};
+	void onCommandReplyMessage(eCommandReply reply) override {};
+	void onBackgroundReplyMessage(eBackgroundReply reply) override {};
 
-	void onShutterState(eShutterState state) override;
+	void onShutterStateMessage(eShutterState state) override;
 
 	void onConnect() override;
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
@@ -131,8 +131,8 @@ public:
 	void stop() override;
 
 protected:
-	void onLensNames(const std::vector<std::string>& names) override {};
-	void onShutterState(eShutterState state) override {};
+	void onLensNamesMessage(const std::vector<std::string>& names) override {};
+	void onShutterStateMessage(eShutterState state) override {};
 
 	void onConnect() override;
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
@@ -165,12 +165,12 @@ public:
 	eRESULT finished() override;
 
 protected:
-	void onCurrentState(bool valid, std::uint16_t average_frames,
+	void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
 		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
 		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 		std::uint32_t num_backgrounds, const std::string& lens_name) override;
 
-	void onBackgroundReply(eBackgroundReply reply) override {};
+	void onBackgroundReplyMessage(eBackgroundReply reply) override {};
 };
 
 
@@ -188,13 +188,13 @@ public:
 	eRESULT finished() override;
 
 protected:
-	void onCurrentState(bool valid, std::uint16_t average_frames,
+	void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
 		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
 		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 		std::uint32_t num_backgrounds, const std::string& lens_name) override;
 
-	void onCommandReply(eCommandReply reply) override;
-	void onBackgroundReply(eBackgroundReply reply) override;
+	void onCommandReplyMessage(eCommandReply reply) override;
+	void onBackgroundReplyMessage(eBackgroundReply reply) override;
 
 	void onConnect() override;
 
@@ -228,16 +228,16 @@ public:
 	QString getStatusStr() override;
 
 protected:
-	void onCurrentState(bool valid, std::uint16_t average_frames,
+	void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
 		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
 		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 		std::uint32_t num_backgrounds, const std::string& lens_name) override;
 
-	void onLensNames(const std::vector<std::string>& names) override;
+	void onLensNamesMessage(const std::vector<std::string>& names) override;
 
-	void onBackgroundReply(eBackgroundReply reply) override;
+	void onBackgroundReplyMessage(eBackgroundReply reply) override;
 
-	void onShutterState(eShutterState state) override;
+	void onShutterStateMessage(eShutterState state) override;
 
 	void onConnect() override;
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
@@ -267,16 +267,16 @@ public:
 	QString getStatusStr() override;
 
 protected:
-	void onCurrentState(bool valid, std::uint16_t average_frames,
+	void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
 		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
 		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 		std::uint32_t num_backgrounds, const std::string& lens_name) override;
 
-	void onLensNames(const std::vector<std::string>& names) override;
+	void onLensNamesMessage(const std::vector<std::string>& names) override;
 
-	void onBackgroundReply(eBackgroundReply reply) override;
+	void onBackgroundReplyMessage(eBackgroundReply reply) override;
 
-	void onShutterState(eShutterState state) override;
+	void onShutterStateMessage(eShutterState state) override;
 
 	void onConnect() override;
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;

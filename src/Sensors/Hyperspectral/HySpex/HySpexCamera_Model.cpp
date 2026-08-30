@@ -56,12 +56,12 @@ const char* cHySpexCameraModel::descriptor() const
 
 void cHySpexCameraModel::updateViews()
 {
-    emit initStatusChanged();
-    emit commStatusChanged();
-    emit acqStatusChanged();
-    emit bgStatusChanged();
-    emit coolingStatusChanged();
-    emit shutterStatusChanged();
+    emit initStatusChanged(mInitStatus);
+    emit commStatusChanged(mCommStatus);
+    emit acqStatusChanged(mAcquisitionStatus);
+    emit bgStatusChanged(mBackgroundStatus);
+    emit coolingStatusChanged(mCoolingStatus);
+    emit shutterStatusChanged(mShutterStatus);
 
     emit imageSizeChanged(mSpatialSize, mSpectralSize);
 
@@ -71,7 +71,7 @@ void cHySpexCameraModel::updateViews()
     emit integrationTimeChanged(mIntegrationTime_us);
     emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
 
-    emit lensInfoChanged();
+    emit lensInfoChanged(QString::fromStdString(mLens), mWorkingDistance_cm, mFieldOfView_deg);
 }
 
 bool cHySpexCameraModel::configure(const nlohmann::json& jsonCfg)
@@ -260,5 +260,71 @@ void cHySpexCameraModel::computeFocusNumber(const HySpexConnect::cSpatialMajorDa
     focusNumber = sqrt(focusNumber / image.num_bands()) / 16.0;
 
     emit newFocusData(focusNumber);
+}
+
+void cHySpexCameraModel::stateQueried()
+{
+    int average_frames = getAverageFrames();
+    int frame_period_us = getFramePeriod_us();
+    int min_frame_period_us = getMinFramePeriod_us();
+    int integration_time_us = getIntegrationTime_us();
+    int max_integration_time_us = getMaxIntegrationTime_us();
+    int num_backgrounds = getNumOfBackgrounds();
+    QString lens_name = QString::fromStdString(getLensName());
+
+    emit stateUpdate(average_frames, frame_period_us, min_frame_period_us,
+        integration_time_us, max_integration_time_us, num_backgrounds, lens_name);
+}
+
+void cHySpexCameraModel::lensNamesQueried()
+{
+    QStringList lens_names;
+
+    for (const auto& name : mLenses)
+    {
+        lens_names.append(QString::fromStdString(name));
+    }
+
+    emit lensNamesChanged(lens_names);
+}
+
+void cHySpexCameraModel::shutterStateQueried()
+{
+    shutterStatusChanged(getShutterStatus());
+}
+
+void cHySpexCameraModel::requestAcquisitionParameters(int average_frame, int frame_period_us, int integration_time_us)
+{
+    setAcquisitionParameters(average_frame, frame_period_us, integration_time_us);
+}
+
+void cHySpexCameraModel::requestLensName(QString lens_name)
+{
+
+}
+
+void cHySpexCameraModel::requestNumOfBackgrounds(int num_backgrounds)
+{
+    setNumOfBackgrounds(num_backgrounds);
+}
+
+void cHySpexCameraModel::requestCalcBackground()
+{
+    calcBackground();
+}
+
+void cHySpexCameraModel::requestStopBackground()
+{
+    stopBackground();
+}
+
+void cHySpexCameraModel::requestOpenShutter()
+{
+    open_shutter();
+}
+
+void cHySpexCameraModel::requestCloseShutter()
+{
+    close_shutter();
 }
 

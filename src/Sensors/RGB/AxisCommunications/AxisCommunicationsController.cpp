@@ -6,46 +6,10 @@
 #include <cassert>
 
 
-cAxisCommunicationsController::cAxisCommunicationsController(cAxisCommunicationsModel* model, QObject* parent)
+cAxisCommunicationsController::cAxisCommunicationsController(QObject* parent)
     :
-    cSensorController(parent), cAxisControllerNetEncoder(512), mpModel(model)
+    cSensorController(parent), cAxisControllerNetEncoder(512)
 {
-    assert(mpModel);
-}
-
-const char* cAxisCommunicationsController::descriptor() const
-{
-    return mpModel->descriptor();
-}
-
-const std::string& cAxisCommunicationsController::manufacturer() const
-{
-    return mpModel->manufacturer();
-}
-
-const std::string& cAxisCommunicationsController::model() const
-{
-    return mpModel->model();
-}
-
-const std::string& cAxisCommunicationsController::serial_number() const
-{
-    return mpModel->serial_number();
-}
-
-const std::string& cAxisCommunicationsController::name() const
-{
-    return mpModel->name();
-}
-
-const std::string& cAxisCommunicationsController::instance() const
-{
-    return mpModel->instance();
-}
-
-bool cAxisCommunicationsController::has_instance() const
-{
-    return mpModel->has_instance();
 }
 
 void cAxisCommunicationsController::processStream(const void* pBuffer, std::size_t buf_length)
@@ -74,99 +38,10 @@ void cAxisCommunicationsController::processStream(const void* pBuffer, std::size
  * Axis Communications Controller F44
  ******************************************************************************/
 
-cAxisCommunicationsController_F44::cAxisCommunicationsController_F44(cAxisCommunicationsModel_F44* model, QObject* parent)
+cAxisCommunicationsController_F44::cAxisCommunicationsController_F44(QObject* parent)
     :
-    cSensorController(parent), cAxisControllerNetEncoder(512), mpModel(model)
-{
-    assert(mpModel);
-}
-
-void cAxisCommunicationsController_F44::connectToModel()
-{
-    connect(mpModel, &cAxisCommunicationsModel::modeChanged,          this, &cAxisCommunicationsController_F44::modeChanged);
-    connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged, this, &cAxisCommunicationsController_F44::lapseIntervalChanged);
-    connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,     this, &cAxisCommunicationsController_F44::frameRateChanged);
-    connect(mpModel, &cAxisCommunicationsModel::imageSizeChanged,     this, &cAxisCommunicationsController_F44::imageSizeChanged);
-    connect(mpModel, &cAxisCommunicationsModel::photoTaken,           this, &cAxisCommunicationsController_F44::photoTaken);
-
-    connect(this, &cAxisCommunicationsController_F44::requestImageSize,        mpModel, &cAxisCommunicationsModel::requestImageSize);
-    connect(this, &cAxisCommunicationsController_F44::requestMode,             mpModel, &cAxisCommunicationsModel::requestMode);
-    connect(this, &cAxisCommunicationsController_F44::requestFrameRate_Hz,     mpModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
-    connect(this, &cAxisCommunicationsController_F44::requestLapseInterval_ms, mpModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
-    connect(this, &cAxisCommunicationsController_F44::requestImage,            mpModel, &cAxisCommunicationsModel::requestImage);
-    connect(this, &cAxisCommunicationsController_F44::requestImages,           mpModel, &cAxisCommunicationsModel::requestImages);
-
-    connect(this, &cAxisCommunicationsController_F44::requestSaveState,    mpModel, &cAxisCommunicationsModel_F44::onSaveState);
-    connect(this, &cAxisCommunicationsController_F44::requestRestoreState, mpModel, &cAxisCommunicationsModel_F44::onRestoreState);
-
-    connect(this, qOverload<bool>(&cAxisCommunicationsController_F44::requestPhoto),       mpModel, qOverload<bool>(&cAxisCommunicationsModel::takePhoto));
-    connect(this, qOverload<bool, bool>(&cAxisCommunicationsController_F44::requestPhoto), mpModel, qOverload<bool, bool>(&cAxisCommunicationsModel::takePhoto));
-}
-
-const char* cAxisCommunicationsController_F44::descriptor() const
-{
-    return mpModel->descriptor();
-}
-
-const std::string& cAxisCommunicationsController_F44::manufacturer() const
-{
-    return mpModel->manufacturer();
-}
-
-const std::string& cAxisCommunicationsController_F44::model() const
-{
-    return mpModel->model();
-}
-
-const std::string& cAxisCommunicationsController_F44::serial_number() const
-{
-    return mpModel->serial_number();
-}
-
-const std::string& cAxisCommunicationsController_F44::name() const
-{
-    return mpModel->name();
-}
-
-const std::string& cAxisCommunicationsController_F44::instance() const
-{
-    return mpModel->instance();
-}
-
-bool cAxisCommunicationsController_F44::has_instance() const
-{
-    return mpModel->has_instance();
-}
-
-void cAxisCommunicationsController_F44::photoTaken()
-{
-    sendTakePhotoReply();
-}
-
-void cAxisCommunicationsController_F44::modeChanged(int mode)
-{
-    sendCameraMode(mode);
-}
-
-void cAxisCommunicationsController_F44::cameraIdChanged(int id)
-{
-    sendActiveCameraId(id);
-}
-
-void cAxisCommunicationsController_F44::lapseIntervalChanged(int interval_ms)
-{
-    sendLapseInterval_ms(interval_ms);
-}
-
-void cAxisCommunicationsController_F44::frameRateChanged(int rate_fps)
-{
-    sendFrameRate(rate_fps);
-}
-
-void cAxisCommunicationsController_F44::imageSizeChanged(int width, int height)
-{
-    sendImageSize(width, height);
-}
+    cSensorController(parent), cAxisControllerNetEncoder(512)
+{}
 
 void cAxisCommunicationsController_F44::processStream(const void* pBuffer, std::size_t buf_length)
 {
@@ -190,97 +65,137 @@ void cAxisCommunicationsController_F44::processStream(const void* pBuffer, std::
     }
 }
 
-void cAxisCommunicationsController_F44::onQueryMode()
+/**
+ * Slot Handlers
+ */
+void cAxisCommunicationsController_F44::photoTaken()
 {
-    auto mode = mpModel->mode();
-    sendCameraMode(static_cast<uint8_t>(mode));
+    sendTakePhotoReplyMessage();
 }
 
-void cAxisCommunicationsController_F44::onQueryState()
+void cAxisCommunicationsController_F44::modeChanged(int mode)
 {
-    auto mode = mpModel->mode();
-    auto id = mpModel->getActiveCameraID();
-    auto image_size = mpModel->getActiveImageSize();
-    auto fps = mpModel->getActiveFramesRate_fps();
-    auto interval_ms = mpModel->lapseInterval_ms();
-
-    bool valid = (id >= 0) && (fps > 0);
-
-    int minID = mpModel->getMinCameraID();
-    int maxID = mpModel->getMaxCameraID();
-
-    auto minFPS = mpModel->minFrameRate_fps();
-    auto maxFPS = mpModel->maxFrameRate_fps();
-
-    sendCurrentState(valid, mode, id, image_size.width, image_size.height, fps, interval_ms, minID, maxID, minFPS, maxFPS);
+    sendCameraModeMessage(static_cast<uint8_t>(mode));
 }
 
-void cAxisCommunicationsController_F44::onQueryCameraId()
+void cAxisCommunicationsController_F44::cameraIdChanged(int id)
 {
-    sendActiveCameraId(mpModel->getActiveCameraID());
+    sendActiveCameraIdMessage(id);
 }
 
-void cAxisCommunicationsController_F44::onQueryImageSize()
+void cAxisCommunicationsController_F44::lapseIntervalChanged(int interval_ms)
 {
-    auto image_size = mpModel->getActiveImageSize();
-    sendImageSize(image_size.width, image_size.height);
+    sendLapseIntervalMessage(interval_ms);
 }
 
-void cAxisCommunicationsController_F44::onQueryFrameRate()
+void cAxisCommunicationsController_F44::frameRateChanged(int rate_fps)
 {
-    sendFrameRate(mpModel->getActiveFramesRate_fps());
+    sendFrameRateMessage(rate_fps);
 }
 
-void cAxisCommunicationsController_F44::onQueryLapseInterval()
+void cAxisCommunicationsController_F44::imageSizeChanged(int width, int height)
 {
-    sendLapseInterval_ms(mpModel->lapseInterval_ms());
+    sendImageSizeMessage(width, height);
 }
 
-void cAxisCommunicationsController_F44::onGrabImage()
+void cAxisCommunicationsController_F44::stateUpdated(int mode, int id, int width, int height, double rate_fps, int interval_ms, int min_id, int max_id, double min_fps, double max_fps)
 {
-    mpModel->requestImage();
+    bool valid = (id >= 0) && (rate_fps > 0);
+
+    std::optional<double> minFPS;
+    std::optional<double> maxFPS;
+
+    if (min_fps > 0.0)
+        minFPS = min_fps;
+
+    if (max_fps > 0.0)
+        maxFPS = max_fps;
+
+    sendCurrentStateMessage(valid, static_cast<uint8_t>(mode), static_cast<uint8_t>(id), 
+        static_cast<uint16_t>(width), static_cast<uint16_t>(height), rate_fps, interval_ms, 
+        static_cast<uint8_t>(min_id), static_cast<uint8_t>(max_id), minFPS, maxFPS);
 }
 
-void cAxisCommunicationsController_F44::onTakePhoto(bool updateView)
+
+/**
+ * Message Handlers
+ */
+
+void cAxisCommunicationsController_F44::onQueryModeMessage()
 {
-    mpModel->takePhoto(updateView);
+    emit queryMode();
 }
 
-void cAxisCommunicationsController_F44::onTakePhoto(bool updateView, bool autoSave)
+void cAxisCommunicationsController_F44::onQueryStateMessage()
 {
-    mpModel->takePhoto(updateView, autoSave);
+    emit queryState();
 }
 
-void cAxisCommunicationsController_F44::setMode(uint8_t mode)
+void cAxisCommunicationsController_F44::onQueryCameraIdMessage()
+{
+    emit queryCameraId();
+}
+
+void cAxisCommunicationsController_F44::onQueryImageSizeMessage()
+{
+    emit queryImageSize();
+}
+
+void cAxisCommunicationsController_F44::onQueryFrameRateMessage()
+{
+    emit queryFrameRate();
+}
+
+void cAxisCommunicationsController_F44::onQueryLapseIntervalMessage()
+{
+    emit queryLapseInterval();
+}
+
+void cAxisCommunicationsController_F44::onGrabImageMessage()
+{
+    emit requestImage();
+}
+
+void cAxisCommunicationsController_F44::onTakePhotoMessage(bool updateView)
+{
+    emit requestPhoto(updateView);
+}
+
+void cAxisCommunicationsController_F44::onTakePhotoMessage(bool updateView, bool autoSave)
+{
+    emit requestPhoto(updateView, autoSave);
+}
+
+void cAxisCommunicationsController_F44::setModeMessage(uint8_t mode)
 {
     emit requestMode(mode);
 }
 
-void cAxisCommunicationsController_F44::setCameraId(uint8_t id)
+void cAxisCommunicationsController_F44::setCameraIdMessage(uint8_t id)
 {
     emit requestCameraID(id);
 }
 
-void cAxisCommunicationsController_F44::setImageSize(uint16_t width, uint16_t height)
+void cAxisCommunicationsController_F44::setImageSizeMessage(uint16_t width, uint16_t height)
 {
     emit requestImageSize(width, height);
 }
 
-void cAxisCommunicationsController_F44::setFrameRate(uint8_t fps)
+void cAxisCommunicationsController_F44::setFrameRateMessage(uint8_t fps)
 {
     emit requestFrameRate_Hz(fps);
 }
-void cAxisCommunicationsController_F44::setLapseInterval_ms(uint32_t interval_ms)
+void cAxisCommunicationsController_F44::setLapseIntervalMessage(uint32_t interval_ms)
 {
     emit requestLapseInterval_ms(interval_ms);
 }
 
-void cAxisCommunicationsController_F44::onSaveState()
+void cAxisCommunicationsController_F44::onSaveStateMessage()
 {
     emit requestSaveState();
 }
 
-void cAxisCommunicationsController_F44::onRestoreState()
+void cAxisCommunicationsController_F44::onRestoreStateMessage()
 {
     emit requestRestoreState();
 }

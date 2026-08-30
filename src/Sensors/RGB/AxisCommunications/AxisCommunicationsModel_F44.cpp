@@ -336,6 +336,35 @@ int cAxisCommunicationsModel_F44::getActiveCameraID() const
     return -1;
 }
 
+void cAxisCommunicationsModel_F44::cameraIdQueried()
+{
+    auto id = getActiveCameraID();
+    emit cameraIdChanged(id);
+}
+
+void cAxisCommunicationsModel_F44::stateQueried()
+{
+    int mode = static_cast<int>(this->mode());
+
+    auto id = getActiveCameraID();
+
+    auto image_size = getActiveImageSize();
+
+    int interval_ms = lapseInterval_ms();
+    double fps = getActiveFramesRate_fps();
+
+    int min_id = getMinCameraID();
+    int max_id = getMaxCameraID();
+
+    auto minFPS = minFrameRate_fps();
+    auto maxFPS = maxFrameRate_fps();
+
+    double min_fps = minFrameRate_fps().value_or(-1.0);
+    double max_fps = maxFrameRate_fps().value_or(-1.0);
+
+    emit stateInfoUpdate(mode, id, image_size.width, image_size.height, fps, interval_ms, min_id, max_id, min_fps, max_fps);
+}
+
 void cAxisCommunicationsModel_F44::setActiveCamera(int id)
 {
     cAxisCamera* pCamera = nullptr;

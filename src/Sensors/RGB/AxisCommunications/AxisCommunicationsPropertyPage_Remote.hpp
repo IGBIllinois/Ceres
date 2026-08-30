@@ -11,7 +11,9 @@
 
 #include <optional>
 
-
+/*
+ * Base Property Page for the Axis Communications Web Cams
+ */
 class cAxisCommunicationsPropertyPage_Remote : public cAxisCommunicationsPropertyPage,
     public cSensorPropertyPageRemoteInterface, 
     protected cAxisPropertiesNetDecoder, protected cAxisPropertiesNetEncoder
@@ -24,14 +26,6 @@ public:
 
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
-
-public:
-    void onMode(uint8_t mode) override;
-    void onImageSize(uint16_t width, uint16_t height) override;
-    void onFrameRate(uint8_t fps) override;
-    void onLapseInterval(uint32_t interval_ms) override;
-
-    void onTakePhotoReply(bool error)  override;
 
 protected:
     void onConnect() override;
@@ -51,6 +45,15 @@ protected:
     void reject() override;
 
 protected:
+    /*** Message Handlers from the networl decoder */
+    void onModeMessage(uint8_t mode) override;
+    void onImageSizeMessage(uint16_t width, uint16_t height) override;
+    void onFrameRateMessage(uint8_t fps) override;
+    void onLapseIntervalMessage(uint32_t interval_ms) override;
+
+    void onTakePhotoReplyMessage(bool error)  override;
+
+protected:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
     int sendOutgoingData(const char* data, std::size_t len) override;
 
@@ -63,21 +66,15 @@ private:
 };
 
 
+/*
+ * Property Page for the Axis Communications F44 system
+ */
+
 class cAxisCommunicationsPropertyPage_Remote_F44 : public cAxisCommunicationsPropertyPage_Remote
 {
 public:
     cAxisCommunicationsPropertyPage_Remote_F44(QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Remote_F44() = default;
-
-public:
-    void onCameraId(uint8_t id) override;
-    void onCurrentState(bool valid, uint8_t id,
-        uint16_t width, uint16_t height, uint8_t fps) override;
-    void onCurrentState(bool valid, uint8_t active_id,
-        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
-    void onCurrentState(bool valid, uint8_t mode, uint8_t active_id,
-        uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
-        uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps) override;
 
 protected slots:
     void cameraIdTextChanged(const QString& text);
@@ -87,6 +84,18 @@ protected:
     void doLayout(QVBoxLayout* pMainLayout) override;
 
     void doApply() override;
+
+protected:
+    /*** Message Handlers from the netowrk decoder */
+    void onCameraIdMessage(uint8_t id) override;
+
+    void onCurrentStateMessage(bool valid, uint8_t id,
+        uint16_t width, uint16_t height, uint8_t fps) override;
+    void onCurrentStateMessage(bool valid, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
+    void onCurrentStateMessage(bool valid, uint8_t mode, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
+        uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps) override;
 
 private:
     QLabel* mpCameraIdLabel = nullptr;

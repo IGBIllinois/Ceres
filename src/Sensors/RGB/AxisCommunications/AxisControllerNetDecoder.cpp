@@ -25,17 +25,17 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
             switch (packet.query())
             {
             case eQUERY_STATE:
-                return onQueryState();
+                return onQueryStateMessage();
             case eQUERY_MODE:
-                return onQueryMode();
+                return onQueryModeMessage();
             case eQUERY_ACTIVE_CAMERA_ID:
-                return onQueryCameraId();
+                return onQueryCameraIdMessage();
             case eQUERY_IMAGE_SIZE:
-                return onQueryImageSize();
+                return onQueryImageSizeMessage();
             case eQUERY_FRAME_RATE:
-                return onQueryFrameRate();
+                return onQueryFrameRateMessage();
             case eQUERY_LAPSE_INTERVAL:
-                return onQueryLapseInterval();
+                return onQueryLapseIntervalMessage();
             }
         }
         break;
@@ -46,7 +46,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto mode = to_camera_mode_t(packet);
-            setMode(mode);
+            setModeMessage(mode);
         }
         break;
     }
@@ -56,7 +56,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto id = to_active_camera_id_t(packet);
-            setCameraId(id);
+            setCameraIdMessage(id);
         }
         break;
     }
@@ -66,7 +66,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto data = to_image_size_t(packet);
-            setImageSize(data.width, data.height);
+            setImageSizeMessage(data.width, data.height);
         }
         break;
     }
@@ -76,7 +76,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto fps = to_frame_rate_t(packet);
-            setFrameRate(fps);
+            setFrameRateMessage(fps);
         }
         break;
     }
@@ -86,12 +86,12 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto interval_ms = to_lapse_interval_t(packet);
-            setLapseInterval_ms(interval_ms);
+            setLapseIntervalMessage(interval_ms);
         }
         break;
     }
     case ePacketType::GRAB_IMAGE:
-        onGrabImage();
+        onGrabImageMessage();
         break;
     case ePacketType::TAKE_PHOTO:
     {
@@ -101,7 +101,7 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
             if (packet.ParseFromArray(buffer.data(), hdr.length))
             {
                 auto update_view = to_take_photo_t(packet);
-                onTakePhoto(update_view);
+                onTakePhotoMessage(update_view);
             }
         }
         else if (hdr.revision == 2)
@@ -110,16 +110,16 @@ void cAxisControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const 
             if (packet.ParseFromArray(buffer.data(), hdr.length))
             {
                 auto result = to_take_photo_t(packet);
-                onTakePhoto(result.update_view, result.auto_save);
+                onTakePhotoMessage(result.update_view, result.auto_save);
             }
         }
         break;
     }
     case ePacketType::SAVE_STATE:
-        onSaveState();
+        onSaveStateMessage();
         break;
     case ePacketType::RESTORE_STATE:
-        onRestoreState();
+        onRestoreStateMessage();
         break;
     }
 }

@@ -219,7 +219,7 @@ cAxisCommunicationsPropertyPage_Local_F44::cAxisCommunicationsPropertyPage_Local
 
 void cAxisCommunicationsPropertyPage_Local_F44::connectToModel()
 {
-	QObject::connect(mpModel, &cAxisCommunicationsModel::cameraIdChanged, this, &cAxisCommunicationsPropertyPage_Local_F44::onCameraIdChange);
+	QObject::connect(mpModel, &cAxisCommunicationsModel_F44::cameraIdChanged, this, &cAxisCommunicationsPropertyPage_Local_F44::onCameraIdChange);
 
 	QObject::connect(this, &cAxisCommunicationsPropertyPage_Local_F44::requestCameraID, mpModel, &cAxisCommunicationsModel_F44::setActiveCamera);
 
@@ -264,7 +264,8 @@ cExperimentState* cAxisCommunicationsPropertyPage_Local_F44::createState(const s
 			QObject::connect(mpModel, &cAxisCommunicationsModel::lapseIntervalChanged,	pState, &cAxisCommunications_Configure_Local::onLapseIntervalChange);
 			QObject::connect(mpModel, &cAxisCommunicationsModel::frameRateChanged,		pState, &cAxisCommunications_Configure_Local::onFrameRateChange);
 			QObject::connect(mpModel, &cAxisCommunicationsModel::imageSizeChanged,		pState, &cAxisCommunications_Configure_Local::onImageSizeChange);
-			QObject::connect(mpModel, &cAxisCommunicationsModel::cameraIdChanged,		pState, &cAxisCommunications_Configure_Local::onCameraIdChange);
+
+			QObject::connect(mpModel, &cAxisCommunicationsModel_F44::cameraIdChanged,   pState, &cAxisCommunications_Configure_Local::onCameraIdChange);
 
 			QObject::connect(pState, &cAxisCommunications_Configure_Local::requestCameraID, mpModel, &cAxisCommunicationsModel_F44::setActiveCamera);
 

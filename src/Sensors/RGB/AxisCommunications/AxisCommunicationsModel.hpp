@@ -96,12 +96,17 @@ signals:
 signals:
     void onNewImage(const QImage& image);
     void modeChanged(int mode);
-    void cameraIdChanged(int id);
     void frameRateChanged(int rate_fps);
     void imageSizeChanged(int width, int height);
     void lapseIntervalChanged(int interval_ms);
 
     void photoTaken();
+
+public slots:
+    void modeQueried();
+    void imageSizeQueried();
+    void frameRateQueried();
+    void lapseIntervalQueried();
 
 public slots:
     void requestMode(int mode);

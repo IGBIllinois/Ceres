@@ -21,23 +21,23 @@ public:
      * Property Page ----> Controller
      */
 
-    void sendQueryState();
-    void sendQueryMode();
-    void sendQueryImageSize();
-    void sendQueryFrameRate();
-    void sendQueryFrameInterval();
+    void sendQueryStateMessage();
+    void sendQueryModeMessage();
+    void sendQueryImageSizeMessage();
+    void sendQueryFrameRateMessage();
+    void sendQueryFrameIntervalMessage();
 
-    void sendSetMode(uint8_t mode);
-    void sendSetCameraId(uint8_t id);
-    void sendSetImageSize(uint16_t width, uint16_t height);
-    void sendSetFrameRate_fps(uint8_t fps);
-    void sendSetLapseInterval_ms(uint32_t interval_ms);
-    void sendGrabImage();
-    void sendTakePhoto(bool update_view);
-    void sendTakePhoto(bool update_view, bool save_image);
+    void sendSetModeMessage(uint8_t mode);
+    void sendSetCameraIdMessage(uint8_t id);
+    void sendSetImageSizeMessage(uint16_t width, uint16_t height);
+    void sendSetFrameRateMessage(uint8_t fps);
+    void sendSetLapseIntervalMessage(uint32_t interval_ms);
+    void sendGrabImageMessage();
+    void sendTakePhotoMessage(bool update_view);
+    void sendTakePhotoMessage(bool update_view, bool save_image);
 
-    void sendSaveState();
-    void sendRestoreState();
+    void sendSaveStateMessage();
+    void sendRestoreStateMessage();
 };
 
 

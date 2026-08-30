@@ -18,8 +18,4 @@ cHySpexSWIR_384_View::~cHySpexSWIR_384_View()
 {
 }
 
-void cHySpexSWIR_384_View::connectToModel()
-{}
-
-
 

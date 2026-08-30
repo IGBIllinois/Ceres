@@ -9,92 +9,92 @@ cAxisPropertiesNetEncoder::cAxisPropertiesNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
 {}
 
-void cAxisPropertiesNetEncoder::sendQueryState()
+void cAxisPropertiesNetEncoder::sendQueryStateMessage()
 {
     encode_query_current_state(mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendQueryMode()
+void cAxisPropertiesNetEncoder::sendQueryModeMessage()
 {
     encode_query_camera_mode(mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendQueryImageSize()
+void cAxisPropertiesNetEncoder::sendQueryImageSizeMessage()
 {
     encode_query_image_size(mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendQueryFrameRate()
+void cAxisPropertiesNetEncoder::sendQueryFrameRateMessage()
 {
     encode_query_frame_rate(mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendQueryFrameInterval()
+void cAxisPropertiesNetEncoder::sendQueryFrameIntervalMessage()
 {
     encode_query_lapse_interval(mBuffer);
     sendData();
 }
 
 
-void cAxisPropertiesNetEncoder::sendSetMode(uint8_t mode)
+void cAxisPropertiesNetEncoder::sendSetModeMessage(uint8_t mode)
 {
     encode_camera_mode(mode, mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendSetCameraId(uint8_t id)
+void cAxisPropertiesNetEncoder::sendSetCameraIdMessage(uint8_t id)
 {
     encode_active_camera_id(id, mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendSetImageSize(uint16_t width, uint16_t height)
+void cAxisPropertiesNetEncoder::sendSetImageSizeMessage(uint16_t width, uint16_t height)
 {
     encode_image_size(width, height, mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendSetFrameRate_fps(uint8_t fps)
+void cAxisPropertiesNetEncoder::sendSetFrameRateMessage(uint8_t fps)
 {
     encode_frame_rate(fps, mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendSetLapseInterval_ms(uint32_t interval_ms)
+void cAxisPropertiesNetEncoder::sendSetLapseIntervalMessage(uint32_t interval_ms)
 {
     encode_lapse_interval(interval_ms, mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendGrabImage()
+void cAxisPropertiesNetEncoder::sendGrabImageMessage()
 {
     encode_grab_image(mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendTakePhoto(bool update_view)
+void cAxisPropertiesNetEncoder::sendTakePhotoMessage(bool update_view)
 {
     encode_take_photo(update_view, mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendTakePhoto(bool update_view, bool auto_save)
+void cAxisPropertiesNetEncoder::sendTakePhotoMessage(bool update_view, bool auto_save)
 {
     encode_take_photo(update_view, auto_save, mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendSaveState()
+void cAxisPropertiesNetEncoder::sendSaveStateMessage()
 {
     encode_save_state(mBuffer);
     sendData();
 }
 
-void cAxisPropertiesNetEncoder::sendRestoreState()
+void cAxisPropertiesNetEncoder::sendRestoreStateMessage()
 {
     encode_restore_state(mBuffer);
     sendData();

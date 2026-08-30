@@ -22,7 +22,7 @@ void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, co
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto data = to_image_size_t(packet);
-            onImageSize(data.width, data.height);
+            onImageSizeMessage(data.width, data.height);
         }
         break;
     }
@@ -32,7 +32,7 @@ void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, co
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto fps = to_frame_rate_t(packet);
-            onFrameRate(fps);
+            onFrameRateMessage(fps);
         }
         break;
     }
@@ -46,7 +46,7 @@ void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, co
             if (packet.ParseFromArray(buffer.data(), hdr.length))
             {
                 auto state = to_current_state_t(packet);
-                onCurrentState(state.valid, state.active_camera_id, state.width, state.height, state.frames_per_second);
+                onCurrentStateMessage(state.valid, state.active_camera_id, state.width, state.height, state.frames_per_second);
             }
             break;
         }
@@ -56,7 +56,7 @@ void cLucidRgbPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, co
             if (packet.ParseFromArray(buffer.data(), hdr.length))
             {
                 auto state = to_current_state_t(packet);
-                onCurrentState(state.valid, state.active_camera_id, state.width, state.height, state.frames_per_second, state.min_camera_id, state.max_camera_id);
+                onCurrentStateMessage(state.valid, state.active_camera_id, state.width, state.height, state.frames_per_second, state.min_camera_id, state.max_camera_id);
             }
             break;
         }

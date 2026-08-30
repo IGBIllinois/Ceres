@@ -27,33 +27,33 @@ public:
      *
      * You need to call sendData to make sure the data is sent out!
      */
-    void encodeQueryState();
-    void encodeQueryLensNames();
-    void encodeQueryShutterState();
-    void encodeAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
-    void encodeLensName(const std::string& lens_name);
-    void encodeNumOfBackgrounds(int num_backgrounds);
-    void encodeCalcBackground();
-    void encodeStopBackground();
+    void encodeQueryStateMessage();
+    void encodeQueryLensNamesMessage();
+    void encodeQueryShutterStateMessage();
+    void encodeAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
+    void encodeLensNameMessage(const std::string& lens_name);
+    void encodeNumOfBackgroundsMessage(int num_backgrounds);
+    void encodeCalcBackgroundMessage();
+    void encodeStopBackgroundMessage();
 
-    void encodeOpenShutter();
-    void encodeCloseShutter();
+    void encodeOpenShutterMessage();
+    void encodeCloseShutterMessage();
 
     /*
      * The send methods will encode the packet into the data buffer and will automatically
      * send the data.
      */
-    void sendQueryState();
-    void sendQueryLensNames();
-    void sendQueryShutterState();
-    void sendAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
-    void sendLensName(const std::string& lens_name);
-    void sendNumOfBackgrounds(int num_backgrounds);
-    void sendCalcBackground();
-    void sendStopBackground();
+    void sendQueryStateMessage();
+    void sendQueryLensNamesMessage();
+    void sendQueryShutterStateMessage();
+    void sendAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
+    void sendLensNameMessage(const std::string& lens_name);
+    void sendNumOfBackgroundsMessage(int num_backgrounds);
+    void sendCalcBackgroundMessage();
+    void sendStopBackgroundMessage();
 
-    void sendOpenShutter();
-    void sendCloseShutter();
+    void sendOpenShutterMessage();
+    void sendCloseShutterMessage();
 };
 
 

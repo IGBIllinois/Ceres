@@ -213,7 +213,7 @@ void cLucidVisionLabsRgbCamera_Configure_Remote::onCurrentState(bool valid, uint
 
 void cLucidVisionLabsRgbCamera_Configure_Remote::onConnect()
 {
-	sendQueryState();
+	sendQueryStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));

@@ -82,10 +82,15 @@ public:
     int getMaxCameraID() const { return mMaxCameraID; }
 
 signals:
+    void cameraIdChanged(int id);
     void enableCamera(int id);
     void cameraRangeUpdated(int min_id, int max_id);
+    void stateInfoUpdate(int mode, int id, int width, int height, double fps, int interval_ms, int min_id, int max_id, double min_fps, double max_fps);
 
 public slots:
+    void cameraIdQueried();
+    void stateQueried();
+
     void setActiveCamera(int id);
     void setActiveImageSize(rgb::sImageSize_t image_size);
     void setActiveFramesRate_fps(int fps);

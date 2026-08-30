@@ -150,7 +150,7 @@ void cAxisCommunicationsPropertyPage_Remote::buttonClicked(QAbstractButton* butt
 
 void cAxisCommunicationsPropertyPage_Remote::onConnect()
 {
-	cAxisPropertiesNetEncoder::sendQueryState();
+	cAxisPropertiesNetEncoder::sendQueryStateMessage();
 }
 
 void cAxisCommunicationsPropertyPage_Remote::onGrabImagePressed()
@@ -158,60 +158,10 @@ void cAxisCommunicationsPropertyPage_Remote::onGrabImagePressed()
 	if (mpMode->currentIndex() == 0)
 	{
 		mpGrabImage->setEnabled(false);
-		cAxisPropertiesNetEncoder::sendTakePhoto(true);
+		cAxisPropertiesNetEncoder::sendTakePhotoMessage(true);
 	}
 	else
-		cAxisPropertiesNetEncoder::sendGrabImage();
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onMode(uint8_t mode)
-{
-	if ((mode < 0) || (mode > 2))
-		return;
-
-	mDefaultMode = mode;
-	mpMode->setCurrentIndex(mode);
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
-{
-	mDefaultImageWidth = width;
-	mDefaultImageHeight = height;
-
-	QString image_size = QString::number(width);
-	image_size += "x";
-	image_size += QString::number(height);
-
-	auto n = mpImageSizes->count();
-	for (int i = 0; i < n; ++i)
-	{
-		auto data = mpImageSizes->itemText(i);
-		if (0 == data.compare(image_size))
-		{
-			mpImageSizes->setCurrentIndex(i);
-			break;
-		}
-	}
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onFrameRate(uint8_t fps)
-{
-	if ((fps == 0) || (fps > 30))
-		return;
-
-	mpFrameRate_fps->setText(QString::number(fps));
-	mDefaultFrameRate_fps = fps;
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onLapseInterval(uint32_t interval_ms)
-{
-	mDefaultLapseInterval_ms = interval_ms;
-	mpLapseInterval_s->setText(QString::number(interval_ms * 0.001f));
-}
-
-void cAxisCommunicationsPropertyPage_Remote::onTakePhotoReply(bool error)
-{
-	mpGrabImage->setEnabled(true);
+		cAxisPropertiesNetEncoder::sendGrabImageMessage();
 }
 
 void cAxisCommunicationsPropertyPage_Remote::showPage()
@@ -248,31 +198,84 @@ void cAxisCommunicationsPropertyPage_Remote::doApply()
 	auto is = axis::to_image_size(image_size.toStdString());
 	if ((mDefaultImageWidth != is.width) || (mDefaultImageHeight != is.height))
 	{
-		sendSetImageSize(is.width, is.height);
+		sendSetImageSizeMessage(is.width, is.height);
 	}
 
 	uint8_t mode = mpMode->currentIndex();
 	if (mDefaultMode != mode)
 	{
-		sendSetMode(mode);
+		sendSetModeMessage(mode);
 	}
 
 	uint8_t fps = mpFrameRate_fps->text().toInt();
 	if (mDefaultFrameRate_fps != fps)
 	{
-		sendSetFrameRate_fps(fps);
+		sendSetFrameRateMessage(fps);
 	}
 
 	uint32_t interval_ms = static_cast<uint32_t>(mpLapseInterval_s->text().toDouble() * 1000.0);
 	if (mDefaultLapseInterval_ms != interval_ms)
 	{
-		sendSetLapseInterval_ms(interval_ms);
+		sendSetLapseIntervalMessage(interval_ms);
 	}
 }
 
 void cAxisCommunicationsPropertyPage_Remote::reject()
 {
 	doCancel();
+}
+
+/**
+ * Message Handlers from the network decoder
+ */
+void cAxisCommunicationsPropertyPage_Remote::onModeMessage(uint8_t mode)
+{
+	if ((mode < 0) || (mode > 2))
+		return;
+
+	mDefaultMode = mode;
+	mpMode->setCurrentIndex(mode);
+}
+
+void cAxisCommunicationsPropertyPage_Remote::onImageSizeMessage(uint16_t width, uint16_t height)
+{
+	mDefaultImageWidth = width;
+	mDefaultImageHeight = height;
+
+	QString image_size = QString::number(width);
+	image_size += "x";
+	image_size += QString::number(height);
+
+	auto n = mpImageSizes->count();
+	for (int i = 0; i < n; ++i)
+	{
+		auto data = mpImageSizes->itemText(i);
+		if (0 == data.compare(image_size))
+		{
+			mpImageSizes->setCurrentIndex(i);
+			break;
+		}
+	}
+}
+
+void cAxisCommunicationsPropertyPage_Remote::onFrameRateMessage(uint8_t fps)
+{
+	if ((fps == 0) || (fps > 30))
+		return;
+
+	mpFrameRate_fps->setText(QString::number(fps));
+	mDefaultFrameRate_fps = fps;
+}
+
+void cAxisCommunicationsPropertyPage_Remote::onLapseIntervalMessage(uint32_t interval_ms)
+{
+	mDefaultLapseInterval_ms = interval_ms;
+	mpLapseInterval_s->setText(QString::number(interval_ms * 0.001f));
+}
+
+void cAxisCommunicationsPropertyPage_Remote::onTakePhotoReplyMessage(bool error)
+{
+	mpGrabImage->setEnabled(true);
 }
 
 void cAxisCommunicationsPropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
@@ -286,6 +289,9 @@ int cAxisCommunicationsPropertyPage_Remote::sendOutgoingData(const char* data, s
 }
 
 
+/*
+ * Property Page for the Axis Communications F44 system
+ */
 
 cAxisCommunicationsPropertyPage_Remote_F44::cAxisCommunicationsPropertyPage_Remote_F44(QWidget* parent)
 {}
@@ -310,81 +316,6 @@ void cAxisCommunicationsPropertyPage_Remote_F44::doLayout(QVBoxLayout* pMainLayo
 	cAxisCommunicationsPropertyPage_Remote::doLayout(pMainLayout);
 }
 
-void cAxisCommunicationsPropertyPage_Remote_F44::onCameraId(uint8_t id)
-{
-	if ((id < mMinCameraId) || (id > mMaxCameraId))
-		return;
-
-	mpCameraId->setCurrentIndex(id - mMinCameraId);
-	mDefaultCameraId = id;
-}
-
-void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentState(bool valid, uint8_t id,
-	uint16_t width, uint16_t height, uint8_t fps)
-{
-	if (!valid) return;
-
-	mMinCameraId = 1;
-	mMaxCameraId = 4;
-
-	mpCameraId->clear();
-
-	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
-	{
-		mpCameraId->addItem(QString::number(i));
-	}
-
-	onCameraId(id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-}
-
-void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentState(bool valid, uint8_t active_id,
-	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
-{
-	if (!valid) return;
-
-	mMinCameraId = min_id;
-	mMaxCameraId = max_id;
-
-	mpCameraId->clear();
-
-	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
-	{
-		mpCameraId->addItem(QString::number(i));
-	}
-
-	onCameraId(active_id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-}
-
-void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentState(bool valid, uint8_t mode, uint8_t active_id,
-	uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms, uint8_t min_id, uint8_t max_id,
-	std::optional<double> min_fps, std::optional<double> max_fps)
-{
-	if (!valid) return;
-
-	mMinCameraId = min_id;
-	mMaxCameraId = max_id;
-
-	mpCameraId->clear();
-
-	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
-	{
-		mpCameraId->addItem(QString::number(i));
-	}
-
-	onMode(mode);
-	onCameraId(active_id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-	onLapseInterval(interval_ms);
-
-	if (min_fps.has_value() && max_fps.has_value())
-		mpFrameRate_fps->setValidator(new QDoubleValidator(min_fps.value(), max_fps.value(), 2));
-}
-
 void cAxisCommunicationsPropertyPage_Remote_F44::cameraIdTextChanged(const QString& text)
 {
 	auto id = text.toInt();
@@ -400,8 +331,88 @@ void cAxisCommunicationsPropertyPage_Remote_F44::doApply()
 	uint8_t id = mpCameraId->currentIndex() + mMinCameraId;
 	if (mDefaultCameraId != id)
 	{
-		sendSetCameraId(id);
+		sendSetCameraIdMessage(id);
 	}
 
 	cAxisCommunicationsPropertyPage_Remote::doApply();
 }
+
+/**
+ * Message Handlers from the network decoder
+ */
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCameraIdMessage(uint8_t id)
+{
+	if ((id < mMinCameraId) || (id > mMaxCameraId))
+		return;
+
+	mpCameraId->setCurrentIndex(id - mMinCameraId);
+	mDefaultCameraId = id;
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentStateMessage(bool valid, uint8_t id,
+	uint16_t width, uint16_t height, uint8_t fps)
+{
+	if (!valid) return;
+
+	mMinCameraId = 1;
+	mMaxCameraId = 4;
+
+	mpCameraId->clear();
+
+	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
+	{
+		mpCameraId->addItem(QString::number(i));
+	}
+
+	onCameraIdMessage(id);
+	onImageSizeMessage(width, height);
+	onFrameRateMessage(fps);
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentStateMessage(bool valid, uint8_t active_id,
+	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
+{
+	if (!valid) return;
+
+	mMinCameraId = min_id;
+	mMaxCameraId = max_id;
+
+	mpCameraId->clear();
+
+	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
+	{
+		mpCameraId->addItem(QString::number(i));
+	}
+
+	onCameraIdMessage(active_id);
+	onImageSizeMessage(width, height);
+	onFrameRateMessage(fps);
+}
+
+void cAxisCommunicationsPropertyPage_Remote_F44::onCurrentStateMessage(bool valid, uint8_t mode, uint8_t active_id,
+	uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms, uint8_t min_id, uint8_t max_id,
+	std::optional<double> min_fps, std::optional<double> max_fps)
+{
+	if (!valid) return;
+
+	mMinCameraId = min_id;
+	mMaxCameraId = max_id;
+
+	mpCameraId->clear();
+
+	for (auto i = mMinCameraId; i <= mMaxCameraId; i++)
+	{
+		mpCameraId->addItem(QString::number(i));
+	}
+
+	onModeMessage(mode);
+	onCameraIdMessage(active_id);
+	onImageSizeMessage(width, height);
+	onFrameRateMessage(fps);
+	onLapseIntervalMessage(interval_ms);
+
+	if (min_fps.has_value() && max_fps.has_value())
+		mpFrameRate_fps->setValidator(new QDoubleValidator(min_fps.value(), max_fps.value(), 2));
+}
+

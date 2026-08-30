@@ -105,7 +105,7 @@ void cMainWindow::initialize()
     QObject::connect(mpOusterModel, &cOusterModel::updateImuIntrinsics, mpOusterView, &cOusterView::imuIntrinsicsChanged);
     QObject::connect(mpOusterModel, &cOusterModel::updateLidarIntrinsics, mpOusterView, &cOusterView::lidarIntrinsicsChanged);
     QObject::connect(mpOusterModel, &cOusterModel::updateDataFormat, mpOusterView, &cOusterView::dataFormatChanged);
-    QObject::connect(mpOusterModel, &cOusterModel::updateAzimuthWindow, mpOusterView, &cOusterView::azimuthWindowChanged);
+    QObject::connect(mpOusterModel, &cOusterModel::azimuthWindowChanged, mpOusterView, &cOusterView::azimuthWindowChanged);
     QObject::connect(mpOusterModel, &cOusterModel::updateImuData, mpOusterView, &cOusterView::imuDataChanged);
     QObject::connect(mpOusterModel, &cOusterModel::updateLidarData, mpOusterView, &cOusterView::displayData);
     //    QObject::connect(mpAxisModel, &cAxisCommunicationsModel_file::onNewImage, mpAxisView, &cAxisCommunicationsView::imageUpdated);

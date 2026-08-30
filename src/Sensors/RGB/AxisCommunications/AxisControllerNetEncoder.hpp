@@ -18,24 +18,24 @@ public:
     /*
      * Controller ----> Property Page
      */
-    void sendCurrentState(bool valid, uint8_t camera_id,
+    void sendCurrentStateMessage(bool valid, uint8_t camera_id,
         uint16_t width, uint16_t height, uint8_t fps);
 
-    void sendCurrentState(bool valid, uint8_t active_camera_id,
+    void sendCurrentStateMessage(bool valid, uint8_t active_camera_id,
         uint16_t width, uint16_t height, uint8_t fps,
         uint8_t min_camera_id, uint8_t max_camera_id);
 
-    void sendCurrentState(bool valid, uint8_t mode, uint8_t active_camera_id,
+    void sendCurrentStateMessage(bool valid, uint8_t mode, uint8_t active_camera_id,
         uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
         uint8_t min_camera_id, uint8_t max_camera_id,
         std::optional<double> min_fps, std::optional<double> max_fps);
 
-    void sendCameraMode(uint8_t mode);
-    void sendActiveCameraId(uint8_t camera_id);
-    void sendImageSize(uint16_t width, uint16_t height);
-    void sendFrameRate(uint8_t fps);
-    void sendLapseInterval_ms(uint32_t interval_ms);
-    void sendTakePhotoReply();
+    void sendCameraModeMessage(uint8_t mode);
+    void sendActiveCameraIdMessage(uint8_t camera_id);
+    void sendImageSizeMessage(uint16_t width, uint16_t height);
+    void sendFrameRateMessage(uint8_t fps);
+    void sendLapseIntervalMessage(uint32_t interval_ms);
+    void sendTakePhotoReplyMessage();
 };
 
 

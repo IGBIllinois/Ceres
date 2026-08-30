@@ -44,17 +44,17 @@ protected:
 	virtual void onConnect() = 0;
 
 protected:
-	void onMode(uint8_t id) override {};
-	void onCameraId(uint8_t id) override {};
-	void onImageSize(uint16_t width, uint16_t height) override {};
-	void onFrameRate(uint8_t fps) override {};
-	void onLapseInterval(uint32_t interval_ms) override {};
-	void onCurrentState(bool valid, uint8_t id, uint16_t width, uint16_t height, uint8_t fps) override {};
-	void onCurrentState(bool valid, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override {};
-	void onCurrentState(bool valid, uint8_t mode, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
+	void onModeMessage(uint8_t id) override {};
+	void onCameraIdMessage(uint8_t id) override {};
+	void onImageSizeMessage(uint16_t width, uint16_t height) override {};
+	void onFrameRateMessage(uint8_t fps) override {};
+	void onLapseIntervalMessage(uint32_t interval_ms) override {};
+	void onCurrentStateMessage(bool valid, uint8_t id, uint16_t width, uint16_t height, uint8_t fps) override {};
+	void onCurrentStateMessage(bool valid, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override {};
+	void onCurrentStateMessage(bool valid, uint8_t mode, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
 		uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps) override {};
 
-	void onTakePhotoReply(bool error)  override {};
+	void onTakePhotoReplyMessage(bool error)  override {};
 
 private:
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
@@ -152,14 +152,14 @@ public:
 	eRESULT finished() override;
 
 private:
-	void onMode(uint8_t id) override;
-	void onCameraId(uint8_t id) override;
-	void onImageSize(uint16_t width, uint16_t height) override;
-	void onFrameRate(uint8_t fps) override;
-	void onLapseInterval(uint32_t interval_ms) override;
-	void onCurrentState(bool valid, uint8_t id, uint16_t width, uint16_t height, uint8_t fps) override;
-	void onCurrentState(bool valid, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
-	void onCurrentState(bool valid, uint8_t mode, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
+	void onModeMessage(uint8_t id) override;
+	void onCameraIdMessage(uint8_t id) override;
+	void onImageSizeMessage(uint16_t width, uint16_t height) override;
+	void onFrameRateMessage(uint8_t fps) override;
+	void onLapseIntervalMessage(uint32_t interval_ms) override;
+	void onCurrentStateMessage(bool valid, uint8_t id, uint16_t width, uint16_t height, uint8_t fps) override;
+	void onCurrentStateMessage(bool valid, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
+	void onCurrentStateMessage(bool valid, uint8_t mode, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
 		uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps) override;
 
 	void onConnect() override;
@@ -193,7 +193,7 @@ public:
 	eRESULT finished() override;
 
 private:
-	void onTakePhotoReply(bool error)  override;
+	void onTakePhotoReplyMessage(bool error)  override;
 	void onConnect() override;
 
 private:

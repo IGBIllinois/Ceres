@@ -19,7 +19,7 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
     {
         sCurrentState_t data = to_current_state_1(hdr.length, buffer);
         
-        onCurrentState(data.valid, data.average_frames,data.frame_period_us,
+        onCurrentStateMessage(data.valid, data.average_frames,data.frame_period_us,
             data.min_frame_period_us, data.integration_time_us, data.max_integration_time_us,
             data.num_backgrounds, data.lens_name);
 
@@ -27,7 +27,7 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
     }
     case ePacketType::LENS_NAMES:
     {
-        onLensNames( to_lens_names_1(hdr.length, buffer) );
+        onLensNamesMessage( to_lens_names_1(hdr.length, buffer) );
 
         break;
     }
@@ -37,14 +37,14 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
         switch (reply)
         {
         case hyspex_eCommand::eCOMMAND_CALC_BACKGROUND:
-            onCommandReply(eCommandReply::CALC_BACKGROUND);
+            onCommandReplyMessage(eCommandReply::CALC_BACKGROUND);
             break;
         case hyspex_eCommand::eCOMMAND_STOP_BACKGROUND:
-            onCommandReply(eCommandReply::STOP_BACKGROUND);
+            onCommandReplyMessage(eCommandReply::STOP_BACKGROUND);
             break;
         case hyspex_eCommand::eCOMMAND_UNSPECIFIED:
         default:
-            onCommandReply(eCommandReply::UNKNOWN);
+            onCommandReplyMessage(eCommandReply::UNKNOWN);
             break;
         }
         break;
@@ -55,16 +55,16 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
         switch (reply)
         {
         case hyspex_eBackgroundReply::eBackgroundReply_GOOD:
-            onBackgroundReply(eBackgroundReply::GOOD);
+            onBackgroundReplyMessage(eBackgroundReply::GOOD);
             break;
         case hyspex_eBackgroundReply::eBackgroundReply_ABORTED:
-            onBackgroundReply(eBackgroundReply::ABORTED);
+            onBackgroundReplyMessage(eBackgroundReply::ABORTED);
             break;
         case hyspex_eBackgroundReply::eBackgroundReply_FAILED:
-            onBackgroundReply(eBackgroundReply::FAILED);
+            onBackgroundReplyMessage(eBackgroundReply::FAILED);
             break;
         case hyspex_eBackgroundReply::eBackgroundReply_PENDING:
-            onBackgroundReply(eBackgroundReply::PENDING);
+            onBackgroundReplyMessage(eBackgroundReply::PENDING);
             break;
         }
         break;
@@ -75,22 +75,22 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
         switch (reply)
         {
         case hyspex_eShutterState::eShutterState_UNKNOWN:
-            onShutterState(eShutterState::UNKNOWN);
+            onShutterStateMessage(eShutterState::UNKNOWN);
             break;
         case hyspex_eShutterState::eShutterState_OPEN:
-            onShutterState(eShutterState::OPEN);
+            onShutterStateMessage(eShutterState::OPEN);
             break;
         case hyspex_eShutterState::eShutterState_CLOSED:
-            onShutterState(eShutterState::CLOSED);
+            onShutterStateMessage(eShutterState::CLOSED);
             break;
         case hyspex_eShutterState::eShutterState_PENDING_OPEN:
-            onShutterState(eShutterState::PENDING_OPEN);
+            onShutterStateMessage(eShutterState::PENDING_OPEN);
             break;
         case hyspex_eShutterState::eShutterState_PENDING_CLOSE:
-            onShutterState(eShutterState::PENDING_CLOSED);
+            onShutterStateMessage(eShutterState::PENDING_CLOSED);
             break;
         case hyspex_eShutterState::eShutterState_ERROR:
-            onShutterState(eShutterState::ERROR);
+            onShutterStateMessage(eShutterState::ERROR);
             break;
         }
         break;

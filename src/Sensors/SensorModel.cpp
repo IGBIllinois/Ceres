@@ -37,6 +37,8 @@ bool cSensorModel::configure(const nlohmann::json& jsonCfg)
         if (!jsonCfg.contains("Manufacturer"))
             throw std::logic_error("Missing \"Manufacturer\" entry.");
         mManufacturer = jsonCfg["Manufacturer"];
+
+        emit manufacturerChanged(QString::fromStdString(mManufacturer));
     }
 
     if (mModel.empty())
@@ -44,6 +46,8 @@ bool cSensorModel::configure(const nlohmann::json& jsonCfg)
         if (!jsonCfg.contains("Model"))
             throw std::logic_error("Missing \"Model\" entry.");
         mModel = jsonCfg["Model"];
+
+        emit modelChanged(QString::fromStdString(mModel));
     }
 
     if (mSerialNumber.empty())
@@ -51,7 +55,12 @@ bool cSensorModel::configure(const nlohmann::json& jsonCfg)
         if (!jsonCfg.contains("Serial Number"))
             throw std::logic_error("Missing \"Serial Number\" entry.");
         mSerialNumber = jsonCfg["Serial Number"];
+
+        emit serialNumberChanged(QString::fromStdString(mSerialNumber));
     }
+
+    emit descriptorChanged(QString::fromStdString(descriptor()));
+
 
     setStatus(sensor::eStatus::CONFIGURED);
     return true;
@@ -72,6 +81,8 @@ bool cSensorModel::initialize()
 void cSensorModel::setInstanceName(const std::string& instance)
 {
     mSensorInstance = instance;
+
+    emit instanceChanged(QString::fromStdString(instance));
 }
 
 void cSensorModel::enableDataRecording(cBlockDataFileWriter& file)
@@ -108,6 +119,8 @@ void cSensorModel::updateName(const std::string& name)
     QString instance = QString::fromStdString(mSensorInstance);
 
     mSensorName = name;
+
+    emit nameChanged(new_name);
 
     emit sensorNameChanging(old_name, new_name, instance);
 }

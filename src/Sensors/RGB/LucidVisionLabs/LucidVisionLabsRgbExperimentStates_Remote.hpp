@@ -44,7 +44,7 @@ protected:
 
 private:
 //	void onMode(uint8_t id) override {};
-	void onImageSize(uint16_t width, uint16_t height) override {};
+	void onImageSizeMessage(uint16_t width, uint16_t height) override {};
 //	void onFrameRate(double fps) override {};
 	//void onLapseInterval(uint32_t interval_ms) override {};
 //	void onCurrentState(bool valid, uint8_t mode,

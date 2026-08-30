@@ -249,11 +249,10 @@ void cHySpexCamera_StatusView::doPlotLayout(QBoxLayout* pMainLayout)
 	pMainLayout->addLayout(plotLayout);
 }
 
-void cHySpexCamera_StatusView::onInitStatusChange()
+
+void cHySpexCamera_StatusView::onInitStatusChange(hyspex::InitStatus status)
 {
 	using namespace hyspex;
-
-	auto status = mpModel->getInitStatus();
 
 	switch (status)
 	{
@@ -290,11 +289,9 @@ void cHySpexCamera_StatusView::onInitStatusChange()
 	}
 }
 
-void cHySpexCamera_StatusView::onAcqStatusChange()
+void cHySpexCamera_StatusView::onAcqStatusChange(hyspex::AcquisitionStatus status)
 {
 	using namespace hyspex;
-
-	auto status = mpModel->getAcquisitionStatus();
 
 	switch (status)
 	{
@@ -328,11 +325,9 @@ void cHySpexCamera_StatusView::onAcqStatusChange()
 	}
 }
 
-void cHySpexCamera_StatusView::onBgStatusChange()
+void cHySpexCamera_StatusView::onBgStatusChange(hyspex::BackgroundStatus status)
 {
 	using namespace hyspex;
-
-	auto status = mpModel->getBackgroundStatus();
 
 	switch (status)
 	{
@@ -357,11 +352,9 @@ void cHySpexCamera_StatusView::onBgStatusChange()
 	}
 }
 
-void cHySpexCamera_StatusView::onCommStatusChange()
+void cHySpexCamera_StatusView::onCommStatusChange(hyspex::CommunicationStatus status)
 {
 	using namespace hyspex;
-
-	auto status = mpModel->getCommunicationStatus();
 
 	switch (status)
 	{
@@ -383,11 +376,9 @@ void cHySpexCamera_StatusView::onCommStatusChange()
 	}
 }
 
-void cHySpexCamera_StatusView::onCoolingStatusChange()
+void cHySpexCamera_StatusView::onCoolingStatusChange(hyspex::CoolingStatus status)
 {
 	using namespace hyspex;
-
-	auto status = mpModel->getCoolingStatus();
 
 	switch (status)
 	{
@@ -412,11 +403,11 @@ void cHySpexCamera_StatusView::onCoolingStatusChange()
 	}
 }
 
-void cHySpexCamera_StatusView::onShutterStatusChange()
+void cHySpexCamera_StatusView::onShutterStatusChange(hyspex::ShutterStatus status)
 {
 	using namespace hyspex;
 
-	auto status = mpModel->getShutterStatus();
+//	auto status = mpModel->getShutterStatus();
 
 	switch (status)
 	{
@@ -482,14 +473,10 @@ void cHySpexCamera_StatusView::onSensorTempChange(double temp_C)
 	mpCoolingStatus->setText(label);
 }
 
-void cHySpexCamera_StatusView::onLensInfoChange()
+void cHySpexCamera_StatusView::onLensInfoChange(QString name, double working_distance_cm, double fov_deg)
 {
-	auto name = mpModel->getLensName();
-	auto wd_cm = mpModel->getWorkingDistance_cm();
-	auto fov_deg = mpModel->getFieldOfView_deg();
-
-	mpLensName->setText(QString::fromStdString(name));
-	mpLensWorkingDistance_cm->setText(QString::number(wd_cm, 'f', 1));
+	mpLensName->setText(name);
+	mpLensWorkingDistance_cm->setText(QString::number(working_distance_cm, 'f', 1));
 	mpLensFieldOfView_deg->setText(QString::number(fov_deg, 'f', 1));
 }
 

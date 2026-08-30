@@ -151,6 +151,15 @@ signals:
     void sensorStatusChanging(QString name, QString instance, sensor::eStatus status);
     void sensorNameChanging(QString old_name, QString new_name, QString instance);
 
+    void descriptorChanged(QString descriptor);
+    void versionChanged(int version);
+    void manufacturerChanged(QString manufacturer);
+    void modelChanged(QString model);
+    void serialNumberChanged(QString serial_number);
+
+    void nameChanged(QString name);
+    void instanceChanged(QString instance);
+
 public:
     /*
      * Call by the data thread to process an incoming data

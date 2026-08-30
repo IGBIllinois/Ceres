@@ -12,6 +12,7 @@
 
 #include <QObject>
 #include <QImage>
+#include <QStringList>
 
 #include <vector>
 #include <mutex>
@@ -106,6 +107,12 @@ public:
     double getFieldOfView_deg() const;
 
     /*
+     * Shutter control
+     */
+    virtual void open_shutter() = 0;
+    virtual void close_shutter() = 0;
+
+    /*
      * Retrieve information for the background
      */
     std::uint32_t getNumOfBackgrounds() const;
@@ -130,12 +137,12 @@ public:
     HySpexConnect::cSpectralData<float> getSpectralDistributionData() const;
 
 signals:
-    void initStatusChanged();
-    void commStatusChanged();
-    void acqStatusChanged();
-    void bgStatusChanged();
-    void coolingStatusChanged();
-    void shutterStatusChanged();
+    void initStatusChanged(hyspex::InitStatus status);
+    void commStatusChanged(hyspex::CommunicationStatus status);
+    void acqStatusChanged(hyspex::AcquisitionStatus status);
+    void bgStatusChanged(hyspex::BackgroundStatus status);
+    void coolingStatusChanged(hyspex::CoolingStatus status);
+    void shutterStatusChanged(hyspex::ShutterStatus status);
 
     void imageSizeChanged(std::size_t spatialSize, std::size_t spectralSize);
 
@@ -147,10 +154,10 @@ signals:
     void ambientTempChanged(double temp_C);
     void sensorTempChanged(double temp_C);
 
-    void lensInfoChanged();
+    void lensNamesChanged(QStringList lens_names);
+    void lensInfoChanged(QString lens_name, double working_distance_cm, double fov_deg);
 
     void computeModeChanged();
-
 
     void newPercentSaturationData();
     void newPercentBandData();
@@ -160,7 +167,25 @@ signals:
 
     void newImageData();
 
+    void stateUpdate(int average_frames, int frame_period_us, 
+        int min_frame_period_us, int integration_time_us, int max_integration_time_us,
+        int num_backgrounds, QString lens_name);
+
 public slots:
+    void stateQueried();
+    void lensNamesQueried();
+    void shutterStateQueried();
+
+    void requestAcquisitionParameters(int average_frame, int frame_period_us, int integration_time_us);
+    void requestLensName(QString lens_name);
+    void requestNumOfBackgrounds(int num_backgrounds);
+
+    void requestCalcBackground();
+    void requestStopBackground();
+
+    void requestOpenShutter();
+    void requestCloseShutter();
+
     virtual void onStartingReferenceMeasurement() = 0;
     virtual void onEndingReferenceMeasurement() = 0;
 

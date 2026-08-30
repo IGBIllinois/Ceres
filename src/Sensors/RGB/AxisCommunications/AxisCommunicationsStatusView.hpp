@@ -26,7 +26,7 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
-	void connectToModel() override;
+//	void connectToModel() override;
 
 signals:
 	void requestImage();
@@ -64,7 +64,4 @@ private:
 //	QPushButton* mpSaveImage = nullptr;
 
 	cRgbImageWidget* mpImage = nullptr;
-
-private:
-	cAxisCommunicationsModel* mpModel = nullptr;
 };

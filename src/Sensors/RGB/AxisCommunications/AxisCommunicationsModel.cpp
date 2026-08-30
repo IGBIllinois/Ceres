@@ -166,6 +166,30 @@ void cAxisCommunicationsModel::stopCommunications()
     delete mpHttpManager; mpHttpManager = nullptr;
 }
 
+void cAxisCommunicationsModel::modeQueried()
+{
+    int mode = static_cast<int>(this->mode());
+    emit modeChanged(mode);
+}
+
+void cAxisCommunicationsModel::imageSizeQueried()
+{
+    auto image_size = getActiveImageSize();
+    emit imageSizeChanged(image_size.width, image_size.height);
+}
+
+void cAxisCommunicationsModel::frameRateQueried()
+{
+    double fps = getActiveFramesRate_fps();
+    emit frameRateChanged(static_cast<int>(fps));
+}
+
+void cAxisCommunicationsModel::lapseIntervalQueried()
+{
+    int interval_ms = lapseInterval_ms();
+    emit lapseIntervalChanged(interval_ms);
+}
+
 void cAxisCommunicationsModel::requestMode(int mode)
 {
     if ((mode >= eMode::SINGLE) && (mode <= eMode::CONTINUOUS))

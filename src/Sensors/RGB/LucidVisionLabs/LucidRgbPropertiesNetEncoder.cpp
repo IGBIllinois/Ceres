@@ -9,74 +9,74 @@ cLucidRgbPropertiesNetEncoder::cLucidRgbPropertiesNetEncoder(std::size_t capacit
     : cNetworkEncoder(capacity)
 {}
 
-void cLucidRgbPropertiesNetEncoder::sendQueryState()
+void cLucidRgbPropertiesNetEncoder::sendQueryStateMessage()
 {
     encode_query_current_state(mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendQueryMode()
+void cLucidRgbPropertiesNetEncoder::sendQueryModeMessage()
 {
     encode_query_camera_mode(mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendQueryImageSize()
+void cLucidRgbPropertiesNetEncoder::sendQueryImageSizeMessage()
 {
     encode_query_image_size(mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendQueryFrameRate()
+void cLucidRgbPropertiesNetEncoder::sendQueryFrameRateMessage()
 {
     encode_query_frame_rate(mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendQueryLapseInterval()
+void cLucidRgbPropertiesNetEncoder::sendQueryLapseIntervalMessage()
 {
     encode_query_lapse_interval(mBuffer);
     sendData();
 }
 
 
-void cLucidRgbPropertiesNetEncoder::sendSetMode(uint8_t mode)
+void cLucidRgbPropertiesNetEncoder::sendSetModeMessage(uint8_t mode)
 {
     encode_camera_mode(mode, mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendSetImageSize(uint16_t width, uint16_t height)
+void cLucidRgbPropertiesNetEncoder::sendSetImageSizeMessage(uint16_t width, uint16_t height)
 {
     encode_image_size(width, height, mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendSetFrameRate_fps(uint8_t fps)
+void cLucidRgbPropertiesNetEncoder::sendSetFrameRateMessage(uint8_t fps)
 {
     encode_frame_rate(fps, mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendSetLapseInterval_ms(uint32_t interval_ms)
+void cLucidRgbPropertiesNetEncoder::sendSetLapseIntervalMessage(uint32_t interval_ms)
 {
     encode_lapse_interval(interval_ms, mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendGrabImage()
+void cLucidRgbPropertiesNetEncoder::sendGrabImageMessage()
 {
     encode_grab_image(mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendTakePhoto(bool update_view)
+void cLucidRgbPropertiesNetEncoder::sendTakePhotoMessage(bool update_view)
 {
     encode_take_photo(update_view, mBuffer);
     sendData();
 }
 
-void cLucidRgbPropertiesNetEncoder::sendTakePhoto(bool update_view, bool auto_save)
+void cLucidRgbPropertiesNetEncoder::sendTakePhotoMessage(bool update_view, bool auto_save)
 {
     encode_take_photo(update_view, auto_save, mBuffer);
     sendData();

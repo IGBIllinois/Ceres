@@ -33,11 +33,8 @@ public:
 
     void writeDataHeader() override;
 
-    virtual void open_shutter() = 0;
-    virtual void close_shutter() = 0;
-
 signals:
-    void backgroundComplete();
+    void backgroundComplete(hyspex::BackgroundStatus status);
 
 
 protected:

@@ -93,7 +93,7 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mCamera->init(mNumBuffersRaw, mNumBufferPreProcessing);
 
     mInitStatus = mCamera->getInitStatus();
-    emit initStatusChanged();
+    emit initStatusChanged(mInitStatus);
 
     if (mInitStatus == hyspex::InitStatus::HYSPEX_INIT_NOT_STARTED)
     {
@@ -101,7 +101,7 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     }
 
     mInitStatus = mCamera->getInitStatus();
-    emit initStatusChanged();
+    emit initStatusChanged(mInitStatus);
 
     switch (mInitStatus)
     {
@@ -175,7 +175,7 @@ bool cHySpexSWIR_384_Model_direct::initialize()
     mLens = mCamera->getLensName();
     mWorkingDistance_cm = mCamera->getLensWorkingDistance_cm();
     mFieldOfView_deg = mCamera->getLensFieldOfView_rad() * nConstants::RAD_TO_DEG;
-    emit lensInfoChanged();
+    emit lensInfoChanged(QString::fromStdString(mLens), mWorkingDistance_cm, mFieldOfView_deg);
 
     mWavelengthRangeId = mCamera->getWavelengthRangeId();
 
@@ -193,13 +193,13 @@ bool cHySpexSWIR_384_Model_direct::initialize()
         mSaturationValue = mMaxPixelValue - 10;
 
     mCommStatus = mCamera->getCommunicationStatus();
-    emit commStatusChanged();
+    emit commStatusChanged(mCommStatus);
 
 	mCoolingStatus = mCamera->getCoolingStatus();
-    emit coolingStatusChanged();
+    emit coolingStatusChanged(mCoolingStatus);
 
     mShutterStatus = mCamera->getShutterStatus();
-    emit shutterStatusChanged();
+    emit shutterStatusChanged(mShutterStatus);
 
     auto averageFrames = mCamera->getAverageFrames();
     if ((mAverageFrames > 0) && (mAverageFrames != averageFrames))
@@ -264,10 +264,10 @@ bool cHySpexSWIR_384_Model_direct::initialize()
 
     mNumBackgrounds = mCamera->getNumberOfBackgrounds();
 	mBackgroundStatus = mCamera->getBackgroundStatus();
-    emit bgStatusChanged();
+    emit bgStatusChanged(mBackgroundStatus);
 
 	mAcquisitionStatus = mCamera->getAcquisitionStatus();
-    emit acqStatusChanged();
+    emit acqStatusChanged(mAcquisitionStatus);
 
     mBadPixelCorrectionData  = mCamera->getBadPixelsWithCalculatedCorrections();
     mResponsivityMatrix      = mCamera->getResponsivityMatrix();
@@ -319,7 +319,7 @@ void cHySpexSWIR_384_Model_direct::stopCommunications()
     mCamera->stopAcquisition();
 
     mAcquisitionStatus = mCamera->getAcquisitionStatus();
-    emit acqStatusChanged();
+    emit acqStatusChanged(mAcquisitionStatus);
 
     mConnected = false;
 
@@ -386,7 +386,7 @@ void cHySpexSWIR_384_Model_direct::update()
 
             if (oldBackgroundStatus != mBackgroundStatus)
             {
-                emit bgStatusChanged();
+                emit bgStatusChanged(mBackgroundStatus);
             }
 
             break;
@@ -396,7 +396,7 @@ void cHySpexSWIR_384_Model_direct::update()
             if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN)
             {
                 mBgCurrentState = eBgStates::NONE;
-                emit backgroundComplete();
+                emit backgroundComplete(hyspex::HYSPEX_BG_VALID);
             }
             break;
         }
@@ -405,6 +405,7 @@ void cHySpexSWIR_384_Model_direct::update()
             mCamera->stopCalculatingBackground();
             mCamera->openShutter();
             mBgCurrentState = eBgStates::SH_OPEN;
+            emit backgroundComplete(hyspex::HYSPEX_BG_ABORTED);
             break;
         }
         }
@@ -615,13 +616,13 @@ void cHySpexSWIR_384_Model_direct::handleStatusCallback(void* p, int eventId, in
 void cHySpexSWIR_384_Model_direct::updateInitStatus(hyspex::InitStatus status)
 {
     mInitStatus = status;
-    emit initStatusChanged();
+    emit initStatusChanged(mInitStatus);
 }
 
 void cHySpexSWIR_384_Model_direct::updateCommStatus(hyspex::CommunicationStatus status)
 {
     mCommStatus = status;
-    emit commStatusChanged();
+    emit commStatusChanged(mCommStatus);
 }
 
 void cHySpexSWIR_384_Model_direct::updateCoolingStatus(hyspex::CoolingStatus status)
@@ -634,25 +635,25 @@ void cHySpexSWIR_384_Model_direct::updateCoolingStatus(hyspex::CoolingStatus sta
             (mCoolingStatus == hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_DEGRADED))
             setStatus(sensor::eStatus::RUNNING);
     }
-    emit coolingStatusChanged();
+    emit coolingStatusChanged(mCoolingStatus);
 }
 
 void cHySpexSWIR_384_Model_direct::updateBackgroundStatus(hyspex::BackgroundStatus status)
 {
     mBackgroundStatus = status;
-    emit bgStatusChanged();
+    emit bgStatusChanged(mBackgroundStatus);
 }
 
 void cHySpexSWIR_384_Model_direct::updateAcquisitionStatus(hyspex::AcquisitionStatus status)
 {
     mAcquisitionStatus = status;
-    emit acqStatusChanged();
+    emit acqStatusChanged(mAcquisitionStatus);
 }
 
 void cHySpexSWIR_384_Model_direct::updateShutterStatus(hyspex::ShutterStatus status)
 {
     mShutterStatus = status;
-    emit shutterStatusChanged();
+    emit shutterStatusChanged(mShutterStatus);
 }
 
 void cHySpexSWIR_384_Model_direct::updateImageData(hyspex::ImageOptions a_options, const hyspex::ImageLine< unsigned short >& a_image)

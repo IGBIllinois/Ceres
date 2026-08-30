@@ -20,20 +20,6 @@ public:
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
-public:
-    void onCurrentState(bool valid, std::uint16_t average_frames,
-        std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
-        std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
-        std::uint32_t num_backgrounds, const std::string& lens_name) override;
-
-    void onLensNames(const std::vector<std::string>& names) override;
-
-    void onCommandReply(eCommandReply reply) override;
-
-    void onBackgroundReply(eBackgroundReply reply) override;
-
-    void onShutterState(eShutterState state) override;
-
 protected:
     void onConnect() override;
     void onDisconnect() override;
@@ -62,6 +48,21 @@ private:
     void setLensName(const std::string& lens_name);
     void setNumOfBackgrounds(int num_backgrounds);
     void calcBackground();
+
+protected:
+    /*** Network Message handers from the decoder */
+    void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
+        std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
+        std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
+        std::uint32_t num_backgrounds, const std::string& lens_name) override;
+
+    void onLensNamesMessage(const std::vector<std::string>& names) override;
+
+    void onCommandReplyMessage(eCommandReply reply) override;
+
+    void onBackgroundReplyMessage(eBackgroundReply reply) override;
+
+    void onShutterStateMessage(eShutterState state) override;
 
 private:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;

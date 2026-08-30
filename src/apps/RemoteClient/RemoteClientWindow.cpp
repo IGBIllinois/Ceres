@@ -554,11 +554,23 @@ void cRemoteClientWindow::createSensorModelsAndViews(const nlohmann::json& confi
 
         if (widgets.pController)
         {
+            QObject::connect(widgets.pModel, &cSensorModel::descriptorChanged,   widgets.pController, &cSensorController::onDescriptorUpdate);
+            QObject::connect(widgets.pModel, &cSensorModel::versionChanged,      widgets.pController, &cSensorController::onVersionUpdate);
+            QObject::connect(widgets.pModel, &cSensorModel::manufacturerChanged, widgets.pController, &cSensorController::onManufacturerUpdate);
+            QObject::connect(widgets.pModel, &cSensorModel::modelChanged,        widgets.pController, &cSensorController::onModelUpdate);
+            QObject::connect(widgets.pModel, &cSensorModel::serialNumberChanged, widgets.pController, &cSensorController::onSerialNumberUpdate);
+
+            QObject::connect(widgets.pModel, &cSensorModel::nameChanged,     widgets.pController, &cSensorController::onNameUpdate);
+            QObject::connect(widgets.pModel, &cSensorModel::instanceChanged, widgets.pController, &cSensorController::onInstanceUpdate);
+
             mMainModel.addSensorController(widgets.pController);
         }
 
         if (widgets.pRemoteStatusView)
         {
+            QObject::connect(widgets.pModel, &cSensorModel::sensorStatusChanging, widgets.pRemoteStatusView, &cSensorStatusView::onSensorStatusChange);
+            QObject::connect(widgets.pModel, &cSensorModel::sensorNameChanging,   widgets.pRemoteStatusView, &cSensorStatusView::onSensorNameChanging);
+
             mpCentralWindow->addTab(widgets.pRemoteStatusView, widgets.pRemoteStatusView->windowTitle());
             QObject::connect(widgets.pModel, &cSensorModel::sensorNameChanging, mpCentralWindow, &cRemoteClientCentalWindow::updateSensorName);
         }

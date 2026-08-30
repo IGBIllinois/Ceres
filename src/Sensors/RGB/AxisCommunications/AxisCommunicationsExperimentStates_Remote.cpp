@@ -82,7 +82,7 @@ cExperimentState::eRESULT cAxisCommunications_SaveState_Remote::finished() { ret
 
 void cAxisCommunications_SaveState_Remote::onConnect()
 {
-	sendSaveState();
+	sendSaveStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -114,7 +114,7 @@ cExperimentState::eRESULT cAxisCommunications_RestoreState_Remote::finished() { 
 
 void cAxisCommunications_RestoreState_Remote::onConnect()
 {
-	sendRestoreState();
+	sendRestoreStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -170,32 +170,32 @@ cExperimentState::eRESULT cAxisCommunications_Configure_Remote::finished()
 	return cExperimentState::eRESULT::DONE;
 }
 
-void cAxisCommunications_Configure_Remote::onMode(uint8_t mode)
+void cAxisCommunications_Configure_Remote::onModeMessage(uint8_t mode)
 {
 	mWaitingForMode = false;
 }
 
-void cAxisCommunications_Configure_Remote::onCameraId(uint8_t id)
+void cAxisCommunications_Configure_Remote::onCameraIdMessage(uint8_t id)
 {
 	mWaitingForCameraID = false;
 }
 
-void cAxisCommunications_Configure_Remote::onImageSize(uint16_t width, uint16_t height)
+void cAxisCommunications_Configure_Remote::onImageSizeMessage(uint16_t width, uint16_t height)
 {
 	mWaitingForResolution = false;
 }
 
-void cAxisCommunications_Configure_Remote::onFrameRate(uint8_t fps)
+void cAxisCommunications_Configure_Remote::onFrameRateMessage(uint8_t fps)
 {
 	mWaitingForFrameRate = false;
 }
 
-void cAxisCommunications_Configure_Remote::onLapseInterval(uint32_t interval_ms)
+void cAxisCommunications_Configure_Remote::onLapseIntervalMessage(uint32_t interval_ms)
 {
 	mWaitingForInterval = false;
 }
 
-void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t id, uint16_t width, uint16_t height, uint8_t fps)
+void cAxisCommunications_Configure_Remote::onCurrentStateMessage(bool valid, uint8_t id, uint16_t width, uint16_t height, uint8_t fps)
 {
 	if (mCameraID >= 0)
 		mWaitingForCameraID = id != mCameraID;
@@ -218,24 +218,24 @@ void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t id
 	mWaitingForResolution = (mImageWidth != width) || (mImageHeight != height);
 
 	if (mWaitingForMode)
-		sendSetMode(static_cast<uint8_t>(mMode));
+		sendSetModeMessage(static_cast<uint8_t>(mMode));
 
 	if (mWaitingForResolution)
-		sendSetImageSize(mImageWidth, mImageHeight);
+		sendSetImageSizeMessage(mImageWidth, mImageHeight);
 
 	if (mWaitingForCameraID)
-		sendSetCameraId(mCameraID);
+		sendSetCameraIdMessage(mCameraID);
 
 	if (mWaitingForFrameRate)
-		sendSetFrameRate_fps(mFrameRate_fps);
+		sendSetFrameRateMessage(mFrameRate_fps);
 
 	if (mWaitingForInterval)
-		sendSetLapseInterval_ms(mLapseInterval_ms);
+		sendSetLapseIntervalMessage(mLapseInterval_ms);
 
 	mWaitingForConfiguration = false;
 }
 
-void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
+void cAxisCommunications_Configure_Remote::onCurrentStateMessage(bool valid, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
 {
 	if (mCameraID >= 0)
 		mWaitingForCameraID = active_id != mCameraID;
@@ -258,24 +258,24 @@ void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t ac
 	mWaitingForResolution = (mImageWidth != width) || (mImageHeight != height);
 
 	if (mWaitingForMode)
-		sendSetMode(static_cast<uint8_t>(mMode));
+		sendSetModeMessage(static_cast<uint8_t>(mMode));
 
 	if (mWaitingForResolution)
-		sendSetImageSize(mImageWidth, mImageHeight);
+		sendSetImageSizeMessage(mImageWidth, mImageHeight);
 
 	if (mWaitingForCameraID)
-		sendSetCameraId(mCameraID);
+		sendSetCameraIdMessage(mCameraID);
 
 	if (mWaitingForFrameRate)
-		sendSetFrameRate_fps(mFrameRate_fps);
+		sendSetFrameRateMessage(mFrameRate_fps);
 
 	if (mWaitingForInterval)
-		sendSetLapseInterval_ms(mLapseInterval_ms);
+		sendSetLapseIntervalMessage(mLapseInterval_ms);
 
 	mWaitingForConfiguration = false;
 }
 
-void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t mode, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
+void cAxisCommunications_Configure_Remote::onCurrentStateMessage(bool valid, uint8_t mode, uint8_t active_id, uint16_t width, uint16_t height, uint8_t fps, uint32_t interval_ms,
 	uint8_t min_id, uint8_t max_id, std::optional<double> min_fps, std::optional<double> max_fps)
 {
 	if (mCameraID >= 0)
@@ -299,26 +299,26 @@ void cAxisCommunications_Configure_Remote::onCurrentState(bool valid, uint8_t mo
 	mWaitingForResolution = (mImageWidth != width) || (mImageHeight != height);
 
 	if (mWaitingForMode)
-		sendSetMode(static_cast<uint8_t>(mMode));
+		sendSetModeMessage(static_cast<uint8_t>(mMode));
 
 	if (mWaitingForResolution)
-		sendSetImageSize(mImageWidth, mImageHeight);
+		sendSetImageSizeMessage(mImageWidth, mImageHeight);
 
 	if (mWaitingForCameraID)
-		sendSetCameraId(mCameraID);
+		sendSetCameraIdMessage(mCameraID);
 
 	if (mWaitingForFrameRate)
-		sendSetFrameRate_fps(mFrameRate_fps);
+		sendSetFrameRateMessage(mFrameRate_fps);
 
 	if (mWaitingForInterval)
-		sendSetLapseInterval_ms(mLapseInterval_ms);
+		sendSetLapseIntervalMessage(mLapseInterval_ms);
 
 	mWaitingForConfiguration = false;
 }
 
 void cAxisCommunications_Configure_Remote::onConnect()
 {
-	sendQueryState();
+	sendQueryStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -356,14 +356,14 @@ cExperimentState::eRESULT cAxisCommunications_TakePhoto_Remote::finished()
 	return mResult;
 }
 
-void cAxisCommunications_TakePhoto_Remote::onTakePhotoReply(bool error)
+void cAxisCommunications_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 {
 	mResult = cExperimentState::eRESULT::DONE;
 };
 
 void cAxisCommunications_TakePhoto_Remote::onConnect()
 {
-	sendTakePhoto(mUpdateView);
+	sendTakePhotoMessage(mUpdateView);
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));

@@ -10,14 +10,14 @@ cLucidRgbControllerNetEncoder::cLucidRgbControllerNetEncoder(std::size_t capacit
     : cNetworkEncoder(capacity)
 {}
 
-void cLucidRgbControllerNetEncoder::sendCurrentState(bool valid, uint8_t camera_id,
+void cLucidRgbControllerNetEncoder::sendCurrentStateMessage(bool valid, uint8_t camera_id,
     uint16_t width, uint16_t height, uint8_t fps)
 {
     encode_current_state(valid, camera_id, width, height, fps, mBuffer);
     sendData();
 }
 
-void cLucidRgbControllerNetEncoder::sendCurrentState(bool valid, uint8_t active_camera_id,
+void cLucidRgbControllerNetEncoder::sendCurrentStateMessage(bool valid, uint8_t active_camera_id,
     uint16_t width, uint16_t height, uint8_t fps,
     uint8_t min_camera_id, uint8_t max_camera_id)
 {
@@ -25,31 +25,31 @@ void cLucidRgbControllerNetEncoder::sendCurrentState(bool valid, uint8_t active_
     sendData();
 }
 
-void cLucidRgbControllerNetEncoder::sendCameraMode(uint8_t mode)
+void cLucidRgbControllerNetEncoder::sendCameraModeMessage(uint8_t mode)
 {
     encode_camera_mode(mode, mBuffer);
     sendData();
 }
 
-void cLucidRgbControllerNetEncoder::sendImageSize(uint16_t width, uint16_t height)
+void cLucidRgbControllerNetEncoder::sendImageSizeMessage(uint16_t width, uint16_t height)
 {
     encode_image_size(width, height, mBuffer);
     sendData();
 }
 
-void cLucidRgbControllerNetEncoder::sendFrameRate(uint8_t fps)
+void cLucidRgbControllerNetEncoder::sendFrameRateMessage(uint8_t fps)
 {
     encode_frame_rate(fps, mBuffer);
     sendData();
 }
 
-void cLucidRgbControllerNetEncoder::sendLapseInterval_ms(uint32_t interval_ms)
+void cLucidRgbControllerNetEncoder::sendLapseIntervalMessage(uint32_t interval_ms)
 {
     encode_lapse_interval(interval_ms, mBuffer);
     sendData();
 }
 
-void cLucidRgbControllerNetEncoder::sendTakePhotoReply()
+void cLucidRgbControllerNetEncoder::sendTakePhotoReplyMessage()
 {
     encode_take_photo_reply(eReply::GOOD, mBuffer);
     sendData();

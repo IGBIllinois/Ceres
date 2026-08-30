@@ -21,20 +21,6 @@ public:
 public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
-public:
-    void onMode(uint8_t mode) override;
-    void onImageSize(uint16_t width, uint16_t height) override;
-    void onFrameRate(uint8_t fps) override;
-
-    void onLapseInterval(uint32_t interval_ms) override;
-
-    void onCurrentState(bool valid, uint8_t id,
-        uint16_t width, uint16_t height, uint8_t fps) override;
-    void onCurrentState(bool valid, uint8_t active_id,
-        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
-
-    void onTakePhotoReply(bool error)  override;
-
 protected:
     void onConnect() override;
     void onGrabImagePressed() override;
@@ -43,6 +29,7 @@ protected:
     void pixelFormatChanged(const QString&) override;
     void gainAutoModeChanged(const QString&) override;
     void balanceWhiteAutoModeChanged(const QString&) override;
+    void gammaEnableChanged(bool check) override;
 
 protected:
     void createWidgets() override;
@@ -58,6 +45,21 @@ protected:
     void doApply() override;
 
     void reject() override;
+
+protected:
+    void onModeMessage(uint8_t mode) override;
+    void onImageSizeMessage(uint16_t width, uint16_t height) override;
+    void onFrameRateMessage(uint8_t fps) override;
+
+    void onLapseIntervalMessage(uint32_t interval_ms) override;
+
+    void onCurrentStateMessage(bool valid, uint8_t id,
+        uint16_t width, uint16_t height, uint8_t fps) override;
+
+    void onCurrentStateMessage(bool valid, uint8_t active_id,
+        uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id) override;
+
+    void onTakePhotoReplyMessage(bool error)  override;
 
 protected:
     void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;

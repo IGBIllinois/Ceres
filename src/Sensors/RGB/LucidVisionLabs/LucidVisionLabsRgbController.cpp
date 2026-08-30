@@ -5,14 +5,20 @@
 
 #include <cassert>
 
-
+/*
 cLucidVisionLabsRgbController::cLucidVisionLabsRgbController(cLucidVisionLabsRgbModel* model, QObject* parent)
     :
     cSensorController(parent), cLucidRgbControllerNetEncoder(512), mpModel(model)
 {
     assert(mpModel);
 }
+*/
+cLucidVisionLabsRgbController::cLucidVisionLabsRgbController(QObject* parent)
+    :
+    cSensorController(parent), cLucidRgbControllerNetEncoder(512)
+{}
 
+/*
 const char* cLucidVisionLabsRgbController::descriptor() const
 {
     return mpModel->descriptor();
@@ -47,6 +53,7 @@ bool cLucidVisionLabsRgbController::has_instance() const
 {
     return mpModel->has_instance();
 }
+*/
 
 void cLucidVisionLabsRgbController::processStream(const void* pBuffer, std::size_t buf_length)
 {
@@ -70,40 +77,30 @@ void cLucidVisionLabsRgbController::processStream(const void* pBuffer, std::size
     }
 }
 
-void cLucidVisionLabsRgbController::onQueryState()
-{
-//    auto window = mpModel->getAzimuthWindow();
-//    auto mode = mpModel->getLidarMode();
+/**
+ * Message Handlers
+ */
 
-//    sendCurrentState(true, mode, window.min_deg, window.max_deg);
-}
-
-/*
-void cAxisCommunicationsController::onSetAzimuthWindow(double min_deg, double max_deg)
-{
-    if (max_deg < min_deg)
-        std::swap(min_deg, max_deg);
-
-    mpModel->setAzimuthWindow(min_deg, max_deg);
-}
-
-void cAxisCommunicationsController::onSetMode(ouster::eLIDAR_MODE mode)
-{
-    mpModel->setLidarMode(mode);
-}
-*/
 
 /******************************************************************************
  * Lucid Vision Labs Controller Triton
  ******************************************************************************/
 
+/*
 cLucidVisionLabsRgbController_Triton::cLucidVisionLabsRgbController_Triton(cLucidVisionLabsRgbModel_Triton* model, QObject* parent)
     :
     cSensorController(parent), cLucidRgbControllerNetEncoder(512), mpModel(model)
 {
     assert(mpModel);
 }
+*/
+cLucidVisionLabsRgbController_Triton::cLucidVisionLabsRgbController_Triton(QObject* parent)
+    :
+    cSensorController(parent), cLucidRgbControllerNetEncoder(512)
+{
+}
 
+/*
 const char* cLucidVisionLabsRgbController_Triton::descriptor() const
 {
     return mpModel->descriptor();
@@ -138,6 +135,7 @@ bool cLucidVisionLabsRgbController_Triton::has_instance() const
 {
     return mpModel->has_instance();
 }
+*/
 
 void cLucidVisionLabsRgbController_Triton::processStream(const void* pBuffer, std::size_t buf_length)
 {
@@ -161,7 +159,11 @@ void cLucidVisionLabsRgbController_Triton::processStream(const void* pBuffer, st
     }
 }
 
-void cLucidVisionLabsRgbController_Triton::onQueryState()
+/**
+ * Message Handlers
+ */
+
+void cLucidVisionLabsRgbController_Triton::onQueryStateMessage()
 {
 /*
     auto id = mpModel->getActiveCameraID();
@@ -177,12 +179,12 @@ void cLucidVisionLabsRgbController_Triton::onQueryState()
 */
 }
 
-void cLucidVisionLabsRgbController_Triton::onQueryMode()
+void cLucidVisionLabsRgbController_Triton::onQueryModeMessage()
 {
 //    sendActiveCameraId(mpModel->getActiveCameraID());
 }
 
-void cLucidVisionLabsRgbController_Triton::onQueryImageSize()
+void cLucidVisionLabsRgbController_Triton::onQueryImageSizeMessage()
 {
 /*
     auto image_size = mpModel->getActiveImageSize();
@@ -190,34 +192,34 @@ void cLucidVisionLabsRgbController_Triton::onQueryImageSize()
 */
 }
 
-void cLucidVisionLabsRgbController_Triton::onQueryFrameRate()
+void cLucidVisionLabsRgbController_Triton::onQueryFrameRateMessage()
 {
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
 
-void cLucidVisionLabsRgbController_Triton::onQueryLapseInterval()
+void cLucidVisionLabsRgbController_Triton::onQueryLapseIntervalMessage()
 {
     //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
 
-void cLucidVisionLabsRgbController_Triton::onGrabImage()
+void cLucidVisionLabsRgbController_Triton::onGrabImageMessage()
 {
-    mpModel->requestImage();
+//    mpModel->requestImage();
 }
 
-void cLucidVisionLabsRgbController_Triton::onTakePhoto(bool updateView)
+void cLucidVisionLabsRgbController_Triton::onTakePhotoMessage(bool updateView)
 {}
 
-void cLucidVisionLabsRgbController_Triton::onTakePhoto(bool updateView, bool autoSave)
+void cLucidVisionLabsRgbController_Triton::onTakePhotoMessage(bool updateView, bool autoSave)
 {}
 
-void cLucidVisionLabsRgbController_Triton::setMode(uint8_t mode)
+void cLucidVisionLabsRgbController_Triton::setModeMessage(uint8_t mode)
 {
 //    mpModel->setActiveCamera(id);
 //    sendActiveCameraId(mpModel->getActiveCameraID());
 }
 
-void cLucidVisionLabsRgbController_Triton::setImageSize(uint16_t width, uint16_t height)
+void cLucidVisionLabsRgbController_Triton::setImageSizeMessage(uint16_t width, uint16_t height)
 {
     rgb::sImageSize_t image_size = {width, height};
 
@@ -225,22 +227,22 @@ void cLucidVisionLabsRgbController_Triton::setImageSize(uint16_t width, uint16_t
 //    sendImageSize(image_size.width, image_size.height);
 }
 
-void cLucidVisionLabsRgbController_Triton::setFrameRate(uint8_t fps)
+void cLucidVisionLabsRgbController_Triton::setFrameRateMessage(uint8_t fps)
 {
 //    mpModel->setActiveFramesRate_fps(fps);
 //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
 
-void cLucidVisionLabsRgbController_Triton::setLapseInterval_ms(uint32_t interval_ms)
+void cLucidVisionLabsRgbController_Triton::setLapseIntervalMessage(uint32_t interval_ms)
 {
     //    mpModel->setActiveFramesRate_fps(fps);
     //    sendFrameRate(mpModel->getActiveFramesRate_fps());
 }
 
-void cLucidVisionLabsRgbController_Triton::onSaveState()
+void cLucidVisionLabsRgbController_Triton::onSaveStateMessage()
 {}
 
-void cLucidVisionLabsRgbController_Triton::onRestoreState()
+void cLucidVisionLabsRgbController_Triton::onRestoreStateMessage()
 {}
 
 

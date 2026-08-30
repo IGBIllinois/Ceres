@@ -69,7 +69,7 @@ void cHySpexCamera_ShutterCtrl_Remote::run()
 {
 	if (mShutterTimer.elapsed())
 	{
-		sendQueryShutterState();
+		sendQueryShutterStateMessage();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
@@ -91,7 +91,7 @@ cExperimentState::eRESULT cHySpexCamera_ShutterCtrl_Remote::finished()
 	return eRESULT::WAITING;
 }
 
-void cHySpexCamera_ShutterCtrl_Remote::onShutterState(eShutterState state)
+void cHySpexCamera_ShutterCtrl_Remote::onShutterStateMessage(eShutterState state)
 {
 	mShutterState = state;
 
@@ -101,27 +101,27 @@ void cHySpexCamera_ShutterCtrl_Remote::onShutterState(eShutterState state)
 
 	if (mDesiredState == eShutterState::CLOSED)
 	{
-		sendCloseShutter();
+		sendCloseShutterMessage();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
-		sendQueryShutterState();
+		sendQueryShutterStateMessage();
 	}
 
 	if (mDesiredState == eShutterState::OPEN)
 	{
-		sendOpenShutter();
+		sendOpenShutterMessage();
 
 		// Sleep for 250 milliseconds
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
-		sendQueryShutterState();
+		sendQueryShutterStateMessage();
 	}
 }
 
 void cHySpexCamera_ShutterCtrl_Remote::onConnect()
 {
-	sendQueryShutterState();
+	sendQueryShutterStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -242,7 +242,7 @@ void cHySpexCamera_Acquisition_Remote::stop() {}
 
 void cHySpexCamera_Acquisition_Remote::onConnect()
 {
-	sendQueryState();
+	sendQueryStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -289,7 +289,7 @@ cExperimentState::eRESULT cHySpexCamera_AcqParameters_Remote::finished()
 	return eRESULT::WAITING;
 }
 
-void cHySpexCamera_AcqParameters_Remote::onCurrentState(bool valid, std::uint16_t average_frames,
+void cHySpexCamera_AcqParameters_Remote::onCurrentStateMessage(bool valid, std::uint16_t average_frames,
 	std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
 	std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 	std::uint32_t num_backgrounds, const std::string& lens_name)
@@ -304,7 +304,7 @@ void cHySpexCamera_AcqParameters_Remote::onCurrentState(bool valid, std::uint16_
 		std::uint32_t framePeriod_us = mDesiredFramePeriod_us.has_value() ? mDesiredFramePeriod_us.value() : mCurrentFramePeriod_us;
 		std::uint32_t integrationTime_us = mDesiredIntegrationTime_us.has_value() ? mDesiredIntegrationTime_us.value() : mCurrentIntegrationTime_us;
 
-		sendAcquisitionParameters(averageFrames, framePeriod_us, integrationTime_us);
+		sendAcquisitionParametersMessage(averageFrames, framePeriod_us, integrationTime_us);
 		mHasAcquisitionState = false;
 		return;
 	}
@@ -389,7 +389,7 @@ cExperimentState::eRESULT cHySpexCamera_Background_Remote::finished()
 	return eRESULT::WAITING;
 }
 
-void cHySpexCamera_Background_Remote::onCurrentState(bool valid, std::uint16_t average_frames,
+void cHySpexCamera_Background_Remote::onCurrentStateMessage(bool valid, std::uint16_t average_frames,
 	std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
 	std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
 	std::uint32_t num_backgrounds, const std::string& lens_name)
@@ -405,14 +405,14 @@ void cHySpexCamera_Background_Remote::onCurrentState(bool valid, std::uint16_t a
 		std::uint32_t framePeriod_us = mDesiredFramePeriod_us.has_value() ? mDesiredFramePeriod_us.value() : mCurrentFramePeriod_us;
 		std::uint32_t integrationTime_us = mDesiredIntegrationTime_us.has_value() ? mDesiredIntegrationTime_us.value() : mCurrentIntegrationTime_us;
 
-		sendAcquisitionParameters(averageFrames, framePeriod_us, integrationTime_us);
+		sendAcquisitionParametersMessage(averageFrames, framePeriod_us, integrationTime_us);
 
 		// Sleep for 250 milliseconds
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
 		mHasAcquisitionState = false;
 		mState = eSTATE::WAIT_FOR_STATE_UPDATE;
-		sendQueryState();
+		sendQueryStateMessage();
 
 		// Sleep for 250 milliseconds
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -422,17 +422,17 @@ void cHySpexCamera_Background_Remote::onCurrentState(bool valid, std::uint16_t a
 
 	if ((mDesiredNumBackgrounds.has_value()) && (mDesiredNumBackgrounds.value() != mCurrentNumBackgrounds))
 	{
-		sendNumOfBackgrounds(mDesiredNumBackgrounds.value());
+		sendNumOfBackgroundsMessage(mDesiredNumBackgrounds.value());
 	}
 
 	mState = eSTATE::WAIT_FOR_BACKGROUND;
-	sendCalcBackground();
+	sendCalcBackgroundMessage();
 }
 
-void cHySpexCamera_Background_Remote::onCommandReply(eCommandReply reply)
+void cHySpexCamera_Background_Remote::onCommandReplyMessage(eCommandReply reply)
 {}
 
-void cHySpexCamera_Background_Remote::onBackgroundReply(eBackgroundReply reply)
+void cHySpexCamera_Background_Remote::onBackgroundReplyMessage(eBackgroundReply reply)
 {
 	switch (reply)
 	{

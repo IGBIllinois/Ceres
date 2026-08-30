@@ -38,12 +38,12 @@ public:
 	void createWidgets() override;
 
 public slots:
-	void onInitStatusChange();
-	void onCommStatusChange();
-	void onAcqStatusChange();
-	void onBgStatusChange();
-	void onCoolingStatusChange();
-	void onShutterStatusChange();
+	void onInitStatusChange(hyspex::InitStatus status);
+	void onCommStatusChange(hyspex::CommunicationStatus status);
+	void onAcqStatusChange(hyspex::AcquisitionStatus status);
+	void onBgStatusChange(hyspex::BackgroundStatus status);
+	void onCoolingStatusChange(hyspex::CoolingStatus status);
+	void onShutterStatusChange(hyspex::ShutterStatus status);
 
 	void onAvgFramesChange(std::uint16_t avgFrames);
 	void onFramePeriodChange(std::uint32_t period_us);
@@ -53,7 +53,7 @@ public slots:
 	void onAmbientTempChange(double temp_C);
 	virtual void onSensorTempChange(double temp_C);
 
-	void onLensInfoChange();
+	void onLensInfoChange(QString name, double working_distance_cm, double fov_deg);
 
 	void onComputeModeChange();
 

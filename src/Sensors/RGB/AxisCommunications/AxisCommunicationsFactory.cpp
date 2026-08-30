@@ -45,11 +45,46 @@ sSensorWidgets create_axis_communications_f44_sensor(const nlohmann::json& senso
             pView->createWidgets();
             pView->doLayout();
 
-            pView->connectToModel();
+            QObject::connect(pModel, &cAxisCommunicationsModel_F44::cameraIdChanged,  pView, &cAxisCommunicationsStatusView::onCameraIdChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged,     pView, &cAxisCommunicationsStatusView::onImageSizeChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::modeChanged,          pView, &cAxisCommunicationsStatusView::onModeChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged,     pView, &cAxisCommunicationsStatusView::onFrameRateChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::lapseIntervalChanged, pView, &cAxisCommunicationsStatusView::onLapseIntervalChange);
+            QObject::connect(pModel, &cAxisCommunicationsModel::onNewImage,           pView, &cAxisCommunicationsStatusView::imageUpdated);
 
-            auto* pController = new cAxisCommunicationsController_F44(pModel);
+            QObject::connect(pView, &cAxisCommunicationsStatusView::requestImage, pModel, &cAxisCommunicationsModel::requestImage);
 
-            pController->connectToModel();
+            auto* pController = new cAxisCommunicationsController_F44();
+
+            QObject::connect(pModel, &cAxisCommunicationsModel::modeChanged,          pController, &cAxisCommunicationsController_F44::modeChanged);
+            QObject::connect(pModel, &cAxisCommunicationsModel::lapseIntervalChanged, pController, &cAxisCommunicationsController_F44::lapseIntervalChanged);
+            QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged,     pController, &cAxisCommunicationsController_F44::frameRateChanged);
+            QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged,     pController, &cAxisCommunicationsController_F44::imageSizeChanged);
+
+            QObject::connect(pModel, &cAxisCommunicationsModel_F44::cameraIdChanged,  pController, &cAxisCommunicationsController_F44::cameraIdChanged);
+            QObject::connect(pModel, &cAxisCommunicationsModel_F44::stateInfoUpdate,  pController, &cAxisCommunicationsController_F44::stateUpdated);
+
+            QObject::connect(pModel, &cAxisCommunicationsModel::photoTaken,           pController, &cAxisCommunicationsController_F44::photoTaken);
+
+            QObject::connect(pController, &cAxisCommunicationsController_F44::queryMode,          pModel, &cAxisCommunicationsModel::modeQueried);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::queryState,         pModel, &cAxisCommunicationsModel_F44::stateQueried);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::queryCameraId,      pModel, &cAxisCommunicationsModel_F44::cameraIdQueried);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::queryImageSize,     pModel, &cAxisCommunicationsModel::imageSizeQueried);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::queryFrameRate,     pModel, &cAxisCommunicationsModel::frameRateQueried);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::queryLapseInterval, pModel, &cAxisCommunicationsModel::lapseIntervalQueried);
+
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestImageSize,        pModel, &cAxisCommunicationsModel::requestImageSize);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestMode,             pModel, &cAxisCommunicationsModel::requestMode);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestFrameRate_Hz,     pModel, &cAxisCommunicationsModel::requestFrameRate_Hz);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestLapseInterval_ms, pModel, &cAxisCommunicationsModel::requestLapseInterval_ms);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestImage,            pModel, &cAxisCommunicationsModel::requestImage);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestImages,           pModel, &cAxisCommunicationsModel::requestImages);
+
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestSaveState,    pModel, &cAxisCommunicationsModel_F44::onSaveState);
+            QObject::connect(pController, &cAxisCommunicationsController_F44::requestRestoreState, pModel, &cAxisCommunicationsModel_F44::onRestoreState);
+
+            QObject::connect(pController, qOverload<bool>(&cAxisCommunicationsController_F44::requestPhoto),       pModel, qOverload<bool>(&cAxisCommunicationsModel::takePhoto));
+            QObject::connect(pController, qOverload<bool, bool>(&cAxisCommunicationsController_F44::requestPhoto), pModel, qOverload<bool, bool>(&cAxisCommunicationsModel::takePhoto));
 
             return sSensorWidgets(pModel, pController, pView);
         }

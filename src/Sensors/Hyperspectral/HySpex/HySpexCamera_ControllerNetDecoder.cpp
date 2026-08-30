@@ -28,19 +28,19 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
 #ifdef LOG_MESSAGE
             qInfo() << "Query status received.";
 #endif
-            onQueryState();
+            onQueryStateMessage();
             break;
         case eQUERY_LENS_NAMES:
 #ifdef LOG_MESSAGE
             qInfo() << "Query lens names received.";
 #endif
-            onQueryLensNames();
+            onQueryLensNamesMessage();
             break;
         case eQUERY_SHUTTER_STATE:
 #ifdef LOG_MESSAGE
             qInfo() << "Query shutter state received.";
 #endif
-            onQueryShutterState();
+            onQueryShutterStateMessage();
             break;
         default:
             qWarning() << "Unknown query state received: " << query;
@@ -50,24 +50,24 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
     case ePacketType::SET_ACQUISITION_PARAMETERS:
     {
         auto data = to_acquisition_parameters_1(hdr.length, buffer);
-        onSetAcquisitionParameters(data.average_frames, data.frame_period_us, data.integration_time_us);
+        onSetAcquisitionParametersMessage(data.average_frames, data.frame_period_us, data.integration_time_us);
         break;
     }
     case ePacketType::SET_LENS_NAME:
     {
         auto data = to_lens_name_1(hdr.length, buffer);
-        onSetLensName(data);
+        onSetLensNameMessage(data);
         break;
     }
     case ePacketType::SET_NUM_BACKGROUNDS:
     {
         auto data = to_num_backgrounds_1(hdr.length, buffer);
-        onSetNumOfBackgrounds(data);
+        onSetNumOfBackgroundsMessage(data);
         break;
     }
     case ePacketType::CALC_BACKGROUND:
     {
-        onCalcBackground();
+        onCalcBackgroundMessage();
         break;
     }
     case ePacketType::SET_SHUTTER_STATE:
@@ -75,10 +75,10 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
         auto state = to_set_shutter_state_1(hdr.length, buffer);
 
         if (state == hyspex_eShutterState::eShutterState_OPEN)
-            onOpenShutter();
+            onOpenShutterMessage();
 
         if (state == hyspex_eShutterState::eShutterState_CLOSED)
-            onCloseShutter();
+            onCloseShutterMessage();
 
         break;
     }
@@ -88,10 +88,10 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
         switch (command)
         {
         case eCOMMAND_CALC_BACKGROUND:
-            onCalcBackground();
+            onCalcBackgroundMessage();
             break;
         case eCOMMAND_STOP_BACKGROUND:
-            onStopBackground();
+            onStopBackgroundMessage();
             break;
         default:
             qWarning() << "Unknown command received: " << command;

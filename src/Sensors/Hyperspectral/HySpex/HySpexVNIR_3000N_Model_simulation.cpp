@@ -29,7 +29,7 @@ void cHySpexVNIR_3000N_Model_simulation::updateViews()
 {
     cHySpexVNIR_3000N_Model::updateViews();
 
-    emit lensInfoChanged();
+    emit lensInfoChanged(QString::fromStdString(mLens), mWorkingDistance_cm, mFieldOfView_deg);
 }
 
 bool cHySpexVNIR_3000N_Model_simulation::configure(const nlohmann::json& jsonCfg)
@@ -63,7 +63,7 @@ bool cHySpexVNIR_3000N_Model_simulation::configure(const nlohmann::json& jsonCfg
     mLens = "3 m";
     mWorkingDistance_cm = 300;
     mFieldOfView_deg = 18.745;
-    emit lensInfoChanged();
+    emit lensInfoChanged(QString::fromStdString(mLens), mWorkingDistance_cm, mFieldOfView_deg);
 
     setStatus(sensor::eStatus::CONFIGURED);
 
@@ -75,10 +75,10 @@ bool cHySpexVNIR_3000N_Model_simulation::initialize()
     emit statusMessage("Retrieving HySpex VNIR-3000N camera configuration...");
 
     mInitStatus = hyspex::InitStatus::HYSPEX_INIT_PENDING_SENSOR;
-    emit initStatusChanged();
+    emit initStatusChanged(mInitStatus);
 
     mInitStatus = hyspex::InitStatus::HYSPEX_INIT_OK;
-    emit initStatusChanged();
+    emit initStatusChanged(mInitStatus);
 
     mWavelengthRangeId = hyspex::WavelengthRangeId::HYSPEX_WRID_VNIR;
 
@@ -92,13 +92,13 @@ bool cHySpexVNIR_3000N_Model_simulation::initialize()
     mSaturationValue = mMaxPixelValue - 2;
 
     mCommStatus = hyspex::CommunicationStatus::HYSPEX_COMM_OK;
-    emit commStatusChanged();
+    emit commStatusChanged(mCommStatus);
 
 	mCoolingStatus = hyspex::CoolingStatus::HYSPEX_COOLING_STABLE_OK;
-    emit coolingStatusChanged();
+    emit coolingStatusChanged(mCoolingStatus);
 
     mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN;
-    emit shutterStatusChanged();
+    emit shutterStatusChanged(mShutterStatus);
 
 	mAverageFrames = 1;
     emit avgFramesChanged(mAverageFrames);
@@ -121,10 +121,10 @@ bool cHySpexVNIR_3000N_Model_simulation::initialize()
 
     mNumBackgrounds = 200;
 	mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_INVALID;
-    emit bgStatusChanged();
+    emit bgStatusChanged(mBackgroundStatus);
 
 	mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_PENDING;
-    emit acqStatusChanged();
+    emit acqStatusChanged(mAcquisitionStatus);
 
     mSpectralCalibrationPerBand.resize(700);
     for (int i = 0; i < 700; ++i)
@@ -140,7 +140,7 @@ bool cHySpexVNIR_3000N_Model_simulation::startCommunications()
     mSimDataUpdateTimer.reset();
 
     mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_RUNNING;
-    emit acqStatusChanged();
+    emit acqStatusChanged(mAcquisitionStatus);
 
     mConnected = (mAcquisitionStatus == hyspex::AcquisitionStatus::HYSPEX_ACQ_PENDING)
         || (mAcquisitionStatus == hyspex::AcquisitionStatus::HYSPEX_ACQ_RUNNING)
@@ -166,7 +166,7 @@ void cHySpexVNIR_3000N_Model_simulation::stopCommunications()
     mSimDataUpdateTimer.stop();
 
     mAcquisitionStatus = hyspex::AcquisitionStatus::HYSPEX_ACQ_STOPPED;
-    emit acqStatusChanged();
+    emit acqStatusChanged(mAcquisitionStatus);
 
     mConnected = false;
 
@@ -214,13 +214,14 @@ void cHySpexVNIR_3000N_Model_simulation::update()
             if (mShutterTimer.elapsed())
             {
                 mBackgroundState = eBgStates::NONE;
-                emit backgroundComplete();
+                emit backgroundComplete(hyspex::HYSPEX_BG_VALID);
             }
             break;
         }
         case eBgStates::ABORT:
         {
             mBackgroundState = eBgStates::SH_OPEN;
+            emit backgroundComplete(hyspex::HYSPEX_BG_ABORTED);
             break;
         }
         }
@@ -295,13 +296,13 @@ void cHySpexVNIR_3000N_Model_simulation::stopBackground()
 void cHySpexVNIR_3000N_Model_simulation::open_shutter()
 {
     mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN;
-    emit shutterStatusChanged();
+    emit shutterStatusChanged(mShutterStatus);
 }
 
 void cHySpexVNIR_3000N_Model_simulation::close_shutter()
 {
     mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED;
-    emit shutterStatusChanged();
+    emit shutterStatusChanged(mShutterStatus);
 }
 
 

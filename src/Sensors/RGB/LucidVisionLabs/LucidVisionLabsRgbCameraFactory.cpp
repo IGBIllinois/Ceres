@@ -58,9 +58,8 @@ sSensorWidgets create_triton_sensor(const nlohmann::json& sensorInfo, bool no_vi
             QObject::connect(pModel, &cAxisCommunicationsModel::frameRateChanged, pView, &cAxisCommunicationsStatusView::onFrameRateChange);
             QObject::connect(pModel, &cAxisCommunicationsModel::imageSizeChanged, pView, &cAxisCommunicationsStatusView::onImageSizeChange);
 
-            auto* pController = new cAxisCommunicationsController_F44(pModel);
+            auto* pController = new cLucidVisionLabsRgbController_Triton(pModel);
 
-            pController->connectToModel();
 
             return sSensorWidgets(pModel, pController, pView);
         }
@@ -107,6 +106,7 @@ sSensorWidgets lucid_vision_labs_rgb::create_sensor(const nlohmann::json& sensor
     return sSensorWidgets();
 }
 
+
 void lucid_vision_labs_rgb::remove_sensor(sSensorWidgets widgets)
 {
     auto* pModel = widgets.pModel;
@@ -126,9 +126,8 @@ cSensorPropertyPage* lucid_vision_labs_rgb::create_sensor_property_page(
     const std::string& model, uint32_t version,
     const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
 {
-//    cAxisCommunicationsPropertyPage_Remote* page = new cAxisCommunicationsPropertyPage_Remote();
-//    page->initialize(remote_ip_address, port, false, local_ip_address);
+    cLucidVisionLabsRgbPropertyPage_Remote* page = new cLucidVisionLabsRgbPropertyPage_Remote();
+    page->initialize(remote_ip_address, port, false, local_ip_address);
 
-//    return page;
-    return nullptr;
+    return page;
 }

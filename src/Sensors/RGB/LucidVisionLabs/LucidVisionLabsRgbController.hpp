@@ -15,8 +15,10 @@ class cLucidVisionLabsRgbController : public cSensorController,
 	Q_OBJECT
 
 public:
-    cLucidVisionLabsRgbController(cLucidVisionLabsRgbModel* model, QObject* parent = nullptr);
+//    cLucidVisionLabsRgbController(cLucidVisionLabsRgbModel* model, QObject* parent = nullptr);
+    cLucidVisionLabsRgbController(QObject* parent = nullptr);
 
+/*
 public:
     const char* descriptor() const override;
     uint32_t version() const override { return 1; };
@@ -26,11 +28,10 @@ public:
     const std::string& name() const override;
     const std::string& instance() const override;
     bool has_instance() const override;
+*/
 
 protected:
-    void onQueryState() override;
-//    void onSetAzimuthWindow(double min_deg, double max_deg) override;
-//    void onSetMode(ouster::eLIDAR_MODE mode) override;
+    /*** Message Handlers from the network decoder */
 
 protected:
     /**
@@ -49,8 +50,8 @@ protected:
         return cSensorController::sendOutgoingData(data, len);
     }
 
-private:
-    cLucidVisionLabsRgbModel* mpModel = nullptr;
+//private:
+//    cLucidVisionLabsRgbModel* mpModel = nullptr;
 };
 
 
@@ -64,8 +65,10 @@ class cLucidVisionLabsRgbController_Triton : public cSensorController,
     Q_OBJECT
 
 public:
-    cLucidVisionLabsRgbController_Triton(cLucidVisionLabsRgbModel_Triton* model, QObject* parent = nullptr);
+//    cLucidVisionLabsRgbController_Triton(cLucidVisionLabsRgbModel_Triton* model, QObject* parent = nullptr);
+    cLucidVisionLabsRgbController_Triton(QObject* parent = nullptr);
 
+/*
 public:
     const char* descriptor() const override;
     uint32_t version() const override { return 1; };
@@ -75,24 +78,26 @@ public:
     const std::string& name() const override;
     const std::string& instance() const override;
     bool has_instance() const override;
+*/
 
 protected:
-    void onQueryState() override;
-    void onQueryMode() override;
-    void onQueryImageSize() override;
-    void onQueryFrameRate() override;
-    void onQueryLapseInterval() override;
-    void onGrabImage() override;
-    void onTakePhoto(bool updateView) override;
-    void onTakePhoto(bool updateView, bool autoSave) override;
+    /*** Message Handlers from the network decoder */
+    void onQueryStateMessage() override;
+    void onQueryModeMessage() override;
+    void onQueryImageSizeMessage() override;
+    void onQueryFrameRateMessage() override;
+    void onQueryLapseIntervalMessage() override;
+    void onGrabImageMessage() override;
+    void onTakePhotoMessage(bool updateView) override;
+    void onTakePhotoMessage(bool updateView, bool autoSave) override;
 
-    void setMode(uint8_t mode) override;
-    void setImageSize(uint16_t width, uint16_t height) override;
-    void setFrameRate(uint8_t fps) override;
-    void setLapseInterval_ms(uint32_t interval_ms) override;
+    void setModeMessage(uint8_t mode) override;
+    void setImageSizeMessage(uint16_t width, uint16_t height) override;
+    void setFrameRateMessage(uint8_t fps) override;
+    void setLapseIntervalMessage(uint32_t interval_ms) override;
 
-    void onSaveState() override;
-    void onRestoreState() override;
+    void onSaveStateMessage() override;
+    void onRestoreStateMessage() override;
 
 
 protected:
@@ -112,8 +117,8 @@ protected:
         return cSensorController::sendOutgoingData(data, len);
     }
 
-private:
-    cLucidVisionLabsRgbModel_Triton* mpModel = nullptr;
+//private:
+//    cLucidVisionLabsRgbModel_Triton* mpModel = nullptr;
 };
 
 

@@ -27,10 +27,5 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
-	void connectToModel() override;
-
 	void onSensorTempChange(double temp_C) override;
-
-private:
-	cHySpexSWIR_384_Model* mpModel = nullptr;
 };

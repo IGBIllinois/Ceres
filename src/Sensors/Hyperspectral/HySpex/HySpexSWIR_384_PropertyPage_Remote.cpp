@@ -162,63 +162,6 @@ void cHySpexSWIR_384_PropertyPage_Remote::onDisconnect()
 	doCancel();
 }
 
-void cHySpexSWIR_384_PropertyPage_Remote::onCurrentState(bool valid, 
-	std::uint16_t average_frames, std::uint32_t frame_period_us, 
-	std::uint32_t min_frame_period_us, std::uint32_t integration_time_us,
-	std::uint32_t max_integration_time_us, std::uint32_t num_backgrounds,
-	const std::string& lens_name)
-{
-	if (!valid) return;
-
-	mAcquisitionParametersValid = true;
-
-	mpAvgFrames->setText(QString::number(average_frames));
-	mpFramePeriod_us->setText(QString::number(frame_period_us));
-	mpMinFramePeriod_us->setText(QString::number(min_frame_period_us));
-	mpIntegrationTime_us->setText(QString::number(integration_time_us));
-	mpMaxIntegrationTime_us->setText(QString::number(max_integration_time_us));
-	mpNumBackgrounds->setText(QString::number(num_backgrounds));
-
-	mDefaultAverageFrames = average_frames;
-	mDefaultFramePeriod_us = frame_period_us;
-	mDefaultIntegrationTime_us = integration_time_us;
-	mDefaultNumBackgrounds = num_backgrounds;
-
-	mDefaultLensName = QString::fromStdString(lens_name);
-
-	for (int i = 0; i < mpLenses->count(); ++i)
-	{
-		if (mDefaultLensName == mpLenses->itemText(i))
-		{
-			mpLenses->setCurrentIndex(i);
-			break;
-		}
-	}
-}
-
-void cHySpexSWIR_384_PropertyPage_Remote::onLensNames(const std::vector<std::string>& names)
-{
-	mpLenses->clear();
-	for (std::size_t i = 0; i < names.size(); ++i)
-	{
-		mpLenses->addItem(QString::fromStdString(names[i]));
-	}
-}
-
-void cHySpexSWIR_384_PropertyPage_Remote::onCommandReply(eCommandReply reply)
-{
-}
-
-void cHySpexSWIR_384_PropertyPage_Remote::onBackgroundReply(eBackgroundReply reply)
-{
-	mBackgroundValid = true;
-	enableControls(true);
-	update();
-}
-
-void cHySpexSWIR_384_PropertyPage_Remote::onShutterState(eShutterState state)
-{}
-
 void cHySpexSWIR_384_PropertyPage_Remote::showPage()
 {
 	if (!openConnection())
@@ -276,6 +219,63 @@ void cHySpexSWIR_384_PropertyPage_Remote::reject()
 	doCancel();
 }
 
+
+void cHySpexSWIR_384_PropertyPage_Remote::onCurrentStateMessage(bool valid,
+	std::uint16_t average_frames, std::uint32_t frame_period_us,
+	std::uint32_t min_frame_period_us, std::uint32_t integration_time_us,
+	std::uint32_t max_integration_time_us, std::uint32_t num_backgrounds,
+	const std::string& lens_name)
+{
+	if (!valid) return;
+
+	mAcquisitionParametersValid = true;
+
+	mpAvgFrames->setText(QString::number(average_frames));
+	mpFramePeriod_us->setText(QString::number(frame_period_us));
+	mpMinFramePeriod_us->setText(QString::number(min_frame_period_us));
+	mpIntegrationTime_us->setText(QString::number(integration_time_us));
+	mpMaxIntegrationTime_us->setText(QString::number(max_integration_time_us));
+	mpNumBackgrounds->setText(QString::number(num_backgrounds));
+
+	mDefaultAverageFrames = average_frames;
+	mDefaultFramePeriod_us = frame_period_us;
+	mDefaultIntegrationTime_us = integration_time_us;
+	mDefaultNumBackgrounds = num_backgrounds;
+
+	mDefaultLensName = QString::fromStdString(lens_name);
+
+	for (int i = 0; i < mpLenses->count(); ++i)
+	{
+		if (mDefaultLensName == mpLenses->itemText(i))
+		{
+			mpLenses->setCurrentIndex(i);
+			break;
+		}
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::onLensNamesMessage(const std::vector<std::string>& names)
+{
+	mpLenses->clear();
+	for (std::size_t i = 0; i < names.size(); ++i)
+	{
+		mpLenses->addItem(QString::fromStdString(names[i]));
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::onCommandReplyMessage(eCommandReply reply)
+{}
+
+void cHySpexSWIR_384_PropertyPage_Remote::onBackgroundReplyMessage(eBackgroundReply reply)
+{
+	mBackgroundValid = true;
+	enableControls(true);
+	update();
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::onShutterStateMessage(eShutterState state)
+{}
+
 /*
  * Network communications methods
  */
@@ -317,7 +317,7 @@ void cHySpexSWIR_384_PropertyPage_Remote::queryState()
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryStateMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -334,7 +334,7 @@ void cHySpexSWIR_384_PropertyPage_Remote::queryLensNames()
 	// We are going to try to get the lens names three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryLensNames();
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryLensNamesMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -353,8 +353,8 @@ void cHySpexSWIR_384_PropertyPage_Remote::setAcquisitionParameters(std::uint16_t
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cHySpexSWIR_384_PropertiesNetEncoder::sendAcquisitionParameters(average_frame, frame_period_us, integration_time_us);
-		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+		cHySpexSWIR_384_PropertiesNetEncoder::sendAcquisitionParametersMessage(average_frame, frame_period_us, integration_time_us);
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryStateMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -373,8 +373,8 @@ void cHySpexSWIR_384_PropertyPage_Remote::setLensName(const std::string& lens_na
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cHySpexSWIR_384_PropertiesNetEncoder::sendLensName(lens_name);
-		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+		cHySpexSWIR_384_PropertiesNetEncoder::sendLensNameMessage(lens_name);
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryStateMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -393,8 +393,8 @@ void cHySpexSWIR_384_PropertyPage_Remote::setNumOfBackgrounds(int num_background
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cHySpexSWIR_384_PropertiesNetEncoder::sendNumOfBackgrounds(num_backgrounds);
-		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryState();
+		cHySpexSWIR_384_PropertiesNetEncoder::sendNumOfBackgroundsMessage(num_backgrounds);
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryStateMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -415,7 +415,7 @@ void cHySpexSWIR_384_PropertyPage_Remote::calcBackground()
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cHySpexSWIR_384_PropertiesNetEncoder::sendCalcBackground();
+		cHySpexSWIR_384_PropertiesNetEncoder::sendCalcBackgroundMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(secs);
 		while (QTime::currentTime() < delayTime)
@@ -426,7 +426,7 @@ void cHySpexSWIR_384_PropertyPage_Remote::calcBackground()
 		}
 	}
 
-	cHySpexSWIR_384_PropertiesNetEncoder::sendStopBackground();
+	cHySpexSWIR_384_PropertiesNetEncoder::sendStopBackgroundMessage();
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

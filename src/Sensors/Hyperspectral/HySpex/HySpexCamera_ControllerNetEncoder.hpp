@@ -30,36 +30,36 @@ public:
       *
       * You need to call sendData to make sure the data is sent out!
       */
-    void encodeCurrentState(bool valid, std::uint16_t average_frames,
+    void encodeCurrentStateMessage(bool valid, std::uint16_t average_frames,
         std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
         std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
         std::uint32_t num_backgrounds, const std::string& lens_name);
 
-    void encodeLensNames(const std::vector<std::string>& names);
+    void encodeLensNamesMessage(const std::vector<std::string>& names);
 
-    void encodeCommandReply(hyspex_eCommand reply);
+    void encodeCommandReplyMessage(hyspex_eCommand reply);
 
-    void encodeBackgroundReply(hyspex_eBackgroundReply reply);
+    void encodeBackgroundReplyMessage(hyspex_eBackgroundReply reply);
 
-    void encodeShutterStateReply(hyspex_eShutterState state);
+    void encodeShutterStateReplyMessage(hyspex_eShutterState state);
 
 
     /*
      * The send methods will encode the packet into the data buffer and will automatically
      * send the data.
      */
-    void sendCurrentState(bool valid, std::uint16_t average_frames,
+    void sendCurrentStateMessage(bool valid, std::uint16_t average_frames,
         std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
         std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
         std::uint32_t num_backgrounds, const std::string& lens_name);
 
-    void sendLensNames(const std::vector<std::string>& names);
+    void sendLensNamesMessage(const std::vector<std::string>& names);
 
-    void sendCommandReply(hyspex_eCommand reply);
+    void sendCommandReplyMessage(hyspex_eCommand reply);
 
-    void sendBackgroundReply(hyspex_eBackgroundReply reply);
+    void sendBackgroundReplyMessage(hyspex_eBackgroundReply reply);
 
-    void sendShutterStateReply(hyspex_eShutterState state);
+    void sendShutterStateReplyMessage(hyspex_eShutterState state);
 };
 
 

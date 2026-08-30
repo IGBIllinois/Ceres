@@ -95,12 +95,12 @@ void cLucidVisionLabsRgbPropertyPage_Remote::buttonClicked(QAbstractButton* butt
 
 void cLucidVisionLabsRgbPropertyPage_Remote::onConnect()
 {
-	cLucidRgbPropertiesNetEncoder::sendQueryState();
+	cLucidRgbPropertiesNetEncoder::sendQueryStateMessage();
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::onGrabImagePressed()
 {
-	cLucidRgbPropertiesNetEncoder::sendGrabImage();
+	cLucidRgbPropertiesNetEncoder::sendGrabImageMessage();
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::exposureTimeSelectorChanged(const QString&)
@@ -128,66 +128,11 @@ void cLucidVisionLabsRgbPropertyPage_Remote::balanceWhiteAutoModeChanged(const Q
 
 }
 
-void cLucidVisionLabsRgbPropertyPage_Remote::onMode(uint8_t id)
+void cLucidVisionLabsRgbPropertyPage_Remote::gammaEnableChanged(bool check)
 {
-//	if ((id == 0) || (id > 4))
-//		return;
-
-//	mpCameraId->setText(QString::number(id));
-//	mDefaultCameraId = id;
+	mpGamma->setEnabled(check);
 }
 
-void cLucidVisionLabsRgbPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
-{
-	QString image_size = QString::number(width);
-	image_size += "x";
-	image_size += QString::number(height);
-
-/*
-	auto n = mpImageSizes->count();
-	for (int i = 0; i < n; ++i)
-	{
-		auto data = mpImageSizes->itemText(i);
-		if (0 == data.compare(image_size))
-		{
-			mDefaultImageSize = image_size;
-			mpImageSizes->setCurrentIndex(i);
-			break;
-		}
-	}
-*/
-}
-
-void cLucidVisionLabsRgbPropertyPage_Remote::onFrameRate(uint8_t fps)
-{
-	if ((fps == 0) || (fps > 30))
-		return;
-
-//	mpFrameRate_fps->setText(QString::number(fps));
-//	mDefaultFrameRate_fps = fps;
-}
-
-void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t id,
-	uint16_t width, uint16_t height, uint8_t fps)
-{
-	if (!valid) return;
-
-//	onCameraId(id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-}
-
-void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentState(bool valid, uint8_t active_id,
-	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
-{
-	if (!valid) return;
-
-//	onCameraId(active_id);
-	onImageSize(width, height);
-	onFrameRate(fps);
-
-//	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
-}
 
 void cLucidVisionLabsRgbPropertyPage_Remote::showPage()
 {
@@ -244,6 +189,80 @@ void cLucidVisionLabsRgbPropertyPage_Remote::doApply()
 void cLucidVisionLabsRgbPropertyPage_Remote::reject()
 {
 	doCancel();
+}
+
+/*
+ * Network Message Handlers
+ */
+void cLucidVisionLabsRgbPropertyPage_Remote::onModeMessage(uint8_t id)
+{
+	//	if ((id == 0) || (id > 4))
+	//		return;
+
+	//	mpCameraId->setText(QString::number(id));
+	//	mDefaultCameraId = id;
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::onImageSizeMessage(uint16_t width, uint16_t height)
+{
+	QString image_size = QString::number(width);
+	image_size += "x";
+	image_size += QString::number(height);
+
+	/*
+		auto n = mpImageSizes->count();
+		for (int i = 0; i < n; ++i)
+		{
+			auto data = mpImageSizes->itemText(i);
+			if (0 == data.compare(image_size))
+			{
+				mDefaultImageSize = image_size;
+				mpImageSizes->setCurrentIndex(i);
+				break;
+			}
+		}
+	*/
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::onFrameRateMessage(uint8_t fps)
+{
+	if ((fps == 0) || (fps > 30))
+		return;
+
+	//	mpFrameRate_fps->setText(QString::number(fps));
+	//	mDefaultFrameRate_fps = fps;
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::onLapseIntervalMessage(uint32_t interval_ms)
+{
+
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentStateMessage(bool valid, uint8_t id,
+	uint16_t width, uint16_t height, uint8_t fps)
+{
+	if (!valid) return;
+
+	//	onCameraId(id);
+	onImageSizeMessage(width, height);
+	onFrameRateMessage(fps);
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::onCurrentStateMessage(bool valid, uint8_t active_id,
+	uint16_t width, uint16_t height, uint8_t fps, uint8_t min_id, uint8_t max_id)
+{
+	if (!valid) return;
+
+	//	onCameraId(active_id);
+	onImageSizeMessage(width, height);
+	onFrameRateMessage(fps);
+
+	//	mpCameraId->setValidator(new QIntValidator(min_id, max_id));
+}
+
+void cLucidVisionLabsRgbPropertyPage_Remote::onTakePhotoReplyMessage(bool error)
+{
+
 }
 
 void cLucidVisionLabsRgbPropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

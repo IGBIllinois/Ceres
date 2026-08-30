@@ -17,8 +17,6 @@ public:
 	cHySpexVNIR_3000N_View(cHySpexVNIR_3000N_Model* pModel, QWidget* parent = nullptr);
 	virtual ~cHySpexVNIR_3000N_View();
 
-	void connectToModel() override;
-
 protected:
 	const cHySpexVNIR_3000N_Model* mpModel;
 };

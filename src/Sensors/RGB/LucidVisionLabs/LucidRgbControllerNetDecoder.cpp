@@ -25,11 +25,11 @@ void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, co
             switch (packet.query())
             {
             case eQUERY_STATE:
-                return onQueryState();
+                return onQueryStateMessage();
             case eQUERY_IMAGE_SIZE:
-                return onQueryImageSize();
+                return onQueryImageSizeMessage();
             case eQUERY_FRAME_RATE:
-                return onQueryFrameRate();
+                return onQueryFrameRateMessage();
             }
         }
         break;
@@ -40,7 +40,7 @@ void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, co
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto data = to_image_size_t(packet);
-            setImageSize(data.width, data.height);
+            setImageSizeMessage(data.width, data.height);
         }
         break;
     }
@@ -50,18 +50,18 @@ void cLucidRgbControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, co
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto fps = to_frame_rate_t(packet);
-            setFrameRate(fps);
+            setFrameRateMessage(fps);
         }
         break;
     }
     case ePacketType::GRAB_IMAGE:
-        onGrabImage();
+        onGrabImageMessage();
         break;
     case ePacketType::SAVE_STATE:
-        onSaveState();
+        onSaveStateMessage();
         break;
     case ePacketType::RESTORE_STATE:
-        onRestoreState();
+        onRestoreStateMessage();
         break;
     }
 }

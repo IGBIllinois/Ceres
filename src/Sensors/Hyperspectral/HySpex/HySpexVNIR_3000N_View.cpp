@@ -18,8 +18,4 @@ cHySpexVNIR_3000N_View::~cHySpexVNIR_3000N_View()
 {
 }
 
-void cHySpexVNIR_3000N_View::connectToModel()
-{
-}
-
 

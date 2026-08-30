@@ -12,7 +12,7 @@ cHySpexCamera_ControllerNetEncoder::cHySpexCamera_ControllerNetEncoder(std::size
 {}
 
 /**   Encode Methods   */
-void cHySpexCamera_ControllerNetEncoder::encodeCurrentState(bool valid, std::uint16_t average_frames,
+void cHySpexCamera_ControllerNetEncoder::encodeCurrentStateMessage(bool valid, std::uint16_t average_frames,
     std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
     std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
     std::uint32_t num_backgrounds, const std::string& lens_name)
@@ -35,7 +35,7 @@ void cHySpexCamera_ControllerNetEncoder::encodeCurrentState(bool valid, std::uin
     }
 }
 
-void cHySpexCamera_ControllerNetEncoder::encodeLensNames(const std::vector<std::string>& names)
+void cHySpexCamera_ControllerNetEncoder::encodeLensNamesMessage(const std::vector<std::string>& names)
 {
     if (encode_lens_names(names, mBuffer) < 0)
     {
@@ -44,7 +44,7 @@ void cHySpexCamera_ControllerNetEncoder::encodeLensNames(const std::vector<std::
     }
 }
 
-void cHySpexCamera_ControllerNetEncoder::encodeCommandReply(hyspex_eCommand reply)
+void cHySpexCamera_ControllerNetEncoder::encodeCommandReplyMessage(hyspex_eCommand reply)
 {
     if (encode_command_reply(reply, mBuffer) < 0)
     {
@@ -53,7 +53,7 @@ void cHySpexCamera_ControllerNetEncoder::encodeCommandReply(hyspex_eCommand repl
     }
 }
 
-void cHySpexCamera_ControllerNetEncoder::encodeBackgroundReply(hyspex_eBackgroundReply reply)
+void cHySpexCamera_ControllerNetEncoder::encodeBackgroundReplyMessage(hyspex_eBackgroundReply reply)
 {
     if (encode_background_reply(reply, mBuffer) < 0)
     {
@@ -62,7 +62,7 @@ void cHySpexCamera_ControllerNetEncoder::encodeBackgroundReply(hyspex_eBackgroun
     }
 }
 
-void cHySpexCamera_ControllerNetEncoder::encodeShutterStateReply(hyspex_eShutterState state)
+void cHySpexCamera_ControllerNetEncoder::encodeShutterStateReplyMessage(hyspex_eShutterState state)
 {
     if (encode_shutter_state_reply(state, mBuffer) < 0)
     {
@@ -73,7 +73,7 @@ void cHySpexCamera_ControllerNetEncoder::encodeShutterStateReply(hyspex_eShutter
 
 
 /**   Send Methods   */
-void cHySpexCamera_ControllerNetEncoder::sendCurrentState(bool valid, std::uint16_t average_frames,
+void cHySpexCamera_ControllerNetEncoder::sendCurrentStateMessage(bool valid, std::uint16_t average_frames,
     std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
     std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
     std::uint32_t num_backgrounds, const std::string& lens_name)
@@ -93,25 +93,25 @@ void cHySpexCamera_ControllerNetEncoder::sendCurrentState(bool valid, std::uint1
     sendData();
 }
 
-void cHySpexCamera_ControllerNetEncoder::sendLensNames(const std::vector<std::string>& names)
+void cHySpexCamera_ControllerNetEncoder::sendLensNamesMessage(const std::vector<std::string>& names)
 {
     encode_lens_names(names, mBuffer);
     sendData();
 }
 
-void cHySpexCamera_ControllerNetEncoder::sendCommandReply(hyspex_eCommand reply)
+void cHySpexCamera_ControllerNetEncoder::sendCommandReplyMessage(hyspex_eCommand reply)
 {
     encode_command_reply(reply, mBuffer);
     sendData();
 }
 
-void cHySpexCamera_ControllerNetEncoder::sendBackgroundReply(hyspex_eBackgroundReply reply)
+void cHySpexCamera_ControllerNetEncoder::sendBackgroundReplyMessage(hyspex_eBackgroundReply reply)
 {
     encode_background_reply(reply, mBuffer);
     sendData();
 }
 
-void cHySpexCamera_ControllerNetEncoder::sendShutterStateReply(hyspex_eShutterState state)
+void cHySpexCamera_ControllerNetEncoder::sendShutterStateReplyMessage(hyspex_eShutterState state)
 {
     encode_shutter_state_reply(state, mBuffer);
     sendData();

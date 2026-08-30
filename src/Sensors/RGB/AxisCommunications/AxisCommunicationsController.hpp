@@ -23,17 +23,7 @@ class cAxisCommunicationsController : public cSensorController,
 	Q_OBJECT
 
 public:
-    cAxisCommunicationsController(cAxisCommunicationsModel* model, QObject* parent = nullptr);
-
-public:
-    const char* descriptor() const override;
-    uint32_t version() const override { return 1; };
-    const std::string& manufacturer() const override;
-    const std::string& model() const override;
-    const std::string& serial_number() const override;
-    const std::string& name() const override;
-    const std::string& instance() const override;
-    bool has_instance() const override;
+    cAxisCommunicationsController(QObject* parent = nullptr);
 
 protected:
     /**
@@ -51,9 +41,6 @@ protected:
     {
         return cSensorController::sendOutgoingData(data, len);
     }
-
-private:
-    cAxisCommunicationsModel* mpModel = nullptr;
 };
 
 
@@ -67,19 +54,15 @@ class cAxisCommunicationsController_F44 : public cSensorController,
     Q_OBJECT
 
 public:
-    cAxisCommunicationsController_F44(cAxisCommunicationsModel_F44* model, QObject* parent = nullptr);
+    cAxisCommunicationsController_F44(QObject* parent = nullptr);
 
-    void connectToModel() override;
-
-public:
-    const char* descriptor() const override;
-    uint32_t version() const override { return 1; };
-    const std::string& manufacturer() const override;
-    const std::string& model() const override;
-    const std::string& serial_number() const override;
-    const std::string& name() const override;
-    const std::string& instance() const override;
-    bool has_instance() const override;
+signals:
+    void queryMode();
+    void queryState();
+    void queryCameraId();
+    void queryImageSize();
+    void queryFrameRate();
+    void queryLapseInterval();
 
 signals:
     void requestMode(int mode);
@@ -102,27 +85,29 @@ public slots:
     void lapseIntervalChanged(int interval_ms);
     void frameRateChanged(int rate_fps);
     void imageSizeChanged(int width, int height);
+    void stateUpdated(int mode, int id, int width, int height, double rate_fps, int interval_ms, int min_id, int max_id, double min_fps, double max_fps);
 
 protected:
-    void onQueryMode() override;
-    void onQueryState() override;
-    void onQueryCameraId() override;
-    void onQueryImageSize() override;
-    void onQueryFrameRate() override;
-    void onQueryLapseInterval() override;
+    /*** Message Handlers from the network decoder */
+    void onQueryModeMessage() override;
+    void onQueryStateMessage() override;
+    void onQueryCameraIdMessage() override;
+    void onQueryImageSizeMessage() override;
+    void onQueryFrameRateMessage() override;
+    void onQueryLapseIntervalMessage() override;
 
-    void onGrabImage() override;
-    void onTakePhoto(bool updateView) override;
-    void onTakePhoto(bool updateView, bool autoSave) override;
+    void onGrabImageMessage() override;
+    void onTakePhotoMessage(bool updateView) override;
+    void onTakePhotoMessage(bool updateView, bool autoSave) override;
 
-    void setMode(uint8_t mode) override;
-    void setCameraId(uint8_t id) override;
-    void setImageSize(uint16_t width, uint16_t height) override;
-    void setFrameRate(uint8_t fps) override;
-    void setLapseInterval_ms(uint32_t interval_ms) override;
+    void setModeMessage(uint8_t mode) override;
+    void setCameraIdMessage(uint8_t id) override;
+    void setImageSizeMessage(uint16_t width, uint16_t height) override;
+    void setFrameRateMessage(uint8_t fps) override;
+    void setLapseIntervalMessage(uint32_t interval_ms) override;
 
-    void onSaveState() override;
-    void onRestoreState() override;
+    void onSaveStateMessage() override;
+    void onRestoreStateMessage() override;
 
 protected:
     /**
@@ -140,9 +125,6 @@ protected:
     {
         return cSensorController::sendOutgoingData(data, len);
     }
-
-private:
-    cAxisCommunicationsModel_F44* mpModel = nullptr;
 };
 
 
