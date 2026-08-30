@@ -17,22 +17,15 @@ public:
     /*
      * Returns a string used as a descriptor of the sensor.
      */
-    virtual const char* descriptor() const = 0;
-    virtual uint32_t version() const = 0;
-    virtual const std::string& manufacturer() const = 0;
-    virtual const std::string& model() const = 0;
-    virtual const std::string& serial_number() const = 0;
+    const char* descriptor() const;
+    uint32_t version() const;
+    const std::string& manufacturer() const;
+    const std::string& model() const;
+    const std::string& serial_number() const;
 
-    virtual const std::string& name() const = 0;
-    virtual const std::string& instance() const = 0;
-    virtual bool has_instance() const = 0;
-
-public:
-    /*
-     * This method is called by factory function to make sure the signals/slots
-     * between the model and status view are established
-     */
-    virtual void connectToModel() = 0;
+    const std::string& name() const;
+    const std::string& instance() const;
+    bool has_instance() const;
 
 public:
     bool startTcpServer(const std::string& ip);
@@ -43,6 +36,16 @@ public:
     bool hasClient() const;
 
     void update();
+
+public slots:
+    virtual void onDescriptorUpdate(QString descriptor);
+    virtual void onVersionUpdate(int version);
+    virtual void onManufacturerUpdate(QString manufacturer);
+    virtual void onModelUpdate(QString model);
+    virtual void onSerialNumberUpdate(QString serial_number);
+
+    virtual void onNameUpdate(QString name);
+    virtual void onInstanceUpdate(QString instance);
 
 protected:
     /**
@@ -73,6 +76,16 @@ private slots:
     void clientDisconnected();
     void clientErrorOccurred(QAbstractSocket::SocketError socketError);
     void clientStateChanged(QAbstractSocket::SocketState socketState);
+
+protected:
+    std::string mDescriptor;
+    uint32_t    mVersion = 1;
+    std::string mManufacturer;
+    std::string mModel;
+    std::string mSerialNumber;
+
+    std::string mName;
+    std::string mInstance;
 
 protected:
 	QTcpServer* mpTcpServer = nullptr;

@@ -20,10 +20,16 @@ cSensorController::~cSensorController()
     mpTcpServer->close();
 }
 
-void cSensorController::connectToModel()
-{
+const char* cSensorController::descriptor() const { return mDescriptor.c_str(); }
+uint32_t cSensorController::version() const { return mVersion; }
+const std::string& cSensorController::manufacturer() const { return mManufacturer; }
+const std::string& cSensorController::model() const { return mModel; }
+const std::string& cSensorController::serial_number() const { return mSerialNumber; }
 
-}
+const std::string& cSensorController::name() const { return mName; }
+const std::string& cSensorController::instance() const { return mInstance; }
+
+bool cSensorController::has_instance() const { return !mInstance.empty(); }
 
 bool cSensorController::startTcpServer(const std::string& ip)
 {
@@ -127,4 +133,38 @@ void cSensorController::clientErrorOccurred(QAbstractSocket::SocketError socketE
 void cSensorController::clientStateChanged(QAbstractSocket::SocketState socketState)
 {}
 
+void cSensorController::onDescriptorUpdate(QString descriptor)
+{
+    mDescriptor = descriptor.toStdString();
+}
+
+void cSensorController::onVersionUpdate(int version)
+{
+    mVersion = version;
+}
+
+void cSensorController::onManufacturerUpdate(QString manufacturer)
+{
+    mManufacturer = manufacturer.toStdString();
+}
+
+void cSensorController::onModelUpdate(QString model)
+{
+    mModel = model.toStdString();
+}
+
+void cSensorController::onSerialNumberUpdate(QString serial_number)
+{
+    mSerialNumber = serial_number.toStdString();
+}
+
+void cSensorController::onNameUpdate(QString name)
+{
+    mName = name.toStdString();
+}
+
+void cSensorController::onInstanceUpdate(QString instance)
+{
+    mInstance = instance.toStdString();
+}
 
