@@ -150,7 +150,7 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 void cGpsReferenceAcquisition_Remote::run()
 {
 	if (mPollStateTimer.elapsed())
-		sendQueryReferenceState();
+		sendQueryReferenceStateMessage();
 }
 
 void cGpsReferenceAcquisition_Remote::pause() {}
@@ -181,7 +181,7 @@ QString cGpsReferenceAcquisition_Remote::getStatusStr()
 	return msg;
 }
 
-void cGpsReferenceAcquisition_Remote::onReferenceParameters(bool valid, uint16_t min_integration_time_sec,
+void cGpsReferenceAcquisition_Remote::onReferenceParametersMessage(bool valid, uint16_t min_integration_time_sec,
 	uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
 	mCurrentMinIntegrationTime_sec = min_integration_time_sec;
@@ -194,14 +194,14 @@ void cGpsReferenceAcquisition_Remote::onReferenceParameters(bool valid, uint16_t
 		std::uint32_t max_time_sec = mDesiredMaxIntegrationTime_sec.has_value() ? mDesiredMaxIntegrationTime_sec.value() : mCurrentMaxIntegrationTime_sec;
 		std::uint32_t threshold_mm = mDesiredRefErrorThreshold_mm.has_value() ? mDesiredRefErrorThreshold_mm.value() : mCurrentRefErrorThreshold_mm;
 
-		sendReferenceParameters(min_time_sec, max_time_sec, threshold_mm);
+		sendReferenceParametersMessage(min_time_sec, max_time_sec, threshold_mm);
 
 		// Sleep for 250 milliseconds
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
 		mHasReferenceParameters = false;
 		mState = eSTATE::WAIT_FOR_STATE_UPDATE;
-		sendQueryReferenceParameters();
+		sendQueryReferenceParametersMessage();
 
 		// Sleep for 250 milliseconds
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -210,17 +210,17 @@ void cGpsReferenceAcquisition_Remote::onReferenceParameters(bool valid, uint16_t
 	}
 
 	mState = eSTATE::WAIT_FOR_REFERENCE;
-	sendCalcReference();
+	sendCalcReferenceMessage();
 }
 
-void cGpsReferenceAcquisition_Remote::onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+void cGpsReferenceAcquisition_Remote::onReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
 	double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
 {}
 
-void cGpsReferenceAcquisition_Remote::onReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count)
+void cGpsReferenceAcquisition_Remote::onReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count)
 {}
 
-void cGpsReferenceAcquisition_Remote::onReferenceCommandReply(eReferenceReply reply)
+void cGpsReferenceAcquisition_Remote::onReferenceCommandReplyMessage(eReferenceReply reply)
 {
 	switch (reply)
 	{
@@ -243,7 +243,7 @@ void cGpsReferenceAcquisition_Remote::onReferenceCommandReply(eReferenceReply re
 void cGpsReferenceAcquisition_Remote::onConnect()
 {
 	mState = eSTATE::WAIT_FOR_STATE;
-	sendQueryReferenceParameters();
+	sendQueryReferenceParametersMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));

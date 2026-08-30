@@ -140,7 +140,8 @@ ouster::imu_data_t cOusterModel::imuData() const
 void cOusterModel::setAzimuthWindow(ouster::azimuth_range_t range)
 {
     mConfigParameters.azimuth_window = range;
-    emit updateAzimuthWindow();
+
+    emit azimuthWindowChanged(range.min_deg, range.max_deg);
 
     QString msg = "Azimuth window is set to (";
     msg += QString::number(range.min_deg);
@@ -151,3 +152,24 @@ void cOusterModel::setAzimuthWindow(ouster::azimuth_range_t range)
     logMessage(logINFO, msg);
 }
 
+void cOusterModel::queryState()
+{
+    auto mode = getLidarMode();
+    auto azimuth_range = getAzimuthWindow();
+
+    emit stateUpdated(static_cast<int>(mode), azimuth_range.min_deg, azimuth_range.max_deg);
+}
+
+void cOusterModel::queryLidarMode()
+{
+    auto mode = getLidarMode();
+
+    emit lidarModeChanged(static_cast<int>(mode));
+}
+
+void cOusterModel::queryAzimuthWindow()
+{
+    auto azimuth_range = getAzimuthWindow();
+
+    emit azimuthWindowChanged(azimuth_range.min_deg, azimuth_range.max_deg);
+}

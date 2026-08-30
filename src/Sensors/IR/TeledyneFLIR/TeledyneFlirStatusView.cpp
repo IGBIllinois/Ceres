@@ -16,10 +16,8 @@
 
 cTeledyneFlirStatusView::cTeledyneFlirStatusView(cTeledyneFlirCameraModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(pModel, parent), mpModel(pModel)
-{
-	assert(mpModel);
-}
+	cSensorStatusView(pModel, parent)
+{}
 
 cTeledyneFlirStatusView::~cTeledyneFlirStatusView()
 {}
@@ -88,20 +86,6 @@ void cTeledyneFlirStatusView::doLayout()
 	mainLayout->addWidget(mpThermalImage, 1);
 
 	setLayout(mainLayout);
-}
-
-void cTeledyneFlirStatusView::connectToModel()
-{
-	connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,          this, &cTeledyneFlirStatusView::onModeChange);
-	connect(mpModel, &cTeledyneFlirCameraModel::lapseIntervalChanged, this, &cTeledyneFlirStatusView::onLapseIntervalChange);
-	connect(mpModel, &cTeledyneFlirCameraModel::frameRateChanged,     this, &cTeledyneFlirStatusView::onFrameRateChange);
-	connect(mpModel, &cTeledyneFlirCameraModel::imageSizeChanged,     this, &cTeledyneFlirStatusView::onImageSizeChange);
-	connect(mpModel, &cTeledyneFlirCameraModel::onNewImage,           this, &cTeledyneFlirStatusView::imageUpdated);
-
-	connect(this, &cTeledyneFlirStatusView::requestMode,             mpModel, &cTeledyneFlirCameraModel::requestMode);
-	connect(this, &cTeledyneFlirStatusView::requestFrameRate_Hz,     mpModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
-	connect(this, &cTeledyneFlirStatusView::requestLapseInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
-	connect(this, &cTeledyneFlirStatusView::requestImage,            mpModel, &cTeledyneFlirCameraModel::requestImage);
 }
 
 void cTeledyneFlirStatusView::onModeChange(int mode)

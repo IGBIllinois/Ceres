@@ -20,7 +20,7 @@ void cOusterPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, cons
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto data = to_azimuth_window_t(packet);
-            onAzimuthWindow(data.min_deg, data.max_deg);
+            onAzimuthWindowMessage(data.min_deg, data.max_deg);
         }
         break;
     }
@@ -30,7 +30,7 @@ void cOusterPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, cons
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto mode = to_lidar_mode_1(packet);
-            onLidarMode(mode);
+            onLidarModeMessage(mode);
         }
         break;
     }
@@ -38,7 +38,7 @@ void cOusterPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, cons
     {
         ouster_StateMessage_1 packet;
         if (packet.ParseFromArray(buffer.data(), hdr.length))
-            onCurrentState(packet.valid(), packet.mode(), packet.azimuth_min_deg(), packet.azimuth_max_deg());
+            onCurrentStateMessage(packet.valid(), packet.mode(), packet.azimuth_min_deg(), packet.azimuth_max_deg());
         break;
     }
     }

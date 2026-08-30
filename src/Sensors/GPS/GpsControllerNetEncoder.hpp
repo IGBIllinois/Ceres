@@ -28,26 +28,26 @@ public:
       *
       * You need to call sendData to make sure the data is sent out!
       */
-    void encodeReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+    void encodeReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
         double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid);
 
-    void encodeReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm);
-    void encodeReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count);
+    void encodeReferenceParametersMessage(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm);
+    void encodeReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count);
 
-    void encodeReferenceState(gps::eReferenceState state);
+    void encodeReferenceStateMessage(gps::eReferenceState state);
 
 
     /*
      * The send methods will encode the packet into the data buffer and will automatically
      * send the data.
      */
-    void sendReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+    void sendReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
         double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid);
-    void sendReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count);
+    void sendReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count);
 
-    void sendReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm);
+    void sendReferenceParametersMessage(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm);
 
-    void sendReferenceState(gps::eReferenceState state);
+    void sendReferenceStateMessage(gps::eReferenceState state);
 };
 
 

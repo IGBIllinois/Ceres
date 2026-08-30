@@ -66,18 +66,25 @@ public:
 signals:
     void updateSensorInfo();
     void updateTimeInfo();
-    void updateLidarMode();
     void updateBeamIntrinsics();
     void updateImuIntrinsics();
     void updateLidarIntrinsics();
     void updateDataFormat();
 
-    void updateAzimuthWindow();
+    void lidarModeChanged(int mode);
+    void azimuthWindowChanged(double min_deg, double max_deg);
+
     void updateImuData();
     void updateLidarData();
 
     void updateRangeData(int range_mm);
 
+    void stateUpdated(int mode, double min_deg, double max_deg);
+
+public slots:
+    void queryState();
+    void queryLidarMode();
+    void queryAzimuthWindow();
 
 public slots:
     virtual void changeAzimuthWindow(double min_deg, double max_deg) = 0;

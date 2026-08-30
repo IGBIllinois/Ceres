@@ -617,8 +617,8 @@ void cOusterModel_net::retrieveConfigParam()
 
     mConfigParameters = configParameters.value();
 
-    emit updateLidarMode();
-    emit updateAzimuthWindow();
+    emit lidarModeChanged(static_cast<int>(mConfigParameters.lidar_mode));
+    emit azimuthWindowChanged(mConfigParameters.azimuth_window.min_deg, mConfigParameters.azimuth_window.max_deg);
 }
 
 void cOusterModel_net::retrieveSensorInfo()
@@ -814,7 +814,7 @@ void cOusterModel_net::retrieveLidarMode()
 
     mConfigParameters.lidar_mode = lidarMode.value();
 
-    emit updateLidarMode();
+    emit lidarModeChanged(static_cast<int>(mConfigParameters.lidar_mode));
 }
 
 void cOusterModel_net::retrieveAzimuthWindow()
@@ -836,7 +836,7 @@ void cOusterModel_net::retrieveAzimuthWindow()
 
     mConfigParameters.azimuth_window = azimuthWindow.value();
 
-    emit updateAzimuthWindow();
+    emit azimuthWindowChanged(mConfigParameters.azimuth_window.min_deg, mConfigParameters.azimuth_window.max_deg);
 }
 
 void cOusterModel_net::emitStatusMessage(QString& msg)

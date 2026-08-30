@@ -31,8 +31,6 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
-	void connectToModel() override;
-
 signals:
 	void tryGpsReconnection();
 
@@ -124,7 +122,4 @@ private:
 	QLineEdit* mpRef_Count = nullptr;
 
 	QPushButton* mpReconnect = nullptr;
-
-private:
-	cSsnxModel* mpModel = nullptr;
 };

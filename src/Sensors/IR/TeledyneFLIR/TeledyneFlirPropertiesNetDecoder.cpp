@@ -21,7 +21,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto id = to_camera_mode_t(packet);
-            onMode(id);
+            onModeMessage(id);
         }
         break;
     }
@@ -31,7 +31,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto data = to_image_size_t(packet);
-            onImageSize(data.width, data.height);
+            onImageSizeMessage(data.width, data.height);
         }
         break;
     }
@@ -41,7 +41,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto fps = to_frame_rate_t(packet);
-            onFrameRate(fps);
+            onFrameRateMessage(fps);
         }
         break;
     }
@@ -51,7 +51,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto interval_ms = to_lapse_interval_t(packet);
-            onLapseInterval(interval_ms);
+            onLapseIntervalMessage(interval_ms);
         }
         break;
     }
@@ -61,7 +61,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto range_K = to_thermal_range_t(packet);
-            onThermalRange(range_K.min_thermal_value_K, range_K.max_thermal_value_K);
+            onThermalRangeMessage(range_K.min_thermal_value_K, range_K.max_thermal_value_K);
         }
         break;
     }
@@ -71,7 +71,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto state = to_current_state_t(packet);
-            onCurrentState(state.valid, state.mode, state.width,
+            onCurrentStateMessage(state.valid, state.mode, state.width,
                 state.height, state.frames_per_second, state.lapse_interval_ms,
                 state.min_frames_per_second, state.max_frames_per_second,
                 state.min_thermal_value_K, state.max_thermal_value_K);
@@ -84,7 +84,7 @@ void cTeledyneFlirPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto reply = to_reply_t(packet);
-            onTakePhotoReply(reply != flir::eReply::GOOD);
+            onTakePhotoReplyMessage(reply != flir::eReply::GOOD);
         }
         break;
     }

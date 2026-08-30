@@ -82,7 +82,7 @@ cExperimentState::eRESULT cTeledyneFlirCamera_SaveState_Remote::finished() { ret
 
 void cTeledyneFlirCamera_SaveState_Remote::onConnect()
 {
-	sendSaveState();
+	sendSaveStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -114,7 +114,7 @@ cExperimentState::eRESULT cTeledyneFlirCamera_RestoreState_Remote::finished() { 
 
 void cTeledyneFlirCamera_RestoreState_Remote::onConnect()
 {
-	sendRestoreState();
+	sendRestoreStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -239,22 +239,22 @@ cExperimentState::eRESULT cTeledyneFlirCamera_Configure_Remote::finished()
 	return cExperimentState::eRESULT::DONE;
 }
 
-void cTeledyneFlirCamera_Configure_Remote::onMode(uint8_t id)
+void cTeledyneFlirCamera_Configure_Remote::onModeMessage(uint8_t id)
 {
 	mWaitingForMode = false;
 }
 
-void cTeledyneFlirCamera_Configure_Remote::onFrameRate(double fps)
+void cTeledyneFlirCamera_Configure_Remote::onFrameRateMessage(double fps)
 {
 	mWaitingForFrameRate = false;
 }
 
-void cTeledyneFlirCamera_Configure_Remote::onLapseInterval(uint32_t interval_ms)
+void cTeledyneFlirCamera_Configure_Remote::onLapseIntervalMessage(uint32_t interval_ms)
 {
 	mWaitingForInterval = false;
 }
 
-void cTeledyneFlirCamera_Configure_Remote::onCurrentState(bool valid, uint8_t mode,
+void cTeledyneFlirCamera_Configure_Remote::onCurrentStateMessage(bool valid, uint8_t mode,
 	uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
 	std::optional<double> min_fps, std::optional<double> max_fps,
 	std::optional<float> min_K, std::optional<float> max_K)
@@ -269,20 +269,20 @@ void cTeledyneFlirCamera_Configure_Remote::onCurrentState(bool valid, uint8_t mo
 		mWaitingForInterval = mLapseInterval_ms != interval_ms;
 
 	if (mWaitingForMode)
-		sendSetMode(static_cast<uint8_t>(mMode));
+		sendSetModeMessage(static_cast<uint8_t>(mMode));
 
 	if (mWaitingForFrameRate)
-		sendSetFrameRate_fps(mFrameRate_fps);
+		sendSetFrameRateMessage(mFrameRate_fps);
 
 	if (mWaitingForInterval)
-		sendSetLapseInterval_ms(mLapseInterval_ms);
+		sendSetLapseIntervalMessage(mLapseInterval_ms);
 
 	mWaitingForConfiguration = false;
 }
 
 void cTeledyneFlirCamera_Configure_Remote::onConnect()
 {
-	sendQueryState();
+	sendQueryStateMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
@@ -360,21 +360,21 @@ cExperimentState::eRESULT cTeledyneFlirCamera_TakePhoto_Remote::finished()
 	return mResult;
 }
 
-void cTeledyneFlirCamera_TakePhoto_Remote::onTakePhotoReply(bool error)
+void cTeledyneFlirCamera_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 {
 	mResult = cExperimentState::eRESULT::DONE;
 };
 
-void cTeledyneFlirCamera_TakePhoto_Remote::onMode(uint8_t mode)
+void cTeledyneFlirCamera_TakePhoto_Remote::onModeMessage(uint8_t mode)
 {
 	if (mode == cTeledyneFlirCameraModel::eMode::SINGLE)
 	{
-		sendTakePhoto(mUpdateView, true);
+		sendTakePhotoMessage(mUpdateView, true);
 	}
 	else
 	{
 		if (mUpdateView)
-			sendGrabImage();
+			sendGrabImageMessage();
 
 		mResult = cExperimentState::eRESULT::DONE;
 	}
@@ -382,7 +382,7 @@ void cTeledyneFlirCamera_TakePhoto_Remote::onMode(uint8_t mode)
 
 void cTeledyneFlirCamera_TakePhoto_Remote::onConnect()
 {
-	sendQueryMode();
+	sendQueryModeMessage();
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));

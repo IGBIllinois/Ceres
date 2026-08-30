@@ -119,9 +119,9 @@ void cTeledyneFlirCameraModel::setMode(eMode mode)
         emit modeChanged(static_cast<int>(mMode));
 }
 
-double  cTeledyneFlirCameraModel::frameRate_Hz() const 
+double  cTeledyneFlirCameraModel::frameRate_Hz() const
 {
-    return mFrameRate_fps; 
+    return mFrameRate_fps;
 }
 
 void cTeledyneFlirCameraModel::setFrameRate_Hz(double frame_rate_hz)
@@ -169,6 +169,39 @@ void cTeledyneFlirCameraModel::setLapseInterval_ms(uint32_t interval_ms)
     }
 }
 
+void cTeledyneFlirCameraModel::setImageSize(int width, int height)
+{
+    bool changing = (width != mImageWidth) || (height != mImageHeight);
+
+    mImageWidth = width;
+    mImageHeight = height;
+
+    if (changing)
+        emit imageSizeChanged(mImageWidth, mImageHeight);
+}
+
+
+void cTeledyneFlirCameraModel::queryMode()
+{
+    emit modeChanged(static_cast<int>(mMode));
+}
+
+void cTeledyneFlirCameraModel::queryFrameRate()
+{
+    emit frameRateChanged(mFrameRate_fps);
+}
+
+void cTeledyneFlirCameraModel::queryLapseInterval()
+{
+    emit lapseIntervalChanged(mLapseInterval_ms);
+}
+
+void cTeledyneFlirCameraModel::queryImageSize()
+{
+    emit imageSizeChanged(mImageWidth, mImageHeight);
+}
+
+
 void cTeledyneFlirCameraModel::requestMode(int mode)
 {
     if ((mode >= eMode::SINGLE) && (mode <= eMode::CONTINUOUS))
@@ -185,6 +218,10 @@ void cTeledyneFlirCameraModel::requestLapseInterval_ms(uint32_t interval_ms)
     setLapseInterval_ms(interval_ms);
 }
 
+void cTeledyneFlirCameraModel::requestImageSize(int width, int height)
+{
+    setImageSize(width, height);
+}
 
 void cTeledyneFlirCameraModel::requestImage()
 {

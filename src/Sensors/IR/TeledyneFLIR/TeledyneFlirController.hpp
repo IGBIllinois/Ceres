@@ -15,24 +15,20 @@ class cTeledyneFlirController : public cSensorController,
 	Q_OBJECT
 
 public:
-    cTeledyneFlirController(cTeledyneFlirCameraModel* model, QObject* parent = nullptr);
+    cTeledyneFlirController(QObject* parent = nullptr);
 
-    void connectToModel() override;
-
-public:
-    const char* descriptor() const override;
-    uint32_t version() const override { return 1; };
-    const std::string& manufacturer() const override;
-    const std::string& model() const override;
-    const std::string& serial_number() const override;
-    const std::string& name() const override;
-    const std::string& instance() const override;
-    bool has_instance() const override;
+signals:
+    void queryMode();
+    void queryFrameRate_Hz();
+    void queryLapseInterval_ms();
+    void queryImageSize();
 
 signals:
     void requestMode(int mode);
     void requestFrameRate_Hz(double frame_rate_hz);
     void requestLapseInterval_ms(uint32_t interval_ms);
+    void requestImageSize(int width, int height);
+
     void requestImage();
     void requestImages(bool update_view);
     void requestPhoto(bool update_view);
@@ -49,18 +45,19 @@ public slots:
     void imageSizeChanged(int width, int height);
 
 protected:
-    void onQueryMode() override;
-    void onQueryImageSize() override;
-    void onQueryFrameRate() override;
-    void onQueryLapseInterval() override;
+    // Message handlers from the decoder
+    void onQueryModeMessage() override;
+    void onQueryImageSizeMessage() override;
+    void onQueryFrameRateMessage() override;
+    void onQueryLapseIntervalMessage() override;
 
-    void setMode(uint8_t mode) override;
-    void setImageSize(uint16_t width, uint16_t height) override;
-    void setFrameRate_Hz(double fps) override;
-    void setLapseInterval_ms(uint32_t interval_ms) override;
+    void onSetModeMessage(uint8_t mode) override;
+    void onSetImageSizeMessage(uint16_t width, uint16_t height) override;
+    void onSetFrameRateMessage(double fps) override;
+    void onSetLapseIntervalMessage(uint32_t interval_ms) override;
 
-    void onSaveState() override;
-    void onRestoreState() override;
+    void onSaveStateMessage() override;
+    void onRestoreStateMessage() override;
 
 protected:
     /**
@@ -78,9 +75,6 @@ protected:
     {
         return cSensorController::sendOutgoingData(data, len);
     }
-
-private:
-    cTeledyneFlirCameraModel* mpModel = nullptr;
 };
 
 
@@ -93,24 +87,33 @@ class cTeledyneFlirController_T1K : public cTeledyneFlirController
     Q_OBJECT
 
 public:
-    cTeledyneFlirController_T1K(cTeledyneFlirCameraModel_T1K* model, QObject* parent = nullptr);
+    cTeledyneFlirController_T1K(QObject* parent = nullptr);
 
-    void connectToModel() override;
+
+signals:
+    void queryState();
+    void queryThermalRange();
+
+    void requestThermalRange(float minValue_K, float maxValue_K);
+
+    void  grabImage();
 
 public slots:
+    void stateUpdated(int mode, int width, int height, double fps, double min_fps, double max_fps,
+        int interval_ms, float minValue_K, float maxValue_K);
+
+    void thermalRangeUpdated(float minValue_K, float maxValue_K);
+
     void onPhotoTaken();
 
 protected:
-    void onQueryState() override;
-    void onQueryThermalRange() override;
-    void onGrabImage() override;
-    void onTakePhoto(bool updateView) override;
-    void onTakePhoto(bool updateView, bool autoSave) override;
+    void onQueryStateMessage() override;
+    void onQueryThermalRangeMessage() override;
+    void onGrabImageMessage() override;
+    void onTakePhotoMessage(bool updateView) override;
+    void onTakePhotoMessage(bool updateView, bool autoSave) override;
 
-    void setThermalRange_K(float min_value_K, float max_value_K) override;
-
-private:
-    cTeledyneFlirCameraModel_T1K* mpModel = nullptr;
+    void onSetThermalRangeMessage(float min_value_K, float max_value_K) override;
 };
 
 

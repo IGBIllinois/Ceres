@@ -21,11 +21,11 @@ public:
      * Property Page ----> Controller
      */
 
-    void sendQueryState();
-    void sendQueryLidarMode();
-    void sendQueryAzimuthWindow();
-    void sendSetAzimuthWindow(double min_deg, double max_deg);
-    void sendSetLidarMode(const std::string& mode);
+    void sendQueryStateMessage();
+    void sendQueryLidarModeMessage();
+    void sendQueryAzimuthWindowMessage();
+    void sendSetAzimuthWindowMessage(double min_deg, double max_deg);
+    void sendSetLidarModeMessage(const std::string& mode);
 };
 
 

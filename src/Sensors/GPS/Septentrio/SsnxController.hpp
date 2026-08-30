@@ -12,12 +12,7 @@ class cSsnxController : public cGpsController
 	Q_OBJECT
 
 public:
-    cSsnxController(cSsnxModel* pModel, QObject* parent = nullptr);
-
-    void connectToModel() override;
-
-private:
-    cSsnxModel* mpModel = nullptr;
+    cSsnxController(QObject* parent = nullptr);
 };
 
 

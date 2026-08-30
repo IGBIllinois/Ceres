@@ -18,10 +18,10 @@ cExperimentState* cOusterPropertyPage_Remote::createState(const std::string& typ
 
 void cOusterPropertyPage_Remote::onConnect()
 {
-	cOusterPropertiesNetEncoder::sendQueryState();
+	cOusterPropertiesNetEncoder::sendQueryStateMessage();
 }
 
-void cOusterPropertyPage_Remote::onAzimuthWindow(double min_deg, double max_deg)
+void cOusterPropertyPage_Remote::onAzimuthWindowMessage(double min_deg, double max_deg)
 {
 	mpMinAzimuthAngle_deg->setText(QString::number(min_deg));
 	mpMaxAzimuthAngle_deg->setText(QString::number(max_deg));
@@ -33,7 +33,7 @@ void cOusterPropertyPage_Remote::onAzimuthWindow(double min_deg, double max_deg)
 	update();
 }
 
-void cOusterPropertyPage_Remote::onLidarMode(const std::string& mode)
+void cOusterPropertyPage_Remote::onLidarModeMessage(const std::string& mode)
 {
 	QString qMode = QString::fromStdString(mode);
 
@@ -52,13 +52,13 @@ void cOusterPropertyPage_Remote::onLidarMode(const std::string& mode)
 	}
 }
 
-void cOusterPropertyPage_Remote::onCurrentState(bool valid, const std::string& mode,
+void cOusterPropertyPage_Remote::onCurrentStateMessage(bool valid, const std::string& mode,
 	double min_deg, double max_deg)
 {
 	if (!valid) return;
 
-	onLidarMode(mode);
-	onAzimuthWindow(min_deg, max_deg);
+	onLidarModeMessage(mode);
+	onAzimuthWindowMessage(min_deg, max_deg);
 }
 
 void cOusterPropertyPage_Remote::showPage()
@@ -91,14 +91,14 @@ void cOusterPropertyPage_Remote::doApply()
 	if ((mDefaultMinAzimuthAngle_deg != min_deg) ||
 		(mDefaultMaxAzimuthAngle_deg != max_deg))
 	{
-		sendSetAzimuthWindow(min_deg, max_deg);
+		sendSetAzimuthWindowMessage(min_deg, max_deg);
 		setEnabled(false);
 	}
 
 	auto mode = mpLidarModes->currentText();
 	if (mode.compare(mDefaultLidarMode) != 0)
 	{
-		sendSetLidarMode(mode.toStdString());
+		sendSetLidarModeMessage(mode.toStdString());
 		setEnabled(false);
 	}
 }

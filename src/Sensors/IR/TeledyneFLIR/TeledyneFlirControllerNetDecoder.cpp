@@ -24,17 +24,17 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
             switch (packet.query())
             {
             case eQUERY_STATE:
-                return onQueryState();
+                return onQueryStateMessage();
             case eQUERY_MODE:
-                return onQueryMode();
+                return onQueryModeMessage();
             case eQUERY_IMAGE_SIZE:
-                return onQueryImageSize();
+                return onQueryImageSizeMessage();
             case eQUERY_FRAME_RATE:
-                return onQueryFrameRate();
+                return onQueryFrameRateMessage();
             case eQUERY_LAPSE_INTERVAL:
-                return onQueryLapseInterval();
+                return onQueryLapseIntervalMessage();
             case eQUERY_THERMAL_RANGE:
-                return onQueryThermalRange();
+                return onQueryThermalRangeMessage();
             }
         }
         break;
@@ -45,7 +45,7 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto mode = to_camera_mode_t(packet);
-            setMode(mode);
+            onSetModeMessage(mode);
         }
         break;
     }
@@ -55,7 +55,7 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto data = to_image_size_t(packet);
-            setImageSize(data.width, data.height);
+            onSetImageSizeMessage(data.width, data.height);
         }
         break;
     }
@@ -65,7 +65,7 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto fps = to_frame_rate_t(packet);
-            setFrameRate_Hz(fps);
+            onSetFrameRateMessage(fps);
         }
         break;
     }
@@ -75,7 +75,7 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto interval_ms = to_lapse_interval_t(packet);
-            setLapseInterval_ms(interval_ms);
+            onSetLapseIntervalMessage(interval_ms);
         }
         break;
     }
@@ -85,12 +85,12 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
         if (packet.ParseFromArray(buffer.data(), hdr.length))
         {
             auto range_K = to_thermal_range_t(packet);
-            setThermalRange_K(range_K.min_thermal_value_K, range_K.max_thermal_value_K);
+            onSetThermalRangeMessage(range_K.min_thermal_value_K, range_K.max_thermal_value_K);
         }
         break;
     }
     case ePacketType::GRAB_IMAGE:
-        onGrabImage();
+        onGrabImageMessage();
         break;
     case ePacketType::TAKE_PHOTO:
     {
@@ -100,7 +100,7 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
             if (packet.ParseFromArray(buffer.data(), hdr.length))
             {
                 auto update_view = to_take_photo_t(packet);
-                onTakePhoto(update_view);
+                onTakePhotoMessage(update_view);
             }
         }
         else if (hdr.revision == 2)
@@ -109,16 +109,16 @@ void cTeledyneFlirControllerNetDecoder::processPacket(const sPacketHeader_t& hdr
             if (packet.ParseFromArray(buffer.data(), hdr.length))
             {
                 auto result = to_take_photo_t(packet);
-                onTakePhoto(result.update_view, result.auto_save);
+                onTakePhotoMessage(result.update_view, result.auto_save);
             }
         }
         break;
     }
     case ePacketType::SAVE_STATE:
-        onSaveState();
+        onSaveStateMessage();
         break;
     case ePacketType::RESTORE_STATE:
-        onRestoreState();
+        onRestoreStateMessage();
         break;
     }
 }

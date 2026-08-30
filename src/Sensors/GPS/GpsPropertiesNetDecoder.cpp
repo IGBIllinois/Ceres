@@ -19,7 +19,7 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     {
         sReferenceParameters_t data = to_reference_parameters_1(hdr.length, buffer);
 
-        onReferenceParameters(true, data.min_integration_time_sec, data.max_integration_time_sec, data.ref_error_threshold_mm);
+        onReferenceParametersMessage(true, data.min_integration_time_sec, data.max_integration_time_sec, data.ref_error_threshold_mm);
 
         break;
     }
@@ -27,7 +27,7 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     {
         sReferenceData_t data = to_reference_data_1(hdr.length, buffer);
         
-        onReferenceData(data.valid, data.avg_lat_rad, data.avg_lng_rad, data.avg_height_m,
+        onReferenceDataMessage(data.valid, data.avg_lat_rad, data.avg_lng_rad, data.avg_height_m,
             data.std_lat_rad, data.std_lng_rad, data.std_height_m, data.height_valid);
 
         break;
@@ -36,7 +36,7 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     {
         sReferencePosition_t data = to_reference_position_1(hdr.length, buffer);
 
-        onReferencePosition(data.x_mm, data.y_mm, data.z_mm, data.error_mm, data.count);
+        onReferencePositionMessage(data.x_mm, data.y_mm, data.z_mm, data.error_mm, data.count);
 
         break;
     }
@@ -46,19 +46,19 @@ void cGpsPropertiesNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
         switch (reply)
         {
         case gps_eReferenceReply::eReferenceReply_GOOD:
-            onReferenceCommandReply(eReferenceReply::GOOD);
+            onReferenceCommandReplyMessage(eReferenceReply::GOOD);
             break;
         case gps_eReferenceReply::eReferenceReply_ABORTED:
-            onReferenceCommandReply(eReferenceReply::ABORTED);
+            onReferenceCommandReplyMessage(eReferenceReply::ABORTED);
             break;
         case gps_eReferenceReply::eReferenceReply_FAILED:
-            onReferenceCommandReply(eReferenceReply::FAILED);
+            onReferenceCommandReplyMessage(eReferenceReply::FAILED);
             break;
         case gps_eReferenceReply::eReferenceReply_PENDING:
-            onReferenceCommandReply(eReferenceReply::PENDING);
+            onReferenceCommandReplyMessage(eReferenceReply::PENDING);
             break;
         case gps_eReferenceReply::eReferenceReply_IDLE:
-            onReferenceCommandReply(eReferenceReply::IDLE);
+            onReferenceCommandReplyMessage(eReferenceReply::IDLE);
             break;
         }
         break;

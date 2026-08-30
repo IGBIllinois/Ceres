@@ -8,31 +8,31 @@ cOusterPropertiesNetEncoder::cOusterPropertiesNetEncoder(std::size_t capacity)
     : cNetworkEncoder(capacity)
 {}
 
-void cOusterPropertiesNetEncoder::sendQueryState()
+void cOusterPropertiesNetEncoder::sendQueryStateMessage()
 {
     encode_query_state(mBuffer);
     sendData();
 }
 
-void cOusterPropertiesNetEncoder::sendQueryLidarMode()
+void cOusterPropertiesNetEncoder::sendQueryLidarModeMessage()
 {
     encode_query_lidar_mode(mBuffer);
     sendData();
 }
 
-void cOusterPropertiesNetEncoder::sendQueryAzimuthWindow()
+void cOusterPropertiesNetEncoder::sendQueryAzimuthWindowMessage()
 {
     encode_query_azimuth_window(mBuffer);
     sendData();
 }
 
-void cOusterPropertiesNetEncoder::sendSetAzimuthWindow(double min_deg, double max_deg)
+void cOusterPropertiesNetEncoder::sendSetAzimuthWindowMessage(double min_deg, double max_deg)
 {
     encode_azimuth_window(min_deg, max_deg, mBuffer);
     sendData();
 }
 
-void cOusterPropertiesNetEncoder::sendSetLidarMode(const std::string& mode)
+void cOusterPropertiesNetEncoder::sendSetLidarModeMessage(const std::string& mode)
 {
     encode_lidar_mode(mode, mBuffer);
     sendData();

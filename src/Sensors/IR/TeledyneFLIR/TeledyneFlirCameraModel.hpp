@@ -70,6 +70,7 @@ public:
 
     uint16_t imageWidth() const;
     uint16_t imageHeight() const;
+    virtual void setImageSize(int width, int height);
 
     const QImage& getCurrentImage() const;
 
@@ -83,9 +84,17 @@ signals:
     void photoTaken();
 
 public slots:
+    void queryMode();
+    void queryFrameRate();
+    void queryLapseInterval();
+    void queryImageSize();
+
+public slots:
     void requestMode(int mode);
     void requestFrameRate_Hz(double frame_rate_hz);
     void requestLapseInterval_ms(uint32_t interval_ms);
+    void requestImageSize(int width, int height);
+
     void requestImage();
     void requestImages(bool update_view);
 

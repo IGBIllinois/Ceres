@@ -24,7 +24,7 @@ cExperimentState* cOusterPropertyPage_Local::createState(const std::string& type
 void cOusterPropertyPage_Local::connectToModel()
 {
 	connect(mpModel, &cOusterModel::updateDataFormat,    this, &cOusterPropertyPage_Local::dataFormatChanged);
-	connect(mpModel, &cOusterModel::updateAzimuthWindow, this, &cOusterPropertyPage_Local::azimuthWindowChanged);
+	connect(mpModel, &cOusterModel::azimuthWindowChanged, this, &cOusterPropertyPage_Local::azimuthWindowChanged);
 
 	connect(this, &cOusterPropertyPage_Local::requestNewLidarMode,     mpModel, &cOusterModel::changeLidarMode);
 	connect(this, &cOusterPropertyPage_Local::requestNewAzimuthWindow, mpModel, &cOusterModel::changeAzimuthWindow);

@@ -13,36 +13,29 @@ class cOusterController : public cSensorController,
 	Q_OBJECT
 
 public:
-    cOusterController(cOusterModel* model, QObject* parent = nullptr);
-
-public:
-    const char* descriptor() const override;
-    uint32_t version() const override { return 1; };
-    const std::string& manufacturer() const override;
-    const std::string& model() const override;
-    const std::string& serial_number() const override;
-    const std::string& name() const override;
-    const std::string& instance() const override;
-    bool has_instance() const override;
-
-public:
-    void connectToModel() override;
-
-protected:
-    void onQueryState() override;
-    void onQueryLidarMode() override;
-    void onQueryAzimuthWindow() override;
-    void setAzimuthWindow(double min_deg, double max_deg) override;
-    void setLidarMode(ouster::eLIDAR_MODE mode) override;
+    cOusterController(QObject* parent = nullptr);
 
 signals:
+    void queryState();
+    void queryLidarMode();
+    void queryAzimuthWindow();
+
     void requestNewAzimuthWindow(double min_deg, double max_deg);
-//    void requestNewLidarMode(ouster::eLIDAR_MODE mode);
     void requestNewLidarMode(QString mode);
 
 public slots:
-    void azimuthWindowChanged();
-    void dataFormatChanged();
+    void stateUpdated(int mode, double min_az_deg, double max_az_deg);
+
+    void lidarModeUpdated(int mode);
+    void azimuthWindowUpdated(double min_az_deg, double max_az_deg);
+
+protected:
+    // Message handler methods from cOusterControllerNetDecoder
+    void onQueryStateMessage() override;
+    void onQueryLidarModeMessage() override;
+    void onQueryAzimuthWindowMessage() override;
+    void onSetAzimuthWindowMessage(double min_deg, double max_deg) override;
+    void onSetLidarModeMessage(ouster::eLIDAR_MODE mode) override;
 
 protected:
     /**
@@ -60,7 +53,4 @@ protected:
     {
         return cSensorController::sendOutgoingData(data, len);
     }
-
-private:
-    cOusterModel* mpModel = nullptr;
 };

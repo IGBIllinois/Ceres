@@ -7,57 +7,10 @@
 #include <cassert>
 
 
-cOusterController::cOusterController(cOusterModel* model, QObject* parent)
+cOusterController::cOusterController(QObject* parent)
     :
-    cSensorController(parent), cOusterControllerNetEncoder(512), mpModel(model)
-{
-    assert(mpModel);
-}
-
-const char* cOusterController::descriptor() const
-{
-    return mpModel->descriptor();
-}
-
-const std::string& cOusterController::manufacturer() const
-{
-    return mpModel->manufacturer();
-}
-
-const std::string& cOusterController::model() const
-{
-    return mpModel->model();
-}
-
-const std::string& cOusterController::serial_number() const
-{
-    return mpModel->serial_number();
-}
-
-const std::string& cOusterController::name() const
-{
-    return mpModel->name();
-}
-
-const std::string& cOusterController::instance() const
-{
-    return mpModel->instance();
-}
-
-bool cOusterController::has_instance() const
-{
-    return mpModel->has_instance();
-}
-
-void cOusterController::connectToModel()
-{
-    connect(this, &cOusterController::requestNewLidarMode,     mpModel, &cOusterModel::changeLidarMode);
-    connect(this, &cOusterController::requestNewAzimuthWindow, mpModel, &cOusterModel::changeAzimuthWindow);
-
-    connect(mpModel, &cOusterModel::updateDataFormat,     this, &cOusterController::dataFormatChanged);
-    connect(mpModel, &cOusterModel::updateAzimuthWindow,  this, &cOusterController::azimuthWindowChanged);
-}
-
+    cSensorController(parent), cOusterControllerNetEncoder(512)
+{}
 
 void cOusterController::processStream(const void* pBuffer, std::size_t buf_length)
 {
@@ -81,59 +34,52 @@ void cOusterController::processStream(const void* pBuffer, std::size_t buf_lengt
     }
 }
 
-void cOusterController::onQueryState()
+void cOusterController::stateUpdated(int mode, double min_az_deg, double max_az_deg)
 {
-    auto window = mpModel->getAzimuthWindow();
-    auto mode = mpModel->getLidarMode();
+    ouster::eLIDAR_MODE lidar_mode = static_cast<ouster::eLIDAR_MODE>(mode);
 
-    sendCurrentState(true, mode, window.min_deg, window.max_deg);
+    sendCurrentStateMessage(true, lidar_mode, min_az_deg, max_az_deg);
 }
 
-void cOusterController::onQueryLidarMode()
+void cOusterController::lidarModeUpdated(int mode)
 {
-    auto mode = mpModel->getLidarMode();
+    ouster::eLIDAR_MODE lidar_mode = static_cast<ouster::eLIDAR_MODE>(mode);
 
-    sendLidarMode(mode);
+    sendLidarModeMessage(lidar_mode);
 }
 
-void cOusterController::onQueryAzimuthWindow()
+void cOusterController::azimuthWindowUpdated(double min_az_deg, double max_az_deg)
 {
-    auto window = mpModel->getAzimuthWindow();
-
-    sendAzimuthWindow(window.min_deg, window.max_deg);
+    sendAzimuthWindowMessage(min_az_deg, max_az_deg);
 }
 
-void cOusterController::setAzimuthWindow(double min_deg, double max_deg)
+
+void cOusterController::onQueryStateMessage()
+{
+    emit queryState();
+}
+
+void cOusterController::onQueryLidarModeMessage()
+{
+    emit queryLidarMode();
+}
+
+void cOusterController::onQueryAzimuthWindowMessage()
+{
+    emit queryAzimuthWindow();
+}
+
+void cOusterController::onSetAzimuthWindowMessage(double min_deg, double max_deg)
 {
     if (max_deg < min_deg)
         std::swap(min_deg, max_deg);
 
-    auto azWin = mpModel->getAzimuthWindow();
-
-    if ((azWin.min_deg == min_deg) && (azWin.max_deg == max_deg))
-    {
-        sendAzimuthWindow(azWin.min_deg, azWin.max_deg);
-        return;
-    }
-
     emit requestNewAzimuthWindow(min_deg, max_deg);
 }
 
-void cOusterController::azimuthWindowChanged()
+void cOusterController::onSetLidarModeMessage(ouster::eLIDAR_MODE mode)
 {
-    auto window = mpModel->getAzimuthWindow();
-    sendAzimuthWindow(window.min_deg, window.max_deg);
-}
-
-void cOusterController::setLidarMode(ouster::eLIDAR_MODE mode)
-{
-//    emit requestNewLidarMode(mode);
     emit requestNewLidarMode(QString::fromStdString(to_string(mode)));
-}
-
-void cOusterController::dataFormatChanged()
-{
-    sendLidarMode(mpModel->getLidarMode());
 }
 
 

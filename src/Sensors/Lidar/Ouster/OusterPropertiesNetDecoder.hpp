@@ -22,9 +22,9 @@ protected:
     /*
      * Controller ----> Property Page
      */
-    virtual void onAzimuthWindow(double min_deg, double max_deg) = 0;
-    virtual void onLidarMode(const std::string& mode) = 0;
-    virtual void onCurrentState(bool valid, const std::string& mode,
+    virtual void onAzimuthWindowMessage(double min_deg, double max_deg) = 0;
+    virtual void onLidarModeMessage(const std::string& mode) = 0;
+    virtual void onCurrentStateMessage(bool valid, const std::string& mode,
         double min_deg, double max_deg) = 0;
 
 protected:

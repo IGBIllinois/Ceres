@@ -67,7 +67,7 @@ void cSsnxPropertyPage_Remote::onConnect()
 {
 	setEnabled(false);
 
-	cGpsPropertiesNetEncoder::sendQueryReferenceParameters();
+	cGpsPropertiesNetEncoder::sendQueryReferenceParametersMessage();
 }
 
 void cSsnxPropertyPage_Remote::onDisconnect()
@@ -83,7 +83,7 @@ void cSsnxPropertyPage_Remote::showPage()
 	cSsnxPropertyPage::showPage();
 }
 
-void cSsnxPropertyPage_Remote::onReferenceParameters(bool valid, uint16_t min_integration_time_sec,
+void cSsnxPropertyPage_Remote::onReferenceParametersMessage(bool valid, uint16_t min_integration_time_sec,
 	uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
 	if (!valid) return;
@@ -102,7 +102,7 @@ void cSsnxPropertyPage_Remote::onReferenceParameters(bool valid, uint16_t min_in
 	update();
 }
 
-void cSsnxPropertyPage_Remote::onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+void cSsnxPropertyPage_Remote::onReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
 	double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
 {
 	if (!valid)
@@ -137,7 +137,7 @@ void cSsnxPropertyPage_Remote::onReferenceData(bool valid, double avg_lat_rad, d
 }
 
 
-void cSsnxPropertyPage_Remote::onReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count)
+void cSsnxPropertyPage_Remote::onReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count)
 {
 	if ((x_mm == -1) && (y_mm == -1) && (z_mm == -1) && (error_mm < 0.0))
 	{
@@ -155,7 +155,7 @@ void cSsnxPropertyPage_Remote::onReferencePosition(int x_mm, int y_mm, int z_mm,
 	mpRef_Error_mm->setText(QString::number(error_mm));
 }
 
-void cSsnxPropertyPage_Remote::onReferenceCommandReply(eReferenceReply reply)
+void cSsnxPropertyPage_Remote::onReferenceCommandReplyMessage(eReferenceReply reply)
 {
 	setEnabled(true);
 
@@ -170,7 +170,7 @@ void cSsnxPropertyPage_Remote::onReferenceCommandReply(eReferenceReply reply)
 		break;
 	case eReferenceReply::GOOD:
 		mpDoReference->setEnabled(true);
-		sendQueryReferenceData();
+		sendQueryReferenceDataMessage();
 		break;
 	}
 
@@ -263,7 +263,7 @@ void cSsnxPropertyPage_Remote::queryReferenceParameters()
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendQueryReferenceParameters();
+		cGpsPropertiesNetEncoder::sendQueryReferenceParametersMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -280,7 +280,7 @@ void cSsnxPropertyPage_Remote::queryReferenceData()
 	// We are going to try to get the lens names three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendQueryReferenceData();
+		cGpsPropertiesNetEncoder::sendQueryReferenceDataMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -299,8 +299,8 @@ void cSsnxPropertyPage_Remote::setReferenceParameters(std::uint16_t min_integrat
 	// We are going to try to get the reference parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendReferenceParameters(min_integration_time_sec, max_integration_time_sec, ref_error_threshold_mm);
-		cGpsPropertiesNetEncoder::sendQueryReferenceParameters();
+		cGpsPropertiesNetEncoder::sendReferenceParametersMessage(min_integration_time_sec, max_integration_time_sec, ref_error_threshold_mm);
+		cGpsPropertiesNetEncoder::sendQueryReferenceParametersMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(3);
 		while (QTime::currentTime() < delayTime)
@@ -321,7 +321,7 @@ void cSsnxPropertyPage_Remote::calcReference()
 	// We are going to try to get the acquisition parameters three times.
 	for (int i = 0; i < 3; ++i)
 	{
-		cGpsPropertiesNetEncoder::sendCalcReference();
+		cGpsPropertiesNetEncoder::sendCalcReferenceMessage();
 
 		QTime delayTime = QTime::currentTime().addSecs(secs);
 		while (QTime::currentTime() < delayTime)
@@ -332,7 +332,7 @@ void cSsnxPropertyPage_Remote::calcReference()
 		}
 	}
 
-	cGpsPropertiesNetEncoder::sendStopReference();
+	cGpsPropertiesNetEncoder::sendStopReferenceMessage();
 }
 
 void cSsnxPropertyPage_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)

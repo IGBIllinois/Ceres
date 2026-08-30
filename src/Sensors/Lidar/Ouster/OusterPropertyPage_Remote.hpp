@@ -22,9 +22,9 @@ public:
     cExperimentState* createState(const std::string& type, const nlohmann::json& entry, QObject* parent) override;
 
 public:
-    void onAzimuthWindow(double min_deg, double max_deg) override;
-    void onLidarMode(const std::string& mode) override;
-    void onCurrentState(bool valid, const std::string& mode, double min_deg, double max_deg) override;
+    void onAzimuthWindowMessage(double min_deg, double max_deg) override;
+    void onLidarModeMessage(const std::string& mode) override;
+    void onCurrentStateMessage(bool valid, const std::string& mode, double min_deg, double max_deg) override;
 
 protected:
     void onConnect() override;

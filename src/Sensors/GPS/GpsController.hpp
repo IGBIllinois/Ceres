@@ -17,19 +17,7 @@ class cGpsController : public cSensorController,
 	Q_OBJECT
 
 public:
-    cGpsController(cGpsModel* pModel, QObject* parent = nullptr);
-
-    void connectToModel() override;
-
-public:
-    const char* descriptor() const override;
-    uint32_t version() const override { return 1; };
-    const std::string& manufacturer() const override;
-    const std::string& model() const override;
-    const std::string& serial_number() const override;
-    const std::string& name() const override;
-    const std::string& instance() const override;
-    bool has_instance() const override;
+    cGpsController(QObject* parent = nullptr);
 
 signals:
     void queryReferenceState();
@@ -52,16 +40,16 @@ public slots:
 
     void referencePositionUpdated(int x_mm, int y_mm, int z_mm, double error_mm, int count);
 
-    /*** Messages handlers from the decoder */
 protected:
-    void onQueryReferenceData() override;
-    void onQueryReferenceParameters() override;
-    void onQueryReferenceState() override;
+    /*** Messages handlers from the decoder */
+    void onQueryReferenceDataMessage() override;
+    void onQueryReferenceParametersMessage() override;
+    void onQueryReferenceStateMessage() override;
 
-    void onCalcReference() override;
-    void onStopReference() override;
+    void onCalcReferenceMessage() override;
+    void onStopReferenceMessage() override;
 
-    void onSetReferenceParameters(std::uint16_t min_integration_time_sec,
+    void onSetReferenceParametersMessage(std::uint16_t min_integration_time_sec,
         std::uint16_t max_integration_time_sec, std::uint16_t error_threshold_mm) override;
 
 protected:
@@ -82,9 +70,6 @@ protected:
     }
 
     void processPacket(gps::ePacketType id, std::uint16_t length, const net_buffer_view& buffer) override {};
-
-protected:
-    cGpsModel* mpModel = nullptr;
 };
 
 

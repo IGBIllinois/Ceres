@@ -5,94 +5,19 @@
 
 #include <cassert>
 
-
+/*
 cTeledyneFlirController::cTeledyneFlirController(cTeledyneFlirCameraModel* model, QObject* parent)
     :
     cSensorController(parent), cTeledyneFlirControllerNetEncoder(512), mpModel(model)
 {
     assert(mpModel);
 }
+*/
 
-void cTeledyneFlirController::connectToModel()
-{
-    connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,          this, &cTeledyneFlirController::modeChanged);
-    connect(mpModel, &cTeledyneFlirCameraModel::lapseIntervalChanged, this, &cTeledyneFlirController::lapseIntervalChanged);
-    connect(mpModel, &cTeledyneFlirCameraModel::frameRateChanged,     this, &cTeledyneFlirController::frameRateChanged);
-    connect(mpModel, &cTeledyneFlirCameraModel::imageSizeChanged,     this, &cTeledyneFlirController::imageSizeChanged);
-    connect(mpModel, &cTeledyneFlirCameraModel::photoTaken,           this, &cTeledyneFlirController::photoTaken);
-
-    connect(this, &cTeledyneFlirController::requestMode,             mpModel, &cTeledyneFlirCameraModel::requestMode);
-    connect(this, &cTeledyneFlirController::requestFrameRate_Hz,     mpModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
-    connect(this, &cTeledyneFlirController::requestLapseInterval_ms, mpModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
-    connect(this, &cTeledyneFlirController::requestImage,            mpModel, &cTeledyneFlirCameraModel::requestImage);
-    connect(this, &cTeledyneFlirController::requestImages,           mpModel, &cTeledyneFlirCameraModel::requestImages);
-
-    connect(this, &cTeledyneFlirController::requestSaveState,    mpModel, &cTeledyneFlirCameraModel::onSaveState);
-    connect(this, &cTeledyneFlirController::requestRestoreState, mpModel, &cTeledyneFlirCameraModel::onRestoreState);
-
-    connect(this, qOverload<bool>(&cTeledyneFlirController::requestPhoto),       mpModel, qOverload<bool>(&cTeledyneFlirCameraModel::takePhoto));
-    connect(this, qOverload<bool, bool>(&cTeledyneFlirController::requestPhoto), mpModel, qOverload<bool, bool>(&cTeledyneFlirCameraModel::takePhoto));
-}
-
-const char* cTeledyneFlirController::descriptor() const
-{
-    return mpModel->descriptor();
-}
-
-const std::string& cTeledyneFlirController::manufacturer() const
-{
-    return mpModel->manufacturer();
-}
-
-const std::string& cTeledyneFlirController::model() const
-{
-    return mpModel->model();
-}
-
-const std::string& cTeledyneFlirController::serial_number() const
-{
-    return mpModel->serial_number();
-}
-
-const std::string& cTeledyneFlirController::name() const
-{
-    return mpModel->name();
-}
-
-const std::string& cTeledyneFlirController::instance() const
-{
-    return mpModel->instance();
-}
-
-bool cTeledyneFlirController::has_instance() const
-{
-    return mpModel->has_instance();
-}
-
-void cTeledyneFlirController::photoTaken()
-{
-    sendTakePhotoReply();
-}
-
-void cTeledyneFlirController::modeChanged(int mode)
-{
-    sendCameraMode(mode);
-}
-
-void cTeledyneFlirController::lapseIntervalChanged(int interval_ms)
-{
-    sendLapseInterval_ms(interval_ms);
-}
-
-void cTeledyneFlirController::frameRateChanged(double rate_fps)
-{
-    sendFrameRate_Hz(rate_fps);
-}
-
-void cTeledyneFlirController::imageSizeChanged(int width, int height)
-{
-    sendImageSize(width, height);
-}
+cTeledyneFlirController::cTeledyneFlirController(QObject* parent)
+    :
+    cSensorController(parent), cTeledyneFlirControllerNetEncoder(512)
+{}
 
 void cTeledyneFlirController::processStream(const void* pBuffer, std::size_t buf_length)
 {
@@ -116,59 +41,84 @@ void cTeledyneFlirController::processStream(const void* pBuffer, std::size_t buf
     }
 }
 
-void cTeledyneFlirController::onQueryMode()
+/*
+ * Slots
+ */
+void cTeledyneFlirController::photoTaken()
 {
-    sendCameraMode(static_cast<uint8_t>(mpModel->mode()));
+    sendTakePhotoReplyMessage();
 }
 
-void cTeledyneFlirController::onQueryImageSize()
+void cTeledyneFlirController::modeChanged(int mode)
 {
-    auto width = mpModel->imageWidth();
-    auto height = mpModel->imageHeight();
-
-    sendImageSize(width, height);
+    sendCameraModeMessage(mode);
 }
 
-void cTeledyneFlirController::onQueryFrameRate()
+void cTeledyneFlirController::lapseIntervalChanged(int interval_ms)
 {
-    sendFrameRate_Hz(mpModel->frameRate_Hz());
+    sendLapseIntervalMessage(interval_ms);
 }
 
-void cTeledyneFlirController::onQueryLapseInterval()
+void cTeledyneFlirController::frameRateChanged(double rate_fps)
 {
-    sendLapseInterval_ms(mpModel->lapseInterval_ms());
+    sendFrameRateMessage(rate_fps);
+}
+
+void cTeledyneFlirController::imageSizeChanged(int width, int height)
+{
+    sendImageSizeMessage(width, height);
+}
+
+/*
+ * Message Handlers
+ */
+void cTeledyneFlirController::onQueryModeMessage()
+{
+    emit queryMode();
+}
+
+void cTeledyneFlirController::onQueryImageSizeMessage()
+{
+    emit queryImageSize();
+}
+
+void cTeledyneFlirController::onQueryFrameRateMessage()
+{
+    emit queryFrameRate_Hz();
+}
+
+void cTeledyneFlirController::onQueryLapseIntervalMessage()
+{
+    emit queryLapseInterval_ms();
 }
 
 
-void cTeledyneFlirController::setMode(uint8_t mode)
+void cTeledyneFlirController::onSetModeMessage(uint8_t mode)
 {
     emit requestMode(mode);
 }
 
-void cTeledyneFlirController::setImageSize(uint16_t width, uint16_t height)
+void cTeledyneFlirController::onSetImageSizeMessage(uint16_t width, uint16_t height)
 {
-    width = mpModel->imageWidth();
-    height = mpModel->imageHeight();
-
-    sendImageSize(width, height);
+    emit requestImageSize(width, height);
 }
 
-void cTeledyneFlirController::setFrameRate_Hz(double fps)
+void cTeledyneFlirController::onSetFrameRateMessage(double fps)
 {
     emit requestFrameRate_Hz(fps);
 }
 
-void cTeledyneFlirController::setLapseInterval_ms(uint32_t interval_ms)
+void cTeledyneFlirController::onSetLapseIntervalMessage(uint32_t interval_ms)
 {
     emit requestLapseInterval_ms(interval_ms);
 }
 
-void cTeledyneFlirController::onSaveState()
+void cTeledyneFlirController::onSaveStateMessage()
 {
     emit requestSaveState();
 }
 
-void cTeledyneFlirController::onRestoreState()
+void cTeledyneFlirController::onRestoreStateMessage()
 {
     emit requestRestoreState();
 }
@@ -178,71 +128,79 @@ void cTeledyneFlirController::onRestoreState()
  * Teledyne FLIR Controller T1K
  ******************************************************************************/
 
-cTeledyneFlirController_T1K::cTeledyneFlirController_T1K(cTeledyneFlirCameraModel_T1K* model, QObject* parent)
+cTeledyneFlirController_T1K::cTeledyneFlirController_T1K(QObject* parent)
     :
-    cTeledyneFlirController(model, parent), mpModel(model)
+    cTeledyneFlirController(parent)
+{}
+
+/*
+ * Slots
+ */
+void cTeledyneFlirController_T1K::stateUpdated(int mode, int width, int height, double fps, double min_fps, double max_fps,
+    int interval_ms, float minValue_K, float maxValue_K)
 {
-    assert(mpModel);
+    std::optional<double> minFrameRate_fps;
+    std::optional<double> maxFrameRate_fps;
+    std::optional<float> minThermalValue_K;
+    std::optional<float> maxThermalValue_K;
+
+    if (min_fps > 1.0)
+        minFrameRate_fps = min_fps;
+
+    if (max_fps > 1.0)
+        maxFrameRate_fps = max_fps;
+
+    if (minValue_K > 1.0)
+        minThermalValue_K = minValue_K;
+
+    if (maxValue_K > 1.0)
+        maxThermalValue_K = maxValue_K;
+
+    sendCurrentStateMessage(true, static_cast<uint8_t>(mode), width, height, fps, interval_ms,
+        minFrameRate_fps, maxFrameRate_fps, minThermalValue_K, maxThermalValue_K);
 }
 
-void cTeledyneFlirController_T1K::connectToModel()
+void cTeledyneFlirController_T1K::thermalRangeUpdated(float minValue_K, float maxValue_K)
 {
-    cTeledyneFlirController::connectToModel();
+    sendThermalRangeMessage(minValue_K, maxValue_K);
 }
 
 void cTeledyneFlirController_T1K::onPhotoTaken()
 {
-    sendTakePhotoReply();
+    sendTakePhotoReplyMessage();
 }
 
-
-void cTeledyneFlirController_T1K::onQueryState()
+/*
+ * Message Handlers
+ */
+void cTeledyneFlirController_T1K::onQueryStateMessage()
 {
-    auto mode = mpModel->mode();
-
-    auto width = mpModel->imageWidth();
-    auto height = mpModel->imageHeight();
-
-    double fps = mpModel->frameRate_Hz();
-    uint32_t interval_ms = mpModel->lapseInterval_ms();
-
-    sendCurrentState(true, static_cast<uint8_t>(mode), width, height, fps, interval_ms,
-        mpModel->minFrameRate_fps(), mpModel->maxFrameRate_fps(),
-        mpModel->minThermalValue_K(), mpModel->maxThermalValue_K());
+    emit queryState();
 }
 
-void cTeledyneFlirController_T1K::onQueryThermalRange()
+void cTeledyneFlirController_T1K::onQueryThermalRangeMessage()
 {
-    float minValue_K = mpModel->minThermalValue_K().value_or(-1.0f);
-    float maxValue_K = mpModel->maxThermalValue_K().value_or(-1.0f);
-
-    sendThermalRange_K(minValue_K, maxValue_K);
+    emit queryThermalRange();
 }
 
-void cTeledyneFlirController_T1K::onGrabImage()
+void cTeledyneFlirController_T1K::onGrabImageMessage()
 {
-    if (mpModel->mode() == cTeledyneFlirCameraModel::SINGLE)
-        emit requestPhoto(true);
-    else
-        emit requestImage();
+    emit grabImage();
 }
 
-void cTeledyneFlirController_T1K::onTakePhoto(bool update_view)
+void cTeledyneFlirController_T1K::onTakePhotoMessage(bool update_view)
 {
     emit requestPhoto(update_view);
 }
 
-void cTeledyneFlirController_T1K::onTakePhoto(bool updateView, bool autoSave)
+void cTeledyneFlirController_T1K::onTakePhotoMessage(bool updateView, bool autoSave)
 {
     emit requestPhoto(updateView, autoSave);
 }
 
-void cTeledyneFlirController_T1K::setThermalRange_K(float min_value_K, float max_value_K)
+void cTeledyneFlirController_T1K::onSetThermalRangeMessage(float min_value_K, float max_value_K)
 {
-    float minValue_K = mpModel->minThermalValue_K().value_or(-1.0f);
-    float maxValue_K = mpModel->maxThermalValue_K().value_or(-1.0f);
-
-    sendThermalRange_K(minValue_K, maxValue_K);
+    emit requestThermalRange(min_value_K, max_value_K);
 }
 
 

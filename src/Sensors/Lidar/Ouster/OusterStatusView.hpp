@@ -25,17 +25,15 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
-	void connectToModel() override;
-
 public slots:
 	void onSensorInfoUpdated();
 	void onTimeInfoUpdated();
-	void onLidarModeUpdated();
+	void onLidarModeUpdated(int mode);
 	void onBeamIntrinsicsUpdated();
 	void onImuIntrinsicsUpdated();
 	void onLidarIntrinsicsUpdated();
 	void onDataFormatUpdated();
-	void onAzimuthWindowUpdated();
+	void onAzimuthWindowUpdated(double min_deg, double max_deg);
 	void onRangeUpdated(int range_mm);
 
 
@@ -59,6 +57,4 @@ private:
 
 	QLabel*    mpRangeLabel = nullptr;
 	QLineEdit* mpRange_mm = nullptr;
-
-	cOusterModel* mpModel;
 };

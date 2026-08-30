@@ -69,15 +69,15 @@ public:
 
 protected:
 
-	void onReferenceParameters(bool valid, uint16_t min_integration_time_sec, 
+	void onReferenceParametersMessage(bool valid, uint16_t min_integration_time_sec,
 		uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm) override;
 
-	void onReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+	void onReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
 		double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid) override;
 
-	void onReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count) override;
+	void onReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count) override;
 
-	void onReferenceCommandReply(eReferenceReply reply) override;
+	void onReferenceCommandReplyMessage(eReferenceReply reply) override;
 
 	void onConnect() override;
 

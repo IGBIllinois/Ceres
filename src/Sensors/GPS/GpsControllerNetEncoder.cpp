@@ -12,7 +12,7 @@ cGpsControllerNetEncoder::cGpsControllerNetEncoder(std::size_t capacity)
 {}
 
 /**   Encode Methods   */
-void cGpsControllerNetEncoder::encodeReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+void cGpsControllerNetEncoder::encodeReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
     double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
 {
     if (encode_reference_data(valid, avg_lat_rad, avg_lng_rad, avg_height_m,
@@ -25,7 +25,7 @@ void cGpsControllerNetEncoder::encodeReferenceData(bool valid, double avg_lat_ra
     }
 }
 
-void cGpsControllerNetEncoder::encodeReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count)
+void cGpsControllerNetEncoder::encodeReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count)
 {
     if (encode_reference_position(x_mm, y_mm, z_mm, error_mm, count, mBuffer) < 0)
     {
@@ -35,7 +35,7 @@ void cGpsControllerNetEncoder::encodeReferencePosition(int x_mm, int y_mm, int z
     }
 }
 
-void cGpsControllerNetEncoder::encodeReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
+void cGpsControllerNetEncoder::encodeReferenceParametersMessage(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
     if (encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer) < 0)
     {
@@ -44,7 +44,7 @@ void cGpsControllerNetEncoder::encodeReferenceParameters(uint16_t integration_ti
     }
 }
 
-void cGpsControllerNetEncoder::encodeReferenceState(gps::eReferenceState state)
+void cGpsControllerNetEncoder::encodeReferenceStateMessage(gps::eReferenceState state)
 {
     gps_eReferenceReply reply;
 
@@ -76,7 +76,7 @@ void cGpsControllerNetEncoder::encodeReferenceState(gps::eReferenceState state)
 }
 
 /**   Send Methods   */
-void cGpsControllerNetEncoder::sendReferenceData(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
+void cGpsControllerNetEncoder::sendReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
     double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
 {
     encode_reference_data(valid, avg_lat_rad, avg_lng_rad, avg_height_m,
@@ -85,20 +85,20 @@ void cGpsControllerNetEncoder::sendReferenceData(bool valid, double avg_lat_rad,
     sendData();
 }
 
-void cGpsControllerNetEncoder::sendReferencePosition(int x_mm, int y_mm, int z_mm, double error_mm, int count)
+void cGpsControllerNetEncoder::sendReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count)
 {
     encode_reference_position(x_mm, y_mm, z_mm, error_mm, count, mBuffer);
 
     sendData();
 }
 
-void cGpsControllerNetEncoder::sendReferenceParameters(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
+void cGpsControllerNetEncoder::sendReferenceParametersMessage(uint16_t integration_time_sec, uint16_t max_integration_time_sec, uint16_t ref_error_threshold_mm)
 {
     encode_reference_parameters_reply(integration_time_sec, max_integration_time_sec, ref_error_threshold_mm, mBuffer);
     sendData();
 }
 
-void cGpsControllerNetEncoder::sendReferenceState(gps::eReferenceState state)
+void cGpsControllerNetEncoder::sendReferenceStateMessage(gps::eReferenceState state)
 {
     gps_eReferenceReply reply;
 

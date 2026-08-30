@@ -49,10 +49,27 @@ sSensorWidgets ouster::create_sensor(const nlohmann::json& sensorInfo, bool no_v
         pView->createWidgets();
         pView->doLayout();
 
+        QObject::connect(pModel, &cOusterModel::updateSensorInfo,      pView, &cOusterStatusView::onSensorInfoUpdated);
+        QObject::connect(pModel, &cOusterModel::updateTimeInfo,        pView, &cOusterStatusView::onTimeInfoUpdated);
+        QObject::connect(pModel, &cOusterModel::lidarModeChanged,      pView, &cOusterStatusView::onLidarModeUpdated);
+        QObject::connect(pModel, &cOusterModel::updateBeamIntrinsics,  pView, &cOusterStatusView::onBeamIntrinsicsUpdated);
+        QObject::connect(pModel, &cOusterModel::updateImuIntrinsics,   pView, &cOusterStatusView::onImuIntrinsicsUpdated);
+        QObject::connect(pModel, &cOusterModel::updateLidarIntrinsics, pView, &cOusterStatusView::onLidarIntrinsicsUpdated);
+        QObject::connect(pModel, &cOusterModel::updateDataFormat,      pView, &cOusterStatusView::onDataFormatUpdated);
+        QObject::connect(pModel, &cOusterModel::azimuthWindowChanged,  pView, &cOusterStatusView::onAzimuthWindowUpdated);
+        QObject::connect(pModel, &cOusterModel::updateRangeData,       pView, &cOusterStatusView::onRangeUpdated);
 
         auto* pController = new cOusterController(pModel);
 
-        pController->connectToModel();
+        QObject::connect(pController, &cOusterController::queryState,              pModel, &cOusterModel::queryState);
+        QObject::connect(pController, &cOusterController::queryLidarMode,          pModel, &cOusterModel::queryLidarMode);
+        QObject::connect(pController, &cOusterController::queryAzimuthWindow,      pModel, &cOusterModel::queryAzimuthWindow);
+        QObject::connect(pController, &cOusterController::requestNewLidarMode,     pModel, &cOusterModel::changeLidarMode);
+        QObject::connect(pController, &cOusterController::requestNewAzimuthWindow, pModel, &cOusterModel::changeAzimuthWindow);
+
+        QObject::connect(pModel, &cOusterModel::stateUpdated,         pController, &cOusterController::stateUpdated);
+        QObject::connect(pModel, &cOusterModel::lidarModeChanged,     pController, &cOusterController::lidarModeUpdated);
+        QObject::connect(pModel, &cOusterModel::azimuthWindowChanged, pController, &cOusterController::azimuthWindowUpdated);
 
         return sSensorWidgets(pModel, pController, pView);
     }

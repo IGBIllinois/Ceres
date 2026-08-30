@@ -6,17 +6,10 @@
 #include <cassert>
 
 
-cSsnxController::cSsnxController(cSsnxModel* pModel, QObject* parent)
+cSsnxController::cSsnxController(QObject* parent)
     :
-    cGpsController(pModel, parent), mpModel(pModel)
-{
-    assert(mpModel);
-}
-
-void cSsnxController::connectToModel()
-{
-    cGpsController::connectToModel();
-}
+    cGpsController(parent)
+{}
 
 
 

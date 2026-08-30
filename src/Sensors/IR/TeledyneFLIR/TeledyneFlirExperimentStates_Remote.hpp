@@ -43,16 +43,16 @@ protected:
 	virtual void onConnect() = 0;
 
 private:
-	void onMode(uint8_t id) override {};
-	void onImageSize(uint16_t width, uint16_t height) override {};
-	void onFrameRate(double fps) override {};
-	void onLapseInterval(uint32_t interval_ms) override {};
-	void onThermalRange(float min_value_K, float max_value_K) override {};
-	void onCurrentState(bool valid, uint8_t mode,
+	void onModeMessage(uint8_t id) override {};
+	void onImageSizeMessage(uint16_t width, uint16_t height) override {};
+	void onFrameRateMessage(double fps) override {};
+	void onLapseIntervalMessage(uint32_t interval_ms) override {};
+	void onThermalRangeMessage(float min_value_K, float max_value_K) override {};
+	void onCurrentStateMessage(bool valid, uint8_t mode,
 		uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
 		std::optional<double> min_fps, std::optional<double> max_fps,
 		std::optional<float> min_K, std::optional<float> max_K) override {};
-	void onTakePhotoReply(bool error)  override {};
+	void onTakePhotoReplyMessage(bool error)  override {};
 
 private:
 	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
@@ -149,10 +149,10 @@ public:
 	eRESULT finished() override;
 
 private:
-	void onMode(uint8_t id) override;
-	void onFrameRate(double fps) override;
-	void onLapseInterval(uint32_t interval_ms) override;
-	void onCurrentState(bool valid, uint8_t mode,
+	void onModeMessage(uint8_t id) override;
+	void onFrameRateMessage(double fps) override;
+	void onLapseIntervalMessage(uint32_t interval_ms) override;
+	void onCurrentStateMessage(bool valid, uint8_t mode,
 		uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
 		std::optional<double> min_fps, std::optional<double> max_fps,
 		std::optional<float> min_K, std::optional<float> max_K) override;
@@ -193,8 +193,8 @@ public:
 	eRESULT finished() override;
 
 private:
-	void onMode(uint8_t mode) override;
-	void onTakePhotoReply(bool error) override;
+	void onModeMessage(uint8_t mode) override;
+	void onTakePhotoReplyMessage(bool error) override;
 
 	void onConnect() override;
 

@@ -25,11 +25,11 @@ protected:
     /*
      * Property Page ----> Controller
      */
-    virtual void onQueryState() = 0;
-    virtual void onQueryLidarMode() = 0;
-    virtual void onQueryAzimuthWindow() = 0;
-    virtual void setAzimuthWindow(double min_deg, double max_deg) = 0;
-    virtual void setLidarMode(ouster::eLIDAR_MODE mode) = 0;
+    virtual void onQueryStateMessage() = 0;
+    virtual void onQueryLidarModeMessage() = 0;
+    virtual void onQueryAzimuthWindowMessage() = 0;
+    virtual void onSetAzimuthWindowMessage(double min_deg, double max_deg) = 0;
+    virtual void onSetLidarModeMessage(ouster::eLIDAR_MODE mode) = 0;
 
 protected:
     void processPacket(const sPacketHeader_t& hdr, const net_buffer_view& buffer) override final;

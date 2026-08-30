@@ -26,8 +26,6 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
-	void connectToModel() override;
-
 signals:
 	void requestMode(int mode);
 	void requestFrameRate_Hz(double frame_rate_hz);
@@ -66,7 +64,4 @@ private:
 	QPushButton* mpGrabImage = nullptr;
 
 	cThermalImageWidget* mpThermalImage = nullptr;
-
-private:
-	cTeledyneFlirCameraModel* mpModel = nullptr;
 };

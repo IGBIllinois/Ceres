@@ -342,6 +342,50 @@ void cTeledyneFlirCameraModel_T1K::update()
     }
 }
 
+void cTeledyneFlirCameraModel_T1K::onQueryState()
+{
+    auto mode = this->mode();
+
+    int width = imageWidth();
+    int height = imageHeight();
+
+    double fps = frameRate_Hz();
+
+    double min_fps = minFrameRate_fps().value_or(-1.0);
+    double max_fps = maxFrameRate_fps().value_or(-1.0);
+
+    int interval_ms = lapseInterval_ms();
+
+    float minK = minThermalValue_K().value_or(-1.0f);
+    float maxK = maxThermalValue_K().value_or(-1.0f);
+
+    emit stateChanged(mode, width, height, fps, min_fps, max_fps, interval_ms, minK, maxK);
+}
+
+void cTeledyneFlirCameraModel_T1K::onQueryThermalRange()
+{
+    float minValue_K = minThermalValue_K().value_or(-1.0f);
+    float maxValue_K = maxThermalValue_K().value_or(-1.0f);
+
+    emit thermalRangeChanged(minValue_K, maxValue_K);
+}
+
+void cTeledyneFlirCameraModel_T1K::onGrabImage()
+{
+    if (mode() == cTeledyneFlirCameraModel::SINGLE)
+        takePhoto(true);
+    else
+        requestImage();
+}
+
+void cTeledyneFlirCameraModel_T1K::requestThermalRange(float minValue_K, float maxValue_K)
+{
+    minValue_K = minThermalValue_K().value_or(-1.0f);
+    maxValue_K = maxThermalValue_K().value_or(-1.0f);
+
+    emit thermalRangeChanged(minValue_K, maxValue_K);
+}
+
 void cTeledyneFlirCameraModel_T1K::errorHappend(int id, QString msg)
 {
     QString full_msg = "Camera ";

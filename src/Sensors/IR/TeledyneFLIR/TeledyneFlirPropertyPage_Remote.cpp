@@ -129,7 +129,7 @@ void cTeledyneFlirPropertyPage_Remote::buttonClicked(QAbstractButton* button)
 
 void cTeledyneFlirPropertyPage_Remote::onConnect()
 {
-	cTeledyneFlirPropertiesNetEncoder::sendQueryState();
+	cTeledyneFlirPropertiesNetEncoder::sendQueryStateMessage();
 }
 
 void cTeledyneFlirPropertyPage_Remote::onGrabImagePressed()
@@ -137,13 +137,13 @@ void cTeledyneFlirPropertyPage_Remote::onGrabImagePressed()
 	if (mpMode->currentIndex() == 0)
 	{
 		mpGrabImage->setEnabled(false);
-		cTeledyneFlirPropertiesNetEncoder::sendTakePhoto(true);
+		cTeledyneFlirPropertiesNetEncoder::sendTakePhotoMessage(true);
 	}
 	else
-		cTeledyneFlirPropertiesNetEncoder::sendGrabImage();
+		cTeledyneFlirPropertiesNetEncoder::sendGrabImageMessage();
 }
 
-void cTeledyneFlirPropertyPage_Remote::onMode(uint8_t mode)
+void cTeledyneFlirPropertyPage_Remote::onModeMessage(uint8_t mode)
 {
 	if ((mode < 0) || (mode > 2))
 		return;
@@ -152,7 +152,7 @@ void cTeledyneFlirPropertyPage_Remote::onMode(uint8_t mode)
 	mpMode->setCurrentIndex(mode);
 }
 
-void cTeledyneFlirPropertyPage_Remote::onImageSize(uint16_t width, uint16_t height)
+void cTeledyneFlirPropertyPage_Remote::onImageSizeMessage(uint16_t width, uint16_t height)
 {
 	QString image_size = QString::number(width);
 	image_size += " x ";
@@ -162,7 +162,7 @@ void cTeledyneFlirPropertyPage_Remote::onImageSize(uint16_t width, uint16_t heig
 	mpImageSize->setEnabled(false);
 }
 
-void cTeledyneFlirPropertyPage_Remote::onFrameRate(double fps)
+void cTeledyneFlirPropertyPage_Remote::onFrameRateMessage(double fps)
 {
 	if ((fps == 0) || (fps > 30))
 		return;
@@ -171,13 +171,13 @@ void cTeledyneFlirPropertyPage_Remote::onFrameRate(double fps)
 	mpFrameRate_fps->setText(QString::number(fps));
 }
 
-void cTeledyneFlirPropertyPage_Remote::onLapseInterval(uint32_t interval_ms)
+void cTeledyneFlirPropertyPage_Remote::onLapseIntervalMessage(uint32_t interval_ms)
 {
 	mDefaultLapseInterval_ms = interval_ms;
 	mpLapseInterval_s->setText(QString::number(interval_ms * 0.001f));
 }
 
-void cTeledyneFlirPropertyPage_Remote::onThermalRange(float min_value_K, float max_value_K)
+void cTeledyneFlirPropertyPage_Remote::onThermalRangeMessage(float min_value_K, float max_value_K)
 {
 	if ((min_value_K > 0) && (max_value_K > 0))
 	{
@@ -193,7 +193,7 @@ void cTeledyneFlirPropertyPage_Remote::onThermalRange(float min_value_K, float m
 	mpThermalRange->setEnabled(false);
 }
 
-void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
+void cTeledyneFlirPropertyPage_Remote::onCurrentStateMessage(bool valid, uint8_t mode,
 	uint16_t width, uint16_t height, double fps, uint32_t interval_ms,
 	std::optional<double> min_fps, std::optional<double> max_fps,
 	std::optional<float> min_K, std::optional<float> max_K)
@@ -204,10 +204,10 @@ void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
 	mDefaultFrameRate_fps = fps;
 	mDefaultLapseInterval_ms = interval_ms;
 
-	onMode(mode);
-	onImageSize(width, height);
-	onFrameRate(fps);
-	onLapseInterval(interval_ms);
+	onModeMessage(mode);
+	onImageSizeMessage(width, height);
+	onFrameRateMessage(fps);
+	onLapseIntervalMessage(interval_ms);
 
 	switch (mode)
 	{
@@ -240,7 +240,7 @@ void cTeledyneFlirPropertyPage_Remote::onCurrentState(bool valid, uint8_t mode,
 		mpThermalRange->setText("Unknown");
 }
 
-void cTeledyneFlirPropertyPage_Remote::onTakePhotoReply(bool error)
+void cTeledyneFlirPropertyPage_Remote::onTakePhotoReplyMessage(bool error)
 {
 	mpGrabImage->setEnabled(true);
 }
@@ -278,19 +278,19 @@ void cTeledyneFlirPropertyPage_Remote::doApply()
 	uint8_t mode = static_cast<uint8_t>(mpMode->currentIndex());
 	if ((mDefaultMode < 200) && (mDefaultMode != mode))
 	{
-		sendSetMode(mode);
+		sendSetModeMessage(mode);
 	}
 
 	double fps = mpFrameRate_fps->text().toDouble();
 	if (mDefaultFrameRate_fps != fps)
 	{
-		sendSetFrameRate_fps(fps);
+		sendSetFrameRateMessage(fps);
 	}
 
 	uint32_t interval_ms = static_cast<uint32_t>(mpLapseInterval_s->text().toDouble() * 1000.0);
 	if (mDefaultLapseInterval_ms != interval_ms)
 	{
-		sendSetLapseInterval_ms(interval_ms);
+		sendSetLapseIntervalMessage(interval_ms);
 	}
 }
 

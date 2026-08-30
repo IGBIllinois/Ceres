@@ -28,19 +28,19 @@ void cGpsControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
 #ifdef LOG_MESSAGE
             qInfo() << "Query reference data received.";
 #endif
-            onQueryReferenceData();
+            onQueryReferenceDataMessage();
             break;
         case eQUERY_REFERENCE_PARAMETERS:
 #ifdef LOG_MESSAGE
             qInfo() << "Query reference parameters received.";
 #endif
-            onQueryReferenceParameters();
+            onQueryReferenceParametersMessage();
             break;
         case eQUERY_REFERENCE_STATE:
 #ifdef LOG_MESSAGE
             qInfo() << "Query reference state received.";
 #endif
-            onQueryReferenceState();
+            onQueryReferenceStateMessage();
             break;
         default:
             qWarning() << "Unknown query state received: " << query;
@@ -50,7 +50,7 @@ void cGpsControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
     case ePacketType::SET_REFERENCE_PARAMETERS:
     {
         auto data = to_reference_parameters_1(hdr.length, buffer);
-        onSetReferenceParameters(data.min_integration_time_sec, data.max_integration_time_sec, data.ref_error_threshold_mm);
+        onSetReferenceParametersMessage(data.min_integration_time_sec, data.max_integration_time_sec, data.ref_error_threshold_mm);
         break;
     }
     case ePacketType::GPS_REFERENCE_COMMAND:
@@ -59,10 +59,10 @@ void cGpsControllerNetDecoder::processPacket(const sPacketHeader_t& hdr, const n
         switch (command)
         {
         case eReferenceCmd_START:
-            onCalcReference();
+            onCalcReferenceMessage();
             break;
         case eReferenceCmd_ABORT:
-            onStopReference();
+            onStopReferenceMessage();
             break;
         default:
             qWarning() << "Unknown command received: " << command;

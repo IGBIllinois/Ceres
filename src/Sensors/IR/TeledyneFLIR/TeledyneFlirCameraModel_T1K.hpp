@@ -72,8 +72,19 @@ public:
     uint16_t maxImageWidth() const;
     uint16_t maxImageHeight() const;
 
+signals:
+    void stateChanged(int mode, int width, int height, double fps, double min_fps, double max_fps,
+        int interval_ms, float minValue_K, float maxValue_K);
+
+    void thermalRangeChanged(float minValue_K, float maxValue_K);
 
 public slots:
+    void onQueryState();
+    void onQueryThermalRange();
+
+    void onGrabImage();
+
+    void requestThermalRange(float minValue_K, float maxValue_K);
 
 protected slots:
     void errorHappend(int id, QString msg);

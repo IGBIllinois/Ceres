@@ -17,13 +17,11 @@
 
 cOusterStatusView::cOusterStatusView(cOusterModel* pModel, QWidget* parent)
 :
-	cSensorStatusView(pModel, parent), mpModel(pModel)
-{
-}
+	cSensorStatusView(pModel, parent)
+{}
 
 cOusterStatusView::~cOusterStatusView()
-{
-}
+{}
 
 void cOusterStatusView::createWidgets()
 {
@@ -120,21 +118,6 @@ void cOusterStatusView::doLayout()
 	setLayout(mainLayout);
 }
 
-void cOusterStatusView::connectToModel()
-{
-	connect(mpModel, &cOusterModel::updateSensorInfo,      this, &cOusterStatusView::onSensorInfoUpdated);
-	connect(mpModel, &cOusterModel::updateTimeInfo,        this, &cOusterStatusView::onTimeInfoUpdated);
-	connect(mpModel, &cOusterModel::updateLidarMode,       this, &cOusterStatusView::onLidarModeUpdated);
-	connect(mpModel, &cOusterModel::updateBeamIntrinsics,  this, &cOusterStatusView::onBeamIntrinsicsUpdated);
-	connect(mpModel, &cOusterModel::updateImuIntrinsics,   this, &cOusterStatusView::onImuIntrinsicsUpdated);
-	connect(mpModel, &cOusterModel::updateLidarIntrinsics, this, &cOusterStatusView::onLidarIntrinsicsUpdated);
-	connect(mpModel, &cOusterModel::updateDataFormat,      this, &cOusterStatusView::onDataFormatUpdated);
-	connect(mpModel, &cOusterModel::updateAzimuthWindow,   this, &cOusterStatusView::onAzimuthWindowUpdated);
-	connect(mpModel, &cOusterModel::updateRangeData,       this, &cOusterStatusView::onRangeUpdated);
-
-	cSensorStatusView::connectToModel();
-}
-
 void cOusterStatusView::onSensorInfoUpdated()
 {
 	mpSensorInfoValid->setState(true);
@@ -145,14 +128,19 @@ void cOusterStatusView::onTimeInfoUpdated()
 	mpTimeInfoValid->setState(true);
 }
 
-void cOusterStatusView::onLidarModeUpdated()
+void cOusterStatusView::onLidarModeUpdated(int mode)
 {
 	using namespace ouster;
 
+	if ((mode < 0) || (mode > ouster::MAX_LIDAR_MODE_NUMBER))
+	{
+		mpLidarModeValid->setState(false);
+		return;
+	}
+
 	mpLidarModeValid->setState(true);
 
-	auto mode = mpModel->getLidarMode();
-	mpLidarMode->setText(QString::fromStdString(to_string(mode)));
+	mpLidarMode->setText(QString::fromStdString(to_string(static_cast<ouster::eLIDAR_MODE>(mode))));
 }
 
 void cOusterStatusView::onBeamIntrinsicsUpdated()
@@ -175,14 +163,15 @@ void cOusterStatusView::onDataFormatUpdated()
 	mpDataFormatValid->setState(true);
 }
 
-void cOusterStatusView::onAzimuthWindowUpdated()
+void cOusterStatusView::onAzimuthWindowUpdated(double min_deg, double max_deg)
 {
 	mpAzimuthWindowValid->setState(true);
 
-	auto window = mpModel->getAzimuthWindow();
+	if (max_deg < min_deg)
+		std::swap(min_deg, max_deg);
 
-	mpMinAzimuthAngle_deg->setText(QString::number(window.min_deg));
-	mpMaxAzimuthAngle_deg->setText(QString::number(window.max_deg));
+	mpMinAzimuthAngle_deg->setText(QString::number(min_deg));
+	mpMaxAzimuthAngle_deg->setText(QString::number(max_deg));
 }
 
 void cOusterStatusView::onRangeUpdated(int range_mm)

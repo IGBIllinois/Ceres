@@ -36,10 +36,30 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
         if (protocol == "direct")
         {
             auto* pView = new cSsnxStatusView(pModel);
+
             pView->createWidgets();
             pView->doLayout();
 
-            pView->connectToModel();
+            QObject::connect(pModel, &cSsnxModel::pvtCartesianDataValid,   pView, &cSsnxStatusView::onPvtCartesianStateChange);
+            QObject::connect(pModel, &cSsnxModel::pvtGeodeticDataValid,    pView, &cSsnxStatusView::onPvtGeodeticStateChange);
+            QObject::connect(pModel, &cSsnxModel::posCovGeodeticDataValid, pView, &cSsnxStatusView::onPosCovGeodeticStateChange);
+            QObject::connect(pModel, &cSsnxModel::velCovGeodeticDataValid, pView, &cSsnxStatusView::onVelCovGeodeticStateChange);
+            QObject::connect(pModel, &cSsnxModel::posProjectedDataValid,   pView, &cSsnxStatusView::onPosProjectedStateChange);
+            QObject::connect(pModel, &cSsnxModel::receiverTimeDataValid,   pView, &cSsnxStatusView::onReceiverTimeStateChange);
+            QObject::connect(pModel, &cSsnxModel::rtcmDatumDataValid,      pView, &cSsnxStatusView::onRtcmDatumStateChange);
+            QObject::connect(pModel, &cSsnxModel::receiverStatusDataValid, pView, &cSsnxStatusView::onReceiverStatusStateChange);
+            QObject::connect(pModel, &cSsnxModel::wifiClientDataValid,     pView, &cSsnxStatusView::onWifiClientStateChange);
+            QObject::connect(pModel, &cSsnxModel::ntripClientDataValid,    pView, &cSsnxStatusView::onNtripStateChange);
+
+            QObject::connect(pModel, &cSsnxModel::receiverStatusChanged,       pView, &cSsnxStatusView::onReceiverStateChange);
+            QObject::connect(pModel, &cSsnxModel::ntripClientStatusChanged,    pView, &cSsnxStatusView::onNtripClientChange);
+            QObject::connect(pModel, &cSsnxModel::wifiClientConnectionChanged, pView, &cSsnxStatusView::onWifiConnectionChange);
+
+            QObject::connect(pModel, &cSsnxModel::solutionTypeChanged,      pView, &cSsnxStatusView::onSolutionTypeChange);
+            QObject::connect(pModel, &cSsnxModel::positionChanged,          pView, &cSsnxStatusView::onPositionChange);
+            QObject::connect(pModel, &cSsnxModel::updateGeodeticPVT,        pView, &cSsnxStatusView::onGeodeticPVT_Change);
+            QObject::connect(pModel, &cSsnxModel::updateUTC,                pView, &cSsnxStatusView::onUTC_Change);
+            QObject::connect(pModel, &cSsnxModel::referencePositionChanged, pView, &cSsnxStatusView::onReferencePositionChange);
 
             if (protocol == "direct")
                 QObject::connect(pView, &cSsnxStatusView::tryGpsReconnection, static_cast<cSsnxModel_direct*>(pModel), &cSsnxModel_direct::reconnectToGps);
@@ -47,9 +67,21 @@ sSensorWidgets ssnx::create_sensor(const nlohmann::json& sensorInfo, bool no_vis
             widgets.pRemoteStatusView = pView;
         }
 
-        auto* pController = new cSsnxController(pModel);
+        auto* pController = new cSsnxController();
 
-        pController->connectToModel();
+        // Base GPS model <-> controller connections
+        QObject::connect(pModel, &cGpsModel::referenceComplete,          pController, &cGpsController::onReferenceComplete);
+        QObject::connect(pModel, &cGpsModel::referenceStateChanged,      pController, &cGpsController::referenceStateUpdated);
+        QObject::connect(pModel, &cGpsModel::referenceParametersChanged, pController, &cGpsController::referenceParametersUpdated);
+        QObject::connect(pModel, &cGpsModel::referenceDataChanged,       pController, &cGpsController::referenceDataUpdated);
+        QObject::connect(pModel, &cGpsModel::referencePositionChanged,   pController, &cGpsController::referencePositionUpdated);
+
+        QObject::connect(pController, &cGpsController::queryReferenceState,       pModel, &cGpsModel::referenceStateQueried);
+        QObject::connect(pController, &cGpsController::queryReferenceParameters,  pModel, &cGpsModel::referenceParametersQueried);
+        QObject::connect(pController, &cGpsController::queryReferenceData,        pModel, &cGpsModel::referenceDataQueried);
+        QObject::connect(pController, &cGpsController::updateReferenceParameters, pModel, &cGpsModel::updateReferenceParameters);
+        QObject::connect(pController, &cGpsController::startReferenceComputation, pModel, &cGpsModel::startReferenceComputation);
+        QObject::connect(pController, &cGpsController::abortReferenceCompute,     pModel, &cGpsModel::abortReferenceCompute);
 
         widgets.pController = pController;
 
