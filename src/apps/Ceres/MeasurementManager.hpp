@@ -42,6 +42,7 @@ private:
 	std::filesystem::path	mMeasurementPath;
 };
 
+/*
 class cMeasurementSelectDlg : public QDialog
 {
 	Q_OBJECT
@@ -61,3 +62,4 @@ private slots:
 private:
 	QTreeWidget* mpMeasurements;
 };
+*/

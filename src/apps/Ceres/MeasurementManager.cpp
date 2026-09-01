@@ -149,6 +149,7 @@ void cMeasurementManager::loadMeasurements(cMeasurementTreeItem& root, const std
 /*
  *  Selections Dialog
  */
+/*
 cMeasurementSelectDlg::cMeasurementSelectDlg(QWidget* parent)
 :
     QDialog(parent),
@@ -220,5 +221,5 @@ void cMeasurementSelectDlg::reject()
 {
     QDialog::reject();
 }
-
+*/
 
