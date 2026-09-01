@@ -109,6 +109,10 @@ std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedMeasurements(
     {
         //    auto* item = static_cast<cExperimentTreeItem>(mpExperiments->topLevelItem(0));
         auto* item = mpMeasurements->topLevelItem(i);
+
+        if (item->checkState(0) == Qt::Unchecked)
+            continue;
+
         cMeasurementTreeItem* pExp = static_cast<cMeasurementTreeItem*>(item);
         if (pExp->hasMeasurementDocument())
         {
@@ -136,6 +140,10 @@ std::vector<std::filesystem::path> cBatchExpConfirmDlg::getSelectedMeasurements(
     {
         //    auto* item = static_cast<cExperimentTreeItem>(mpExperiments->topLevelItem(0));
         auto* item = pRoot->child(i);
+
+        if (item->checkState(0) == Qt::Unchecked)
+            continue;
+
         cMeasurementTreeItem* pExp = static_cast<cMeasurementTreeItem*>(item);
         if (pExp->hasMeasurementDocument())
         {
