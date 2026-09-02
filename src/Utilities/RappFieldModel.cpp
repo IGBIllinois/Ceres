@@ -217,6 +217,12 @@ int nRFM::set_reference_height_mm(int geometric_height_mm, int x_mm, int y_mm, i
 int nRFM::compute_reference_height_mm(int geometric_height_mm, int x_mm, int y_mm, int z_mm)
 {
     int32_t ground_height_mm = static_cast<int32_t>(gGroundModel.getMeshHeight_mm(x_mm, y_mm)) + 1;
+
+    if (ground_height_mm == rfm::INVALID_HEIGHT)
+    {
+        return rfm::INVALID_HEIGHT;
+    }
+
     int32_t aerial_height_mm = static_cast<int32_t>(gAerialModel.getMeshHeight_mm(x_mm, y_mm));
 
     if (aerial_height_mm == rfm::INVALID_HEIGHT)
@@ -254,4 +260,14 @@ int nRFM::compute_dolly_height_mm(int height_mm, int x_mm, int y_mm, int ref_hei
     int new_z_mm = ground_height_mm + height_mm + dolly_offset_mm;
 
     return new_z_mm;
+}
+
+const cRappGroundModel& nRFM::get_ground_model()
+{
+    return gGroundModel;
+}
+
+const cRappAerialModel& nRFM::get_aerial_model()
+{
+    return gAerialModel;
 }

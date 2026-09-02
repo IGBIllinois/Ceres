@@ -4,6 +4,10 @@
 #include <vector>
 #include <string>
 
+// Forward declarations
+class cRappGroundModel;
+class cRappAerialModel;
+
 namespace nRFM
 {
 	bool load_ground_data(const std::string& fileName);
@@ -24,4 +28,7 @@ namespace nRFM
 	int dolly_offset_mm(int x_mm, int y_mm, int ref_height_mm);
 
 	int compute_dolly_height_mm(int height_mm, int x_mm, int y_mm, int ref_height_mm);
+
+	const cRappGroundModel& get_ground_model();
+	const cRappAerialModel& get_aerial_model();
 };
