@@ -39,6 +39,7 @@ namespace hyspex
 		BACKGROUND_REPLY = 1002,
 		SHUTTER_STATE_REPLY = 1003,
 		COMMAND_REPLY = 1004,
+		LENS_INFO = 1005,
 	};
 
 
@@ -109,6 +110,16 @@ namespace hyspex
 
 	hyspex_eShutterState to_shutter_state_reply_1(std::uint16_t length, const net_buffer_view& buffer);
 	int encode_shutter_state_reply(hyspex_eShutterState state, net_buffer& buffer);
+
+	/*** send/receive the current state message ***/
+	struct sLensInfo_t
+	{
+		std::string lens_name;
+		double working_distance_cm = 0;
+		double fov_deg = 0;
+	};
+	sLensInfo_t to_lens_info_1(std::uint16_t length, const net_buffer_view& buffer);
+	int encode_lens_info(const std::string& lens_name, double working_distance_cm, double fov_deg, net_buffer& buffer);
 
 } // End of namespace hyspex
 

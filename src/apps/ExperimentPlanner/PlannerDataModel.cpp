@@ -2,9 +2,12 @@
 #include "PlannerDataModel.hpp"
 #include "SensorModel.hpp"
 #include "ExperimentCtrlModel.hpp"
+#include "ExperimentVariableNames.hpp"
+#include "ExperimentVariableTable.hpp"
 #include "ExperimentTypes.hpp"
 
 #include "Spidercam/SpidercamModel.hpp"
+#include "RappFieldModel.hpp"
 
 #include <QMessageBox>
 
@@ -213,6 +216,7 @@ bool cPlannerDataModel::experimentRequiresDataFile() const
 bool cPlannerDataModel::loadExperiment(const std::string& expPath, const std::string& expName, const nlohmann::json& expDoc)
 {
     using namespace nlohmann;
+    using namespace nExperimentVariables;
 
     if (isExperimentRunning())
     {
@@ -230,6 +234,22 @@ bool cPlannerDataModel::loadExperiment(const std::string& expPath, const std::st
         if (ctrl.compare(mThread.mpController->descriptor()) != 0)
         {
             return false;
+        }
+
+        if (nRFM::has_reference_height_mm())
+        {
+            auto table = mThread.mpController->getGlobalVariableTable();
+
+            if (table.expired())
+            {
+                mThread.mpController->createGlobalVariableTable();
+                table = mThread.mpController->getGlobalVariableTable();
+            }
+
+            auto variables = table.lock();
+
+            if (!variables->set(REFERENCE_HEIGHT_mm, nRFM::reference_height_mm()))
+                variables->add(REFERENCE_HEIGHT_mm, nRFM::reference_height_mm());
         }
 
         if (mThread.mpController->loadExperiment(expPath, expName, expDoc["experiment"]))

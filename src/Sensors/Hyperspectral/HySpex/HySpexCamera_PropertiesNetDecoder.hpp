@@ -35,6 +35,8 @@ protected:
 
     virtual void onLensNamesMessage(const std::vector<std::string>& names) = 0;
 
+    virtual void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) = 0;
+
     enum class eCommandReply { UNKNOWN, CALC_BACKGROUND, STOP_BACKGROUND };
     virtual void onCommandReplyMessage(eCommandReply reply) = 0;
 

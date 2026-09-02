@@ -1,4 +1,23 @@
 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+
+set(resource_files
+  spidercam_resources.qrc
+)
+
+source_group("Resources" FILES
+  ${resource_files}
+)
+
+if (${Qt} STREQUAL "Qt6")
+	qt6_add_resources(SPIDERCAM_RESOURCES spidercam_resources.qrc OPTIONS "--verbose")
+else()
+	qt5_add_resources(SPIDERCAM_RESOURCES spidercam_resources.qrc OPTIONS "--verbose")
+endif()
+
+
 # Add the public header files to use the library
 set(SPIDERCAM_CTRL_PUBLIC_HEADERS
 
@@ -19,6 +38,8 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
 #
 # Spidercam Simulation files
 #
+    SpidercamCtrlPanel.hpp
+    SpidercamCtrlPanel.cpp
     SpidercamModel_sim.hpp
     SpidercamModel_sim.cpp
 
@@ -84,6 +105,7 @@ PUBLIC
     ${SPIDERCAM_CTRL_PUBLIC_HEADERS}
  
 PRIVATE
+    ${SPIDERCAM_RESOURCES}
     ${SPIDERCAM_CTRL_SOURCE_FILES}
 )
 

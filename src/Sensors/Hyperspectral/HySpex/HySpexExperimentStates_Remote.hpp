@@ -73,6 +73,8 @@ protected:
 
 	void onLensNamesMessage(const std::vector<std::string>& names) override {};
 
+	void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) override {};
+
 	void onCommandReplyMessage(eCommandReply reply) override {};
 	void onBackgroundReplyMessage(eBackgroundReply reply) override {};
 
@@ -132,6 +134,7 @@ public:
 
 protected:
 	void onLensNamesMessage(const std::vector<std::string>& names) override {};
+	void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) override {};
 	void onShutterStateMessage(eShutterState state) override {};
 
 	void onConnect() override;
@@ -235,6 +238,8 @@ protected:
 
 	void onLensNamesMessage(const std::vector<std::string>& names) override;
 
+	void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) override;
+
 	void onBackgroundReplyMessage(eBackgroundReply reply) override;
 
 	void onShutterStateMessage(eShutterState state) override;
@@ -273,6 +278,8 @@ protected:
 		std::uint32_t num_backgrounds, const std::string& lens_name) override;
 
 	void onLensNamesMessage(const std::vector<std::string>& names) override;
+
+	void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) override;
 
 	void onBackgroundReplyMessage(eBackgroundReply reply) override;
 

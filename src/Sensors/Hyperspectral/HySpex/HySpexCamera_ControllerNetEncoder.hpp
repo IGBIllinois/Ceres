@@ -37,6 +37,8 @@ public:
 
     void encodeLensNamesMessage(const std::vector<std::string>& names);
 
+    void encodeLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg);
+
     void encodeCommandReplyMessage(hyspex_eCommand reply);
 
     void encodeBackgroundReplyMessage(hyspex_eBackgroundReply reply);
@@ -54,6 +56,8 @@ public:
         std::uint32_t num_backgrounds, const std::string& lens_name);
 
     void sendLensNamesMessage(const std::vector<std::string>& names);
+
+    void sendLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg);
 
     void sendCommandReplyMessage(hyspex_eCommand reply);
 

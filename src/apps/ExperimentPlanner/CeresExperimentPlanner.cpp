@@ -8,6 +8,8 @@
 
 int main(int argc, char** argv)
 {
+    Q_INIT_RESOURCE(spidercam_resources);
+
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QCoreApplication::setOrganizationName("University of Illinois");
     QCoreApplication::setOrganizationDomain("rapp.ripe.illinois.edu");
@@ -20,6 +22,10 @@ int main(int argc, char** argv)
     mainWin.initialize();
     mainWin.show();
 
-	return app.exec();
+	auto result = app.exec();
+
+    Q_CLEANUP_RESOURCE(spidercam_resources);
+
+    return result;
 }
 

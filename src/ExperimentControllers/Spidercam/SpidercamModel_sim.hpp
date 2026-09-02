@@ -34,9 +34,13 @@ public:
 	*/
 	bool systemReady() const override;
 
-
 	bool startCommunications() override;
 	void stopCommunications() override;
+
+public slots:
+	void moveY(int delta_east_mm);
+	void moveX(int delta_south_mm);
+	void moveZ(int delta_up_mm);
 
 public:
 	bool linkError() const;

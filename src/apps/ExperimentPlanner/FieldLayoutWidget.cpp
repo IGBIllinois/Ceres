@@ -1,8 +1,12 @@
 
 #include "FieldLayoutWidget.hpp"
 #include "FieldLayoutDlg.hpp"
+#include "../../Utilities/Constants.hpp"
 
+#include <QLabel>
+#include <QLineEdit>
 #include <QLayout>
+#include <QGroupBox>
 #include <QContextMenuEvent>
 #include <QStatusBar>
 
@@ -19,6 +23,39 @@ void cFieldLayoutWidget::initialize()
     mpScanArea = new cSpidercamScanArea(this);
     mpScanArea->hideDollyPosition();
 
+    QLabel* pX_Label = new QLabel();
+    pX_Label->setText("X (m)");
+
+    mpX_m = new QLineEdit();
+    mpX_m->setReadOnly(true);
+
+    QLabel* pY_Label = new QLabel();
+    pY_Label->setText("Y (m)");
+
+    mpY_m = new QLineEdit();
+    mpY_m->setReadOnly(true);
+
+    QLabel* pZ_Label = new QLabel();
+    pZ_Label->setText("Z (m)");
+
+    mpZ_m = new QLineEdit();
+    mpZ_m->setReadOnly(true);
+
+//    mpPosInfo = new QGroupBox(this);
+    mpPosInfo = new QWidget(this);
+    mpPosInfo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    auto* statuslayout = new QHBoxLayout();
+    statuslayout->addWidget(pX_Label);
+    statuslayout->addWidget(mpX_m);
+    statuslayout->addWidget(pY_Label);
+    statuslayout->addWidget(mpY_m);
+    statuslayout->addWidget(pZ_Label);
+    statuslayout->addWidget(mpZ_m);
+
+    mpPosInfo->setLayout(statuslayout);
+    mpPosInfo->hide();
+
     mpExperimentStatus = new QStatusBar();
     mpExperimentStatus->setHidden(true);
     mpExperimentStatus->setSizeGripEnabled(false);
@@ -30,6 +67,8 @@ void cFieldLayoutWidget::initialize()
     mainlayout->addWidget(mpScanArea);
     mainlayout->addSpacing(10);
     mainlayout->addWidget(mpExperimentStatus);
+    mainlayout->addSpacing(10);
+    mainlayout->addWidget(mpPosInfo);
 
     setLayout(mainlayout);
 }
@@ -81,12 +120,14 @@ const std::vector<cSpidercamScanArea::experimentLayout_t>& cFieldLayoutWidget::g
 
 void cFieldLayoutWidget::onConnectToSpidercam()
 {
+    mpPosInfo->show();
     mpScanArea->showDollyPosition();
     mpScanArea->repaint();
 }
 
 void cFieldLayoutWidget::onDisconnectFromSpidercam()
 {
+    mpPosInfo->hide();
     mpScanArea->hideDollyPosition();
     mpScanArea->repaint();
 }
@@ -106,6 +147,14 @@ void cFieldLayoutWidget::updateLimits(spidercam::sWorkingDimensions limits)
 void cFieldLayoutWidget::updatePosition(spidercam::sPosition_1_t pos)
 {
     mpScanArea->updateDollyPosition(pos.X_mm, pos.Y_mm);
+
+    mX_mm = pos.X_mm;
+    mY_mm = pos.Y_mm;
+    mZ_mm = pos.Z_mm;
+
+    mpX_m->setText(QString::number(pos.X_mm * nConstants::MM_TO_M, 'f', 3));
+    mpY_m->setText(QString::number(pos.Y_mm * nConstants::MM_TO_M, 'f', 3));
+    mpZ_m->setText(QString::number(pos.height_mm * nConstants::MM_TO_M, 'f', 3));
 }
 
 void cFieldLayoutWidget::updateRecordingState(bool recording)

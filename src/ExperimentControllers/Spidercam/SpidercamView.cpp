@@ -52,7 +52,6 @@ cSpidercamView::cSpidercamView()
 	mainlayout->addWidget(mpScanArea);
 
 	auto* statuslayout = new QHBoxLayout();
-
 	statuslayout->addWidget(pX_Label);
 	statuslayout->addWidget(mpX_m);
 	statuslayout->addWidget(pY_Label);

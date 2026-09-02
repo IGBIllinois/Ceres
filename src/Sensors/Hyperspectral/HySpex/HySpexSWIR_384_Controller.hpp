@@ -14,7 +14,7 @@ public:
 
 public:
     /*** Qt slot handler */
-    void onBackgroundComplete(hyspex::BackgroundStatus status) override;
+
 
 protected:
     /*** Messages handlers from the decoder */

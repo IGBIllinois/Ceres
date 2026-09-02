@@ -268,6 +268,9 @@ void cHySpexVNIR_3000N_PropertyPage_Remote::onLensNamesMessage(const std::vector
 	}
 }
 
+void cHySpexVNIR_3000N_PropertyPage_Remote::onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg)
+{}
+
 void cHySpexVNIR_3000N_PropertyPage_Remote::onCommandReplyMessage(eCommandReply reply)
 {}
 

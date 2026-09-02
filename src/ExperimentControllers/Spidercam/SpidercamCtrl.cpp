@@ -240,7 +240,10 @@ void cSpidercamController::errorHandler(QAbstractSocket::SocketError socketError
                     << "settings are correct.";
         break;
     default:
-        qCritical() << "The following error occurred: " << mpSocket->errorString();
+    {
+//        qCritical() << "The following error occurred: " << mpSocket->errorString();
+        break;
+    }
     }
 
 }

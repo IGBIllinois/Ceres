@@ -507,4 +507,43 @@ int hyspex::encode_shutter_state_reply(hyspex_eShutterState state, net_buffer& b
     return sizeof(sPacketHeader_t) + hdr.length;
 }
 
+hyspex::sLensInfo_t hyspex::to_lens_info_1(std::uint16_t length, const net_buffer_view& buffer)
+{
+    hyspex_LensInfo_1 pckt;
+    if (pckt.ParseFromArray(buffer.data(), length))
+    {
+        sLensInfo_t info;
+        info.lens_name = pckt.lens_name();
+        info.working_distance_cm = pckt.working_distance_cm();
+        info.fov_deg = pckt.fov_deg();
+
+        return info;
+    }
+
+    return sLensInfo_t();
+}
+
+int hyspex::encode_lens_info(const std::string& lens_name, double working_distance_cm, double fov_deg, net_buffer& buffer)
+{
+    hyspex_LensInfo_1 pckt;
+    
+    pckt.set_lens_name(lens_name);
+    pckt.set_working_distance_cm(working_distance_cm);
+    pckt.set_fov_deg(fov_deg);
+
+    std::string str;
+    if (!pckt.SerializeToString(&str))
+        return -1;
+
+    sPacketHeader_t hdr;
+    hdr.id = static_cast<uint16_t>(ePacketType::LENS_INFO);
+    hdr.revision = 1;
+    hdr.length = str.length();
+    set_timestamp(&hdr.timestamp);
+
+    buffer << hdr;
+    buffer.write(str);
+
+    return sizeof(sPacketHeader_t) + hdr.length;
+}
 

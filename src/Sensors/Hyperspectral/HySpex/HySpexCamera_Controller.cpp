@@ -5,55 +5,11 @@
 #include <cassert>
 
 
-//cHySpexCamera_Controller::cHySpexCamera_Controller(cHySpexCameraModel* model, QObject* parent)
-//    :
-//    cSensorController(parent), mpModel(model)
-//{
-//    assert(mpModel);
-//}
-
 cHySpexCamera_Controller::cHySpexCamera_Controller(QObject* parent)
     :
     cSensorController(parent), cHySpexCamera_ControllerNetEncoder(512)
 {
 }
-
-/*
-const char* cHySpexCamera_Controller::descriptor() const
-{
-    return mpModel->descriptor();
-}
-
-const std::string& cHySpexCamera_Controller::manufacturer() const
-{
-    return mpModel->manufacturer();
-}
-
-const std::string& cHySpexCamera_Controller::model() const
-{
-    return mpModel->model();
-}
-
-const std::string& cHySpexCamera_Controller::serial_number() const
-{
-    return mpModel->serial_number();
-}
-
-const std::string& cHySpexCamera_Controller::name() const
-{
-    return mpModel->name();
-}
-
-const std::string& cHySpexCamera_Controller::instance() const
-{
-    return mpModel->instance();
-}
-
-bool cHySpexCamera_Controller::has_instance() const
-{
-    return mpModel->has_instance();
-}
-*/
 
 void cHySpexCamera_Controller::processStream(const void* pBuffer, std::size_t buf_length)
 {
@@ -123,9 +79,47 @@ void cHySpexCamera_Controller::shutterStatusUpdated(hyspex::ShutterStatus status
     }
 }
 
+void cHySpexCamera_Controller::backgroundStatusUpdated(hyspex::BackgroundStatus status)
+{
+    switch (status)
+    {
+    case hyspex::BackgroundStatus::HYSPEX_BG_PENDING:
+        sendCommandReplyMessage(hyspex_eCommand::eCOMMAND_CALC_BACKGROUND);
+        break;
+    case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
+        sendCommandReplyMessage(hyspex_eCommand::eCOMMAND_STOP_BACKGROUND);
+        break;
+    case hyspex::BackgroundStatus::HYSPEX_BG_INVALID:
+    case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
+    case hyspex::BackgroundStatus::HYSPEX_BG_PENDING_READY:
+    case hyspex::BackgroundStatus::HYSPEX_BG_EXPIRED:
+        break;
+    }
+}
+
 void cHySpexCamera_Controller::lensInfoUpdated(QString name, double working_distance_cm, double fov_deg)
 {
+    sendLensInfoMessage(name.toStdString(), working_distance_cm, fov_deg);
+}
 
+void cHySpexCamera_Controller::onBackgroundComplete(hyspex::BackgroundStatus status)
+{
+    switch (status)
+    {
+    case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
+    case hyspex::BackgroundStatus::HYSPEX_BG_PENDING_READY:
+        sendBackgroundReplyMessage(hyspex_eBackgroundReply::eBackgroundReply_GOOD);
+        break;
+    case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
+        sendBackgroundReplyMessage(hyspex_eBackgroundReply::eBackgroundReply_ABORTED);
+        break;
+    case hyspex::BackgroundStatus::HYSPEX_BG_PENDING:
+        sendBackgroundReplyMessage(hyspex_eBackgroundReply::eBackgroundReply_PENDING);
+        break;
+    default:
+        sendBackgroundReplyMessage(hyspex_eBackgroundReply::eBackgroundReply_FAILED);
+        break;
+    }
 }
 
 

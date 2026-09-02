@@ -30,7 +30,6 @@ public slots:
     void dockLocationChanged(Qt::DockWidgetArea area);
     void topLevelChanged(bool topLevel);
 
-
 private:
     void createWidgets();
     void horizontalLayout();

@@ -115,6 +115,33 @@ void cSpidercamModel_sim::stopCommunications()
     mTimer.stop();
 }
 
+void cSpidercamModel_sim::moveY(int delta_east_mm)
+{
+    mY_mm += delta_east_mm;
+    mY_mm = std::min<double>(mY_mm, mLimits.maxY_mm);
+    mY_mm = std::max<double>(mY_mm, mLimits.minY_mm);
+    mVy_mmps = 0.0;
+    mTargetY_mm = -1;
+}
+
+void cSpidercamModel_sim::moveX(int delta_south_mm)
+{
+    mX_mm += delta_south_mm;
+    mX_mm = std::min<double>(mX_mm, mLimits.maxX_mm);
+    mX_mm = std::max<double>(mX_mm, mLimits.minX_mm);
+    mVx_mmps = 0.0;
+    mTargetX_mm = -1;
+}
+
+void cSpidercamModel_sim::moveZ(int delta_up_mm)
+{
+    mZ_mm += delta_up_mm;
+    mZ_mm = std::min<double>(mZ_mm, mLimits.maxHeight_mm);
+    mZ_mm = std::max<double>(mZ_mm, mLimits.minHeight_mm);
+    mVz_mmps = 0.0;
+    mTargetZ_mm = -1;
+}
+
 cExperimentState* cSpidercamModel_sim::createState(const std::string& type, const nlohmann::json& expDoc)
 {
     if (type == "movement")

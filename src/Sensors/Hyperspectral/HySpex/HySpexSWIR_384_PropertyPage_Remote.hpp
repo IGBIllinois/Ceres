@@ -61,6 +61,8 @@ public:
 
     void onLensNamesMessage(const std::vector<std::string>& names) override;
 
+    void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) override;
+
     void onCommandReplyMessage(eCommandReply reply) override;
 
     void onBackgroundReplyMessage(eBackgroundReply reply) override;

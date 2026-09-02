@@ -12,9 +12,9 @@
 QT_BEGIN_NAMESPACE
 //class QAbstractButton;
 //class QPushButton;
-//class QLineEdit;
+class QLineEdit;
 //class QCheckBox;
-//class QLabel;
+class QGroupBox;
 class QStatusBar;
 QT_END_NAMESPACE
 
@@ -65,6 +65,17 @@ protected:
 
 private:
 	bool mDirty = false;
+
+	int32_t mX_mm = 0;
+	int32_t mY_mm = 0;
+	int32_t mZ_mm = 0;
+
+//	QGroupBox* mpPosInfo = nullptr;
+	QWidget* mpPosInfo = nullptr;
+
+	QLineEdit* mpX_m = nullptr;
+	QLineEdit* mpY_m = nullptr;
+	QLineEdit* mpZ_m = nullptr;
 
 	cSpidercamScanArea* mpScanArea = nullptr;
 

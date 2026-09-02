@@ -31,6 +31,12 @@ void cHySpexCamera_PropertiesNetDecoder::processPacket(const sPacketHeader_t& hd
 
         break;
     }
+    case ePacketType::LENS_INFO:
+    {
+        auto info = to_lens_info_1(hdr.length, buffer);
+        onLensInfoMessage(info.lens_name, info.working_distance_cm, info.fov_deg);
+        break;
+    }
     case ePacketType::COMMAND_REPLY:
     {
         auto reply = to_command_reply_1(hdr.length, buffer);

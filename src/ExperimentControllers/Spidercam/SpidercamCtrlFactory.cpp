@@ -7,6 +7,7 @@
 #include "SpidercamModel_sim.hpp"
 #include "SpidercamDollyStatus.hpp"
 #include "SpidercamToolbar.hpp"
+#include "SpidercamCtrlPanel.hpp"
 
 #include <QWidget>
 #include <QString>
@@ -58,7 +59,31 @@ sExperimentControllerWidgets spidercam::create_controller(const nlohmann::json& 
     cSpidercamModel* pModel = nullptr;
     
     if (use_sim)
+    {
         pModel = new cSpidercamModel_sim();
+
+        if (no_visualization)
+        {
+            auto* pDockWidget = new QDockWidget();
+            auto* pCtrl = new cSpidercamCtrlPanel(pDockWidget);
+
+            cSpidercamModel_sim* pSimModel = static_cast<cSpidercamModel_sim*>(pModel);
+
+            QObject::connect(pCtrl, &cSpidercamCtrlPanel::stepX, pSimModel, &cSpidercamModel_sim::moveX);
+            QObject::connect(pCtrl, &cSpidercamCtrlPanel::stepY, pSimModel, &cSpidercamModel_sim::moveY);
+            QObject::connect(pCtrl, &cSpidercamCtrlPanel::stepZ, pSimModel, &cSpidercamModel_sim::moveZ);
+
+            pDockWidget->setWindowTitle(pCtrl->windowTitle());
+            pDockWidget->setWidget(pCtrl);
+
+//            QObject::connect(pDockWidget, &QDockWidget::dockLocationChanged, pCtrl, &cSpidercamCtrlPanel::dockLocationChanged);
+//            QObject::connect(pDockWidget, &QDockWidget::topLevelChanged,     pCtrl, &cSpidercamCtrlPanel::topLevelChanged);
+            QObject::connect(pModel, &cSpidercamModel::limitsChanged,        pCtrl, &cSpidercamCtrlPanel::updateLimits);
+            QObject::connect(pModel, &cSpidercamModel::positionChanged,      pCtrl, &cSpidercamCtrlPanel::updatePosition);
+
+            return sExperimentControllerWidgets(pModel, nullptr, pDockWidget);
+        }
+    }
     else
         pModel = new cSpidercamModel_net();
 

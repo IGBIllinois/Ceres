@@ -67,10 +67,16 @@ void cHySpexVNIR_3000N_Model_net::setNumOfBackgrounds(int num_backgrounds)
 }
 
 void cHySpexVNIR_3000N_Model_net::calcBackground()
-{}
+{
+    emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_VALID);
+    emit backgroundComplete(hyspex::HYSPEX_BG_VALID);
+}
 
 void cHySpexVNIR_3000N_Model_net::stopBackground()
-{}
+{
+    emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_ABORTED);
+    emit backgroundComplete(hyspex::HYSPEX_BG_ABORTED);
+}
 
 void cHySpexVNIR_3000N_Model_net::open_shutter()
 {}

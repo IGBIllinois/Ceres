@@ -195,6 +195,7 @@ void cHySpexVNIR_3000N_Model_simulation::update()
                 mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_PENDING;
                 mBackgroundTimer.reset();
                 mBackgroundState = eBgStates::COMPLETE;
+                emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_PENDING);
             }
             break;
         }
@@ -214,6 +215,7 @@ void cHySpexVNIR_3000N_Model_simulation::update()
             if (mShutterTimer.elapsed())
             {
                 mBackgroundState = eBgStates::NONE;
+                emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_VALID);
                 emit backgroundComplete(hyspex::HYSPEX_BG_VALID);
             }
             break;
@@ -221,6 +223,7 @@ void cHySpexVNIR_3000N_Model_simulation::update()
         case eBgStates::ABORT:
         {
             mBackgroundState = eBgStates::SH_OPEN;
+            emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_ABORTED);
             emit backgroundComplete(hyspex::HYSPEX_BG_ABORTED);
             break;
         }

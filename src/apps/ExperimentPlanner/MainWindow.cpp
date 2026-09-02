@@ -40,7 +40,10 @@
 
 #include "ExperimentCtrlFactory.hpp"
 #include "ExperimentCtrlModel.hpp"
+#include "ExperimentCtrlView.hpp"
 #include "Spidercam/SpidercamModel.hpp"
+#include "ReferenceHeightDlg.hpp"
+#include "RappFieldModel.hpp"
 
 #include "ComputeGroundHeightDlg.hpp"
 #include "ComputeSpidercamHeightDlg.hpp"
@@ -158,13 +161,12 @@ cMainWindow::cMainWindow(QWidget* parent) :
     QString fileName = mSettings.value("Defaults/groundMeshFile").toString();
 
     if (!fileName.isEmpty())
-        loadGpsData(fileName);
-
+        nRFM::load_ground_data(fileName.toStdString());
 
     fileName = mSettings.value("Defaults/aerialMeshFile").toString();
 
     if (!fileName.isEmpty())
-        loadAerialData(fileName);
+        nRFM::load_aerial_data(fileName.toStdString());
 
     mLimits.minX_mm = 10'000;
     mLimits.maxX_mm = 190'000;
@@ -591,12 +593,20 @@ void cMainWindow::createSubMenusAndActions()
     mpPreferencesMenu->addAction(pMenuItem);
 
     //
-    // Build the Preference Sub Menu
+    // Build the Spidercam Sub Menu
     //
     mpSpidercamConnect = new QAction(tr("Connect"), this);
     mpSpidercamConnect->setStatusTip(tr("Connect to Spidercam"));
     connect(mpSpidercamConnect, &QAction::triggered, this, &cMainWindow::onConnectToSpidercam);
     mpSpidercamMenu->addAction(mpSpidercamConnect);
+
+    mpSpidercamMenu->addSeparator();
+
+    mpSetReferenceHeight = new QAction(tr("Set Reference Height"), this);
+    mpSetReferenceHeight->setStatusTip(tr("Set the reference height using the geometric height at the current location"));
+    mpSetReferenceHeight->setEnabled(false);
+    connect(mpSetReferenceHeight, &QAction::triggered, this, &cMainWindow::onSpidercamReferenceHeight);
+    mpSpidercamMenu->addAction(mpSetReferenceHeight);
 
     mpSpidercamMenu->addSeparator();
 
@@ -969,7 +979,7 @@ void cMainWindow::onEditRecomputeHeight()
 {
     cRecomputeSpidercamHeightDlg dlg;
 
-    dlg.setReferenceHeight_mm(mReferenceHeight_mm);
+    dlg.setReferenceHeight_mm(nRFM::reference_height_mm());
 
     auto result = dlg.exec();
 
@@ -1010,8 +1020,8 @@ void cMainWindow::onEditRecomputeHeight()
 
                 if (z_mm < 7750)
                 {
-                    int ground_height_mm = static_cast<int>(mGroundData.getMeshHeight_mm(x_mm, y_mm));
-                    int dolly_offset_mm = static_cast<int>(mAerialData.getDollyOffset_mm(x_mm, y_mm, ref_height_mm));
+                    int ground_height_mm = nRFM::ground_height_mm(x_mm, y_mm);
+                    int dolly_offset_mm = nRFM::dolly_offset_mm(x_mm, y_mm, ref_height_mm);
 
                     int new_z_mm = ground_height_mm + height_mm + dolly_offset_mm;
                     movement->setZ_mm(new_z_mm);
@@ -1167,26 +1177,25 @@ void cMainWindow::onGenerateLidarScan_PlotInfo()
 
 void cMainWindow::onGenerateHyperspectralRefScan_SpiderCam_Point()
 {
-    cCreateHyperspectralReferenceExperimentFromSpiderCamDlg dlg(this);
+    cCreateHyperspectralReferenceExperimentFromSpiderCamDlg* pDlg = new cCreateHyperspectralReferenceExperimentFromSpiderCamDlg();
 
-    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
-    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
+    connect(pDlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(pDlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(pDlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     if (mpModel && mpModel->isConnected())
     {
-        dlg.positionUpdated(mpModel->getPosition());
-        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::positionUpdated);
+        pDlg->positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, pDlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::positionUpdated);
     }
 
-    auto result = dlg.exec();
+    connect(pDlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::finished, [this](int result) 
+        {
+            if (result == QDialog::Accepted)
+                mpEditMenu->setDisabled(false);
+        });
 
-    if (result == QDialog::Rejected)
-    {
-        return;
-    }
-
-    mpEditMenu->setDisabled(false);
+    pDlg->show();
 }
 
 void cMainWindow::onGenerateHyperspectralRefScan_GPS()
@@ -1334,26 +1343,25 @@ void cMainWindow::onGenerateHyperspectralScan_PlotInfo()
 
 void cMainWindow::onGenerateThermalScan_SpiderCam_Point()
 {
-    cCreateThermalExperimentFromSpiderCamDlg dlg;
+    cCreateThermalExperimentFromSpiderCamDlg* pDlg = new cCreateThermalExperimentFromSpiderCamDlg();
 
-    connect(&dlg, &cCreateThermalExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
-    connect(&dlg, &cCreateThermalExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
-    connect(&dlg, &cCreateThermalExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
+    connect(pDlg, &cCreateThermalExperimentFromSpiderCamDlg::clearPaths, mpFieldLayout, &cFieldLayoutWidget::clearRecordingPath);
+    connect(pDlg, &cCreateThermalExperimentFromSpiderCamDlg::drawPath, mpFieldLayout, &cFieldLayoutWidget::drawRecordingPath);
+    connect(pDlg, &cCreateThermalExperimentFromSpiderCamDlg::experimentChanged, this, &cMainWindow::onMeasurementChange);
 
     if (mpModel && mpModel->isConnected())
     {
-        dlg.positionUpdated(mpModel->getPosition());
-        connect(mpModel, &cPlannerDataModel::positionChanged, &dlg, &cCreateThermalExperimentFromSpiderCamDlg::positionUpdated);
+        pDlg->positionUpdated(mpModel->getPosition());
+        connect(mpModel, &cPlannerDataModel::positionChanged, pDlg, &cCreateThermalExperimentFromSpiderCamDlg::positionUpdated);
     }
 
-    auto result = dlg.exec();
+    connect(pDlg, &cCreateHyperspectralReferenceExperimentFromSpiderCamDlg::finished, [this](int result)
+        {
+            if (result == QDialog::Accepted)
+                mpEditMenu->setDisabled(false);
+        });
 
-    if (result == QDialog::Rejected)
-    {
-        return;
-    }
-
-    mpEditMenu->setDisabled(false);
+    pDlg->show();
 }
 
 void cMainWindow::onGenerateThermalScan_PlotInfo()
@@ -1418,36 +1426,36 @@ void cMainWindow::onGenerateThermalScan_PlotInfo()
  *******************************************************************/
 void cMainWindow::onComputeGroundHeight()
 {
-    cComputeGroundHeightDlg dlg(mGroundData, this);
+    cComputeGroundHeightDlg dlg(nRFM::get_ground_model(), this);
 
     dlg.exec();
 }
 
 void cMainWindow::onComputeSpidercamHeight()
 {
-    cComputeSpidercamHeightDlg dlg(mGroundData, this);
+    cComputeSpidercamHeightDlg dlg(nRFM::get_ground_model(), this);
 
     dlg.exec();
 }
 
 void cMainWindow::onComputeSensorRange()
 {
-    cComputeSensorRangeDlg dlg(mGroundData, this);
+    cComputeSensorRangeDlg dlg(nRFM::get_ground_model(), this);
 
     dlg.exec();
 }
 
 void cMainWindow::onComputeReferenceHeight()
 {
-    cComputeReferenceHeightDlg dlg(mGroundData, mAerialData, this);
+    cComputeReferenceHeightDlg dlg(nRFM::get_ground_model(), nRFM::get_aerial_model(), this);
 
-    dlg.setReferenceHeight_mm(mReferenceHeight_mm);
+    dlg.setReferenceHeight_mm(nRFM::reference_height_mm());
 
     auto result = dlg.exec();
 
     if (result == QDialog::Accepted)
     {
-        mReferenceHeight_mm = dlg.getReferenceHeight_mm();
+        nRFM::set_reference_height_mm(dlg.getReferenceHeight_mm());
     }
 }
 
@@ -1482,7 +1490,7 @@ void cMainWindow::onPreferenceLoadGroundMesh()
     if (fileName.isEmpty())
         return;
 
-    if (loadGpsData(fileName))
+    if (nRFM::load_ground_data(fileName.toStdString()))
         mSettings.setValue("Defaults/groundMeshFile", fileName);
 }
 
@@ -1497,7 +1505,7 @@ void cMainWindow::onPreferenceLoadAerialMesh()
     if (fileName.isEmpty())
         return;
 
-    if (loadAerialData(fileName))
+    if (nRFM::load_aerial_data(fileName.toStdString()))
         mSettings.setValue("Defaults/aerialMeshFile", fileName);
 }
 
@@ -1667,18 +1675,18 @@ void cMainWindow::onConnectToSpidercam()
     QObject::connect(pCtrlModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
     QObject::connect(pCtrlModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
 
-
-    //    QObject::connect(this, &cMainWindow::refreshDisplay, mpController, &cExperimentControlView::refresh);
-
-    /*
-        QObject::connect(pModel, &cExperimentControlModel::experimentStatus,
-            mpController, &cExperimentControlView::experimentStatusUpdating);
-
-        QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
-            mpController, &cExperimentControlView::experimentStateChanging);
-    */
-
     mpModel->addExperimentControlModel(pCtrlModel);
+
+    if (widgets.pDockableView)
+    {
+        widgets.pDockableView->setParent(this);
+        widgets.pDockableView->setAllowedAreas(Qt::NoDockWidgetArea);
+        widgets.pDockableView->setFloating(true);
+        widgets.pDockableView->show();
+
+        addDockWidget(Qt::BottomDockWidgetArea, widgets.pDockableView);
+        mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
+    }
 
     if (configDoc.contains(name))
     {
@@ -1762,59 +1770,12 @@ void cMainWindow::onConnectToSpidercam()
         }
     }
 
-#if 0
-    if (mpVideoView == nullptr)
-    {
-        try
-        {
-            if (configDoc.contains("axis_communications"))
-            {
-                nlohmann::json sensorInfo;
-                sensorInfo["type"] = "axis_communications";
-                sensorInfo["protocol"] = "net";
-                sensorInfo["sensor"] = "F44";
-
-                auto widgets = rgb::create_sensor("axis_communications", sensorInfo);
-
-                if (widgets.pModel)
-                {
-                    QObject::connect(widgets.pModel, &cSensorModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-                    QObject::connect(widgets.pModel, &cSensorModel::elogMessage, this, &cMainWindow::onLogMessage);
-
-                    auto jsonCfg = configDoc["axis_communications"];
-                    widgets.pModel->configure(jsonCfg);
-
-                    if (widgets.pDockableView)
-                    {
-                        addDockWidget(Qt::NoDockWidgetArea, widgets.pDockableView);
-                        mpViewMenu->addAction(widgets.pDockableView->toggleViewAction());
-                        mpVideoView = widgets.pDockableView;
-                        mpVideoView->show();
-                    }
-
-                    widgets.pModel->updateViews();
-
-                    mpModel->addSensor(widgets.pModel);
-                }
-
-            }
-        }
-        catch (const std::exception& e)
-        {
-        }
-    }
-    else
-    {
-        mpViewMenu->addAction(mpVideoView->toggleViewAction());
-        mpVideoView->show();
-    }
-#endif
-
     mpModel->startDataThread();
 
     mpSpidercamConnect->setText(tr("Disconnect"));
     mpSpidercamConnect->setStatusTip(tr("Disconnect from Spidercam"));
 
+    mpSetReferenceHeight->setEnabled(true);
     mpTestMeasurement->setEnabled(true);
     mpStopMeasurement->setEnabled(true);
     mpPauseRunMeasurement->setEnabled(true);
@@ -1830,6 +1791,7 @@ void cMainWindow::onDisconnectFromSpidercam()
 
     onSpidercamStopMeasurement();
 
+    mpSetReferenceHeight->setEnabled(false);
     mpTestMeasurement->setEnabled(false);
     mpStopMeasurement->setEnabled(false);
     mpPauseRunMeasurement->setEnabled(false);
@@ -1845,30 +1807,13 @@ void cMainWindow::onDisconnectFromSpidercam()
 
     cExperimentControlModel* pCtrlModel = mpModel->removeExperimentControlModel();
 
-    QObject::disconnect(pCtrlModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::disconnect(pCtrlModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::disconnect(pCtrlModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::disconnect(pCtrlModel, &cExperimentControlModel::errorMessage, this, &cMainWindow::onErrorMessage);
+    pCtrlModel->disconnect();
+    mpModel->disconnect();
 
-    QObject::disconnect(mpModel, &cPlannerDataModel::limitsChanged, mpFieldLayout, &cFieldLayoutWidget::updateLimits);
-    QObject::disconnect(mpModel, &cPlannerDataModel::positionChanged, mpFieldLayout, &cFieldLayoutWidget::updatePosition);
-    QObject::disconnect(mpModel, &cPlannerDataModel::recordingStateChanged, mpFieldLayout, &cFieldLayoutWidget::updateRecordingState);
-    QObject::disconnect(mpModel, &cPlannerDataModel::experimentStatus, mpFieldLayout, &cFieldLayoutWidget::experimentStatusUpdating);
-    QObject::disconnect(mpModel, &cPlannerDataModel::experimentStateChanged, mpFieldLayout, &cFieldLayoutWidget::experimentStateChanging);
-
-    QObject::disconnect(mpModel, &cPlannerDataModel::statusMessage, this, &cMainWindow::onStatusUpdate);
-    QObject::disconnect(mpModel, &cPlannerDataModel::infoMessage, this, &cMainWindow::onInfoMessage);
-    QObject::disconnect(mpModel, &cPlannerDataModel::warningMessage, this, &cMainWindow::onWarningMessage);
-    QObject::disconnect(mpModel, &cPlannerDataModel::errorMessage, this, &cMainWindow::onErrorMessage);
-
-    QObject::disconnect(mpModel, &cPlannerDataModel::experimentTerminated, this, &cMainWindow::onMeasurementTerminated);
-    QObject::disconnect(mpModel, &cPlannerDataModel::experimentCompleted, this, &cMainWindow::onMeasurementCompleted);
+    pCtrlModel->deleteLater();;
 
     mpModel->deleteLater();
-//    delete mpModel;
     mpModel = nullptr;
-
-    delete pCtrlModel;
 
     mpSpidercamConnect->setText(tr("Connect"));
     mpSpidercamConnect->setStatusTip(tr("Connect to Spidercam"));
@@ -1964,6 +1909,47 @@ void cMainWindow::onSpidercamPauseRunMeasurement()
         mpModel->pauseExperiment();
         mpPauseRunMeasurement->setText("Continue Measurement");
         mpPauseRunMeasurement->setStatusTip(tr("Continue the running measurement"));
+    }
+}
+
+void cMainWindow::onSpidercamReferenceHeight()
+{
+    if (!mpModel)
+    {
+        return;
+    }
+
+    int32_t reference_height_mm = nRFM::reference_height_mm();
+
+    QVariant value = mSettings.value("Defaults/ReferenceHeight");
+
+    if (value.canConvert<int32_t>())
+        reference_height_mm = value.toInt();
+
+    cReferenceHeightDlg dlg(this);
+
+    dlg.setReferenceHeight_mm(reference_height_mm);
+
+    auto pos = mpModel->getPosition();
+
+//    cSpidercamView* pView = dynamic_cast<cSpidercamView*>(mpController);
+
+//    if (pView)
+//    {
+        dlg.setPosition(pos.X_mm, pos.Y_mm, pos.Z_mm);
+//    }
+
+    auto result = dlg.exec();
+
+    if (result == QDialog::Accepted)
+    {
+        reference_height_mm = dlg.getReferenceHeight_mm();
+
+        if (reference_height_mm > rfm::INVALID_HEIGHT)
+        {
+            nRFM::set_reference_height_mm(reference_height_mm);
+            mSettings.setValue("Defaults/ReferenceHeight", reference_height_mm);
+        }
     }
 }
 
@@ -2216,109 +2202,4 @@ void cMainWindow::closeEvent(QCloseEvent* event)
 }
 
 //-----------------------------------------------------------------------------
-bool cMainWindow::loadGpsData(QString fileName)
-{
-    std::filesystem::path fpath = fileName.toStdString();
-    bool does_exist = std::filesystem::exists(fpath);
-
-    if (!does_exist)
-    {
-        QString msg = "The GPS data file '";
-        msg += fileName;
-        msg += "' does not exist!";
-        QMessageBox::warning(this, "File Not Found", msg);
-        return false;
-    }
-
-    cGpsFileReader gps;
-    if (!gps.loadFromFile(fileName.toStdString()))
-    {
-        QString msg = "The GPS data file '";
-        msg += fileName;
-        msg += "' failed to load!";
-        QMessageBox::warning(this, "File Failed", msg);
-
-        return false;
-    }
-
-    auto points = gps.GetPoints();
-
-    std::vector<rfm::rappPoint_t> rapp_points;
-
-    for (const auto& point : points)
-    {
-        std::int32_t x_mm = point.x_m * nConstants::M_TO_MM;
-        std::int32_t y_mm = point.y_m * nConstants::M_TO_MM;
-        std::int32_t z_mm = point.z_m * nConstants::M_TO_MM;
-
-        rapp_points.emplace_back(x_mm , y_mm , z_mm);
-    }
-
-    mGroundData.addGroundPoints(rapp_points);
-
-    auto data = mGroundData.getGroundPoints();
-    auto mesh = computeGroundMesh(data);
-
-    mGroundData.clearGroundMesh();
-    mGroundData.addMeshData(mesh);
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-bool cMainWindow::loadAerialData(QString fileName)
-{
-    std::filesystem::path fpath = fileName.toStdString();
-    bool does_exist = std::filesystem::exists(fpath);
-
-    if (!does_exist)
-    {
-        QString msg = "The Aerial data file '";
-        msg += fileName;
-        msg += "' does not exist!";
-        QMessageBox::warning(this, "File Not Found", msg);
-        return false;
-    }
-
-    cGpsFileReader aerial;
-    if (!aerial.loadFromFile(fileName.toStdString()))
-    {
-        QString msg = "The Aerial data file '";
-        msg += fileName;
-        msg += "' failed to load!";
-        QMessageBox::warning(this, "File Failed", msg);
-
-        return false;
-    }
-
-    auto points = aerial.GetPoints();
-
-    if (aerial.GetRefPoint().has_value())
-    {
-        auto ref_point = aerial.GetRefPoint().value();
-        mReferenceHeight_mm = ref_point.z_m * nConstants::M_TO_MM;
-    }
-
-    std::vector<rfm::rappPoint_t> rapp_points;
-
-    for (const auto& point : points)
-    {
-        std::int32_t x_mm = point.x_m * nConstants::M_TO_MM;
-        std::int32_t y_mm = point.y_m * nConstants::M_TO_MM;
-        std::int32_t z_mm = point.z_m * nConstants::M_TO_MM;
-
-        rapp_points.emplace_back(x_mm, y_mm, z_mm);
-    }
-
-    mAerialData.addAerialPoints(rapp_points);
-
-    auto data = mAerialData.getAerialPoints();
-    auto mesh = computeMesh(data, 15000);
-
-    mAerialData.clearAerialMesh();
-    mAerialData.addMeshData(mesh);
-
-    return true;
-}
-
 

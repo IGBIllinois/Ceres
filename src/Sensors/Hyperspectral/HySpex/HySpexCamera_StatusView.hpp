@@ -63,7 +63,7 @@ public slots:
 	void onSpatialDistributionUpdated();
 	void onSpectralDistributionUpdated();
 
-	void updateImage(QImage image);
+	void updateImage(const QImage& image);
 
 protected:
 	void doStatusLayout(QBoxLayout* pMainLayout);

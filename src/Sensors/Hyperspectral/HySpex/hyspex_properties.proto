@@ -126,3 +126,10 @@ message hyspex_ShutterStateReply_1
 {
 	hyspex_eShutterState state = 1;
 }
+
+message hyspex_LensInfo_1 
+{
+    string lens_name = 1;
+    double working_distance_cm = 2;
+    double fov_deg = 3;
+}

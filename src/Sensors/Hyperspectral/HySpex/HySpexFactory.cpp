@@ -142,6 +142,12 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
         QObject::connect(pController, &cHySpexCamera_Controller::openShutter,  pModel, &cHySpexCameraModel::requestOpenShutter);
         QObject::connect(pController, &cHySpexCamera_Controller::closeShutter, pModel, &cHySpexCameraModel::requestCloseShutter);
 
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::stateUpdate,          pController, &cHySpexVNIR_3000N_Controller::stateUpdated);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::lensNamesChanged,     pController, &cHySpexVNIR_3000N_Controller::lensNamesUpdated);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::shutterStatusChanged, pController, &cHySpexVNIR_3000N_Controller::shutterStatusUpdated);
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::bgStatusChanged,      pController, &cHySpexVNIR_3000N_Controller::backgroundStatusUpdated);
+        
+        QObject::connect(pModel, &cHySpexVNIR_3000N_Model::lensInfoChanged,    pController, &cHySpexVNIR_3000N_Controller::lensInfoUpdated);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::backgroundComplete, pController, &cHySpexVNIR_3000N_Controller::onBackgroundComplete);
 
         return sSensorWidgets(pModel, pController, pView);
@@ -243,6 +249,12 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
         QObject::connect(pController, &cHySpexCamera_Controller::openShutter,  pModel, &cHySpexCameraModel::requestOpenShutter);
         QObject::connect(pController, &cHySpexCamera_Controller::closeShutter, pModel, &cHySpexCameraModel::requestCloseShutter);
 
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::stateUpdate,          pController, &cHySpexSWIR_384_Controller::stateUpdated);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::lensNamesChanged,     pController, &cHySpexSWIR_384_Controller::lensNamesUpdated);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::shutterStatusChanged, pController, &cHySpexSWIR_384_Controller::shutterStatusUpdated);
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::bgStatusChanged,      pController, &cHySpexSWIR_384_Controller::backgroundStatusUpdated);
+
+        QObject::connect(pModel, &cHySpexSWIR_384_Model::lensInfoChanged,    pController, &cHySpexSWIR_384_Controller::lensInfoUpdated);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::backgroundComplete, pController, &cHySpexSWIR_384_Controller::onBackgroundComplete);
 
         return sSensorWidgets(pModel, pController, pView);

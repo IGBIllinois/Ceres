@@ -44,6 +44,15 @@ void cHySpexCamera_ControllerNetEncoder::encodeLensNamesMessage(const std::vecto
     }
 }
 
+void cHySpexCamera_ControllerNetEncoder::encodeLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg)
+{
+    if (encode_lens_info(name, working_distance_cm, fov_deg, mBuffer) < 0)
+    {
+        sendData();
+        encode_lens_info(name, working_distance_cm, fov_deg, mBuffer);
+    }
+}
+
 void cHySpexCamera_ControllerNetEncoder::encodeCommandReplyMessage(hyspex_eCommand reply)
 {
     if (encode_command_reply(reply, mBuffer) < 0)
@@ -96,6 +105,12 @@ void cHySpexCamera_ControllerNetEncoder::sendCurrentStateMessage(bool valid, std
 void cHySpexCamera_ControllerNetEncoder::sendLensNamesMessage(const std::vector<std::string>& names)
 {
     encode_lens_names(names, mBuffer);
+    sendData();
+}
+
+void cHySpexCamera_ControllerNetEncoder::sendLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg)
+{
+    encode_lens_info(name, working_distance_cm, fov_deg, mBuffer);
     sendData();
 }
 

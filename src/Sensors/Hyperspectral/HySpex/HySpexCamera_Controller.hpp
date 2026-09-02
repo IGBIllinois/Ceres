@@ -52,10 +52,11 @@ public slots:
 
     void lensNamesUpdated(QStringList lens_names);
     void shutterStatusUpdated(hyspex::ShutterStatus status);
+    void backgroundStatusUpdated(hyspex::BackgroundStatus status);
 
     void lensInfoUpdated(QString name, double working_distance_cm, double fov_deg);
 
-    virtual void onBackgroundComplete(hyspex::BackgroundStatus status) = 0;
+    void onBackgroundComplete(hyspex::BackgroundStatus status);
 
 protected:
     /*** Message Handlers from the network decoder */

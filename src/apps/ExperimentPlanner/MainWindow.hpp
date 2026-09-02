@@ -4,7 +4,6 @@
 #include "ExperimentFile.hpp"
 
 #include "RappGroundModel.hpp"
-#include "RappAerialModel.hpp"
 
 #include <spidercam_connect/spidercam_types.hpp>
 
@@ -129,6 +128,7 @@ private slots:
     void onPreferenceDefaultPlotSplitDirectory();
     void onPreferenceDefaultFieldBoundaries();
 
+
     // Slots associated with "Spidercam" menu actions
 private slots:
     void onConnectToSpidercam();
@@ -136,6 +136,7 @@ private slots:
     void onSpidercamTestMeasurement();
     void onSpidercamStopMeasurement();
     void onSpidercamPauseRunMeasurement();
+    void onSpidercamReferenceHeight();
 
 // Slots associated with "Help" menu actions
 private slots:
@@ -166,14 +167,7 @@ private:
     bool loadMeasurement(const std::filesystem::path& measurement);
 
 private:
-    bool loadGpsData(QString fileName);
-    bool loadAerialData(QString fileName);
-
-private:
-    cRappGroundModel mGroundData;
-    cRappAerialModel mAerialData;
     spidercam::sWorkingDimensions mLimits;
-    int mReferenceHeight_mm = 0;
 
     QSettings mSettings;
 
@@ -196,6 +190,8 @@ private:
     QMenu* mpHelpMenu = nullptr;
 
     QAction* mpSpidercamConnect = nullptr;
+
+    QAction* mpSetReferenceHeight = nullptr;
     QAction* mpTestMeasurement = nullptr;
     QAction* mpStopMeasurement = nullptr;
     QAction* mpPauseRunMeasurement = nullptr;
