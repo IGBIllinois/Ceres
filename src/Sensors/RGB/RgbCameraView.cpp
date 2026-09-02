@@ -16,6 +16,11 @@ cRgbCameraView::~cRgbCameraView()
 {
 }
 
+void cRgbCameraView::updateCrossHairsColor(int r, int g, int b)
+{
+    mpImage->updateCrossHairsColor(r, g, b);
+}
+
 void cRgbCameraView::enableCrosshairs(bool enable)
 {
     mpImage->showCrossHairs(enable);

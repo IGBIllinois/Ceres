@@ -50,15 +50,15 @@ public:
     rgb::sImageSize_t getImageSize() const;
     void setImageSize(rgb::sImageSize_t image_size);
 
-    QImage* currentImage() const;
+    const QImage& currentImage() const;
 
     bool startGrabbing();
     void stopGrabbing();
     bool isGrabbing() const { return (mCurrentState == GrabbingState::On); }
 
 signals:
-    void frameGrabbed(int id, QImage* img);
-    void imageGrabbed(int id, QImage* img);
+    void frameGrabbed(int id, const QImage& img);
+    void imageGrabbed(int id, const QImage& img);
     void errorHappend(int id, QString msg);
     void stateChanged(int id, GrabbingState newState);
 
@@ -80,7 +80,7 @@ private:
 
     QBuffer* mpImageBuffer = nullptr;
     QImageReader* mpImageReader = nullptr;
-    QImage* mpCurrentImage = nullptr;
+    QImage mCurrentImage;
 
     QNetworkAccessManager* mpDownloadManager = nullptr;
     QNetworkRequest* mpRequest = nullptr;

@@ -557,9 +557,9 @@ bool cAxisCommunicationsModel_F44::updateImageSize(int width, int height)
     return true;
 }
 
-void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
+void cAxisCommunicationsModel_F44::frameGrabbed(int id, const QImage& img)
 {
-    mCurrentImage = *img;
+    mCurrentImage = img;
     if (mAutoEmitImages || mImageRequested)
     {
         emit onNewImage(mCurrentImage);
@@ -619,9 +619,9 @@ void cAxisCommunicationsModel_F44::frameGrabbed(int id, QImage* img)
     }
 }
 
-void cAxisCommunicationsModel_F44::imageGrabbed(int id, QImage* img)
+void cAxisCommunicationsModel_F44::imageGrabbed(int id, const QImage& img)
 {
-    mCurrentImage = *img;
+    mCurrentImage = img;
 
     if (mAutoEmitImages || mImageRequested)
     {

@@ -9,7 +9,8 @@ cRgbImageWidget::cRgbImageWidget(QWidget* parent)
 :
     QWidget(parent)
 {
-    mColor.setRgb(255, 0, 255);
+//    mColor.setRgb(255, 0, 255);     // Magneta
+    mColor.setRgb(255, 233, 0);     // Yellow
     mPen.setColor(mColor);
     mPen.setWidth(2);
 }
@@ -27,6 +28,12 @@ void cRgbImageWidget::setImage(const QImage& image)
 {
     mCurrentImage = image;
     mAspectRatio = image.width() / static_cast<double>(image.height());
+}
+
+void cRgbImageWidget::updateCrossHairsColor(int r, int g, int b)
+{
+    mColor.setRgb(r, g, b);
+    mPen.setColor(mColor);
 }
 
 void cRgbImageWidget::showCrossHairs(bool enable)

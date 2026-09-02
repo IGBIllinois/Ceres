@@ -99,8 +99,8 @@ public slots:
     void onRestoreState();
 
 protected slots:
-    void frameGrabbed(int id, QImage* img);
-    void imageGrabbed(int id, QImage* img);
+    void frameGrabbed(int id, const QImage& img);
+    void imageGrabbed(int id, const QImage& img);
     void errorHappend(int id, QString msg);
     void stateChanged(int id, cAxisCamera::GrabbingState newState);
 

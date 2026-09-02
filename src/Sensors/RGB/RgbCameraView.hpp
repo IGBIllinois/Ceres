@@ -25,6 +25,7 @@ public:
 	virtual void connectToModel() = 0;
 
 public slots:
+	void updateCrossHairsColor(int r, int g, int b);
 	void enableCrosshairs(bool enable);
 
 public slots:

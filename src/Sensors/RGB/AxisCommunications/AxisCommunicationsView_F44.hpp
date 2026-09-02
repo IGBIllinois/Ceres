@@ -11,6 +11,7 @@ class QLabel;
 class QLineEdit;
 class QToolButton;
 class QPushButton;
+class QComboBox;
 QT_END_NAMESPACE
 
 class cAxisCommunicationsModel_F44;
@@ -37,6 +38,7 @@ public slots:
 
 protected slots:
 	void cameraIdIndexChanged(int id);
+	void crossHairsColorChanged(int id);
 
 protected:
 	void createWidgets() override;
@@ -49,6 +51,7 @@ private:
 	int mMinCameraId = 0;
 	int mMaxCameraId = 0;
 
+	QComboBox* mpCrossHairsColor = nullptr;
 	QPushButton* mpShowCrossHairs = nullptr;
 
 //	QPushButton* mpSaveImage = nullptr;

@@ -61,6 +61,16 @@ void cAxisCommunicationsView_F44::createWidgets()
     mpCameraId->setCurrentIndex(mpModel->getActiveCameraID() - mMinCameraId);
     connect(mpCameraId, &QComboBox::currentIndexChanged, this, &cAxisCommunicationsView_F44::cameraIdIndexChanged);
 
+    mpCrossHairsColor = new QComboBox(this);
+    mpCrossHairsColor->addItem("Yellow");
+    mpCrossHairsColor->addItem("Magneta");
+    mpCrossHairsColor->addItem("Orange");
+    mpCrossHairsColor->addItem("Red");
+    mpCrossHairsColor->addItem("Blue");
+    mpCrossHairsColor->addItem("White");
+    mpCrossHairsColor->addItem("Black");
+    QObject::connect(mpCrossHairsColor, &QComboBox::currentIndexChanged, this, &cAxisCommunicationsView_F44::crossHairsColorChanged);
+
     mpShowCrossHairs = new QPushButton("Show Crosshairs", this);
     mpShowCrossHairs->setCheckable(true);
     QObject::connect(mpShowCrossHairs, &QPushButton::clicked, this, &cAxisCommunicationsView_F44::enableCrosshairs);
@@ -88,7 +98,9 @@ void cAxisCommunicationsView_F44::doControlLayout(QHBoxLayout* pControlLayout)
     pControlLayout->addWidget(mpLapseInterval_s);
 
     pControlLayout->addStretch(1);
+    pControlLayout->addWidget(mpCrossHairsColor);
 
+    pControlLayout->addSpacing(10);
     pControlLayout->addWidget(mpShowCrossHairs);
 }
 
@@ -118,6 +130,36 @@ void cAxisCommunicationsView_F44::onCameraRangeChange(int min_id, int max_id)
     }
 
     mpCameraId->setCurrentIndex(mpModel->getActiveCameraID() - mMinCameraId);
+}
+
+void cAxisCommunicationsView_F44::crossHairsColorChanged(int id)
+{
+    switch (id)
+    {
+    case 0:
+        updateCrossHairsColor(255, 233, 0);     // Yellow
+        break;
+    case 1:
+        updateCrossHairsColor(255, 0, 255);     // Magneta
+        break;
+    case 2:
+        updateCrossHairsColor(255, 165, 0);	    // Orange
+//        updateCrossHairsColor(255, 102, 0);	    // Safety Orange
+        break;
+    case 3:
+        updateCrossHairsColor(255, 0, 0);		// Red
+        break;
+    case 4:
+        updateCrossHairsColor(0, 0, 255);		// Blue
+        break;
+    case 5:
+        updateCrossHairsColor(255, 255, 255);	// White
+        break;
+    case 6:
+        updateCrossHairsColor(0, 0, 0);			// Black
+        break;
+    }
+
 }
 
 

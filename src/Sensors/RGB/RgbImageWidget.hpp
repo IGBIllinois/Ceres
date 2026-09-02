@@ -22,6 +22,7 @@ public:
 	void setImage(const QImage& image);
 
 public slots:
+	void updateCrossHairsColor(int r, int g, int b);
 	void showCrossHairs(bool enable);
 
 public slots:

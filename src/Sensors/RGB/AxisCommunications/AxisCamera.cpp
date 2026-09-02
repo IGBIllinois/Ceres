@@ -36,7 +36,7 @@ cAxisCamera::cAxisCamera(int id, QObject* parent)
         throw std::runtime_error("Missing JPEG decoder");
     }
 
-    mpCurrentImage = new QImage(640, 480, QImage::Format_RGB888);
+    mCurrentImage = QImage(640, 480, QImage::Format_RGB888);
     mpImageBuffer = new QBuffer(this);
     mpImageBuffer->open(QBuffer::ReadWrite);
     mpImageReader->setDevice(mpImageBuffer);
@@ -54,8 +54,8 @@ cAxisCamera::cAxisCamera(int id, QObject* parent)
 
 cAxisCamera::~cAxisCamera()
 {
-    delete mpImageReader;   mpImageReader = nullptr;
-    delete mpCurrentImage;  mpCurrentImage = nullptr;
+    delete mpImageReader;
+    mpImageReader = nullptr;
 }
 
 
@@ -96,17 +96,16 @@ rgb::sImageSize_t cAxisCamera::getImageSize() const
 void cAxisCamera::setImageSize(rgb::sImageSize_t image_size)
 {
     mImageSize = image_size;
-    if ((mpCurrentImage->width() != mImageSize.width) ||
-        (mpCurrentImage->height() != mImageSize.height))
+    if ((mCurrentImage.width() != mImageSize.width) ||
+        (mCurrentImage.height() != mImageSize.height))
     {
-        delete mpCurrentImage;
-        mpCurrentImage = new QImage(mImageSize.width, mImageSize.height, QImage::Format_RGB888);
+        mCurrentImage = QImage(mImageSize.width, mImageSize.height, QImage::Format_RGB888);
     }
 }
 
-QImage* cAxisCamera::currentImage() const
+const QImage& cAxisCamera::currentImage() const
 {
-    return mpCurrentImage;
+    return mCurrentImage;
 }
 
 bool cAxisCamera::startGrabbing()
@@ -164,9 +163,9 @@ void cAxisCamera::downloadFinished(QNetworkReply* reply)
 {
     mpImageReader->setDevice(reply);
     qWarning() << "start reading image";
-    mpImageReader->read(mpCurrentImage);
+    mpImageReader->read(&mCurrentImage);
     qWarning() << "reading image done";
-    emit imageGrabbed(mCameraID, mpCurrentImage);
+    emit imageGrabbed(mCameraID, mCurrentImage);
 
     mCurrentState = GrabbingState::Off;
     emit stateChanged(mCameraID, mCurrentState);
@@ -252,12 +251,12 @@ void cAxisCamera::bufferToImage()
     bool ok = false;
     mpImageReader->setDevice(mpImageBuffer);
     mpImageBuffer->seek(0);
-    ok = mpImageReader->read(mpCurrentImage);
+    ok = mpImageReader->read(&mCurrentImage);
     mpImageBuffer->seek(0);
 
     if (ok)
     {
-        emit frameGrabbed(mCameraID, mpCurrentImage);
+        emit frameGrabbed(mCameraID, mCurrentImage);
     }
     else
     {

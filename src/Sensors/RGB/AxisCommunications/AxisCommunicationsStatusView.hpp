@@ -26,8 +26,6 @@ public:
 	void createWidgets() override;
 	void doLayout() override;
 
-//	void connectToModel() override;
-
 signals:
 	void requestImage();
 	void saveImage();

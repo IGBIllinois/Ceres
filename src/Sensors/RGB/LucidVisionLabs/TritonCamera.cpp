@@ -14,15 +14,14 @@
 
 cTritonCamera::cTritonCamera(int id, QObject* parent)
 :
-    QObject(parent), mCameraID(id),
-    mpImageBuffer(nullptr), mpImageReader(nullptr), mpCurrentImage(nullptr),
+    QObject(parent), mCameraID(id), mpImageBuffer(nullptr), mpImageReader(nullptr), 
     mpDownloadManager(nullptr), mpRequest(nullptr), mpReply(nullptr)
 
 {
     mpImageReader = new QImageReader();
     mpImageReader->setAutoDetectImageFormat(true);
 
-    mpCurrentImage = new QImage(640, 480, QImage::Format_RGB888);
+    mCurrentImage = QImage(640, 480, QImage::Format_RGB888);
     mpImageBuffer = new QBuffer(this);
     mpImageBuffer->open(QBuffer::ReadWrite);
     mpImageReader->setDevice(mpImageBuffer);
@@ -80,17 +79,16 @@ rgb::sImageSize_t cTritonCamera::getImageSize() const
 void cTritonCamera::setImageSize(rgb::sImageSize_t image_size)
 {
     mImageSize = image_size;
-    if ((mpCurrentImage->width() != mImageSize.width) ||
-        (mpCurrentImage->height() != mImageSize.height))
+    if ((mCurrentImage.width() != mImageSize.width) ||
+        (mCurrentImage.height() != mImageSize.height))
     {
-        delete mpCurrentImage;
-        mpCurrentImage = new QImage(mImageSize.width, mImageSize.height, QImage::Format_RGB888);
+        mCurrentImage = QImage(mImageSize.width, mImageSize.height, QImage::Format_RGB888);
     }
 }
 
-QImage* cTritonCamera::currentImage() const
+const QImage& cTritonCamera::currentImage() const
 {
-    return mpCurrentImage;
+    return mCurrentImage;
 }
 
 bool cTritonCamera::startGrabbing()
@@ -148,9 +146,9 @@ void cTritonCamera::downloadFinished(QNetworkReply* reply)
 {
     mpImageReader->setDevice(reply);
     qWarning() << "start reading image";
-    mpImageReader->read(mpCurrentImage);
+    mpImageReader->read(&mCurrentImage);
     qWarning() << "reading image done";
-    emit imageGrabbed(mCameraID, mpCurrentImage);
+    emit imageGrabbed(mCameraID, mCurrentImage);
 
     mCurrentState = GrabbingState::Off;
     emit stateChanged(mCameraID, mCurrentState);
@@ -236,12 +234,12 @@ void cTritonCamera::bufferToImage()
     bool ok = false;
     mpImageReader->setDevice(mpImageBuffer);
     mpImageBuffer->seek(0);
-    ok = mpImageReader->read(mpCurrentImage);
+    ok = mpImageReader->read(&mCurrentImage);
     mpImageBuffer->seek(0);
 
     if (ok)
     {
-        emit frameGrabbed(mCameraID, mpCurrentImage);
+        emit frameGrabbed(mCameraID, mCurrentImage);
     }
     else
     {
