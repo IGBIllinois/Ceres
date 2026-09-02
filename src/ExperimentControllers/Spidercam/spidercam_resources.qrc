@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="spidercam.illinois.edu">
+        <file alias="images/up_arrow.png">./Resources/Images/up_arrow.png</file>
+        <file alias="images/down_arrow.png">./Resources/Images/down_arrow.png</file>
+        <file alias="images/right_arrow.png">./Resources/Images/right_arrow.png</file>
+        <file alias="images/left_arrow.png">./Resources/Images/left_arrow.png</file>
+        <file alias="images/double_up_arrow.png">./Resources/Images/double_up_arrow.png</file>
+        <file alias="images/double_down_arrow.png">./Resources/Images/double_down_arrow.png</file>
+        <file alias="images/double_right_arrow.png">./Resources/Images/double_right_arrow.png</file>
+        <file alias="images/double_left_arrow.png">./Resources/Images/double_left_arrow.png</file>
+    </qresource>
+</RCC>
