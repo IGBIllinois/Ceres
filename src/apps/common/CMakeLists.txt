@@ -23,6 +23,12 @@ target_sources(common
 
 PRIVATE
 #
+# Common Dialogs
+#
+    ReferenceHeightDlg.hpp
+    ReferenceHeightDlg.cpp
+
+#
 # General Application files
 #
     DataModel.hpp

@@ -114,9 +114,6 @@ PRIVATE
     CeresOptionsDlg.hpp
     CeresOptionsDlg.cpp
 
-    ReferenceHeightDlg.hpp
-    ReferenceHeightDlg.cpp
-
     MissingSensorsDlg.hpp
     MissingSensorsDlg.cpp
 
