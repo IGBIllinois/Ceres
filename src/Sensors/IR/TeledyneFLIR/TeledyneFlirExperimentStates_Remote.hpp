@@ -5,6 +5,8 @@
 #include "ExperimentStateRemoteInterface.hpp"
 #include "TeledyneFlirPropertiesNetDecoder.hpp"
 #include "TeledyneFlirPropertiesNetEncoder.hpp"
+#include "TeledyneFlirExperimentStatesHelpers.hpp"
+#include "TeledyneFlirCameraModel.hpp"
 
 #include "Timers.hpp"
 
@@ -176,7 +178,7 @@ private:
 /**        Teledyne FLIR Experiment State to Take Photo           **/
 /*******************************************************************/
 
-class cTeledyneFlirCamera_TakePhoto_Remote : public cTeledyneFlirCameraExperimentState_Remote
+class cTeledyneFlirCamera_TakePhoto_Remote : public cTeledyneFlirCameraExperimentState_Remote, protected cTeledyneFlirExperimentHelper_TakeImage
 {
 	Q_OBJECT
 
@@ -199,7 +201,7 @@ private:
 	void onConnect() override;
 
 private:
-	bool mUpdateView = false;
+	cTeledyneFlirCameraModel::eMode mMode = cTeledyneFlirCameraModel::eMode::CONTINUOUS;
 
 	cExperimentState::eRESULT mResult = cExperimentState::eRESULT::WAITING;
 };

@@ -2,6 +2,8 @@
 #pragma once
 
 #include "ExperimentState.hpp"
+#include "TeledyneFlirExperimentStatesHelpers.hpp"
+#include "TeledyneFlirExperimentStatesHelpers.hpp"
 
 #include <QObject>
 
@@ -142,7 +144,7 @@ private:
 /**       Teledyne FLIR Experiment States to Take Photo           **/
 /*******************************************************************/
 
-class cTeledyneFlirCamera_TakePhoto_Local : public cTeledyneFlirCameraExperimentState_Local
+class cTeledyneFlirCamera_TakePhoto_Local : public cTeledyneFlirCameraExperimentState_Local, protected cTeledyneFlirExperimentHelper_TakeImage
 {
 	Q_OBJECT
 
@@ -170,9 +172,6 @@ public slots:
 	void onPhotoTaken();
 
 private:
-	bool mUpdateView = false;
-
-	bool mTriggerPhoto = true;
 	cExperimentState::eRESULT mResult = cExperimentState::eRESULT::WAITING;
 };
 

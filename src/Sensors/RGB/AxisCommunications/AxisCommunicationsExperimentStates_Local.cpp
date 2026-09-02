@@ -198,7 +198,7 @@ void cAxisCommunications_TakePhoto_Local::run()
 			if (mUpdateView)
 				emit updateView();
 
-			mResult = cExperimentState::eRESULT::DONE;
+//			mResult = cExperimentState::eRESULT::DONE;
 		}
 
 		mTriggerPhoto = false;
@@ -215,7 +215,13 @@ cExperimentState::eRESULT cAxisCommunications_TakePhoto_Local::finished()
 
 void cAxisCommunications_TakePhoto_Local::onPhotoTaken()
 {
-	mResult = cExperimentState::eRESULT::DONE;
+	--mNumOfPhotos;
+	if (mNumOfPhotos < 1)
+		mResult = cExperimentState::eRESULT::DONE;
+	else
+	{
+		mTriggerPhoto = true;
+	}
 };
 
 

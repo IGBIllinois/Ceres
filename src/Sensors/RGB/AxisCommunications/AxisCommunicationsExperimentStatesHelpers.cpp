@@ -150,6 +150,16 @@ bool cAxisCommunicationsExperimentHelper_TakePhoto::configure(const nlohmann::js
 		{
 			mUpdateView = stateDoc["update_view"];
 		}
+
+		if (stateDoc.contains("number of photos"))
+		{
+			mNumOfPhotos = stateDoc["number of photos"];
+		}
+
+		if (stateDoc.contains("number_of_photos"))
+		{
+			mNumOfPhotos = stateDoc["number_of_photos"];
+		}
 	}
 	catch (const detail::parse_error& e)
 	{

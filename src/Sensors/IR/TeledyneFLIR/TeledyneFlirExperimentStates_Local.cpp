@@ -256,54 +256,12 @@ QString cTeledyneFlirCamera_TakePhoto_Local::getStatusStr()
 
 bool cTeledyneFlirCamera_TakePhoto_Local::configure(const nlohmann::json& stateDoc)
 {
-	using namespace nlohmann;
-
-	mUpdateView = false;
-
-	try
-	{
-		if (stateDoc.contains("update view"))
-		{
-			mUpdateView = stateDoc["update view"];
-		}
-	}
-	catch (const detail::parse_error& e)
-	{
-		QString msg = "Parse Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::type_error& e)
-	{
-		QString msg = "Type Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::exception& e)
-	{
-		QString msg = "Unknown Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-
-	return true;
+	return cTeledyneFlirExperimentHelper_TakeImage::configure(stateDoc);
 }
 
 void cTeledyneFlirCamera_TakePhoto_Local::run() 
 {
-	if (mTriggerPhoto)
+	if (mTriggerImage)
 	{
 		if (mpModel->mode() == cTeledyneFlirCameraModel::eMode::SINGLE)
 		{
@@ -314,10 +272,10 @@ void cTeledyneFlirCamera_TakePhoto_Local::run()
 			if (mUpdateView)
 				emit updateView();
 
-			mResult = cExperimentState::eRESULT::DONE;
+//			mResult = cExperimentState::eRESULT::DONE;
 		}
 
-		mTriggerPhoto = false;
+		mTriggerImage = false;
 	}
 }
 
@@ -331,7 +289,13 @@ cExperimentState::eRESULT cTeledyneFlirCamera_TakePhoto_Local::finished()
 
 void cTeledyneFlirCamera_TakePhoto_Local::onPhotoTaken()
 {
-	mResult = cExperimentState::eRESULT::DONE;
+	--mNumOfImages;
+	if (mNumOfImages < 1)
+		mResult = cExperimentState::eRESULT::DONE;
+	else
+	{
+		mTriggerImage = true;
+	}
 };
 
 

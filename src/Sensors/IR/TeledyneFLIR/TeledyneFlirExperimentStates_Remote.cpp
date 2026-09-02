@@ -310,49 +310,7 @@ QString cTeledyneFlirCamera_TakePhoto_Remote::getStatusStr()
 
 bool cTeledyneFlirCamera_TakePhoto_Remote::configure(const nlohmann::json& stateDoc)
 {
-	using namespace nlohmann;
-
-	mUpdateView = false;
-
-	try
-	{
-		if (stateDoc.contains("update view"))
-		{
-			mUpdateView = stateDoc["update view"];
-		}
-	}
-	catch (const detail::parse_error& e)
-	{
-		QString msg = "Parse Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::type_error& e)
-	{
-		QString msg = "Type Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::exception& e)
-	{
-		QString msg = "Unknown Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-
-	return true;
+	return cTeledyneFlirExperimentHelper_TakeImage::configure(stateDoc);
 }
 
 cExperimentState::eRESULT cTeledyneFlirCamera_TakePhoto_Remote::finished()
@@ -362,11 +320,31 @@ cExperimentState::eRESULT cTeledyneFlirCamera_TakePhoto_Remote::finished()
 
 void cTeledyneFlirCamera_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 {
-	mResult = cExperimentState::eRESULT::DONE;
+	--mNumOfImages;
+
+	if (mNumOfImages < 1)
+		mResult = cExperimentState::eRESULT::DONE;
+	else
+	{
+		if (mMode == cTeledyneFlirCameraModel::eMode::SINGLE)
+		{
+			sendTakePhotoMessage(mUpdateView, true);
+		}
+		else
+		{
+			if (mUpdateView)
+				sendGrabImageMessage();
+		}
+
+		// Sleep for 250 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+	}
 };
 
 void cTeledyneFlirCamera_TakePhoto_Remote::onModeMessage(uint8_t mode)
 {
+	mMode = static_cast<cTeledyneFlirCameraModel::eMode>(mode);
+
 	if (mode == cTeledyneFlirCameraModel::eMode::SINGLE)
 	{
 		sendTakePhotoMessage(mUpdateView, true);
@@ -376,7 +354,7 @@ void cTeledyneFlirCamera_TakePhoto_Remote::onModeMessage(uint8_t mode)
 		if (mUpdateView)
 			sendGrabImageMessage();
 
-		mResult = cExperimentState::eRESULT::DONE;
+//		mResult = cExperimentState::eRESULT::DONE;
 	}
 }
 

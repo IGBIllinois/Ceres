@@ -53,6 +53,8 @@ set(TELEDYNE_FLIR_SOURCE_FILES
 #
 # Teledyne FLIR Experiment State Files
 #
+	TeledyneFlirExperimentStatesHelpers.hpp
+	TeledyneFlirExperimentStatesHelpers.cpp
 	TeledyneFlirExperimentStates_Local.hpp
 	TeledyneFlirExperimentStates_Local.cpp
 	TeledyneFlirExperimentStates_Remote.hpp

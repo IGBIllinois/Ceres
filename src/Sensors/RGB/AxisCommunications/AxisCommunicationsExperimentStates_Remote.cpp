@@ -340,6 +340,24 @@ cAxisCommunications_TakePhoto_Remote::cAxisCommunications_TakePhoto_Remote(const
 
 QString cAxisCommunications_TakePhoto_Remote::getStatusStr()
 {
+	if (mNumOfPhotos > 1)
+	{
+		QString msg;
+
+		if (mUpdateView)
+		{
+			msg = "Taking ";
+			msg += QString::number(mNumOfPhotos);
+			msg += " Photos and updating view...";
+			return msg;
+		}
+
+		msg = "Taking ";
+		msg += QString::number(mNumOfPhotos);
+		msg += " Photos...";
+		return msg;
+	}
+
 	if (mUpdateView)
 		return "Taking Photo and updating view...";
 
@@ -358,7 +376,17 @@ cExperimentState::eRESULT cAxisCommunications_TakePhoto_Remote::finished()
 
 void cAxisCommunications_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 {
-	mResult = cExperimentState::eRESULT::DONE;
+	--mNumOfPhotos;
+	
+	if (mNumOfPhotos < 1)
+		mResult = cExperimentState::eRESULT::DONE;
+	else
+	{
+		sendTakePhotoMessage(mUpdateView);
+
+		// Sleep for 250 milliseconds
+		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
+	}
 };
 
 void cAxisCommunications_TakePhoto_Remote::onConnect()
