@@ -237,7 +237,10 @@ void cOusterCmdStream_Qt::errorHandler(QAbstractSocket::SocketError socketError)
                     << "settings are correct.";
         break;
     default:
-        qCritical() << "The following error occurred: " << mSocket.errorString();
+    {
+//        qCritical() << "The following error occurred: " << mSocket.errorString();
+        break;
+    }
     }
 
 }
