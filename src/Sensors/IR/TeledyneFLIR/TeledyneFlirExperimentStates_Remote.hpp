@@ -134,7 +134,7 @@ private:
 /**     Teledyne FLIR Experiment State to Configure Camera        **/
 /*******************************************************************/
 
-class cTeledyneFlirCamera_Configure_Remote : public cTeledyneFlirCameraExperimentState_Remote
+class cTeledyneFlirCamera_Configure_Remote : public cTeledyneFlirCameraExperimentState_Remote, protected cTeledyneFlirExperimentHelper_Configure
 {
 	Q_OBJECT
 
@@ -160,17 +160,6 @@ private:
 		std::optional<float> min_K, std::optional<float> max_K) override;
 
 	void onConnect() override;
-
-private:
-	int mMode = -1;
-	int mLapseInterval_ms = -1;
-	double mFrameRate_fps = -1;
-
-	bool mWaitingForConfiguration = true;
-
-	bool mWaitingForMode = false;
-	bool mWaitingForFrameRate = false;
-	bool mWaitingForInterval = false;
 };
 
 
@@ -178,7 +167,7 @@ private:
 /**        Teledyne FLIR Experiment State to Take Photo           **/
 /*******************************************************************/
 
-class cTeledyneFlirCamera_TakePhoto_Remote : public cTeledyneFlirCameraExperimentState_Remote, protected cTeledyneFlirExperimentHelper_TakeImage
+class cTeledyneFlirCamera_TakePhoto_Remote : public cTeledyneFlirCameraExperimentState_Remote, protected cTeledyneFlirExperimentHelper_TakePhoto
 {
 	Q_OBJECT
 

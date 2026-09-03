@@ -21,62 +21,39 @@ bool cTeledyneFlirExperimentHelper_Configure::configure(const nlohmann::json& st
 
 	try
 	{
-		if (stateDoc.contains("id"))
-		{
-			mCameraID = stateDoc["id"];
-			mWaitingForCameraID = true;
-		}
-
 		if (stateDoc.contains("mode"))
 		{
 			auto mode = stateDoc["mode"];
-/*
 			if (nStringUtils::iequal(mode, "photo"))
 			{
-				mMode = static_cast<int>(cAxisCommunicationsModel::eMode::SINGLE);
+				mMode = static_cast<int>(cTeledyneFlirCameraModel::eMode::SINGLE);
 			}
 			else if (nStringUtils::iequal(mode, "time lapse") || nStringUtils::iequal(mode, "time-lapse"))
 			{
-				mMode = static_cast<int>(cAxisCommunicationsModel::eMode::TIME_LAPSE);
+				mMode = static_cast<int>(cTeledyneFlirCameraModel::eMode::TIME_LAPSE);
 			}
 			else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))
 			{
-				mMode = static_cast<int>(cAxisCommunicationsModel::eMode::CONTINUOUS);
+				mMode = static_cast<int>(cTeledyneFlirCameraModel::eMode::CONTINUOUS);
 			}
-
-			mWaitingForMode = true;
-*/
 		}
-
-		if (stateDoc.contains("resolution"))
-		{
-/*
-			rgb::sImageSize_t image_size = axis::to_image_size(stateDoc["resolution"]);
-			mImageWidth = image_size.width;
-			mImageHeight = image_size.height;
-
-			mWaitingForResolution = true;
-*/
-		}
-
 
 		if (stateDoc.contains("frame rate (hz)"))
 		{
-			mFrameRate_fps = stateDoc["frame rate (hz)"].get<double>();
-			mWaitingForFrameRate = true;
+			mFrameRate_fps = stateDoc["frame rate (hz)"];
 		}
 
 		int32_t lapse_interval_ms = -1;
 
-		if (stateDoc.contains("time lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["time lapse interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("time lapse interval (ms)"))
-			lapse_interval_ms = stateDoc["time lapse interval (ms)"].get<int32_t>();
-
-		else if (stateDoc.contains("time-lapse interval (s)"))
+		if (stateDoc.contains("time-lapse interval (s)"))
 			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"].get<float>() * 1000.0);
 		else if (stateDoc.contains("time-lapse interval (ms)"))
 			lapse_interval_ms = stateDoc["time-lapse interval (ms)"].get<int32_t>();
+
+		else if (stateDoc.contains("time lapse interval (s)"))
+			lapse_interval_ms = static_cast<int32_t>(stateDoc["time lapse interval (s)"].get<float>() * 1000.0);
+		else if (stateDoc.contains("time lapse interval (ms)"))
+			lapse_interval_ms = stateDoc["time lapse interval (ms)"].get<int32_t>();
 
 		else if (stateDoc.contains("lapse interval (s)"))
 			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"].get<float>() * 1000.0);
@@ -91,7 +68,6 @@ bool cTeledyneFlirExperimentHelper_Configure::configure(const nlohmann::json& st
 		if (lapse_interval_ms > 0)
 		{
 			mLapseInterval_ms = lapse_interval_ms;
-			mWaitingForInterval = true;
 		}
 	}
 	catch (const detail::parse_error& e)
@@ -99,7 +75,7 @@ bool cTeledyneFlirExperimentHelper_Configure::configure(const nlohmann::json& st
 		QString msg = "Parse Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Configure Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -109,7 +85,7 @@ bool cTeledyneFlirExperimentHelper_Configure::configure(const nlohmann::json& st
 		QString msg = "Type Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Configure Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -119,7 +95,7 @@ bool cTeledyneFlirExperimentHelper_Configure::configure(const nlohmann::json& st
 		QString msg = "Unknown Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Configure Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -130,14 +106,14 @@ bool cTeledyneFlirExperimentHelper_Configure::configure(const nlohmann::json& st
 
 
 /***********************************************************************/
-/**      Teledyne FLIR Experiment State Helper to Take Image          **/
+/**      Teledyne FLIR Experiment State Helper to Take Photo          **/
 /***********************************************************************/
 
-cTeledyneFlirExperimentHelper_TakeImage::cTeledyneFlirExperimentHelper_TakeImage()
+cTeledyneFlirExperimentHelper_TakePhoto::cTeledyneFlirExperimentHelper_TakePhoto()
 {
 }
 
-bool cTeledyneFlirExperimentHelper_TakeImage::configure(const nlohmann::json& stateDoc)
+bool cTeledyneFlirExperimentHelper_TakePhoto::configure(const nlohmann::json& stateDoc)
 {
 	using namespace nlohmann;
 
@@ -155,14 +131,14 @@ bool cTeledyneFlirExperimentHelper_TakeImage::configure(const nlohmann::json& st
 			mUpdateView = stateDoc["update_view"];
 		}
 
-		if (stateDoc.contains("number of images"))
+		if (stateDoc.contains("number of photos"))
 		{
-			mNumOfImages = stateDoc["number of images"];
+			mNumOfPhotos = stateDoc["number of photos"];
 		}
 
-		if (stateDoc.contains("number_of_images"))
+		if (stateDoc.contains("number_of_photos"))
 		{
-			mNumOfImages = stateDoc["number_of_images"];
+			mNumOfPhotos = stateDoc["number_of_photos"];
 		}
 	}
 	catch (const detail::parse_error& e)
@@ -170,7 +146,7 @@ bool cTeledyneFlirExperimentHelper_TakeImage::configure(const nlohmann::json& st
 		QString msg = "Parse Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Take Photo Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -180,7 +156,7 @@ bool cTeledyneFlirExperimentHelper_TakeImage::configure(const nlohmann::json& st
 		QString msg = "Type Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Take Photo Experiment State Error", msg);
 		mb.exec();
 
 		return false;
@@ -190,7 +166,7 @@ bool cTeledyneFlirExperimentHelper_TakeImage::configure(const nlohmann::json& st
 		QString msg = "Unknown Error: ";
 		msg += e.what();
 
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
+		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Take Photo Experiment State Error", msg);
 		mb.exec();
 
 		return false;

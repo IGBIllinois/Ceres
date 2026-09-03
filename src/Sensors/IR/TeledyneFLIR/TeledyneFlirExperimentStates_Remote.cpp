@@ -141,91 +141,7 @@ QString cTeledyneFlirCamera_Configure_Remote::getStatusStr()
 
 bool cTeledyneFlirCamera_Configure_Remote::configure(const nlohmann::json& stateDoc)
 {
-	using namespace nlohmann;
-
-	try
-	{
-		if (stateDoc.contains("mode"))
-		{
-			auto mode = stateDoc["mode"];
-			if (nStringUtils::iequal(mode, "photo"))
-			{
-				mMode = static_cast<int>(cTeledyneFlirCameraModel::eMode::SINGLE);
-			}
-			else if (nStringUtils::iequal(mode, "time lapse") || nStringUtils::iequal(mode, "time-lapse"))
-			{
-				mMode = static_cast<int>(cTeledyneFlirCameraModel::eMode::TIME_LAPSE);
-			}
-			else if (nStringUtils::iequal(mode, "video") || nStringUtils::iequal(mode, "continuous"))
-			{
-				mMode = static_cast<int>(cTeledyneFlirCameraModel::eMode::CONTINUOUS);
-			}
-		}
-
-		if (stateDoc.contains("frame rate (hz)"))
-		{
-			mFrameRate_fps = stateDoc["frame rate (hz)"];
-		}
-
-		int32_t lapse_interval_ms = -1;
-
-		if (stateDoc.contains("time-lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["time-lapse interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("time-lapse interval (ms)"))
-			lapse_interval_ms = stateDoc["time-lapse interval (ms)"].get<int32_t>();
-
-		else if (stateDoc.contains("time lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["time lapse interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("time lapse interval (ms)"))
-			lapse_interval_ms = stateDoc["time lapse interval (ms)"].get<int32_t>();
-
-		else if (stateDoc.contains("lapse interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["lapse interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("lapse interval (ms)"))
-			lapse_interval_ms = stateDoc["lapse interval (ms)"].get<int32_t>();
-
-		else if (stateDoc.contains("interval (s)"))
-			lapse_interval_ms = static_cast<int32_t>(stateDoc["interval (s)"].get<float>() * 1000.0);
-		else if (stateDoc.contains("interval (ms)"))
-			lapse_interval_ms = stateDoc["interval (ms)"].get<int32_t>();
-
-		if (lapse_interval_ms > 0)
-		{
-			mLapseInterval_ms = lapse_interval_ms;
-		}
-	}
-	catch (const detail::parse_error& e)
-	{
-		QString msg = "Parse Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::type_error& e)
-	{
-		QString msg = "Type Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-	catch (const detail::exception& e)
-	{
-		QString msg = "Unknown Error: ";
-		msg += e.what();
-
-		QMessageBox mb(QMessageBox::Critical, "Teledyne FLIR Experiment State Error", msg);
-		mb.exec();
-
-		return false;
-	}
-
-	return true;
+	return cTeledyneFlirExperimentHelper_Configure::configure(stateDoc);
 }
 
 cExperimentState::eRESULT cTeledyneFlirCamera_Configure_Remote::finished()
@@ -310,7 +226,7 @@ QString cTeledyneFlirCamera_TakePhoto_Remote::getStatusStr()
 
 bool cTeledyneFlirCamera_TakePhoto_Remote::configure(const nlohmann::json& stateDoc)
 {
-	return cTeledyneFlirExperimentHelper_TakeImage::configure(stateDoc);
+	return cTeledyneFlirExperimentHelper_TakePhoto::configure(stateDoc);
 }
 
 cExperimentState::eRESULT cTeledyneFlirCamera_TakePhoto_Remote::finished()
@@ -320,9 +236,9 @@ cExperimentState::eRESULT cTeledyneFlirCamera_TakePhoto_Remote::finished()
 
 void cTeledyneFlirCamera_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 {
-	--mNumOfImages;
+	--mNumOfPhotos;
 
-	if (mNumOfImages < 1)
+	if (mNumOfPhotos < 1)
 		mResult = cExperimentState::eRESULT::DONE;
 	else
 	{

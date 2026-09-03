@@ -98,7 +98,7 @@ private:
 /**    Teledyne FLIR Experiment States to Configure Camera        **/
 /*******************************************************************/
 
-class cTeledyneFlirCamera_Configure_Local : public cTeledyneFlirCameraExperimentState_Local
+class cTeledyneFlirCamera_Configure_Local : public cTeledyneFlirCameraExperimentState_Local, protected cTeledyneFlirExperimentHelper_Configure
 {
 	Q_OBJECT
 
@@ -126,17 +126,6 @@ public slots:
 	void modeChanged(int mode);
 	void lapseIntervalChanged(int interval_ms);
 	void frameRateChanged(double rate_fps);
-
-private:
-	int mMode = 0;
-	int mLapseInterval_ms = 0;
-	double mFrameRate_fps = 0;
-
-	bool mUpdateConfiguration = true;
-
-	bool mWaitingForMode = false;
-	bool mWaitingForFrameRate = false;
-	bool mWaitingForInterval = false;
 };
 
 
@@ -144,7 +133,7 @@ private:
 /**       Teledyne FLIR Experiment States to Take Photo           **/
 /*******************************************************************/
 
-class cTeledyneFlirCamera_TakePhoto_Local : public cTeledyneFlirCameraExperimentState_Local, protected cTeledyneFlirExperimentHelper_TakeImage
+class cTeledyneFlirCamera_TakePhoto_Local : public cTeledyneFlirCameraExperimentState_Local, protected cTeledyneFlirExperimentHelper_TakePhoto
 {
 	Q_OBJECT
 
@@ -172,6 +161,8 @@ public slots:
 	void onPhotoTaken();
 
 private:
+	bool mTriggerImage = true;
+
 	cExperimentState::eRESULT mResult = cExperimentState::eRESULT::WAITING;
 };
 

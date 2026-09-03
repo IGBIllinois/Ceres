@@ -20,35 +20,30 @@ protected:
 	int mMode = -1;
 	int mLapseInterval_ms = -1;
 	double mFrameRate_fps = -1;
-	int mImageWidth = -1;
-	int mImageHeight = -1;
-	int mCameraID = -1;
+
+	bool mWaitingForConfiguration = true;
 
 	bool mWaitingForMode = false;
-	bool mWaitingForCameraID = false;
-	bool mWaitingForResolution = false;
 	bool mWaitingForFrameRate = false;
 	bool mWaitingForInterval = false;
 };
 
 
 /***********************************************************************/
-/**      Teledyne FLIR Experiment State Helper to Take Image          **/
+/**      Teledyne FLIR Experiment State Helper to Take Photo          **/
 /***********************************************************************/
 
-class cTeledyneFlirExperimentHelper_TakeImage
+class cTeledyneFlirExperimentHelper_TakePhoto
 {
 public:
-	cTeledyneFlirExperimentHelper_TakeImage();
+	cTeledyneFlirExperimentHelper_TakePhoto();
 
 	bool configure(const nlohmann::json& stateDoc);
 
 protected:
 	bool mUpdateView = false;
 
-	bool mTriggerImage = true;
-
-	int mNumOfImages = 1;
+	int mNumOfPhotos = 1;
 };
 
 
