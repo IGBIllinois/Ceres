@@ -46,8 +46,6 @@ public:
 protected:
 	bool mUpdateView = false;
 
-	bool mTriggerPhoto = true;
-
 	int mNumOfPhotos = 1;
 };
 

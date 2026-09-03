@@ -167,6 +167,8 @@ public slots:
 	void onPhotoTaken();
 
 private:
+	bool mTriggerPhoto = true;
+
 	cExperimentState::eRESULT mResult = cExperimentState::eRESULT::WAITING;
 };
 
