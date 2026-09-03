@@ -287,6 +287,11 @@ void cTeledyneFlirCameraModel_T1K::update()
             mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
             newData = true;
             mTimeLapseTimer.start();
+            if (mPhotoRequested)
+            {
+                mPhotoRequested = false;
+                emit photoTaken();
+            }
         }
         break;
     case eMode::CONTINUOUS:
@@ -295,6 +300,11 @@ void cTeledyneFlirCameraModel_T1K::update()
             mCurrentImage = mCamera->getImage();
             mCurrentImage.setTimestamp_ns(cTimestampProvider::timestamp_ns());
             newData = true;
+            if (mPhotoRequested)
+            {
+                mPhotoRequested = false;
+                emit photoTaken();
+            }
         }
         break;
     }
@@ -337,6 +347,7 @@ void cTeledyneFlirCameraModel_T1K::update()
             }
 
             emit onNewImage(mColorizedImage);
+
             mImageRequested = false;
         }
     }

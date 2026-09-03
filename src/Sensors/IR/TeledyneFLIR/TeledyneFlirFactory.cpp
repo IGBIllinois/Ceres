@@ -11,6 +11,8 @@
 #include "TeledyneFlirPropertyPage_Remote.hpp"
 #include "TeledyneFlirPropertyPage_Local.hpp"
 
+#include "TeledyneDiscoverCameras.hpp"
+
 #include <teledyne_atlas_connect/TeledyneFlirCameraFactory.hpp>
 #include <teledyne_atlas_connect/TeledyneFlirCamera.hpp>
 
@@ -20,6 +22,8 @@
 #include <QMetaType>
 #include <QDebug>
 #include <QOverload>
+#include <QCoreApplication>
+#include <QAbstractEventDispatcher>
 
 
 // Example of how to declare a metatype in Qt
@@ -34,23 +38,50 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         return sSensorWidgets();
     }
 
-    cTeledyneFlirCameraFactory factory;
-
     std::string protocol = sensorInfo["protocol"];
 
-    long long timeout_sec = 5;
+    if ((protocol != "usb") && (protocol != "network") && (protocol != "emulator"))
+    {
+        qCritical() << "The \"protocol\" entry is invalid: " << protocol;
+        qCritical() << "Valid values are: usb, network, or emulator";
+        return sSensorWidgets();
+    }
+
+    long long timeout_sec = 15;
     if (sensorInfo.contains("timeout (s)"))
         timeout_sec = sensorInfo["timeout (s)"].get<long long>();
 
-    factory.discoverCameras(protocol, timeout_sec);
+    if (timeout_sec < 5)
+        timeout_sec = 5;
 
-    if (factory.empty())
+    std::unique_ptr<cTeledyneFlirCameraFactory> pFactory = std::make_unique<cTeledyneFlirCameraFactory>();
+
+    auto pThread = new cDiscoverThread(pFactory.get(), protocol, timeout_sec);
+
+    bool discoveryComplete = false;
+
+    QObject::connect(pThread, &cDiscoverThread::discoverComplete, [&discoveryComplete]()
+        {
+            discoveryComplete = true; 
+        });
+    QObject::connect(pThread, &cDiscoverThread::discoverComplete, pThread, &cDiscoverThread::deleteLater);
+
+    pThread->startSearchForCameras();
+
+    QAbstractEventDispatcher* pDispatcher = QCoreApplication::instance()->eventDispatcher();
+
+    while (!discoveryComplete)
+    {
+        pDispatcher->processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
+
+    if (pFactory->empty())
     {
         qCritical() << "No cameras were found!";
         return sSensorWidgets();
     }
 
-    auto camera = factory.getCamera(sensorName);
+    auto camera = pFactory->getCamera(sensorName);
 
     if (!camera)
         return sSensorWidgets();

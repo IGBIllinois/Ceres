@@ -184,14 +184,11 @@ public:
 	eRESULT finished() override;
 
 private:
-	void onModeMessage(uint8_t mode) override;
 	void onTakePhotoReplyMessage(bool error) override;
 
 	void onConnect() override;
 
 private:
-	cTeledyneFlirCameraModel::eMode mMode = cTeledyneFlirCameraModel::eMode::CONTINUOUS;
-
 	cExperimentState::eRESULT mResult = cExperimentState::eRESULT::WAITING;
 };
 

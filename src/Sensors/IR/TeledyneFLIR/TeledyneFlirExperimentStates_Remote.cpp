@@ -242,41 +242,16 @@ void cTeledyneFlirCamera_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 		mResult = cExperimentState::eRESULT::DONE;
 	else
 	{
-		if (mMode == cTeledyneFlirCameraModel::eMode::SINGLE)
-		{
-			sendTakePhotoMessage(mUpdateView, true);
-		}
-		else
-		{
-			if (mUpdateView)
-				sendGrabImageMessage();
-		}
+		sendTakePhotoMessage(mUpdateView, true);
 
 		// Sleep for 250 milliseconds
 		std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 	}
 };
 
-void cTeledyneFlirCamera_TakePhoto_Remote::onModeMessage(uint8_t mode)
-{
-	mMode = static_cast<cTeledyneFlirCameraModel::eMode>(mode);
-
-	if (mode == cTeledyneFlirCameraModel::eMode::SINGLE)
-	{
-		sendTakePhotoMessage(mUpdateView, true);
-	}
-	else
-	{
-		if (mUpdateView)
-			sendGrabImageMessage();
-
-//		mResult = cExperimentState::eRESULT::DONE;
-	}
-}
-
 void cTeledyneFlirCamera_TakePhoto_Remote::onConnect()
 {
-	sendQueryModeMessage();
+	sendTakePhotoMessage(mUpdateView, true);
 
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));

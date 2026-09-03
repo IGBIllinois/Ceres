@@ -3,6 +3,7 @@
 
 #include "teledyne_atlas_connect/TeledyneFlirCameraFactory.hpp"
 
+
 //-----------------------------------------------------------------------------
 cFindCameras::cFindCameras(cTeledyneFlirCameraFactory* pFactory, const std::string& interface_name, long long timeout_sec)
     : mpFactory(pFactory)
