@@ -39,6 +39,26 @@ cExperimentState* cTeledyneFlirPropertyPage_Remote::createState(const std::strin
 
 		std::string cmd = entry["command"];
 
+		if ((cmd == "save_state") || (cmd == "save state"))
+		{
+			auto* pState = new cTeledyneFlirCamera_SaveState_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
+		if ((cmd == "restore_state") || (cmd == "restore state"))
+		{
+			auto* pState = new cTeledyneFlirCamera_RestoreState_Remote(hostname, port, localIp, use_IpV6, parent);
+
+			if (parent)
+				pState->moveToThread(parent->thread());
+
+			return pState;
+		}
+
 		if (cmd == "configure")
 		{
 			auto* pState = new cTeledyneFlirCamera_Configure_Remote(hostname, port, localIp, use_IpV6, parent);

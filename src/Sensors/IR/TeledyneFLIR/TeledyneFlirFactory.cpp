@@ -13,6 +13,8 @@
 
 #include "TeledyneDiscoverCameras.hpp"
 
+#include "..\..\..\Utilities\Timers.hpp"
+
 #include <teledyne_atlas_connect/TeledyneFlirCameraFactory.hpp>
 #include <teledyne_atlas_connect/TeledyneFlirCamera.hpp>
 
@@ -66,13 +68,20 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         });
     QObject::connect(pThread, &cDiscoverThread::discoverComplete, pThread, &cDiscoverThread::deleteLater);
 
+    cOneShotTimer time_out;
+    time_out.time_sec(2 * timeout_sec);
+
     pThread->startSearchForCameras();
+    time_out.start();
 
     QAbstractEventDispatcher* pDispatcher = QCoreApplication::instance()->eventDispatcher();
 
     while (!discoveryComplete)
     {
         pDispatcher->processEvents(QEventLoop::ExcludeUserInputEvents);
+
+        if (time_out.elapsed())
+            break;
     }
 
     if (pFactory->empty())
@@ -101,6 +110,8 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         QObject::connect(pModel, &cTeledyneFlirCameraModel::frameRateChanged,     pView, &cTeledyneFlirStatusView::onFrameRateChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::imageSizeChanged,     pView, &cTeledyneFlirStatusView::onImageSizeChange);
         QObject::connect(pModel, &cTeledyneFlirCameraModel::onNewImage,           pView, &cTeledyneFlirStatusView::imageUpdated);
+
+        QObject::connect(pModel, &cTeledyneFlirCameraModel_T1K::thermalRangeChanged, pView, &cTeledyneFlirStatusView::thermalRangeUpdated);
 
         QObject::connect(pView, &cTeledyneFlirStatusView::requestMode,             pModel, &cTeledyneFlirCameraModel::requestMode);
         QObject::connect(pView, &cTeledyneFlirStatusView::requestFrameRate_Hz,     pModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);

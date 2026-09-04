@@ -47,6 +47,10 @@ void cTeledyneFlirStatusView::createWidgets()
 	mpFrameRate_fps->setReadOnly(true);
 	connect(mpFrameRate_fps, &QLineEdit::editingFinished, this, &cTeledyneFlirStatusView::frameRateEditingFinished);
 
+	mpThermalRangeLabel = new QLabel("Thermal Range (K):", this);
+	mpThermalRange = new QLineEdit(this);
+	mpThermalRange->setReadOnly(true);
+
 	mpGrabImage = new QPushButton("Grab Image", this);
 	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirStatusView::requestImage);
 
@@ -74,6 +78,11 @@ void cTeledyneFlirStatusView::doLayout()
 
 	cameraInfoLayout->addWidget(mpFrameRateLabel);
 	cameraInfoLayout->addWidget(mpFrameRate_fps);
+
+	cameraInfoLayout->addSpacing(10);
+
+	cameraInfoLayout->addWidget(mpThermalRangeLabel);
+	cameraInfoLayout->addWidget(mpThermalRange);
 
 	cameraInfoLayout->addStretch(1);
 
@@ -113,6 +122,16 @@ void cTeledyneFlirStatusView::onImageSizeChange(int width, int height)
 
 	mpImageSizes->setText(str);
 }
+
+void cTeledyneFlirStatusView::thermalRangeUpdated(float minValue_K, float maxValue_K)
+{
+	QString thermal_range = QString::number(minValue_K);
+	thermal_range += " to ";
+	thermal_range += QString::number(maxValue_K);
+
+	mpThermalRange->setText(thermal_range);
+}
+
 
 void cTeledyneFlirStatusView::imageUpdated(const QImage& image)
 {

@@ -87,7 +87,7 @@ void cTeledyneFlirCamera_SaveState_Remote::onConnect()
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
-	eRESULT mResult = cExperimentState::eRESULT::DONE;
+	mResult = cExperimentState::eRESULT::DONE;
 };
 
 
@@ -119,7 +119,7 @@ void cTeledyneFlirCamera_RestoreState_Remote::onConnect()
 	// Sleep for 250 milliseconds
 	std::this_thread::sleep_for(std::chrono::milliseconds(NETWORK_DELAY_MS));
 
-	eRESULT mResult = cExperimentState::eRESULT::DONE;
+	mResult = cExperimentState::eRESULT::DONE;
 };
 
 

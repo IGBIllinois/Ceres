@@ -66,6 +66,9 @@ void cTeledyneFlirCameraModel_T1K::updateViews()
     emit lapseIntervalChanged(mLapseInterval_ms);
     emit frameRateChanged(mFrameRate_fps);
     emit imageSizeChanged(mImageWidth, mImageHeight);
+
+    if (mMinThermalRange_K.has_value() && mMaxThermalRange_K.has_value())
+        emit thermalRangeChanged(mMinThermalRange_K.value(), mMaxThermalRange_K.value());
 }
 
 bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)

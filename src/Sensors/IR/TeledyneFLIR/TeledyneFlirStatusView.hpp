@@ -39,6 +39,7 @@ public slots:
 	void onLapseIntervalChange(int interval_ms);
 	void onFrameRateChange(double rate_fps);
 	void onImageSizeChange(int width, int height);
+	void thermalRangeUpdated(float minValue_K, float maxValue_K);
 	void imageUpdated(const QImage& image);
 
 	void resizeEvent(QResizeEvent*) override;
@@ -60,6 +61,9 @@ private:
 
 	QLabel* mpFrameRateLabel = nullptr;
 	QLineEdit* mpFrameRate_fps = nullptr;
+
+	QLabel* mpThermalRangeLabel = nullptr;
+	QLineEdit* mpThermalRange = nullptr;
 
 	QPushButton* mpGrabImage = nullptr;
 
