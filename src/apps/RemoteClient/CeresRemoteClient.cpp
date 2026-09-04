@@ -6,6 +6,8 @@
 #include "CeresSplashScreen.hpp"
 #include "RemoteClientWindow.hpp"
 
+#include <QSharedMemory>
+
 #include <fstream>
 #include <string>
 #include <chrono>
@@ -79,6 +81,13 @@ void on_terminate()
 
 int main(int argc, char** argv)
 {
+    QSharedMemory thereCanBeOnlyOne("There Can Only Be One");
+
+    if (!thereCanBeOnlyOne.create(128))
+    {
+        return -1;
+    }
+
     auto termination_handler = std::set_terminate(on_terminate);
 
     {
@@ -134,5 +143,7 @@ int main(int argc, char** argv)
     }
 
     std::set_terminate(termination_handler);
+
+    thereCanBeOnlyOne.deleteLater();
 }
 
