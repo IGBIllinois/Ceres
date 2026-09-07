@@ -29,6 +29,11 @@ cAxisCommunicationsPropertyPage_Remote::cAxisCommunicationsPropertyPage_Remote(Q
 		cAxisPropertiesNetEncoder(255)
 {}
 
+cAxisCommunicationsPropertyPage_Remote::cAxisCommunicationsPropertyPage_Remote(const std::string& instance, QWidget* parent)
+: cAxisCommunicationsPropertyPage(instance, parent), cSensorPropertyPageRemoteInterface(parent),
+cAxisPropertiesNetEncoder(255)
+{}
+
 cExperimentState* cAxisCommunicationsPropertyPage_Remote::createState(const std::string& type, const nlohmann::json& entry, QObject* parent)
 {
 	if (nStringUtils::iequal(type, axis_communications_id))
@@ -294,6 +299,10 @@ int cAxisCommunicationsPropertyPage_Remote::sendOutgoingData(const char* data, s
  */
 
 cAxisCommunicationsPropertyPage_Remote_F44::cAxisCommunicationsPropertyPage_Remote_F44(QWidget* parent)
+{}
+
+cAxisCommunicationsPropertyPage_Remote_F44::cAxisCommunicationsPropertyPage_Remote_F44(const std::string& instance, QWidget* parent)
+	: cAxisCommunicationsPropertyPage_Remote(instance)
 {}
 
 void cAxisCommunicationsPropertyPage_Remote_F44::createWidgets()

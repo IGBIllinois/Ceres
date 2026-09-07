@@ -45,6 +45,8 @@ public:
 
     ::gps::sReferencePosition getReferencePosition() const;
 
+    bool configure(const nlohmann::json& jsonCfg) override;
+
     void writeDataHeader() override;
 
 signals:
@@ -101,6 +103,14 @@ protected:
     int mUtcDay = 0;
     int mUtcMonth = 0;
     int mUtcYear = 0;
+
+    struct sAntennaOffset_t
+    {
+        int32_t  x_mm = 0;
+        int32_t  y_mm = 0;
+        int32_t  z_mm = 0;
+    }
+    mAntennaOffset;
 
     bool mRxTimeLocked = false;
 

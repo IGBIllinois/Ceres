@@ -53,6 +53,8 @@ void cAxisCommunicationsModel::updateViews()
 {
     emit modeChanged(static_cast<int>(mMode));
     emit lapseIntervalChanged(mLapseInterval_ms);
+
+    cRgbCameraModel::updateViews();
 }
 
 bool cAxisCommunicationsModel::autoEmitImages() const { return mAutoEmitImages; }

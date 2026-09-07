@@ -148,3 +148,11 @@ cSensorPropertyPage* axis_communications::create_sensor_property_page(
 
     return page;
 }
+
+cSensorPropertyPage* axis_communications::create_sensor_property_page(const std::string& instance, const std::string& model, uint32_t version,
+    const std::string& remote_ip_address, uint16_t port, const std::string& local_ip_address)
+{
+    cAxisCommunicationsPropertyPage_Remote* page = new cAxisCommunicationsPropertyPage_Remote_F44(instance);
+    page->initialize(remote_ip_address, port, false, local_ip_address);
+    return page;
+}

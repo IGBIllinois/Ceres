@@ -79,14 +79,6 @@ private:
     ///< the command queue in case the receiver is turned off and then back on
     std::queue<std::string> mSavedCommandQueue; 
 
-    struct sAntennaOffset_t
-    {
-        double  x_mm = 0;
-        double  y_mm = 0;
-        double  z_mm = 0;
-    }
-    mAntennaOffset;
-
     struct sCartesian_t
     {
         bool dataValid = false;

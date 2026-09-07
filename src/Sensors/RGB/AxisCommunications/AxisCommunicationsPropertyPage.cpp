@@ -14,6 +14,10 @@ cAxisCommunicationsPropertyPage::cAxisCommunicationsPropertyPage(QWidget* parent
 {
 }
 
+cAxisCommunicationsPropertyPage::cAxisCommunicationsPropertyPage(const std::string& instance, QWidget* parent)
+	: cSensorPropertyPage(instance, parent)
+{}
+
 void cAxisCommunicationsPropertyPage::createWidgets()
 {
 	mpModeLabel = new QLabel("Mode:", this);

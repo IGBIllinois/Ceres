@@ -20,6 +20,7 @@ class cAxisCommunicationsPropertyPage_Remote : public cAxisCommunicationsPropert
 {
 public:
     cAxisCommunicationsPropertyPage_Remote(QWidget* parent = nullptr);
+    explicit cAxisCommunicationsPropertyPage_Remote(const std::string& instance, QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Remote() = default;
 
     void connectToModel() override {};
@@ -74,6 +75,7 @@ class cAxisCommunicationsPropertyPage_Remote_F44 : public cAxisCommunicationsPro
 {
 public:
     cAxisCommunicationsPropertyPage_Remote_F44(QWidget* parent = nullptr);
+    explicit cAxisCommunicationsPropertyPage_Remote_F44(const std::string& instance, QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage_Remote_F44() = default;
 
 protected slots:

@@ -27,6 +27,7 @@ class cAxisCommunicationsPropertyPage : public cSensorPropertyPage, public cExpe
 
 public:
     cAxisCommunicationsPropertyPage(QWidget* parent = nullptr);
+    explicit cAxisCommunicationsPropertyPage(const std::string& instance, QWidget* parent = nullptr);
     ~cAxisCommunicationsPropertyPage() = default;
 
     void createWidgets() override;

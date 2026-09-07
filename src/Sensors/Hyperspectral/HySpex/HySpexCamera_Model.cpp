@@ -72,6 +72,8 @@ void cHySpexCameraModel::updateViews()
     emit maxIntegrationTimeChanged(mMaxIntegrationTime_us);
 
     emit lensInfoChanged(QString::fromStdString(mLens), mWorkingDistance_cm, mFieldOfView_deg);
+
+    cHyperspectralModel::updateViews();
 }
 
 bool cHySpexCameraModel::configure(const nlohmann::json& jsonCfg)

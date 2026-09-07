@@ -108,6 +108,25 @@ gps::sReferencePosition cGpsModel::getReferencePosition() const
     return mReferencePosition;
 }
 
+bool cGpsModel::configure(const nlohmann::json& jsonCfg)
+{
+    if (jsonCfg.contains("antenna_offset"))
+    {
+        auto antenna_offset = jsonCfg["antenna_offset"];
+
+        if (antenna_offset.contains("x_mm (south is +)"))
+            mAntennaOffset.x_mm = antenna_offset["x_mm (south is +)"];
+
+        if (antenna_offset.contains("y_mm (east is +)"))
+            mAntennaOffset.y_mm = antenna_offset["y_mm (east is +)"];
+
+        if (antenna_offset.contains("z_mm (up is +)"))
+            mAntennaOffset.z_mm = antenna_offset["z_mm (up is +)"];
+    }
+
+    return cSensorModel::configure(jsonCfg);
+}
+
 void cGpsModel::writeDataHeader()
 {
     // Write Data Header is call at the beginning of each measurement run.
@@ -292,6 +311,10 @@ void cGpsModel::calcReferencePosition()
         double dz = p2.z_mm - p1.z_mm;
 
         double error = sqrt(dx * dx + dy * dy + dz * dz);
+
+        p.x_mm -= mAntennaOffset.x_mm;
+        p.y_mm -= mAntennaOffset.y_mm;
+        p.z_mm -= mAntennaOffset.z_mm;
 
         emit referencePositionChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
 

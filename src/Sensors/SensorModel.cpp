@@ -30,6 +30,23 @@ cSensorModel::cSensorModel(const std::string& name, const std::string& instance,
     setObjectName(title);
 }
 
+void cSensorModel::updateViews()
+{
+    if (!mManufacturer.empty())
+        emit manufacturerChanged(QString::fromStdString(mManufacturer));
+
+    if (!mModel.empty())
+        emit modelChanged(QString::fromStdString(mModel));
+
+    if (!mSerialNumber.empty())
+        emit serialNumberChanged(QString::fromStdString(mSerialNumber));
+
+    emit nameChanged(QString::fromStdString(mSensorName));
+
+    if (!mSensorInstance.empty())
+        emit instanceChanged(QString::fromStdString(mSensorInstance));
+}
+
 bool cSensorModel::configure(const nlohmann::json& jsonCfg)
 {
     if (mManufacturer.empty())

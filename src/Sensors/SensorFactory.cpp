@@ -137,8 +137,8 @@ cSensorPropertyPage* create_sensor_property_page(const std::string& sensor_id, c
     result = lidar::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
     if (result) return result;
 
-//    result = rgb::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
-//    if (result) return result;
+    result = rgb::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
+    if (result) return result;
 
 //    result = hyperspectral::create_sensor_property_page(sensor_id, instance, model, version, remote_ip_address, port, local_ip_address);
 //    if (result) return result;
