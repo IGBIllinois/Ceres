@@ -28,6 +28,9 @@ public:
 	QString experimentErrorWavFilename() const;
 	void setExperimentErrorWavFilename(QString filename);
 
+	QString experimentAttentionWavFilename() const;
+	void setExperimentAttentionWavFilename(QString filename);
+
 	QString fieldLayoutFilename() const;
 	void setFieldLayoutFilename(QString filename);
 
@@ -37,11 +40,13 @@ public:
 private slots:
 	void browseEndOfExperimentWavFile();
 	void browseExperimentErrorWavFile();
+	void browseExperimentAttentionWavFile();
 	void browseFieldLayout();
 	void browseExperimentPath();
 
 	void testEndOfExperimentWavFiles();
 	void testExperimentErrorWavFiles();
+	void testExperimentAttentionWavFiles();
 
 private:
 	void createControls();
@@ -57,6 +62,11 @@ private:
 	QPushButton* mpBrowseExperimentErrorWavFile = nullptr;
 	QPushButton* mpTestExperimentErrorWavFile = nullptr;
 	QComboBox* mpExperimentErrorAudioID = nullptr;
+
+	QLineEdit* mpExperimentAttentionWavFilename = nullptr;
+	QPushButton* mpBrowseExperimentAttentionWavFile = nullptr;
+	QPushButton* mpTestExperimentAttentionWavFile = nullptr;
+	QComboBox* mpExperimentAttentionAudioID = nullptr;
 
 	QLineEdit* mpFieldLayoutFilename = nullptr;
 	QPushButton* mpBrowseFieldLayout = nullptr;

@@ -123,6 +123,11 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     if (!wav_file_name.isEmpty())
         mExperimentErrorSound.open(wav_file_name.toStdString());
+
+    wav_file_name = mSettings.value("Defaults/Options/ExperimentAttentionWavFilename").toString();
+
+    if (!wav_file_name.isEmpty())
+        mExperimentAttentionSound.open(wav_file_name.toStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -534,6 +539,10 @@ void cMainWindow::onSettingsOptions()
 
     pDlg->setExperimentErrorWavFilename(error_wav_file_name);
 
+    auto attention_wav_file_name = mSettings.value("Defaults/Options/ExperimentAttentionWavFilename").toString();
+
+    pDlg->setExperimentAttentionWavFilename(attention_wav_file_name);
+
     auto result = pDlg->exec();
 
     if (result == QDialog::Accepted)
@@ -560,6 +569,18 @@ void cMainWindow::onSettingsOptions()
                 close();
 
             mExperimentErrorSound.open(filename.toStdString());
+        }
+
+        filename = pDlg->experimentAttentionWavFilename();
+
+        if (attention_wav_file_name != filename)
+        {
+            mSettings.setValue("Defaults/Options/ExperimentAttentionWavFilename", filename);
+
+            if (mExperimentAttentionSound.is_open())
+                close();
+
+            mExperimentAttentionSound.open(filename.toStdString());
         }
     }
 
@@ -724,6 +745,13 @@ void cMainWindow::onExperimentCompleted()
 
     onStatusUpdate("Measurement completed!");
 }
+
+void cMainWindow::onExperimentAttention()
+{
+    if (mExperimentAttentionSound.is_open())
+        mExperimentAttentionSound.play();
+}
+
 
 //-----------------------------------------------------------------------------
 void cMainWindow::updateControllerConnection(bool connected)
@@ -1093,6 +1121,7 @@ void cMainWindow::createExperimentController(const nlohmann::json& configDoc)
     QObject::connect(pModel, &cExperimentControlModel::experimentStateChanged,
         mpHobbsMeter, &cHobbsMeter::onExperimentStateChange);
 
+    QObject::connect(pModel, &cExperimentControlModel::experimentAlert, this, &cMainWindow::onExperimentAttention);
     QObject::connect(pModel, &cExperimentControlModel::statusMessage, this, &cMainWindow::onStatusUpdate);
     QObject::connect(pModel, &cExperimentControlModel::infoMessage, this, &cMainWindow::onInfoMessage);
     QObject::connect(pModel, &cExperimentControlModel::warningMessage, this, &cMainWindow::onWarningMessage);

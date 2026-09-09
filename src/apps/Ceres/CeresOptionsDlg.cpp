@@ -48,6 +48,16 @@ void cCeresOptionsDlg::setExperimentErrorWavFilename(QString filename)
 	mpExperimentErrorWavFilename->setText(filename);
 }
 
+QString cCeresOptionsDlg::experimentAttentionWavFilename() const
+{
+	return mpExperimentAttentionWavFilename->text();
+}
+
+void cCeresOptionsDlg::setExperimentAttentionWavFilename(QString filename)
+{
+	mpExperimentAttentionWavFilename->setText(filename);
+}
+
 QString cCeresOptionsDlg::fieldLayoutFilename() const
 {
 	return mpFieldLayoutFilename->text();
@@ -84,6 +94,14 @@ void cCeresOptionsDlg::createControls()
 	mpTestExperimentErrorWavFile = new QPushButton("Test", this);
 	connect(mpTestExperimentErrorWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::testExperimentErrorWavFiles);
 
+	mpExperimentAttentionWavFilename = new QLineEdit(this);
+	mpExperimentAttentionWavFilename->setMinimumWidth(300);
+	mpBrowseExperimentAttentionWavFile = new QPushButton("Browse", this);
+	connect(mpBrowseExperimentAttentionWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::browseExperimentAttentionWavFile);
+	mpTestExperimentAttentionWavFile = new QPushButton("Test", this);
+	connect(mpTestExperimentAttentionWavFile, &QPushButton::pressed, this, &cCeresOptionsDlg::testExperimentAttentionWavFiles);
+
+
 	mpFieldLayoutFilename = new QLineEdit(this);
 	mpBrowseFieldLayout = new QPushButton("Browse", this);
 	connect(mpBrowseFieldLayout, &QPushButton::pressed, this, &cCeresOptionsDlg::browseFieldLayout);
@@ -94,6 +112,7 @@ void cCeresOptionsDlg::createControls()
 
 	mpEndOfExperimentAudioID = new QComboBox(this);
 	mpExperimentErrorAudioID = new QComboBox(this);
+	mpExperimentAttentionAudioID = new QComboBox(this);
 
 	cAudioDevices audio_devices;
 	auto devices = audio_devices.getAudioDevices();
@@ -102,6 +121,7 @@ void cCeresOptionsDlg::createControls()
 	{
 		mpEndOfExperimentAudioID->addItem(QString::fromStdString(device.audio_device_name), device.audio_device_ID);
 		mpExperimentErrorAudioID->addItem(QString::fromStdString(device.audio_device_name), device.audio_device_ID);
+		mpExperimentAttentionAudioID->addItem(QString::fromStdString(device.audio_device_name), device.audio_device_ID);
 	}
 }
 
@@ -158,6 +178,34 @@ void cCeresOptionsDlg::createLayout()
 	text = new QLabel("Audio Device : ");
 	pOutputLayout->addWidget(text);
 	pOutputLayout->addWidget(mpExperimentErrorAudioID);
+
+	pWavLayout->addLayout(pOutputLayout);
+
+	pGroupBox->setLayout(pWavLayout);
+	pMainLayout->addWidget(pGroupBox);
+
+	pMainLayout->addSpacing(5);
+
+	pGroupBox = new QGroupBox(tr("Experiment Error"));
+	pGroupBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	pWavLayout = new QVBoxLayout();
+
+	pSoundLayout = new QHBoxLayout();
+
+	text = new QLabel("WAV File : ");
+	pSoundLayout->addWidget(text);
+	pSoundLayout->addWidget(mpExperimentAttentionWavFilename);
+	pSoundLayout->addWidget(mpBrowseExperimentAttentionWavFile);
+	pSoundLayout->addWidget(mpTestExperimentAttentionWavFile);
+
+	pWavLayout->addLayout(pSoundLayout);
+
+	pOutputLayout = new QHBoxLayout();
+
+	text = new QLabel("Audio Device : ");
+	pOutputLayout->addWidget(text);
+	pOutputLayout->addWidget(mpExperimentAttentionAudioID);
 
 	pWavLayout->addLayout(pOutputLayout);
 
@@ -225,6 +273,19 @@ void cCeresOptionsDlg::browseExperimentErrorWavFile()
 	mpExperimentErrorWavFilename->setText(fileName);
 }
 
+void cCeresOptionsDlg::browseExperimentAttentionWavFile()
+{
+	QString defaultDirectory = mpExperimentAttentionWavFilename->text();
+
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Load WAV file"), defaultDirectory,
+		"Wav Files (*.wav)");
+
+	if (fileName.isEmpty())
+		return;
+
+	mpExperimentAttentionWavFilename->setText(fileName);
+}
+
 void cCeresOptionsDlg::browseFieldLayout()
 {
 	QString defaultDirectory = mpFieldLayoutFilename->text();
@@ -267,6 +328,23 @@ void cCeresOptionsDlg::testExperimentErrorWavFiles()
 		return;
 
 	SDL_AudioDeviceID id = mpExperimentErrorAudioID->currentData().toInt();
+
+	if (mTestSound.is_open())
+		mTestSound.close();
+
+	mTestSound.setPlaybackDevice(id);
+	if (mTestSound.open(wavFilename))
+		mTestSound.play();
+}
+
+void cCeresOptionsDlg::testExperimentAttentionWavFiles()
+{
+	std::string wavFilename = mpExperimentAttentionWavFilename->text().toStdString();
+
+	if (wavFilename.empty())
+		return;
+
+	SDL_AudioDeviceID id = mpExperimentAttentionAudioID->currentData().toInt();
 
 	if (mTestSound.is_open())
 		mTestSound.close();

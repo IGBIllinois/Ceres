@@ -72,6 +72,7 @@ public slots:
 //    void onRunControllerAction(QString msg);
     void onExperimentTerminated();
     void onExperimentCompleted();
+    void onExperimentAttention();
 
 protected slots:
     void updateControllerConnection(bool connected);
@@ -165,6 +166,7 @@ private:
 
     cSound mExperimentErrorSound;
     cSound mEndOfExperimentSound;
+    cSound mExperimentAttentionSound;
 
     std::string mBatchFileName;
     std::vector<std::filesystem::path> mBatchProcess;
