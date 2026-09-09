@@ -223,6 +223,8 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 
 			if ((sensor_offset_mm == -10000) || (canopy_height_mm == -10000))
 			{
+				emit attentionAlert();
+
 				cAboveCanopyHeightDlg* pDlg = new cAboveCanopyHeightDlg();
 
 				if (canopy_height_mm != -10000)
@@ -299,6 +301,8 @@ bool cSpidercamExperimentState_Movement::configure(const nlohmann::json& stateDo
 
 			if (sensor_offset_mm == -10000)
 			{
+				emit attentionAlert();
+
 				cAboveGroundHeightDlg* pDlg = new cAboveGroundHeightDlg();
 
 				if (sensor_offset_mm != -10000)

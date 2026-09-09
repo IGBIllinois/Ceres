@@ -1,4 +1,5 @@
 
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 source_group("Resources" FILES gps_properties.proto)
@@ -65,8 +66,8 @@ set(GPS_SOURCE_FILES
 #
 # We skip these header files as they are public and MOC will be used 
 # in the main application
-#set_property(SOURCE ExperimentCtrlView.hpp PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+# Note: this only works by giving the full or relative path to the file!!
+set_source_files_properties(SOURCE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR}/ExperimentState.hpp PROPERTIES SKIP_AUTOMOC ON)
 
 
 # The static library (.lib/.a) for incorporating GPS data in Ceres

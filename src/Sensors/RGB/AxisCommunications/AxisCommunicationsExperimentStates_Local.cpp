@@ -14,7 +14,7 @@
 /**       Base Class for Axis Communications Local Experiment States      **/
 /***************************************************************************/
 cAxisCommunicationsExperimentState_Local::cAxisCommunicationsExperimentState_Local(cAxisCommunicationsModel* pModel, QObject* parent)
-	: QObject(parent), mpModel(pModel)
+	: cExperimentState(parent), mpModel(pModel)
 {}
 
 cAxisCommunicationsExperimentState_Local::~cAxisCommunicationsExperimentState_Local()
@@ -174,10 +174,7 @@ cAxisCommunications_TakePhoto_Local::cAxisCommunications_TakePhoto_Local(cAxisCo
 
 QString cAxisCommunications_TakePhoto_Local::getStatusStr()
 {
-	if (mUpdateView)
-		return "Taking Photo and updating view...";
-
-	return "Taking Photo...";
+	return getStatusMessage();
 }
 
 bool cAxisCommunications_TakePhoto_Local::configure(const nlohmann::json& stateDoc)
@@ -220,6 +217,8 @@ void cAxisCommunications_TakePhoto_Local::onPhotoTaken()
 		mResult = cExperimentState::eRESULT::DONE;
 	else
 	{
+		emit statusUpdate(getStatusMessage());
+
 		mTriggerPhoto = true;
 	}
 };

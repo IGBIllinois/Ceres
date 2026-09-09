@@ -18,7 +18,7 @@ const long long NETWORK_DELAY_MS = 500;
 /*******************************************************************/
 cTeledyneFlirCameraExperimentState_Remote::cTeledyneFlirCameraExperimentState_Remote
 	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6, QObject* parent)
-	: cExperimentStateRemoteInterface(parent), cTeledyneFlirPropertiesNetEncoder(255)
+	: cExperimentState(parent), cExperimentStateRemoteInterface(/*parent*/), cTeledyneFlirPropertiesNetEncoder(255)
 {
 	mHostname = hostname;
 	mPort = port;
@@ -218,10 +218,7 @@ cTeledyneFlirCamera_TakePhoto_Remote::cTeledyneFlirCamera_TakePhoto_Remote(const
 
 QString cTeledyneFlirCamera_TakePhoto_Remote::getStatusStr()
 {
-	if (mUpdateView)
-		return "Taking Photo and updating view...";
-
-	return "Taking Photo...";
+	return getStatusMessage();
 }
 
 bool cTeledyneFlirCamera_TakePhoto_Remote::configure(const nlohmann::json& stateDoc)
@@ -242,6 +239,8 @@ void cTeledyneFlirCamera_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 		mResult = cExperimentState::eRESULT::DONE;
 	else
 	{
+		emit statusUpdate(getStatusMessage());
+
 		sendTakePhotoMessage(mUpdateView, true);
 
 		// Sleep for 250 milliseconds

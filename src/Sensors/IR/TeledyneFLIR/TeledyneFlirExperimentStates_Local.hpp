@@ -17,7 +17,7 @@ class cTeledyneFlirCameraModel;
 /**    Base Class for Teledyne FLIR Local Experiment States      **/
 /*******************************************************************/
 
-class cTeledyneFlirCameraExperimentState_Local : public QObject, public cExperimentState
+class cTeledyneFlirCameraExperimentState_Local : public cExperimentState
 {
 	Q_OBJECT
 

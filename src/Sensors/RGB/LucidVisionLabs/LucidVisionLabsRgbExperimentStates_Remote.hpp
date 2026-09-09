@@ -19,7 +19,7 @@ class cLucidVisionLabsRgbPropertyPage_Remote;
 /**    Base Class for  Lucid Vision Labs RGB Camera Remote Experiment States      **/
 /***********************************************************************************/
 
-class cLucidVisionLabsRgbCameraExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState,
+class cLucidVisionLabsRgbCameraExperimentState_Remote : public cExperimentState, public cExperimentStateRemoteInterface,
 	protected cLucidRgbPropertiesNetDecoder, protected cLucidRgbPropertiesNetEncoder
 {
 	Q_OBJECT

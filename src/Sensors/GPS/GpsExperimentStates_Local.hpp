@@ -17,7 +17,7 @@ class cGpsModel;
 /**           Base Class for GPS Experiment States             **/
 /*******************************************************************/
 
-class cGpsExperimentState_Local : public QObject, public cExperimentState
+class cGpsExperimentState_Local : public cExperimentState
 {
 	Q_OBJECT
 

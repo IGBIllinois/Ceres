@@ -16,7 +16,7 @@ class cAxisCommunicationsModel;
 /**    Base Class for Axis Communications Camera Local Experiment States      **/
 /*********************************************************************************/
 
-class cAxisCommunicationsExperimentState_Local : public QObject, public cExperimentState
+class cAxisCommunicationsExperimentState_Local : public cExperimentState
 {
 	Q_OBJECT
 

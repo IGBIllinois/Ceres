@@ -5,6 +5,8 @@
 
 #include <spidercam_connect/spidercam_types.hpp>
 
+#include <QObject>
+
 // Forward Declarations
 class iSpidercamController;
 
@@ -58,6 +60,8 @@ protected:
 
 class cSpidercamExperimentState_Movement : public cSpidercamExperimentState
 {
+	Q_OBJECT
+
 public:
 	cSpidercamExperimentState_Movement(const spidercam::sPosition_1_t& pos,
 		iSpidercamController& controller, uint32_t tolerance_mm);

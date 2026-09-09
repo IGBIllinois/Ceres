@@ -195,4 +195,29 @@ bool cAxisCommunicationsExperimentHelper_TakePhoto::configure(const nlohmann::js
 	return true;
 }
 
+QString cAxisCommunicationsExperimentHelper_TakePhoto::getStatusMessage()
+{
+	if (mNumOfPhotos > 1)
+	{
+		QString msg;
+
+		if (mUpdateView)
+		{
+			msg = "Taking ";
+			msg += QString::number(mNumOfPhotos);
+			msg += " Photos and updating view...";
+			return msg;
+		}
+
+		msg = "Taking ";
+		msg += QString::number(mNumOfPhotos);
+		msg += " Photos...";
+		return msg;
+	}
+
+	if (mUpdateView)
+		return "Taking Photo and updating view...";
+
+	return "Taking Photo...";
+}
 

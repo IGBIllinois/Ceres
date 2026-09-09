@@ -13,12 +13,12 @@
 /*******************************************************************/
 /**   Interface for Experiment State to Control Remote Sensor     **/
 /*******************************************************************/
-class cExperimentStateRemoteInterface : public QObject
+class cExperimentStateRemoteInterface //: public QObject
 {
-	Q_OBJECT
+//	Q_OBJECT
 
 public:
-	cExperimentStateRemoteInterface(QObject* parent = nullptr);
+	cExperimentStateRemoteInterface(/*QObject* parent = nullptr*/);
 	virtual ~cExperimentStateRemoteInterface();
 
 	bool initialize(const std::string& hostname, uint16_t port,
@@ -41,7 +41,7 @@ public:
 	/*
 	 * Signals handlers from the TCP socket
 	 */
-private slots:
+private: // slots:
 	void connected();
 	void disconnected();
 	void errorOccurred(QAbstractSocket::SocketError socketError);

@@ -72,6 +72,7 @@ PRIVATE
     ${SEPTENTRIO_SOURCE_FILES}
 )
 
+
 target_include_directories(septentrio_static PRIVATE ${COMMON_INCLUDE_DIR})
 target_include_directories(septentrio_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 

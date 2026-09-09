@@ -18,7 +18,7 @@
 /**           Base Class for GPS Experiment States             **/
 /*******************************************************************/
 
-class cGpsExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState,
+class cGpsExperimentState_Remote : public cExperimentState, public cExperimentStateRemoteInterface,
 	protected cGpsPropertiesNetDecoder, protected cGpsPropertiesNetEncoder
 {
 	Q_OBJECT

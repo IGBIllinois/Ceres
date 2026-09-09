@@ -6,7 +6,10 @@
 
 #include <qglobal.h>
 
+
+// Forward Declaration
 class cExperimentState;
+
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE

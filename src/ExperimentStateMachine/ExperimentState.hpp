@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <QString>
 
 #include <nlohmann/json.hpp>
@@ -10,8 +11,10 @@
 class cExperimentVariableTable;
 
 
-class cExperimentState
+class cExperimentState : public QObject
 {
+	Q_OBJECT
+
 public:
 	enum class eRESULT 
 	{
@@ -20,20 +23,17 @@ public:
 		ABORT		// The state is requesting an abort of the experiment
 	};
 
-	cExperimentState() = default;
-	virtual ~cExperimentState() = default;
+	cExperimentState(QObject* parent = nullptr);
+	virtual ~cExperimentState();
 
 	virtual QString getStatusStr() = 0;
 
-	void attachVariableTable(std::weak_ptr<cExperimentVariableTable> vars)
-	{
-		mVariables = vars;
-	}
+	void attachVariableTable(std::weak_ptr<cExperimentVariableTable> vars);
 
 	virtual bool configure(const nlohmann::json& stateDoc) = 0;
 	virtual void cleanup() {};
 
-	virtual bool needsDataFile() { return recording(); }
+	virtual bool needsDataFile();
 	virtual bool recording() = 0;
 
 	virtual bool initialize() = 0;
@@ -41,6 +41,10 @@ public:
 	virtual void pause() = 0;
 	virtual void stop() = 0;
 	virtual eRESULT finished() = 0;
+
+signals:
+	void attentionAlert();
+	void statusUpdate(QString msg);
 
 protected:
 	std::weak_ptr<cExperimentVariableTable> mVariables;

@@ -14,7 +14,7 @@
 /**  Base Class for Teledyne FLIR Local Experiment States  **/
 /*******************************************************************/
 cTeledyneFlirCameraExperimentState_Local::cTeledyneFlirCameraExperimentState_Local(cTeledyneFlirCameraModel* pModel, QObject* parent)
-	: QObject(parent), mpModel(pModel)
+	: cExperimentState(parent), mpModel(pModel)
 {}
 
 cTeledyneFlirCameraExperimentState_Local::~cTeledyneFlirCameraExperimentState_Local()
@@ -158,10 +158,7 @@ cTeledyneFlirCamera_TakePhoto_Local::cTeledyneFlirCamera_TakePhoto_Local(cTeledy
 
 QString cTeledyneFlirCamera_TakePhoto_Local::getStatusStr()
 {
-	if (mUpdateView)
-		return "Taking Photo and updating view...";
-
-	return "Taking Photo...";
+	return getStatusMessage();
 }
 
 bool cTeledyneFlirCamera_TakePhoto_Local::configure(const nlohmann::json& stateDoc)
@@ -195,6 +192,8 @@ void cTeledyneFlirCamera_TakePhoto_Local::onPhotoTaken()
 		mResult = cExperimentState::eRESULT::DONE;
 	else
 	{
+		emit statusUpdate(getStatusMessage());
+
 		mTriggerImage = true;
 	}
 };

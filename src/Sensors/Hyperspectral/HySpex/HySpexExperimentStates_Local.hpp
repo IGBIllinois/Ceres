@@ -17,7 +17,7 @@ class cHySpexVNIR_3000N_Model;
 /**           Base Class for HySpex Experiment States             **/
 /*******************************************************************/
 
-class cHySpexCamera_ExperimentState_Local : public QObject, public cExperimentState
+class cHySpexCamera_ExperimentState_Local : public cExperimentState
 {
 	Q_OBJECT
 

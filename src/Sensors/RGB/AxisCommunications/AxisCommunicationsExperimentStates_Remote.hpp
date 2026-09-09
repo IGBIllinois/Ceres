@@ -20,7 +20,7 @@ class cAxisCommunicationsPropertyPage_Remote;
 /**         Base Class for Axis Communications Remote Experiment States           **/
 /***********************************************************************************/
 
-class cAxisCommunicationsExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState,
+class cAxisCommunicationsExperimentState_Remote : public cExperimentState, public cExperimentStateRemoteInterface, 
 	protected cAxisPropertiesNetDecoder, protected cAxisPropertiesNetEncoder
 {
 	Q_OBJECT

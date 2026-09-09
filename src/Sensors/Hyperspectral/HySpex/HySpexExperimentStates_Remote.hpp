@@ -22,7 +22,7 @@ class cHySpexVNIR_3000N_PropertyPage_Remote;
 /**           Base Class for HySpex Experiment States             **/
 /*******************************************************************/
 
-class cHySpexCamera_ExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState
+class cHySpexCamera_ExperimentState_Remote : public cExperimentState, public cExperimentStateRemoteInterface
 {
 	Q_OBJECT
 

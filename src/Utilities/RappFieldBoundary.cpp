@@ -20,15 +20,24 @@ using namespace NS_PROJ::util;
 
 namespace
 {
+	// The "measurementOffset_mm" is the distance between the red reflective tape and the sensors hanging below it.
 	uint32_t measurementOffset_mm = 10000;
 
+	// The surveyed locations "center of base" of the four towers
 	const std::array<rfm::planePoint_t, 4> mUIUC_TowerLocations = {
 		rfm::planePoint_t(1237093.164, 1019287.146, 710.708),
 		rfm::planePoint_t(1236468.119, 1019286.889, 710.774),
 		rfm::planePoint_t(1236468.156, 1019912.027, 710.853),
 		rfm::planePoint_t(1237093.252, 1019911.889, 710.752) };
 
-	constexpr double mUIUC_ReferenceHeight_ft = 708.045;
+	// The "mReferenceHeightOffset_m" is an offset that is applied to the reference or zero height to increase vertical travel and
+	// reduce tension when loading/unloading dolly
+	constexpr double mReferenceHeightOffset_m = -1.0;
+	constexpr double mReferenceHeightOffset_ft = mReferenceHeightOffset_m * nConstants::M_TO_FT;
+
+	// The "mUIUC_ReferenceHeight_ft" is the reference or zero height of the spidercam system.  The reference point is located in front
+	// of the trailer between the two white pipes.  An offset is added to make it easier to load/unload the dolly.
+	constexpr double mUIUC_ReferenceHeight_ft = 708.045; // + mReferenceHeightOffset_ft;
 	constexpr double mUIUC_ReferenceHeight_m = mUIUC_ReferenceHeight_ft * nConstants::FT_TO_M;
 
 	const std::array<rfm::rappPoint_t, 4> mRappTowerLocations = {

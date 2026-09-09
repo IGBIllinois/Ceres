@@ -39,6 +39,7 @@ namespace
     {
         for (cExperimentState* state : states)
         {
+            state->disconnect();
             delete state;
             state = nullptr;
         }
@@ -75,6 +76,7 @@ cExperimentStateMachine::~cExperimentStateMachine()
 
     for (auto state : mPendingDelete)
     {
+        state->disconnect();
         delete state;
     }
 
@@ -210,10 +212,9 @@ cExperimentState* cExperimentStateMachine::createState(const std::string& type, 
         return new cExperimentState_Delay();
 
     if (type == "pause")
+    {
         return new cExperimentState_Pause();
-
-    if (type == "record_state")
-        return new cExperimentState_Recording();
+    }
 
     return nullptr;
 }
@@ -298,6 +299,10 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
             if (pState)
             {
                 pState->attachVariableTable(mVariableTable);
+
+                QObject::connect(pState, &cExperimentState::attentionAlert, this, &cExperimentStateMachine::experimentAlert);
+                QObject::connect(pState, &cExperimentState::statusUpdate, this, &cExperimentStateMachine::experimentStatus);
+
                 if (pState->configure(entry))
                 {
                     mExperimentStates.push_back(pState);
@@ -550,6 +555,7 @@ void cExperimentStateMachine::updateExperimentStateMachine()
         std::lock_guard<std::mutex> lock{mPendingDeleteMutex};
         for (auto state : mPendingDelete)
         {
+            state->disconnect();
             delete state;
         }
 
@@ -715,6 +721,10 @@ std::vector<cExperimentState*> cExperimentStateMachine::loadMeasurementStates(co
             if (pState)
             {
                 pState->attachVariableTable(mVariableTable);
+
+                QObject::connect(pState, &cExperimentState::attentionAlert, this, &cExperimentStateMachine::experimentAlert);
+                QObject::connect(pState, &cExperimentState::statusUpdate, this, &cExperimentStateMachine::experimentStatus);
+
                 if (pState->configure(entry))
                     states.push_back(pState);
             }

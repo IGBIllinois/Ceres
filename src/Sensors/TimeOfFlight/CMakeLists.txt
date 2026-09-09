@@ -23,6 +23,13 @@ set(TOF_CAMERA_SOURCE_FILES
 )
 
 
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+#set_property(SOURCE ExperimentCtrlView.hpp PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+
+
 # The static library (.lib/.a) for communicating with Time-of-Flight Cameras
 add_library(tof_camera_static STATIC)
 

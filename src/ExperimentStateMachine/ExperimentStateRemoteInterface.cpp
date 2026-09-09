@@ -5,8 +5,8 @@
 /*******************************************************************/
 /**   Interface for Experiment State to Control Remote Sensor     **/
 /*******************************************************************/
-cExperimentStateRemoteInterface::cExperimentStateRemoteInterface(QObject* parent)
-    : QObject(parent), mConnected(false), mpSocket(nullptr), mPort(0)
+cExperimentStateRemoteInterface::cExperimentStateRemoteInterface(/*QObject* parent*/)
+    : /*QObject(parent), */mConnected(false), mpSocket(nullptr), mPort(0)
 {
     qRegisterMetaType<QAbstractSocket::SocketError>();
     qRegisterMetaType<QAbstractSocket::SocketState>();
@@ -28,31 +28,37 @@ void cExperimentStateRemoteInterface::destroy()
             mpSocket->close();
         }
 
-        QObject::disconnect(mpSocket, &QTcpSocket::connected, this, &cExperimentStateRemoteInterface::connected);
-        QObject::disconnect(mpSocket, &QTcpSocket::disconnected, this, &cExperimentStateRemoteInterface::disconnected);
-        QObject::disconnect(mpSocket, &QTcpSocket::errorOccurred, this, &cExperimentStateRemoteInterface::errorOccurred);
-        QObject::disconnect(mpSocket, &QTcpSocket::hostFound, this, &cExperimentStateRemoteInterface::hostFound);
-        QObject::disconnect(mpSocket, &QTcpSocket::stateChanged, this, &cExperimentStateRemoteInterface::stateChanged);
-        QObject::disconnect(mpSocket, &QTcpSocket::readyRead, this, &cExperimentStateRemoteInterface::processIncomingData);
+        mpSocket->disconnect();
 
-        delete mpSocket;
-        mpSocket = nullptr;
+        mpSocket->deleteLater();
     }
+
+    mpSocket = nullptr;
 }
 
 bool cExperimentStateRemoteInterface::initialize(const std::string& hostname, uint16_t port,
     bool use_ipv6, const std::string& local_ip)
 {
-    mpSocket = new QTcpSocket(this);
+
+    mpSocket = new QTcpSocket();
     mpSocket->setSocketOption(QAbstractSocket::SocketOption::LowDelayOption, 1);
     mpSocket->setSocketOption(QAbstractSocket::SocketOption::KeepAliveOption, 1);
 
+    QObject::connect(mpSocket, &QTcpSocket::connected, [this]() { connected(); });
+    QObject::connect(mpSocket, &QTcpSocket::disconnected, [this]() { disconnected(); });
+    QObject::connect(mpSocket, &QTcpSocket::errorOccurred, [this](QAbstractSocket::SocketError socketError) { errorOccurred(socketError); });
+    QObject::connect(mpSocket, &QTcpSocket::hostFound, [this]() { hostFound(); });
+    QObject::connect(mpSocket, &QTcpSocket::stateChanged, [this](QAbstractSocket::SocketState socketState) { stateChanged(socketState); });
+    QObject::connect(mpSocket, &QTcpSocket::readyRead, [this]() { processIncomingData(); });
+
+/*
     QObject::connect(mpSocket, &QTcpSocket::connected, this, &cExperimentStateRemoteInterface::connected);
     QObject::connect(mpSocket, &QTcpSocket::disconnected, this, &cExperimentStateRemoteInterface::disconnected);
     QObject::connect(mpSocket, &QTcpSocket::errorOccurred, this, &cExperimentStateRemoteInterface::errorOccurred);
     QObject::connect(mpSocket, &QTcpSocket::hostFound, this, &cExperimentStateRemoteInterface::hostFound);
     QObject::connect(mpSocket, &QTcpSocket::stateChanged, this, &cExperimentStateRemoteInterface::stateChanged);
     QObject::connect(mpSocket, &QTcpSocket::readyRead, this, &cExperimentStateRemoteInterface::processIncomingData);
+*/
 
     if (!local_ip.empty())
     {

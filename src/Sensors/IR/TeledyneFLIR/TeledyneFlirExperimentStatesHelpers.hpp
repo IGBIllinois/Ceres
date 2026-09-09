@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <QString>
+
 #include <nlohmann/json.hpp>
 
 
@@ -39,6 +41,8 @@ public:
 	cTeledyneFlirExperimentHelper_TakePhoto();
 
 	bool configure(const nlohmann::json& stateDoc);
+
+	QString getStatusMessage();
 
 protected:
 	bool mUpdateView = false;

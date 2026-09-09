@@ -69,6 +69,13 @@ set(HOKUYO_SOURCE_FILES
 )
 
 
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+# Note: this only works by giving the full or relative path to the file!!
+set_property(SOURCE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR}/ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+
+
 # The static library (.lib/.a) for incorporating OUSTER LiDAR data in Ceres
 add_library(hokuyo_sensor_static STATIC)
 

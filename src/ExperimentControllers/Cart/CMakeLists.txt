@@ -50,6 +50,11 @@ set(CART_CTRL_SOURCE_FILES
 #    SpidercamExperimentStates.cpp
 )
 
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+
 
 # The static library (.lib/.a) for incorporating spidercam control in Ceres
 add_library(CartCtrl_static STATIC)

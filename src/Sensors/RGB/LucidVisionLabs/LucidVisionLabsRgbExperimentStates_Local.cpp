@@ -14,7 +14,7 @@
 /**  Base Class for Lucid Vision Labs RGB Camera Local Experiment States  **/
 /***************************************************************************/
 cLucidVisionLabsRgbCameraExperimentState_Local::cLucidVisionLabsRgbCameraExperimentState_Local(cLucidVisionLabsRgbModel* pModel, QObject* parent)
-	: QObject(parent), mpModel(pModel)
+	: mpModel(pModel)
 {}
 
 cLucidVisionLabsRgbCameraExperimentState_Local::~cLucidVisionLabsRgbCameraExperimentState_Local()

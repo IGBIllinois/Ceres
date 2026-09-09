@@ -21,7 +21,7 @@ class cTeledyneFlirPropertyPage_Remote;
 /**    Base Class for Teledyne FLIR Remote Experiment States      **/
 /*******************************************************************/
 
-class cTeledyneFlirCameraExperimentState_Remote : public cExperimentStateRemoteInterface, public cExperimentState,
+class cTeledyneFlirCameraExperimentState_Remote : public cExperimentState, public cExperimentStateRemoteInterface,
 	protected cTeledyneFlirPropertiesNetDecoder, protected cTeledyneFlirPropertiesNetEncoder
 {
 	Q_OBJECT

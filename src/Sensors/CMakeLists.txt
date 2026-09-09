@@ -76,6 +76,7 @@ PRIVATE
 # We skip these header files as they are public and MOC will be used 
 # in the main application
 set_property(SOURCE SensorModel.hpp PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

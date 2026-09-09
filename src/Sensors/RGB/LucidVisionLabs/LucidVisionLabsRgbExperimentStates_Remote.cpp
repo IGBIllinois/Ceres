@@ -18,7 +18,7 @@ const long long NETWORK_DELAY_MS = 500;
 /***********************************************************************************/
 cLucidVisionLabsRgbCameraExperimentState_Remote::cLucidVisionLabsRgbCameraExperimentState_Remote
 	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6, QObject* parent)
-	: cExperimentStateRemoteInterface(parent), cLucidRgbPropertiesNetEncoder(255)
+	: cExperimentState(parent), cExperimentStateRemoteInterface(/*parent*/), cLucidRgbPropertiesNetEncoder(255)
 {
 	mHostname = hostname;
 	mPort = port;

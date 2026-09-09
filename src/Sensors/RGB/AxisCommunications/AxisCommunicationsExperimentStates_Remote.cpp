@@ -18,7 +18,7 @@ const long long NETWORK_DELAY_MS = 500;
 /***********************************************************************************/
 cAxisCommunicationsExperimentState_Remote::cAxisCommunicationsExperimentState_Remote
 	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6, QObject* parent)
-	: cExperimentStateRemoteInterface(parent), cAxisPropertiesNetEncoder(255)
+	: cExperimentState(parent), cExperimentStateRemoteInterface(/*parent*/), cAxisPropertiesNetEncoder(255)
 {
 	mHostname = hostname;
 	mPort = port;
@@ -340,28 +340,7 @@ cAxisCommunications_TakePhoto_Remote::cAxisCommunications_TakePhoto_Remote(const
 
 QString cAxisCommunications_TakePhoto_Remote::getStatusStr()
 {
-	if (mNumOfPhotos > 1)
-	{
-		QString msg;
-
-		if (mUpdateView)
-		{
-			msg = "Taking ";
-			msg += QString::number(mNumOfPhotos);
-			msg += " Photos and updating view...";
-			return msg;
-		}
-
-		msg = "Taking ";
-		msg += QString::number(mNumOfPhotos);
-		msg += " Photos...";
-		return msg;
-	}
-
-	if (mUpdateView)
-		return "Taking Photo and updating view...";
-
-	return "Taking Photo...";
+	return getStatusMessage();
 }
 
 bool cAxisCommunications_TakePhoto_Remote::configure(const nlohmann::json& stateDoc)
@@ -382,6 +361,8 @@ void cAxisCommunications_TakePhoto_Remote::onTakePhotoReplyMessage(bool error)
 		mResult = cExperimentState::eRESULT::DONE;
 	else
 	{
+		emit statusUpdate(getStatusMessage());
+
 		sendTakePhotoMessage(mUpdateView);
 
 		// Sleep for 250 milliseconds

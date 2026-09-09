@@ -12,7 +12,7 @@ class cHySpexVNIR_3000N_PropertyPage_Remote;
 /**           Base Class for Ouster Experiment States             **/
 /*******************************************************************/
 
-class cOuster_Properties_Remote : public cExperimentStateRemoteInterface, public cExperimentState
+class cOuster_Properties_Remote : public cExperimentState, public cExperimentStateRemoteInterface
 {
 	Q_OBJECT
 

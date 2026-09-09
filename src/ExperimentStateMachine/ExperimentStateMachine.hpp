@@ -98,6 +98,7 @@ public:
     void clearVariableTable();
 
 signals:
+    void experimentAlert();
     void experimentStatus(QString msg);
     void experimentStateChanged(experiment::eState state);
     void stateNumberChanged(int id);

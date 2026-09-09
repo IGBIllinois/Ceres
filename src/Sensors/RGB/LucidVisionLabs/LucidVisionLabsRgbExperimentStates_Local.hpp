@@ -15,7 +15,7 @@ class cLucidVisionLabsRgbModel;
 /**    Base Class for Lucid Vision Labs RGB Camera Local Experiment States      **/
 /*********************************************************************************/
 
-class cLucidVisionLabsRgbCameraExperimentState_Local : public QObject, public cExperimentState
+class cLucidVisionLabsRgbCameraExperimentState_Local : public cExperimentState
 {
 	Q_OBJECT
 

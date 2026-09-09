@@ -1,6 +1,11 @@
 
 set(CMAKE_AUTOMOC ON)
 
+#
+# We skip these header files as they are public and MOC will be used 
+# in the main application
+#set_property(SOURCE ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+
 
 add_library(ExperimentStateMachine STATIC)
 
@@ -31,6 +36,8 @@ PRIVATE
     ExperimentStateRemoteInterface.hpp
     ExperimentStateRemoteInterface.cpp
 
+    ExperimentState.cpp
+
 #
 # A variable table for passing values to difference experiment states
 # within the state machine
@@ -49,6 +56,8 @@ PRIVATE
 #
 # We skip these header files as they are public and MOC will be used 
 # in the main application
+# Note: this only works by giving the full or relative path to the file!!
+
 #set_property(SOURCE ExperimentCtrlView.hpp PROPERTY SKIP_AUTOMOC ON)
 #set_property(SOURCE ExperimentCtrlModel.hpp PROPERTY SKIP_AUTOMOC ON)
 

@@ -13,7 +13,7 @@ const long long NETWORK_DELAY_MS = 500;
 /**       Base Class for Local GPS Experiment States          **/
 /*******************************************************************/
 cGpsExperimentState_Local::cGpsExperimentState_Local(cGpsModel* pModel, QObject* parent)
-	: QObject(parent), mpModel(pModel)
+	: cExperimentState(parent), mpModel(pModel)
 {
 }
 

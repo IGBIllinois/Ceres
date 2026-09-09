@@ -16,7 +16,7 @@ const long long NETWORK_DELAY_MS = 500;
 /*******************************************************************/
 cHySpexCamera_ExperimentState_Remote::cHySpexCamera_ExperimentState_Remote
 	(const std::string& hostname, uint16_t port, const std::string& localIpAddress, bool use_IpV6, QObject* parent)
-	: cExperimentStateRemoteInterface(parent)
+	: cExperimentState(parent), cExperimentStateRemoteInterface(/*parent*/)
 {
 	mHostname = hostname;
 	mPort = port;

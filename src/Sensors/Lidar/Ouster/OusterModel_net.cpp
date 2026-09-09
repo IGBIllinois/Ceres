@@ -58,7 +58,7 @@ uint16_t cOusterModel_net::data_class_id() const
 
 void cOusterModel_net::updateViews()
 {
-
+    cOusterModel::updateViews();
 }
 
 bool cOusterModel_net::configure(const nlohmann::json& jsonCfg)

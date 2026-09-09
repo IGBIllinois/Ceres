@@ -15,7 +15,7 @@ class cAboveGroundHeightDlg;
  * An experiment state to ask for the parameters needed to compute 
  * aerial droop to stay at a constants height above the ground
  */
-class cExperimentState_AGH : public QObject, public cExperimentState
+class cExperimentState_AGH : public cExperimentState
 {
 	Q_OBJECT
 
@@ -36,6 +36,7 @@ public:
 	eRESULT finished() override;
 
 signals:
+	void attentionAlert();
 	void showDlg();
 
 private:
@@ -50,7 +51,7 @@ class cAboveCanopyHeightDlg;
  * aerial droop to stay at a constants height above the plant canopy
  */
 
-class cExperimentState_ACH : public QObject, public cExperimentState
+class cExperimentState_ACH : public cExperimentState
 {
 	Q_OBJECT
 
@@ -71,6 +72,7 @@ public:
 	eRESULT finished() override;
 
 signals:
+	void attentionAlert();
 	void showDlg();
 
 private:
