@@ -81,6 +81,8 @@ public:
 protected:
     cExperimentControlModel(QObject* parent = nullptr);
 
+    void handleStateErrorMessage(const QString& msg) override;
+
     void emitStatusMessage(const QString& msg) override;
     void emitMeasurementName(const QString& name) override;
 };

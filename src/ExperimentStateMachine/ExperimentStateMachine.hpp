@@ -112,6 +112,10 @@ public slots:
     virtual void terminateExperiment();
     virtual void pauseExperiment();
 
+
+protected slots:
+    virtual void handleStateErrorMessage(const QString& msg) = 0;
+
 public:
     void updateExperimentStateMachine();
 

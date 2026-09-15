@@ -302,6 +302,7 @@ bool cExperimentStateMachine::loadExperiment(const std::string& exp_path, const 
 
                 QObject::connect(pState, &cExperimentState::attentionAlert, this, &cExperimentStateMachine::experimentAlert);
                 QObject::connect(pState, &cExperimentState::statusUpdate, this, &cExperimentStateMachine::experimentStatus);
+                QObject::connect(pState, &cExperimentState::errorUpdate, this, &cExperimentStateMachine::handleStateErrorMessage);
 
                 if (pState->configure(entry))
                 {
@@ -724,6 +725,7 @@ std::vector<cExperimentState*> cExperimentStateMachine::loadMeasurementStates(co
 
                 QObject::connect(pState, &cExperimentState::attentionAlert, this, &cExperimentStateMachine::experimentAlert);
                 QObject::connect(pState, &cExperimentState::statusUpdate, this, &cExperimentStateMachine::experimentStatus);
+                QObject::connect(pState, &cExperimentState::errorUpdate, this, &cExperimentStateMachine::handleStateErrorMessage);
 
                 if (pState->configure(entry))
                     states.push_back(pState);

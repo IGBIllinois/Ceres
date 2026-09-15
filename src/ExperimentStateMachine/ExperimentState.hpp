@@ -44,7 +44,9 @@ public:
 
 signals:
 	void attentionAlert();
+
 	void statusUpdate(QString msg);
+	void errorUpdate(QString msg);
 
 protected:
 	std::weak_ptr<cExperimentVariableTable> mVariables;

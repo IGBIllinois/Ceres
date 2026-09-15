@@ -10,6 +10,12 @@ cExperimentControlModel::cExperimentControlModel(QObject* parent)
 {
 }
 
+void cExperimentControlModel::handleStateErrorMessage(const QString& msg)
+{
+    emit errorMessage("Measurement State Error", msg);
+}
+
+
 void cExperimentControlModel::emitStatusMessage(const QString& msg)
 {
     emit statusMessage(msg);
