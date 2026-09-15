@@ -222,6 +222,9 @@ void cGpsReferenceAcquisition_Remote::onReferencePositionMessage(int x_mm, int y
 
 void cGpsReferenceAcquisition_Remote::onReferenceCommandReplyMessage(eReferenceReply reply)
 {
+	if (mState == eSTATE::ERROR)
+		return;
+
 	switch (reply)
 	{
 	// The reference position has completed with the position tolerence
@@ -234,8 +237,13 @@ void cGpsReferenceAcquisition_Remote::onReferenceCommandReplyMessage(eReferenceR
 		break;
 	// The reference position has been stopped!
 	case eReferenceReply::ABORTED:
+	{
+		QString msg = "GPS failed to collect reference position!\n";
+		msg += "Possible causes include: stuck in CONNECTED state, or poor satellite coverage.";
+		emit errorUpdate(msg);
 		mState = eSTATE::ERROR;
 		break;
+	}
 	}
 }
 

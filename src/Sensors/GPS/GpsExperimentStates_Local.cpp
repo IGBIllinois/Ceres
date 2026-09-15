@@ -147,16 +147,37 @@ QString cGpsReferenceAcquisition_Local::getStatusStr()
 	return msg;
 }
 
-void onReferenceComplete();
-void referenceStateUpdated(::gps::eReferenceState state);
-
 void referenceParametersUpdated(int min_integration_time_sec, int max_integration_time_sec, int ref_error_threshold_mm);
 
 void cGpsReferenceAcquisition_Local::onReferenceComplete()
 {}
 
 void cGpsReferenceAcquisition_Local::referenceStateUpdated(::gps::eReferenceState state)
-{}
+{
+	if (mState == eSTATE::ERROR)
+		return;
+
+	switch (state)
+	{
+		// The reference position has completed with the position tolerence
+	case ::gps::eReferenceState::COMPLETE_GOOD:
+		mState = eSTATE::COMPLETE;
+		break;
+		// The reference position has completed but outside the position tolerence
+	case ::gps::eReferenceState::COMPLETE_FAILED:
+		mState = eSTATE::COMPLETE;
+		break;
+		// The reference position has been stopped!
+	case ::gps::eReferenceState::ABORT:
+	{
+		QString msg = "GPS failed to collect reference position!\n";
+		msg += "Possible causes include: stuck in CONNECTED state, or poor satellite coverage.";
+		emit errorUpdate(msg);
+		mState = eSTATE::ERROR;
+		break;
+	}
+	}
+}
 
 void cGpsReferenceAcquisition_Local::referenceParametersUpdated(int min_integration_time_sec, int max_integration_time_sec, int ref_error_threshold_mm)
 {}
