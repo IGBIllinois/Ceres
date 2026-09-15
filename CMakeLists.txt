@@ -155,6 +155,8 @@ endif(WIN32)
 # Find and include a simple plotting library
 find_package(QCustomPlot REQUIRED)
 
+find_package(simple_matrix REQUIRED)
+
 # Find and include my libraries for data collection
 find_package(ouster_connect REQUIRED)
 

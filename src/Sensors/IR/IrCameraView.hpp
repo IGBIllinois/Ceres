@@ -1,7 +1,9 @@
 
 #pragma once
 
-#include "../../Utilities/ColorGradient.hpp"
+//#include "../../Utilities/ColorGradient.hpp"
+
+#include "ThermalColorTypes.hpp"
 
 #include "ThermalImageWidget.hpp"
 
@@ -26,6 +28,9 @@ public:
 	 */
 	virtual void connectToModel() = 0;
 
+signals:
+	void requestColorPalette(eColorTable palette);
+
 public slots:
 	void dockLocationChanged(Qt::DockWidgetArea area);
 	void topLevelChanged(bool topLevel);
@@ -38,5 +43,5 @@ protected:
 	cThermalImageWidget* mpThermalImage = nullptr;
 
 private:
-	cColorGradient mColorGradient;
+//	cColorGradient mColorGradient;
 };

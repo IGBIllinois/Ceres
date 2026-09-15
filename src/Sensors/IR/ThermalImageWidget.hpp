@@ -17,9 +17,6 @@ public:
 	cThermalImageWidget(QWidget* parent = nullptr);
 	virtual ~cThermalImageWidget();
 
-	bool maintainingAspectRatio() const;
-	void maintainAspectRatio(bool enable);
-
 	const QImage& getImage() const;
 	void setImage(const QImage& image);
 
@@ -30,8 +27,9 @@ public:
 
 private:
 	QImage mCurrentImage;
+	QImage mResizedImage;
+
 	int mWindowHeight = -1;
 	int mWindowWidth = -1;
 	double mAspectRatio = 1.0;
-	bool mMaintainAspectRatio = false;
 };

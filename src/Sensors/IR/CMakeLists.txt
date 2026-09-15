@@ -22,6 +22,25 @@ set(IR_CAMERA_SOURCE_FILES
     IrCameraModel.hpp
     IrCameraModel.cpp
     IrCameraFactory.cpp
+
+#
+# Thermal False Color Tables
+#
+	ThermalColorTypes.hpp
+	IronbowColorTable.hpp
+	IronbowColorTable.cpp
+	RainbowColorTable.hpp
+	RainbowColorTable.cpp
+	Rainbow_HC_ColorTable.hpp
+	Rainbow_HC_ColorTable.cpp
+	WhiteHotColorTable.hpp
+	WhiteHotColorTable.cpp
+	BlackHotColorTable.hpp
+	BlackHotColorTable.cpp
+	ArcticColorTable.hpp
+	ArcticColorTable.cpp
+	ThermalColorTable.hpp
+	ThermalColorTable.cpp
 )
 
 

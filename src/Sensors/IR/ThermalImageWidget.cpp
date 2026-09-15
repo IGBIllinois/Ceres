@@ -17,17 +17,6 @@ cThermalImageWidget::~cThermalImageWidget()
 {
 }
 
-bool cThermalImageWidget::maintainingAspectRatio() const
-{
-    return mMaintainAspectRatio;
-}
-
-void cThermalImageWidget::maintainAspectRatio(bool enable)
-{
-    mMaintainAspectRatio = enable;
-}
-
-
 const QImage& cThermalImageWidget::getImage() const
 {
     return mCurrentImage;
@@ -61,24 +50,9 @@ void cThermalImageWidget::paintEvent(QPaintEvent* event)
 
     if ((mWindowWidth > 0) && (mWindowHeight > 0))
     {
-        QRect rect(0, 0, mWindowWidth, mWindowHeight);
+        mResizedImage = mCurrentImage.scaled(mWindowWidth, mWindowHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-        if (mMaintainAspectRatio)
-        {
-            int w = mWindowHeight * mAspectRatio;
-            int h = mWindowWidth / mAspectRatio;
-
-            if (w < mWindowWidth)
-            {
-                rect.setWidth(w);
-            }
-            else if (h < mWindowHeight)
-            {
-                rect.setHeight(h);
-            }
-        }
-
-        painter.drawImage(rect, mCurrentImage);
+        painter.drawImage(0, 0, mResizedImage);
     }
     else
         painter.drawImage(0, 0, mCurrentImage);
