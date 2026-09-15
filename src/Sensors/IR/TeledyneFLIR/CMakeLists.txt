@@ -112,9 +112,6 @@ PRIVATE
     ${TELEDYNE_FLIR_PROTO_HDRS}
 	${TELEDYNE_FLIR_PROTO_SRCS}
 
-	ColorTable.hpp
-	ColorTable.cpp
-
 	teledyne_flir_properties.proto
 )
 

@@ -2,6 +2,14 @@
 #include "TeledyneFlirCameraModel.hpp"
 #include "TeledyneFlirIDs.hpp"
 
+#include "../ThermalColorTable.hpp"
+#include "../IronbowColorTable.hpp"
+#include "../RainbowColorTable.hpp"
+#include "../Rainbow_HC_ColorTable.hpp"
+#include "../ArcticColorTable.hpp"
+#include "../WhiteHotColorTable.hpp"
+#include "../BlackHotColorTable.hpp"
+
 #include "StringUtils.hpp"
 
 #include <QNetworkAccessManager>
@@ -27,7 +35,7 @@ cTeledyneFlirCameraModel::cTeledyneFlirCameraModel(const std::string& name, QObj
 :
     cIrCameraModel(name, parent), mColorizedImage(640, 480, QImage::Format_RGB888)
 {
-    mManufacturer = "Teledyne";
+    mManufacturer = "Teledyne FLIR";
 }
 
 cTeledyneFlirCameraModel::~cTeledyneFlirCameraModel()

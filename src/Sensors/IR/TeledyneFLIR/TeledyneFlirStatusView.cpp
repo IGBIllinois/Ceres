@@ -51,8 +51,17 @@ void cTeledyneFlirStatusView::createWidgets()
 	mpThermalRange = new QLineEdit(this);
 	mpThermalRange->setReadOnly(true);
 
+	mpColorPalette = new QComboBox(this);
+	mpColorPalette->addItem("Ironbow");
+	mpColorPalette->addItem("Rainbow");
+	mpColorPalette->addItem("Rainbow HC");
+	mpColorPalette->addItem("White Hot");
+	mpColorPalette->addItem("Black Hot");
+	mpColorPalette->addItem("Arctic");
+	connect(mpColorPalette, &QComboBox::currentTextChanged, this, &cTeledyneFlirStatusView::colorPaletteTextChanged);
+
 	mpGrabImage = new QPushButton("Grab Image", this);
-	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirStatusView::requestImage);
+	connect(mpGrabImage, &QPushButton::pressed, this, &cTeledyneFlirStatusView::grabImageRequested);
 
 	mpThermalImage = new cThermalImageWidget(this);
 }
@@ -83,6 +92,10 @@ void cTeledyneFlirStatusView::doLayout()
 
 	cameraInfoLayout->addWidget(mpThermalRangeLabel);
 	cameraInfoLayout->addWidget(mpThermalRange);
+
+	cameraInfoLayout->addSpacing(10);
+
+	cameraInfoLayout->addWidget(mpColorPalette);
 
 	cameraInfoLayout->addStretch(1);
 
@@ -132,6 +145,32 @@ void cTeledyneFlirStatusView::thermalRangeUpdated(float minValue_K, float maxVal
 	mpThermalRange->setText(thermal_range);
 }
 
+void cTeledyneFlirStatusView::colorPaletteUpdated(eColorTable palette)
+{
+	switch (palette)
+	{
+	case eColorTable::IRONBOW:
+		mpColorPalette->setCurrentIndex(0);
+		break;
+	case eColorTable::RAINBOW:
+		mpColorPalette->setCurrentIndex(1);
+		break;
+	case eColorTable::RAINBOW_HC:
+		mpColorPalette->setCurrentIndex(2);
+		break;
+	case eColorTable::WHITE_HOT:
+		mpColorPalette->setCurrentIndex(3);
+		break;
+	case eColorTable::BLACK_HOT:
+		mpColorPalette->setCurrentIndex(4);
+		break;
+	case eColorTable::ARCTIC:
+		mpColorPalette->setCurrentIndex(5);
+		break;
+	default:
+		return;
+	}
+}
 
 void cTeledyneFlirStatusView::imageUpdated(const QImage& image)
 {
@@ -157,6 +196,22 @@ void cTeledyneFlirStatusView::modeTextChanged(const QString& text)
 		emit requestMode(2);
 }
 
+void cTeledyneFlirStatusView::colorPaletteTextChanged(const QString& text)
+{
+	if (text == "Ironbow")
+		emit requestColorPalette(eColorTable::IRONBOW);
+	else if (text == "Rainbow")
+		emit requestColorPalette(eColorTable::RAINBOW);
+	else if (text == "Rainbow HC")
+		emit requestColorPalette(eColorTable::RAINBOW_HC);
+	else if (text == "White Hot")
+		emit requestColorPalette(eColorTable::WHITE_HOT);
+	else if (text == "Black Hot")
+		emit requestColorPalette(eColorTable::BLACK_HOT);
+	else if (text == "Arctic")
+		emit requestColorPalette(eColorTable::ARCTIC);
+}
+
 void cTeledyneFlirStatusView::frameRateEditingFinished()
 {
 	double frame_rate_hz = mpFrameRate_fps->text().toDouble();
@@ -168,4 +223,9 @@ void cTeledyneFlirStatusView::lapseIntervalEditingFinished()
 	uint32_t interval_ms = static_cast<uint32_t>(mpLapseInterval_s->text().toDouble() * 1000.0);
 
 	emit requestLapseInterval_ms(interval_ms);
+}
+
+void cTeledyneFlirStatusView::grabImageRequested()
+{
+	emit requestImages(true);
 }

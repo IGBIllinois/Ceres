@@ -3,7 +3,6 @@
 
 #include "TeledyneFlirCameraModel.hpp"
 #include "Timers.hpp"
-#include "ColorTable.hpp"
 
 #include <cbdf/TeledyneFlirSerializer.hpp>
 
@@ -99,9 +98,6 @@ protected:
 
     void onSaveState() override;
     void onRestoreState() override;
-
-protected:
-    cColorTable mColorTable;
 
 private:
     std::unique_ptr<cTeledyneFlirCamera> mCamera;

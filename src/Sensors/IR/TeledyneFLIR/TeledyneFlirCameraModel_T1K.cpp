@@ -1,6 +1,8 @@
 
 #include "TeledyneFlirCameraModel_T1K.hpp"
 
+#include "../ThermalColorTable.hpp"
+
 #include "TimestampProvider.hpp"
 
 #include <teledyne_atlas_connect/TeledyneFlirCamera.hpp>
@@ -25,7 +27,12 @@ cTeledyneFlirCameraModel_T1K::cTeledyneFlirCameraModel_T1K(std::unique_ptr<cTele
     mCamera = std::move(camera);
 
     mModel = mCamera->modelName();
+
     mSerialNumber = mCamera->serialNumber();
+
+    // An asterisk signals we are using the emulator
+    if (mModel == "*") mModel.clear();
+
 
     mFrameRate_fps = mCamera->getFrameRate_Hz();
     mMinFrameRate_fps = mCamera->getMinFrameRate_Hz();
@@ -35,9 +42,9 @@ cTeledyneFlirCameraModel_T1K::cTeledyneFlirCameraModel_T1K(std::unique_ptr<cTele
     mMaxThermalRange_K = mCamera->getThermalRangeMax_K();
 
     if (mMinThermalRange_K.has_value() && mMaxThermalRange_K.has_value())
-        mColorTable.setRange(mMinThermalRange_K.value(), mMaxThermalRange_K.value());
+        mColorTable->setRange(mMinThermalRange_K.value(), mMaxThermalRange_K.value());
     else
-        mColorTable.setRange(250, 400);
+        mColorTable->setRange(250, 400);
 
     auto width = mCamera->width();
     if (width > 0)
@@ -69,17 +76,19 @@ void cTeledyneFlirCameraModel_T1K::updateViews()
 
     if (mMinThermalRange_K.has_value() && mMaxThermalRange_K.has_value())
         emit thermalRangeChanged(mMinThermalRange_K.value(), mMaxThermalRange_K.value());
+
+    cTeledyneFlirCameraModel::updateViews();
 }
 
 bool cTeledyneFlirCameraModel_T1K::configure(const nlohmann::json& jsonCfg)
 {
-    updateName(mCamera->modelName());
+    bool result = cTeledyneFlirCameraModel::configure(jsonCfg);
+
+    updateName(mModel);
 
     size_t buffer_size = mImageHeight * mImageWidth * sizeof(double);
 
     mSerializer.setBufferCapacity(buffer_size + 2048);
-
-    bool result = cTeledyneFlirCameraModel::configure(jsonCfg);
 
     if (result)
         setStatus(sensor::eStatus::CONFIGURED);
@@ -333,7 +342,9 @@ void cTeledyneFlirCameraModel_T1K::update()
         {
             mColorizedImage = QImage(mCurrentImage.width(), mCurrentImage.height(), QImage::Format_RGB888);
 
-            mColorTable.setRange(mCurrentImage.minTemperature(), mCurrentImage.maxTemperature());
+            mCurrentImage.findThermalLimits();
+
+            mColorTable->setRange(mCurrentImage.minImageTemperature_K(), mCurrentImage.maxImageTemperature_K());
 
             // Access raw pixel data
             uchar* image_data = mColorizedImage.bits();
@@ -341,7 +352,7 @@ void cTeledyneFlirCameraModel_T1K::update()
 
             for (uint i = 0; i < mCurrentImage.size(); ++i)
             {
-                auto color = mColorTable.getColor(mCurrentImage[i]);
+                auto color = mColorTable->getColorRGB(mCurrentImage[i]);
 
                 uchar* pixel = &image_data[i * 3];
                 pixel[0] = color.red;

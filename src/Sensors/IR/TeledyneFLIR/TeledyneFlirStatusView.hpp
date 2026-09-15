@@ -4,6 +4,9 @@
 #include "../Sensors/SensorStatusView.hpp"
 #include "ThermalImageWidget.hpp"
 
+#include "../ThermalColorTypes.hpp"
+
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -31,6 +34,8 @@ signals:
 	void requestFrameRate_Hz(double frame_rate_hz);
 	void requestLapseInterval_ms(uint32_t interval_ms);
 
+	void requestColorPalette(eColorTable palette);
+
 	void requestImage();
 	void requestImages(bool update_view);
 
@@ -40,14 +45,17 @@ public slots:
 	void onFrameRateChange(double rate_fps);
 	void onImageSizeChange(int width, int height);
 	void thermalRangeUpdated(float minValue_K, float maxValue_K);
+	void colorPaletteUpdated(eColorTable palette);
 	void imageUpdated(const QImage& image);
 
 	void resizeEvent(QResizeEvent*) override;
 
 protected slots:
 	void modeTextChanged(const QString&);
+	void colorPaletteTextChanged(const QString&);
 	void frameRateEditingFinished();
 	void lapseIntervalEditingFinished();
+	void grabImageRequested();
 
 private:
 	QLabel* mpModeLabel = nullptr;
@@ -64,6 +72,8 @@ private:
 
 	QLabel* mpThermalRangeLabel = nullptr;
 	QLineEdit* mpThermalRange = nullptr;
+
+	QComboBox* mpColorPalette = nullptr;
 
 	QPushButton* mpGrabImage = nullptr;
 

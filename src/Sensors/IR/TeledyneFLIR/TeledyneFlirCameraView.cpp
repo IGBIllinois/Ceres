@@ -88,8 +88,20 @@ void cTeledyneFlirCameraView::initialize()
 		mpThermalRange->setText("Unknown");
 	}
 
+	mpColorPalette = new QComboBox(this);
+	mpColorPalette->addItem("Ironbow");
+	mpColorPalette->addItem("Rainbow");
+	mpColorPalette->addItem("Rainbow HC");
+	mpColorPalette->addItem("White Hot");
+	mpColorPalette->addItem("Black Hot");
+	mpColorPalette->addItem("Arctic");
+	connect(mpColorPalette, &QComboBox::currentTextChanged, this, &cTeledyneFlirCameraView::colorPaletteTextChanged);
+
 	statusLayout->addWidget(mpThermalRangeLabel);
 	statusLayout->addWidget(mpThermalRange);
+	statusLayout->addSpacing(10);
+
+	statusLayout->addWidget(mpColorPalette);
 	statusLayout->addStretch(1);
 
 	mpGrabImage = new QPushButton("Grab Image", this);
@@ -121,6 +133,8 @@ void cTeledyneFlirCameraView::connectToModel()
 	QObject::connect(mpModel, &cTeledyneFlirCameraModel::modeChanged,        this, &cTeledyneFlirCameraView::onModeChange);
 	QObject::connect(mpModel, &cTeledyneFlirCameraModel::imageSizeChanged,   this, &cTeledyneFlirCameraView::onImageSizeChange);
 	QObject::connect(mpModel, &cTeledyneFlirCameraModel::onNewImage,         this, &cTeledyneFlirCameraView::imageUpdated);
+
+	QObject::connect(this, &cTeledyneFlirCameraView::requestColorPalette, mpModel, &cTeledyneFlirCameraModel::setColorModel);
 
 	QObject::connect(this, &cTeledyneFlirCameraView::requestImage,  mpModel, &cTeledyneFlirCameraModel::requestImage);
 	QObject::connect(this, &cTeledyneFlirCameraView::requestImages, mpModel, &cTeledyneFlirCameraModel::requestImages);
@@ -155,6 +169,33 @@ void cTeledyneFlirCameraView::onImageSizeChange(int width, int height)
 	mpImageSize->setText(image_size);
 }
 
+void cTeledyneFlirCameraView::colorPaletteUpdated(eColorTable palette)
+{
+	switch (palette)
+	{
+	case eColorTable::IRONBOW:
+		mpColorPalette->setCurrentIndex(0);
+		break;
+	case eColorTable::RAINBOW:
+		mpColorPalette->setCurrentIndex(1);
+		break;
+	case eColorTable::RAINBOW_HC:
+		mpColorPalette->setCurrentIndex(2);
+		break;
+	case eColorTable::WHITE_HOT:
+		mpColorPalette->setCurrentIndex(3);
+		break;
+	case eColorTable::BLACK_HOT:
+		mpColorPalette->setCurrentIndex(4);
+		break;
+	case eColorTable::ARCTIC:
+		mpColorPalette->setCurrentIndex(5);
+		break;
+	default:
+		return;
+	}
+}
+
 void cTeledyneFlirCameraView::onGrabImage()
 {
 	mpGrabImage->setEnabled(false);
@@ -184,4 +225,19 @@ void cTeledyneFlirCameraView::imageUpdated(const QImage& image)
         mpThermalImage->repaint();
 }
 
+void cTeledyneFlirCameraView::colorPaletteTextChanged(const QString& text)
+{
+	if (text == "Ironbow")
+		emit requestColorPalette(eColorTable::IRONBOW);
+	else if (text == "Rainbow")
+		emit requestColorPalette(eColorTable::RAINBOW);
+	else if (text == "Rainbow HC")
+		emit requestColorPalette(eColorTable::RAINBOW_HC);
+	else if (text == "White Hot")
+		emit requestColorPalette(eColorTable::WHITE_HOT);
+	else if (text == "Black Hot")
+		emit requestColorPalette(eColorTable::BLACK_HOT);
+	else if (text == "Arctic")
+		emit requestColorPalette(eColorTable::ARCTIC);
+}
 

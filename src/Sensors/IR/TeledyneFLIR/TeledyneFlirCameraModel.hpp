@@ -3,7 +3,6 @@
 
 #include "../IrCameraModel.hpp"
 #include "Timers.hpp"
-#include "ColorTable.hpp"
 
 #include <teledyne_atlas_connect/TeledyneAtlasData.hpp>
 
@@ -13,6 +12,8 @@
 
 #include <vector>
 #include <optional>
+
+// Forward Declaration
 
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
@@ -133,7 +134,6 @@ protected:
 
     nTeledyneAtlasConnect::cThermalImage mCurrentImage;
 
-    cColorTable mColorTable;
     QImage mColorizedImage;
 
     cTeledyneFlirSerializer mSerializer;

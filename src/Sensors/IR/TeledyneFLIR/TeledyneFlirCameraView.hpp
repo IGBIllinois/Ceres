@@ -38,9 +38,14 @@ public slots:
 	void onSensorNameChanging(QString old_name, QString new_name, QString instance);
 	void onModeChange(int mode);
 	void onImageSizeChange(int width, int height);
+	void colorPaletteUpdated(eColorTable palette);
+
 	void onGrabImage();
 	void onGrabImages(bool state);
 	virtual void imageUpdated(const QImage& image);
+
+protected slots:
+	void colorPaletteTextChanged(const QString&);
 
 protected:
     QLabel* mpModeLabel = nullptr;
@@ -51,6 +56,8 @@ protected:
 
     QLabel* mpThermalRangeLabel = nullptr;
     QLineEdit* mpThermalRange = nullptr;
+
+	QComboBox* mpColorPalette = nullptr;
 
 	QPushButton* mpGrabImage = nullptr;
 	QPushButton* mpAutoUpdateImages = nullptr;
