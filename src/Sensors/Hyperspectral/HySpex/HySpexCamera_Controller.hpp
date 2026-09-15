@@ -38,11 +38,11 @@ signals:
     void setLensName(QString lens_name);
     void setNumOfBackgrounds(int num_backgrounds);
 
-    void calcBackground();
-    void stopBackground();
+    void requestCalcBackground();
+    void requestStopBackground();
 
-    void openShutter();
-    void closeShutter();
+    void requestOpenShutter();
+    void requestCloseShutter();
 
 public slots:
     /*** Qt slot handler */

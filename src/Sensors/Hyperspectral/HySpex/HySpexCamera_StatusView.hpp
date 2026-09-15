@@ -37,6 +37,12 @@ public:
 	 */
 	void createWidgets() override;
 
+signals:
+	void requestAutoExposure(bool state);
+
+	void requestCalcBackground();
+	void requestStopBackground();
+
 public slots:
 	void onInitStatusChange(hyspex::InitStatus status);
 	void onCommStatusChange(hyspex::CommunicationStatus status);
@@ -75,6 +81,7 @@ private slots:
 	void saturationButtonToggled(bool state);
 	void bandButtonToggled(bool state);
 	void focusButtonToggled(bool state);
+	void autoExposureButtonToggled(bool state);
 	void SpatialDistributionButtonToggled(bool state);
 	void SpectralDistributionButtonToggled(bool state);
 	void backgroundPressed();
@@ -129,6 +136,7 @@ protected:
 	QPushButton* mpPercentSaturationButton = nullptr;
 	QPushButton* mpPercentBandButton = nullptr;
 	QPushButton* mpFocusButton = nullptr;
+	QPushButton* mpAutoExposure = nullptr;
 	QPushButton* mpSpatialDistribution = nullptr;
 	QPushButton* mpSpectralDistribution = nullptr;
 	QPushButton* mpDoBackground = nullptr;

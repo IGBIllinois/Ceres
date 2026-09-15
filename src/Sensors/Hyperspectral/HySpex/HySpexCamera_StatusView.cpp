@@ -682,6 +682,38 @@ void cHySpexCamera_StatusView::focusButtonToggled(bool state)
 	mpModel->computeFocus(state);
 }
 
+void cHySpexCamera_StatusView::autoExposureButtonToggled(bool state)
+{
+	if (state)
+	{
+		unclickAllButtons(mpFocusButton);
+
+		mpPlot->yAxis->setRange(0, 10.0);
+		mpPlot->yAxis->setLabel("Focus");
+		mpPlot->yAxis2->setLabel("");
+		mpPlot->yAxis2->setTickLabels(false);
+
+		mpPlot->xAxis->setRange(0, 100);
+		mpPlot->xAxis->setLabel("Time");
+		mpPlot->graph(0)->data()->clear();
+
+		if (mpPlot->graphCount() == 2)
+		{
+			mpPlot->graph(1)->data()->clear();
+			mpPlot->removeGraph(1);
+		}
+
+		mpPlot->replot();
+
+		mFocusTimeStart = QTime::currentTime();
+		mFocusLastPointKey_ms = 0;
+		mMaxFocusValue = 0.0;
+		mFocusCounter = 0;
+	}
+
+	emit requestAutoExposure(state);
+}
+
 void cHySpexCamera_StatusView::onFocusDataUpdated(double focus_number)
 {
 	auto key_ms = mFocusTimeStart.msecsTo(QTime::currentTime());
@@ -821,7 +853,6 @@ void cHySpexCamera_StatusView::SpectralDistributionButtonToggled(bool state)
 	}
 
 	mpModel->computeSpectralDistribution(state);
-
 }
 
 void cHySpexCamera_StatusView::onSpectralDistributionUpdated()
@@ -870,7 +901,7 @@ void cHySpexCamera_StatusView::updateImage(const QImage& image)
 void cHySpexCamera_StatusView::backgroundPressed()
 {
 	unclickAllButtons(nullptr);
-	mpModel->calcBackground();
+	emit requestCalcBackground();
 }
 
 void cHySpexCamera_StatusView::unclickAllButtons(QPushButton* pExcept)

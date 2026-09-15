@@ -160,22 +160,22 @@ void cHySpexCamera_Controller::onSetNumOfBackgroundsMessage(int num_backgrounds)
 
 void cHySpexCamera_Controller::onCalcBackgroundMessage()
 {
-    emit calcBackground();
+    emit requestCalcBackground();
 }
 
 void cHySpexCamera_Controller::onStopBackgroundMessage()
 {
-    emit stopBackground();
+    emit requestStopBackground();
 }
 
 void cHySpexCamera_Controller::onOpenShutterMessage()
 {
-    emit openShutter();
+    emit requestOpenShutter();
 }
 
 void cHySpexCamera_Controller::onCloseShutterMessage()
 {
-    emit closeShutter();
+    emit requestCloseShutter();
 }
 
 

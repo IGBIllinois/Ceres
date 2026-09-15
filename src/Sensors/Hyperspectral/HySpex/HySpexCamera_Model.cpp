@@ -310,22 +310,22 @@ void cHySpexCameraModel::requestNumOfBackgrounds(int num_backgrounds)
     setNumOfBackgrounds(num_backgrounds);
 }
 
-void cHySpexCameraModel::requestCalcBackground()
+void cHySpexCameraModel::handleCalcBackgroundRequest()
 {
     calcBackground();
 }
 
-void cHySpexCameraModel::requestStopBackground()
+void cHySpexCameraModel::handleStopBackgroundRequest()
 {
     stopBackground();
 }
 
-void cHySpexCameraModel::requestOpenShutter()
+void cHySpexCameraModel::handleOpenShutterRequest()
 {
     open_shutter();
 }
 
-void cHySpexCameraModel::requestCloseShutter()
+void cHySpexCameraModel::handleCloseShutterRequest()
 {
     close_shutter();
 }

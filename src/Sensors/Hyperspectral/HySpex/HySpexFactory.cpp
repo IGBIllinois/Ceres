@@ -126,6 +126,10 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newSpatialDistributionData,  pView, &cHySpexVNIR_3000N_StatusView::onSpatialDistributionUpdated);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::newSpectralDistributionData, pView, &cHySpexVNIR_3000N_StatusView::onSpectralDistributionUpdated);
 
+        QObject::connect(pView, &cHySpexVNIR_3000N_StatusView::requestCalcBackground, pModel, &cHySpexCameraModel::handleCalcBackgroundRequest);
+        QObject::connect(pView, &cHySpexVNIR_3000N_StatusView::requestStopBackground, pModel, &cHySpexCameraModel::handleStopBackgroundRequest);
+
+
         auto* pController = new cHySpexVNIR_3000N_Controller(pModel);
 
         QObject::connect(pController, &cHySpexCamera_Controller::queryState,        pModel, &cHySpexCameraModel::stateQueried);
@@ -136,11 +140,11 @@ sSensorWidgets create_vnir_3000N_sensor(const nlohmann::json& sensorInfo, bool n
         QObject::connect(pController, &cHySpexCamera_Controller::setLensName,              pModel, &cHySpexCameraModel::requestLensName);
         QObject::connect(pController, &cHySpexCamera_Controller::setNumOfBackgrounds,      pModel, &cHySpexCameraModel::requestNumOfBackgrounds);
 
-        QObject::connect(pController, &cHySpexCamera_Controller::calcBackground, pModel, &cHySpexCameraModel::requestCalcBackground);
-        QObject::connect(pController, &cHySpexCamera_Controller::stopBackground, pModel, &cHySpexCameraModel::requestStopBackground);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestCalcBackground, pModel, &cHySpexCameraModel::handleCalcBackgroundRequest);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestStopBackground, pModel, &cHySpexCameraModel::handleStopBackgroundRequest);
 
-        QObject::connect(pController, &cHySpexCamera_Controller::openShutter,  pModel, &cHySpexCameraModel::requestOpenShutter);
-        QObject::connect(pController, &cHySpexCamera_Controller::closeShutter, pModel, &cHySpexCameraModel::requestCloseShutter);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestOpenShutter,  pModel, &cHySpexCameraModel::handleOpenShutterRequest);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestCloseShutter, pModel, &cHySpexCameraModel::handleCloseShutterRequest);
 
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::stateUpdate,          pController, &cHySpexVNIR_3000N_Controller::stateUpdated);
         QObject::connect(pModel, &cHySpexVNIR_3000N_Model::lensNamesChanged,     pController, &cHySpexVNIR_3000N_Controller::lensNamesUpdated);
@@ -232,8 +236,11 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
         QObject::connect(pModel, &cHySpexSWIR_384_Model::newSpatialDistributionData,  pView, &cHySpexSWIR_384_StatusView::onSpatialDistributionUpdated);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::newSpectralDistributionData, pView, &cHySpexSWIR_384_StatusView::onSpectralDistributionUpdated);
 
-        auto* pController = new cHySpexSWIR_384_Controller(pModel);
+        QObject::connect(pView, &cHySpexSWIR_384_StatusView::requestCalcBackground, pModel, &cHySpexCameraModel::handleCalcBackgroundRequest);
+        QObject::connect(pView, &cHySpexSWIR_384_StatusView::requestStopBackground, pModel, &cHySpexCameraModel::handleStopBackgroundRequest);
 
+
+        auto* pController = new cHySpexSWIR_384_Controller(pModel);
 
         QObject::connect(pController, &cHySpexCamera_Controller::queryState,        pModel, &cHySpexCameraModel::stateQueried);
         QObject::connect(pController, &cHySpexCamera_Controller::queryLensNames,    pModel, &cHySpexCameraModel::lensNamesQueried);
@@ -243,11 +250,11 @@ sSensorWidgets create_swir_384_sensor(const nlohmann::json& sensorInfo, bool no_
         QObject::connect(pController, &cHySpexCamera_Controller::setLensName,              pModel, &cHySpexCameraModel::requestLensName);
         QObject::connect(pController, &cHySpexCamera_Controller::setNumOfBackgrounds,      pModel, &cHySpexCameraModel::requestNumOfBackgrounds);
 
-        QObject::connect(pController, &cHySpexCamera_Controller::calcBackground, pModel, &cHySpexCameraModel::requestCalcBackground);
-        QObject::connect(pController, &cHySpexCamera_Controller::stopBackground, pModel, &cHySpexCameraModel::requestStopBackground);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestCalcBackground, pModel, &cHySpexCameraModel::handleCalcBackgroundRequest);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestStopBackground, pModel, &cHySpexCameraModel::handleStopBackgroundRequest);
 
-        QObject::connect(pController, &cHySpexCamera_Controller::openShutter,  pModel, &cHySpexCameraModel::requestOpenShutter);
-        QObject::connect(pController, &cHySpexCamera_Controller::closeShutter, pModel, &cHySpexCameraModel::requestCloseShutter);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestOpenShutter,  pModel, &cHySpexCameraModel::handleOpenShutterRequest);
+        QObject::connect(pController, &cHySpexCamera_Controller::requestCloseShutter, pModel, &cHySpexCameraModel::handleCloseShutterRequest);
 
         QObject::connect(pModel, &cHySpexSWIR_384_Model::stateUpdate,          pController, &cHySpexSWIR_384_Controller::stateUpdated);
         QObject::connect(pModel, &cHySpexSWIR_384_Model::lensNamesChanged,     pController, &cHySpexSWIR_384_Controller::lensNamesUpdated);

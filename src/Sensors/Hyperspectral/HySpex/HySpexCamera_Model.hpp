@@ -180,11 +180,11 @@ public slots:
     void requestLensName(QString lens_name);
     void requestNumOfBackgrounds(int num_backgrounds);
 
-    void requestCalcBackground();
-    void requestStopBackground();
+    void handleCalcBackgroundRequest();
+    void handleStopBackgroundRequest();
 
-    void requestOpenShutter();
-    void requestCloseShutter();
+    void handleOpenShutterRequest();
+    void handleCloseShutterRequest();
 
     virtual void onStartingReferenceMeasurement() = 0;
     virtual void onEndingReferenceMeasurement() = 0;

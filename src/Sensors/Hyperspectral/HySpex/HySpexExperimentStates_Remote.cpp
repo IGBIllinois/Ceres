@@ -434,6 +434,9 @@ void cHySpexCamera_Background_Remote::onCommandReplyMessage(eCommandReply reply)
 
 void cHySpexCamera_Background_Remote::onBackgroundReplyMessage(eBackgroundReply reply)
 {
+	if (mState == eSTATE::ERROR)
+		return;
+
 	switch (reply)
 	{
 	case eBackgroundReply::GOOD:
@@ -443,7 +446,12 @@ void cHySpexCamera_Background_Remote::onBackgroundReplyMessage(eBackgroundReply 
 		mState = eSTATE::WAIT_FOR_BACKGROUND;
 		break;
 	default:
+	{
+		QString msg = "HySpex Compute Background Failed!";
+		emit errorUpdate(msg);
+
 		mState = eSTATE::ERROR;
+	}
 	}
 }
 

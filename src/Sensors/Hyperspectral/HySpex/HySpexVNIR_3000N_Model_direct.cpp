@@ -366,6 +366,11 @@ void cHySpexVNIR_3000N_Model_direct::update()
                 emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_VALID);
                 emit backgroundComplete(hyspex::HYSPEX_BG_VALID);
             }
+            else
+            {
+                mCamera->openShutter();
+            }
+
             break;
         }
         case eBgStates::ABORT:
