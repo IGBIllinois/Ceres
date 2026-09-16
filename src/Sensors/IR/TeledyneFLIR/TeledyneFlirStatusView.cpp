@@ -227,5 +227,5 @@ void cTeledyneFlirStatusView::lapseIntervalEditingFinished()
 
 void cTeledyneFlirStatusView::grabImageRequested()
 {
-	emit requestImages(true);
+	emit requestImage();
 }

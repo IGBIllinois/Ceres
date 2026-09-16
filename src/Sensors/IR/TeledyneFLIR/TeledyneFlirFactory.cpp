@@ -117,6 +117,7 @@ sSensorWidgets create_teledyne_flir_TIK_sensor(const std::string& sensorName, co
         QObject::connect(pView, &cTeledyneFlirStatusView::requestFrameRate_Hz,     pModel, &cTeledyneFlirCameraModel::requestFrameRate_Hz);
         QObject::connect(pView, &cTeledyneFlirStatusView::requestLapseInterval_ms, pModel, &cTeledyneFlirCameraModel::requestLapseInterval_ms);
         QObject::connect(pView, &cTeledyneFlirStatusView::requestImage,            pModel, &cTeledyneFlirCameraModel::requestImage);
+        QObject::connect(pView, &cTeledyneFlirStatusView::requestImages,           pModel, &cTeledyneFlirCameraModel::requestImages);
 
         QObject::connect(pModel, &cIrCameraModel::colorModelUpdated,           pView, &cTeledyneFlirStatusView::colorPaletteUpdated);
         QObject::connect(pView, &cTeledyneFlirStatusView::requestColorPalette, pModel, &cIrCameraModel::setColorModel);
