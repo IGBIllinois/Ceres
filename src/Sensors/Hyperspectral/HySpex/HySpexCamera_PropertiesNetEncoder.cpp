@@ -38,6 +38,15 @@ void cHySpexCamera_PropertiesNetEncoder::encodeQueryShutterStateMessage()
     }
 }
 
+void cHySpexCamera_PropertiesNetEncoder::encodeQueryBackgroundStateMessage()
+{
+    if (encode_hyspex_query(eQUERY_BACKGROUND_STATE, mBuffer) < 0)
+    {
+        sendData();
+        encode_hyspex_query(eQUERY_BACKGROUND_STATE, mBuffer);
+    }
+}
+
 void cHySpexCamera_PropertiesNetEncoder::encodeAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {
     if (encode_acquisition_parameters(average_frame, frame_period_us, integration_time_us, mBuffer) < 0)
@@ -117,6 +126,12 @@ void cHySpexCamera_PropertiesNetEncoder::sendQueryLensNamesMessage()
 void cHySpexCamera_PropertiesNetEncoder::sendQueryShutterStateMessage()
 {
     encode_hyspex_query(eQUERY_SHUTTER_STATE, mBuffer);
+    sendData();
+}
+
+void cHySpexCamera_PropertiesNetEncoder::sendQueryBackgroundStateMessage()
+{
+    encode_hyspex_query(eQUERY_BACKGROUND_STATE, mBuffer);
     sendData();
 }
 

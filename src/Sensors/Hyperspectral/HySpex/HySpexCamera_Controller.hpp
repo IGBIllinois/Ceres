@@ -14,25 +14,13 @@ class cHySpexCamera_Controller : public cSensorController, protected cHySpexCame
 	Q_OBJECT
 
 public:
-//    cHySpexCamera_Controller(cHySpexCameraModel* model, QObject* parent = nullptr);
     cHySpexCamera_Controller(QObject* parent = nullptr);
-
-/*
-public:
-    const char* descriptor() const override;
-    uint32_t version() const override { return 1; };
-    const std::string& manufacturer() const override;
-    const std::string& model() const override;
-    const std::string& serial_number() const override;
-    const std::string& name() const override;
-    const std::string& instance() const override;
-    bool has_instance() const override;
-*/
 
 signals:
     void queryState();
     void queryLensNames();
     void queryShutterState();
+    void queryBackgroundState();
 
     void setAcquisitionParameters(int average_frame, int frame_period_us, int integration_time_us);
     void setLensName(QString lens_name);
@@ -63,6 +51,7 @@ protected:
     void onQueryStateMessage() override;
     void onQueryLensNamesMessage() override;
     void onQueryShutterStateMessage() override;
+    void onQueryBackgroundStateMessage() override;
     void onSetAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us) override;
     void onSetLensNameMessage(const std::string& lens_name) override;
     void onSetNumOfBackgroundsMessage(int num_backgrounds) override;

@@ -18,7 +18,10 @@ void cHySpexVNIR_3000N_PropertyPage::doLayout()
 
 	mainLayout->addWidget(getLensLayout());
 	mainLayout->addWidget(getAcquisitionLayout());
+	mainLayout->addWidget(getShutterLayout());
 	mainLayout->addWidget(getBackgroundLayout());
+
+	mainLayout->addSpacing(10);
 
 	mainLayout->addWidget(mpButtons);
 

@@ -27,7 +27,7 @@ class cHySpexCamera_ExperimentState_Remote : public cExperimentState, public cEx
 	Q_OBJECT
 
 public:
-	cHySpexCamera_ExperimentState_Remote(const std::string& hostname, uint16_t port,
+	cHySpexCamera_ExperimentState_Remote(std::string_view camera_name, const std::string& hostname, uint16_t port,
 		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 	virtual ~cHySpexCamera_ExperimentState_Remote();
 
@@ -37,6 +37,8 @@ public:
 	bool initialize() override;
 
 protected:
+	std::string mCameraName;
+
 	std::string mHostname;
 	std::string mLocalIpAddress;
 	bool mUse_IpV6 = false;
@@ -53,7 +55,7 @@ class cHySpexCamera_ShutterCtrl_Remote : public cHySpexCamera_ExperimentState_Re
 	Q_OBJECT
 
 public:
-	cHySpexCamera_ShutterCtrl_Remote(const std::string& hostname, uint16_t port,
+	cHySpexCamera_ShutterCtrl_Remote(std::string_view camera_name, const std::string& hostname, uint16_t port,
 		const std::string& localIpAddress, bool use_IpV6, eShutterState desired_state, QObject* parent = nullptr);
 
 	bool configure(const nlohmann::json& stateDoc) override;
@@ -95,7 +97,7 @@ protected:
 class cHySpexCamera_CloseShutter_Remote : public cHySpexCamera_ShutterCtrl_Remote
 {
 public:
-	cHySpexCamera_CloseShutter_Remote(const std::string& hostname, uint16_t port,
+	cHySpexCamera_CloseShutter_Remote(std::string_view camera_name, const std::string& hostname, uint16_t port,
 		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
@@ -105,7 +107,7 @@ public:
 class cHySpexCamera_OpenShutter_Remote : public cHySpexCamera_ShutterCtrl_Remote
 {
 public:
-	cHySpexCamera_OpenShutter_Remote(const std::string& hostname, uint16_t port,
+	cHySpexCamera_OpenShutter_Remote(std::string_view camera_name, const std::string& hostname, uint16_t port,
 		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
@@ -122,7 +124,7 @@ class cHySpexCamera_Acquisition_Remote : public cHySpexCamera_ExperimentState_Re
 	Q_OBJECT
 
 public:
-	cHySpexCamera_Acquisition_Remote(const std::string& hostname, uint16_t port,
+	cHySpexCamera_Acquisition_Remote(std::string_view camera_name, const std::string& hostname, uint16_t port,
 		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 	~cHySpexCamera_Acquisition_Remote();
 
@@ -158,7 +160,7 @@ protected:
 class cHySpexCamera_AcqParameters_Remote : public cHySpexCamera_Acquisition_Remote
 {
 public:
-	cHySpexCamera_AcqParameters_Remote(const std::string& hostname, uint16_t port,
+	cHySpexCamera_AcqParameters_Remote(std::string_view camera_name, const std::string& hostname, uint16_t port,
 		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
@@ -181,7 +183,7 @@ protected:
 class cHySpexCamera_Background_Remote : public cHySpexCamera_Acquisition_Remote
 {
 public:
-	cHySpexCamera_Background_Remote(const std::string& hostname, uint16_t port,
+	cHySpexCamera_Background_Remote(std::string_view camera_name, const std::string& hostname, uint16_t port,
 		const std::string& localIpAddress, bool use_IpV6, QObject* parent = nullptr);
 
 	bool configure(const nlohmann::json& stateDoc) override;
@@ -208,93 +210,5 @@ protected:
 	enum class eSTATE { WAIT_FOR_CONNECT, WAIT_FOR_STATE, WAIT_FOR_STATE_UPDATE, WAIT_FOR_BACKGROUND, COMPLETE, ERROR };
 	eSTATE mState = eSTATE::WAIT_FOR_CONNECT;
 };
-
-
-
-
-
-
-#if 0
-/*******************************************************************/
-/**            The HySpex VNIR-3000N Experiment States            **/
-/*******************************************************************/
-
-class cHySpexVNIR_3000N_Properties_Remote : public cHySpexCamera_Properties_Remote,
-	private cHySpexVNIR_3000N_PropertiesNetDecoder, private cHySpexVNIR_3000N_PropertiesNetEncoder
-{
-	Q_OBJECT
-
-public:
-	cHySpexVNIR_3000N_Properties_Remote(cHySpexVNIR_3000N_PropertyPage_Remote* property_page);
-	~cHySpexVNIR_3000N_Properties_Remote();
-
-	QString getStatusStr() override;
-
-protected:
-	void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
-		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
-		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
-		std::uint32_t num_backgrounds, const std::string& lens_name) override;
-
-	void onLensNamesMessage(const std::vector<std::string>& names) override;
-
-	void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) override;
-
-	void onBackgroundReplyMessage(eBackgroundReply reply) override;
-
-	void onShutterStateMessage(eShutterState state) override;
-
-	void onConnect() override;
-	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
-	int sendOutgoingData(const char* data, std::size_t len) override;
-
-private:
-	std::string mHostname;
-	std::string mLocalIpAddress;
-	bool mUse_IpV6 = false;
-	uint16_t   mPort = 0;
-};
-
-
-/*******************************************************************/
-/**            The HySpex SWIR-384 Experiment State               **/
-/*******************************************************************/
-
-class cHySpexSWIR_384_Properties_Remote : public cHySpexCamera_Properties_Remote,
-	private cHySpexSWIR_384_PropertiesNetDecoder, private cHySpexSWIR_384_PropertiesNetEncoder
-{
-	Q_OBJECT
-
-public:
-	cHySpexSWIR_384_Properties_Remote(cHySpexSWIR_384_PropertyPage_Remote* property_page);
-	~cHySpexSWIR_384_Properties_Remote();
-
-	QString getStatusStr() override;
-
-protected:
-	void onCurrentStateMessage(bool valid, std::uint16_t average_frames,
-		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
-		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
-		std::uint32_t num_backgrounds, const std::string& lens_name) override;
-
-	void onLensNamesMessage(const std::vector<std::string>& names) override;
-
-	void onLensInfoMessage(const std::string& name, double working_distance_cm, double fov_deg) override;
-
-	void onBackgroundReplyMessage(eBackgroundReply reply) override;
-
-	void onShutterStateMessage(eShutterState state) override;
-
-	void onConnect() override;
-	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
-	int sendOutgoingData(const char* data, std::size_t len) override;
-
-private:
-	std::string mHostname;
-	std::string mLocalIpAddress;
-	bool mUse_IpV6 = false;
-	uint16_t   mPort = 0;
-};
-#endif
 
 

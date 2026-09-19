@@ -42,6 +42,12 @@ void cHySpexCamera_ControllerNetDecoder::processPacket(const sPacketHeader_t& hd
 #endif
             onQueryShutterStateMessage();
             break;
+        case eQUERY_BACKGROUND_STATE:
+#ifdef LOG_MESSAGE
+            qInfo() << "Query background state received.";
+#endif
+            onQueryBackgroundStateMessage();
+            break;
         default:
             qWarning() << "Unknown query state received: " << query;
         }

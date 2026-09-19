@@ -7,6 +7,8 @@
 #include "../../SensorPropertyPage.hpp"
 #include "ExperimentStateCreator.hpp"
 
+#include <hyspex/datatypes.h>
+
  // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -20,6 +22,8 @@ QT_END_NAMESPACE
 
 class cHySpexCamera_PropertyPage : public cSensorPropertyPage, public cExperimentStateCreator
 {
+    Q_OBJECT
+
 public:
     cHySpexCamera_PropertyPage(QWidget* parent = nullptr);
     ~cHySpexCamera_PropertyPage() = default;
@@ -28,6 +32,7 @@ public:
 
     void enableControls(bool enable) override;
 
+    virtual void changeShutterState() = 0;
     virtual void doCalcBackground() = 0;
 
 public:
@@ -36,6 +41,7 @@ public:
 protected:
     QGroupBox* getLensLayout();
     QGroupBox* getAcquisitionLayout();
+    QGroupBox* getShutterLayout();
     QGroupBox* getBackgroundLayout();
 
 protected:
@@ -57,6 +63,7 @@ protected:
     QLabel* mpMaxIntegrationTimeLabel = nullptr;
     QLineEdit* mpMaxIntegrationTime_us = nullptr;
 
+    QPushButton* mpShutter = nullptr;
 
     QLabel* mpNumBackgroundsLabel = nullptr;
     QLineEdit* mpNumBackgrounds = nullptr;
@@ -70,6 +77,9 @@ protected:
     std::uint32_t mDefaultNumBackgrounds = 0;
 
     QString mDefaultLensName;
+
+    hyspex::ShutterStatus mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN;
+
 };
 
 

@@ -22,13 +22,16 @@ class cHySpexCamera_ExperimentState_Local : public cExperimentState
 	Q_OBJECT
 
 public:
-	cHySpexCamera_ExperimentState_Local(QObject* parent = nullptr);
+	cHySpexCamera_ExperimentState_Local(std::string_view camera_name, QObject* parent = nullptr);
 	virtual ~cHySpexCamera_ExperimentState_Local();
 
 	void cleanup() override;
 
 	bool recording() override;
 	bool initialize() override;
+
+protected:
+	std::string mCameraName;
 };
 
 /*******************************************************************/
@@ -47,7 +50,7 @@ protected:
 //	enum class eBackgroundReply { GOOD, FAILED, ABORTED, PENDING };
 
 public:
-	cHySpexCamera_ShutterCtrl_Local(eShutterState desired_state, QObject* parent = nullptr);
+	cHySpexCamera_ShutterCtrl_Local(eShutterState desired_state, std::string_view camera_name, QObject* parent = nullptr);
 
 	bool configure(const nlohmann::json& stateDoc) override;
 
@@ -68,7 +71,7 @@ protected:
 class cHySpexCamera_CloseShutter_Local : public cHySpexCamera_ShutterCtrl_Local
 {
 public:
-	cHySpexCamera_CloseShutter_Local(QObject* parent = nullptr);
+	cHySpexCamera_CloseShutter_Local(std::string_view camera_name, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
 };
@@ -77,7 +80,7 @@ public:
 class cHySpexCamera_OpenShutter_Local : public cHySpexCamera_ShutterCtrl_Local
 {
 public:
-	cHySpexCamera_OpenShutter_Local(QObject* parent = nullptr);
+	cHySpexCamera_OpenShutter_Local(std::string_view camera_name, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
 };
@@ -92,7 +95,7 @@ class cHySpexCamera_Acquisition_Local : public cHySpexCamera_ExperimentState_Loc
 	Q_OBJECT
 
 public:
-	cHySpexCamera_Acquisition_Local(QObject* parent = nullptr);
+	cHySpexCamera_Acquisition_Local(std::string_view camera_name, QObject* parent = nullptr);
 	~cHySpexCamera_Acquisition_Local();
 
 	bool configure(const nlohmann::json& stateDoc) override;
@@ -118,7 +121,7 @@ protected:
 class cHySpexCamera_AcqParameters_Local : public cHySpexCamera_Acquisition_Local
 {
 public:
-	cHySpexCamera_AcqParameters_Local(QObject* parent = nullptr);
+	cHySpexCamera_AcqParameters_Local(std::string_view camera_name, QObject* parent = nullptr);
 
 	QString getStatusStr() override;
 
@@ -133,7 +136,7 @@ public:
 class cHySpexCamera_Background_Local : public cHySpexCamera_Acquisition_Local
 {
 public:
-	cHySpexCamera_Background_Local(QObject* parent = nullptr);
+	cHySpexCamera_Background_Local(std::string_view camera_name, QObject* parent = nullptr);
 
 	bool configure(const nlohmann::json& stateDoc) override;
 
@@ -148,89 +151,5 @@ protected:
 	enum class eSTATE { WAIT_FOR_CONNECT, WAIT_FOR_STATE, WAIT_FOR_STATE_UPDATE, WAIT_FOR_BACKGROUND, COMPLETE, ERROR };
 	eSTATE mState = eSTATE::WAIT_FOR_CONNECT;
 };
-
-
-
-
-
-
-#if 0
-/*******************************************************************/
-/**            The HySpex VNIR-3000N Experiment States            **/
-/*******************************************************************/
-
-class cHySpexVNIR_3000N_Properties_Remote : public cHySpexCamera_Properties_Remote,
-	private cHySpexVNIR_3000N_PropertiesNetDecoder, private cHySpexVNIR_3000N_PropertiesNetEncoder
-{
-	Q_OBJECT
-
-public:
-	cHySpexVNIR_3000N_Properties_Remote(cHySpexVNIR_3000N_PropertyPage_Remote* property_page);
-	~cHySpexVNIR_3000N_Properties_Remote();
-
-	QString getStatusStr() override;
-
-protected:
-	void onCurrentState(bool valid, std::uint16_t average_frames,
-		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
-		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
-		std::uint32_t num_backgrounds, const std::string& lens_name) override;
-
-	void onLensNames(const std::vector<std::string>& names) override;
-
-	void onBackgroundReply(eBackgroundReply reply) override;
-
-	void onShutterState(eShutterState state) override;
-
-	void onConnect() override;
-	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
-	int sendOutgoingData(const char* data, std::size_t len) override;
-
-private:
-	std::string mHostname;
-	std::string mLocalIpAddress;
-	bool mUse_IpV6 = false;
-	uint16_t   mPort = 0;
-};
-
-
-/*******************************************************************/
-/**            The HySpex SWIR-384 Experiment State               **/
-/*******************************************************************/
-
-class cHySpexSWIR_384_Properties_Remote : public cHySpexCamera_Properties_Remote,
-	private cHySpexSWIR_384_PropertiesNetDecoder, private cHySpexSWIR_384_PropertiesNetEncoder
-{
-	Q_OBJECT
-
-public:
-	cHySpexSWIR_384_Properties_Remote(cHySpexSWIR_384_PropertyPage_Remote* property_page);
-	~cHySpexSWIR_384_Properties_Remote();
-
-	QString getStatusStr() override;
-
-protected:
-	void onCurrentState(bool valid, std::uint16_t average_frames,
-		std::uint32_t frame_period_us, std::uint32_t min_frame_period_us,
-		std::uint32_t integration_time_us, std::uint32_t max_integration_time_us,
-		std::uint32_t num_backgrounds, const std::string& lens_name) override;
-
-	void onLensNames(const std::vector<std::string>& names) override;
-
-	void onBackgroundReply(eBackgroundReply reply) override;
-
-	void onShutterState(eShutterState state) override;
-
-	void onConnect() override;
-	void decodeIncomingData(const void* pBuffer, std::size_t buf_length) override;
-	int sendOutgoingData(const char* data, std::size_t len) override;
-
-private:
-	std::string mHostname;
-	std::string mLocalIpAddress;
-	bool mUse_IpV6 = false;
-	uint16_t   mPort = 0;
-};
-#endif
 
 

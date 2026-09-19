@@ -30,6 +30,7 @@ public:
     void encodeQueryStateMessage();
     void encodeQueryLensNamesMessage();
     void encodeQueryShutterStateMessage();
+    void encodeQueryBackgroundStateMessage();
     void encodeAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
     void encodeLensNameMessage(const std::string& lens_name);
     void encodeNumOfBackgroundsMessage(int num_backgrounds);
@@ -46,6 +47,7 @@ public:
     void sendQueryStateMessage();
     void sendQueryLensNamesMessage();
     void sendQueryShutterStateMessage();
+    void sendQueryBackgroundStateMessage();
     void sendAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
     void sendLensNameMessage(const std::string& lens_name);
     void sendNumOfBackgroundsMessage(int num_backgrounds);

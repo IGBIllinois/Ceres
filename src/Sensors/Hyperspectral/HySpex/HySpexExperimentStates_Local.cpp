@@ -10,8 +10,9 @@
 /*******************************************************************/
 /**       Base Class for Remote HySpex Experiment States          **/
 /*******************************************************************/
-cHySpexCamera_ExperimentState_Local::cHySpexCamera_ExperimentState_Local
-	(QObject* parent)
+cHySpexCamera_ExperimentState_Local::cHySpexCamera_ExperimentState_Local(std::string_view camera_name, QObject* parent)
+	:
+	cExperimentState(parent), mCameraName(camera_name)
 {}
 
 cHySpexCamera_ExperimentState_Local::~cHySpexCamera_ExperimentState_Local()
@@ -34,9 +35,9 @@ bool cHySpexCamera_ExperimentState_Local::recording()
 /*******************************************************************/
 /**         HySpex Experiment States to Control Shutter           **/
 /*******************************************************************/
-cHySpexCamera_ShutterCtrl_Local::cHySpexCamera_ShutterCtrl_Local(eShutterState desired_state, QObject* parent)
+cHySpexCamera_ShutterCtrl_Local::cHySpexCamera_ShutterCtrl_Local(eShutterState desired_state, std::string_view camera_name, QObject* parent)
 	:
-	mDesiredState(desired_state)
+	cHySpexCamera_ExperimentState_Local(camera_name, parent), mDesiredState(desired_state)
 {
 //	mShutterTimer.interval_sec(5);
 //	mShutterTimer.stop();
@@ -73,9 +74,9 @@ cExperimentState::eRESULT cHySpexCamera_ShutterCtrl_Local::finished()
 
 
 /*** Experimental State to Close Shutter ***/
-cHySpexCamera_CloseShutter_Local::cHySpexCamera_CloseShutter_Local(QObject* parent)
+cHySpexCamera_CloseShutter_Local::cHySpexCamera_CloseShutter_Local(std::string_view camera_name, QObject* parent)
 	:
-	cHySpexCamera_ShutterCtrl_Local(eShutterState::CLOSED, parent)
+	cHySpexCamera_ShutterCtrl_Local(eShutterState::CLOSED, camera_name, parent)
 {}
 
 QString cHySpexCamera_CloseShutter_Local::getStatusStr()
@@ -84,9 +85,9 @@ QString cHySpexCamera_CloseShutter_Local::getStatusStr()
 }
 
 /*** Experimental State to Open Shutter ***/
-cHySpexCamera_OpenShutter_Local::cHySpexCamera_OpenShutter_Local(QObject* parent)
+cHySpexCamera_OpenShutter_Local::cHySpexCamera_OpenShutter_Local(std::string_view camera_name, QObject* parent)
 	:
-	cHySpexCamera_ShutterCtrl_Local(eShutterState::OPEN, parent)
+	cHySpexCamera_ShutterCtrl_Local(eShutterState::OPEN, camera_name, parent)
 {}
 
 QString cHySpexCamera_OpenShutter_Local::getStatusStr()
@@ -98,9 +99,9 @@ QString cHySpexCamera_OpenShutter_Local::getStatusStr()
 /*******************************************************************/
 /**       HySpex Experiment States to Control Acquisition         **/
 /*******************************************************************/
-cHySpexCamera_Acquisition_Local::cHySpexCamera_Acquisition_Local(QObject* parent)
+cHySpexCamera_Acquisition_Local::cHySpexCamera_Acquisition_Local(std::string_view camera_name, QObject* parent)
 	: 
-	cHySpexCamera_ExperimentState_Local(parent)
+	cHySpexCamera_ExperimentState_Local(camera_name, parent)
 {}
 
 cHySpexCamera_Acquisition_Local::~cHySpexCamera_Acquisition_Local()
@@ -172,9 +173,9 @@ void cHySpexCamera_Acquisition_Local::stop() {}
 
 
 /*** Experimental State to Adjust Acquisition Parameters ***/
-cHySpexCamera_AcqParameters_Local::cHySpexCamera_AcqParameters_Local(QObject* parent)
+cHySpexCamera_AcqParameters_Local::cHySpexCamera_AcqParameters_Local(std::string_view camera_name, QObject* parent)
 	:
-	cHySpexCamera_Acquisition_Local(parent) 
+	cHySpexCamera_Acquisition_Local(camera_name, parent)
 {}
 
 QString cHySpexCamera_AcqParameters_Local::getStatusStr()
@@ -202,9 +203,9 @@ cExperimentState::eRESULT cHySpexCamera_AcqParameters_Local::finished()
 
 
 /*** Experimental State to Do Background Measurement ***/
-cHySpexCamera_Background_Local::cHySpexCamera_Background_Local(QObject* parent)
+cHySpexCamera_Background_Local::cHySpexCamera_Background_Local(std::string_view camera_name, QObject* parent)
 	:
-	cHySpexCamera_Acquisition_Local(parent)
+	cHySpexCamera_Acquisition_Local(camera_name, parent)
 {}
 
 

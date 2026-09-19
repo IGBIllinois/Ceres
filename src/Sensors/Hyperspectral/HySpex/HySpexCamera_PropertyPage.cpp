@@ -32,17 +32,19 @@ void cHySpexCamera_PropertyPage::createWidgets()
 	mpMaxIntegrationTime_us = new QLineEdit(this);
 	mpMaxIntegrationTime_us->setReadOnly(true);
 
-
 	/** Lens Info */
 	mpLensLabel = new QLabel("Name");
 	mpLenses = new QComboBox();
 
-	/** Background Info */
+	mpShutter = new QPushButton("Unknown");
+	connect(mpShutter, &QPushButton::pressed, this, &cHySpexCamera_PropertyPage::changeShutterState);
 
+	/** Background Info */
 	mpNumBackgroundsLabel = new QLabel("Backgrounds :", this);
 	mpNumBackgrounds = new QLineEdit(this);
 
 	mpDoBackground = new QPushButton("Calc Background");
+
 //	mpDoBackground->setCheckable(true);
 //	connect(mpDoBackground, &QPushButton::clicked, this, &cHySpexCamera_PropertyPage::doCalcBackground);
 	connect(mpDoBackground, &QPushButton::pressed, this, &cHySpexCamera_PropertyPage::doCalcBackground);
@@ -56,8 +58,10 @@ void cHySpexCamera_PropertyPage::enableControls(bool enable)
 	mpMinFramePeriod_us->setEnabled(enable);
 	mpIntegrationTime_us->setEnabled(enable);
 	mpMaxIntegrationTime_us->setEnabled(enable);
-	mpNumBackgrounds->setEnabled(enable);
 
+	mpShutter->setEnabled(enable);
+
+	mpNumBackgrounds->setEnabled(enable);
 	mpDoBackground->setEnabled(enable);
 }
 
@@ -89,6 +93,19 @@ QGroupBox* cHySpexCamera_PropertyPage::getAcquisitionLayout()
 	acqBox->setLayout(acqLayout);
 
 	return acqBox;
+}
+
+QGroupBox* cHySpexCamera_PropertyPage::getShutterLayout()
+{
+	QGroupBox* shutterBox = new QGroupBox("Shutter");
+
+	auto* shutterLayout = new QHBoxLayout();
+
+	shutterLayout->addWidget(mpShutter);
+
+	shutterBox->setLayout(shutterLayout);
+
+	return shutterBox;
 }
 
 QGroupBox* cHySpexCamera_PropertyPage::getBackgroundLayout()

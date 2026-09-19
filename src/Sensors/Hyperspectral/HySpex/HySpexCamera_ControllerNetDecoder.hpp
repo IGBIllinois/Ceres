@@ -31,6 +31,7 @@ protected:
     virtual void onQueryStateMessage() = 0;
     virtual void onQueryLensNamesMessage() = 0;
     virtual void onQueryShutterStateMessage() = 0;
+    virtual void onQueryBackgroundStateMessage() = 0;
     virtual void onSetAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us) = 0;
     virtual void onSetLensNameMessage(const std::string& lens_name) = 0;
     virtual void onSetNumOfBackgroundsMessage(int num_backgrounds) = 0;

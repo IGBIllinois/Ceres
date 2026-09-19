@@ -142,6 +142,11 @@ void cHySpexCamera_Controller::onQueryShutterStateMessage()
     emit queryShutterState();
 }
 
+void cHySpexCamera_Controller::onQueryBackgroundStateMessage()
+{
+    emit queryBackgroundState();
+}
+
 void cHySpexCamera_Controller::onSetAcquisitionParametersMessage(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {
     emit setAcquisitionParameters(average_frame, frame_period_us, integration_time_us);

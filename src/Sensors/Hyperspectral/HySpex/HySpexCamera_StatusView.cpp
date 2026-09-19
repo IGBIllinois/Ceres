@@ -43,18 +43,24 @@ void cHySpexCamera_StatusView::createWidgets()
 	mpInitializationStatus = new QButtonIndicator(this);
 	mpInitializationStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	mpInitializationStatus->setMinimumWidth(125);
+	mpInitializationStatus->setState(QButtonIndicator::UNKNOWN, "INIT UNKNOWN");
 
 	mpAcquisitionStatus = new QButtonIndicator(this);
 	mpAcquisitionStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	mpAcquisitionStatus->setMinimumWidth(125);
+	mpAcquisitionStatus->setState(QButtonIndicator::UNKNOWN, "ACQ UNKNOWN");
+
 
 	mpBackgroundStatus = new QButtonIndicator(this);
 	mpBackgroundStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	mpBackgroundStatus->setMinimumWidth(125);
+	mpBackgroundStatus->setState(QButtonIndicator::eState::UNKNOWN, "BG UNKNOWN");
+
 
 	mpCommunicationStatus = new QButtonIndicator(this);
 	mpCommunicationStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	mpCommunicationStatus->setMinimumWidth(125);
+	mpCommunicationStatus->setState(QButtonIndicator::UNKNOWN, "COMM UNKNOWN");
 
 	mpCoolingStatus = new QButtonIndicator(this);
 	mpCoolingStatus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -102,12 +108,17 @@ void cHySpexCamera_StatusView::createWidgets()
 	mpLensFieldOfView_deg = new QLineEdit();
 	mpLensFieldOfView_deg->setReadOnly(true);
 
+
 	/** Display */
 	mpPercentSaturationButton = new QPushButton("%SAT");
+	mpPercentSaturationButton->setToolTip("Shows the current saturation level of the scene.");
+	mpPercentSaturationButton->setWhatsThis("Percent Saturation (%SAT) shows the current saturation level of the scene. This is useful to determine what Integration Time should be used for a particular recording. The idea is to get as close to saturation as possible (for optimal SNR), while not going into saturation.");
 	mpPercentSaturationButton->setCheckable(true);
 	QObject::connect(mpPercentSaturationButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::saturationButtonToggled);
 
 	mpPercentBandButton = new QPushButton("%BAND");
+	mpPercentBandButton->setToolTip("Shows how many bands are saturated for a given pixel.");
+	mpPercentBandButton->setWhatsThis("Percent Saturated Bands (%BANDS) shows how many bands are saturated for a given pixel, and greyscale for non-saturated pixels.");
 	mpPercentBandButton->setCheckable(true);
 	QObject::connect(mpPercentBandButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::bandButtonToggled);
 
@@ -116,10 +127,14 @@ void cHySpexCamera_StatusView::createWidgets()
 	QObject::connect(mpFocusButton, &QPushButton::clicked, this, &cHySpexCamera_StatusView::focusButtonToggled);
 
 	mpSpatialDistribution = new QPushButton("Spatial Distribution");
+	mpSpatialDistribution->setToolTip("Shows the spatial distribution for a given spectral line.");
+	mpSpatialDistribution->setWhatsThis("The Spatial Distribution plot shows the spatial distribution for a given spectral line. If you have a uniform scene, this can be useful to adjust the lighting on the sample.");
 	mpSpatialDistribution->setCheckable(true);
 	QObject::connect(mpSpatialDistribution, &QPushButton::clicked, this, &cHySpexCamera_StatusView::SpatialDistributionButtonToggled);
 
 	mpSpectralDistribution = new QPushButton("Spectral Distribution");
+	mpSpectralDistribution->setToolTip("Shows the spectrum for one point in the scene.");
+	mpSpectralDistribution->setWhatsThis("Spectral Distribution shows the spectrum for one point in the scene.");
 	mpSpectralDistribution->setCheckable(true);
 	QObject::connect(mpSpectralDistribution, &QPushButton::clicked, this, &cHySpexCamera_StatusView::SpectralDistributionButtonToggled);
 
@@ -332,7 +347,7 @@ void cHySpexCamera_StatusView::onBgStatusChange(hyspex::BackgroundStatus status)
 	switch (status)
 	{
 	case HYSPEX_BG_INVALID:
-		mpBackgroundStatus->setState(QButtonIndicator::eState::UNKNOWN, "BG NONE");
+		mpBackgroundStatus->setState(QButtonIndicator::eState::ERROR, "BG INVALID");
 		break;
 	case HYSPEX_BG_PENDING:
 		mpBackgroundStatus->setState(QButtonIndicator::eState::WARNING, "BG PENDING");

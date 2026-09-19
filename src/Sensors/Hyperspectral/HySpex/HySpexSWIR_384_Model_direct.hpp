@@ -94,7 +94,9 @@ protected:
 private:
     cIntervalTimer mTemperatureUpdateTimer;
 
-    enum class eBgStates {NONE, SH_CLOSE, STARTED, SH_OPEN, ABORT };
+    cIntervalTimer mBackgroundShutterTimer;
+
+    enum class eBgStates {NONE, CMD_SH_CLOSE, WAIT_FOR_SH_CLOSE, START, WAIT_FOR_COMPLETION, CMD_SH_OPEN, WAIT_FOR_SH_OPEN, ABORT };
     Q_ENUM(eBgStates)
 
     eBgStates mBgCurrentState = eBgStates::NONE;

@@ -39,7 +39,7 @@ cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::st
 
 		if (cmd == "background")
 		{
-			auto* pState = new cHySpexCamera_Background_Remote(hostname, port, localIp, use_IpV6, parent);
+			auto* pState = new cHySpexCamera_Background_Remote(swir_384_id, hostname, port, localIp, use_IpV6, parent);
 
 			if (parent)
 				pState->moveToThread(parent->thread());
@@ -49,7 +49,7 @@ cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::st
 
 		if (cmd == "close shutter")
 		{
-			auto* pState = new cHySpexCamera_CloseShutter_Remote(hostname, port, localIp, use_IpV6, parent);
+			auto* pState = new cHySpexCamera_CloseShutter_Remote(swir_384_id, hostname, port, localIp, use_IpV6, parent);
 
 			if (parent)
 				pState->moveToThread(parent->thread());
@@ -59,7 +59,7 @@ cExperimentState* cHySpexSWIR_384_PropertyPage_Remote::createState(const std::st
 
 		if (cmd == "open shutter")
 		{
-			auto* pState = new cHySpexCamera_OpenShutter_Remote(hostname, port, localIp, use_IpV6, parent);
+			auto* pState = new cHySpexCamera_OpenShutter_Remote(swir_384_id, hostname, port, localIp, use_IpV6, parent);
 
 			if (parent)
 				pState->moveToThread(parent->thread());
@@ -146,6 +146,7 @@ void cHySpexSWIR_384_PropertyPage_Remote::onConnect()
 	}
 
 	queryState();
+	queryShutterState();
 
 	enableControls(true);
 	update();
@@ -172,6 +173,21 @@ void cHySpexSWIR_384_PropertyPage_Remote::showPage()
 	}
 
 	cHySpexSWIR_384_PropertyPage::showPage();
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::changeShutterState()
+{
+	auto state = mpShutter->text();
+
+	if (state == "CLOSE")
+	{
+		sendCloseShutterMessage();
+	}
+
+	if (state == "OPEN")
+	{
+		sendOpenShutterMessage();
+	}
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::doCalcBackground()
@@ -278,7 +294,35 @@ void cHySpexSWIR_384_PropertyPage_Remote::onBackgroundReplyMessage(eBackgroundRe
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::onShutterStateMessage(eShutterState state)
-{}
+{
+	switch (state)
+	{
+	case eShutterState::UNKNOWN:
+		mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN;
+		mpShutter->setText("UNKNOWN");
+		break;
+	case eShutterState::OPEN:
+		mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN;
+		mpShutter->setText("CLOSE");		// We use the opposite name because if the user presses the button, this is what we want to happen.
+		break;
+	case eShutterState::CLOSED:
+		mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED;
+		mpShutter->setText("OPEN");
+		break;
+	case eShutterState::PENDING_OPEN:
+		mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_PENDING_OPEN;
+		mpShutter->setText("CLOSE");
+		break;
+	case eShutterState::PENDING_CLOSED:
+		mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_PENDING_CLOSE;
+		mpShutter->setText("OPEN");
+		break;
+	case eShutterState::ERROR:
+		mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_FAIL_CLOSE;
+		mpShutter->setText("ERROR");
+		break;
+	}
+}
 
 /*
  * Network communications methods
@@ -331,6 +375,30 @@ void cHySpexSWIR_384_PropertyPage_Remote::queryState()
 				return;
 		}
 	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::queryShutterState()
+{
+	mShutterStatus = hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN;
+
+	// We are going to try to get the lens names three times.
+	for (int i = 0; i < 3; ++i)
+	{
+		cHySpexSWIR_384_PropertiesNetEncoder::sendQueryShutterStateMessage();
+
+		QTime delayTime = QTime::currentTime().addSecs(3);
+		while (QTime::currentTime() < delayTime)
+		{
+			QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+			if (mShutterStatus != hyspex::ShutterStatus::HYSPEX_SHUTTER_UNKNOWN)
+				return;
+		}
+	}
+}
+
+void cHySpexSWIR_384_PropertyPage_Remote::queryBackgroundState()
+{
+
 }
 
 void cHySpexSWIR_384_PropertyPage_Remote::queryLensNames()

@@ -25,6 +25,7 @@ protected:
 
     void showPage() override;
 
+    void changeShutterState() override;
     void doCalcBackground() override;
 
     void doOK() override;

@@ -35,6 +35,7 @@ protected:
 
     void showPage() override;
 
+    void changeShutterState() override;
     void doCalcBackground() override;
 
     void doOK() override;
@@ -46,6 +47,8 @@ protected:
 protected:
     void sendChangedData();
     void queryState();
+    void queryShutterState();
+    void queryBackgroundState();
     void queryLensNames();
     void setAcquisitionParameters(std::uint16_t average_frame, std::uint32_t frame_period_us, std::uint32_t integration_time_us);
     void setLensName(const std::string& lens_name);
