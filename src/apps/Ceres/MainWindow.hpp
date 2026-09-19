@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "..\..\Utilities\Timers.hpp"
+
 #include <vector>
 #include <map>
 #include <filesystem>
@@ -166,6 +168,8 @@ private:
 
     cSound mExperimentErrorSound;
     cSound mEndOfExperimentSound;
+
+    cIntervalTimer mExperimentAttentionSoundTimer;
     cSound mExperimentAttentionSound;
 
     std::string mBatchFileName;

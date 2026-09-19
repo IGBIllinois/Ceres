@@ -128,6 +128,9 @@ cMainWindow::cMainWindow(QWidget* parent) :
 
     if (!wav_file_name.isEmpty())
         mExperimentAttentionSound.open(wav_file_name.toStdString());
+
+    mExperimentAttentionSoundTimer.interval_sec(15);
+    mExperimentAttentionSoundTimer.start();
 }
 
 //-----------------------------------------------------------------------------
@@ -749,7 +752,10 @@ void cMainWindow::onExperimentCompleted()
 void cMainWindow::onExperimentAttention()
 {
     if (mExperimentAttentionSound.is_open())
-        mExperimentAttentionSound.play();
+    {
+        if (mExperimentAttentionSoundTimer.elapsed())
+            mExperimentAttentionSound.play();
+    }
 }
 
 
