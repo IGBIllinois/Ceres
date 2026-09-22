@@ -59,6 +59,9 @@ void cHySpexVNIR_3000N_Model_net::setAcquisitionParameters(std::uint16_t avg_fra
     std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {}
 
+void cHySpexVNIR_3000N_Model_net::calcIntegrationTime()
+{}
+
 void cHySpexVNIR_3000N_Model_net::setNumOfBackgrounds(int num_backgrounds)
 {
     if (num_backgrounds < 0) num_backgrounds = 0;

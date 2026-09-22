@@ -562,6 +562,9 @@ void cHySpexSWIR_384_Model_direct::setAcquisitionParameters(std::uint16_t avg_fr
         emit integrationTimeChanged(mIntegrationTime_us);
 }
 
+void cHySpexSWIR_384_Model_direct::calcIntegrationTime()
+{}
+
 void cHySpexSWIR_384_Model_direct::setNumOfBackgrounds(int num_backgrounds)
 {
     if (num_backgrounds < 0) num_backgrounds = 0;

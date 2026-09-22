@@ -151,6 +151,17 @@ double cHySpexCameraModel::getFieldOfView_deg() const { return mFieldOfView_deg;
 
 std::uint32_t cHySpexCameraModel::getNumOfBackgrounds() const { return mNumBackgrounds; }
 
+std::uint32_t cHySpexCameraModel::getAutoExposureLevel_pct() const { return mAutoExposureLevel_pct; };
+
+void cHySpexCameraModel::setAutoExposureLevel_pct(std::uint32_t autoExposureLevel_pct)
+{
+    if ((autoExposureLevel_pct > 10) && (autoExposureLevel_pct < 98))
+    {
+        mAutoExposureLevel_pct = autoExposureLevel_pct;
+    }
+}
+
+
 void cHySpexCameraModel::computePercentSaturation(bool compute)
 {
     auto prevComputeState = meComputeData;
@@ -292,7 +303,12 @@ void cHySpexCameraModel::lensNamesQueried()
 
 void cHySpexCameraModel::shutterStateQueried()
 {
-    shutterStatusChanged(getShutterStatus());
+    emit shutterStatusChanged(getShutterStatus());
+}
+
+void cHySpexCameraModel::autoExposureLevelQueried()
+{
+    emit autoExposureLevelChanged(mAutoExposureLevel_pct);
 }
 
 void cHySpexCameraModel::requestAcquisitionParameters(int average_frame, int frame_period_us, int integration_time_us)
@@ -310,6 +326,11 @@ void cHySpexCameraModel::requestNumOfBackgrounds(int num_backgrounds)
     setNumOfBackgrounds(num_backgrounds);
 }
 
+void cHySpexCameraModel::requestAutoExposureLevel_pct(int auto_exposure_level_pct)
+{
+    setAutoExposureLevel_pct(auto_exposure_level_pct);
+}
+
 void cHySpexCameraModel::handleCalcBackgroundRequest()
 {
     calcBackground();
@@ -318,6 +339,11 @@ void cHySpexCameraModel::handleCalcBackgroundRequest()
 void cHySpexCameraModel::handleStopBackgroundRequest()
 {
     stopBackground();
+}
+
+void cHySpexCameraModel::handleCalcIntegrationTime()
+{
+    calcIntegrationTime();
 }
 
 void cHySpexCameraModel::handleOpenShutterRequest()

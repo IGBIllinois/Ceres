@@ -61,6 +61,10 @@ void cHySpexSWIR_384_Model_net::setAcquisitionParameters(std::uint16_t avg_frame
     std::uint32_t frame_period_us, std::uint32_t integration_time_us)
 {}
 
+void cHySpexSWIR_384_Model_net::calcIntegrationTime()
+{}
+
+
 void cHySpexSWIR_384_Model_net::setNumOfBackgrounds(int num_backgrounds)
 {
     if (num_backgrounds < 0) num_backgrounds = 0;

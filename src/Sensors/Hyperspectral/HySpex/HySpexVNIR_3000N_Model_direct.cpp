@@ -534,6 +534,9 @@ void cHySpexVNIR_3000N_Model_direct::setAcquisitionParameters(std::uint16_t avg_
         emit integrationTimeChanged(mIntegrationTime_us);
 }
 
+void cHySpexVNIR_3000N_Model_direct::calcIntegrationTime()
+{}
+
 void cHySpexVNIR_3000N_Model_direct::setNumOfBackgrounds(int num_backgrounds)
 {
     if (num_backgrounds < 0) num_backgrounds = 0;

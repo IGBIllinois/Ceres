@@ -122,6 +122,14 @@ public:
     virtual void stopBackground() = 0;
 
     /*
+     * Retrieve information for the computing devices integration time
+     */
+    std::uint32_t getAutoExposureLevel_pct() const;
+    void setAutoExposureLevel_pct(std::uint32_t autoExposureLevel_pct);
+
+    virtual void calcIntegrationTime() = 0;
+
+    /*
      * Turn on/off data computations
      */
     virtual void computePercentSaturation(bool compute);
@@ -157,6 +165,8 @@ signals:
     void lensNamesChanged(QStringList lens_names);
     void lensInfoChanged(QString lens_name, double working_distance_cm, double fov_deg);
 
+    void autoExposureLevelChanged(int auto_exposure_level_pct);
+
     void computeModeChanged();
 
     void newPercentSaturationData();
@@ -175,13 +185,17 @@ public slots:
     void stateQueried();
     void lensNamesQueried();
     void shutterStateQueried();
+    void autoExposureLevelQueried();
 
     void requestAcquisitionParameters(int average_frame, int frame_period_us, int integration_time_us);
     void requestLensName(QString lens_name);
     void requestNumOfBackgrounds(int num_backgrounds);
+    void requestAutoExposureLevel_pct(int auto_exposure_level_pct);
 
     void handleCalcBackgroundRequest();
     void handleStopBackgroundRequest();
+
+    void handleCalcIntegrationTime();
 
     void handleOpenShutterRequest();
     void handleCloseShutterRequest();
@@ -249,6 +263,8 @@ protected:
     double mFieldOfView_deg = 0.0;
 
     std::uint32_t mNumBackgrounds = 200;
+
+    std::uint32_t mAutoExposureLevel_pct = 80;
 
     HySpexConnect::cSpatialMajorData<float> mBackgroundMatrix;
     HySpexConnect::cSpatialMajorData<float> mResponsivityMatrix;
