@@ -203,8 +203,12 @@ void cGpsModel::abortReferenceCompute()
 * HELPER METHODS
 *******************************************************************************/
 
-void cGpsModel::calcReferencePosition()
+bool cGpsModel::calcReferencePosition()
 {
+    if ((mReferenceState == gps::eReferenceState::COMPLETE_GOOD)
+        || (mReferenceState == gps::eReferenceState::WAITING))
+        return false;
+
     if (mReferenceState == gps::eReferenceState::START)
     {
         mReferenceState = gps::eReferenceState::PENDING;
@@ -225,16 +229,15 @@ void cGpsModel::calcReferencePosition()
 
         mReferenceState = gps::eReferenceState::WAITING;
 
+        emit referencePositionChanged(-1, -1, -1, -1.0, -1);
         emit referenceComplete();
 
-        emit referencePositionChanged(-1, -1, -1, -1.0, -1);
-
         logMessage(logSTATUS, "Reference computation aborted!");
-        return;
+        return false;
     }
 
     if (mReferenceState != gps::eReferenceState::PENDING)
-        return;
+        return false;
 
     if (mRefMaxIntegrationTimer.elapsed())
     {
@@ -246,11 +249,11 @@ void cGpsModel::calcReferencePosition()
 
             mReferencePosition.valid = false;
 
-            emit referenceComplete();
             emit referencePositionChanged(-1, -1, -1, -1.0, count);
+            emit referenceComplete();
             logMessage(logSTATUS, "Reference computation failed!");
 
-            return;
+            return false;
         }
 
         double avgLat_rad = std::accumulate(mRefLatitudes.begin(), mRefLatitudes.end(), 0.0) / mRefLatitudes.size();
@@ -299,8 +302,6 @@ void cGpsModel::calcReferencePosition()
         mRefLongitudes.clear();
         mRefHeights.clear();
 
-        emit referenceComplete();
-
         auto p = rfb::fromGPS(avgLat_rad, avgLng_rad, avgHeight_m);
 
         auto p1 = rfb::fromGPS(avgLat_rad - stdLat_rad, avgLng_rad - stdLng_rad, avgHeight_m - stdHeight_m);
@@ -317,12 +318,13 @@ void cGpsModel::calcReferencePosition()
         p.z_mm -= mAntennaOffset.z_mm;
 
         emit referencePositionChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
+        emit referenceComplete();
 
         logMessage(logSTATUS, "Reference computation hit max integration time!");
 
         mReferenceState = gps::eReferenceState::COMPLETE_GOOD;
 
-        return;
+        return true;
     }
 
     mRefLatitudes.push_back(mLatitude_rad);
@@ -336,7 +338,7 @@ void cGpsModel::calcReferencePosition()
     }
 
     if (!mRefMinIntegrationTimer.elapsed())
-        return;
+        return false;
 
     double avgLat_rad = std::accumulate(mRefLatitudes.begin(), mRefLatitudes.end(), 0.0) / mRefLatitudes.size();
     double avgLng_rad = std::accumulate(mRefLongitudes.begin(), mRefLongitudes.end(), 0.0) / mRefLongitudes.size();
@@ -402,12 +404,16 @@ void cGpsModel::calcReferencePosition()
 
         mReferenceState = gps::eReferenceState::COMPLETE_GOOD;
 
-        emit referenceComplete();
-
         auto p = rfb::fromGPS(avgLat_rad, avgLng_rad, avgHeight_m);
 
         emit referencePositionChanged(p.x_mm, p.y_mm, p.z_mm, error, count);
+        emit referenceComplete();
+
         logMessage(logSTATUS, "Reference computation complete");
+
+        return true;
     }
+
+    return false;
 }
 

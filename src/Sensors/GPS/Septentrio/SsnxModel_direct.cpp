@@ -380,8 +380,8 @@ void cSsnxModel_direct::pvtGeodetic(const ssnx::gps::PVT_Geodetic_2_t& pvt)
     {
         mSerializer.write(device_id(), pvt);
     }
-    else
-        calcReferencePosition();
+    
+    calcReferencePosition();
 
     if (mRecordTrack)
     {

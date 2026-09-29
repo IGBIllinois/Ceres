@@ -30,7 +30,6 @@ public:
 
 	void cleanup() override;
 
-	bool recording() override;
 	bool initialize() override;
 
 private:
@@ -58,6 +57,8 @@ public:
 	virtual ~cGpsReferenceAcquisition_Remote();
 
 	bool configure(const nlohmann::json& stateDoc) override;
+
+	bool recording() override;
 
 	void run() override;
 	void pause() override;
@@ -89,6 +90,8 @@ protected:
 	std::uint16_t mCurrentMinIntegrationTime_sec = 0;
 	std::uint16_t mCurrentMaxIntegrationTime_sec = 0;
 	std::uint16_t mCurrentRefErrorThreshold_mm = 0;
+
+	bool mRecordData = false;
 
 	bool mHasReferenceParameters = false;
 

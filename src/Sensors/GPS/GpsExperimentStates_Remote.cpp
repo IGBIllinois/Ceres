@@ -39,11 +39,6 @@ void cGpsExperimentState_Remote::cleanup()
 	destroy();
 }
 
-bool cGpsExperimentState_Remote::recording()
-{
-	return false;
-}
-
 void cGpsExperimentState_Remote::decodeIncomingData(const void* pBuffer, std::size_t buf_length)
 {
 	cGpsPropertiesNetDecoder::decode(pBuffer, buf_length);
@@ -87,12 +82,21 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 		{
 			mDesiredMaxIntegrationTime_sec = stateDoc["max integration time (sec)"];
 			mHasReferenceParameters = true;
+
+			uint32_t interval_sec = std::max<uint32_t>(static_cast<uint32_t>(1.25 * mDesiredMaxIntegrationTime_sec.value()), 3);
+			mPollStateTimer.interval_sec(interval_sec);
+
 		}
 
 		if (stateDoc.contains("error threshold (mm)"))
 		{
 			mDesiredRefErrorThreshold_mm = stateDoc["error threshold (mm)"];
 			mHasReferenceParameters = true;
+		}
+
+		if (stateDoc.contains("record"))
+		{
+			mRecordData = stateDoc["record"];
 		}
 	}
 	catch (const detail::parse_error& e)
@@ -145,6 +149,11 @@ bool cGpsReferenceAcquisition_Remote::configure(const nlohmann::json& stateDoc)
 	}
 
 	return true;
+}
+
+bool cGpsReferenceAcquisition_Remote::recording()
+{
+	return mRecordData;
 }
 
 void cGpsReferenceAcquisition_Remote::run()
@@ -215,10 +224,16 @@ void cGpsReferenceAcquisition_Remote::onReferenceParametersMessage(bool valid, u
 
 void cGpsReferenceAcquisition_Remote::onReferenceDataMessage(bool valid, double avg_lat_rad, double avg_lng_rad, double avg_height_m,
 	double std_lat_rad, double std_lng_rad, double std_height_m, bool height_valid)
-{}
+{
+	int x = 5;
+	++x;
+}
 
 void cGpsReferenceAcquisition_Remote::onReferencePositionMessage(int x_mm, int y_mm, int z_mm, double error_mm, int count)
-{}
+{
+	int x = 5;
+	++x;
+}
 
 void cGpsReferenceAcquisition_Remote::onReferenceCommandReplyMessage(eReferenceReply reply)
 {

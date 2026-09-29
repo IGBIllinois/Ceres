@@ -74,7 +74,7 @@ protected:
     virtual ~cGpsModel();
 
 protected:
-    void calcReferencePosition();
+    bool calcReferencePosition();
 
 protected:
     ::gps::eSolutionType mSolutionType = ::gps::eSolutionType::NONE;
