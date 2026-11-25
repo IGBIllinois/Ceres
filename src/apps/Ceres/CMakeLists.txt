@@ -1,6 +1,6 @@
 
 # We need a C and C++ compiler, so make sure project() test for it.
-project(Ceres VERSION 2.1.0.0 LANGUAGES C CXX)
+project(Ceres VERSION 2.1.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -104,9 +104,6 @@ PRIVATE
     CtrlDataThread.cpp
     CtrlDataModel.hpp
     CtrlDataModel.cpp
-
-    Sound.hpp
-    Sound.cpp
 
     HobbsMeter.hpp
     HobbsMeter.cpp

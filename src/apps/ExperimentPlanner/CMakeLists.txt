@@ -174,6 +174,9 @@ PRIVATE
     MeasurementTreeItem.hpp
     MeasurementTreeItem.cpp
 
+    ComputeGroundHeightDlg.hpp
+    ComputeGroundHeightDlg.cpp
+
     ComputeSpidercamHeightDlg.hpp
     ComputeSpidercamHeightDlg.cpp
 
@@ -182,9 +185,6 @@ PRIVATE
 
     ComputeReferenceHeightDlg.hpp
     ComputeReferenceHeightDlg.cpp
-
-    ComputeGroundHeightDlg.hpp
-    ComputeGroundHeightDlg.cpp
 
     RecomputeSpidercamHeightDlg.hpp
     RecomputeSpidercamHeightDlg.cpp

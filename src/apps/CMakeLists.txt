@@ -89,3 +89,20 @@ add_subdirectory(DataViewer)
 message("Creating Ceres Experiment Planner application...")
 add_subdirectory(ExperimentPlanner)
 
+
+#******************************************************************************
+# Ceres Field Mapper
+#******************************************************************************
+
+message("Creating Ceres Field Mapper application...")
+add_subdirectory(FieldMapper)
+
+
+#******************************************************************************
+# Ceres Experiment Configure File
+#******************************************************************************
+
+message("Creating Experiment Configure file library...")
+add_subdirectory(ExperimentConfig)
+
+

@@ -264,7 +264,9 @@ void cMainWindow::initialize(cCeresSplashScreen* pSplashScreen)
     QTimer::singleShot(1000, mpModel, &cDataModel::startDataThread);
 }
 
-//-----------------------------------------------------------------------------
+/********************************************************************
+ * Slots associated with "File" menu actions
+ *******************************************************************/
 void cMainWindow::onFileRefresh()
 {
     mpMeasurements->refresh();
@@ -272,7 +274,9 @@ void cMainWindow::onFileRefresh()
     emit refreshDisplay();
 }
 
-//-----------------------------------------------------------------------------
+/********************************************************************
+ * Slots associated with "Experiment" menu actions
+ *******************************************************************/
 void cMainWindow::onExperimentLoad()
 {
     if (mpModel->isExperimentRunning())
@@ -348,90 +352,6 @@ void cMainWindow::onExperimentLoad()
     mpModel->setBatchMode(mBatchProcess.size() > 0);
 
     loadMeasurement(measurementFile);
-}
-
-//-----------------------------------------------------------------------------
-bool cMainWindow::loadMeasurement(const cMeasurementTreeItem& measurement)
-{
-    QString msg = "Loading measurement \"";
-    msg += measurement.text(0);
-    msg += "\" from file ";
-    msg += measurement.getFilename();
-    onStatusUpdate(msg);
-
-    std::filesystem::path fullFilename = measurement.getFilename().toStdString();
-    std::string path = fullFilename.parent_path().string();
-    std::string name = fullFilename.filename().replace_extension().string();
-
-    auto expDoc = measurement.getMeasurementDocument();
-    if (!mpModel->loadExperiment(path, name, expDoc))
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool cMainWindow::loadMeasurement(const std::filesystem::path& measurement_file)
-{
-    using namespace nlohmann;
-
-    std::string path = measurement_file.parent_path().string();
-
-    std::ifstream in;
-    in.open(measurement_file);
-
-    if (!in.is_open())
-    {
-        throw std::invalid_argument("Could not open file.");
-    }
-
-    nlohmann::json jsonDoc;
-    std::string name;
-
-    try
-    {
-        in >> jsonDoc;
-
-        if (jsonDoc.contains("measurement name"))
-            name = jsonDoc["measurement name"];
-        else if (jsonDoc.contains("measurement_name"))
-            name = jsonDoc["measurement_name"];
-        else if (jsonDoc.contains("experiment name"))
-            name = jsonDoc["experiment name"];
-        else
-            name = jsonDoc["experiment_name"];
-    }
-    catch (const detail::exception& e)
-    {
-        QString msg = "Failed to loading measurement file: ";
-        msg += QString::fromStdString(measurement_file.string());
-        onWarningMessage("File Error", msg);
-
-        return false;
-    }
-
-
-    QString msg = "Loading measurement \"";
-    msg += QString::fromStdString(name);
-    msg += "\" from file ";
-    msg += QString::fromStdString(measurement_file.string());
-    onStatusUpdate(msg);
-
-    if (!mpModel->loadExperiment(path, name, jsonDoc))
-    {
-        QString msg = "Measurement \"";
-        msg += QString::fromStdString(name);
-        msg += "\" from file ";
-        msg += QString::fromStdString(measurement_file.string());
-        msg += " failed to load!";
-        onStatusUpdate(msg);
-        return false;
-    }
-
-    mBatchFileName = name;
-
-    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -521,6 +441,7 @@ void cMainWindow::onExperimentStop()
 //    onExperimentTerminated();
 }
 
+//-----------------------------------------------------------------------------
 void cMainWindow::onSetExperimentActions(bool load, bool run, bool pause, bool stop)
 {
     mpExpLoad->setEnabled(load);
@@ -529,7 +450,9 @@ void cMainWindow::onSetExperimentActions(bool load, bool run, bool pause, bool s
     mpExpStop->setEnabled(stop);
 }
 
-//-----------------------------------------------------------------------------
+/********************************************************************
+ * Slots associated with "Settings" menu actions
+ *******************************************************************/
 void cMainWindow::onSettingsOptions()
 {
     auto* pDlg = new cCeresOptionsDlg();
@@ -591,6 +514,7 @@ void cMainWindow::onSettingsOptions()
 
 }
 
+//-----------------------------------------------------------------------------
 void cMainWindow::onSettingsLoadGroundMesh()
 {
     QString savedFileName = mSettings.value("Defaults/groundMeshFile").toString();
@@ -602,6 +526,7 @@ void cMainWindow::onSettingsLoadGroundMesh()
         mSettings.setValue("Defaults/groundMeshFile", fileName);
 }
 
+//-----------------------------------------------------------------------------
 void cMainWindow::onSettingsLoadAerialMesh()
 {
     QString savedFileName = mSettings.value("Defaults/aerialMeshFile").toString();
@@ -613,6 +538,7 @@ void cMainWindow::onSettingsLoadAerialMesh()
         mSettings.setValue("Defaults/aerialMeshFile", fileName);
 }
 
+//-----------------------------------------------------------------------------
 void cMainWindow::onSettingsReferenceHeight()
 {
     int32_t reference_height_mm = nRFM::reference_height_mm();
@@ -653,6 +579,9 @@ void cMainWindow::showAboutDialog()
     AboutDialog().exec();
 }
 
+/********************************************************************
+ * General message handlers
+ *******************************************************************/
 void cMainWindow::onStatusUpdate(QString msg)
 {
     if (mpSplashScreen)
@@ -701,6 +630,9 @@ void cMainWindow::onLogMessage(uint8_t type, QString device, QString instance, Q
     onStatusUpdate(msg);
 }
 
+/********************************************************************
+ * Experiment message handlers
+ *******************************************************************/
 void cMainWindow::onExperimentTerminated()
 {
     mBatchProcess.clear();
@@ -758,40 +690,9 @@ void cMainWindow::onExperimentAttention()
     }
 }
 
-
-//-----------------------------------------------------------------------------
-void cMainWindow::updateControllerConnection(bool connected)
-{
-    if (mControllerConnected && !connected)
-    {
-        onStatusUpdate("Connection to experiment controller has been lost!");
-    }
-
-    mControllerConnected = connected;
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::loopHeartbeatUpdated()
-{
-    if (mShowRedHeart)
-    {
-        mpHeartBeat->setPixmap(*mpRedHeart);
-        mShowRedHeart = false;
-    }
-    else
-    {
-        mpHeartBeat->setPixmap(*mpEmptyHeart);
-        mShowRedHeart = true;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void cMainWindow::loopTerminated()
-{
-    mpHeartBeat->setPixmap(*mpBlackHeart);
-}
-
-//-----------------------------------------------------------------------------
+/********************************************************************
+ * Create methods for program startup
+ *******************************************************************/
 void cMainWindow::createMainMenu()
 {
     mpFileMenu = mpUI->menuBar->addMenu(tr("&File"));
@@ -807,7 +708,9 @@ void cMainWindow::createSubMenusAndActions()
 {
     QAction* pMenuItem = nullptr;
 
-    // Build the File Menu
+    //
+    // Build the File Sub Menu
+    //
     pMenuItem = new QAction(tr("Refresh"), this);
     pMenuItem->setStatusTip(tr("Refresh the experiment window"));
     connect(pMenuItem, &QAction::triggered, this, &cMainWindow::onFileRefresh);
@@ -821,7 +724,9 @@ void cMainWindow::createSubMenusAndActions()
     connect(pMenuItem, &QAction::triggered, &QApplication::closeAllWindows);
     mpFileMenu->addAction(pMenuItem);
 
-    // Build the Experiment Menu
+    //
+    // Build the Experiment Sub Menu
+    //
     mpExpLoad = new QAction(tr("&Load"), this);
     mpExpLoad->setStatusTip(tr("Load experiment..."));
     connect(mpExpLoad, &QAction::triggered, this, &cMainWindow::onExperimentLoad);
@@ -847,6 +752,7 @@ void cMainWindow::createSubMenusAndActions()
     mpExpStop->setEnabled(false);
 
     connect(this, &cMainWindow::setExperimentActions, this, &cMainWindow::onSetExperimentActions);
+
 
     // Build the View Menu
     /* The view menu is built by the dock window system */
@@ -1010,13 +916,6 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
     }
     else if (data_model.is_object())
     {
-//        std::string c4_ip = data_model["c4_ip"];
-//        uint16_t port = data_model["port"];
-
-//        std::string c3_ip;
-//        if (data_model.contains("c3_ip"))
-//            c3_ip = data_model["c3_ip"];
-
         cCtrlDataModelRemote* pModel = new cCtrlDataModelRemote(this);
 
         QObject::connect(pModel, &cCtrlDataModelRemote::updateLoopHeartbeat, this, &cMainWindow::loopHeartbeatUpdated);
@@ -1054,35 +953,6 @@ void cMainWindow::createDataModel(const nlohmann::json& configDoc)
 
     QObject::connect(mpModel, &cCtrlDataModel::experimentTerminated, this, &cMainWindow::onExperimentTerminated);
     QObject::connect(mpModel, &cCtrlDataModel::experimentCompleted, this, &cMainWindow::onExperimentCompleted);
-}
-
-
-//-----------------------------------------------------------------------------
-void cMainWindow::startDataModel(const nlohmann::json& configDoc)
-{
-    auto data_model = configDoc["data model"];
-
-    if (data_model.is_object())
-    {
-        std::string c4_ip = data_model["c4_ip"];
-        uint16_t port = data_model["port"];
-
-        std::string c3_ip;
-        if (data_model.contains("c3_ip"))
-            c3_ip = data_model["c3_ip"];
-
-        cCtrlDataModelRemote* pModel = dynamic_cast<cCtrlDataModelRemote*>(mpModel);
-
-        if (!pModel)
-            return;
-
-        bool result = pModel->try_to_connect(QString(c4_ip.c_str()), port,
-            false, QString(c3_ip.c_str()));
-
-        if (!result)
-        {
-        }
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1283,11 +1153,162 @@ void cMainWindow::createSensorModelsAndViews(const nlohmann::json& configDoc)
     }
 }
 
+/********************************************************************
+ * Utilities methods
+ *******************************************************************/
+
+//-----------------------------------------------------------------------------
+bool cMainWindow::loadMeasurement(const cMeasurementTreeItem& measurement)
+{
+    QString msg = "Loading measurement \"";
+    msg += measurement.text(0);
+    msg += "\" from file ";
+    msg += measurement.getFilename();
+    onStatusUpdate(msg);
+
+    std::filesystem::path fullFilename = measurement.getFilename().toStdString();
+    std::string path = fullFilename.parent_path().string();
+    std::string name = fullFilename.filename().replace_extension().string();
+
+    auto expDoc = measurement.getMeasurementDocument();
+    if (!mpModel->loadExperiment(path, name, expDoc))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+bool cMainWindow::loadMeasurement(const std::filesystem::path& measurement_file)
+{
+    using namespace nlohmann;
+
+    std::string path = measurement_file.parent_path().string();
+
+    std::ifstream in;
+    in.open(measurement_file);
+
+    if (!in.is_open())
+    {
+        throw std::invalid_argument("Could not open file.");
+    }
+
+    nlohmann::json jsonDoc;
+    std::string name;
+
+    try
+    {
+        in >> jsonDoc;
+
+        if (jsonDoc.contains("measurement name"))
+            name = jsonDoc["measurement name"];
+        else if (jsonDoc.contains("measurement_name"))
+            name = jsonDoc["measurement_name"];
+        else if (jsonDoc.contains("experiment name"))
+            name = jsonDoc["experiment name"];
+        else
+            name = jsonDoc["experiment_name"];
+    }
+    catch (const detail::exception& e)
+    {
+        QString msg = "Failed to loading measurement file: ";
+        msg += QString::fromStdString(measurement_file.string());
+        onWarningMessage("File Error", msg);
+
+        return false;
+    }
+
+
+    QString msg = "Loading measurement \"";
+    msg += QString::fromStdString(name);
+    msg += "\" from file ";
+    msg += QString::fromStdString(measurement_file.string());
+    onStatusUpdate(msg);
+
+    if (!mpModel->loadExperiment(path, name, jsonDoc))
+    {
+        QString msg = "Measurement \"";
+        msg += QString::fromStdString(name);
+        msg += "\" from file ";
+        msg += QString::fromStdString(measurement_file.string());
+        msg += " failed to load!";
+        onStatusUpdate(msg);
+        return false;
+    }
+
+    mBatchFileName = name;
+
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::updateControllerConnection(bool connected)
+{
+    if (mControllerConnected && !connected)
+    {
+        onStatusUpdate("Connection to experiment controller has been lost!");
+    }
+
+    mControllerConnected = connected;
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::loopHeartbeatUpdated()
+{
+    if (mShowRedHeart)
+    {
+        mpHeartBeat->setPixmap(*mpRedHeart);
+        mShowRedHeart = false;
+    }
+    else
+    {
+        mpHeartBeat->setPixmap(*mpEmptyHeart);
+        mShowRedHeart = true;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::loopTerminated()
+{
+    mpHeartBeat->setPixmap(*mpBlackHeart);
+}
+
+//-----------------------------------------------------------------------------
+void cMainWindow::startDataModel(const nlohmann::json& configDoc)
+{
+    auto data_model = configDoc["data model"];
+
+    if (data_model.is_object())
+    {
+        std::string c4_ip = data_model["c4_ip"];
+        uint16_t port = data_model["port"];
+
+        std::string c3_ip;
+        if (data_model.contains("c3_ip"))
+            c3_ip = data_model["c3_ip"];
+
+        cCtrlDataModelRemote* pModel = dynamic_cast<cCtrlDataModelRemote*>(mpModel);
+
+        if (!pModel)
+            return;
+
+        bool result = pModel->try_to_connect(QString(c4_ip.c_str()), port,
+            false, QString(c3_ip.c_str()));
+
+        if (!result)
+        {
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void cMainWindow::addSensorPropertyPage(QAction* pAction)
 {
     mpSensorMenu->addAction(pAction);
 }
 
+//-----------------------------------------------------------------------------
 void cMainWindow::removeSensorPropertyPage(QAction* pAction)
 {
     mpSensorMenu->removeAction(pAction);

@@ -68,6 +68,7 @@ cCtrlDataModel::cCtrlDataModel(QObject* parent)
 
 cCtrlDataModel::~cCtrlDataModel()
 {
+    disconnect();
 }
 
 

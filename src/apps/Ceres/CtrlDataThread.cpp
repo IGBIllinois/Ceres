@@ -41,14 +41,16 @@ bool cCtrlDataThread::stopCommunications()
     // Shutdown the network communications that are tied to this thread
     cDataThread::stopCommunications();
 
-    mpController->stopCommunications();
+    if (mpController)
+        mpController->stopCommunications();
 
     return true;
 }
 
 void cCtrlDataThread::updateAll()
 {
-    mpController->update();
+    if (mpController)
+        mpController->update();
 
     cDataThread::updateAll();
 }

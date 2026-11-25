@@ -71,7 +71,7 @@ public slots:
     void onErrorMessage(QString title, QString msg);
     void onLogMessage(uint8_t type, QString device, QString instance, QString msg);
 
-//    void onRunControllerAction(QString msg);
+public slots:
     void onExperimentTerminated();
     void onExperimentCompleted();
     void onExperimentAttention();
@@ -81,11 +81,13 @@ protected slots:
     void loopHeartbeatUpdated();
     void loopTerminated();
 
+//! Menu Actions !//
 private slots:
     //! File Menu Actions
     void onFileRefresh();
 
 private slots:
+    //! Experiment Menu Actions
     void onExperimentLoad();
     void onExperimentRun();
     void onExperimentPause();

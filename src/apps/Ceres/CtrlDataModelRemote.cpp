@@ -404,6 +404,9 @@ void cCtrlDataModelRemote::dataRecordingStateChange(bool record)
 
 bool cCtrlDataModelRemote::hasRequiredSensors(const std::string& exp_name, const nlohmann::json& expDoc)
 {
+    if (!expDoc.contains("sensors"))
+        return true;
+
     auto remote_sensors = mpView->getSensorStatus();
 
     auto required_sensors = expDoc["sensors"];

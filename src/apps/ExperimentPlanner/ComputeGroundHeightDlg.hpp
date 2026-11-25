@@ -29,6 +29,7 @@ public:
 
 	int32_t getGroundHeight_mm() const;
 
+public slots:
 	void setPosition(int32_t x_mm, int32_t y_mm);
 
 private slots:
