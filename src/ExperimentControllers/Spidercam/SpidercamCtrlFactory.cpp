@@ -114,6 +114,9 @@ sExperimentControllerWidgets spidercam::create_controller(const nlohmann::json& 
 
     auto* pToolBar = new cSpidercamToolbar();
 
+    QObject::connect(pModel, &cSpidercamModel::limitsChanged,   pToolBar, &cSpidercamToolbar::updateLimits);
+    QObject::connect(pModel, &cSpidercamModel::positionChanged, pToolBar, &cSpidercamToolbar::updatePosition);
+
 //    QObject::connect(pModel, &cSpidercamModel::batteryLevelChanged, pStatusBar, &cBatteryStatus::updateBatteryLevel);
 
     return sExperimentControllerWidgets(pModel, pView, pDockWidget, pStatusBar, pToolBar);

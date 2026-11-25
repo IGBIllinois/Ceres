@@ -54,6 +54,8 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
     SpidercamScanArea.cpp
     SpidercamView.hpp
     SpidercamView.cpp
+    SpidercamStatusBar.hpp
+    SpidercamStatusBar.cpp
     SpidercamModel.hpp
     SpidercamModel.cpp
     SpidercamCtrlProxies.hpp
@@ -81,7 +83,11 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
     AerialCompensationDlg.cpp
     AerialCompensationStates.hpp
     AerialCompensationStates.cpp
-	
+
+    SpidercamGroundHeightDlg.hpp
+    SpidercamGroundHeightDlg.cpp
+    SpidercamHeightDlg.hpp
+    SpidercamHeightDlg.cpp
 )
 
 
@@ -90,6 +96,9 @@ set(SPIDERCAM_CTRL_SOURCE_FILES
 # in the main application
 #set_property(SOURCE ExperimentCtrlView.hpp PROPERTY SKIP_AUTOMOC ON)
 set_property(SOURCE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR}/ExperimentState.hpp PROPERTY SKIP_AUTOMOC ON)
+
+set_property(SOURCE ${UTILITIES_INCLUDE_DIR}/QIndicator.hpp PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ${UTILITIES_INCLUDE_DIR}/QLogWidget.hpp PROPERTY SKIP_AUTOMOC ON)
 
 
 # The static library (.lib/.a) for incorporating spidercam control in Ceres
@@ -117,6 +126,7 @@ PRIVATE
 )
 
 target_include_directories(SpidercamCtrl_static PRIVATE ${COMMON_INCLUDE_DIR})
+target_include_directories(SpidercamCtrl_static PRIVATE ${UTILITIES_INCLUDE_DIR})
 target_include_directories(SpidercamCtrl_static PRIVATE ${EXPERIMENT_STATE_MACHINE_INCLUDE_DIR})
 
 target_link_libraries(SpidercamCtrl_static PUBLIC cbdf::ctrl)
@@ -125,6 +135,7 @@ target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Widgets)
 target_link_libraries(SpidercamCtrl_static PUBLIC ${Qt}::Network)
 target_link_libraries(SpidercamCtrl_static PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(SpidercamCtrl_static PRIVATE spidercam_connect::spidercam_connect_static)
+target_link_libraries(SpidercamCtrl_static PRIVATE Utilities)
 
 #
 # Due to Qt's license, we must use the Qt DLLs.  For Windows, we must use MSVC dynamic runtime libraries

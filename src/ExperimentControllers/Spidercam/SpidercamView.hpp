@@ -6,6 +6,9 @@
 
 #include <spidercam_connect/spidercam_types.hpp>
 
+// Forward Declaration
+class cSpidercamStatusBar;
+
 // Qt Forward Declaration
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -65,6 +68,6 @@ private:
 
     QString mMeasurementName;
 
-    QStatusBar* mpExperimentStatus = nullptr;
+    cSpidercamStatusBar* mpExperimentStatus = nullptr;
 };
 

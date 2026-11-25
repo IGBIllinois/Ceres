@@ -161,7 +161,8 @@ void cSpidercamController::stopCommunications()
         mpSocket->close();
     }
 
-    delete mpSocket; mpSocket = nullptr;
+    delete mpSocket; 
+    mpSocket = nullptr;
 }
 
 void cSpidercamController::clearIncomingBuffer()

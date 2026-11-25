@@ -137,6 +137,8 @@ private:
     double mY_Scale = 1.0;
     double mBorderWidth = 0.0;
     double mBorderHeight = 0.0;
+    double mMeasurementAreaWidth = 0.0;
+    double mMeasurementAreaHeight = 0.0;
     edge_detect<bool> mIsRecording;
 
     struct location
@@ -179,6 +181,11 @@ private:
     QPen   mBorderPen;
     QColor mBorderColor;
     QBrush mBorderBrush;
+
+    // For drawing the Spidercam measurement area
+    QPen   mMeasurementAreaPen;
+    QColor mMeasurementAreaColor;
+    QBrush mMeasurementAreaBrush;
 
     // For drawing the greenway inside the Spidercam area
     QPen   mGreenwayPen;

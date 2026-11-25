@@ -1,5 +1,6 @@
 
 #include "SpidercamView.hpp"
+#include "SpidercamStatusBar.hpp"
 #include "../../Utilities/Constants.hpp"
 #include "ExperimentTypes.hpp"
 #include "../../Utilities/RappFieldBoundary.hpp"
@@ -41,7 +42,7 @@ cSpidercamView::cSpidercamView()
 	mpSpeed_mps = new QLineEdit();
 	mpSpeed_mps->setReadOnly(true);
 
-	mpExperimentStatus = new QStatusBar();
+	mpExperimentStatus = new cSpidercamStatusBar();
 	mpExperimentStatus->setHidden(true);
 	mpExperimentStatus->setSizeGripEnabled(false);
 	mpExperimentStatus->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);

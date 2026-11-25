@@ -1,6 +1,7 @@
 
 #include "SpidercamScanArea.hpp"
 #include "../../Utilities/Constants.hpp"
+#include "../../Utilities/RappFieldBoundary.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -82,6 +83,15 @@ cSpidercamScanArea::cSpidercamScanArea(QWidget* parent)
 	mBorderPen.setWidth(1);
 	mBorderBrush.setColor(mBorderColor);
 	mBorderBrush.setStyle(Qt::NoBrush);
+
+	mMeasurementAreaColor.setRgb(0, 0, 255);
+	mMeasurementAreaPen.setColor(mMeasurementAreaColor);
+	mMeasurementAreaPen.setStyle(Qt::DashLine);
+	mMeasurementAreaPen.setCapStyle(Qt::RoundCap);
+	mMeasurementAreaPen.setJoinStyle(Qt::RoundJoin);
+	mMeasurementAreaPen.setWidth(0);
+	mMeasurementAreaBrush.setColor(mMeasurementAreaColor);
+	mMeasurementAreaBrush.setStyle(Qt::NoBrush);
 
 	mGreenwayColor.setRgb(59, 122, 87);	// Amazon Green
 	mGreenwayColor.setRgb(176, 191, 26);	// Acid Green
@@ -643,6 +653,15 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		painter.drawText(QPoint(mX_Offset + mBorderWidth + xBounds.width(), mBorderHeight), QString("W2"));
 		painter.drawText(QPoint(mX_Offset + mBorderWidth + xBounds.width(), xBounds.height()), QString("W3"));
 		painter.drawText(QPoint(mX_Offset - w4Bounds.width(), w4Bounds.height()), QString("W4"));
+
+		// Draw the spidercam measurement border
+		double scaling = window_height / (rfb::maxY_mm() - rfb::minY_mm());
+		int offset = rfb::getMeasureOffset_mm() * scaling;
+		mMeasurementAreaWidth = window_height - (2 * offset);
+		mMeasurementAreaHeight = window_height - (2 * offset);
+		painter.setPen(mMeasurementAreaPen);
+		painter.setBrush(mMeasurementAreaBrush);
+		painter.drawRect(mX_Offset + offset, mY_Offset + offset, mMeasurementAreaWidth, mMeasurementAreaHeight);
 	}
 	else
 	{
@@ -686,6 +705,15 @@ void cSpidercamScanArea::paintEvent(QPaintEvent* event)
 		painter.drawText(QPoint(mX_Offset + mBorderWidth - w3Bounds.width(), y), QString("W2"));
 		painter.drawText(QPoint(mX_Offset + mBorderWidth - w3Bounds.width(), mY_Offset - 3), QString("W3"));
 		painter.drawText(QPoint(mX_Offset, mY_Offset - 3), QString("W4"));
+
+		// Draw the spidercam measurement border
+		double scaling = l / (rfb::maxX_mm() - rfb::minX_mm());
+		int offset = rfb::getMeasureOffset_mm() * scaling;
+		mMeasurementAreaWidth = l - (2 * offset);
+		mMeasurementAreaHeight = l - (2 * offset);
+		painter.setPen(mMeasurementAreaPen);
+		painter.setBrush(mMeasurementAreaBrush);
+		painter.drawRect(mX_Offset + offset, mY_Offset + offset, mMeasurementAreaWidth, mMeasurementAreaHeight);
 	}
 
 	for (auto& marker : mMarkers)
