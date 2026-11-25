@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="ripe.icns">./Resources/Icons/ripe.icns</file>
+        <file alias="ripe.ico">./Resources/Icons/ripe.ico</file>
+        <file alias="open_file.png">./Resources/Icons/open_file.png</file>
+        <file alias="quit.png">./Resources/Icons/quit.png</file>
+        <file alias="about.png">./Resources/Icons/about.png</file>
+        <file alias="zoom_to.png">./Resources/Images/zoom_to.png</file>
+        <file alias="top_view.png">./Resources/Images/ccViewZpos.png</file>
+        <file alias="bottom_view.png">./Resources/Images/ccViewZneg.png</file>
+        <file alias="right_view.png">./Resources/Images/ccViewXpos.png</file>
+        <file alias="left_view.png">./Resources/Images/ccViewXneg.png</file>
+        <file alias="front_view.png">./Resources/Images/ccViewYpos.png</file>
+        <file alias="back_view.png">./Resources/Images/ccViewYneg.png</file>
+    </qresource>
+</RCC>
