@@ -37,7 +37,7 @@ namespace
 
 	// The "mUIUC_ReferenceHeight_ft" is the reference or zero height of the spidercam system.  The reference point is located in front
 	// of the trailer between the two white pipes.  An offset is added to make it easier to load/unload the dolly.
-	constexpr double mUIUC_ReferenceHeight_ft = 708.045; // + mReferenceHeightOffset_ft;
+	constexpr double mUIUC_ReferenceHeight_ft = 708.045 + mReferenceHeightOffset_ft;
 	constexpr double mUIUC_ReferenceHeight_m = mUIUC_ReferenceHeight_ft * nConstants::FT_TO_M;
 
 	const std::array<rfm::rappPoint_t, 4> mRappTowerLocations = {
