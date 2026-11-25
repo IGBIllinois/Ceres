@@ -107,7 +107,7 @@ void cHySpexVNIR_3000N_Model::onStartingReferenceMeasurement()
 //    if (mIsRecording && mSerializer)
     if (mSerializer)
     {
-        QString msg = "VNIR 3000N received the start of reference measurement.";
+        QString msg = "Received start of reference measurement.";
         logMessage(logINFO, msg);
 
         mSerializer.writeBeginOfReference(mDeviceID);
@@ -119,7 +119,7 @@ void cHySpexVNIR_3000N_Model::onEndingReferenceMeasurement()
 //    if (mIsRecording && mSerializer)
     if (mSerializer)
     {
-        QString msg = "VNIR 3000N received the end of reference measurement.";
+        QString msg = "Received end of reference measurement.";
         logMessage(logINFO, msg);
 
         mSerializer.writeEndOfReference(mDeviceID);

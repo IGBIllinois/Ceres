@@ -11,6 +11,8 @@
 
 #include <optional>
 
+#define LOG_BK_STATE_MACHINE 0
+
 using namespace hyspex;
 
 
@@ -348,6 +350,10 @@ void cHySpexSWIR_384_Model_direct::update()
         {
             if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED)
             {
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Shutter is Already Closed, Background Started.");
+#endif // LOG_BK_STATE_MACHINE
+
                 mBgCurrentState = eBgStates::START;
                 emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_PENDING);
 
@@ -355,6 +361,10 @@ void cHySpexSWIR_384_Model_direct::update()
             }
             else
             {
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Commanding Shutter Close.");
+#endif // LOG_BK_STATE_MACHINE
+
                 mCamera->closeShutter();
                 mBgCurrentState = eBgStates::WAIT_FOR_SH_CLOSE;
 
@@ -370,41 +380,58 @@ void cHySpexSWIR_384_Model_direct::update()
                 mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_PENDING;
                 mBgCurrentState = eBgStates::START;
                 emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_PENDING);
+
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Shutter Is Closed, Background Starting.");
+#endif // LOG_BK_STATE_MACHINE
             }
             else if (mBackgroundShutterTimer.elapsed())
             {
                 mShutterStatus = mCamera->getShutterStatus();
                 if (mShutterStatus != hyspex::ShutterStatus::HYSPEX_SHUTTER_CLOSED)
+                {
+#if LOG_BK_STATE_MACHINE
+                    logMessage(logSTATUS, "Background Shutter Timer Elapsed: Switching to Commanding Shutter Close.");
+#endif // LOG_BK_STATE_MACHINE
+
                     mBgCurrentState = eBgStates::CMD_SH_CLOSE;
+                }
                 else
+                {
+#if LOG_BK_STATE_MACHINE
+                    logMessage(logSTATUS, "Background Shutter Timer Elapsed: Shutter seems to be Closed.");
+#endif // LOG_BK_STATE_MACHINE
+
                     emit shutterStatusChanged(mShutterStatus);
+                }
             }
 
             break;
         }
         case eBgStates::START:
         {
-//            mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_PENDING;
+#if LOG_BK_STATE_MACHINE
+            logMessage(logSTATUS, "Background Started.");
+#endif // LOG_BK_STATE_MACHINE
+
+            mBackgroundStatus = hyspex::BackgroundStatus::HYSPEX_BG_PENDING;
             unsigned int timeout_ms = ((mNumBackgrounds + 10) * mFramePeriod_us) / 1000;
             mCamera->calculateBackgroundAsync(timeout_ms, mNumBackgrounds);
             mBgCurrentState = eBgStates::WAIT_FOR_COMPLETION;
-            emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_PENDING);
+            emit bgStatusChanged(mBackgroundStatus);
             break;
         }
         case eBgStates::WAIT_FOR_COMPLETION:
         {
             auto oldBackgroundStatus = mBackgroundStatus;
-
             mBackgroundStatus = mCamera->getBackgroundStatus();
+
             switch (mBackgroundStatus)
             {
             case hyspex::BackgroundStatus::HYSPEX_BG_VALID:
             {
                 mCamera->stopCalculatingBackground();
                 mBackgroundMatrix = mCamera->getBackgroundMatrix();
-                mCamera->openShutter();
-                mBgCurrentState = eBgStates::CMD_SH_OPEN;
-                mBackgroundShutterTimer.start();
 
                 if (mIsRecording && mSerializer)
                 {
@@ -412,10 +439,19 @@ void cHySpexSWIR_384_Model_direct::update()
                     mSerializer.writeBackgroundMatrix(device_id(), mBackgroundMatrix);
                 }
 
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Background Complete: Commanding Shutter Open.");
+#endif // LOG_BK_STATE_MACHINE
+
+                mBgCurrentState = eBgStates::CMD_SH_OPEN;
                 break;
             }
             case hyspex::BackgroundStatus::HYSPEX_BG_ABORTED:
             {
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Background Aborted: Commanding Shutter Open.");
+#endif // LOG_BK_STATE_MACHINE
+
                 mBgCurrentState = eBgStates::CMD_SH_OPEN;
                 break;
             }
@@ -432,6 +468,10 @@ void cHySpexSWIR_384_Model_direct::update()
         {
             if (mShutterStatus == hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN)
             {
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Shutter is Already Open, Background Complete.");
+#endif // LOG_BK_STATE_MACHINE
+
                 mBgCurrentState = eBgStates::NONE;
                 emit bgStatusChanged(hyspex::BackgroundStatus::HYSPEX_BG_VALID);
                 emit backgroundComplete(hyspex::HYSPEX_BG_VALID);
@@ -440,6 +480,10 @@ void cHySpexSWIR_384_Model_direct::update()
             }
             else
             {
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Commanding Shutter Open.");
+#endif // LOG_BK_STATE_MACHINE
+
                 mCamera->openShutter();
                 mBgCurrentState = eBgStates::WAIT_FOR_SH_OPEN;
 
@@ -457,14 +501,30 @@ void cHySpexSWIR_384_Model_direct::update()
                 emit backgroundComplete(hyspex::HYSPEX_BG_VALID);
 
                 mBackgroundShutterTimer.stop();
+
+#if LOG_BK_STATE_MACHINE
+                logMessage(logSTATUS, "Shutter Is Open, Background Complete.");
+#endif // LOG_BK_STATE_MACHINE
             }
             else if (mBackgroundShutterTimer.elapsed())
             {
                 mShutterStatus = mCamera->getShutterStatus();
                 if (mShutterStatus != hyspex::ShutterStatus::HYSPEX_SHUTTER_OPEN)
+                {
+#if LOG_BK_STATE_MACHINE
+                    logMessage(logSTATUS, "Background Shutter Timer Elapsed: Switching to Commanding Shutter Open.");
+#endif // LOG_BK_STATE_MACHINE
+
                     mBgCurrentState = eBgStates::CMD_SH_OPEN;
+                }
                 else
+                {
+#if LOG_BK_STATE_MACHINE
+                    logMessage(logSTATUS, "Background Shutter Timer Elapsed: Shutter seems to be Open.");
+#endif // LOG_BK_STATE_MACHINE
+
                     emit shutterStatusChanged(mShutterStatus);
+                }
             }
 
             break;
@@ -575,11 +635,14 @@ void cHySpexSWIR_384_Model_direct::setNumOfBackgrounds(int num_backgrounds)
 
 void cHySpexSWIR_384_Model_direct::calcBackground()
 {
+    logMessage(logSTATUS, "Calculating Background...");
+
     mBackgroundShutterTimer.stop();
 
     // Sometimes calculating a background gets stuck in the pending stage.
     if (mBackgroundStatus == hyspex::BackgroundStatus::HYSPEX_BG_PENDING)
     {
+        logMessage(logSTATUS, "Background is stuck in pending!");
         mCamera->stopCalculatingBackground();
     }
 

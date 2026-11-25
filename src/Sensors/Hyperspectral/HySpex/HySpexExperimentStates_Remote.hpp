@@ -190,6 +190,8 @@ public:
 
 	QString getStatusStr() override;
 
+	void run() override;
+
 	eRESULT finished() override;
 
 protected:
@@ -206,6 +208,10 @@ protected:
 protected:
 	std::optional<std::uint32_t> mDesiredNumBackgrounds;
 	std::uint32_t mCurrentNumBackgrounds = 0;
+
+	cIntervalTimer mCurrentStateCheck;
+	cIntervalTimer mStartBackgroundCheck;
+	cIntervalTimer mBackgroundStatusCheck;
 
 	enum class eSTATE { WAIT_FOR_CONNECT, WAIT_FOR_STATE, WAIT_FOR_STATE_UPDATE, WAIT_FOR_BACKGROUND, COMPLETE, ERROR };
 	eSTATE mState = eSTATE::WAIT_FOR_CONNECT;
