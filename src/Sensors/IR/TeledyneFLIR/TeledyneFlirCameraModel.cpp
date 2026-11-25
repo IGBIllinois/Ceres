@@ -233,16 +233,19 @@ void cTeledyneFlirCameraModel::requestImageSize(int width, int height)
 
 void cTeledyneFlirCameraModel::requestImage()
 {
+    logMessage(logSTATUS, "Image requested...");
     mImageRequested = true;
 }
 
 void cTeledyneFlirCameraModel::requestImages(bool auto_emit)
 {
+    logMessage(logSTATUS, "Images requested...");
     mAutoEmitImages = auto_emit;
 }
 
 void cTeledyneFlirCameraModel::takePhoto(bool update_view)
 {
+    logMessage(logSTATUS, "Take Photo...");
     if (mMode == eMode::SINGLE)
     {
         mPhotoRequested = true;
@@ -260,6 +263,7 @@ void cTeledyneFlirCameraModel::takePhoto(bool update_view)
 
 void cTeledyneFlirCameraModel::takePhoto(bool update_view, bool auto_save)
 {
+    logMessage(logSTATUS, "Take Photo w/ auto save...");
     if (mMode == eMode::SINGLE)
     {
         mPhotoRequested = true;
