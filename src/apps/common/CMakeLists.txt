@@ -53,6 +53,9 @@ PRIVATE
 	RemoteClientNetEncoder.hpp
 	RemoteClientNetEncoder.cpp
 
+    Sound.hpp
+    Sound.cpp
+
 	${PROTO_HDRS}
 	${PROTO_SRCS}
 	ceres_remote_client.proto
